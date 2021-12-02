@@ -44,6 +44,9 @@
         },
         {
             "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/associated_case"
         }
     ],
     "mixinFacets": [
@@ -66,7 +69,7 @@
             "type": "string"
         },
         "workflow_runs": {
-            "title": "workflow runs",
+            "title": "Workflow Runs",
             "description": "The list of workflow runs with their status and output files",
             "type": "array",
             "items": {
@@ -248,8 +251,29 @@
         "common_fields": {
             "title": "Common Fields",
             "description": "Common fields that go into all workflow_run, processed_files and qc items",
+            "comment": "The properties here must be valid for all item types in description above to prevent validation errors",
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": false,
+            "properties": {
+                "institution": {
+                    "title": "Institution",
+                    "description": "Institution associated with the MWFR",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "project": {
+                    "title": "Project",
+                    "description": "Project associated with the MWFR",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "associated_case": {
+                    "title": "Associated Case",
+                    "description": "The case accession associated with this MWFR",
+                    "type": "string",
+                    "format": "accession"
+                }
+            }
         },
         "overall_qcs": {
             "title": "Overall QCs",
@@ -294,15 +318,16 @@
                         "error"
                     ]
                 },
-                "errors": {
-                    "title": "Errors Creating Links",
-                    "description": "The errors that occurred while creating output file links",
+                "output_file_errors": {
+                    "title": "Files with LinkTo Errors",
+                    "description": "Associated output files with errors while creating links to the associated case",
                     "type": "array",
-                    "items": [
-                        {
-                            "type": "string"
-                        }
-                    ]
+                    "items": {
+                        "title": "File with LinkTo Errors",
+                        "description": "Associated output file with errors while creating links to the associated case",
+                        "type": "string",
+                        "linkTo": "FileProcessed"
+                    }
                 }
             }
         }

@@ -44,6 +44,9 @@
         },
         {
             "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/associated_case"
         }
     ],
     "mixinFacets": [

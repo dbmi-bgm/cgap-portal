@@ -220,21 +220,71 @@
                     },
                     "custom_pf_fields": {
                         "title": "Custom PF fields",
-                        "description": "Custom fields to be added to processed file items through Tibanna",
+                        "description": "Custom fields to be added to specified processed file items through Tibanna",
                         "type": "object",
-                        "properties": {
-                            "allOf": [
-                                {
-                                    "$ref": "file_processed.json"
+                        "additionalProperties": {
+                            "type": "object",
+                            "description": "Custom fields to be added to processed file items through Tibanna",
+                            "comment": "Ensure all properties here are same as those located on processed file schema",
+                            "properties": {
+                                "description": {
+                                    "title": "Description",
+                                    "description": "A plain text description of the file.",
+                                    "type": "string"
+                                },
+                                "file_type": {
+                                    "title": "File Type",
+                                    "description": "The type of file based on the information in the file.",
+                                    "suggested_enum": [
+                                        "alignments",
+                                        "image",
+                                        "other",
+                                        "intermediate file",
+                                        "raw VCF",
+                                        "gVCF",
+                                        "Higlass SV VCF",
+                                        "full annotated VCF"
+                                    ]
+                                },
+                                "variant_type": {
+                                    "title": "Variant Type",
+                                    "description": "The variant type associated with this file",
+                                    "type": "string",
+                                    "enum": [
+                                        "SNV",
+                                        "SV"
+                                    ]
+                                },
+                                "linkto_placement": {
+                                    "title": "LinkTo Placement",
+                                    "description": "Information on where to place a linkTo for this file",
+                                    "type": "array",
+                                    "items": {
+                                        "title": "LinkTo Placement",
+                                        "description": "Information on where to place a linkTo for this file",
+                                        "type": "object",
+                                        "additionalProperties": false,
+                                        "properties": {
+                                            "location": {
+                                                "title": "LinkTo Location",
+                                                "description": "Location to place a linkTo",
+                                                "type": "string",
+                                                "enum": [
+                                                    "sample.processed_files",
+                                                    "sample_processing.processed_files"
+                                                ]
+                                            }
+                                        }
+                                    }
                                 }
-                            ]
+                            }
                         }
                     },
                     "custom_qc_fields": {
                         "title": "Custom QC fields",
                         "description": "Custom fields to be added to QC items through Tibanna",
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": false
                     }
                 }
             }

@@ -47,6 +47,9 @@
         },
         {
             "$ref": "workflow_run.json#/properties"
+        },
+        {
+            "$ref": "mixins.json#/associated_case"
         }
     ],
     "mixinFacets": [

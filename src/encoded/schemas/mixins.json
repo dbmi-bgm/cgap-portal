@@ -3,9 +3,11 @@
     "schema_version": {
         "schema_version": {
             "title": "Schema Version",
-            "internal_comment":  "Do not submit, value is assigned by the server. The version of the JSON schema that the server uses to validate the object. Schema version indicates generation of schema used to save version to to enable upgrade steps to work. Individual schemas should set the default.",
+            "internal_comment": "Do not submit, value is assigned by the server. The version of the JSON schema that the server uses to validate the object. Schema version indicates generation of schema used to save version to to enable upgrade steps to work. Individual schemas should set the default.",
             "type": "string",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "pattern": "^\\d+(\\.\\d+)*$",
             "requestMethod": []
         }
@@ -15,7 +17,9 @@
             "title": "UUID",
             "type": "string",
             "format": "uuid",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "serverDefault": "uuid4",
             "permission": "restricted_fields",
             "requestMethod": "POST"
@@ -26,7 +30,9 @@
             "title": "Accession",
             "description": "A unique identifier to be used to reference the object.",
             "internal_comment": "Only admins are allowed to set or update this value.",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "type": "string",
             "format": "accession",
             "permission": "restricted_fields",
@@ -37,7 +43,7 @@
             "description": "Accessions previously assigned to objects that have been merged with this object.",
             "type": "array",
             "lookup": 1000,
-            "internal_comment":"Only admins are allowed to set or update this value.",
+            "internal_comment": "Only admins are allowed to set or update this value.",
             "items": {
                 "title": "Alternate Accession",
                 "description": "An accession previously assigned to an object that has been merged with this object.",
@@ -60,7 +66,7 @@
                 "uniqueKey": "alias",
                 "title": "ID Alias",
                 "description": "Institution-specific ID (e.g. bgm:cohort-1234-a).",
-                "type":  "string",
+                "type": "string",
                 "pattern": "^[^\\s\\\\\\/]+:[^\\s\\\\\\/]+$"
             }
         }
@@ -86,11 +92,17 @@
             "rdfs:subPropertyOf": "dc:created",
             "title": "Date Created",
             "lookup": 1000,
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "type": "string",
             "anyOf": [
-                {"format": "date-time"},
-                {"format": "date"}
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
             ],
             "serverDefault": "now",
             "permission": "restricted_fields"
@@ -98,7 +110,9 @@
         "submitted_by": {
             "rdfs:subPropertyOf": "dc:creator",
             "title": "Submitted By",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "type": "string",
             "linkTo": "User",
             "lookup": 1000,
@@ -109,7 +123,9 @@
     "modified": {
         "last_modified": {
             "title": "Last Modified",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "type": "object",
             "additionalProperties": false,
             "lookup": 1000,
@@ -119,8 +135,12 @@
                     "description": "Do not submit, value is assigned by the server. The date the object is modified.",
                     "type": "string",
                     "anyOf": [
-                        {"format": "date-time"},
-                        {"format": "date"}
+                        {
+                            "format": "date-time"
+                        },
+                        {
+                            "format": "date"
+                        }
                     ],
                     "permission": "restricted_fields"
                 },
@@ -137,16 +157,20 @@
     "attribution": {
         "institution": {
             "title": "Institution",
-             "description": "Institution associated with the submission.",
-             "type": "string",
-             "exclude_from": ["FFedit-create"],
-             "linkTo": "Institution"
+            "description": "Institution associated with the submission.",
+            "type": "string",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "linkTo": "Institution"
         },
         "project": {
             "title": "Project",
             "description": "Project associated with the submission.",
             "type": "string",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "linkTo": "Project"
         }
     },
@@ -155,7 +179,9 @@
             "title": "Notes",
             "description": "Internal notes.",
             "type": "string",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "elasticsearch_mapping_index_type": {
                 "title": "Field mapping index type",
                 "description": "Defines one of three types of indexing available",
@@ -170,24 +196,24 @@
         }
     },
     "documents": {
-      "documents": {
-          "title": "Documents",
-          "description": "Documents that provide additional information (not data file).",
-          "comment": "See Documents sheet or collection for existing items.",
-          "type": "array",
-          "uniqueItems": true,
-          "items": {
-              "title": "Document",
-              "description": "A document that provides additional information (not data file).",
-              "type": "string",
-              "linkTo": "Document"
-          }
-      }
+        "documents": {
+            "title": "Documents",
+            "description": "Documents that provide additional information (not data file).",
+            "comment": "See Documents sheet or collection for existing items.",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Document",
+                "description": "A document that provides additional information (not data file).",
+                "type": "string",
+                "linkTo": "Document"
+            }
+        }
     },
     "attachment": {
         "attachment": {
             "title": "Attached File",
-            "description" : "File attached to this Item.",
+            "description": "File attached to this Item.",
             "type": "object",
             "lookup": 1,
             "additionalProperties": false,
@@ -197,13 +223,13 @@
             "properties": {
                 "download": {
                     "title": "File Name",
-                    "description" : "File Name of the attachment.",
+                    "description": "File Name of the attachment.",
                     "type": "string"
                 },
                 "href": {
                     "internal_comment": "Internal webapp URL for document file",
-                    "title" : "href",
-                    "description" : "Path to download the file attached to this Item.",
+                    "title": "href",
+                    "description": "Path to download the file attached to this Item.",
                     "type": "string"
                 },
                 "type": {
@@ -229,26 +255,26 @@
                 },
                 "md5sum": {
                     "title": "MD5 Checksum",
-                    "description" : "Use this to ensure that your file was downloaded without errors or corruption.",
+                    "description": "Use this to ensure that your file was downloaded without errors or corruption.",
                     "type": "string",
                     "format": "md5sum"
                 },
                 "size": {
                     "title": "Attachment size",
-                    "description" : "Size of the attachment on disk",
+                    "description": "Size of the attachment on disk",
                     "type": "integer"
                 },
                 "width": {
                     "title": "Image width",
-                    "description" : "Width of the image attached, in pixels.",
+                    "description": "Width of the image attached, in pixels.",
                     "type": "integer"
                 },
                 "height": {
                     "title": "Image height",
-                    "description" : "Height of the image attached, in pixels.",
+                    "description": "Height of the image attached, in pixels.",
                     "type": "integer"
                 },
-                "blob_id":{
+                "blob_id": {
                     "title": "Blob ID",
                     "type": "string",
                     "internal_comment": "blob storage ID. Use to like with s3/rds"
@@ -269,7 +295,7 @@
             "items": {
                 "title": "External identifier",
                 "description": "A unique identifier from external resource.",
-                "type":  "string"
+                "type": "string"
             }
         }
     },
@@ -306,7 +332,7 @@
             "items": {
                 "title": "Alternative identifier",
                 "description": "An alternative identifier from this resource - referring to an object that has been deprecated/obsoleted.",
-                "type":  "string"
+                "type": "string"
             }
         }
     },
@@ -333,7 +359,7 @@
             "items": {
                 "title": "Tag",
                 "description": "A tag for the item.",
-                "type":  "string"
+                "type": "string"
             }
         }
     },
@@ -358,33 +384,36 @@
             "uniqueItems": true,
             "permission": "restricted_fields",
             "items": {
-                "title" : "Static Content Definition",
-                "description" : "Link to UserContent Item plus location.",
-                "type" : "object",
-                "required" : ["location", "content"],
-                "properties" : {
-                    "content" : {
-                        "type" : "string",
+                "title": "Static Content Definition",
+                "description": "Link to UserContent Item plus location.",
+                "type": "object",
+                "required": [
+                    "location",
+                    "content"
+                ],
+                "properties": {
+                    "content": {
+                        "type": "string",
                         "linkTo": "UserContent",
-                        "title" : "Link to Content",
-                        "description" : "A UserContent Item."
+                        "title": "Link to Content",
+                        "description": "A UserContent Item."
                     },
-                    "location" : {
-                        "type" : "string",
-                        "title" : "Location of Content",
-                        "description" : "Where this content should be displayed. Item schemas could potentially define an enum to contrain values.",
-                        "default" : "header"
+                    "location": {
+                        "type": "string",
+                        "title": "Location of Content",
+                        "description": "Where this content should be displayed. Item schemas could potentially define an enum to contrain values.",
+                        "default": "header"
                     },
-                    "description" : {
-                        "type" : "string",
-                        "title" : "Description",
-                        "description" : "Description or note about this content. Might be displayed as a footnote or caption, if applicable for view."
+                    "description": {
+                        "type": "string",
+                        "title": "Description",
+                        "description": "Description or note about this content. Might be displayed as a footnote or caption, if applicable for view."
                     }
                 }
             }
         }
     },
-    "facets_common" : {
+    "facets_common": {
         "project.display_title": {
             "title": "Project"
         },
@@ -398,12 +427,17 @@
             "description": "Additional, archived or preliminary processed filesets that are derived from files in this experiment set.",
             "type": "array",
             "lookup": 410,
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "items": {
                 "title": "Supplementary Processed Filesets",
                 "description": "Fileset metadata",
                 "type": "object",
-                "required": ["title", "files"],
+                "required": [
+                    "title",
+                    "files"
+                ],
                 "properties": {
                     "title": {
                         "title": "Fileset Title",
@@ -438,6 +472,14 @@
                     }
                 }
             }
+        }
+    },
+    "associated_case": {
+        "associated_case": {
+            "title": "Associated Case",
+            "description": "The case accession associated with this file",
+            "type": "string",
+            "format": "accession"
         }
     }
 }
