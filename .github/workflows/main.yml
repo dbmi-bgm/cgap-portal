@@ -124,4 +124,4 @@ jobs:
         if: ${{ matrix.test_type == 'Docker' }}
         run: |
           touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
-          make build-docker-local
+          docker build
