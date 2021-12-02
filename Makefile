@@ -47,14 +47,20 @@ configure:  # does any pre-requisite installs
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
-build:  # builds
+build-poetry:
 	make configure
 	poetry install
+
+macbuild-poetry:
+	make configure
+	make macpoetry-install
+
+build:  # builds
+	make build-poetry
 	make build-after-poetry
 
 macbuild:  # builds for Catalina
-	make configure
-	make macpoetry-install
+	make macbuild-poetry
 	make build-after-poetry
 
 rebuild:

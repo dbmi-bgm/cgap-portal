@@ -51,11 +51,15 @@ jobs:
           sudo apt-get install postgresql-11 postgresql-client-11
           echo "/usr/lib/postgresql/11/bin" >> $GITHUB_PATH
           sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
-      - name: Install Deps
+      - name: Install Poetry
         if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' || matrix.test_type == 'Docker' }}
         run: |
+          make build-poetry
+      - name: Install Other Deps
+        if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' }}
+        run: |
           node --version
-          make build
+          make build-after-poetry
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
