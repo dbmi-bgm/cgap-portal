@@ -3,11 +3,7 @@ version: 0.2
 phases:
   pre_build:
     commands:
-      - pyenv versions
-      - pyenv install 3.6.10
-      - pyenv local 3.6.10
-      - make build-poetry
-      - poetry run prepare-docker --load-inserts
+      - touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
       - echo Logging in to Amazon ECR...
       - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
   build:
