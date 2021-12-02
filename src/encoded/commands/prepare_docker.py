@@ -12,7 +12,7 @@ ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__fil
 DOCKER_COMPOSE_FILE = os.path.join(ROOT_DIR, 'docker-compose.yml')
 DOCKER_DEVELOPMENT_INI_FILE = os.path.join(ROOT_DIR, "deploy/docker/local/docker_development.ini")
 
-DATA_SET_CHOICES = ['prod', 'test', 'local']
+DATA_SET_CHOICES = ['prod', 'test', 'local', 'deploy']
 DEFAULT_DATA_SET = 'local'
 
 def empty_assignment(line, expanded):

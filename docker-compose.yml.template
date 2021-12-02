@@ -58,7 +58,6 @@ services:
       # Set LOAD_INSERTS=true to load inserts, usually only for the first run.
       # (There will be no LOAD: line here in the output if that is not set.)
       LOAD: "${LOAD_INSERTS}"
-      ENCODED_S3_ENCRYPT_KEY_ID: "${S3_ENCRYPT_KEY_ID}"
       application_type: "local"  # use local entrypoint
       ENCODED_VERSION: "local"
       CGAP_ENV_NAME: "cgap-docker-${USER}-test"
