@@ -169,15 +169,23 @@ def submit_for_ingestion(context, request):
     success = True
     message = "Uploaded successfully."
 
+    class ExtraArgs:
+        SERVER_SIDE_ENCRYPTION = "ServerSideEncryption"
+        SSE_KMS_KEY_ID = "SSEKMSKeyId"
+
     # Set up potentially useful additional args
     extra_kwargs = {}
     s3_encrypt_key_id = request.registry.get(SettingsKey.S3_ENCRYPT_KEY_ID)
     if s3_encrypt_key_id:
         log.warning(f"submit_for_ingestion adding SSEKMSKeyId ({s3_encrypt_key_id}) arguments in upload_fileobj call.")
         extra_kwargs["ExtraArgs"] = {
-            "ServerSideEncryption": "aws:kms",
-            "SSEKMSKeyId": s3_encrypt_key_id,
+            ExtraArgs.SERVER_SIDE_ENCRYPTION: "aws:kms",
+            ExtraArgs.SSE_KMS_KEY_ID: s3_encrypt_key_id,
         }
+
+    additional_info = ""
+    if extra_kwargs:
+        additional_info = f" (with SSEKMSKeyId: {additional_info.get(ExtraArgs.SSE_KMS_KEY_ID)})"
 
     try:
         # Make sure to pass any extra args.
@@ -188,7 +196,7 @@ def submit_for_ingestion(context, request):
         log.error(e)
 
         success = False
-        message = "{error_type}: {error_message}".format(error_type=full_class_name(e), error_message=str(e))
+        message = f"{full_class_name(e)}: {str(e)}{additional_info}"
 
     # This manifest will be stored in the manifest.json file on on s3 AND will be returned from this endpoint call.
     manifest_content = {
@@ -219,8 +227,7 @@ def submit_for_ingestion(context, request):
 
             log.error(e)
 
-            message = ("{error_type} (while uploading metadata): {error_message}"
-                       .format(error_type=full_class_name(e), error_message=str(e)))
+            message = f"{full_class_name(e)} (while uploading metadata): {str(e)}{additional_info}"
 
             raise SubmissionFailure(message)
 
