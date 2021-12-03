@@ -188,7 +188,7 @@ def submit_for_ingestion(context, request):
 
     additional_info = ""
     if extra_kwargs:
-        additional_info = f" (with SSEKMSKeyId: {additional_info.get(ExtraArgs.SSE_KMS_KEY_ID)})"
+        additional_info = f" (with SSEKMSKeyId: {s3_encrypt_key_id})"
     else:
         additional_info = " (no SSEKMSKeyId)"
 
