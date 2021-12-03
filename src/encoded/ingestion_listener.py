@@ -177,13 +177,13 @@ def submit_for_ingestion(context, request):
     extra_kwargs = {}
     s3_encrypt_key_id = request.registry.settings.get(SettingsKey.S3_ENCRYPT_KEY_ID)
     if s3_encrypt_key_id:
-        log.warning(f"submit_for_ingestion adding SSEKMSKeyId ({s3_encrypt_key_id}) arguments in upload_fileobj call.")
+        log.error(f"submit_for_ingestion adding SSEKMSKeyId ({s3_encrypt_key_id}) arguments in upload_fileobj call.")
         extra_kwargs["ExtraArgs"] = {
             ExtraArgs.SERVER_SIDE_ENCRYPTION: "aws:kms",
             ExtraArgs.SSE_KMS_KEY_ID: s3_encrypt_key_id,
         }
     else:
-        log.warning(f"submit_for_ingestion found no s3 encrypt key id ({SettingsKey.S3_ENCRYPT_KEY_ID})"
+        log.error(f"submit_for_ingestion found no s3 encrypt key id ({SettingsKey.S3_ENCRYPT_KEY_ID})"
                     f" in request.registry.settings.")
 
     additional_info = ""
