@@ -182,10 +182,15 @@ def submit_for_ingestion(context, request):
             ExtraArgs.SERVER_SIDE_ENCRYPTION: "aws:kms",
             ExtraArgs.SSE_KMS_KEY_ID: s3_encrypt_key_id,
         }
+    else:
+        log.warning(f"submit_for_ingestion found no s3 encrypt key id ({SettingsKey.S3_ENCRYPT_KEY_ID})"
+                    f" in request.registry.settings.")
 
     additional_info = ""
     if extra_kwargs:
         additional_info = f" (with SSEKMSKeyId: {additional_info.get(ExtraArgs.SSE_KMS_KEY_ID)})"
+    else:
+        additional_info = " (no SSEKMSKeyId)"
 
     try:
         # Make sure to pass any extra args.
