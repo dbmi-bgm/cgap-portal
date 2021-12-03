@@ -1,6 +1,5 @@
 import argparse
 import atexit
-import boto3
 import botocore.exceptions
 import cgi
 import datetime
@@ -40,6 +39,7 @@ from .util import (
     resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
+    make_s3_client
 )
 from .ingestion.queue_utils import IngestionQueueManager
 from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
@@ -162,7 +162,8 @@ def submit_for_ingestion(context, request):
     object_name = "{id}/datafile{ext}".format(id=submission_id, ext=ext)
     manifest_name = "{id}/manifest.json".format(id=submission_id)
 
-    s3_client = boto3.client('s3')
+    # We might need to extract some additional information from the GAC
+    s3_client = make_s3_client()
 
     upload_time = datetime.datetime.utcnow().isoformat()
     success = True
@@ -255,7 +256,7 @@ DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
 
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
     bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
-    s3_client = s3_client or boto3.client('s3')
+    s3_client = s3_client or make_s3_client()
     manifest_name = "{id}/manifest.json".format(id=submission_id)
     data = json.load(s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)['Body'])
     email = None

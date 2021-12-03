@@ -1,5 +1,6 @@
 # utility functions
 
+import boto3
 import contextlib
 import datetime
 import gzip
@@ -10,6 +11,7 @@ import re
 import tempfile
 
 from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
+from dcicutils.secrets_utils import assume_identity
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
 from snovault import COLLECTIONS, Collection
@@ -431,3 +433,15 @@ def vapp_for_ingestion(app=None, registry=None, context=None):
 #         return lambda name: name.lower() in canonical_names
 #     else:
 #         return constantly(True)
+
+
+def make_s3_client():
+    s3_client_extra_args = {}
+    if 'IDENTITY' in os.environ:
+        identity = assume_identity()
+        s3_client_extra_args['aws_access_key_id'] = identity.get('S3_AWS_ACCESS_KEY_ID'),
+        s3_client_extra_args['aws_secret_access_key'] = identity.get('S3_AWS_SECRET_ACCESS_KEY')
+
+    s3_client = boto3.client('s3', **s3_client_extra_args)
+
+    return s3_client
