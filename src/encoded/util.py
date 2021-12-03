@@ -439,7 +439,7 @@ def make_s3_client():
     s3_client_extra_args = {}
     if 'IDENTITY' in os.environ:
         identity = assume_identity()
-        s3_client_extra_args['aws_access_key_id'] = identity.get('S3_AWS_ACCESS_KEY_ID'),
+        s3_client_extra_args['aws_access_key_id'] = identity.get('S3_AWS_ACCESS_KEY_ID')
         s3_client_extra_args['aws_secret_access_key'] = identity.get('S3_AWS_SECRET_ACCESS_KEY')
 
     s3_client = boto3.client('s3', **s3_client_extra_args)
