@@ -175,7 +175,7 @@ def submit_for_ingestion(context, request):
 
     # Set up potentially useful additional args
     extra_kwargs = {}
-    s3_encrypt_key_id = request.registry.get(SettingsKey.S3_ENCRYPT_KEY_ID)
+    s3_encrypt_key_id = request.registry.settings.get(SettingsKey.S3_ENCRYPT_KEY_ID)
     if s3_encrypt_key_id:
         log.warning(f"submit_for_ingestion adding SSEKMSKeyId ({s3_encrypt_key_id}) arguments in upload_fileobj call.")
         extra_kwargs["ExtraArgs"] = {
