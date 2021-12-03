@@ -43,6 +43,7 @@ from .util import (
 )
 from .ingestion.queue_utils import IngestionQueueManager
 from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
+from .root import SettingsKey
 
 
 log = structlog.getLogger(__name__)
@@ -167,8 +168,18 @@ def submit_for_ingestion(context, request):
     success = True
     message = "Uploaded successfully."
 
+    # Set up potentially useful additional args
+    extra_kwargs = {}
+    s3_encrypt_key_id = request.registry.get(SettingsKey.S3_ENCRYPT_KEY_ID)
+    if s3_encrypt_key_id:
+        extra_kwargs["ExtraArgs"] = {
+            "ServerSideEncryption": "aws:kms",
+            "SSEKMSKeyId": s3_encrypt_key_id,
+        }
+
     try:
-        s3_client.upload_fileobj(input_file_stream, Bucket=bundles_bucket, Key=object_name)
+        # Make sure to pass any extra args.
+        s3_client.upload_fileobj(input_file_stream, Bucket=bundles_bucket, Key=object_name, **extra_kwargs)
 
     except botocore.exceptions.ClientError as e:
 
@@ -200,7 +211,7 @@ def submit_for_ingestion(context, request):
 
         try:
             with io.BytesIO(manifest_content_formatted.encode('utf-8')) as fp:
-                s3_client.upload_fileobj(fp, Bucket=bundles_bucket, Key=manifest_name)
+                s3_client.upload_fileobj(fp, Bucket=bundles_bucket, Key=manifest_name, **extra_kwargs)
 
         except botocore.exceptions.ClientError as e:
 

@@ -4,10 +4,10 @@ from collections import OrderedDict
 from dcicutils import lang_utils
 from dcicutils.s3_utils import s3Utils, HealthPageKey
 from dcicutils.env_utils import infer_foursight_url_from_env
-from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
 from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
+from .appdefs import APP_VERSION_REGISTRY_KEY
 from .schema_formats import is_accession
 
 
