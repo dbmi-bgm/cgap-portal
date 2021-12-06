@@ -31,9 +31,7 @@ export function AddToVariantSampleListButton(props){
 
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
 
-    if (searchType === "StructuralVariantSample") {
-        return null; // TODO: actually make add to VSL work with Structural Variant Samples.
-    }
+    const mapSearchTypeToDisplay = { VariantSample: "Variant Sample", StructuralVariantSample: "Structural Variant Sample" };
 
     /** PATCH or create new VariantSampleList w. additions */
 
@@ -59,7 +57,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" disabled>
                 <span>
-                    No Sample Variants selected
+                    No {mapSearchTypeToDisplay[searchType]}s selected
                 </span>
             </button>
         );
