@@ -186,7 +186,6 @@ def submit_for_ingestion(context, request):
         log.error(f"submit_for_ingestion found no s3 encrypt key id ({SettingsKey.S3_ENCRYPT_KEY_ID})"
                     f" in request.registry.settings.")
 
-    additional_info = ""
     if extra_kwargs:
         additional_info = f" (with SSEKMSKeyId: {s3_encrypt_key_id})"
     else:
@@ -269,9 +268,11 @@ DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
 
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
     bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
-    s3_client = s3_client or make_s3_client()
+    s3_client = make_s3_client()
     manifest_name = "{id}/manifest.json".format(id=submission_id)
-    data = json.load(s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)['Body'])
+    log.warning(f'Processing submission {manifest_name}')
+    obj = s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)
+    data = json.load(obj)['Body']
     email = None
     try:
         email = data['email']
