@@ -272,7 +272,8 @@ def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=Non
     manifest_name = "{id}/manifest.json".format(id=submission_id)
     log.warning(f'Processing submission {manifest_name}')
     obj = s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)
-    data = json.load(obj)['Body']
+    # data = json.load(obj)['Body']
+    data = json.load(obj['Body'])
     email = None
     try:
         email = data['email']
