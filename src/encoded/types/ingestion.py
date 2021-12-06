@@ -95,7 +95,8 @@ class SubmissionFolio:
     def s3_output(self, key_name, key_type='txt'):
         key = "%s/%s.%s" % (self.submission_id, key_name, key_type)
         self.resolution[key_name] = key
-        with s3_output_stream(self.s3_client, bucket=self.bucket, key=key) as fp:
+        with s3_output_stream(self.s3_client, bucket=self.bucket, key=key,
+                              s3_encrypt_key_id=self.s3_encrypt_key_id) as fp:
             yield fp
 
     def fail(self):
@@ -122,10 +123,12 @@ class SubmissionFolio:
 
         self.object_name = object_name = manifest['object_name']
         self.parameters = parameters = manifest['parameters']
+        self.s3_encrypt_key_id = manifest['s3_encrypt_key_id']
         email = manifest['email']
 
         debuglog(submission_id, "object_name:", object_name)
         debuglog(submission_id, "parameters:", parameters)
+        debuglog(submission_id, "s3_encrypt_key_id:", s3_encrypt_key_id)
 
         started_key = "%s/started.txt" % submission_id
         create_empty_s3_file(self.s3_client, bucket=self.bucket, key=started_key, s3_encrypt_key_id=s3_encrypt_key_id)
@@ -165,7 +168,8 @@ class SubmissionFolio:
         except Exception as e:
 
             resolution["traceback_key"] = traceback_key = "%s/traceback.txt" % submission_id
-            with s3_output_stream(self.s3_client, bucket=self.bucket, key=traceback_key) as fp:
+            with s3_output_stream(self.s3_client, bucket=self.bucket, key=traceback_key,
+                                  s3_encrypt_key_id=s3_encrypt_key_id) as fp:
                 traceback.print_exc(file=fp)
 
             resolution["error_type"] = e.__class__.__name__
@@ -182,7 +186,8 @@ class SubmissionFolio:
 
         with s3_output_stream(self.s3_client,
                               bucket=self.bucket,
-                              key="%s/resolution.json" % submission_id) as fp:
+                              key="%s/resolution.json" % submission_id,
+                              s3_encrypt_key_id=s3_encrypt_key_id) as fp:
             PRINT(json.dumps(resolution, indent=2), file=fp)
 
     def process_standard_bundle_results(self, bundle_result):

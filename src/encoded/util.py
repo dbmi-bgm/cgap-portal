@@ -165,7 +165,7 @@ def subrequest_item_creation(request: pyramid.request.Request, item_type: str, j
 # For now, for expedience, they can live here and we can refactor later. -kmp 25-Jul-2020
 
 @contextlib.contextmanager
-def s3_output_stream(s3_client, bucket: str, key: str):
+def s3_output_stream(s3_client, bucket: str, key: str, s3_encrypt_key_id: Optional[str] = None):
     """
     This context manager allows one to write:
 
@@ -184,13 +184,16 @@ def s3_output_stream(s3_client, bucket: str, key: str):
         s3_client: a client object that results from a boto3.client('s3', ...) call.
         bucket: an S3 bucket name
         key: the name of a key within the given S3 bucket
+        s3_encrypt_key_id: a KMS encryption key id or None
     """
 
     tempfile_name = tempfile.mktemp()
     try:
         with io.open(tempfile_name, 'w') as fp:
             yield fp
-        s3_client.upload_file(Filename=tempfile_name, Bucket=bucket, Key=key)
+        extra_kwargs = extra_kwargs_for_s3_encrypt_key_id(s3_encrypt_key_id=s3_encrypt_key_id,
+                                                          client_name='s3_output_stream')
+        s3_client.upload_file(Filename=tempfile_name, Bucket=bucket, Key=key, **extra_kwargs)
     finally:
         try:
             os.remove(tempfile_name)
