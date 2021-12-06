@@ -346,12 +346,14 @@ def patch_vcf_file_status(request, uuids):
 @debug_log
 def queue_ingestion(context, request):
     """ Queues uuids as part of the request body for ingestion. Can batch as many as desired in a
-        single request.
+        single request. Note that you can also pass ingestion_type, which will apply to all uuids queued.
+        The default is (SNV) vcf.
     """
     ignored(context)
     uuids = request.json.get('uuids', [])
+    ingestion_type = request.json.get('ingestion_type', 'vcf')  # note that this applies to all uuids
     override_name = request.json.get('override_name', None)
-    return enqueue_uuids_for_request(request, uuids, override_name=override_name)
+    return enqueue_uuids_for_request(request, uuids, override_name=override_name, ingestion_type=ingestion_type)
 
 
 def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_name=None):
@@ -363,7 +365,7 @@ def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_
     if uuids is []:
         return response
     queue_manager = get_queue_manager(request, override_name=override_name)
-    _, failed = queue_manager.add_uuids(uuids)
+    _, failed = queue_manager.add_uuids(uuids, ingestion_type=ingestion_type)
     if not failed:
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
