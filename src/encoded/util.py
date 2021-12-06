@@ -20,6 +20,7 @@ from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
+from typing import Optional
 from .types.base import get_item_or_none
 
 
@@ -249,15 +250,65 @@ def s3_input_stream(s3_client, bucket: str, key: str, mode: str = 'r'):
             yield fp
 
 
-def create_empty_s3_file(s3_client, bucket: str, key: str):
+class SettingsKey:
+    APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
+    BLOB_BUCKET = 'blob_bucket'
+    EB_APP_VERSION = 'eb_app_version'
+    ELASTICSEARCH_SERVER = 'elasticsearch.server'
+    ENCODED_VERSION = 'encoded_version'
+    FILE_UPLOAD_BUCKET = 'file_upload_bucket'
+    FILE_WFOUT_BUCKET = 'file_wfout_bucket'
+    FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
+    IDENTITY = 'identity'
+    INDEXER = 'indexer'
+    INDEXER_NAMESPACE = 'indexer.namespace'
+    INDEX_SERVER = 'index_server'
+    LOAD_TEST_DATA = 'load_test_data'
+    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'
+    S3_ENCRYPT_KEY_ID = 's3_encrypt_key_id'
+    SNOVAULT_VERSION = 'snovault_version'
+    SQLALCHEMY_URL = 'sqlalchemy.url'
+    SYSTEM_BUCKET = 'system_bucket'
+    TIBANNA_CWLS_BUCKET = 'tibanna_cwls_bucket'
+    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'
+    UTILS_VERSION = 'utils_version'
+
+
+class ExtraArgs:
+    SERVER_SIDE_ENCRYPTION = "ServerSideEncryption"
+    SSE_KMS_KEY_ID = "SSEKMSKeyId"
+
+
+def extra_kwargs_for_s3_encrypt_key_id(s3_encrypt_key_id, client_name):
+
+    extra_kwargs = {}
+    if s3_encrypt_key_id:
+        log.error(f"{client_name} adding SSEKMSKeyId ({s3_encrypt_key_id}) arguments in upload_fileobj call.")
+        extra_kwargs["ExtraArgs"] = {
+            ExtraArgs.SERVER_SIDE_ENCRYPTION: "aws:kms",
+            ExtraArgs.SSE_KMS_KEY_ID: s3_encrypt_key_id,
+        }
+    else:
+        log.error(f"{client_name} found no s3 encrypt key id ({SettingsKey.S3_ENCRYPT_KEY_ID})"
+                  f" in request.registry.settings.")
+
+    return extra_kwargs
+
+
+def create_empty_s3_file(s3_client, bucket: str, key: str, s3_encrypt_key_id: Optional[str] = None):
     """
     Args:
         s3_client: a client object that results from a boto3.client('s3', ...) call.
         bucket: an S3 bucket name
         key: the name of a key within the given S3 bucket
+        s3_encrypt_key_id: the name of a KMS encrypt key id, or None
     """
     empty_file = "/dev/null"
-    s3_client.upload_file(empty_file, Bucket=bucket, Key=key)
+
+    extra_kwargs = extra_kwargs_for_s3_encrypt_key_id(s3_encrypt_key_id=s3_encrypt_key_id,
+                                                      client_name='create_empty_s3_file')
+
+    s3_client.upload_file(empty_file, Bucket=bucket, Key=key, **extra_kwargs)
 
 
 def get_trusted_email(request, context=None, raise_errors=True):
@@ -368,7 +419,6 @@ def content_type_allowed(request):
             else:
                 if re.match(path_condition, request.path):
                     return True
-
 
     return False
 

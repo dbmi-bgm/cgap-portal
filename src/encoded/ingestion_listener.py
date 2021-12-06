@@ -33,17 +33,16 @@ from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
+from .ingestion.queue_utils import IngestionQueueManager
+from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
     resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
-    make_s3_client
+    SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
-from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
-from .root import SettingsKey
 
 
 log = structlog.getLogger(__name__)
@@ -169,22 +168,10 @@ def submit_for_ingestion(context, request):
     success = True
     message = "Uploaded successfully."
 
-    class ExtraArgs:
-        SERVER_SIDE_ENCRYPTION = "ServerSideEncryption"
-        SSE_KMS_KEY_ID = "SSEKMSKeyId"
-
     # Set up potentially useful additional args
-    extra_kwargs = {}
     s3_encrypt_key_id = request.registry.settings.get(SettingsKey.S3_ENCRYPT_KEY_ID)
-    if s3_encrypt_key_id:
-        log.error(f"submit_for_ingestion adding SSEKMSKeyId ({s3_encrypt_key_id}) arguments in upload_fileobj call.")
-        extra_kwargs["ExtraArgs"] = {
-            ExtraArgs.SERVER_SIDE_ENCRYPTION: "aws:kms",
-            ExtraArgs.SSE_KMS_KEY_ID: s3_encrypt_key_id,
-        }
-    else:
-        log.error(f"submit_for_ingestion found no s3 encrypt key id ({SettingsKey.S3_ENCRYPT_KEY_ID})"
-                    f" in request.registry.settings.")
+    extra_kwargs = extra_kwargs_for_s3_encrypt_key_id(s3_encrypt_key_id=s3_encrypt_key_id,
+                                                      client_name='submit_for_ingestion')
 
     if extra_kwargs:
         additional_info = f" (with SSEKMSKeyId: {s3_encrypt_key_id})"
@@ -206,6 +193,7 @@ def submit_for_ingestion(context, request):
     manifest_content = {
         "filename": filename,
         "object_name": object_name,
+        "s3_encrypt_key_id": s3_encrypt_key_id,
         "submission_id": submission_id,
         "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
         "beanstalk_env_is_prd": is_stg_or_prd_env(bs_env),
@@ -267,6 +255,7 @@ DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
 
 
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
+    ignored(s3_client)  # we might want to restore the ability to pass this, but no one actually does. -kmp 6-Dec-2021
     bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
     s3_client = make_s3_client()
     manifest_name = "{id}/manifest.json".format(id=submission_id)
