@@ -9,6 +9,7 @@ import transaction
 
 from botocore.exceptions import ClientError
 from copy import deepcopy
+from dcicutils.ecr_utils import CGAP_ECR_REGION
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPTemporaryRedirect,
@@ -100,6 +101,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
 
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
+    s3_encrypt_key_id = None  # might be reassigned later from identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
     if name is not None:
         policy = {
             'Version': '2012-10-17',
@@ -107,25 +109,28 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 {
                     'Effect': 'Allow',
                     'Action': 's3:PutObject',
-                    'Resource': 'arn:aws:s3:::{bucket}/{key}'.format(bucket=bucket, key=key),
-                }
+                    'Resource': f'arn:aws:s3:::{bucket}/{key}',
+                },
             ]
         }
         # In the new environment, extract S3 Keys from global application configuration
         if 'IDENTITY' in os.environ:
             identity = assume_identity()
             with override_environ(**identity):
-                conn = boto3.client('sts', aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
+                conn = boto3.client('sts',
+                                    aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
                                     aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
-            if 'S3_ENCRYPT_KEY_ID' in identity:  # must be used with ACCOUNT_NUMBER as well
+            s3_encrypt_key_id = identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
+            if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
                 policy['Statement'].append({
                     'Effect': 'Allow',
                     'Action': 'kms:Encrypt',
-                    'Resource': f'arn:aws:kms:us-east-1:{identity["ACCOUNT_NUMBER"]}:key/{identity["S3_ENCRYPT_KEY_ID"]}'
+                    'Resource': f'arn:aws:kms:{CGAP_ECR_REGION}:{identity["ACCOUNT_NUMBER"]}:key/{s3_encrypt_key_id}'
                 })
         # In the old account, we are always passing IAM User creds so these will just work
         else:
-            conn = boto3.client('sts', aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+            conn = boto3.client('sts',
+                                aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
                                 aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
         token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
         # 'access_key' 'secret_key' 'expiration' 'session_token'
@@ -134,7 +139,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         # Uncaught serialization error picked up by Docker - Will 2/25/2021
         credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
-            'upload_url': 's3://{bucket}/{key}'.format(bucket=bucket, key=key),
+            'upload_url': f's3://{bucket}/{key}',
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
             'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
             'request_id': token.get('ResponseMetadata').get('RequestId'),
@@ -145,6 +150,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
         'bucket': bucket,
         'key': key,
         'upload_credentials': credentials,
+        's3_encrypt_key_id': s3_encrypt_key_id,
     }
 
 
