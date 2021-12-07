@@ -156,7 +156,6 @@ def external_creds(bucket, key, name=None, profile_name=None):
         'bucket': bucket,
         'key': key,
         'upload_credentials': credentials,
-        's3_encrypt_key_id': s3_encrypt_key_id,
     }
 
 
