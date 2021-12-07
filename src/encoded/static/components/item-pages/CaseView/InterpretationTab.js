@@ -26,7 +26,9 @@ export class InterpretationTabController extends React.Component {
         let useVSItem = variantSampleListItem;
 
         if (changedOrdering) {
-            const { variant_samples: vsSelections } = variantSampleListItem;
+            const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
+
+            // order SNV/Indel variant samples
             const vsIDDict = {};
             vsSelections.forEach(function(vsSelection){
                 const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
@@ -36,7 +38,17 @@ export class InterpretationTabController extends React.Component {
                 return vsIDDict[vsAtID];
             });
 
-            useVSItem = { ...variantSampleListItem, "variant_samples": reorderedVSes };
+            // order CNV/SV variant samples
+            const cnvIDDict = {};
+            cnvSelections.forEach(function(cnvSelection) {
+                const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;
+                cnvIDDict[cnvAtID] = cnvSelection;
+            });
+            const reorderedCNVs = changedOrdering.map(function(cnvAtID) {
+                return cnvIDDict[cnvAtID];
+            });
+
+            useVSItem = { ...variantSampleListItem, "variant_samples": reorderedVSes, "structural_variant_samples": reorderedCNVs };
         }
 
         return useVSItem;
@@ -48,6 +60,7 @@ export class InterpretationTabController extends React.Component {
         this.resetVariantSampleSelectionDeletionsAndOrdering = this.resetVariantSampleSelectionDeletionsAndOrdering.bind(this);
         this.state = {
             "deletedVariantSampleSelections": {},
+            "deletedStructuralVariantSampleSelections": {},
             // Not yet implemented fully:
             "changedOrdering": null
         };
@@ -69,24 +82,41 @@ export class InterpretationTabController extends React.Component {
         });
     }
 
+    toggleStructuralVariantSampleSelectionDeletion(vsUUIDToDelete){
+        this.setState(function({ deletedStructuralVariantSampleSelections }){
+            const nextDeletedVSes = { ...deletedStructuralVariantSampleSelections };
+            if (nextDeletedVSes[vsUUIDToDelete]) {
+                delete nextDeletedVSes[vsUUIDToDelete];
+            } else {
+                nextDeletedVSes[vsUUIDToDelete] = true;
+            }
+            return { "deletedStructuralVariantSampleSelections": nextDeletedVSes };
+        });
+    }
+
     resetVariantSampleSelectionDeletionsAndOrdering(){
-        this.setState({ "deletedVariantSampleSelections": {}, "changedOrdering": null });
+        this.setState({ "deletedVariantSampleSelections": {}, "deletedStructuralVariantSampleSelections": {}, "changedOrdering": null });
     }
 
     render(){
         const { children, variantSampleListItem: propVariantSampleListItem, ...passProps } = this.props;
-        const { deletedVariantSampleSelections, changedOrdering } = this.state;
+        const { deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, changedOrdering } = this.state;
 
-        const deletionsLen = this.memoized.deletionsLen(deletedVariantSampleSelections);
+        const snvDeletionsLen = this.memoized.deletionsLen(deletedVariantSampleSelections);
+        const cnvDeletionsLen = this.memoized.deletionsLen(deletedStructuralVariantSampleSelections);
         const variantSampleListItem = this.memoized.reorderedVariantSampleListItem(propVariantSampleListItem, changedOrdering);
 
         const childProps = {
             ...passProps,
             variantSampleListItem, // <- reordered. Might make sense to do reordering elsewhere..
             deletedVariantSampleSelections,
+            deletedStructuralVariantSampleSelections,
             changedOrdering,
-            deletionsLen,
+            snvDeletionsLen,
+            cnvDeletionsLen,
+            // deletionsLen,
             "toggleVariantSampleSelectionDeletion": this.toggleVariantSampleSelectionDeletion,
+            "toggleStructuralVariantSampleSelectionDeletion": this.toggleStructuralVariantSampleSelectionDeletion,
             "resetVariantSampleSelectionDeletionsAndOrdering": this.resetVariantSampleSelectionDeletionsAndOrdering
         };
 
@@ -114,9 +144,11 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         variantSampleListItem,
         isLoadingVariantSampleListItem = false,
         fetchVariantSampleListItem,
+        deletedStructuralVariantSampleSelections,
         deletedVariantSampleSelections,
         changedOrdering,
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         resetVariantSampleSelectionDeletionsAndOrdering,
         deletionsLen
     } = props;
@@ -145,7 +177,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
             </div>
             <div>
                 <VariantSampleSelectionList {...{ variantSampleListItem, isLoadingVariantSampleListItem,
-                    deletedVariantSampleSelections, anyUnsavedChanges, schemas, context, toggleVariantSampleSelectionDeletion }} />
+                    deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, anyUnsavedChanges, schemas, context,
+                    toggleVariantSampleSelectionDeletion, toggleStructuralVariantSampleSelectionDeletion }} />
             </div>
         </React.Fragment>
     );

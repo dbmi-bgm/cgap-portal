@@ -4,7 +4,7 @@ import React, { useCallback, useMemo, useState } from 'react';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { display, LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
@@ -47,7 +47,9 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
         // From InterpretationTab:
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         deletedVariantSampleSelections,
+        deletedStructuralVariantSampleSelections,
         anyUnsavedChanges,
 
         // From CaseReviewTab:
@@ -64,7 +66,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         sendToReportStore
     } = props;
 
-    const { variant_samples: vsSelections = [] } =  variantSampleListItem || {};
+    const { variant_samples: vsSelections = [], structural_variant_samples: cnvSelections = [] } =  variantSampleListItem || {};
 
     // Used for faster lookups of current tag title.
     const tableTagsByID = useMemo(function(){
@@ -80,7 +82,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         return tableTagsByID;
     }, [ projectReportSettings ]);
 
-    if (vsSelections.length === 0) {
+    if (vsSelections.length === 0 && cnvSelections.length === 0) {
         return (
             <h4 className="text-400 text-center text-secondary py-3">
                 { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
@@ -99,10 +101,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         tableTagsByID,
         updateClassificationForVS,
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         anyUnsavedChanges
     };
 
-    return vsSelections.map(function(selection, index){
+    const snvOptions = vsSelections.map(function(selection, index){
         const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
         if (!vsAtID) {
             // Handle lack of permissions, show some 'no permissions' view, idk..
@@ -119,6 +122,41 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                 {...{ selection, index, unsavedClassification, isDeleted }}  />
         );
     });
+
+    console.log("selections", cnvSelections);
+    const cnvOptions = cnvSelections.map(function(selection, index) {
+        const { structural_variant_sample_item: { "@id": vsAtID, uuid: vsUUID, display_title } = {} } = selection;
+        if (!vsAtID) {
+            // Handle lack of permissions, show some 'no permissions' view, idk..
+            return (
+                <div className="text-center p-3">
+                    <em>Item with no view permissions</em>
+                </div>
+            );
+        }
+        const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
+        const isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
+        return (
+            <div key={vsUUID}>
+                { display_title }
+            </div>
+            // <VariantSampleSelection {...commonProps} key={vsUUID || index}
+            //     {...{ selection, index, unsavedClassification, isDeleted }}  />
+        );
+    });
+
+    return (
+        <div className="row">
+            <div className="col-12">
+                <h2 className="mb-3">SNV / Indel Variants</h2>
+                {snvOptions}
+            </div>
+            <div className="col-12">
+                <h2 className="mb-3">CNV / SV Variants</h2>
+                {cnvOptions}
+            </div>
+        </div>
+    );
 
 });
 
