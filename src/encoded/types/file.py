@@ -122,7 +122,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
                                     aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
             s3_encrypt_key_id = identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
             if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
-                policy['Statement'].append({
+                policy['Statement'].append({  # NoQA - PyCharm doesn't like this append for some bogus reason
                     'Effect': 'Allow',
                     'Action': [
                         'kms:Encrypt',
