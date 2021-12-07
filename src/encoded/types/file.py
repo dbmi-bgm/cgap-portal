@@ -124,7 +124,13 @@ def external_creds(bucket, key, name=None, profile_name=None):
             if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
                 policy['Statement'].append({
                     'Effect': 'Allow',
-                    'Action': 'kms:Encrypt',
+                    'Action': [
+                        'kms:Encrypt',
+                        'kms:Decrypt',
+                        'kms:ReEncrypt*',
+                        'kms:GenerateDataKey*',
+                        'kms:DescribeKey'
+                    ],
                     'Resource': f'arn:aws:kms:{CGAP_ECR_REGION}:{identity["ACCOUNT_NUMBER"]}:key/{s3_encrypt_key_id}'
                 })
         # In the old account, we are always passing IAM User creds so these will just work
