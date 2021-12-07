@@ -115,21 +115,37 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
         cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
     }
 
+    return <InnerTabToggle activeIdx={currViewIdx}
+        titleA={<span>{ filteringTabViews["0"].name } Filtering</span>}
+        titleB={<span>{ filteringTabViews["1"].name } Filtering</span>}
+        onClickA={onClickSNV} onClickB={onClickCNV} disabledA={snvDisabled} disabledB={cnvDisabled}
+        dataTipB={cnvTip} />;
+});
+
+/** Pulled out into own component so can style/adjust-if-needed together w. Case Review Tab */
+export function InnerTabToggle (props) {
+    const {
+        activeIdx = 0,
+        titleA = "View A", titleB = "View B",
+        disabledA = false, disabledB = false,
+        onClickA, onClickB,
+        dataTipA = null, dataTipB = null
+    } = props;
     return (
         <div className="card py-2 px-1 d-flex d-md-inline-flex flex-row">
-            <button type="button" aria-pressed={currentlyOnSNV}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active pe-none" : "link")}
-                onClick={onClickSNV} disabled={snvDisabled}>
-                { filteringTabViews["0"].name } Filtering
+            <button type="button" aria-pressed={activeIdx === 0}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (activeIdx === 0 ? "primary-dark active pe-none" : "link")}
+                onClick={onClickA} disabled={disabledA} data-tip={dataTipA}>
+                { titleA }
             </button>
-            <button type="button" aria-pressed={currentlyOnCNV}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active pe-none" : "link")}
-                onClick={onClickCNV} disabled={cnvDisabled} data-tip={cnvTip}>
-                { filteringTabViews["1"].name } Filtering
+            <button type="button" aria-pressed={activeIdx === 1}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (activeIdx === 1 ? "primary-dark active pe-none" : "link")}
+                onClick={onClickB} disabled={disabledB} data-tip={dataTipB}>
+                { titleB }
             </button>
         </div>
     );
-});
+}
 
 function createBlankFilterSetItem(searchType, caseAccession){
     return {

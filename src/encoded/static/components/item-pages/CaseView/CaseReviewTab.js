@@ -8,6 +8,7 @@ import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/ut
 import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
 import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample } from './variant-sample-selection-panels';
+import { InnerTabToggle } from './FilteringTab';
 
 
 
@@ -344,10 +345,18 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
     return (
         <React.Fragment>
-            <div className="d-flex align-items-center justify-content-between mb-24">
+            <div className="d-flex align-items-center justify-content-between mb-36">
+
                 <h1 className="text-300 mb-0">
                     Case Review
                 </h1>
+
+                <div className="my-3 my-md-n3">
+                    <InnerTabToggle activeIdx={0} disabledB
+                        titleA="I. Note Finalization"
+                        titleB="II. Report Generation"
+                    />
+                </div>
 
                 {/* Hidden Temporarily
                 <div>
