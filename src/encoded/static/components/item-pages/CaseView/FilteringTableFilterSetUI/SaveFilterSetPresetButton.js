@@ -442,7 +442,7 @@ export class SaveFilterSetPresetButton extends React.Component {
 
                 { modal }
 
-                <button className="btn btn-outline-light btn-sm" type="button" onClick={disabled ? null : this.onClickSavePresetButton}
+                <button className="btn btn-outline-light btn-sm text-truncate" type="button" onClick={disabled ? null : this.onClickSavePresetButton}
                     disabled={disabled} data-tip="Create copy of this current FilterSet and set it as a preset for yourself">
                     { savingStatus === 1 ? <i className="icon icon-circle-notch icon-spin fas"/> : "Save as Preset" }
                 </button>

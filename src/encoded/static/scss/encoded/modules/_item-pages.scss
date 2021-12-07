@@ -1617,31 +1617,6 @@ i.status-indicator-dot {
 					}
 				}
 
-				
-				.filtering-tab-toggle {
-
-					button.btn.active {
-						pointer-events: none;
-					}
-
-					/**
-					width: max-content;
-	
-					> div {
-						padding: 5px 40px;
-
-						@include media-breakpoint-down(sm) {
-							padding: 5px 12px;
-						}
-	
-						&.active {
-							background-color: lighten($primary, 40%);
-							color: $primary-dark;
-							border-radius: 0.4em;
-						} 
-					}
-					**/
-				}
 			}
 		}
 	}

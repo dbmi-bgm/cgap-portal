@@ -57,12 +57,14 @@ export function FilteringTab(props) {
 
     return (
         <React.Fragment>
-            <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
-            <div className="row mb-1 mt-0">
+            <div className="row flex-column-reverse flex-md-row align-items-center">
                 <h1 className="col my-0">
                     { filteringTabViews[currViewIdx].name + " " }
                     <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
+                <div className="col-12 col-md-auto my-3 my-md-n3">
+                    <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
+                </div>
             </div>
             <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
                 <SelectedItemsController isMultiselect>
@@ -114,20 +116,19 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
     }
 
     return (
-        <div className="card py-2 px-1 mb-3 d-flex d-md-inline-flex flex-row filtering-tab-toggle">
+        <div className="card py-2 px-1 d-flex d-md-inline-flex flex-row">
             <button type="button" aria-pressed={currentlyOnSNV}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active" : "link")}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active pe-none" : "link")}
                 onClick={onClickSNV} disabled={snvDisabled}>
                 { filteringTabViews["0"].name } Filtering
             </button>
             <button type="button" aria-pressed={currentlyOnCNV}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "link")}
+                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active pe-none" : "link")}
                 onClick={onClickCNV} disabled={cnvDisabled} data-tip={cnvTip}>
                 { filteringTabViews["1"].name } Filtering
             </button>
         </div>
     );
-
 });
 
 function createBlankFilterSetItem(searchType, caseAccession){
