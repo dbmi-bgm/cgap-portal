@@ -62,6 +62,7 @@ class SubmissionFolio:
         self.object_name = None
         self.parameters = None
         self.resolution = None
+        self.s3_encrypt_key_id = None  # This is overridden based on manifest later
 
     def __str__(self):
         return "<SubmissionFolio(%s) %s>" % (self.ingestion_type, self.submission_id)

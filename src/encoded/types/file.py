@@ -83,7 +83,9 @@ file_workflow_run_embeds = [
     'workflow_run_inputs.output_files.value_qc.overall_quality_status'
 ]
 
-file_workflow_run_embeds_processed = file_workflow_run_embeds + [e.replace('workflow_run_inputs.', 'workflow_run_outputs.') for e in file_workflow_run_embeds]
+file_workflow_run_embeds_processed = (file_workflow_run_embeds
+                                      + [e.replace('workflow_run_inputs.', 'workflow_run_outputs.')
+                                         for e in file_workflow_run_embeds])
 
 
 def show_upload_credentials(request=None, context=None, status=None):
@@ -262,7 +264,6 @@ class File(Item):
                 return obucket.get('title')
         return None
 
-
     def _update(self, properties, sheets=None):
         if not properties:
             return
@@ -372,8 +373,8 @@ class File(Item):
                 # This is a cool python feature. If break is not hit in the loop,
                 # go to the `else` statement. Works for empty lists as well
                 for target_relation in target_fl_props.get('related_files', []):
-                    if (target_relation.get('file') == my_uuid and
-                        target_relation.get('relationship_type') == rev_switch):
+                    if (target_relation.get('file') == my_uuid
+                            and target_relation.get('relationship_type') == rev_switch):
                         break
                 else:
                     # Get the current request in order to queue the forced
@@ -874,7 +875,7 @@ def validate_file_format_validity_for_file_type(context, request):
 
 
 def validate_file_filename(context, request):
-    ''' validator for filename field '''
+    """ validator for filename field """
     found_match = False
     data = request.json
     if 'filename' not in data:
@@ -921,8 +922,7 @@ def validate_file_filename(context, request):
 
 
 def validate_processed_file_unique_md5_with_bypass(context, request):
-    '''validator to check md5 on processed files, unless you tell it
-       not to'''
+    """validator to check md5 on processed files, unless you tell it not to"""
     # skip validator if not file processed
     if context.type_info.item_type != 'file_processed':
         return
@@ -954,8 +954,8 @@ def validate_processed_file_unique_md5_with_bypass(context, request):
 
 
 def validate_processed_file_produced_from_field(context, request):
-    '''validator to make sure that the values in the
-    produced_from field are valid file identifiers'''
+    """validator to make sure that the values in the
+    produced_from field are valid file identifiers"""
     # skip validator if not file processed
     if context.type_info.item_type != 'file_processed':
         return
@@ -981,9 +981,9 @@ def validate_processed_file_produced_from_field(context, request):
 
 
 def validate_extra_file_format(context, request):
-    '''validator to check to be sure that file_format of extrafile is not the
+    """validator to check to be sure that file_format of extrafile is not the
        same as the file and is a known format for the schema
-    '''
+    """
     files_ok = True
     data = request.json
     if not data.get('extra_files'):
@@ -1012,8 +1012,8 @@ def validate_extra_file_format(context, request):
             try:
                 off_uuid = ok_format_item.get('uuid')
             except AttributeError:
-                raise  Exception("FileFormat Item %s contains unknown FileFormats"
-                                 " in the extrafile_formats property" % file_format_item.get('uuid'))
+                raise Exception("FileFormat Item %s contains unknown FileFormats"
+                                " in the extrafile_formats property" % file_format_item.get('uuid'))
             valid_ext_formats.append(off_uuid)
     seen_ext_formats = []
     # formats = request.registry['collections']['FileFormat']
@@ -1099,7 +1099,7 @@ def file_add(context, request, render=None):
                          validate_file_format_validity_for_file_type,
                          validate_processed_file_unique_md5_with_bypass,
                          validate_processed_file_produced_from_field],
-            request_param=['check_only=true'])
+             request_param=['check_only=true'])
 @debug_log
 def file_edit(context, request, render=None):
     return item_edit(context, request, render)

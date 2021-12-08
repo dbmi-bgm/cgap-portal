@@ -499,9 +499,9 @@ def make_s3_client():
         s3_client_extra_args['aws_access_key_id'] = key_id = identity.get('S3_AWS_ACCESS_KEY_ID')
         s3_client_extra_args['aws_secret_access_key'] = identity.get('S3_AWS_SECRET_ACCESS_KEY')
         s3_client_extra_args['region_name'] = CGAP_ECS_REGION
-        log.warning(f"make_s3_client using S3 entity ID {key_id[:10]} arguments in boto3 client creation call.")
+        log.warning(f"make_s3_client using S3 entity ID {key_id[:10]} arguments in `boto3 client creation call.")
     else:
-        log.wawrning(f'make_s3_client called with no identity')
+        log.warning(f'make_s3_client called with no identity')
 
     s3_client = boto3.client('s3', **s3_client_extra_args)
     return s3_client
