@@ -1,6 +1,5 @@
 import argparse
 import atexit
-import boto3
 import botocore.exceptions
 import cgi
 import datetime
@@ -34,15 +33,16 @@ from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
+from .ingestion.queue_utils import IngestionQueueManager
+from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
     resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
+    SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
-from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
 
 
 log = structlog.getLogger(__name__)
@@ -161,26 +161,39 @@ def submit_for_ingestion(context, request):
     object_name = "{id}/datafile{ext}".format(id=submission_id, ext=ext)
     manifest_name = "{id}/manifest.json".format(id=submission_id)
 
-    s3_client = boto3.client('s3')
+    # We might need to extract some additional information from the GAC
+    s3_client = make_s3_client()
 
     upload_time = datetime.datetime.utcnow().isoformat()
     success = True
     message = "Uploaded successfully."
 
+    # Set up potentially useful additional args
+    s3_encrypt_key_id = request.registry.settings.get(SettingsKey.S3_ENCRYPT_KEY_ID)
+    extra_kwargs = extra_kwargs_for_s3_encrypt_key_id(s3_encrypt_key_id=s3_encrypt_key_id,
+                                                      client_name='submit_for_ingestion')
+
+    if extra_kwargs:
+        additional_info = f" (with SSEKMSKeyId: {s3_encrypt_key_id})"
+    else:
+        additional_info = " (no SSEKMSKeyId)"
+
     try:
-        s3_client.upload_fileobj(input_file_stream, Bucket=bundles_bucket, Key=object_name)
+        # Make sure to pass any extra args.
+        s3_client.upload_fileobj(input_file_stream, Bucket=bundles_bucket, Key=object_name, **extra_kwargs)
 
     except botocore.exceptions.ClientError as e:
 
         log.error(e)
 
         success = False
-        message = "{error_type}: {error_message}".format(error_type=full_class_name(e), error_message=str(e))
+        message = f"{full_class_name(e)}: {str(e)}{additional_info}"
 
     # This manifest will be stored in the manifest.json file on on s3 AND will be returned from this endpoint call.
     manifest_content = {
         "filename": filename,
         "object_name": object_name,
+        "s3_encrypt_key_id": s3_encrypt_key_id,
         "submission_id": submission_id,
         "submission_uri": SubmissionFolio.make_submission_uri(submission_id),
         "beanstalk_env_is_prd": is_stg_or_prd_env(bs_env),
@@ -200,14 +213,13 @@ def submit_for_ingestion(context, request):
 
         try:
             with io.BytesIO(manifest_content_formatted.encode('utf-8')) as fp:
-                s3_client.upload_fileobj(fp, Bucket=bundles_bucket, Key=manifest_name)
+                s3_client.upload_fileobj(fp, Bucket=bundles_bucket, Key=manifest_name, **extra_kwargs)
 
         except botocore.exceptions.ClientError as e:
 
             log.error(e)
 
-            message = ("{error_type} (while uploading metadata): {error_message}"
-                       .format(error_type=full_class_name(e), error_message=str(e)))
+            message = f"{full_class_name(e)} (while uploading metadata): {str(e)}{additional_info}"
 
             raise SubmissionFailure(message)
 
@@ -243,10 +255,14 @@ DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
 
 
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
+    ignored(s3_client)  # we might want to restore the ability to pass this, but no one actually does. -kmp 6-Dec-2021
     bundles_bucket = bundles_bucket or metadata_bundles_bucket(app.registry)
-    s3_client = s3_client or boto3.client('s3')
+    s3_client = make_s3_client()
     manifest_name = "{id}/manifest.json".format(id=submission_id)
-    data = json.load(s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)['Body'])
+    log.warning(f'Processing submission {manifest_name}')
+    obj = s3_client.get_object(Bucket=bundles_bucket, Key=manifest_name)
+    # data = json.load(obj)['Body']
+    data = json.load(obj['Body'])
     email = None
     try:
         email = data['email']
@@ -320,12 +336,14 @@ def patch_vcf_file_status(request, uuids):
 @debug_log
 def queue_ingestion(context, request):
     """ Queues uuids as part of the request body for ingestion. Can batch as many as desired in a
-        single request.
+        single request. Note that you can also pass ingestion_type, which will apply to all uuids queued.
+        The default is (SNV) vcf.
     """
     ignored(context)
     uuids = request.json.get('uuids', [])
+    ingestion_type = request.json.get('ingestion_type', 'vcf')  # note that this applies to all uuids
     override_name = request.json.get('override_name', None)
-    return enqueue_uuids_for_request(request, uuids, override_name=override_name)
+    return enqueue_uuids_for_request(request, uuids, override_name=override_name, ingestion_type=ingestion_type)
 
 
 def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_name=None):
@@ -337,7 +355,7 @@ def enqueue_uuids_for_request(request, uuids, *, ingestion_type='vcf', override_
     if uuids is []:
         return response
     queue_manager = get_queue_manager(request, override_name=override_name)
-    _, failed = queue_manager.add_uuids(uuids)
+    _, failed = queue_manager.add_uuids(uuids, ingestion_type=ingestion_type)
     if not failed:
         response['notification'] = 'Success'
         response['number_queued'] = len(uuids)
