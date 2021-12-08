@@ -612,7 +612,7 @@ const bioinfoPopoverContent = {
     ),
     filteredSNVIndelVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline.readthedocs.io/en/latest/wgs-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-master.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
             remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
             Briefly, these filters include: (1) removing intergenic variants; (2) whitelisting some variants based on VEP, ClinVar, and SpliceAI
             annotations; (3) Removing variants with only intronic consequences; and (4) removing common variants based on gnomAD population allele
