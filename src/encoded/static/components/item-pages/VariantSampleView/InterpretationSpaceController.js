@@ -510,7 +510,7 @@ class GenericInterpretationPanel extends React.PureComponent {
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
-        this.onTextChange = this.onTextChange.bind(this);
+        this.onTextAreaChange = this.onTextAreaChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
     }
 
@@ -536,9 +536,9 @@ class GenericInterpretationPanel extends React.PureComponent {
     }
 
     // Will use same update fxn for multiple text fields
-    onTextChange(event, stateToChange) {
+    onTextAreaChange(event) {
         const { value: newValue } = event.target || {};
-        this.setState({ [stateToChange]: newValue });
+        this.setState({ "note_text": newValue });
     }
 
     // Using same update fxn for multiple dropdowns
@@ -604,7 +604,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                 { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
-                <AutoGrowTextArea {...{ isFallback }} cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
+                <AutoGrowTextArea disabled={isFallback} className="w-100 mb-1" value={noteText} onChange={this.onTextAreaChange} placeholder="Required" />
                 { noteType === "note_interpretation" ?
                     <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_rules_invoked', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
@@ -691,20 +691,37 @@ class NoGrowTextArea extends React.Component {
     }
 }
 
+/** @todo Move to /utils/ or /item-pages/components/ */
 class AutoGrowTextArea extends React.Component {
     constructor(props) {
         super(props);
-
-        this.state = { textAreaHeight: "100%", parentHeight: "auto" };
-        this.textAreaRef = React.createRef(null);
-
         this.onChangeWrapper = this.onChangeWrapper.bind(this);
+        this.state = {
+            "textAreaHeight": "auto",
+            "parentHeight": "auto"
+        };
+        this.memoized = {
+            textareaWrapperStyle: memoize(function(parentHeight, maxHeight){
+                return {
+                    "minHeight" : typeof textAreaHeight !== "number" ? parentHeight
+                        : parentHeight > maxHeight ? maxHeight : parentHeight
+                };
+            }),
+            textareaStyle: memoize(function(textAreaHeight, maxHeight){
+                return {
+                    "height": typeof textAreaHeight !== "number" ? textAreaHeight
+                        : textAreaHeight > maxHeight ? maxHeight : textAreaHeight,
+                    "resize": "none"
+                };
+            })
+        };
+        this.textAreaRef = React.createRef(null);
     }
 
     componentDidMount() {
-        const { minHeight, maxHeight } = this.props;
+        const { minHeight, maxHeight, buffer } = this.props;
 
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
+        const currScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
         // if (minHeight > currScrollHeight) {
         //     this.setState({
         //         parentHeight: `${minHeight}px`,
@@ -712,59 +729,59 @@ class AutoGrowTextArea extends React.Component {
         //     });
         // } else {
         this.setState({
-            parentHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`,
-            textAreaHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`
+            "parentHeight": currScrollHeight > maxHeight ? maxHeight : currScrollHeight,
+            "textAreaHeight": currScrollHeight > maxHeight ? maxHeight : currScrollHeight
         });
         // }
     }
 
     onChangeWrapper(e) {
-        const { onTextChange, field, minHeight, maxHeight } = this.props;
+        const { onChange, minHeight, maxHeight, buffer } = this.props;
 
-        onTextChange(e, field);
+        onChange(e);
 
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
+        const currScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
         // if (minHeight && minHeight > currScrollHeight) {
-        //     this.setState({ textAreaHeight: "auto", parentHeight: `${minHeight}px` }, () => {
+        //     this.setState({ textAreaHeight: "auto", parentHeight: minHeight }, () => {
         //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
         //         if (minHeight > newScrollHeight) {
         //             this.setState({
-        //                 parentHeight: `${minHeight}px`,
-        //                 textAreaHeight: `${minHeight}}px`
+        //                 parentHeight: minHeight,
+        //                 textAreaHeight: minHeight
         //             });
         //         }
         //     });
         // } else {
-        this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight < maxHeight ? currScrollHeight : maxHeight}px` }, () => {
-            const newScrollHeight = this.textAreaRef.current.scrollHeight;
+        this.setState({
+            "textAreaHeight": "auto",
+            "parentHeight": currScrollHeight < maxHeight ? currScrollHeight : maxHeight
+        }, () => {
+            const newScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
             this.setState({
-                parentHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`,
-                textAreaHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`
+                "parentHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight,
+                "textAreaHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight
             });
         });
         // }
     }
 
     render() {
-        const { text, cls, minHeight, maxHeight, isFallback } = this.props;
+        const { value, className, minHeight, maxHeight, ...passProps } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
-
-        const disableField = isFallback;
-
         return (
-            <div style={{
-                minHeight: parentHeight > maxHeight ? maxHeight: parentHeight,
-                // height: parentHeight
-            }} className={cls}>
-                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} placeholder="Required" disabled={disableField} />
+            // passProps includes row, placeholder, disabled, ...
+            <div style={this.memoized.textareaWrapperStyle(parentHeight, maxHeight)} className={className}>
+                <textarea {...passProps} value={value} ref={this.textAreaRef} style={this.memoized.textareaStyle(textAreaHeight, maxHeight)}
+                    className="w-100" onChange={this.onChangeWrapper} />
             </div>
         );
     }
 }
 AutoGrowTextArea.defaultProps = {
-    minHeight: 150,
-    maxHeight: 325
+    "minHeight": 150,
+    "maxHeight": 325,
+    "buffer": 5, // Help prevent showing scrollbar due to rounding or padding of textarea height.
+    "rows": 5 // Used for minHeight, more or less.
 };
 
 
