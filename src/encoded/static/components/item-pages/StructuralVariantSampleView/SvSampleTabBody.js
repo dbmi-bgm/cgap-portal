@@ -63,7 +63,7 @@ function SvQualityTable(props) {
     const startExists = confidence_interval_start.length > 0;
     const endExists = confidence_interval_end.length > 0;
 
-    const impreciseDisplay = imprecise === false ? "Imprecise" : imprecise === true ? "Precise" : fallbackElem;
+    const impreciseDisplay = imprecise === false ? "Precise" : imprecise === true ? "Imprecise": fallbackElem;
     return (
         <div className="table-responsive">
             <table className="w-100">
