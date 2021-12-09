@@ -152,7 +152,7 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
             "email": fake_tester_email,
             "success": True,
             "message": "Uploaded successfully.",
-
+            "s3_encrypt_key_id": None,
             "upload_time": dt.just_utcnow().isoformat(),
             "parameters": {
                 "ingestion_type": ingestion_type,
@@ -194,8 +194,8 @@ class MockBuggyBotoS3Client(MockBotoS3Client):
         if self.counter <= self.allowed_ok:
             return super().upload_fileobj(input_file_stream, Bucket=Bucket, Key=Key)
         else:
-            raise botocore.exceptions.ClientError({'Error': {'Code': 400, 'Message': "Simulated error."}},
-                                                  'upload_fileobj')
+            error_info = {'Error': {'Code': 400, 'Message': "Simulated error."}}
+            raise botocore.exceptions.ClientError(error_info, 'upload_fileobj')  # NoQA - PyCharm worries needlessly
 
 
 def test_submit_for_ingestion_authorized_but_failed_first_s3_interaction(es_testapp):
@@ -211,7 +211,7 @@ def test_submit_for_ingestion_authorized_but_failed_first_s3_interaction(es_test
                               ' "description": "",'
                               ' "detail": "botocore.exceptions.ClientError:'
                               ' An error occurred (400) when calling the upload_fileobj operation:'
-                              ' Simulated error."}\'')
+                              ' Simulated error. (no SSEKMSKeyId)"}\'')
         else:
             raise AssertionError("An expected webtest.AppError was not raised.")
 
@@ -229,6 +229,6 @@ def test_submit_for_ingestion_authorized_but_failed_second_s3_interaction(es_tes
                               ' "description": "",'
                               ' "detail": "botocore.exceptions.ClientError (while uploading metadata):'
                               ' An error occurred (400) when calling the upload_fileobj operation:'
-                              ' Simulated error."}\'')
+                              ' Simulated error. (no SSEKMSKeyId)"}\'')
         else:
             raise AssertionError("An expected webtest.AppError was not raised.")
