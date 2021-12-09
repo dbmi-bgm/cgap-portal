@@ -360,13 +360,11 @@ def download(context, request):
     calculated = calculate_properties(context, request)
     if 'url' not in calculated:
         raise HTTPNotFound(calculated['accession'])
-    accession = calculated.get('accession', None)
-    if not accession:
-        raise HTTPNotFound(calculated['uuid'])
-    terminal = 'report.html'
+    url = urlparse(calculated['url'])
+    bucket, key = url.netloc, url.path.lstrip('/')
     params_to_get_obj = {
-        'Bucket': request.registry.settings.get('file_wfout_bucket'),
-        'Key': '/'.join(['', accession, terminal])
+        'Bucket': bucket,
+        'Key': key
     }
     location = build_s3_presigned_get_url(params=params_to_get_obj)
 
