@@ -132,10 +132,12 @@ export function InnerTabToggle ({ activeIdx = 0, options = [] }) {
     const renderedOptions = options.map(function(opt, optIdx){
         const { title, disabled, onClick, dataTip } = opt;
         return (
-            <button type="button" {...{ onClick, disabled }} aria-pressed={activeIdx === optIdx} key={optIdx} data-tip={dataTip}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link")}>
-                { title }
-            </button>
+            <div className="px-1 flex-grow-1" data-tip={dataTip} key={optIdx}>
+                <button type="button" {...{ onClick, disabled }} aria-pressed={activeIdx === optIdx}
+                    className={"px-md-4 px-lg-5 btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link")}>
+                    { title }
+                </button>
+            </div>
         );
     });
     return (

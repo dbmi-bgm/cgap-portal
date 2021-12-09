@@ -9,6 +9,7 @@ import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
 import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 import { InnerTabToggle } from './FilteringTab';
+import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
 
 
@@ -363,7 +364,8 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         },
         {
             "title": "II. Report Generation",
-            "onClick": onClickB
+            "onClick": onClickB,
+            "disabled": true // Under Construction
         }
     ];
 
@@ -445,9 +447,12 @@ function ReportGenerationView () {
 
             <div className="form-group">
                 <label htmlFor="report_generation_indication">Indication</label>
+                <AutoGrowTextArea id="report_generation_indication" rows="3" defaultValue="Familial Breast-Ovarian Cancer" />
+                {/*
                 <textarea className="form-control" id="report_generation_indication" rows="3">
                     Familial Breast-Ovarian Cancer
                 </textarea>
+                */}
             </div>
 
         </form>

@@ -12,7 +12,7 @@ import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import { console, navigate, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
+import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
 /**
  * Stores and manages global note state for interpretation space. Handles AJAX
@@ -670,119 +670,26 @@ function NoteFieldDrop(props) {
     );
 }
 
-/** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
-class NoGrowTextArea extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
-    }
-    onChangeWrapper(e) {
-        const { onTextChange, field } = this.props;
-        onTextChange(e, field);
-    }
-    render() {
-        const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
-        return (
-            <div className={cls} style={{ minHeight: "135px" }}>
-                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
-            </div>
-        );
-    }
-}
-
-/** @todo Move to /utils/ or /item-pages/components/ */
-class AutoGrowTextArea extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
-        this.state = {
-            "textAreaHeight": "auto",
-            "parentHeight": "auto"
-        };
-        this.memoized = {
-            textareaWrapperStyle: memoize(function(parentHeight, maxHeight){
-                return {
-                    "minHeight" : typeof textAreaHeight !== "number" ? parentHeight
-                        : parentHeight > maxHeight ? maxHeight : parentHeight
-                };
-            }),
-            textareaStyle: memoize(function(textAreaHeight, maxHeight){
-                return {
-                    "height": typeof textAreaHeight !== "number" ? textAreaHeight
-                        : textAreaHeight > maxHeight ? maxHeight : textAreaHeight,
-                    "resize": "none"
-                };
-            })
-        };
-        this.textAreaRef = React.createRef(null);
-    }
-
-    componentDidMount() {
-        const { minHeight, maxHeight, buffer } = this.props;
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
-        // if (minHeight > currScrollHeight) {
-        //     this.setState({
-        //         parentHeight: `${minHeight}px`,
-        //         textAreaHeight: `${minHeight}}px`
-        //     });
-        // } else {
-        this.setState({
-            "parentHeight": currScrollHeight > maxHeight ? maxHeight : currScrollHeight,
-            "textAreaHeight": currScrollHeight > maxHeight ? maxHeight : currScrollHeight
-        });
-        // }
-    }
-
-    onChangeWrapper(e) {
-        const { onChange, minHeight, maxHeight, buffer } = this.props;
-
-        onChange(e);
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
-        // if (minHeight && minHeight > currScrollHeight) {
-        //     this.setState({ textAreaHeight: "auto", parentHeight: minHeight }, () => {
-        //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
-        //         if (minHeight > newScrollHeight) {
-        //             this.setState({
-        //                 parentHeight: minHeight,
-        //                 textAreaHeight: minHeight
-        //             });
-        //         }
-        //     });
-        // } else {
-        this.setState({
-            "textAreaHeight": "auto",
-            "parentHeight": currScrollHeight < maxHeight ? currScrollHeight : maxHeight
-        }, () => {
-            const newScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
-            this.setState({
-                "parentHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight,
-                "textAreaHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight
-            });
-        });
-        // }
-    }
-
-    render() {
-        const { value, className, minHeight, maxHeight, ...passProps } = this.props;
-        const { textAreaHeight, parentHeight } = this.state;
-        return (
-            // passProps includes row, placeholder, disabled, ...
-            <div style={this.memoized.textareaWrapperStyle(parentHeight, maxHeight)} className={className}>
-                <textarea {...passProps} value={value} ref={this.textAreaRef} style={this.memoized.textareaStyle(textAreaHeight, maxHeight)}
-                    className="w-100" onChange={this.onChangeWrapper} />
-            </div>
-        );
-    }
-}
-AutoGrowTextArea.defaultProps = {
-    "minHeight": 150,
-    "maxHeight": 325,
-    "buffer": 5, // Help prevent showing scrollbar due to rounding or padding of textarea height.
-    "rows": 5 // Used for minHeight, more or less.
-};
+// /** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
+// class NoGrowTextArea extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         this.onChangeWrapper = this.onChangeWrapper.bind(this);
+//     }
+//     onChangeWrapper(e) {
+//         const { onTextChange, field } = this.props;
+//         onTextChange(e, field);
+//     }
+//     render() {
+//         const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
+//         return (
+//             <div className={cls} style={{ minHeight: "135px" }}>
+//                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
+//                     onChange={this.onChangeWrapper} />
+//             </div>
+//         );
+//     }
+// }
 
 
 function noteFieldNameToSchemaFormatted(field) {
