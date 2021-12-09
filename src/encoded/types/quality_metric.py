@@ -1,4 +1,14 @@
 """The type file for the collection Quality Metric."""
+import datetime
+import pytz
+from urllib.parse import parse_qs, urlparse
+from pyramid.settings import asbool
+from pyramid.view import view_config
+from pyramid.httpexceptions import (
+    HTTPTemporaryRedirect,
+    HTTPNotFound,
+)
+from ..util import build_s3_presigned_get_url
 from snovault.calculated import calculate_properties
 from snovault import (
     abstract_collection,
@@ -341,3 +351,32 @@ class QualityMetricPeddyqc(QualityMetric):
     item_type = 'quality_metric_peddyqc'
     schema = load_schema('encoded:schemas/quality_metric_peddyqc.json')
     embedded_list = QualityMetric.embedded_list
+
+
+@view_config(name='download', context=QualityMetric, request_method='GET',
+             permission='view', subpath_segments=[0, 1])
+def download(context, request):
+    """ Downloads the quality metric report from S3 """
+    calculated = calculate_properties(context, request)
+    if 'url' not in calculated:
+        raise HTTPNotFound(calculated['accession'])
+    accession = calculated.get('accession', None)
+    if not accession:
+        raise HTTPNotFound(calculated['uuid'])
+    terminal = 'report.html'
+    params_to_get_obj = {
+        'Bucket': request.registry.settings.get('file_wfout_bucket'),
+        'Key': '/'.join(['', accession, terminal])
+    }
+    location = build_s3_presigned_get_url(params=params_to_get_obj)
+
+    if asbool(request.params.get('soft')):
+        expires = int(parse_qs(urlparse(location).query)['Expires'][0])
+        return {
+            '@type': ['SoftRedirect'],
+            'location': location,
+            'expires': datetime.datetime.fromtimestamp(expires, pytz.utc).isoformat(),
+        }
+
+    # 307 redirect specifies to keep original method
+    raise HTTPTemporaryRedirect(location=location)  # 307
