@@ -47,14 +47,20 @@ configure:  # does any pre-requisite installs
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
-build:  # builds
+build-poetry:
 	make configure
 	poetry install
+
+macbuild-poetry:
+	make configure
+	make macpoetry-install
+
+build:  # builds
+	make build-poetry
 	make build-after-poetry
 
 macbuild:  # builds for Catalina
-	make configure
-	make macpoetry-install
+	make macbuild-poetry
 	make build-after-poetry
 
 rebuild:
@@ -207,7 +213,7 @@ build-docker-test:
 	@# This will do the equivalent of
 	@#    make ecr-login AWS_ACCOUNT=<selected-test-account>
 	@#    make build-docker-production AWS_ACCOUNT=<selected-test-account> ENV_NAME=<selected-env>
-	@# but it has to do the login inside the script, we can't do it separately here
+	@# but it has to do the login inside the script, we cannot do it separately here
 	@# because it has to infer the correct AWS_ACCOUNT and ENV_NAME by nosing into
 	@# ~/.aws_test/test_creds.sh looking for ACCOUNT_NUMBER (note: not AWS_ACCOUNT) and ENV_NAME.
 	scripts/build-docker-test --login

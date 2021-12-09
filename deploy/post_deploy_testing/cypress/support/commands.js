@@ -31,7 +31,7 @@ import { Buffer } from 'buffer';
 
 /** Expected to throw error of some sort if not on search page, or no results. */
 Cypress.Commands.add('searchPageTotalResultCount', function(options){
-    return cy.get('div.above-results-table-row .box.results-count > div.d-inline-block > span.text-500')
+    return cy.get('div.above-results-table-row #results-count')
         .invoke('text').then(function(resultText){
             return parseInt(resultText);
         });
@@ -148,39 +148,7 @@ Cypress.Commands.add('logout4DN', function(options = { 'useEnvToken' : true }){
 });
 
 
-/*** Browse View Utils ****/
 
-Cypress.Commands.add('getQuickInfoBarCounts', function(options = { shouldNotEqual : '' }){
-
-    return cy.get('#stats-stat-expsets').invoke('text').should('have.length.above', 0).should('not.equal', '' + options.shouldNotEqual)
-        .then(function(expsetCountElemText){
-            return cy.get('#stats-stat-experiments').then(function(expCountElem){
-                return cy.get('#stats-stat-files').then((fileCountElem)=>{
-                    const experiment_sets = parseInt(expsetCountElemText);
-                    const experiments = parseInt(expCountElem.text());
-                    const files = parseInt(fileCountElem.text());
-                    return { experiment_sets, experiments, files };
-                });
-            });
-        });
-
-});
-
-
-
-Cypress.Commands.add('getSelectAllFilesButton', function(options = {}){
-    return cy.get('div.above-results-table-row #select-all-files-button');
-});
-
-Cypress.Commands.add('getFileTypePanelButton', function(options = {}){
-    return cy.get('div.above-results-table-row #selected-files-file-type-filter-button');
-});
-
-// TODO: Change these functions to use the `id` attributes of these buttons once they make it to prod.
-
-Cypress.Commands.add('getDownloadButton', function(options = {}){
-    return cy.get('div.above-results-table-row div.clearfix > div:nth-child(1) > div:nth-child(2) > div.btn-group > button.btn:nth-child(1)');
-});
 
 /** Session Caching */
 

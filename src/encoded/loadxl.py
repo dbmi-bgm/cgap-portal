@@ -589,7 +589,7 @@ def load_prod_data(app, overwrite=False):
     return load_data(app, indir='master-inserts', overwrite=overwrite)
 
 
-def load_deploy_data(app, **kwargs):
+def load_deploy_data(app, overwrite=True, **kwargs):
     """
     Load deploy-inserts and master-inserts. Overwrites duplicate items
     in both directories to match deploy-inserts version.

@@ -392,6 +392,11 @@
                                     "plusStrandColor": "#cfd0ff",
                                     "minusStrandColor": "#ffd1d4",
                                     "outlineReadOnHover": true,
+                                    "outlineMateOnHover": true,
+                                    "highlightReadsBy": [
+                                        "insertSize",
+                                        "pairOrientation"
+                                    ],
                                     "axisLabelFormatting": "normal",
                                     "axisPositionHorizontal": "right",
                                     "collapseWhenMaxTileWidthReached": false
