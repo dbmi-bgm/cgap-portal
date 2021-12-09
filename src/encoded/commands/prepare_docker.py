@@ -36,11 +36,12 @@ def template_creator(extra_environment_variables):
     return create_from_template
 
 
-def prepare_docker(data_set=DEFAULT_DATA_SET, load_inserts=False, run_tests=False):
+def prepare_docker(data_set=DEFAULT_DATA_SET, load_inserts=False, run_tests=False, s3_encrypt_key_id=""):
     extra_vars = {
         "DATA_SET": data_set,
         "LOAD_INSERTS": "true" if load_inserts else "",
         "RUN_TESTS": "true" if run_tests else "",
+        "S3_ENCRYPT_KEY_ID": s3_encrypt_key_id,
     }
     prepare_from_template = template_creator(extra_vars)
     prepare_from_template(DOCKER_COMPOSE_FILE, expect_change=True)
@@ -58,9 +59,15 @@ def main():
                         help="if supplied, causes inserts to be loaded (default: not loaded)")
     parser.add_argument("--run-tests", default=False, action="store_true",
                         help="if supplied, causes tests to be run in container (default: not tested)")
+    parser.add_argument('--s3-encrypt-key-id', default="",
+                        help="an encrypt key id (default: the empty string)")
+
     args = parser.parse_args()
     logging.basicConfig()
-    prepare_docker(data_set=args.data_set, load_inserts=args.load_inserts, run_tests=args.run_tests)
+    prepare_docker(data_set=args.data_set,
+                   load_inserts=args.load_inserts,
+                   run_tests=args.run_tests,
+                   s3_encrypt_key_id=args.s3_encrypt_key_id)
 
 
 if __name__ == '__main__':
