@@ -621,7 +621,7 @@ const bioinfoPopoverContent = {
     ),
     filteredSVVariants: (
         <div>
-            During processing, <a href="https://cgap-sv-pipeline.readthedocs.io/en/latest/sv-part3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-master.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
             remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
             to fewer than 500. Briefly, these filters include: (1) whitelisting SVs based on VEP annotations; (2) removing SVs with only intronic
             or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
