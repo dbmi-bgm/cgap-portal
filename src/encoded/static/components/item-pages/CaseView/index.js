@@ -26,7 +26,8 @@ import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { InterpretationTab, InterpretationTabController } from './InterpretationTab';
-import { CaseReviewTab, CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab';
+import { CaseReviewTab } from './CaseReviewTab';
+import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
 

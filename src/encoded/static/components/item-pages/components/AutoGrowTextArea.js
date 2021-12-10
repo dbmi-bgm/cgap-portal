@@ -31,10 +31,15 @@ export class AutoGrowTextArea extends React.Component {
         this.textAreaRef = React.createRef(null);
     }
 
+    /**
+     * @todo
+     * Pull out this logic into sep. method then call it from componentDidMount and componentDidUpdate(if maxHeight!==pastProps.maxHeight)
+     */
     componentDidMount() {
         const { minHeight, maxHeight, buffer } = this.props;
 
-        const currScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
+        const currScrollHeight = this.textAreaRef.current.scrollHeight;
+        const newScrollHeight = currScrollHeight + buffer;
         // if (minHeight > currScrollHeight) {
         //     this.setState({
         //         parentHeight: `${minHeight}px`,
@@ -42,8 +47,8 @@ export class AutoGrowTextArea extends React.Component {
         //     });
         // } else {
         this.setState({
-            "parentHeight": currScrollHeight > maxHeight ? maxHeight : currScrollHeight,
-            "textAreaHeight": currScrollHeight > maxHeight ? maxHeight : currScrollHeight
+            "parentHeight": newScrollHeight > maxHeight ? maxHeight : newScrollHeight,
+            "textAreaHeight": newScrollHeight > maxHeight ? maxHeight : newScrollHeight
         });
         // }
     }
@@ -53,7 +58,8 @@ export class AutoGrowTextArea extends React.Component {
 
         onChange(e);
 
-        const currScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
+        //const currScrollHeight = this.textAreaRef.current.scrollHeight;
+
         // if (minHeight && minHeight > currScrollHeight) {
         //     this.setState({ textAreaHeight: "auto", parentHeight: minHeight }, () => {
         //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
@@ -65,21 +71,18 @@ export class AutoGrowTextArea extends React.Component {
         //         }
         //     });
         // } else {
-        this.setState({
-            "textAreaHeight": "auto",
-            "parentHeight": currScrollHeight < maxHeight ? currScrollHeight : maxHeight
-        }, () => {
-            const newScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
+        this.setState({ "textAreaHeight": "auto" }, () => {
+            const newScrollHeight2 = this.textAreaRef.current.scrollHeight + buffer;
             this.setState({
-                "parentHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight,
-                "textAreaHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight
+                "parentHeight": newScrollHeight2 < maxHeight ? newScrollHeight2 : maxHeight,
+                "textAreaHeight": newScrollHeight2 < maxHeight ? newScrollHeight2 : maxHeight
             });
         });
         // }
     }
 
     render() {
-        const { value, children, className, minHeight, maxHeight, ...passProps } = this.props;
+        const { value, children, className, buffer, minHeight, maxHeight, ...passProps } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
         const useValue = value || children;
         return (
@@ -92,9 +95,9 @@ export class AutoGrowTextArea extends React.Component {
     }
 }
 AutoGrowTextArea.defaultProps = {
-    "minHeight": 150,
+    // "minHeight": 150,
     "maxHeight": 325,
-    "buffer": 5, // Help prevent showing scrollbar due to rounding or padding of textarea height.
+    "buffer": 2, // Help prevent showing scrollbar due to rounding or padding of textarea height.
     "rows": 5, // Used for minHeight, more or less.
     "onChange": function(event) {
         console.log("Called defaultProps.onChange", event);

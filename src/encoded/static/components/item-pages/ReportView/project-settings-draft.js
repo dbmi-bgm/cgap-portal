@@ -57,24 +57,47 @@ export const projectReportSettings = {
             }
         ]
     },
-    "introduction": {
-        "title" : "Introduction",
-        "order": 0,
-        "included": true
-    },
-    "indication": {
-        "title" : "Indication",
-        "order": 1,
-        "included": true
-    },
-    "tests_performed": {
-        "title" : "Test Performed",
-        "order": 2,
-        "included": true,
-        // Maybe, if not free-text:
-        "tests_shown": ["something1", "something2"]
-    },
-    "result_summary": {
-        "included": true
+    // "introduction": {
+    //     "title" : "Introduction",
+    //     "order": 0,
+    //     "included": true
+    // },
+    "report_sections": {
+        "indication": {
+            "title" : "Indication",
+            "order": 1,
+            "included": true
+        },
+        "analysis_performed": {
+            "title" : "Tests / Analysis Performed",
+            "order": 2,
+            "included": true,
+            // Maybe, if not free-text:
+            "tests_shown": ["something1", "something2"]
+        },
+        "result_summary": {
+            "title" : "Result Summary",
+            "included": true
+        },
+        "findings_table": {
+            // "title" : null,
+            "included": true
+        },
+        "recommendations": {
+            "title" : "Recommendations",
+            "included": true
+        },
+        "additional_case_notes": {
+            "title" : "Additional Case Notes",
+            "included": true
+        },
+        "methodology": {
+            "title" : "Methodology",
+            "included": true
+        },
+        "references": {
+            "title": "References",
+            "included": true
+        }
     }
 };
