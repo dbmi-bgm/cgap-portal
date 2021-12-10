@@ -359,7 +359,7 @@ def download(context, request):
     """ Downloads the quality metric report from S3 """
     calculated = calculate_properties(context, request)
     if 'url' not in calculated:
-        raise HTTPNotFound(calculated['accession'])
+        raise HTTPNotFound(calculated)
     url = urlparse(calculated['url'])
     bucket, key = url.netloc, url.path.lstrip('/')
     params_to_get_obj = {
