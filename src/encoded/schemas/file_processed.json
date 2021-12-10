@@ -188,13 +188,24 @@
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "location": {
-                        "title": "LinkTo Location",
-                        "description": "Location to place a linkTo",
+                    "item": {
+                        "title": "LinkTo Item",
+                        "description": "Item on which to place a linkTo",
+                        "type": "string",
+                        "format": "uuid"
+                    },
+                    "field": {
+                        "title": "LinkTo Field",
+                        "description": "The field on the item on which to place a linkTo",
+                        "type": "string"
+                    },
+                    "type": {
+                        "title": "Placement type",
+                        "description": "How to create the linkTo on the item's field",
                         "type": "string",
                         "enum": [
-                            "sample_processing.samples.processed_files",
-                            "sample_processing.processed_files"
+                            "replace",
+                            "append"
                         ]
                     },
                     "status": {
