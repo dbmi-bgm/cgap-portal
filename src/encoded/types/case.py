@@ -191,6 +191,7 @@ def _build_case_embedded_list():
         "sample.library_info",
         "sample.last_modified.*",
         "sample.completed_processes",
+        "sample.indication",
 
         # File linkTo
         "sample.files.status",

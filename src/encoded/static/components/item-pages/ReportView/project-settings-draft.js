@@ -66,38 +66,51 @@ export const projectReportSettings = {
         "indication": {
             "title" : "Indication",
             "order": 1,
-            "included": true
+            "included": true,
+            "readonly": false
         },
         "analysis_performed": {
             "title" : "Tests / Analysis Performed",
             "order": 2,
             "included": true,
+            "readonly": true,
             // Maybe, if not free-text:
             "tests_shown": ["something1", "something2"]
         },
         "result_summary": {
             "title" : "Result Summary",
-            "included": true
+            "order": 3,
+            "included": true,
+            "readonly": false
         },
         "findings_table": {
             // "title" : null,
+            "order": 4,
             "included": true
         },
         "recommendations": {
             "title" : "Recommendations",
-            "included": true
+            "order": 5,
+            "included": true,
+            "readonly": false
         },
         "additional_case_notes": {
             "title" : "Additional Case Notes",
-            "included": true
+            "order": 6,
+            "included": true,
+            "readonly": false
         },
         "methodology": {
             "title" : "Methodology",
-            "included": true
+            "order": 7,
+            "included": true,
+            "readonly": false
         },
         "references": {
             "title": "References",
-            "included": true
+            "order": 8,
+            "included": true,
+            "readonly": false
         }
     }
 };

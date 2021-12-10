@@ -5,6 +5,8 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { getAllNotesFromVariantSample } from './../variant-sample-selection-panels';
+
 
 export class CaseReviewController extends React.Component {
 

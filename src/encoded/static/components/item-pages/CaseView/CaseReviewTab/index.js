@@ -13,6 +13,7 @@ import { AutoGrowTextArea } from './../../components/AutoGrowTextArea';
 import { projectReportSettings } from './../../ReportView/project-settings-draft';
 
 import { SaveFindingsButton } from './SaveFindingsButton';
+import { ReportGenerationView } from './ReportGenerationView';
 
 
 export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
@@ -141,68 +142,13 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                 </div>
                 :
-                <ReportGenerationView />
+                <ReportGenerationView {...{ context }} />
             }
 
         </React.Fragment>
     );
 });
 
-
-
-function ReportGenerationView () {
-    const { report_sections } = projectReportSettings;
-
-    // const section_mappings = [
-    //     "indication",
-    //     "analysis_performed",
-    //     "result_summary"
-    // ];
-
-    const sortedSectionKeys = Object.keys(report_sections).sort(function(a, b){
-        const { [a]: { order: orderA = Infinity }, [b]: { order: orderB = Infinity } } = report_sections;
-        return orderA < orderB ? -1 : 1;
-    }).filter(function(key){
-        // TODO: If we add checkboxes here for toggling if in report or not,
-        // we could skip filtering and instead pre-populate the checkbox values with 'included'
-        const { [key]: { included = false } } = report_sections;
-        return included;
-    });
-
-    console.log("KEYS", sortedSectionKeys);
-
-    return (
-        <form className="d-block">
-
-            <h4 className="text-300 mb-24">
-                Input or adjust the fields below to complete your report
-            </h4>
-
-            <div className="form-group">
-                <label htmlFor="report_generation_indication">Indication</label>
-                <AutoGrowTextArea id="report_generation_indication" rows="1" defaultValue="Familial Breast-Ovarian Cancer" />
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="report_generation_tests_analysis_performed">Test / Analysis Performed</label>
-                <AutoGrowTextArea id="report_generation_indication" rows="1" defaultValue="Familial Breast-Ovarian Cancer" />
-            </div>
-
-            <div className="form-group">
-                <label htmlFor="report_generation_indication_result_summary">Result Summary</label>
-                <AutoGrowTextArea id="report_generation_indication" rows="1" defaultValue="Familial Breast-Ovarian Cancer" />
-            </div>
-
-            {/* TODO: Preview findings table */}
-
-            <div className="form-group">
-                <label htmlFor="report_generation_recommendations">Recommendations</label>
-                <AutoGrowTextArea id="report_generation_indication" rows="1" defaultValue="Familial Breast-Ovarian Cancer" />
-            </div>
-
-        </form>
-    );
-}
 
 
 function countVariantSamplesWithAnySelectionSize(variantSampleListItem, selectionStore){
