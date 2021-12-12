@@ -118,7 +118,7 @@ class GeneListSubmission:
                 if line.lower().startswith(term):
                     term_line = line
                     term_idx = term_line.lower().index(term)
-                    term_line = term_line[(term_idx + len(term)) :]
+                    term_line = term_line[(term_idx + len(term) + 1):]
                     term_line = term_line.translate({ord(i): None for i in ':;"\n"'})
                     term_line = term_line.strip()
                     if term_line:
