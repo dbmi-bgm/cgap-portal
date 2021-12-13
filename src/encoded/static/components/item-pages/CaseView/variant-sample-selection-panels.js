@@ -39,7 +39,7 @@ export const CaseSpecificSelectionsPanel = React.memo(function CaseSpecificSelec
             <button type="button" className={"card-header btn py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}
                 onClick={toggleExpanded}>
                 <h4 className="text-400 my-0 d-flex align-items-center text-white" >
-                    <i className={"mr-1 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
+                    <i className={"mr-15 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
                     <span>Case Specific Selections</span>
                 </h4>
             </button>
@@ -75,7 +75,7 @@ export const CaseSpecificSelectionsPanel = React.memo(function CaseSpecificSelec
     );
 });
 
-export class NoteSubSelectionStateController extends React.Component {
+export class NoteSubSelectionStateController extends React.PureComponent {
     constructor(props){
         super(props);
 
@@ -139,7 +139,7 @@ export class NoteSubSelectionStateController extends React.Component {
 }
 
 
-function ACMGClassificationSelections (props) {
+const ACMGClassificationSelections = React.memo(function ACMGClassificationSelections (props) {
     const {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
@@ -170,7 +170,7 @@ function ACMGClassificationSelections (props) {
             </div>
         </div>
     );
-}
+});
 
 function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncluded }) {
     const { variant_samples = [] } = variantSampleListItem || {};
@@ -259,7 +259,7 @@ function ACMGClassificationSelectionsCommonCheckboxList ({ store, toggleItems, v
 
 
 
-function VariantGeneSelections (props) {
+const VariantGeneSelections = React.memo(function VariantGeneSelections (props) {
     const {
         // From CaseReviewTab (& higher)
         variantSampleListItem,
@@ -290,7 +290,7 @@ function VariantGeneSelections (props) {
             </div>
         </div>
     );
-}
+});
 
 
 function VariantGeneSelectionsCommonCheckboxList ({ store, toggleItems, variantSampleListItem, alreadySaved, noteTypesIncluded }) {

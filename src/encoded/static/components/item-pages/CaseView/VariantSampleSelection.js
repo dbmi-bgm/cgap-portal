@@ -388,7 +388,7 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 });
 
 
-function ActionsDropdown(props){
+const ActionsDropdown = React.memo(function ActionsDropdown(props){
     const { toggleVariantSampleSelectionDeletion, variantSample, isDeleted } = props;
     const { uuid: vsUUID } = variantSample;
 
@@ -412,7 +412,7 @@ function ActionsDropdown(props){
             </DropdownItem>
         </DropdownButton>
     );
-}
+});
 
 
 function ClassificationDropdown(props){

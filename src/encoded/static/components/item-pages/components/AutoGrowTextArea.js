@@ -1,14 +1,15 @@
 'use strict';
 
 import React from 'react';
-import PropTypes from 'prop-types';
+import PropTypes, { func } from 'prop-types';
 import _ from 'underscore';
 import memoize from 'memoize-one';
 
 export class AutoGrowTextArea extends React.Component {
     constructor(props) {
         super(props);
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
+        this.resizeToFitContent = this.resizeToFitContent.bind(this);
+        this.onChange = this.onChange.bind(this);
         this.state = {
             "textAreaHeight": "auto",
             "parentHeight": "auto"
@@ -31,54 +32,36 @@ export class AutoGrowTextArea extends React.Component {
         this.textAreaRef = React.createRef(null);
     }
 
-    /**
-     * @todo
-     * Pull out this logic into sep. method then call it from componentDidMount and componentDidUpdate(if maxHeight!==pastProps.maxHeight)
-     */
     componentDidMount() {
-        const { minHeight, maxHeight, buffer } = this.props;
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        const newScrollHeight = currScrollHeight + buffer;
-        // if (minHeight > currScrollHeight) {
-        //     this.setState({
-        //         parentHeight: `${minHeight}px`,
-        //         textAreaHeight: `${minHeight}}px`
-        //     });
-        // } else {
-        this.setState({
-            "parentHeight": newScrollHeight > maxHeight ? maxHeight : newScrollHeight,
-            "textAreaHeight": newScrollHeight > maxHeight ? maxHeight : newScrollHeight
-        });
-        // }
+        this.resizeToFitContent();
     }
 
-    onChangeWrapper(e) {
-        const { onChange, minHeight, maxHeight, buffer } = this.props;
-
-        onChange(e);
-
-        //const currScrollHeight = this.textAreaRef.current.scrollHeight;
-
-        // if (minHeight && minHeight > currScrollHeight) {
-        //     this.setState({ textAreaHeight: "auto", parentHeight: minHeight }, () => {
-        //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
-        //         if (minHeight > newScrollHeight) {
-        //             this.setState({
-        //                 parentHeight: minHeight,
-        //                 textAreaHeight: minHeight
-        //             });
-        //         }
-        //     });
-        // } else {
-        this.setState({ "textAreaHeight": "auto" }, () => {
-            const newScrollHeight2 = this.textAreaRef.current.scrollHeight + buffer;
+    resizeToFitContent(){
+        const { minHeight, maxHeight, buffer } = this.props;
+        this.setState(function({ textAreaHeight: existingTextAreaHeight }){
+            // Check existing state manually here b.c. AutoGrowTextArea is not a PureCompoennt.
+            // (Prevent unecessary re-render on componentDidMount)
+            if (existingTextAreaHeight === "auto") {
+                return null;
+            }
+            return { "textAreaHeight": "auto" };
+        }, () => {
+            const newScrollHeight = this.textAreaRef.current.scrollHeight + buffer;
             this.setState({
-                "parentHeight": newScrollHeight2 < maxHeight ? newScrollHeight2 : maxHeight,
-                "textAreaHeight": newScrollHeight2 < maxHeight ? newScrollHeight2 : maxHeight
+                "parentHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight,
+                "textAreaHeight": newScrollHeight < maxHeight ? newScrollHeight : maxHeight
             });
         });
-        // }
+    }
+
+    onChange(e) {
+        const { onChange: propOnChange } = this.props;
+
+        if (typeof propOnChange === "function") {
+            propOnChange(e);
+        }
+
+        this.resizeToFitContent();
     }
 
     render() {
@@ -89,7 +72,7 @@ export class AutoGrowTextArea extends React.Component {
             // passProps includes row, placeholder, disabled, ...
             <div style={this.memoized.textareaWrapperStyle(parentHeight, maxHeight)} className={className}>
                 <textarea {...passProps} value={useValue} ref={this.textAreaRef} style={this.memoized.textareaStyle(textAreaHeight, maxHeight)}
-                    className="form-control" onChange={this.onChangeWrapper} />
+                    className="form-control" onChange={this.onChange} />
             </div>
         );
     }

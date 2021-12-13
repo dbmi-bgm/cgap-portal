@@ -41,7 +41,13 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         kbNotesIncluded,
         toggleReportNoteSubselectionState,
         toggleKBNoteSubselectionState,
+        // From ajax.FetchedItem in CaseView/index.js
+        fetchedReportItem,
+        isFetchingReportItem,
+        fetchReportItem
     } = props;
+
+    const { last_modified: { date_modified: reportLastModified = null } = {} } = fetchedReportItem || {};
 
     // TODO: Determine if any notes saved to report, and then (a) undisable button + (b) set state to 1.
     const [ currentViewIdx, setCurrentViewIdx ] = useState(0);
@@ -60,7 +66,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         return null;
     }
 
-    const commonBtnProps = { variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem };
+    const commonBtnProps = { variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem, fetchedReportItem, fetchReportItem };
 
     const commonSelectionsProps = {
         isLoadingVariantSampleListItem, variantSampleListItem,
@@ -89,6 +95,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                 <h1 className="text-300 mb-0">
                     Case Review
+                    { isFetchingReportItem ? <i className="icon icon-fw icon-circle-notch icon-spin fas ml-12 text-muted" data-tip="Loading Report..." /> : null }
                 </h1>
 
                 <div className="my-3 my-md-n3">
@@ -120,7 +127,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                             */}
 
                             <PatchItemsProgress>
-                                <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore, context }} className="my-1 mr-1"/>
+                                <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore }} className="my-1 mr-1"/>
                             </PatchItemsProgress>
 
                             <PatchItemsProgress>
@@ -131,7 +138,8 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                         <div className="text-left">
                             <PatchItemsProgress>
-                                <SaveFindingsButton {...commonBtnProps} {...{ changedClassificationsByVS, updateClassificationForVS, changedClassificationsCount }} className="ml-md-05 my-1" />
+                                <SaveFindingsButton {...commonBtnProps} className="ml-md-05 my-1" {...{ changedClassificationsByVS,
+                                    updateClassificationForVS, changedClassificationsCount, alreadyInReportNotes }} />
                             </PatchItemsProgress>
                         </div>
 
@@ -142,7 +150,8 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                 </div>
                 :
-                <ReportGenerationView {...{ context }} />
+                // Use date last modified as key, to reset form input values.
+                <ReportGenerationView {...{ context, fetchedReportItem, fetchReportItem }} key={reportLastModified} />
             }
 
         </React.Fragment>
@@ -285,7 +294,8 @@ function SaveNotesToProjectButton (props) {
 
 function SaveNotesToReportButton (props) {
     const {
-        context: { report } = {},
+        fetchedReportItem,
+        fetchReportItem,
         variantSampleListItem,
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
@@ -300,7 +310,7 @@ function SaveNotesToReportButton (props) {
         "@id": reportAtID,
         uuid: reportUUID = null,
         variant_samples: reportVariantSamples = []
-    } = report || {};
+    } = fetchedReportItem || {};
 
     const selectionStoreSize = useMemo(function(){
         return Object.keys(sendToReportStore).length;
@@ -413,6 +423,7 @@ function SaveNotesToReportButton (props) {
         // PATCH Report Item with `variant_samples`. TODO: Check for edit permissions first (?)
         const reportVariantSampleUUIDsToPatch = Object.keys(reportPatchVariantSampleUUIDs);
         const reportVariantSampleUUIDsToPatchLen = reportVariantSampleUUIDsToPatch.length;
+        let performedReportPatch = false;
         if (reportVariantSampleUUIDsToPatchLen > 0) {
             if (!_.isEqual(reportVariantSampleUUIDsToPatch, _.pluck(reportVariantSamples, "uuid"))) {
                 // Skip if is same value to be patched (maybe this is 2nd saving action as result of some prior network error(s))
@@ -420,6 +431,7 @@ function SaveNotesToReportButton (props) {
                     reportAtID,
                     { "variant_samples": reportVariantSampleUUIDsToPatch }
                 ]);
+                performedReportPatch = true;
             }
         }
 
@@ -431,11 +443,20 @@ function SaveNotesToReportButton (props) {
                 } else {
                     throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToReportButton");
                 }
+
+                if (performedReportPatch) {
+                    if (typeof fetchReportItem === "function") {
+                        console.log("Refreshing our fetchedReportItem.");
+                        fetchReportItem();
+                    } else {
+                        throw new Error("No `props.fetchReportItem` supplied to SaveNotesToReportButton");
+                    }
+                }
             }
             // TODO:
             // if (patchErrors.length > 0) {}
         });
-    }, [ disabled, patchItems, variantSampleListItem, sendToReportStore, report, fetchVariantSampleListItem ]);
+    }, [ disabled, patchItems, variantSampleListItem, sendToReportStore, fetchedReportItem, fetchVariantSampleListItem, fetchReportItem ]);
 
     const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
 

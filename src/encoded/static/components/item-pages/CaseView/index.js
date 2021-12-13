@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { console, navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -158,7 +158,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         sample_processing: sampleProcessing = null,
         initial_search_href_filter_addon: snvFilterHrefAddon = "",
         sv_initial_search_href_filter_addon: svFilterHrefAddon = "",
-        actions: caseActions = []
+        actions: caseActions = [],
+        report: { "@id": reportAtID }
     } = context;
 
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
@@ -345,13 +346,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
-                        <CaseReviewSelectedNotesStore {...{ context, variantSampleListItem }}>
-                            <NoteSubSelectionStateController>
-                                <CaseReviewController>
+                        <CaseReviewController {...{ context, variantSampleListItem }}>
+                            <CaseReviewSelectedNotesStore>
+                                <NoteSubSelectionStateController>
                                     <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
-                                </CaseReviewController>
-                            </NoteSubSelectionStateController>
-                        </CaseReviewSelectedNotesStore>
+                                </NoteSubSelectionStateController>
+                            </CaseReviewSelectedNotesStore>
+                        </CaseReviewController>
                     </DotRouterTab>
                 </DotRouter>
                 : null }

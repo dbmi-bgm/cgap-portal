@@ -10,17 +10,14 @@ import { projectReportSettings } from './../../ReportView/project-settings-draft
 
 
 export function ReportGenerationView (props) {
-    const { context } = props;
+    const { context, fetchedReportItem } = props;
     const { sample, sample_processing } = context || {};
-    const { indication } = sample || {};
-    const { analysis_type } = sample_processing || {};
+    const { indication: indicationFromSample } = sample || {};
+    const { analysis_type: analysisTypeFromSampleProcessing } = sample_processing || {};
     const { report_sections } = projectReportSettings;
+    const { "@id": fetchedReportAtID } = fetchedReportItem || {};
 
-    // const section_mappings = [
-    //     "indication",
-    //     "analysis_performed",
-    //     "result_summary"
-    // ];
+    console.log("TTT", fetchedReportItem);
 
     const sortedSectionKeys = Object.keys(report_sections).sort(function(a, b){
         const { [a]: { order: orderA = Infinity }, [b]: { order: orderB = Infinity } } = report_sections;
@@ -33,9 +30,7 @@ export function ReportGenerationView (props) {
 
     sortedSectionKeys.forEach(function(sectionKey){
         const { [sectionKey]: sectionOptions } = report_sections;
-        const { included = true, title = null, required = false, readonly = false } = sectionOptions;
-
-        const inputElementID = "report_generation_" + sectionKey;
+        const { included = true, title = null } = sectionOptions;
 
         if (!included) {
             // TODO: If we add checkboxes here for toggling if in report or not,
@@ -43,31 +38,31 @@ export function ReportGenerationView (props) {
             return;
         }
 
+        const inputGroupProps = {
+            sectionKey,
+            sectionOptions,
+            //"disabled": !fetchedReportAtID,
+            "key": sectionKey
+        };
+
         // TODO: Consider converting case-switch into an object of render functions
         // Especially if we need to do same thing as here for the report PDF body generation.
         switch (sectionKey) {
             case "indication":
                 renderedSections.push(
-                    <div className="form-group" key={sectionKey}>
-                        <label htmlFor={inputElementID}>{ title || "Indication" }</label>
-                        <AutoGrowTextArea id={inputElementID} rows="1" defaultValue={indication} disabled={readonly} />
-                    </div>
+                    <TextAreaGroup {...inputGroupProps} title={title || "Indication"}
+                        defaultValue={indicationFromSample} />
                 );
                 break;
             case "analysis_performed":
                 renderedSections.push(
-                    <div className="form-group" key={sectionKey}>
-                        <label htmlFor={inputElementID}>{ title || "Tests / Analysis Performed" }</label>
-                        <AutoGrowTextArea id={inputElementID} rows="1" defaultValue={analysis_type} disabled={readonly} />
-                    </div>
+                    <TextAreaGroup {...inputGroupProps} title={title || "Tests / Analysis Performed"}
+                        defaultValue={analysisTypeFromSampleProcessing} />
                 );
                 break;
             case "result_summary":
                 renderedSections.push(
-                    <div className="form-group" key={sectionKey}>
-                        <label htmlFor={inputElementID}>{ title || "Result Summary" }</label>
-                        <AutoGrowTextArea id={inputElementID} rows="1" defaultValue="Familial Breast-Ovarian Cancer" disabled={readonly} />
-                    </div>
+                    <TextAreaGroup {...inputGroupProps} title={title || "Result Summary"} />
                 );
                 break;
             case "findings_table":
@@ -75,10 +70,22 @@ export function ReportGenerationView (props) {
                 break;
             case "recommendations":
                 renderedSections.push(
-                    <div className="form-group" key={sectionKey}>
-                        <label htmlFor={inputElementID}>{ title || "Recommendations" }</label>
-                        <AutoGrowTextArea id={inputElementID} rows="1" defaultValue="Familial Breast-Ovarian Cancer" disabled={readonly} />
-                    </div>
+                    <TextAreaGroup {...inputGroupProps} title={title || "Recommendations"} />
+                );
+                break;
+            case "additional_case_notes":
+                renderedSections.push(
+                    <TextAreaGroup {...inputGroupProps} title={title || "Additional Case Notes"} rows={5} />
+                );
+                break;
+            case "methodology":
+                renderedSections.push(
+                    <TextAreaGroup {...inputGroupProps} title={title || "Methodology"} rows={3} />
+                );
+                break;
+            case "references":
+                renderedSections.push(
+                    <TextAreaGroup {...inputGroupProps} title={title || "References"} rows={5} />
                 );
                 break;
             default:
@@ -115,7 +122,28 @@ export function ReportGenerationView (props) {
 
             { renderedSections }
 
-
         </form>
     );
 }
+
+function TextAreaGroup (props) {
+    const {
+        sectionKey,
+        sectionOptions,
+        children = null,
+        title = null,
+        ...passProps
+    } = props;
+    const { readonly = false, required = false } = sectionOptions;
+    const inputElementID = "report_generation_" + sectionKey;
+    return (
+        <div className="form-group">
+            { children ? children : <label htmlFor={inputElementID}>{ title }</label> }
+            <AutoGrowTextArea {...passProps} id={inputElementID} disabled={readonly} />
+        </div>
+    );
+}
+TextAreaGroup.defaultProps = {
+    "rows": 1,
+    "defaultValue": ""
+};

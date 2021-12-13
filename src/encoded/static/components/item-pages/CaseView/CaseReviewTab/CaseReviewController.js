@@ -3,7 +3,7 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
-import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { getAllNotesFromVariantSample } from './../variant-sample-selection-panels';
 
@@ -68,10 +68,13 @@ export class CaseReviewController extends React.Component {
     constructor(props){
         super(props);
         this.fetchProjectItem = this.fetchProjectItem.bind(this);
+        this.fetchReportItem = this.fetchReportItem.bind(this);
         this.updateClassificationForVS = this.updateClassificationForVS.bind(this);
         this.state = {
             "changedClassificationsByVS": {},
             "projectItem": null,
+            "reportItem": null,
+            "isFetchingReportItem": true,
             // Reference to object, not clone (extra memory) of it. Used solely for getDerivedStateFromProps.
             "pastVSLItem": props.variantSampleListItem
         };
@@ -82,9 +85,12 @@ export class CaseReviewController extends React.Component {
     }
 
     componentDidMount() {
-        const { projectItem } = this.state;
+        const { projectItem, reportItem } = this.state;
         if (!projectItem) {
             this.fetchProjectItem();
+        }
+        if (!reportItem) {
+            this.fetchReportItem();
         }
     }
 
@@ -107,6 +113,37 @@ export class CaseReviewController extends React.Component {
 
 
         // ajax.load("/embed" or projectAtID, ...)
+    }
+
+    fetchReportItem(callback){
+        const { context: { report: { "@id": reportAtID } = {} } } = this.props;
+
+        if (!reportAtID) {
+            return null;
+        }
+
+        const reportFetchCallback = (res = []) => {
+            const [ fetchedReportItem ] = res;
+            const { "@id": fetchedReportAtID } = fetchedReportItem || {};
+            if (!fetchedReportAtID){
+                // Alert, perhaps.
+                this.setState({ "isFetchingReportItem": false });
+                return;
+            }
+            this.setState({ fetchedReportItem, "isFetchingReportItem": false }, callback);
+        };
+
+        /* todo: embed */
+        this.setState({ "isFetchingReportItem": true }, function(){
+            ajax.load("/embed", reportFetchCallback, "POST", reportFetchCallback, JSON.stringify({
+                "ids": [ reportAtID ],
+                "fields": [
+                    "@id",
+                    "uuid",
+                    "variant_samples.uuid"
+                ]
+            }));
+        });
     }
 
     updateClassificationForVS(vsUUID, classification, callback){
@@ -135,13 +172,16 @@ export class CaseReviewController extends React.Component {
 
     render(){
         const { children, ...passProps } = this.props;
-        const { changedClassificationsByVS } = this.state;
+        const { changedClassificationsByVS, fetchedReportItem, isFetchingReportItem } = this.state;
         const changedClassificationsCount = this.memoized.changedClassificationsCount(changedClassificationsByVS);
         const childProps = {
             ...passProps,
             changedClassificationsByVS,
             changedClassificationsCount,
-            "updateClassificationForVS": this.updateClassificationForVS
+            "updateClassificationForVS": this.updateClassificationForVS,
+            fetchedReportItem,
+            isFetchingReportItem,
+            "fetchReportItem": this.fetchReportItem
         };
 
         return React.Children.map(children, (child)=>{
@@ -172,19 +212,30 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
     }
 
     static alreadyInReportNotes(variantSampleListItem, report){
-        const { uuid: reportUUID } = report || {};
+        const { uuid: reportUUID, variant_samples = [] } = report || {};
         if (!reportUUID) {
             return {};
         }
-        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ associated_items: noteAssociatedItems }){
-            const foundReportEntry = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
-            return !!(foundReportEntry);
+        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function(noteItem, vsItem){
+            const { associated_items: noteAssociatedItems } = noteItem;
+            const { uuid: vsUUID } = vsItem;
+            // Ensure this VariantSample is in `Report.variant_samples`.
+            const foundVSEntryInReport = _.findWhere(variant_samples, { "uuid": vsUUID });
+            if (!foundVSEntryInReport) {
+                return false;
+            }
+            // Ensure this Report is in `Note.associated_items`
+            const foundReportEntryInNote = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
+            if (!foundReportEntryInNote) {
+                return false;
+            }
+            return true;
         });
     }
 
     /** Using getDerivedStateFromProps instd of componentDidUpdate prevents additional render(s) */
     static getDerivedStateFromProps(props, state){
-        const { variantSampleListItem, context: { report } } = props;
+        const { variantSampleListItem, fetchedReportItem } = props;
         const { pastVSLItem, sendToProjectStore = {}, sendToReportStore = {} } = state;
 
         const nextState = { "pastVSLItem": variantSampleListItem };
@@ -193,7 +244,7 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
             // Clear sendToProjectStore and sendToReportStore of any items that were just saved
             // or updated by someone else.
             const alreadyInProjectNotes = CaseReviewSelectedNotesStore.alreadyInProjectNotes(variantSampleListItem);
-            const alreadyInReportNotes = CaseReviewSelectedNotesStore.alreadyInReportNotes(variantSampleListItem, report);
+            const alreadyInReportNotes = CaseReviewSelectedNotesStore.alreadyInReportNotes(variantSampleListItem, fetchedReportItem);
 
             const nextSendToProjectStore = { ...sendToProjectStore };
             const nextSendToReportStore = { ...sendToReportStore };
@@ -261,7 +312,7 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
         const {
             props: {
                 children,
-                context,
+                fetchedReportItem,
                 variantSampleListItem,
                 ...passProps
             },
@@ -270,15 +321,13 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
             toggleSendToReportStoreItems,
         } = this;
 
-        const { report } = context;
-
         const alreadyInProjectNotes = this.memoized.alreadyInProjectNotes(variantSampleListItem);
-        const alreadyInReportNotes = this.memoized.alreadyInReportNotes(variantSampleListItem, report);
+        const alreadyInReportNotes = this.memoized.alreadyInReportNotes(variantSampleListItem, fetchedReportItem);
 
         const childProps = {
             ...passProps,
             ...state,
-            context,
+            fetchedReportItem,
             variantSampleListItem,
             alreadyInProjectNotes,
             alreadyInReportNotes,
@@ -308,7 +357,7 @@ export function buildAlreadyStoredNoteUUIDDict(variantSampleListItem, checkFunct
     vsObjects.forEach(function({ variant_sample_item }){
         getAllNotesFromVariantSample(variant_sample_item).forEach(function(noteItem){
             const { uuid: noteUUID } = noteItem;
-            if (checkFunction(noteItem)) {
+            if (checkFunction(noteItem, variant_sample_item)) {
                 dict[noteUUID] = true;
             }
         });
