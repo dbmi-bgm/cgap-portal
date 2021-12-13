@@ -10,7 +10,7 @@ import logging
 # import re
 import traceback
 
-from dcicutils.misc_utils import ignored, check_true, PRINT, VirtualApp
+from dcicutils.misc_utils import PRINT  # , ignored, check_true, VirtualApp
 from snovault import collection, load_schema
 # from pyramid.request import Request
 # from pyramid.security import Allow, Deny, Everyone
@@ -27,7 +27,7 @@ from ..util import (
     debuglog, beanstalk_env_from_registry, create_empty_s3_file, s3_output_stream,  # subrequest_item_creation,
     make_vapp_for_ingestion,  # vapp_for_email,
 )
-from ..ingestion.common import metadata_bundles_bucket, get_parameter
+from ..ingestion.common import metadata_bundles_bucket  # , get_parameter
 
 
 # ALLOW_SUBMITTER_VIEW_ACL = (
@@ -36,7 +36,7 @@ from ..ingestion.common import metadata_bundles_bucket, get_parameter
 #     #       There is never reason for a user outside the system to update this status. -kmp 26-Jul-2020
 #     []  # Special additional permissions might go here.
 #     + ALLOW_PROJECT_MEMBER_ADD_ACL  # Is this right? See note above.
-#     + ONLY_ADMIN_VIEW_ACL     # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
+#     + ONLY_ADMIN_VIEW_ACL    # Slightly misleading name. Allows admins to edit, too, actually. But only they can view.
 # )
 
 
@@ -62,6 +62,7 @@ class SubmissionFolio:
         self.object_name = None
         self.parameters = None
         self.resolution = None
+        self.s3_encrypt_key_id = None  # This is overridden based on manifest later
 
     def __str__(self):
         return "<SubmissionFolio(%s) %s>" % (self.ingestion_type, self.submission_id)
@@ -95,7 +96,8 @@ class SubmissionFolio:
     def s3_output(self, key_name, key_type='txt'):
         key = "%s/%s.%s" % (self.submission_id, key_name, key_type)
         self.resolution[key_name] = key
-        with s3_output_stream(self.s3_client, bucket=self.bucket, key=key) as fp:
+        with s3_output_stream(self.s3_client, bucket=self.bucket, key=key,
+                              s3_encrypt_key_id=self.s3_encrypt_key_id) as fp:
             yield fp
 
     def fail(self):
@@ -118,18 +120,23 @@ class SubmissionFolio:
         response = self.s3_client.get_object(Bucket=self.bucket, Key=manifest_key)
         manifest = json.load(response['Body'])
 
+        s3_encrypt_key_id = manifest.get("s3_encrypt_key_id")
+
         self.object_name = object_name = manifest['object_name']
         self.parameters = parameters = manifest['parameters']
+        self.s3_encrypt_key_id = manifest['s3_encrypt_key_id']
         email = manifest['email']
 
         debuglog(submission_id, "object_name:", object_name)
         debuglog(submission_id, "parameters:", parameters)
+        debuglog(submission_id, "s3_encrypt_key_id:", s3_encrypt_key_id)
 
         started_key = "%s/started.txt" % submission_id
-        create_empty_s3_file(self.s3_client, bucket=self.bucket, key=started_key)
+        create_empty_s3_file(self.s3_client, bucket=self.bucket, key=started_key, s3_encrypt_key_id=s3_encrypt_key_id)
 
         # PyCharm thinks this is unused. -kmp 26-Jul-2020
-        # data_stream = submission.s3_client.get_object(Bucket=submission.bucket, Key="%s/manifest.json" % submission_id)['Body']
+        # data_stream = submission.s3_client.get_object(Bucket=submission.bucket,
+        #                                               Key="%s/manifest.json" % submission_id)['Body']
 
         resolution = {
             "data_key": object_name,
@@ -162,7 +169,8 @@ class SubmissionFolio:
         except Exception as e:
 
             resolution["traceback_key"] = traceback_key = "%s/traceback.txt" % submission_id
-            with s3_output_stream(self.s3_client, bucket=self.bucket, key=traceback_key) as fp:
+            with s3_output_stream(self.s3_client, bucket=self.bucket, key=traceback_key,
+                                  s3_encrypt_key_id=s3_encrypt_key_id) as fp:
                 traceback.print_exc(file=fp)
 
             resolution["error_type"] = e.__class__.__name__
@@ -179,7 +187,8 @@ class SubmissionFolio:
 
         with s3_output_stream(self.s3_client,
                               bucket=self.bucket,
-                              key="%s/resolution.json" % submission_id) as fp:
+                              key="%s/resolution.json" % submission_id,
+                              s3_encrypt_key_id=s3_encrypt_key_id) as fp:
             PRINT(json.dumps(resolution, indent=2), file=fp)
 
     def process_standard_bundle_results(self, bundle_result):

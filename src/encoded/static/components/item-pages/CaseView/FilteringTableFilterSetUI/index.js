@@ -421,7 +421,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
     } */ else {
         titleBlock = (
             <button type="button" onClick={onHeaderClick}
-                className="btn btn-link btn-lg text-decoration-none h-100">
+                className="btn btn-link btn-lg text-decoration-none h-100 w-100 text-left">
                 <h4 className="my-0 text-400 text-white">
                     <i className={"small icon icon-fw fas mr-1 icon-" + (bodyOpen ? "minus" : "plus")} />
                     { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
@@ -443,7 +443,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
             <div className="flex-grow-1 align-self-stretch">
                 { titleBlock }
             </div>
-            <div className="ml-16">
+            <div className="flex-shrink-0 flex-grow-0 pl-16 overflow-hidden">
                 { haveDuplicateQueries || haveDuplicateNames ?
                     <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger"
                         data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
@@ -451,7 +451,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
 
                 <div role="group" className="dropdown btn-group">
                     <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
-                        className="btn btn-sm btn-outline-light fixed-height align-items-center d-flex" />
+                        className="btn btn-sm btn-outline-light align-items-center d-flex text-truncate" />
                     <SaveFilterSetPresetButton {...savePresetDropdownProps} />
                 </div>
             </div>

@@ -57,12 +57,14 @@ export function FilteringTab(props) {
 
     return (
         <React.Fragment>
-            <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
-            <div className="row mb-1 mt-0">
+            <div className="row flex-column-reverse flex-md-row align-items-center">
                 <h1 className="col my-0">
                     { filteringTabViews[currViewIdx].name + " " }
                     <span className="text-300">Variant Filtering and Technical Review</span>
                 </h1>
+                <div className="col-12 col-md-auto my-3 my-md-n3">
+                    <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
+                </div>
             </div>
             <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
                 <SelectedItemsController isMultiselect>
@@ -88,47 +90,62 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
         } = {}
     } = context;
 
-    const currentlyOnSNV = currViewIdx === 0;
-    const currentlyOnCNV = currViewIdx === 1;
-
     const onClickSNV = useCallback(function(e){
-        if (!currentlyOnSNV) {
-            setCurrViewIdx(0);
-        }
+        setCurrViewIdx(0);
     });
 
     const onClickCNV = useCallback(function(e){
-        if (!currentlyOnCNV) {
-            setCurrViewIdx(1);
-        }
+        setCurrViewIdx(1);
     });
 
-    // End up getting a list of non-case-specific variants (with duplicates from multiple cases)
-    // if these searchHrefAddons aren't present, so important to disable the tab in those instances
-    const snvDisabled = !snvFilterHrefAddon;
-    const cnvDisabled = !svFilterHrefAddon;
+    const options = useMemo(function(){
 
-    let cnvTip = null;
-    if (analysis_type.startsWith("WES")) {
-        cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
-    }
+        // End up getting a list of non-case-specific variants (with duplicates from multiple cases)
+        // if these searchHrefAddons aren't present, so important to disable the tab in those instances
+        const snvDisabled = !snvFilterHrefAddon;
+        const cnvDisabled = !svFilterHrefAddon;
 
+        let cnvTip = null;
+        if (analysis_type.startsWith("WES")) {
+            cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
+        }
+        return [
+            {
+                "onClick": onClickSNV,
+                "disabled": snvDisabled,
+                "title": <span>{ filteringTabViews["0"].name } Filtering</span>,
+            },
+            {
+                "onClick": onClickCNV,
+                "disabled": cnvDisabled,
+                "title": <span>{ filteringTabViews["1"].name } Filtering</span>,
+                "dataTip": cnvTip
+            }
+        ];
+    }, [ context ]);
+
+    return <InnerTabToggle options={options} activeIdx={currViewIdx} />;
+});
+
+/** Pulled out into own component so can style/adjust-if-needed together w. Case Review Tab */
+export function InnerTabToggle ({ activeIdx = 0, options = [] }) {
+    const renderedOptions = options.map(function(opt, optIdx){
+        const { title, disabled, onClick, dataTip } = opt;
+        return (
+            <div className="px-1 flex-grow-1" data-tip={dataTip} key={optIdx}>
+                <button type="button" {...{ onClick, disabled }} aria-pressed={activeIdx === optIdx}
+                    className={"px-md-4 px-lg-5 btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link")}>
+                    { title }
+                </button>
+            </div>
+        );
+    });
     return (
-        <div className="card py-2 px-1 mb-3 d-flex d-md-inline-flex flex-row filtering-tab-toggle">
-            <button type="button" aria-pressed={currentlyOnSNV}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnSNV ? "primary-dark active" : "link")}
-                onClick={onClickSNV} disabled={snvDisabled}>
-                { filteringTabViews["0"].name } Filtering
-            </button>
-            <button type="button" aria-pressed={currentlyOnCNV}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (currentlyOnCNV ? "primary-dark active" : "link")}
-                onClick={onClickCNV} disabled={cnvDisabled} data-tip={cnvTip}>
-                { filteringTabViews["1"].name } Filtering
-            </button>
+        <div className="card py-2 px-1 d-flex d-md-inline-flex flex-row">
+            { renderedOptions }
         </div>
     );
-
-});
+}
 
 function createBlankFilterSetItem(searchType, caseAccession){
     return {
