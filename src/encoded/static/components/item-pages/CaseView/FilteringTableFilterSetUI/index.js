@@ -10,6 +10,7 @@ import ReactTooltip from 'react-tooltip';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
+import { SearchBar } from './../../../browse/SearchBar';
 import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
 import { SaveFilterSetButton } from './SaveFilterSetButton';
 import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
@@ -47,7 +48,14 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             });
         }
 
-        const dict = {};
+        const dict = {
+            // Treat 'q' as a facet/filter when used in filterblocks.
+            "q": {
+                "title": "Text Search",
+                "field": "q",
+                "order": -100
+            }
+        };
 
         function saveFacetToDict(facetFields){
             const {
@@ -189,6 +197,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
             sortBy, sortColumns, // From SPC/SortController
             requestedCompoundFilterSet, // From SPC/VirtualHrefController
+            isContextLoading,
+            navigate: virtualNavigate,
 
             // From FilteringTab (& higher, e.g. App/redux-store):
             caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab,
@@ -280,20 +290,26 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         if (isActiveDotRouterTab) {
             aboveTableControls = (
                 <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
-                    <h4 className="text-400 col-12 col-lg my-0 py-1">
-                        <strong className="mr-1">{ totalCount }</strong>
-                        <span>
-                            Variant Matches for { currentFilterBlockName ?
-                                <em>{ currentFilterBlockName }</em>
-                                // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                : (
-                                    <React.Fragment>
-                                        <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
-                                        { ` of ${selectedFilterBlockCount} Filter Blocks` }
-                                    </React.Fragment>
-                                ) }
-                        </span>
-                    </h4>
+                    <div className="col-12 col-lg-4 py-2">
+                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }} />
+                    </div>
+                    <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
+                        { typeof totalCount === "number" ?
+                            <React.Fragment>
+                                <strong>{ totalCount || 0 }</strong>
+                                &nbsp;
+                                matches for { currentFilterBlockName ?
+                                    <em>{ currentFilterBlockName }</em>
+                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                    : (
+                                        <React.Fragment>
+                                            <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                            { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                        </React.Fragment>
+                                    ) }
+                            </React.Fragment>
+                            : null }
+                    </h5>
                     <div className="col col-lg-auto pr-06 d-flex">
                         { selectedVariantSamples instanceof Map ?
                             <div className="pr-14">
@@ -305,6 +321,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                     </div>
                 </AboveTableControlsBaseCGAP>
             );
+        } else {
+            aboveTableControls = null;
         }
 
         const presetSelectionUIProps = {

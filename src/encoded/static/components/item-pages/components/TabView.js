@@ -114,16 +114,13 @@ export class TabView extends React.PureComponent {
         });
 
         // Filter down to locations which don't already exist in our tabs.
-        staticTabContent = _.filter(
-            _.map(staticTabContent, function(s){
-                const splitLocation = s.location.split(':');
-                const tabKey = splitLocation.slice(1).join(':'); // This could have more ':'s in it, theoretically.
-                return _.extend({ tabKey }, s);
-            }),
-            function(s){
-                return existingTabKeys.indexOf(s.tabKey) === -1;
-            }
-        );
+        staticTabContent = staticTabContent.map(function(s){
+            const splitLocation = s.location.split(':');
+            const tabKey = splitLocation.slice(1).join(':'); // This could have more ':'s in it, theoretically.
+            return _.extend({ tabKey }, s);
+        }).filter(function(s){
+            return existingTabKeys.indexOf(s.tabKey) === -1;
+        });
 
         const groupedContent = _.groupBy(staticTabContent, 'tabKey');
 
@@ -148,11 +145,11 @@ export class TabView extends React.PureComponent {
         // Content with position : 'tab' gets its own tab.
         //
 
-        const staticTabContentSingles = _.filter(staticContentList, function(s){
+        const staticTabContentSingles = staticContentList.filter(function(s){
             return s.content && !s.content.error && s.location === 'tab';
         });
 
-        _.forEach(staticTabContentSingles, function(s, idx){
+        staticTabContentSingles.forEach(function(s, idx){
             const { content: { title = null, options : { title_icon = null } } } = s;
             const showTitle = title || 'Custom Tab ' + (idx + 1);
             const tabKey = title.toLowerCase().split(' ').join('_');
@@ -203,7 +200,6 @@ export class TabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.getActiveKey = this.getActiveKey.bind(this);
         this.setActiveKey = this.setActiveKey.bind(this);
         this.getTabByHref = this.getTabByHref.bind(this);
         this.maybeSwitchTabAccordingToHref = this.maybeSwitchTabAccordingToHref.bind(this);
@@ -234,10 +230,6 @@ export class TabView extends React.PureComponent {
         }
     }
 
-    getActiveKey(){
-        return this.state.currentTabKey;
-    }
-
     setActiveKey(nextKey){
         this.setState({ 'currentTabKey' : nextKey });
     }
@@ -248,8 +240,8 @@ export class TabView extends React.PureComponent {
      */
     getTabByHref(){
         const { contents, href } = this.props;
+        const { currentTabKey: currKey } = this.state;
         const { hash } = memoizedUrlParse(href);
-        const currKey = this.getActiveKey();
 
         let firstHashPart = null;
         if (typeof hash === "string" && hash.length > 1) {
@@ -399,7 +391,7 @@ class TabPane extends React.PureComponent {
 
     cacheCurrentTabContent(){
         const { currentTab, currentTabIdx: idx } = this.props;
-        const { key, content, cache = true } = currentTab;
+        const { key, content, cache = false } = currentTab;
         this.cachedContent[key] = { content, idx, key, cache };
     }
 
@@ -411,11 +403,12 @@ class TabPane extends React.PureComponent {
         return _.values(this.cachedContent).filter(function(viewObj){
             return viewObj && (viewObj.cache || viewObj.key === currKey);
         }).map(function({ content, idx, key }){
-            const cls = "tab-pane-outer" + (currKey === key ? " active" : " d-none");
+            const isActiveTab = currKey === key;
+            const cls = "tab-pane-outer" + (isActiveTab ? " active" : " d-none");
             return (
                 <div className={cls} data-tab-key={key} id={key} key={key || idx}>
                     <TabPaneErrorBoundary>
-                        { content }
+                        { React.cloneElement(content, { isActiveTab }) }
                     </TabPaneErrorBoundary>
                 </div>
             );

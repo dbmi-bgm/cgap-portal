@@ -52,15 +52,22 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
     // TODO: Determine if any notes saved to report, and then (a) undisable button + (b) set state to 1.
     const [ currentViewIdx, setCurrentViewIdx ] = useState(0);
 
-    const onClickA = useCallback(function(e){
+    const [ resetCounter, setResetCounter ] = useState(0);
+
+    const onClickNoteFinalization = useCallback(function(e){
         e.stopPropagation();
         setCurrentViewIdx(0);
-    });
+    }, [ setCurrentViewIdx ]);
 
-    const onClickB = useCallback(function(e){
+    const onClickReportGeneration = useCallback(function(e){
         e.stopPropagation();
         setCurrentViewIdx(1);
-    });
+    }, [ setCurrentViewIdx ]);
+
+    const onResetForm = useCallback(function(e){
+        e.stopPropagation();
+        setResetCounter(resetCounter + 1);
+    }, [ resetCounter, setResetCounter ]);
 
     if (!isActiveDotRouterTab) {
         return null;
@@ -79,11 +86,11 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
     const toggleOptions = [
         {
             "title": "I. Note Finalization",
-            "onClick": onClickA
+            "onClick": onClickNoteFinalization
         },
         {
             "title": "II. Report Generation",
-            "onClick": onClickB,
+            "onClick": onClickReportGeneration,
             // "disabled": true // Under Construction
         }
     ];
@@ -151,7 +158,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                 </div>
                 :
                 // Use date last modified as key, to reset form input values.
-                <ReportGenerationView {...{ context, fetchedReportItem, fetchReportItem }} key={reportLastModified} />
+                <ReportGenerationView {...{ context, fetchedReportItem, fetchReportItem, onResetForm, variantSampleListItem }} key={reportLastModified + "_" + resetCounter} />
             }
 
         </React.Fragment>

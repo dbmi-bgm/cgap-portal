@@ -10,27 +10,46 @@ import { projectReportSettings } from './../../ReportView/project-settings-draft
 
 
 export function ReportGenerationView (props) {
-    const { context, fetchedReportItem } = props;
-    const { sample, sample_processing } = context || {};
+    const {
+        context: {
+            sample,
+            sample_processing
+        },
+        fetchedReportItem,
+        onResetForm,
+        variantSampleListItem
+    } = props;
     const { indication: indicationFromSample } = sample || {};
     const { analysis_type: analysisTypeFromSampleProcessing } = sample_processing || {};
     const { report_sections } = projectReportSettings;
-    const { "@id": fetchedReportAtID } = fetchedReportItem || {};
+    const {
+        "@id": fetchedReportAtID,
+        "indication": savedIndication,
+        "analysis_performed": savedAnalysisPerformed,
+        "result_summary": savedResultSummary,
+        "recommendations": savedRecommendations,
+        "methodology": savedMethodology,
+        "references": savedReferences,
+    } = fetchedReportItem || {};
 
-    console.log("TTT", fetchedReportItem);
+    const sortedSectionKeys = useMemo(function(){
+        return Object.keys(report_sections).sort(function(a, b){
+            const { [a]: { order: orderA = Infinity }, [b]: { order: orderB = Infinity } } = report_sections;
+            return orderA < orderB ? -1 : 1;
+        });
+    }, [ report_sections ]);
 
-    const sortedSectionKeys = Object.keys(report_sections).sort(function(a, b){
-        const { [a]: { order: orderA = Infinity }, [b]: { order: orderB = Infinity } } = report_sections;
-        return orderA < orderB ? -1 : 1;
+    const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
+    const variantSamples = vsObjects.map(function({ variant_sample_item }){
+        return variant_sample_item;
     });
-
 
     const renderedSections = [];
     const warnings = [];
 
     sortedSectionKeys.forEach(function(sectionKey){
         const { [sectionKey]: sectionOptions } = report_sections;
-        const { included = true, title = null } = sectionOptions;
+        const { included = true, title = null, defaultValue } = sectionOptions;
 
         if (!included) {
             // TODO: If we add checkboxes here for toggling if in report or not,
@@ -51,41 +70,49 @@ export function ReportGenerationView (props) {
             case "indication":
                 renderedSections.push(
                     <TextAreaGroup {...inputGroupProps} title={title || "Indication"}
-                        defaultValue={indicationFromSample} />
+                        defaultValue={savedIndication || indicationFromSample} />
                 );
                 break;
             case "analysis_performed":
                 renderedSections.push(
                     <TextAreaGroup {...inputGroupProps} title={title || "Tests / Analysis Performed"}
-                        defaultValue={analysisTypeFromSampleProcessing} />
+                        defaultValue={savedAnalysisPerformed || analysisTypeFromSampleProcessing} />
                 );
                 break;
             case "result_summary":
                 renderedSections.push(
-                    <TextAreaGroup {...inputGroupProps} title={title || "Result Summary"} />
+                    <TextAreaGroup {...inputGroupProps} title={title || "Result Summary"}
+                        defaultValue={savedResultSummary || defaultValue} />
                 );
                 break;
             case "findings_table":
                 // TODO
+                renderedSections.push(
+                    <ReportFindingsTable {...{ variantSamples }} />
+                );
                 break;
             case "recommendations":
                 renderedSections.push(
-                    <TextAreaGroup {...inputGroupProps} title={title || "Recommendations"} />
+                    <TextAreaGroup {...inputGroupProps} title={title || "Recommendations"}
+                        defaultValue={savedRecommendations || defaultValue} />
                 );
                 break;
             case "additional_case_notes":
                 renderedSections.push(
-                    <TextAreaGroup {...inputGroupProps} title={title || "Additional Case Notes"} rows={5} />
+                    <TextAreaGroup {...inputGroupProps} title={title || "Additional Case Notes"} rows={5}
+                        defaultValue={null} placeholder="Under Development..." disabled={true} />
                 );
                 break;
             case "methodology":
                 renderedSections.push(
-                    <TextAreaGroup {...inputGroupProps} title={title || "Methodology"} rows={3} />
+                    <TextAreaGroup {...inputGroupProps} title={title || "Methodology"} rows={3}
+                        defaultValue={savedMethodology || defaultValue} />
                 );
                 break;
             case "references":
                 renderedSections.push(
-                    <TextAreaGroup {...inputGroupProps} title={title || "References"} rows={5} />
+                    <TextAreaGroup {...inputGroupProps} title={title || "References"} rows={5}
+                        defaultValue={savedReferences || defaultValue} />
                 );
                 break;
             default:
@@ -109,14 +136,40 @@ export function ReportGenerationView (props) {
         );
     }
 
+
+    const onSubmit = useCallback(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        const formData = new FormData(e.target);
+        console.log("SUBMITTED", e.target, Object.fromEntries(formData));
+    }, []);
+
     console.log("KEYS", sortedSectionKeys);
 
     return (
-        <form className="d-block">
+        <form onSubmit={onSubmit} className="d-block">
 
-            <h4 className="text-300 mb-24">
-                Input or adjust the fields below to complete your report
-            </h4>
+            <div className="row">
+
+                <h4 className="col text-300 mb-24">
+                    Input or adjust the fields below to complete your report
+                </h4>
+
+                <div className="col-auto">
+                    <div className="btn-group" role="group">
+                        <button type="submit" className="btn btn-primary align-items-center d-flex">
+                            <i className="icon icon-save fas mr-08"/>
+                            Save
+                        </button>
+                        <button type="button" className="btn btn-primary align-items-center d-flex"
+                            onClick={onResetForm} data-tip="Revert unsaved changes">
+                            <i className="icon icon-undo fas mr-08"/>
+                            Reset
+                        </button>
+                    </div>
+                </div>
+
+            </div>
 
             { renderedWarnings }
 
@@ -132,6 +185,7 @@ function TextAreaGroup (props) {
         sectionOptions,
         children = null,
         title = null,
+        disabled: propDisabled,
         ...passProps
     } = props;
     const { readonly = false, required = false } = sectionOptions;
@@ -139,7 +193,7 @@ function TextAreaGroup (props) {
     return (
         <div className="form-group">
             { children ? children : <label htmlFor={inputElementID}>{ title }</label> }
-            <AutoGrowTextArea {...passProps} id={inputElementID} disabled={readonly} />
+            <AutoGrowTextArea {...passProps} id={inputElementID} disabled={propDisabled || readonly} name={sectionKey} />
         </div>
     );
 }
@@ -147,3 +201,60 @@ TextAreaGroup.defaultProps = {
     "rows": 1,
     "defaultValue": ""
 };
+
+const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
+    const { variantSamples } = props;
+    const { table_tags: { tags: tableTagOptions } } = projectReportSettings;
+
+    const tagOptionsMapping = useMemo(function(){
+        const tagMap = {};
+        tableTagOptions.forEach(function(tag){
+            tagMap[tag.id] = tag;
+        });
+        return tagMap;
+    }, [ tableTagOptions ]);
+
+    const findingsTableGroupings = _.groupBy(variantSamples, "finding_table_tag");
+    const findingsTableKeysFound = Object.keys(findingsTableGroupings);
+    const findingsTableKeysFoundLen = findingsTableKeysFound.length;
+    const noGroupsFound = findingsTableKeysFoundLen === 1 && typeof findingsTableKeysFound[0] === "undefined";
+
+    if (noGroupsFound) {
+        return (
+            <div className="border-top border-bottom py-2 mb-16">
+                <h5>No finding table tags applied to any variant samples.</h5>
+            </div>
+        );
+    }
+
+    const renderedTables = tableTagOptions.map(function(findingTag, idx){
+        // const samplesForTag = findingsTableGroupings[findingTag];
+        const tagOptions = tagOptionsMapping[findingTag];
+
+        if (!tagOptions) {
+            // Unsupported tag.. return.. some error..
+        }
+
+        const { title, always_visible } = tagOptions || {};
+
+        if (typeof findingTag === "undefined") {
+            // ...
+        }
+
+        console.log(findingTag);
+
+        return (
+            <div key={idx}>
+                <h5>
+                    { title }
+                </h5>
+            </div>
+        );
+    }).filter(function(renderedTable){
+        return !!renderedTable;
+    });
+
+    console.log("FINDINGs GROUPS", findingsTableGroupings);
+    return null;
+});
+

@@ -86,6 +86,10 @@ export const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetD
             // If not range facet, transform vals to proper names.
             // (formatRangeVal will do same if necessary)
             v = v.map(function(termVal){
+                // Special case for 'q' (free text search field)
+                if (field === "q") {
+                    return "\"" + termVal + "\"";
+                }
                 return Schemas.Term.toName(field, termVal);
             });
 

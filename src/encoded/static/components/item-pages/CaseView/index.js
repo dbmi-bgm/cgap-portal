@@ -131,10 +131,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         addToBodyClassList,
         removeFromBodyClassList,
         setIsSubmitting,
+        // Passed in from CaseView or 1 of its controllers
         graphData,
         selectedDiseaseIdxMap,
         idToGraphIdentifier,
         PedigreeVizLibrary = null,
+        // Passed in from TabView
+        isActiveTab,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
@@ -281,24 +284,28 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
     return (
         <React.Fragment>
-            <div className="container-wide">
-                <h3 className="tab-section-title">
-                    <div className="pt-12 pb-06">
-                        <span>
-                            { caseNamedTitle || caseNamedID }
-                        </span>
-                        <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
-                            { caseAccession }
-                        </object.CopyWrapper>
-                    </div>
-                </h3>
-            </div>
+            { !isActiveTab ? null : (
+                <div className="container-wide">
+                    <h3 className="tab-section-title">
+                        <div className="pt-12 pb-06">
+                            <span>
+                                { caseNamedTitle || caseNamedID }
+                            </span>
+                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
+                                { caseAccession }
+                            </object.CopyWrapper>
+                        </div>
+                    </h3>
+                </div>
+            ) }
             <hr className="tab-section-title-horiz-divider" />
             <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
-                    <div className="col-stats mb-2 mb-lg-0">
-                        <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
-                    </div>
+                    { !isActiveTab ? null : (
+                        <div className="col-stats mb-2 mb-lg-0">
+                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
+                        </div>
+                    )}
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
                             <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
@@ -326,7 +333,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             </div>
 
             { currFamily && caseIndividual ?
-                <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
                         <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
                     </DotRouterTab>
@@ -362,19 +369,20 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 CaseInfoTabView.getTabObject = function(props){
     const { context: { variant_sample_list_id } = {} } = props;
     return {
-        'tab' : (
+        "tab" : (
             <React.Fragment>
                 <i className="icon icon-cogs fas icon-fw"/>
                 <span>Case Info</span>
             </React.Fragment>
         ),
-        'key' : 'case-info',
-        'disabled' : false,
-        'content' : (
+        "key" : "case-info",
+        "disabled" : false,
+        "content" : (
             <VariantSampleListController id={variant_sample_list_id}>
                 <CaseInfoTabView {...props} />
             </VariantSampleListController>
-        )
+        ),
+        "cache": true
     };
 };
 
@@ -400,14 +408,21 @@ class DotRouter extends React.PureComponent {
             throw new Error("Must provide children and ideally default tab to DotRouter via props.");
         }
 
+        let defaultChildTab = null;
+
         for (var i = 0; i < childrenLen; i++) {
-            if (children[i].props.default === true) {
-                return children[i];
+            const currChild = children[i];
+            if (currChild.props.disabled) {
+                continue;
+            }
+            defaultChildTab = currChild;
+            if (currChild.props.default === true) {
+                break;
             }
         }
 
-        // If no default found, use first child component as default.
-        return children[0];
+        // If no default found, use last non-disabled tab.
+        return defaultChildTab;
     }
 
     static defaultProps = {
@@ -419,13 +434,16 @@ class DotRouter extends React.PureComponent {
 
     constructor(props){
         super(props);
+        this.getCurrentTab = this.getCurrentTab.bind(this);
         this.memoized = {
             getDefaultTab: memoize(DotRouter.getDefaultTab),
             getDotPath: memoize(DotRouter.getDotPath)
         };
     }
 
-    /** Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself */
+    /**
+     * Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself
+     */
     getCurrentTab() {
         const { children, href } = this.props;
         const dotPath = this.memoized.getDotPath(href);
@@ -445,7 +463,7 @@ class DotRouter extends React.PureComponent {
     }
 
     render() {
-        const { children, className, prependDotPath, navClassName, contentsClassName, elementID } = this.props;
+        const { children, className, prependDotPath, navClassName, contentsClassName, elementID, isActive = true } = this.props;
         const currentTab = this.getCurrentTab();
         const { props : { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
         const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
@@ -460,10 +478,10 @@ class DotRouter extends React.PureComponent {
                 }
             } = childTab;
 
-            const active = currTabDotPath === dotPath;
+            const active = isActive && (currTabDotPath === dotPath);
 
             if (active || cache) {
-                // If we cache tab contents, then pass down `props.isActiveTab` so select downstream components
+                // If we cache tab contents, then pass down `props.isActiveDotRouterTab` so select downstream components
                 // can hide or unmount themselves when not needed for performance.
                 const transformedChildren = !cache ? tabChildren : React.Children.map(tabChildren, (child)=>{
                     if (!React.isValidElement(child)) {

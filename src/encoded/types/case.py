@@ -283,8 +283,8 @@ def _build_case_embedded_list():
         "report.last_modified.*",
         "report.status",
         "report.accession",
-        "report.case.accession", # This is same as this Item's accession, no?
-        "report.variant_samples.uuid",
+        # "report.case.accession", # This is same as this Item's accession, no?
+        # "report.variant_samples.uuid",
 
         # FilterSet linkTo
         "active_filterset.@id",

@@ -65,13 +65,13 @@ export class AutoGrowTextArea extends React.Component {
     }
 
     render() {
-        const { value, children, className, buffer, minHeight, maxHeight, ...passProps } = this.props;
+        const { className, buffer, minHeight, maxHeight, ...passProps } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
-        const useValue = value || children;
+
         return (
-            // passProps includes row, placeholder, disabled, ...
+            // passProps includes value, defaultValue, children, row, placeholder, disabled, ...
             <div style={this.memoized.textareaWrapperStyle(parentHeight, maxHeight)} className={className}>
-                <textarea {...passProps} value={useValue} ref={this.textAreaRef} style={this.memoized.textareaStyle(textAreaHeight, maxHeight)}
+                <textarea {...passProps} ref={this.textAreaRef} style={this.memoized.textareaStyle(textAreaHeight, maxHeight)}
                     className="form-control" onChange={this.onChange} />
             </div>
         );

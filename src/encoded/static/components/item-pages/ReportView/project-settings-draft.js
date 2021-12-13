@@ -57,11 +57,6 @@ export const projectReportSettings = {
             }
         ]
     },
-    // "introduction": {
-    //     "title" : "Introduction",
-    //     "order": 0,
-    //     "included": true
-    // },
     "report_sections": {
         "indication": {
             "title" : "Indication",
@@ -75,13 +70,14 @@ export const projectReportSettings = {
             "included": true,
             "readonly": true,
             // Maybe, if not free-text:
-            "tests_shown": ["something1", "something2"]
+            //"tests_shown": ["something1", "something2"]
         },
         "result_summary": {
             "title" : "Result Summary",
             "order": 3,
             "included": true,
-            "readonly": false
+            "readonly": false,
+            "defaultValue": null
         },
         "findings_table": {
             // "title" : null,
@@ -92,25 +88,30 @@ export const projectReportSettings = {
             "title" : "Recommendations",
             "order": 5,
             "included": true,
-            "readonly": false
+            "readonly": false,
+            "defaultValue": null,
         },
         "additional_case_notes": {
             "title" : "Additional Case Notes",
             "order": 6,
             "included": true,
-            "readonly": false
+            "readonly": false,
+            "defaultValue": null,
         },
         "methodology": {
             "title" : "Methodology",
             "order": 7,
             "included": true,
-            "readonly": false
+            "readonly": false,
+            // Considering something like this -
+            "defaultValue": "Tested ABCD with XYZ and then something or other"
         },
         "references": {
             "title": "References",
             "order": 8,
             "included": true,
-            "readonly": false
+            "readonly": false,
+            "defaultValue": null,
         }
     }
 };

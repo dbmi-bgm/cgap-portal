@@ -73,7 +73,7 @@ export class CaseReviewController extends React.Component {
         this.state = {
             "changedClassificationsByVS": {},
             "projectItem": null,
-            "reportItem": null,
+            "fetchedReportItem": null,
             "isFetchingReportItem": true,
             // Reference to object, not clone (extra memory) of it. Used solely for getDerivedStateFromProps.
             "pastVSLItem": props.variantSampleListItem
@@ -85,11 +85,11 @@ export class CaseReviewController extends React.Component {
     }
 
     componentDidMount() {
-        const { projectItem, reportItem } = this.state;
+        const { projectItem, fetchedReportItem } = this.state;
         if (!projectItem) {
             this.fetchProjectItem();
         }
-        if (!reportItem) {
+        if (!fetchedReportItem) {
             this.fetchReportItem();
         }
     }
@@ -140,7 +140,22 @@ export class CaseReviewController extends React.Component {
                 "fields": [
                     "@id",
                     "uuid",
-                    "variant_samples.uuid"
+                    /** Datetime in string/isoformat. Used as unique key for ReportGenerationView to reset its values upon Report updates. */
+                    "last_modified.date_modified",
+                    /**
+                     * Used for checking if Note is saved to Report.
+                     * Updated on adding Notes to Report and setting/unsetting finding_table_tag
+                     */
+                    "variant_samples.uuid",
+                    /** String */
+                    "indication",
+                    "analysis_performed",
+                    "result_summary",
+                    "recommendations",
+                    "methodology",
+                    "references",
+                    /** linkTo Note */
+                    "extra_notes"
                 ]
             }));
         });

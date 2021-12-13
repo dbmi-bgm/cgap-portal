@@ -65,6 +65,30 @@
                 "linkTo": "VariantSample"
             }
         },
+        "indication": {
+            "title": "Indication",
+            "type": "string"
+        },
+        "analysis_performed": {
+            "title": "Analysis / Tests Performed",
+            "type": "string"
+        },
+        "result_summary": {
+            "title": "Result Summary",
+            "type": "string"
+        },
+        "recommendations": {
+            "title": "Recommendations",
+            "type": "string"
+        },
+        "methodology": {
+            "title": "Methodology",
+            "type": "string"
+        },
+        "references": {
+            "title": "References",
+            "type": "string"
+        },
         "extra_notes": {
             "title": "Additional Notes",
             "description": "Notes for this report that are not attached to the Variant Samples",

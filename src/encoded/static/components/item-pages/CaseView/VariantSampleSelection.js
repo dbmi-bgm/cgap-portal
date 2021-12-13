@@ -157,8 +157,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         tableTagsByID
     } = props;
     const {
-        accession: caseAccession,
-        report: { uuid: reportUUID } = {}
+        accession: caseAccession
     } = context; // `context` refers to our Case in here.
     const {
         date_selected,
@@ -372,7 +371,9 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
         <React.Fragment>
             <i className={
                 "icon align-middle icon-fw title-prefix-icon fas mr-12 icon-"
-                + (noSavedNotes ? "exclamation-triangle text-warning" : countNotesInReport > 0 ? "file text-secondary" : "minus-circle text-secondary")
+                + (noSavedNotes ? "exclamation-triangle text-warning"
+                    : countNotesInReport > 0 ? "file-alt text-secondary"
+                        : "minus-circle text-secondary")
             } data-tip={
                 noSavedNotes ? "No notes saved for this Sample Variant, annotate it under the Interpretation tab."
                     : `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`
