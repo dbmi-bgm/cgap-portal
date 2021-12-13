@@ -172,6 +172,31 @@ class TestGeneListSubmission:
         assert genelist.errors
         assert not genelist.post_output
 
+    def test_gene_url_encoding(self, es_testapp, workbook, wb_project, wb_institution):
+        """Test search on provided genes with non-URL characters works
+        as expected (redirects followed).
+
+        If non-URL character in the case (as in test data here), this
+        is not an issue since we never expect such characters in an
+        accession, so no need to try and follow re-directs.
+        """
+        genelist = GeneListSubmission(
+            GENELIST_PATH + "test_gene_url_encoding.txt",
+            wb_project["@id"],
+            wb_institution["@id"],
+            es_testapp,
+        )
+        assert len(genelist.gene_ids) == 2
+        assert genelist.case_atids
+        assert not genelist.bam_sample_ids
+        assert genelist.errors
+        gene_in_error = False
+        for gene in genelist.genes:
+            if any([gene in error for error in genelist.errors]):
+                gene_in_error = True
+        assert gene_in_error
+        assert not genelist.post_output
+
     def test_validate_and_post(self, es_testapp, workbook, wb_project, wb_institution):
         """
         Test for correct validation but no posting of document and gene list
