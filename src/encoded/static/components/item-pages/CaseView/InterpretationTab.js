@@ -57,6 +57,7 @@ export class InterpretationTabController extends React.Component {
     constructor(props){
         super(props);
         this.toggleVariantSampleSelectionDeletion = this.toggleVariantSampleSelectionDeletion.bind(this);
+        this.toggleStructuralVariantSampleSelectionDeletion = this.toggleStructuralVariantSampleSelectionDeletion.bind(this);
         this.resetVariantSampleSelectionDeletionsAndOrdering = this.resetVariantSampleSelectionDeletionsAndOrdering.bind(this);
         this.state = {
             "deletedVariantSampleSelections": {},

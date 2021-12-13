@@ -188,6 +188,56 @@ export const variantSampleColumnExtensionMap = {
     }
 };
 
+export const structuralVariantSampleColumnExtensionMap = {
+    // Worst Transcript col
+    "structural_variant.worst_transcript": {
+        /** TODO: Update worst consequence with data from SV col ext map once highlighted gene functionality is added to interpretation space */
+        render: (result, props) => <div className="text-muted text-small">Highlighted Gene <br/>Not Selected</div>,
+    },
+    // Gene, Transcript col
+    "structural_variant.transcript": {
+        render: (result, props) => {
+            const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
+            const { align = "left" } = props || {};
+
+            const path = atID + "?annotationTab=0";
+
+            const transcriptsDeduped = {};
+            transcripts.forEach((transcript) => {
+                const { csq_gene: { display_title = null } = {} } = transcript;
+                transcriptsDeduped[display_title] = true;
+            });
+            const genes = Object.keys(transcriptsDeduped);
+
+            const rows = [];
+
+            if (genes.length <= 2) { // show comma separated
+                rows.push(
+                    <div className="text-small">
+                        <span className="text-muted">List:&nbsp;</span>
+                        <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>
+                    </div>);
+            } else {
+                // show first and last gene separated by "..." with first 10 available on hover in first row
+                const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
+                const tipGenes = genes.slice(0, lastItemIndex).join(", ");
+                rows.push(
+                    <div className="text-small">
+                        <span className="text-muted">List:</span>
+                        <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a>
+                    </div>);
+            }
+
+            rows.push(
+                <div className="text-muted">
+                    <i className="icon icon-star fas" />:&nbsp;
+                    <span className="text-small">Not Selected</span>
+                </div>);
+
+            return (<div className="w-100"><StackedRowColumn className={"text-" + align} {...{ rows }} /></div>);
+        }
+    }
+};
 
 /**************************************************
  *** Definitions for some table cell components ***

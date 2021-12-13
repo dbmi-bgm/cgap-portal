@@ -169,8 +169,12 @@ export class VariantSampleListController extends React.PureComponent {
                         "structural_variant_samples.structural_variant_sample_item.display_title",
                         "structural_variant_samples.structural_variant_sample_item.finding_table_tag",
                         "structural_variant_samples.structural_variant_sample_item.actions",
-                        "structural_variant_samples.structural_variant_sample_item.variant.@id",
-                        "structural_variant_samples.structural_variant_sample_item.variant.display_title",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.@id",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.display_title",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.transcript.csq_gene.display_title",
+                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.father_genotype_label",
 
                         // VariantSampleItem Notes (for CaseReviewTab)
                         ...variantSampleListItemNoteEmbeds

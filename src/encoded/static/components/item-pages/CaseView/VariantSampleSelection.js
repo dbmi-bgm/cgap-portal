@@ -6,7 +6,7 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { display, LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
-import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 // TEMPORARY:
@@ -118,7 +118,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
         const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
         return (
-            <VariantSampleSelection {...commonProps} key={vsUUID || index}
+            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="VariantSample"
                 {...{ selection, index, unsavedClassification, isDeleted }}  />
         );
     });
@@ -137,24 +137,26 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
         const isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
         return (
-            <div key={vsUUID}>
-                { display_title }
-            </div>
-            // <VariantSampleSelection {...commonProps} key={vsUUID || index}
-            //     {...{ selection, index, unsavedClassification, isDeleted }}  />
+            // <div key={vsUUID}>
+            //     { display_title }
+            // </div>
+            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="StructuralVariantSample"
+                {...{ selection, index, unsavedClassification, isDeleted }}  />
         );
     });
 
     return (
         <div className="row">
-            <div className="col-12">
-                <h2 className="mb-3">SNV / Indel Variants</h2>
-                {snvOptions}
-            </div>
-            <div className="col-12">
-                <h2 className="mb-3">CNV / SV Variants</h2>
-                {cnvOptions}
-            </div>
+            { !!vsSelections.length &&
+                <div className="col-12">
+                    <h2 className="mb-3">SNV / Indel Variants</h2>
+                    {snvOptions}
+                </div> }
+            { !!cnvSelections.length &&
+                <div className="col-12">
+                    <h2 className="mb-3">CNV / SV Variants</h2>
+                    {cnvOptions}
+                </div> }
         </div>
     );
 
@@ -166,20 +168,27 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
  * as value 'cells' of this card.
  */
 const {
-    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
+    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFuncSNV },
     "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
     "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
 } = variantSampleColumnExtensionMap;
 
+const {
+    "structural_variant.worst_transcript": { render: worstTranscriptRenderFunc },
+    "structural_variant.transcript": { render: geneTranscriptRenderFuncSV }
+} = structuralVariantSampleColumnExtensionMap;
+
 export const VariantSampleSelection = React.memo(function VariantSampleSelection(props){
     const {
-        selection,  // VariantSample Item
+        selection,  // VariantSample or StructuralVariantSample Item
+        searchType, // VariantSample or StructuralVariantSample (string)
         index,
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
         // From InterpretationTab (if used):
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         isDeleted,
         anyUnsavedChanges, // If true, then should prevent navigation to VS items as would lose changes in current view. (Unless we adjust to open in new window.)
         // From CaseReviewTab (if used):
@@ -201,9 +210,12 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const {
         date_selected,
         filter_blocks_request_at_time_of_selection,
-        variant_sample_item: variantSample
+        variant_sample_item: variantSample,
+        structural_variant_sample_item: structuralVariantSample
     } = selection;
 
+    const selectedVS = variantSample || structuralVariantSample;
+    const toggleSelectedVSDeletionFx = toggleStructuralVariantSampleSelectionDeletion || toggleVariantSampleSelectionDeletion;
 
     // TODO: Consider if should just re-use state.isExpanded for "Actions" btn, expanding to show a menu..
     const [ isExpanded, setIsExpanded ] = useState(false); // Can move this state up if have pagination or infinite scroll or something in future.
@@ -216,16 +228,28 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         "VariantSample": {
             columns: {
                 "variant.genes.genes_most_severe_gene.display_title": {
-                    title: geneTranscriptColTitle,
-                    description: geneTranscriptColDescription
+                    title: snvGeneTranscriptColTitle,
+                    description: snvGeneTranscriptColDescription
                 } = {},
                 "variant.genes.genes_most_severe_hgvsc": {
-                    title: variantColTitle,
-                    description: variantColDescription
+                    title: snvVariantColTitle,
+                    description: snvVariantColDescription
                 } = {},
                 "associated_genotype_labels.proband_genotype_label": {
-                    title: genotypeLabelColTitle,
-                    description: genotypeLabelColDescription
+                    title: snvGenotypeLabelColTitle,
+                    description: snvGenotypeLabelColDescription
+                } = {}
+            } = {}
+        } = {},
+        "StructuralVariantSample": {
+            columns: {
+                "structural_variant.display_title": {
+                    title: svVariantColTitle,
+                    description: svVariantColDescription
+                } = {},
+                "associated_genotype_labels.proband_genotype_label": {
+                    title: svGenotypeLabelColTitle,
+                    description: svGenotypeLabelColDescription
                 } = {}
             } = {}
         } = {}
@@ -233,15 +257,18 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const {
         "@id": vsID,
-        variant: { display_title: variantDisplayTitle },
+        variant: { display_title: snvVariantDisplayTitle } = {},
+        structural_variant: { display_title: svVariantDisplayTitle } = {},
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
         gene_notes: lastGeneNote = null
-    } = variantSample || {};
+    } = selectedVS || {};
+
+    console.log("selectedVS", selectedVS);
 
     const { countNotes, countNotesInReport, countNotesInKnowledgeBase } = useMemo(function(){
-        const notes = getAllNotesFromVariantSample(variantSample);
+        const notes = getAllNotesFromVariantSample(selectedVS);
         const countNotes = notes.length;
         let countNotesInReport = 0;
         let countNotesInKnowledgeBase = 0;
@@ -254,7 +281,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             }
         });
         return { countNotes, countNotesInReport, countNotesInKnowledgeBase };
-    }, [ context, variantSample ]);
+    }, [ context, selectedVS ]);
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
     const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
@@ -263,7 +290,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     let expandedNotesSection = null;
     if (isExpanded) {
         const noteSectionProps = {
-            variantSample,
+            variantSample: selectedVS,
             toggleSendToProjectStoreItems,
             toggleSendToReportStoreItems,
             sendToProjectStore,
@@ -274,6 +301,20 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
     }
 
+    const variantIsSNV = searchType === "VariantSample";
+
+    // Pull values from SV if SV, SNV if SNV
+    const geneTranscriptColDescription = snvGeneTranscriptColDescription; // todo: add sv version
+    const geneTranscriptColTitle = snvGeneTranscriptColTitle; // todo: add sv version
+    const variantColTitle = (variantIsSNV ? snvVariantColTitle : svVariantColTitle );
+    const variantGenotypeLabelColTitle = (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle );
+    const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : svVariantDisplayTitle );
+    const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
+    const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
+    const geneTranscriptRenderFunc = (variantIsSNV ? geneTranscriptRenderFuncSNV: geneTranscriptRenderFuncSV);
+
+    console.log("display title", snvVariantDisplayTitle, svVariantDisplayTitle, variantDisplayTitle,  (variantIsSNV ? snvVariantDisplayTitle : svVariantDisplayTitle ));
+
     return (
         <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
             <div className="card-header pr-12">
@@ -282,8 +323,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
                             { parentTabType === parentTabTypes.CASEREVIEW ?
-                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle }}/>
-                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession }} />
+                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle }} />
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, caseAccession, variantDisplayTitle }} />
                             }
                         </h4>
                     </div>
@@ -296,7 +337,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
                         { parentTabType === parentTabTypes.CASEREVIEW ?
                             <div className="d-block d-lg-flex align-items-center">
-                                <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS }} />
+                                <ClassificationDropdown variantSample={selectedVS} {...{ tableTagsByID, unsavedClassification, updateClassificationForVS }} />
                                 <button type="button" className={"btn btn-sm d-flex align-items-center btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
                                     onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                     <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
@@ -307,7 +348,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             : null }
 
                         { parentTabType === parentTabTypes.INTERPRETATION ?
-                            <ActionsDropdown {...{ toggleVariantSampleSelectionDeletion, isDeleted, variantSample }} />
+                            <ActionsDropdown variantSample={selectedVS} toggleVariantSampleSelectionDeletion={toggleSelectedVSDeletionFx} {...{ isDeleted }} />
                             : null }
 
                     </div>
@@ -320,19 +361,27 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
                             { geneTranscriptColTitle || "Gene, Transcript" }
                         </label>
-                        { geneTranscriptRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        { geneTranscriptRenderFunc(selectedVS, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
-                    <div className="col col-sm-4 col-lg-2 py-2">
-                        <label className="mb-04 text-small" data-tip={variantColDescription}>
-                            { variantColTitle || "Variant" }
-                        </label>
-                        { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
-                    </div>
+                    { variantIsSNV &&
+                        <div className="col col-sm-4 col-lg-2 py-2">
+                            <label className="mb-04 text-small" data-tip={variantColDescription}>
+                                { variantColTitle || "Variant" }
+                            </label>
+                            { variantRenderFunc(selectedVS, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        </div> }
+                    { !variantIsSNV &&
+                        <div className="col col-sm-4 col-lg-2 py-2">
+                            <label className="mb-04 text-small">
+                                { "Worst Consequence" }
+                            </label>
+                            { worstTranscriptRenderFunc(selectedVS)}
+                        </div> }
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
-                            { genotypeLabelColTitle || "Genotype" }
+                            { variantGenotypeLabelColTitle || "Genotype" }
                         </label>
-                        { genotypeLabelRenderFunc(variantSample, { align: 'left' }) }
+                        { genotypeLabelRenderFunc(selectedVS, { align: 'left' }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small">ACMG Classification</label>
@@ -428,7 +477,7 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 
 function ActionsDropdown(props){
     const { toggleVariantSampleSelectionDeletion, variantSample, isDeleted } = props;
-    const { uuid: vsUUID } = variantSample;
+    const { uuid: vsUUID } = variantSample; // can be StructuralVariantSample OR VariantSample
 
     const onSelect = useCallback(function(evtKey, e){
         if (evtKey === "delete") {
