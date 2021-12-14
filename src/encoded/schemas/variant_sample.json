@@ -555,8 +555,9 @@
                 }
             ]
         },
-        "variant.transcript.csq_exon": {
+        "variant.transcript": {
             "title": "Location",
+            "comment": "Column display is overriden by front-end",
             "order": 25
         },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
