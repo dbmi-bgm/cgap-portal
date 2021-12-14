@@ -12,7 +12,7 @@ import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import { console, navigate, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
+import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
 /**
  * Stores and manages global note state for interpretation space. Handles AJAX
@@ -510,7 +510,7 @@ class GenericInterpretationPanel extends React.PureComponent {
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
-        this.onTextChange = this.onTextChange.bind(this);
+        this.onTextAreaChange = this.onTextAreaChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
     }
 
@@ -536,9 +536,9 @@ class GenericInterpretationPanel extends React.PureComponent {
     }
 
     // Will use same update fxn for multiple text fields
-    onTextChange(event, stateToChange) {
+    onTextAreaChange(event) {
         const { value: newValue } = event.target || {};
-        this.setState({ [stateToChange]: newValue });
+        this.setState({ "note_text": newValue });
     }
 
     // Using same update fxn for multiple dropdowns
@@ -604,7 +604,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                 { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
-                <AutoGrowTextArea {...{ isFallback }} cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
+                <AutoGrowTextArea disabled={isFallback} className="w-100 mb-1" value={noteText} onChange={this.onTextAreaChange} placeholder="Required" />
                 { noteType === "note_interpretation" ?
                     <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_rules_invoked', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
@@ -670,102 +670,26 @@ function NoteFieldDrop(props) {
     );
 }
 
-/** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
-class NoGrowTextArea extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
-    }
-    onChangeWrapper(e) {
-        const { onTextChange, field } = this.props;
-        onTextChange(e, field);
-    }
-    render() {
-        const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
-        return (
-            <div className={cls} style={{ minHeight: "135px" }}>
-                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
-            </div>
-        );
-    }
-}
-
-class AutoGrowTextArea extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = { textAreaHeight: "100%", parentHeight: "auto" };
-        this.textAreaRef = React.createRef(null);
-
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
-    }
-
-    componentDidMount() {
-        const { minHeight, maxHeight } = this.props;
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        // if (minHeight > currScrollHeight) {
-        //     this.setState({
-        //         parentHeight: `${minHeight}px`,
-        //         textAreaHeight: `${minHeight}}px`
-        //     });
-        // } else {
-        this.setState({
-            parentHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`,
-            textAreaHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`
-        });
-        // }
-    }
-
-    onChangeWrapper(e) {
-        const { onTextChange, field, minHeight, maxHeight } = this.props;
-
-        onTextChange(e, field);
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        // if (minHeight && minHeight > currScrollHeight) {
-        //     this.setState({ textAreaHeight: "auto", parentHeight: `${minHeight}px` }, () => {
-        //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
-        //         if (minHeight > newScrollHeight) {
-        //             this.setState({
-        //                 parentHeight: `${minHeight}px`,
-        //                 textAreaHeight: `${minHeight}}px`
-        //             });
-        //         }
-        //     });
-        // } else {
-        this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight < maxHeight ? currScrollHeight : maxHeight}px` }, () => {
-            const newScrollHeight = this.textAreaRef.current.scrollHeight;
-            this.setState({
-                parentHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`,
-                textAreaHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`
-            });
-        });
-        // }
-    }
-
-    render() {
-        const { text, cls, minHeight, maxHeight, isFallback } = this.props;
-        const { textAreaHeight, parentHeight } = this.state;
-
-        const disableField = isFallback;
-
-        return (
-            <div style={{
-                minHeight: parentHeight > maxHeight ? maxHeight: parentHeight,
-                // height: parentHeight
-            }} className={cls}>
-                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} placeholder="Required" disabled={disableField} />
-            </div>
-        );
-    }
-}
-AutoGrowTextArea.defaultProps = {
-    minHeight: 150,
-    maxHeight: 325
-};
+// /** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
+// class NoGrowTextArea extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         this.onChangeWrapper = this.onChangeWrapper.bind(this);
+//     }
+//     onChangeWrapper(e) {
+//         const { onTextChange, field } = this.props;
+//         onTextChange(e, field);
+//     }
+//     render() {
+//         const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
+//         return (
+//             <div className={cls} style={{ minHeight: "135px" }}>
+//                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
+//                     onChange={this.onChangeWrapper} />
+//             </div>
+//         );
+//     }
+// }
 
 
 function noteFieldNameToSchemaFormatted(field) {

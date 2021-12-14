@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useCallback, useMemo } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -9,6 +9,7 @@ import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 import { VariantSampleSelectionList, parentTabTypes } from './VariantSampleSelection';
 import { CaseSpecificSelectionsPanel, getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 import { InnerTabToggle } from './FilteringTab';
+import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
 
 
@@ -329,6 +330,19 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         toggleKBNoteSubselectionState,
     } = props;
 
+    // TODO: Determine if any notes saved to report, and then (a) undisable button + (b) set state to 1.
+    const [ currentViewIdx, setCurrentViewIdx ] = useState(0);
+
+    const onClickA = useCallback(function(e){
+        e.stopPropagation();
+        setCurrentViewIdx(0);
+    });
+
+    const onClickB = useCallback(function(e){
+        e.stopPropagation();
+        setCurrentViewIdx(1);
+    });
+
     if (!isActiveDotRouterTab) {
         return null;
     }
@@ -343,6 +357,19 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         schemas, context
     };
 
+    const toggleOptions = [
+        {
+            "title": "I. Note Finalization",
+            "onClick": onClickA
+        },
+        {
+            "title": "II. Report Generation",
+            "onClick": onClickB,
+            "disabled": true // Under Construction
+        }
+    ];
+
+
     return (
         <React.Fragment>
             <div className="d-flex align-items-center justify-content-between mb-36">
@@ -352,10 +379,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                 </h1>
 
                 <div className="my-3 my-md-n3">
-                    <InnerTabToggle activeIdx={0} disabledB
-                        titleA="I. Note Finalization"
-                        titleB="II. Report Generation"
-                    />
+                    <InnerTabToggle options={toggleOptions} activeIdx={currentViewIdx} />
                 </div>
 
                 {/* Hidden Temporarily
@@ -368,44 +392,72 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                 */}
 
             </div>
-            <div>
 
-                <CaseSpecificSelectionsPanel {...commonSelectionsProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
+            { currentViewIdx === 0 ? // Note Finalization
+                <div>
 
-                <div className="d-block d-md-flex align-items-center justify-content-between mb-12">
-                    <div className="text-left">
-                        {/*
-                        <button type="button" className="btn btn-primary mr-05" disabled>
-                            Export current 'Send to Project' selections as <span className="text-600">TSV spreadsheet</span>
-                        </button>
-                        */}
+                    <CaseSpecificSelectionsPanel {...commonSelectionsProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
 
-                        <PatchItemsProgress>
-                            <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore, context }} className="my-1 mr-1"/>
-                        </PatchItemsProgress>
+                    <div className="d-block d-md-flex align-items-center justify-content-between mb-12">
+                        <div className="text-left">
+                            {/*
+                            <button type="button" className="btn btn-primary mr-05" disabled>
+                                Export current 'Send to Project' selections as <span className="text-600">TSV spreadsheet</span>
+                            </button>
+                            */}
 
-                        <PatchItemsProgress>
-                            <SaveNotesToProjectButton {...commonBtnProps} {...{ sendToProjectStore }} className="my-1 mr-1"/>
-                        </PatchItemsProgress>
+                            <PatchItemsProgress>
+                                <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore, context }} className="my-1 mr-1"/>
+                            </PatchItemsProgress>
+
+                            <PatchItemsProgress>
+                                <SaveNotesToProjectButton {...commonBtnProps} {...{ sendToProjectStore }} className="my-1 mr-1"/>
+                            </PatchItemsProgress>
+
+                        </div>
+
+                        <div className="text-left">
+                            <PatchItemsProgress>
+                                <SaveFindingsButton {...commonBtnProps} {...{ changedClassificationsByVS, updateClassificationForVS, changedClassificationsCount }} className="ml-md-05 my-1" />
+                            </PatchItemsProgress>
+                        </div>
 
                     </div>
 
-                    <div className="text-left">
-                        <PatchItemsProgress>
-                            <SaveFindingsButton {...commonBtnProps} {...{ changedClassificationsByVS, updateClassificationForVS, changedClassificationsCount }} className="ml-md-05 my-1" />
-                        </PatchItemsProgress>
-                    </div>
+                    <VariantSampleSelectionList {...commonSelectionsProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
+                        parentTabType={parentTabTypes.CASEREVIEW} />
 
                 </div>
+                :
+                <ReportGenerationView />
+            }
 
-                <VariantSampleSelectionList {...commonSelectionsProps} {...{ changedClassificationsByVS, updateClassificationForVS }}
-                    parentTabType={parentTabTypes.CASEREVIEW} />
-
-            </div>
         </React.Fragment>
     );
 });
 
+
+
+function ReportGenerationView () {
+    return (
+        <form className="d-block">
+            <h5 className="text-300">
+                Input fields below to complete your report
+            </h5>
+
+            <div className="form-group">
+                <label htmlFor="report_generation_indication">Indication</label>
+                <AutoGrowTextArea id="report_generation_indication" rows="3" defaultValue="Familial Breast-Ovarian Cancer" />
+                {/*
+                <textarea className="form-control" id="report_generation_indication" rows="3">
+                    Familial Breast-Ovarian Cancer
+                </textarea>
+                */}
+            </div>
+
+        </form>
+    );
+}
 
 
 /**
