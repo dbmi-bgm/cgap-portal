@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import { getMostSevereConsequence, getTranscriptLocation } from '../item-pages/VariantSampleView/AnnotationSections';
 
 /**
  * This gets merged into the columnExtensionMap.js.
@@ -113,6 +114,30 @@ export const variantSampleColumnExtensionMap = {
                     <GenesMostSevereHGVSCColumn gene={firstGene} {...{ align }} />
                 </a>
             );
+        }
+    },
+    "variant.transcript": { // "Location"
+        render: function(result, props) {
+            const { variant: { transcript = [] } = {} } = result;
+
+            // Find worst transcript and consequences
+            let worstTranscript;
+            let consequences;
+            for (let i = 0; i < transcript.length; i++) {
+                const thisTranscript = transcript[i];
+                const { csq_most_severe, csq_consequence } = thisTranscript;
+                if (csq_most_severe) {
+                    worstTranscript = thisTranscript;
+                    consequences = csq_consequence;
+                    break;
+                }
+            }
+            if (!worstTranscript) { return null; }
+
+            // Get most severe consequence from consequences
+            const worstConsequence = getMostSevereConsequence(consequences);
+
+            return getTranscriptLocation(worstTranscript, worstConsequence);
         }
     },
     "variant.genes.genes_most_severe_consequence.coding_effect": { // Coding Effect column
