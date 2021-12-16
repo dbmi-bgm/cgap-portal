@@ -525,7 +525,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
             { lastEvaluatedFromClinVar ?
                 <div className="row mt-03">
                     <div className="col-3">
-                        <label className="mb-0">Last Evaluted: </label>
+                        <label className="mb-0">Last Evaluated: </label>
                     </div>
                     <div className="col-9">
                         <LocalizedTime timestamp={lastEvaluatedFromClinVar} />
