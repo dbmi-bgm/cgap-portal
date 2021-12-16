@@ -2419,7 +2419,7 @@ i.status-indicator-dot {
 			justify-content: space-between;
 			height: 32px;
 			position: relative;
-			// z-index: 5;
+			z-index: 1;
 
 			> .dropdown > .btn-outline-secondary {
 				@include button-variant(#fff, #e0e0e0);
@@ -2448,6 +2448,9 @@ i.status-indicator-dot {
 				margin-top: -16px;
 				flex-grow: 1;
 				border-radius: $border-radius-sm;
+				> * {
+					z-index: 1;
+				}
 			}
 		}
 
@@ -2475,8 +2478,19 @@ i.status-indicator-dot {
 				@media (max-width:1300px) and (min-width:768px) {
 					padding-top: 50px;
 				}
+
 			}
 		}
+	}
+
+	.info-body.clinvar-info-body {
+		/** Add powered by NCBI logo **/
+		position: relative;
+		background-image: url("/static/img/NCBI_powered.png");
+		background-size: 153px 72px;
+		background-position: 98% 6px;
+		background-position: calc(100% - 9px) 6px;
+		background-repeat: no-repeat;
 	}
 
 	.sample-variant-info-header {
