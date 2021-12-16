@@ -2487,7 +2487,8 @@ i.status-indicator-dot {
 		/** Add powered by NCBI logo **/
 		position: relative;
 		background-image: url("/static/img/NCBI_powered.png");
-		background-size: 153px 72px;
+		// background-size: 153px 72px; // = Full size
+		background-size: 115px 54px; // = 3/4 size
 		background-position: 98% 6px;
 		background-position: calc(100% - 9px) 6px;
 		background-repeat: no-repeat;
