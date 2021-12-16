@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
@@ -12,7 +12,8 @@ import { ExternalDatabasesSection, ClinVarSection, standardizeGnomadValue } from
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
  */
 
-export const VariantTabBody = React.memo(function VariantTabBody ({ context, schemas, currentTranscriptIdx }) {
+export const VariantTabBody = React.memo(function VariantTabBody (props) {
+    const { context, schemas, currentTranscriptIdx, currentClinVarResponse, currentClinVarResponseLoading } = props;
     const { variant } = context;
     const {
         csq_clinvar: variationID,
@@ -50,7 +51,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
         }
 
         return ret;
-    }, [ schemas, variationID ]);
+    }, [ schemas, variant ]);
 
     const titleDict = useMemo(function(){
         return {
@@ -59,21 +60,23 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
         };
     });
 
-    let gnomadExternalLink = null;
-    const isDeletion = !ALT || ALT === "-"; // Can't link to deletions in gnomAD at moment.
-    if (showingTable === "v3" && annotationID && !isDeletion) {
-        gnomadExternalLink = (
-            "https://gnomad.broadinstitute.org/variant/"
-            + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
-            + "?dataset=gnomad_r3"
-        );
-    } else if (showingTable === "v2" && hg19_chr && hg19_pos && !isDeletion && REF) {
-        gnomadExternalLink = (
-            "https://gnomad.broadinstitute.org/variant/"
-            + (`chr${hg19_chr}:${hg19_pos}${REF}_${ALT}`)
-            + "?dataset=gnomad_r2_1"
-        );
-    }
+    const gnomadExternalLink = useMemo(function(){
+        const isDeletion = !ALT || ALT === "-"; // Can't link to deletions in gnomAD at moment.
+        if (showingTable === "v3" && annotationID && !isDeletion) {
+            return (
+                "https://gnomad.broadinstitute.org/variant/"
+                + annotationID // <- Do not wrap in encodeURIComponent -- transformed value isn't found.
+                + "?dataset=gnomad_r3"
+            );
+        } else if (showingTable === "v2" && hg19_chr && hg19_pos && !isDeletion && REF) {
+            return (
+                "https://gnomad.broadinstitute.org/variant/"
+                + (`chr${hg19_chr}:${hg19_pos}${REF}_${ALT}`)
+                + "?dataset=gnomad_r2_1"
+            );
+        }
+        return null;
+    }, [ variant, showingTable ]);
 
     return (
         <div className="variant-tab-body card-body">
@@ -94,7 +97,7 @@ export const VariantTabBody = React.memo(function VariantTabBody ({ context, sch
                             </h4>
                         </div>
                         <div className="info-body clinvar-info-body">
-                            <ClinVarSection {...{ getTipForField, context, schemas, clinvarExternalHref }} />
+                            <ClinVarSection {...{ getTipForField, context, schemas, clinvarExternalHref, currentClinVarResponse }} />
                         </div>
                     </div>
 
