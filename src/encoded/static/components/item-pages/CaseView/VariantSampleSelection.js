@@ -11,6 +11,7 @@ import { getAllNotesFromVariantSample } from './variant-sample-selection-panels'
 
 // TEMPORARY:
 import { projectReportSettings } from './../ReportView/project-settings-draft';
+import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 
 /**
@@ -149,12 +150,14 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         <div className="row">
             { !!vsSelections.length &&
                 <div className="col-12">
-                    <h2 className="mb-3">SNV / Indel Variants</h2>
+                    <h2 className="mb-05 text-600">SNV / Indel Variants</h2>
+                    <hr className="mb-2 mt-0" />
                     {snvOptions}
                 </div> }
             { !!cnvSelections.length &&
                 <div className="col-12">
-                    <h2 className="mb-3">CNV / SV Variants</h2>
+                    <h2 className="mb-05 text-600">CNV / SV Variants</h2>
+                    <hr className="mb-2 mt-0" />
                     {cnvOptions}
                 </div> }
         </div>
@@ -162,6 +165,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
 });
 
+const transformSVDisplayTitle = (svs) => {
+    const { structural_variant: { END, START, CHROM, SV_TYPE, size_display } = {} } = svs || {};
+    console.log("SVS", svs.structural_variant);
+    return `${SV_TYPE} chr${CHROM}:${decorateNumberWithCommas(START)} - ${decorateNumberWithCommas(END)} [${size_display}]`;
+};
 
 /**
  * For now, we just re-use the column render func from some VariantSample columns
@@ -308,7 +316,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const geneTranscriptColTitle = snvGeneTranscriptColTitle; // todo: add sv version
     const variantColTitle = (variantIsSNV ? snvVariantColTitle : svVariantColTitle );
     const variantGenotypeLabelColTitle = (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle );
-    const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : svVariantDisplayTitle );
+    const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : transformSVDisplayTitle(structuralVariantSample));
     const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
     const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
     const geneTranscriptRenderFunc = (variantIsSNV ? geneTranscriptRenderFuncSNV: geneTranscriptRenderFuncSV);
