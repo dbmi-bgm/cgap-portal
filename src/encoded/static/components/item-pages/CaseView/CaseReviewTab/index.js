@@ -69,9 +69,9 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         setResetCounter(resetCounter + 1);
     }, [ resetCounter, setResetCounter ]);
 
-    if (!isActiveDotRouterTab) {
-        return null;
-    }
+    // if (!isActiveDotRouterTab) {
+    //     return null;
+    // }
 
     const commonBtnProps = { variantSampleListItem, fetchVariantSampleListItem, isLoadingVariantSampleListItem, fetchedReportItem, fetchReportItem };
 
@@ -98,29 +98,32 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
     return (
         <React.Fragment>
-            <div className="d-flex align-items-center justify-content-between mb-36">
 
-                <h1 className="text-300 mb-0">
-                    Case Review
-                    { isFetchingReportItem ? <i className="icon icon-fw icon-circle-notch icon-spin fas ml-12 text-muted" data-tip="Loading Report..." /> : null }
-                </h1>
+            { isActiveDotRouterTab ?
+                <div className="d-flex align-items-center justify-content-between mb-36">
 
-                <div className="my-3 my-md-n3">
-                    <InnerTabToggle options={toggleOptions} activeIdx={currentViewIdx} />
+                    <h1 className="text-300 mb-0">
+                        Case Review
+                        { isFetchingReportItem ? <i className="icon icon-fw icon-circle-notch icon-spin fas ml-12 text-muted" data-tip="Loading Report..." /> : null }
+                    </h1>
+
+                    <div className="my-3 my-md-n3">
+                        <InnerTabToggle options={toggleOptions} activeIdx={currentViewIdx} />
+                    </div>
+
+                    {/* Hidden Temporarily
+                    <div>
+                        <button type="button" className="btn btn-primary ml-05 d-flex align-items-center" disabled>
+                            <i className="icon icon-file-pdf far mr-1"/>
+                            View Report
+                        </button>
+                    </div>
+                    */}
+
                 </div>
+                : null }
 
-                {/* Hidden Temporarily
-                <div>
-                    <button type="button" className="btn btn-primary ml-05 d-flex align-items-center" disabled>
-                        <i className="icon icon-file-pdf far mr-1"/>
-                        View Report
-                    </button>
-                </div>
-                */}
-
-            </div>
-
-            { currentViewIdx === 0 ? // Note Finalization
+            { isActiveDotRouterTab && currentViewIdx === 0 ? // Note Finalization
                 <div>
 
                     <CaseSpecificSelectionsPanel {...commonSelectionsProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
@@ -156,10 +159,13 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                         parentTabType={parentTabTypes.CASEREVIEW} />
 
                 </div>
-                :
-                // Use date last modified as key, to reset form input values.
-                <ReportGenerationView {...{ context, fetchedReportItem, fetchReportItem, onResetForm, variantSampleListItem }} key={reportLastModified + "_" + resetCounter} />
-            }
+                : null }
+
+            <div className={currentViewIdx === 1 ? "d-block" : "d-none"}>
+                <ReportGenerationView {...{ context, fetchedReportItem, fetchReportItem, onResetForm, variantSampleListItem }}
+                    key={reportLastModified + "_" + resetCounter} visible={currentViewIdx === 1} />
+            </div>
+
 
         </React.Fragment>
     );

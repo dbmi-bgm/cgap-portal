@@ -4,12 +4,15 @@ import React, { useCallback, useMemo, useState } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
+import { variantSampleColumnExtensionMap, GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../../browse/variantSampleColumnExtensionMap';
+import { DiscoveryCandidacyColumn, ACMGClassificationColumn } from './../VariantSampleSelection';
 import { AutoGrowTextArea } from './../../components/AutoGrowTextArea';
 import { projectReportSettings } from './../../ReportView/project-settings-draft';
 
 
-export function ReportGenerationView (props) {
+export const ReportGenerationView = React.memo(function ReportGenerationView (props) {
     const {
         context: {
             sample,
@@ -17,7 +20,8 @@ export function ReportGenerationView (props) {
         },
         fetchedReportItem,
         onResetForm,
-        variantSampleListItem
+        variantSampleListItem,
+        visible = true
     } = props;
     const { indication: indicationFromSample } = sample || {};
     const { analysis_type: analysisTypeFromSampleProcessing } = sample_processing || {};
@@ -28,6 +32,7 @@ export function ReportGenerationView (props) {
         "analysis_performed": savedAnalysisPerformed,
         "result_summary": savedResultSummary,
         "recommendations": savedRecommendations,
+        "extra_notes": savedExtraNotes,
         "methodology": savedMethodology,
         "references": savedReferences,
     } = fetchedReportItem || {};
@@ -61,7 +66,8 @@ export function ReportGenerationView (props) {
             sectionKey,
             sectionOptions,
             //"disabled": !fetchedReportAtID,
-            "key": sectionKey
+            "key": sectionKey,
+            visible
         };
 
         // TODO: Consider converting case-switch into an object of render functions
@@ -88,7 +94,7 @@ export function ReportGenerationView (props) {
             case "findings_table":
                 // TODO
                 renderedSections.push(
-                    <ReportFindingsTable {...{ variantSamples }} />
+                    <ReportFindingsTable {...{ variantSamples, visible }} reportItem={fetchedReportItem} />
                 );
                 break;
             case "recommendations":
@@ -97,10 +103,10 @@ export function ReportGenerationView (props) {
                         defaultValue={savedRecommendations || defaultValue} />
                 );
                 break;
-            case "additional_case_notes":
+            case "extra_notes":
                 renderedSections.push(
                     <TextAreaGroup {...inputGroupProps} title={title || "Additional Case Notes"} rows={5}
-                        defaultValue={null} placeholder="Under Development..." disabled={true} />
+                        defaultValue={savedExtraNotes || defaultValue} />
                 );
                 break;
             case "methodology":
@@ -177,7 +183,7 @@ export function ReportGenerationView (props) {
 
         </form>
     );
-}
+});
 
 function TextAreaGroup (props) {
     const {
@@ -188,11 +194,11 @@ function TextAreaGroup (props) {
         disabled: propDisabled,
         ...passProps
     } = props;
-    const { readonly = false, required = false } = sectionOptions;
+    const { readonly = false, required = false } = sectionOptions || {};
     const inputElementID = "report_generation_" + sectionKey;
     return (
-        <div className="form-group">
-            { children ? children : <label htmlFor={inputElementID}>{ title }</label> }
+        <div className="form-group mb-2 border-bottom pb-24">
+            { children ? children : title ? <label htmlFor={inputElementID}>{ title }</label> : null }
             <AutoGrowTextArea {...passProps} id={inputElementID} disabled={propDisabled || readonly} name={sectionKey} />
         </div>
     );
@@ -203,16 +209,21 @@ TextAreaGroup.defaultProps = {
 };
 
 const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
-    const { variantSamples } = props;
-    const { table_tags: { tags: tableTagOptions } } = projectReportSettings;
+    const { variantSamples, reportItem, visible = true } = props;
+    const {
+        table_tags: {
+            tags: tableTagOptions = []
+        }
+    } = projectReportSettings;
+    const { findings_texts = {} } = reportItem || {};
 
-    const tagOptionsMapping = useMemo(function(){
-        const tagMap = {};
-        tableTagOptions.forEach(function(tag){
-            tagMap[tag.id] = tag;
-        });
-        return tagMap;
-    }, [ tableTagOptions ]);
+    // const tagOptionsMapping = useMemo(function(){
+    //     const tagMap = {};
+    //     tableTagOptions.forEach(function(tag){
+    //         tagMap[tag.id] = tag;
+    //     });
+    //     return tagMap;
+    // }, [ tableTagOptions ]);
 
     const findingsTableGroupings = _.groupBy(variantSamples, "finding_table_tag");
     const findingsTableKeysFound = Object.keys(findingsTableGroupings);
@@ -227,27 +238,41 @@ const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
         );
     }
 
-    const renderedTables = tableTagOptions.map(function(findingTag, idx){
-        // const samplesForTag = findingsTableGroupings[findingTag];
-        const tagOptions = tagOptionsMapping[findingTag];
+    const renderedTables = tableTagOptions.map(function(tagOptions, idx){
+        const { id, title, always_visible = false, none_tagged_fallback_text } = tagOptions || {};
+        const samplesForTag = findingsTableGroupings[id] || [];
+        const samplesForTagLen = samplesForTag.length;
+        const savedTagNoteText = findings_texts[id] || null;
 
-        if (!tagOptions) {
-            // Unsupported tag.. return.. some error..
+        if (samplesForTagLen === 0 && !always_visible) {
+            // Exclude, unless options say to always show this table even if no results.
+            return null;
         }
 
-        const { title, always_visible } = tagOptions || {};
+        const header = (
+            <h5>
+                <span className="text-600 text-uppercase">{ title }</span>
+                <span className="text-400">{` - ${samplesForTagLen} Variant${samplesForTagLen === 1 ? "" : "s"}`}</span>
+            </h5>
+        );
 
-        if (typeof findingTag === "undefined") {
-            // ...
+        if (samplesForTagLen === 0) {
+            return (
+                <div className="mb-24">
+                    <ReportFindingsTableNoSamplesFallback {...{ header, visible, id }}
+                        defaultValue={savedTagNoteText || none_tagged_fallback_text} />
+                </div>
+            );
         }
 
-        console.log(findingTag);
+        // console.log("TTT", tagOptions, samplesForTag);
 
         return (
-            <div key={idx}>
-                <h5>
-                    { title }
-                </h5>
+            <div className="mb-24" key={idx}>
+                { header }
+                <ReportFindingsFindingTable variantSamples={samplesForTag} tagOptions={tagOptions} />
+                {/* <label className="d-block text-small">Finding Notes</label> */}
+                {/* <AutoGrowTextArea visible={visible} defaultValue={savedTagNoteText} rows={1} name={"finding_tag_text_" + id} /> */}
             </div>
         );
     }).filter(function(renderedTable){
@@ -255,6 +280,141 @@ const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
     });
 
     console.log("FINDINGs GROUPS", findingsTableGroupings);
-    return null;
+    return (
+        <div className="mb-2 findings-tables-section border-bottom">
+            { renderedTables }
+        </div>
+    );
 });
 
+function ReportFindingsTableNoSamplesFallback (props) {
+    const { header, id, visible, defaultValue, includeDefaultChecked = true } = props;
+    const [ includeChecked, setIncludeChecked ] = useState(includeDefaultChecked);
+    const onCheck = useCallback(function(e){
+        setIncludeChecked(!includeChecked);
+    }, [ includeChecked ]);
+    return (
+        <React.Fragment>
+            <div className="d-flex align-items-center">
+                { header }
+                <Checkbox name={"include_finding_tag_text_" + id} onChange={onCheck} checked={includeChecked} className="ml-16">
+                    Add text in place of table?
+                </Checkbox>
+            </div>
+            <AutoGrowTextArea {...{ defaultValue, visible }} rows={1} disabled={!includeChecked} name={"finding_tag_text_" + id} className="mb-16" />
+        </React.Fragment>
+    );
+}
+
+
+/**
+ * For now, we just re-use the column render func from some VariantSample columns
+ * as value 'cells' of this card.
+ */
+const {
+    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
+    "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
+    "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
+} = variantSampleColumnExtensionMap;
+
+const ReportFindingsFindingTable = React.memo(function ReportFindingsFindingTable (props) {
+    const { variantSamples = [], tagOptions } = props;
+    const {
+        table_columns: {
+            gene: showGeneCol = true,
+            variant: showVariantCol = true,
+            genotype: showGenotypeCol = true,
+            discovery_strength: showDiscoveryCol = true,
+            acmg_classification: showACMGClassificationCol = true
+        } = {},
+        show_icons,
+        primary_theme
+    } = tagOptions || {};
+
+    const bodyRows = variantSamples.map(function(vs, idx){
+        const {
+            variant : { genes : [ firstGene = null ] = [] } = {},
+            interpretation: clinicalInterpretationNote = null,
+            discovery_interpretation: discoveryInterpretationNote = null
+        } = vs;
+        const cols = [];
+        if (showGeneCol) cols.push(
+            <td>
+                <GenesMostSevereDisplayTitle result={vs} align="left" showTips={false} truncate={false} />
+            </td>
+        );
+        if (showVariantCol) cols.push(
+            <td>
+                <GenesMostSevereHGVSCColumn gene={firstGene} align="left" showTips={false} truncate={false} />
+            </td>
+        );
+        if (showGenotypeCol) cols.push(
+            <td>
+                <ProbandGenotypeLabelColumn result={vs} align="left" showTips={false} truncate={false} showIcon={show_icons} />
+            </td>
+        );
+        if (showACMGClassificationCol) cols.push(
+            <td>
+                <ACMGClassificationColumn clinicalInterpretationNote={clinicalInterpretationNote} showIcon={show_icons} />
+            </td>
+        );
+        if (showDiscoveryCol) cols.push(
+            <td>
+                <DiscoveryCandidacyColumn discoveryInterpretationNote={discoveryInterpretationNote} showIcon={show_icons} />
+            </td>
+        );
+        return <tr key={idx}>{ cols }</tr>;
+    });
+
+    return (
+        <table className={"report-findings-table table table-striped" + (primary_theme ? " primary-theme" : "")}>
+            <thead>
+                <ReportFindingsFindingTableHeader tagOptions={tagOptions} />
+            </thead>
+            <tbody>
+                { bodyRows }
+            </tbody>
+        </table>
+    );
+});
+
+function ReportFindingsFindingTableHeader({ tagOptions }){
+    const {
+        table_columns: {
+            gene: showGeneCol = true,
+            variant: showVariantCol = true,
+            genotype: showGenotypeCol = true,
+            discovery_strength: showDiscoveryCol = true,
+            acmg_classification: showACMGClassificationCol = true
+        } = {}
+    } = tagOptions || {};
+
+    const headerCols = [];
+    if (showGeneCol) headerCols.push(
+        <th scope="col">
+            Gene
+        </th>
+    );
+    if (showVariantCol) headerCols.push(
+        <th scope="col">
+            Variant
+        </th>
+    );
+    if (showGenotypeCol) headerCols.push(
+        <th scope="col">
+            Genotype
+        </th>
+    );
+    if (showACMGClassificationCol) headerCols.push(
+        <th scope="col">
+            Classification
+        </th>
+    );
+    if (showDiscoveryCol) headerCols.push(
+        <th scope="col">
+            Strength
+        </th>
+    );
+
+    return <tr>{ headerCols }</tr>;
+}

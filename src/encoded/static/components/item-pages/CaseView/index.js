@@ -966,11 +966,11 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
             <span className="text-400">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
-            <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right"
+            <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right d-flex align-items-center"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
                 disabled={(!vcfAtId)}>
-                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
-                View <span className="text-600">Provenance Graph</span>
+                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-08 small" />
+                <span className="mr-03">View</span><span className="text-600">Provenance Graph</span>
             </a>
         </h4>
     );

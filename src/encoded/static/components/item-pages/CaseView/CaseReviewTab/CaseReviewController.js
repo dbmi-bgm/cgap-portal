@@ -154,8 +154,8 @@ export class CaseReviewController extends React.Component {
                     "recommendations",
                     "methodology",
                     "references",
-                    /** linkTo Note */
-                    "extra_notes"
+                    "extra_notes",
+                    "findings_texts"
                 ]
             }));
         });

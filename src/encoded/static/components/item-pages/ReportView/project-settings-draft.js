@@ -35,25 +35,80 @@ export const projectReportSettings = {
             {
                 "id": "clinical-primary",
                 "title": "Primary Findings",
-                "always_visible": true
+                "always_visible": true,
+                "none_tagged_fallback_text": "No pathogenic or likely pathogenic variants were identified.",
+                "table_columns": {
+                    "gene": true,
+                    "variant": true,
+                    "genotype": true,
+                    "acmg_classification": true,
+                    "discovery_strength": false
+                },
+                "primary_theme": true, // If true, table will be styled to appear more prominently, i.e. white text over a dark background for the headings.
+                "show_icons": true,
+                // "theme": "primary" // Should be an enum, if we allow this option, maybe ["default", "primary", "danger", "warning"] or something..
+                // Arguably we should de-prioritize this since can't rely on color printers?
             },
             {
                 "id": "clinical-secondary",
                 "title": "Secondary Findings",
                 // If true, then table present with statement that no results found.
-                "always_visible": true
+                "always_visible": true,
+                "none_tagged_fallback_text": "No pathogenic or likely pathogenic variants were identified.",
+                "table_columns": {
+                    "gene": true,
+                    "variant": true,
+                    "genotype": true,
+                    "acmg_classification": true,
+                    "discovery_strength": false
+                },
+                "primary_theme": false,
+                "show_icons": false
             },
             {
                 "id": "research-high-priority",
-                "title": "High Priority Findings (Research)"
+                "title": "High Priority Findings (Research)",
+                "always_visible": false,
+                "none_tagged_fallback_text": null,
+                "table_columns": {
+                    "gene": true,
+                    "variant": true,
+                    "genotype": true,
+                    "acmg_classification": false,
+                    "discovery_strength": true
+                },
+                "primary_theme": false,
+                "show_icons": false
             },
             {
                 "id": "research-medium-priority",
-                "title": "Medium Priority Findings (Research)"
+                "title": "Medium Priority Findings (Research)",
+                "always_visible": false,
+                "none_tagged_fallback_text": null,
+                "table_columns": {
+                    "gene": true,
+                    "variant": true,
+                    "genotype": true,
+                    "acmg_classification": false,
+                    "discovery_strength": true
+                },
+                "primary_theme": false,
+                "show_icons": false
             },
             {
                 "id": "research-low-priority",
-                "title": "Low Priority Findings (Research)"
+                "title": "Low Priority Findings (Research)",
+                "always_visible": false,
+                "none_tagged_fallback_text": null,
+                "table_columns": {
+                    "gene": true,
+                    "variant": true,
+                    "genotype": true,
+                    "acmg_classification": false,
+                    "discovery_strength": true
+                },
+                "primary_theme": false,
+                "show_icons": false
             }
         ]
     },
@@ -91,7 +146,7 @@ export const projectReportSettings = {
             "readonly": false,
             "defaultValue": null,
         },
-        "additional_case_notes": {
+        "extra_notes": {
             "title" : "Additional Case Notes",
             "order": 6,
             "included": true,

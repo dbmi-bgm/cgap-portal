@@ -218,8 +218,6 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     }, [ context, variantSample ]);
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
-    const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
-    const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discoveryInterpretationNote || {};
 
     let expandedNotesSection = null;
     if (isExpanded) {
@@ -275,55 +273,33 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                 </div>
             </div>
 
-            <div className="card-body pt-0 pb-08">
+            <div className="card-body pt-04 pb-08">
                 <div className="row flex-column flex-sm-row">
                     <div className="col col-sm-4 col-lg-2 py-2">
-                        <label className="mb-04 text-small" data-tip={geneTranscriptColDescription}>
+                        <label className="mb-04 text-small d-block" data-tip={geneTranscriptColDescription}>
                             { geneTranscriptColTitle || "Gene, Transcript" }
                         </label>
                         { geneTranscriptRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
-                        <label className="mb-04 text-small" data-tip={variantColDescription}>
+                        <label className="mb-04 text-small d-block" data-tip={variantColDescription}>
                             { variantColTitle || "Variant" }
                         </label>
                         { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
                     <div className="col col-sm-4 col-lg-3 py-2">
-                        <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
+                        <label className="mb-04 text-small d-block" data-tip={genotypeLabelColDescription}>
                             { genotypeLabelColTitle || "Genotype" }
                         </label>
                         { genotypeLabelRenderFunc(variantSample, { align: 'left' }) }
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
-                        <label className="mb-04 text-small">ACMG Classification</label>
-                        { acmgClassification ?
-                            <div className="w-100 text-left">
-                                <i className="status-indicator-dot mr-1" data-status={acmgClassification}/>
-                                { acmgClassification }
-                            </div>
-                            : <div className="w-100 text-left"><PlaceHolderStatusIndicator /></div> }
+                        <label className="mb-04 text-small d-block">ACMG Classification</label>
+                        <ACMGClassificationColumn clinicalInterpretationNote={clinicalInterpretationNote} />
                     </div>
                     <div className="col col-sm-8 col-lg-3 py-2">
-                        <label className="mb-04 text-small">Discovery</label>
-                        <div className="w-100 text-left">
-                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Gene: </span>
-                            { geneCandidacy ?
-                                <span className="text-left">
-                                    <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
-                                    { geneCandidacy }
-                                </span>
-                                : <PlaceHolderStatusIndicator/> }
-                        </div>
-                        <div className="text-left">
-                            <span className="font-italic text-muted d-inline-block" style={{ width: "70px" }}>Variant: </span>
-                            { variantCandidacy ?
-                                <span className="w-100 text-left">
-                                    <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/>
-                                    { variantCandidacy }
-                                </span>
-                                : <PlaceHolderStatusIndicator/> }
-                        </div>
+                        <label className="mb-04 text-small d-block">Discovery</label>
+                        <DiscoveryCandidacyColumn discoveryInterpretationNote={discoveryInterpretationNote} />
                     </div>
                 </div>
             </div>
@@ -342,6 +318,48 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         </div>
     );
 });
+
+export const ACMGClassificationColumn = React.memo(function ACMGClassificationColumn ({ clinicalInterpretationNote, showIcon = true }) {
+    const { classification: acmgClassification = null } = clinicalInterpretationNote || {};
+    if (!acmgClassification) {
+        return <PlaceHolderStatusIndicator showIcon={showIcon} />;
+    }
+    return (
+        <React.Fragment>
+            { showIcon ? <i className="status-indicator-dot mr-1" data-status={acmgClassification}/> : null }
+            { acmgClassification }
+        </React.Fragment>
+    );
+});
+
+export const DiscoveryCandidacyColumn = React.memo(function DiscoveryCandidacyColumn ({ discoveryInterpretationNote, showIcon = true }) {
+    const { gene_candidacy: geneCandidacy = null, variant_candidacy: variantCandidacy = null } = discoveryInterpretationNote || {};
+    const labelStyle = useMemo(function(){ return { "width" : 70 }; }); // Don't create new object reference each re-render
+    return (
+        <React.Fragment>
+            <div className="text-left">
+                <span className="font-italic text-muted d-inline-block" style={labelStyle}>Gene: </span>
+                { geneCandidacy ?
+                    <span className="text-left">
+                        <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
+                        { geneCandidacy }
+                    </span>
+                    : <PlaceHolderStatusIndicator showIcon={showIcon} /> }
+            </div>
+            <div className="text-left">
+                <span className="font-italic text-muted d-inline-block" style={labelStyle}>Variant: </span>
+                { variantCandidacy ?
+                    <span className="w-100 text-left">
+                        { showIcon ? <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/> : null }
+                        { variantCandidacy }
+                    </span>
+                    : <PlaceHolderStatusIndicator showIcon={showIcon} /> }
+            </div>
+        </React.Fragment>
+    );
+});
+
+
 
 function InterpretationTabVariantSampleTitle(props){
     const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
@@ -505,10 +523,10 @@ function ClassificationDropdown(props){
 
 
 
-const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator(){
+const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator({ showIcon = true }){
     return (
         <span className="text-left text-muted text-truncate">
-            <i className="status-indicator-dot mr-1" data-status="Not Available" />
+            { showIcon ? <i className="status-indicator-dot mr-1" data-status="Not Available" /> : null }
             Not Available
         </span>
     );

@@ -32,8 +32,29 @@ export class AutoGrowTextArea extends React.Component {
         this.textAreaRef = React.createRef(null);
     }
 
+    componentDidUpdate(pastProps){
+        const { maxHeight: pastMaxHeight, visible: pastVisible = true } = pastProps;
+        const { maxHeight, visible = true } = this.props;
+
+        if (visible === false && pastVisible === true) {
+            // Effectively reset state to speed up next visible=true update.
+            // setTimeout to defer it past other UI updates
+            setTimeout(()=>{
+                this.setState({ "textAreaHeight": "auto", "parentHeight": "auto" });
+            }, 5);
+        } else if ((visible === true && pastVisible === false) || maxHeight !== pastMaxHeight) {
+            // If visible=false upon mount, then initialize auto-sizing here.
+            // Also reset auto-sized height if maxHeight changes (very unlikely -- remove?)
+            this.resizeToFitContent();
+        }
+    }
+
     componentDidMount() {
-        this.resizeToFitContent();
+        const { visible = true } = this.props;
+        if (visible) {
+            // Defer initial sizing if not visible (e.g. ancestor element has display:none)
+            this.resizeToFitContent();
+        }
     }
 
     resizeToFitContent(){
@@ -82,7 +103,5 @@ AutoGrowTextArea.defaultProps = {
     "maxHeight": 325,
     "buffer": 2, // Help prevent showing scrollbar due to rounding or padding of textarea height.
     "rows": 5, // Used for minHeight, more or less.
-    "onChange": function(event) {
-        console.log("Called defaultProps.onChange", event);
-    }
+    "onChange": null
 };
