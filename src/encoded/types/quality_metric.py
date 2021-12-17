@@ -360,8 +360,9 @@ def download(context, request):
     properties = context.upgrade_properties()
     if 'url' not in properties:
         raise HTTPNotFound(properties)
-    url = urlparse(properties['url'])
-    bucket, key = url.netloc, url.path.lstrip('/')
+    # parse direct s3 link
+    # format: https://s3.amazonaws.com/cgap-devtest-main-application-cgap-devtest-wfout/GAPFI1HVXJ5F/fastqc_report.html
+    [bucket, key] = urlparse(properties['url']).path.lstrip('/').split('/', 1)
     params_to_get_obj = {
         'Bucket': bucket,
         'Key': key
