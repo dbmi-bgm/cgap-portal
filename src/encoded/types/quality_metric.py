@@ -357,10 +357,10 @@ class QualityMetricPeddyqc(QualityMetric):
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
     """ Downloads the quality metric report from S3 """
-    calculated = calculate_properties(context, request)
-    if 'url' not in calculated:
-        raise HTTPNotFound(calculated)
-    url = urlparse(calculated['url'])
+    properties = context.upgrade_properties()
+    if 'url' not in properties:
+        raise HTTPNotFound(properties)
+    url = urlparse(properties['url'])
     bucket, key = url.netloc, url.path.lstrip('/')
     params_to_get_obj = {
         'Bucket': bucket,
