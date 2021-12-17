@@ -151,6 +151,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
             'upload_url': f's3://{bucket}/{key}',
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
             'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
+            's3_encrypt_key_id': s3_encrypt_key_id,
             'request_id': token.get('ResponseMetadata').get('RequestId'),
             'key': key
         })

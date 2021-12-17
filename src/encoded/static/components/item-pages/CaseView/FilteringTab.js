@@ -90,59 +90,59 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
         } = {}
     } = context;
 
-    const currentlyOnSNV = currViewIdx === 0;
-    const currentlyOnCNV = currViewIdx === 1;
-
     const onClickSNV = useCallback(function(e){
-        if (!currentlyOnSNV) {
-            setCurrViewIdx(0);
-        }
+        setCurrViewIdx(0);
     });
 
     const onClickCNV = useCallback(function(e){
-        if (!currentlyOnCNV) {
-            setCurrViewIdx(1);
-        }
+        setCurrViewIdx(1);
     });
 
-    // End up getting a list of non-case-specific variants (with duplicates from multiple cases)
-    // if these searchHrefAddons aren't present, so important to disable the tab in those instances
-    const snvDisabled = !snvFilterHrefAddon;
-    const cnvDisabled = !svFilterHrefAddon;
+    const options = useMemo(function(){
 
-    let cnvTip = null;
-    if (analysis_type.startsWith("WES")) {
-        cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
-    }
+        // End up getting a list of non-case-specific variants (with duplicates from multiple cases)
+        // if these searchHrefAddons aren't present, so important to disable the tab in those instances
+        const snvDisabled = !snvFilterHrefAddon;
+        const cnvDisabled = !svFilterHrefAddon;
 
-    return <InnerTabToggle activeIdx={currViewIdx}
-        titleA={<span>{ filteringTabViews["0"].name } Filtering</span>}
-        titleB={<span>{ filteringTabViews["1"].name } Filtering</span>}
-        onClickA={onClickSNV} onClickB={onClickCNV} disabledA={snvDisabled} disabledB={cnvDisabled}
-        dataTipB={cnvTip} />;
+        let cnvTip = null;
+        if (analysis_type.startsWith("WES")) {
+            cnvTip = "SV/CNV is currently available for only germline WGS data. Additional pipelines are under development.";
+        }
+        return [
+            {
+                "onClick": onClickSNV,
+                "disabled": snvDisabled,
+                "title": <span>{ filteringTabViews["0"].name } Filtering</span>,
+            },
+            {
+                "onClick": onClickCNV,
+                "disabled": cnvDisabled,
+                "title": <span>{ filteringTabViews["1"].name } Filtering</span>,
+                "dataTip": cnvTip
+            }
+        ];
+    }, [ context ]);
+
+    return <InnerTabToggle options={options} activeIdx={currViewIdx} />;
 });
 
 /** Pulled out into own component so can style/adjust-if-needed together w. Case Review Tab */
-export function InnerTabToggle (props) {
-    const {
-        activeIdx = 0,
-        titleA = "View A", titleB = "View B",
-        disabledA = false, disabledB = false,
-        onClickA, onClickB,
-        dataTipA = null, dataTipB = null
-    } = props;
+export function InnerTabToggle ({ activeIdx = 0, options = [] }) {
+    const renderedOptions = options.map(function(opt, optIdx){
+        const { title, disabled, onClick, dataTip } = opt;
+        return (
+            <div className="px-1 flex-grow-1" data-tip={dataTip} key={optIdx}>
+                <button type="button" {...{ onClick, disabled }} aria-pressed={activeIdx === optIdx}
+                    className={"px-md-4 px-lg-5 btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link")}>
+                    { title }
+                </button>
+            </div>
+        );
+    });
     return (
         <div className="card py-2 px-1 d-flex d-md-inline-flex flex-row">
-            <button type="button" aria-pressed={activeIdx === 0}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (activeIdx === 0 ? "primary-dark active pe-none" : "link")}
-                onClick={onClickA} disabled={disabledA} data-tip={dataTipA}>
-                { titleA }
-            </button>
-            <button type="button" aria-pressed={activeIdx === 1}
-                className={"mx-1 flex-grow-1 px-md-4 px-lg-5 btn btn-" + (activeIdx === 1 ? "primary-dark active pe-none" : "link")}
-                onClick={onClickB} disabled={disabledB} data-tip={dataTipB}>
-                { titleB }
-            </button>
+            { renderedOptions }
         </div>
     );
 }
