@@ -470,17 +470,14 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         csq_clinvar_clnrevstat: reviewStatusFromVariant
     } = variant || structural_variant;
 
+    const { result: { [variationID]: clinVarResult } = {} } = currentClinVarResponse || {};
     const {
-        result: {
-            [variationID]: {
-                clinical_significance: {
-                    description: clinicalSignificanceFromClinVar,
-                    review_status: reviewStatusFromClinVar,
-                    last_evaluated: lastEvaluatedFromClinVar
-                } = {}
-            } = {}
+        clinical_significance: {
+            description: clinicalSignificanceFromClinVar,
+            review_status: reviewStatusFromClinVar,
+            last_evaluated: lastEvaluatedFromClinVar
         } = {}
-    } = currentClinVarResponse || {};
+    } = clinVarResult || {};
 
     if (!variationID) {
         // No ClinVar info available ??

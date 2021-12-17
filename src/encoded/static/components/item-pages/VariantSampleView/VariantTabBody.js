@@ -96,7 +96,7 @@ export const VariantTabBody = React.memo(function VariantTabBody (props) {
                                     : null }
                             </h4>
                         </div>
-                        <div className="info-body clinvar-info-body">
+                        <div className={"info-body clinvar-info-body" + (currentClinVarResponse ? " has-clinvar-response" : "")}>
                             <ClinVarSection {...{ getTipForField, context, schemas, clinvarExternalHref, currentClinVarResponse }} />
                         </div>
                     </div>
