@@ -88,7 +88,8 @@ class CompoundSearchBuilder:
     @staticmethod
     def format_result_for_endpoint_response(request, es_results, filter_set, result_sort, search_builder_instance):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
-            setting status on the request if needed.
+            setting status on the request if needed. Also sets "__matching_filter_block_indices" computed field to identify
+            which filter block indices the result matched.
 
         :param request: current request
         :param es_results: response from ES
@@ -245,6 +246,7 @@ class CompoundSearchBuilder:
                 subreq = cls.build_subreq_from_single_query(request, query, route=cls.BUILD_QUERY_URL,
                                                             from_=from_, to=to)
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
+                # See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-named-queries-and-filters.html
                 sub_query["bool"]["_name"] = block_index
                 sub_queries.append(sub_query)
 
