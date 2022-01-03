@@ -134,25 +134,11 @@ export const variantSampleColumnExtensionMap = {
         "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
         "colTitle": <i className="icon icon-fw icon-image fas" />,
         "render": function(result, props) {
-            const { bam_snapshot = null, uuid = null } = result;
+            const { bam_snapshot = null } = result;
             if (!bam_snapshot) {
                 return null;
             }
             return <BAMSnapshotColumn {...{ result }} />;
-        }
-    },
-    "__matching_filter_block_indices": {
-        // Currently is default_hidden: true until better rendering is completed.
-        "noSort": true,
-        "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-        "colTitle": <i className="icon icon-fw icon-file far"/>,
-        "render": function(result, props) {
-            const { __matching_filter_block_indices = [] } = result;
-            // TODO, maybe add tooltip to get full filter block names.
-            if (__matching_filter_block_indices) {
-                return __matching_filter_block_indices.join(", ");
-            }
-            return null;
         }
     }
 };

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useRef } from 'react';
 import queryString from 'query-string';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -312,6 +312,8 @@ function FilteringTabBody(props) {
         return { onClearFiltersVirtual, isClearFiltersBtnVisible };
     }, [ context ]);
 
+    const filterSetControllerRef = useRef(null);
+
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedVariantSamples there.
     const fsuiProps = {
         schemas, session,
@@ -323,6 +325,12 @@ function FilteringTabBody(props) {
         isActiveDotRouterTab,
         // setIsSubmitting,
         // "caseItem": context
+    };
+
+    const fsControllerProps = {
+        searchHrefBase, onResetSelectedVariantSamples, searchType,
+        "excludeFacets": hideFacets,
+        "ref": filterSetControllerRef
     };
 
     const embeddedTableHeaderBody = (
@@ -352,16 +360,20 @@ function FilteringTabBody(props) {
     const embeddedTableHeader = activeFilterSetID ? (
         <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
             onFail={onFailInitialFilterSetItemLoad}>
-            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets}>
+            <FilterSetController {...fsControllerProps}>
                 { embeddedTableHeaderBody }
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item could use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        <FilterSetController {...fsControllerProps} initialFilterSetItem={blankFilterSetItem}>
             { embeddedTableHeaderBody }
         </FilterSetController>
     );
+
+    // Not an ideal practice/pattern, avoid if possible:
+    const { current: filterSetControllerInstance } = filterSetControllerRef;
+    const currFilterSet = filterSetControllerInstance ? filterSetControllerInstance.state.currFilterSet : null;
 
 
     // This maxHeight is stylistic and dependent on our view design/style
@@ -377,6 +389,7 @@ function FilteringTabBody(props) {
         selectedVariantSamples, onSelectVariantSample,
         savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
+        currFilterSet, // <- Used for Matching Filter Block Indices column
         "key": searchTableKey
     };
 

@@ -193,7 +193,16 @@ export class FilterSetController extends React.PureComponent {
         // Not particularly necessary, but helps make less redundant since we have the required `search_type` already.
         delete globalFlagsQuery.type;
 
-        const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
+        const filterBlockQueries = filter_blocks.map(function(fb, fbIdx){
+            const { query } = fb;
+            return {
+                query,
+                "name": fbIdx, // Will be using filter block indices as unique names here.
+                "flags_applied": []
+            };
+        });
+
+        const selectedFilterBlockQueries = selectedIdxCount === 0 ? filterBlockQueries : filterBlockQueries.filter(function(fb, fbIdx){
             return selectedFilterBlockIndices[fbIdx];
         });
 
@@ -210,12 +219,7 @@ export class FilterSetController extends React.PureComponent {
             //         "query": global_flags
             //     }
             // ],
-            "filter_blocks": selectedFilterBlocks.map(function({ query }){
-                return {
-                    query,
-                    "flags_applied": [] // ["CurrentFilterSet"]
-                };
-            })
+            "filter_blocks": selectedFilterBlockQueries
         };
     }
 
