@@ -9,7 +9,6 @@ from pyramid.httpexceptions import (
     HTTPNotFound,
 )
 from ..util import build_s3_presigned_get_url
-from snovault.calculated import calculate_properties
 from snovault import (
     abstract_collection,
     calculated_property,
@@ -353,6 +352,23 @@ class QualityMetricPeddyqc(QualityMetric):
     embedded_list = QualityMetric.embedded_list
 
 
+def parse_qc_s3_url(url):
+    """ Parses the given s3 URL into its pair of bucket, key
+        Note that this function works the way it does because of how these
+        urls end up in our database. Eventually we should clean this up.
+        Format:
+            https://s3.amazonaws.com/cgap-devtest-main-application-cgap-devtest-wfout/GAPFI1HVXJ5F/fastqc_report.html
+            https://cgap-devtest-main-application-tibanna-logs.s3.amazonaws.com/41c2fJDQcLk3.metrics/metrics.html
+    """
+    parsed_url = urlparse(url)
+    if parsed_url.hostname.endswith('.s3.amazonaws.com'):
+        bucket = parsed_url.hostname[:parsed_url.hostname.index('.s3.amazonaws.com')]
+        key = parsed_url.path.lstrip('/')
+    else:
+        [bucket, key] = parsed_url.path.lstrip('/').split('/', 1)
+    return bucket, key
+
+
 @view_config(name='download', context=QualityMetric, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 def download(context, request):
@@ -362,7 +378,8 @@ def download(context, request):
         raise HTTPNotFound(properties)
     # parse direct s3 link
     # format: https://s3.amazonaws.com/cgap-devtest-main-application-cgap-devtest-wfout/GAPFI1HVXJ5F/fastqc_report.html
-    [bucket, key] = urlparse(properties['url']).path.lstrip('/').split('/', 1)
+    # or: https://cgap-devtest-main-application-tibanna-logs.s3.amazonaws.com/41c2fJDQcLk3.metrics/metrics.html
+    bucket, key = parse_qc_s3_url(properties['url'])
     params_to_get_obj = {
         'Bucket': bucket,
         'Key': key
