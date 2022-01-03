@@ -280,6 +280,56 @@ class Variant(Item):
         chrom_info = nc.get_chrominfo('hg38')
         return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
 
+    @calculated_property(schema={
+        "title": "Most severe location",
+        "description": "Location of variant in most severe transcript",
+        "type": "string"
+    })
+    def most_severe_location(self, request):
+        """Get relative location of variant per most severe transcript.
+
+        Used in filtering space column, so provide user-friendly
+        read-out.
+        """
+        result = None
+        transcripts = self.properties.get("transcript", [])
+        for transcript in transcripts:
+            if transcript.get("csq_most_severe") is True:
+                exon = transcript.get("csq_exon")
+                intron = transcript.get("csq_intron")
+                distance = transcript.get("csq_distance")
+                consequences = transcript.get("csq_consequence", [])
+                if intron:
+                    result = "Intron " + intron
+                elif exon:
+                    result = "Exon " + exon
+                    for consequence in consequences:
+                        item = get_item_or_none(request, consequence)
+                        if not item:
+                            continue
+                        consequence_title = item.get("var_conseq_name")
+                        if consequence_title == "3_prime_UTR_variant":
+                            result += " (3' UTR)"
+                            break
+                        elif consequence_title == "5_prime_UTR_variant":
+                            result += " (5' UTR)"
+                            break
+                elif distance:
+                    result = distance + " bp"
+                    for consequence in consequences:
+                        item = get_item_or_none(request, consequence)
+                        if not item:
+                            continue
+                        consequence_title = item.get("var_conseq_name")
+                        if consequence_title == "downstream_gene_variant":
+                            result += " downstream"
+                            break
+                        elif consequence_title == "upstream_gene_variant":
+                            result += " upstream"
+                            break
+                break
+        return result
+
 
 @collection(
     name='variant-samples',
