@@ -108,12 +108,20 @@ class CompoundSearchBuilder:
             result["__matching_filter_block_indices"] = filter_block_indices
             result_list.append(result)
 
+        columns = SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ])
+        # We used multiple filter blocks, so we add in column for "__matching_filter_block_indices"
+        columns["__matching_filter_block_indices"] = {
+            "title": "Filter Block Indices Matched",
+            "order": 1000,
+            "default_hidden": True # We will remove this flag (and rename column) once can render Filter Block names on UI.
+        }
+
         return {
-            # "@id": "/compound_search", # Not necessary from UI atm but considering adding for semantics
-            # "@type": ["SearchResults"], # Not necessary from UI atm but considering adding for semantics
+            # "@id": "/compound_search", # Removed - presense of @id on UI is inferred to mean that there is 1 filter block in request.
+            # "@type": ["SearchResults"], # Not necessary from UI atm but can consider adding for semantics
             "total": es_results['hits'].get("total", 0),
             "@graph": result_list,
-            "columns": SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ]),
+            "columns": columns,
             "sort": result_sort
         }
 
