@@ -87,6 +87,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     );
                 }
             },
+            // TODO: Move these to variantSampleColumnExtensionMap so we don't create new functions every render (or change to isLoadingVariantSample, ...)
             "structural_variant.transcript.csq_gene.display_title": {
                 "noSort": true, // not currently a useful or informative sort.
                 "render": function(result, props) {
@@ -129,7 +130,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
+    }, [ originalColExtMap /* , selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem */ ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }

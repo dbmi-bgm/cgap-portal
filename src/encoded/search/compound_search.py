@@ -88,7 +88,8 @@ class CompoundSearchBuilder:
     @staticmethod
     def format_result_for_endpoint_response(request, es_results, filter_set, result_sort, search_builder_instance):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
-            setting status on the request if needed.
+            setting status on the request if needed. Also sets "__matching_filter_block_indices" computed field to identify
+            which filter block indices the result matched.
 
         :param request: current request
         :param es_results: response from ES
@@ -101,12 +102,27 @@ class CompoundSearchBuilder:
         if search_builder_instance.search_session_id:  # Is 'None' if e.g. limit=all
             request.response.set_cookie('searchSessionID', search_builder_instance.search_session_id)
 
+        result_list = []
+        for hit in es_results['hits'].get("hits", []):
+            result = hit['_source']['embedded']
+            filter_block_indices = [ int(query_index) for query_index in hit.get("matched_queries", []) ]
+            result["__matching_filter_block_indices"] = filter_block_indices
+            result_list.append(result)
+
+        columns = SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ])
+        # We used multiple filter blocks, so we add in column for "__matching_filter_block_indices"
+        columns["__matching_filter_block_indices"] = {
+            "title": "Filter Block Indices Matched",
+            "order": 1000,
+            "default_hidden": True # We will remove this flag (and rename column) once can render Filter Block names on UI.
+        }
+
         return {
-            # "@id": "/compound_search", # Not necessary from UI atm but considering adding for semantics
-            # "@type": ["SearchResults"], # Not necessary from UI atm but considering adding for semantics
+            # "@id": "/compound_search", # Removed - presense of @id on UI is inferred to mean that there is 1 filter block in request.
+            # "@type": ["SearchResults"], # Not necessary from UI atm but can consider adding for semantics
             "total": es_results['hits'].get("total", 0),
-            "@graph": [ hit['_source']['embedded'] for hit in es_results['hits'].get("hits", []) ],
-            "columns": SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ]),
+            "@graph": result_list,
+            "columns": columns,
             "sort": result_sort
         }
 
@@ -215,7 +231,7 @@ class CompoundSearchBuilder:
         # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
         else:
             sub_queries = []
-            for block in filter_blocks:
+            for block_index, block in enumerate(filter_blocks):
                 block_query = block[cls.QUERY]
                 flags_applied = block[cls.FLAGS_APPLIED]
                 query = block_query
@@ -230,6 +246,8 @@ class CompoundSearchBuilder:
                 subreq = cls.build_subreq_from_single_query(request, query, route=cls.BUILD_QUERY_URL,
                                                             from_=from_, to=to)
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
+                # See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-named-queries-and-filters.html
+                sub_query["bool"]["_name"] = block_index
                 sub_queries.append(sub_query)
 
 
