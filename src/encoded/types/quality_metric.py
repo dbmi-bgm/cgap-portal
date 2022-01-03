@@ -22,6 +22,11 @@ from .base import (
     # lab_award_attribution_embed_list
 )
 
+
+# S3 URL identifier
+S3_BUCKET_DOMAIN_SUFFIX = '.s3.amazonaws.com'
+
+
 """Schema for QCs' quality_metric_summary calculated property"""
 QC_SUMMARY_SCHEMA = {
     "type": "array",
@@ -361,8 +366,8 @@ def parse_qc_s3_url(url):
             https://cgap-devtest-main-application-tibanna-logs.s3.amazonaws.com/41c2fJDQcLk3.metrics/metrics.html
     """
     parsed_url = urlparse(url)
-    if parsed_url.hostname.endswith('.s3.amazonaws.com'):
-        bucket = parsed_url.hostname[:parsed_url.hostname.index('.s3.amazonaws.com')]
+    if parsed_url.hostname.endswith(S3_BUCKET_DOMAIN_SUFFIX):
+        bucket = parsed_url.hostname[:-len(S3_BUCKET_DOMAIN_SUFFIX)]
         key = parsed_url.path.lstrip('/')
     else:
         [bucket, key] = parsed_url.path.lstrip('/').split('/', 1)
