@@ -320,7 +320,7 @@ def get_higlass_viewconf(context, request):
 
             text_track_sample = deepcopy(text_track)
             text_track_sample["uid"] = "text" + accession
-            text_track_sample["options"]["text"] = "GnomAD SV"
+            text_track_sample["options"]["text"] = "gnomAD-SV"
             top_tracks.append(text_track_sample)
 
             empty_track_sample = deepcopy(empty_track_b)
