@@ -10,6 +10,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 
 import { layout, ajax, console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas } from './../../util';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 /**
  * Shared components between VariantSample and StructuralVariantSample item pages
@@ -459,15 +460,24 @@ function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
 }
 
 // TODO: Potentially more work and more testing needed to modularize
-export function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref }){
+export function ClinVarSection({ context, getTipForField, schemas, clinvarExternalHref, currentClinVarResponse }){
     const { variant = null, structural_variant = null } = context;
     const {
         csq_clinvar: variationID,
-        csq_clinvar_clnsig: clinicalSignificance,
+        csq_clinvar_clnsig: clinicalSignificanceFromVariant,
         csq_clinvar_clnsigconf: conflictingClinicalSignificance,
         clinvar_submission = [], // TODO - missing in data rn.
-        csq_clinvar_clnrevstat: reviewStatus
+        csq_clinvar_clnrevstat: reviewStatusFromVariant
     } = variant || structural_variant;
+
+    const { result: { [variationID]: clinVarResult } = {} } = currentClinVarResponse || {};
+    const {
+        clinical_significance: {
+            description: clinicalSignificanceFromClinVar,
+            review_status: reviewStatusFromClinVar,
+            last_evaluated: lastEvaluatedFromClinVar
+        } = {}
+    } = clinVarResult || {};
 
     if (!variationID) {
         // No ClinVar info available ??
@@ -481,7 +491,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
     return (
         <React.Fragment>
 
-            <div className="mb-1">
+            <div className="mb-12">
                 <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
                 { clinvarExternalHref?
                     <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
@@ -491,23 +501,34 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
                     : <span>{ variationID }</span> }
             </div>
 
-            <div className="row">
+            <div className="row mt-03">
                 <div className="col-3">
-                    <label data-tip={getTipForField("csq_clinvar_clnsig")} className="mb-03">Interpretation: </label>
+                    <label data-tip={getTipForField("csq_clinvar_clnsig")} className="mb-0">Interpretation: </label>
                 </div>
                 <div className="col-9">
-                    { clinicalSignificance }
+                    { clinicalSignificanceFromClinVar || clinicalSignificanceFromVariant }
                 </div>
             </div>
 
-            <div className="row">
+            <div className="row mt-03">
                 <div className="col-3">
                     <label data-tip={getTipForField("csq_clinvar_clnrevstat")} className="mb-0">Review Status: </label>
                 </div>
                 <div className="col-9">
-                    { reviewStatus }
+                    { reviewStatusFromClinVar || reviewStatusFromVariant }
                 </div>
             </div>
+
+            { lastEvaluatedFromClinVar ?
+                <div className="row mt-03">
+                    <div className="col-3">
+                        <label className="mb-0">Last Evaluated: </label>
+                    </div>
+                    <div className="col-9">
+                        <LocalizedTime timestamp={lastEvaluatedFromClinVar} localize={false} />
+                    </div>
+                </div>
+                : null }
 
         </React.Fragment>
     );

@@ -2504,7 +2504,7 @@ table.report-findings-table {
 			justify-content: space-between;
 			height: 32px;
 			position: relative;
-			// z-index: 5;
+			z-index: 1;
 
 			> .dropdown > .btn-outline-secondary {
 				@include button-variant(#fff, #e0e0e0);
@@ -2533,6 +2533,9 @@ table.report-findings-table {
 				margin-top: -16px;
 				flex-grow: 1;
 				border-radius: $border-radius-sm;
+				> * {
+					z-index: 1;
+				}
 			}
 		}
 
@@ -2560,7 +2563,21 @@ table.report-findings-table {
 				@media (max-width:1300px) and (min-width:768px) {
 					padding-top: 50px;
 				}
+
 			}
+		}
+	}
+
+	.info-body.clinvar-info-body {
+		/** Add powered by NCBI logo **/
+		position: relative;
+		&.has-clinvar-response {
+			background-image: url("/static/img/NCBI_powered.png");
+			// background-size: 153px 72px; // = Full size
+			background-size: 115px 54px; // = 3/4 size
+			background-position: 98% 6px;
+			background-position: calc(100% - 5px) 4px;
+			background-repeat: no-repeat;
 		}
 	}
 
