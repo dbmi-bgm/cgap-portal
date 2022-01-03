@@ -1,8 +1,10 @@
 'use strict';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
+import ReactTooltip from 'react-tooltip';
+
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { PatchItemsProgress } from './../../../util/PatchItemsProgress';
@@ -94,6 +96,10 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
             // "disabled": true // Under Construction
         }
     ];
+
+    useEffect(function(){
+        setTimeout(ReactTooltip.rebuild, 0);
+    }, [ currentViewIdx ]);
 
 
     return (

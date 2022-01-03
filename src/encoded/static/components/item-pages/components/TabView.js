@@ -7,6 +7,7 @@ import memoize from 'memoize-one';
 
 import { navigate, console, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { UserContentBodyList } from './../../static-pages/components/UserContentBodyList';
+import ReactTooltip from 'react-tooltip';
 
 
 /**
@@ -225,8 +226,14 @@ export class TabView extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        if (pastProps.href !== this.props.href){
+        const { href } = this.props;
+        const { currentTabKey } = this.state;
+        if (pastProps.href !== href){
             this.maybeSwitchTabAccordingToHref();
+            return;
+        }
+        if (pastState.currentTabKey !== currentTabKey) {
+            setTimeout(ReactTooltip.rebuild, 0);
         }
     }
 

@@ -150,10 +150,8 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         console.log("SUBMITTED", e.target, Object.fromEntries(formData));
     }, []);
 
-    console.log("KEYS", sortedSectionKeys);
-
     return (
-        <form onSubmit={onSubmit} className="d-block">
+        <form onSubmit={onSubmit} className="d-block container">
 
             <div className="row">
 

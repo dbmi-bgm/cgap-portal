@@ -2176,29 +2176,54 @@ table.report-findings-table {
 				}
 			}
 			td {
-				&:first-child {
+				position: relative;
+				&:first-child:after,
+				&:last-child:after {
+					content: " ";
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					width: $border-radius-lg;
+				}
+
+				&:first-child:after {
+					left: 0;
 					border-left: 1px solid $gray-400;
 				}
-				&:last-child {
+				&:last-child:after {
+					right: 0;
 					border-right: 1px solid $gray-400;
 				}
 			}
 			&:last-child {
 				td {
-					border-bottom: 1px solid $gray-400;
+					&:before {
+						content: " ";
+						position: absolute;
+						left: 0;
+						right: 0;
+						bottom: 0;
+						height: $border-radius-lg;
+						border-bottom: 1px solid $gray-400;
+					}
+					&:first-child:before,
+					&:first-child:after {
+						border-bottom-left-radius: $border-radius-lg;
+					}
+					&:last-child:before,
+					&:last-child:after {
+						border-bottom-right-radius: $border-radius-lg;
+					}
 				}
 			}
 		}
 	}
 
-	border-radius: $border-radius-lg;
-	border-bottom: 1px solid $gray-400;
-
 	&.primary-theme {
 		border-color: $primary-dark;
 		thead, tbody {
 			tr {
-				th, td {
+				td:before, td:after {
 					border-color: $primary-dark;
 				}
 				th {

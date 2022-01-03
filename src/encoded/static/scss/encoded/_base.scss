@@ -45,6 +45,9 @@ $dropdown-link-hover-bg: #ddd;
 /**** Bootstrap Variables ****/
 /*****************************/
 
+/* We override these with our own subset */
+$enable-print-styles: false;
+
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,
