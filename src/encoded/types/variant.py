@@ -32,7 +32,7 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path
+from ..util import resolve_file_path, build_s3_presigned_get_url
 from ..types.base import Item, get_item_or_none
 
 
@@ -670,23 +670,17 @@ class VariantSample(Item):
         return associated_genelists
 
 
-
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 @debug_log
 def download(context, request):
     """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
     calculated = calculate_properties(context, request)
-    s3_client = boto3.client('s3')
     params_to_get_obj = {
         'Bucket': request.registry.settings.get('file_wfout_bucket'),
         'Key': calculated['bam_snapshot']
     }
-    location = s3_client.generate_presigned_url(
-        ClientMethod='get_object',
-        Params=params_to_get_obj,
-        ExpiresIn=36*60*60
-    )
+    location = build_s3_presigned_get_url(params=params_to_get_obj)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -921,7 +915,6 @@ def process_notes(context, request):
         perform_patch_as_admin(note_atid, note_payload)
         note_patch_count += 1
 
-
     return {
         "status" : "success",
         "patch_results": {
@@ -930,9 +923,6 @@ def process_notes(context, request):
             "Note": note_patch_count,
         }
     }
-
-
-
 
 
 @collection(
@@ -965,11 +955,6 @@ class VariantSampleList(Item):
         # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
         # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
-
-
-
-
-
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
@@ -1033,7 +1018,7 @@ def variant_sample_list_spreadsheet(context, request):
 
 
 POPULATION_SUFFIX_TITLE_TUPLES = [
-    ("afr", "African-American/African"), 
+    ("afr", "African-American/African"),
     ("ami", "Amish"),
     ("amr", "Latino"),
     ("asj", "Ashkenazi Jewish"),
@@ -1053,7 +1038,7 @@ def get_spreadsheet_mappings(request = None):
             if transcript.get(field, False) is True:
                 return transcript
         return None
-    
+
     def get_canonical_transcript(variant_sample):
         return get_boolean_transcript_field(variant_sample, "csq_canonical")
 
