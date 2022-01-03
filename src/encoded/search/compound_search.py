@@ -101,11 +101,18 @@ class CompoundSearchBuilder:
         if search_builder_instance.search_session_id:  # Is 'None' if e.g. limit=all
             request.response.set_cookie('searchSessionID', search_builder_instance.search_session_id)
 
+        result_list = []
+        for hit in es_results['hits'].get("hits", []):
+            result = hit['_source']['embedded']
+            filter_block_indices = [ int(query_index) for query_index in hit.get("matched_queries", []) ]
+            result["__matching_filter_block_indices"] = filter_block_indices
+            result_list.append(result)
+
         return {
             # "@id": "/compound_search", # Not necessary from UI atm but considering adding for semantics
             # "@type": ["SearchResults"], # Not necessary from UI atm but considering adding for semantics
             "total": es_results['hits'].get("total", 0),
-            "@graph": [ hit['_source']['embedded'] for hit in es_results['hits'].get("hits", []) ],
+            "@graph": result_list,
             "columns": SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ]),
             "sort": result_sort
         }
@@ -215,7 +222,7 @@ class CompoundSearchBuilder:
         # Iterate through filter_blocks, adding global_flags if specified and adding flags if specified
         else:
             sub_queries = []
-            for block in filter_blocks:
+            for block_index, block in enumerate(filter_blocks):
                 block_query = block[cls.QUERY]
                 flags_applied = block[cls.FLAGS_APPLIED]
                 query = block_query
@@ -230,6 +237,7 @@ class CompoundSearchBuilder:
                 subreq = cls.build_subreq_from_single_query(request, query, route=cls.BUILD_QUERY_URL,
                                                             from_=from_, to=to)
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
+                sub_query["bool"]["_name"] = block_index
                 sub_queries.append(sub_query)
 
 
