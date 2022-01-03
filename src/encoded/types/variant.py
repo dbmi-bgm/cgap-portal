@@ -315,17 +315,16 @@ class Variant(Item):
                             result += " (5' UTR)"
                             break
                 elif distance:
-                    result = distance + " bp"
                     for consequence in consequences:
                         item = get_item_or_none(request, consequence)
                         if not item:
                             continue
                         consequence_title = item.get("var_conseq_name")
                         if consequence_title == "downstream_gene_variant":
-                            result += " downstream"
+                            result = distance + " bp downstream"
                             break
                         elif consequence_title == "upstream_gene_variant":
-                            result += " upstream"
+                            result = distance + " bp upstream"
                             break
                 break
         return result

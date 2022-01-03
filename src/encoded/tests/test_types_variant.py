@@ -153,7 +153,7 @@ def consequence_name_to_atid(testapp, project, institution):
             "Exon 2/6 (3' UTR)",
         ),
         ([make_transcript(distance="1000")], None),
-        ([make_transcript(distance="1000", most_severe=True)], "1000 bp"),
+        ([make_transcript(distance="1000", most_severe=True)], None),
         (
             [
                 make_transcript(
