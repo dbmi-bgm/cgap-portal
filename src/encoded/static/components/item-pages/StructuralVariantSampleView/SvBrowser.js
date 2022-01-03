@@ -366,7 +366,7 @@ export class SvBrowser extends React.PureComponent {
             );
         });
         vcfCheckboxes.push(
-            <SvSettingsCheckbox key="vcf" label="GnomAD SV" checked={svVcfVisibility["gnomad-sv"]} onChange={(e) => this.updateVcfVisibility("gnomad-sv")} />
+            <SvSettingsCheckbox key="vcf" label="gnomAD-SV" checked={svVcfVisibility["gnomad-sv"]} onChange={(e) => this.updateVcfVisibility("gnomad-sv")} />
         );
 
         return (
