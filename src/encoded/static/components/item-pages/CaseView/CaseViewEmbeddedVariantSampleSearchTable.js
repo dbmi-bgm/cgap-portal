@@ -40,10 +40,10 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 "render": function(result, parentProps){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                            selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
                             <VariantSampleDisplayTitleColumn />
-                        </DisplayTitleColumnWrapper>
+                        </VariantSampleDisplayTitleColumnWrapper>
                     );
                 }
             },
@@ -97,10 +97,10 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 "render": function(result, parentProps){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            {/* <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} /> */}
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                            /* selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem */ }}>
                             <VariantSampleDisplayTitleColumnSV />
-                        </DisplayTitleColumnWrapper>
+                        </VariantSampleDisplayTitleColumnWrapper>
                     );
                 }
             },
@@ -165,6 +165,52 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
+/** Maintain just 1 child VS window reference (using name 'child-vs-window') **/
+let childVSWindow = null;
+
+/** Open Variant Sample in new window */
+function VariantSampleDisplayTitleColumnWrapper (props) {
+    const {
+        result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+        selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem,
+        children
+    } = props;
+
+    const onClick = useCallback(function(evt){
+        evt.preventDefault();
+        evt.stopPropagation(); // Avoid having event bubble up and being caught by App.js onClick.
+        const { "@id": resultAtID } = result;
+        const childWindowNavigate = childVSWindow && !childVSWindow.closed && childVSWindow.fourfront && childVSWindow.fourfront.navigate;
+        if (childWindowNavigate) {
+            // Calling `childVSWindow.fourfront.navigate` doesn't work consistently across browsers,
+            // it's an enhancement to window.open but not replacement for it.
+            // Using `childVSWindow.postMessage` would be safer in long term if we like this UX.
+            childWindowNavigate(resultAtID);
+            // TODO Maybe:
+            // childVSWindow.postMessage({"action" : "navigate", "params" : ["/variant-samples/.../"]});
+            // wherein App.js could create an event listener for posted messages with action===navigate...
+            childVSWindow.focus();
+        } else {
+            childVSWindow = window.open(
+                resultAtID,
+                'child-vs-window',
+                "directories=0,titlebar=0,toolbar=0,menubar=0,width=800,height=600"
+            );
+        }
+        return false;
+    }, [ result ]);
+
+    let checkbox = null;
+    if (selectedVariantSamples && onSelectVariantSample && savedVariantSampleIDMap) {
+        checkbox = <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />;
+    }
+
+    return (
+        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen, onClick }}>
+            { checkbox }{ children }
+        </DisplayTitleColumnWrapper>
+    );
+}
 
 
 /** Based mostly on SPC SelectionItemCheckbox w. minor alterations */
