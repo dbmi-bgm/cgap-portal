@@ -151,13 +151,14 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         toggleVariantSampleSelectionDeletion,
         toggleStructuralVariantSampleSelectionDeletion,
         resetVariantSampleSelectionDeletionsAndOrdering,
-        deletionsLen
+        snvDeletionsLen,
+        cnvDeletionsLen,
     } = props;
 
     console.log("InterpretationTab props", props);
 
 
-    const anyUnsavedChanges = changedOrdering !== null || deletionsLen > 0;
+    const anyUnsavedChanges = changedOrdering !== null || snvDeletionsLen > 0 || cnvDeletionsLen > 0;
 
     if (!isActiveDotRouterTab) {
         return null;
@@ -173,7 +174,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 <div className="d-block d-md-flex">
                     <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="mr-08" />
                     <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, changedOrdering,
-                        resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, deletionsLen, fetchVariantSampleListItem }} />
+                        resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, snvDeletionsLen, cnvDeletionsLen, fetchVariantSampleListItem }} />
                 </div>
             </div>
             <div>
@@ -192,18 +193,22 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         variantSampleListItem,
         deletedVariantSampleSelections,
         changedOrdering,
-        resetVariantSampleSelectionDeletionsAndOrdering,
+        resetVariantSampleSelectionDeletionsAndOrdering, //look into this
         anyUnsavedChanges,
-        deletionsLen,
+        snvDeletionsLen,
+        cnvDeletionsLen,
         fetchVariantSampleListItem
     } = props;
 
     const [ isPatching, setIsPatching ] = useState(false);
 
+    const deletionsPresent = snvDeletionsLen > 0 || cnvDeletionsLen > 0;
+
     const patchVariantSampleListItem = useCallback(function(e){
         const {
             "@id": vslAtID,
-            variant_samples: originalVariantSamplesList = []
+            variant_samples: originalVariantSamplesList = [],
+            structural_variant_samples: originalStructuralVariantSamplesList = []
         } = variantSampleListItem;
         function handleResponse(resp) {
             const { status } = resp;
@@ -265,20 +270,20 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     if (changedOrdering) {
         titleParts.push("Ordering");
     }
-    if (deletionsLen > 0) {
+    if (deletionsPresent) {
         titleParts.push("Deletions");
     }
 
     let iconCls = null;
     if (isPatching) {
         iconCls = "circle-notch icon-spin fas";
-    } else if (deletionsLen > 0) {
+    } else if (deletionsPresent) {
         iconCls = "trash fas";
     } else {
         iconCls = "save fas";
     }
 
-    const btnCls = "btn d-flex align-items-center btn-" + (deletionsLen > 0 ? "danger" : "primary");
+    const btnCls = "btn d-flex align-items-center btn-" + (deletionsPresent ? "danger" : "primary");
     const disabled = !anyUnsavedChanges || isPatching;
 
     return (
@@ -306,7 +311,7 @@ const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpre
             title={
                 <span>
                     <i className="icon icon-fw icon-table fas mr-08"/>
-                    Export As...
+                    Export SNVs As...
                 </span>
             }>
             <a href={baseHref + "tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
