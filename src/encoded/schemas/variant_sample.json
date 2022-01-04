@@ -555,6 +555,10 @@
                 }
             ]
         },
+        "variant.most_severe_location": {
+            "title": "Location",
+            "order": 25
+        },
         "variant.genes.genes_most_severe_consequence.coding_effect": {
             "title": "Coding Effect",
             "order": 30
