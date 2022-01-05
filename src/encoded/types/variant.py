@@ -32,7 +32,7 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path
+from ..util import resolve_file_path, build_s3_presigned_get_url
 from ..types.base import Item, get_item_or_none
 
 
@@ -279,6 +279,55 @@ class Variant(Item):
     def POS_ABS(self, CHROM, POS):
         chrom_info = nc.get_chrominfo('hg38')
         return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
+
+    @calculated_property(schema={
+        "title": "Most severe location",
+        "description": "Location of variant in most severe transcript",
+        "type": "string"
+    })
+    def most_severe_location(self, request):
+        """Get relative location of variant per most severe transcript.
+
+        Used in filtering space column, so provide user-friendly
+        read-out.
+        """
+        result = None
+        transcripts = self.properties.get("transcript", [])
+        for transcript in transcripts:
+            if transcript.get("csq_most_severe") is True:
+                exon = transcript.get("csq_exon")
+                intron = transcript.get("csq_intron")
+                distance = transcript.get("csq_distance")
+                consequences = transcript.get("csq_consequence", [])
+                if intron:
+                    result = "Intron " + intron
+                elif exon:
+                    result = "Exon " + exon
+                    for consequence in consequences:
+                        item = get_item_or_none(request, consequence)
+                        if not item:
+                            continue
+                        consequence_title = item.get("var_conseq_name")
+                        if consequence_title == "3_prime_UTR_variant":
+                            result += " (3' UTR)"
+                            break
+                        elif consequence_title == "5_prime_UTR_variant":
+                            result += " (5' UTR)"
+                            break
+                elif distance:
+                    for consequence in consequences:
+                        item = get_item_or_none(request, consequence)
+                        if not item:
+                            continue
+                        consequence_title = item.get("var_conseq_name")
+                        if consequence_title == "downstream_gene_variant":
+                            result = distance + " bp downstream"
+                            break
+                        elif consequence_title == "upstream_gene_variant":
+                            result = distance + " bp upstream"
+                            break
+                break
+        return result
 
 
 @collection(
@@ -621,23 +670,17 @@ class VariantSample(Item):
         return associated_genelists
 
 
-
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 @debug_log
 def download(context, request):
     """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
     calculated = calculate_properties(context, request)
-    s3_client = boto3.client('s3')
     params_to_get_obj = {
         'Bucket': request.registry.settings.get('file_wfout_bucket'),
         'Key': calculated['bam_snapshot']
     }
-    location = s3_client.generate_presigned_url(
-        ClientMethod='get_object',
-        Params=params_to_get_obj,
-        ExpiresIn=36*60*60
-    )
+    location = build_s3_presigned_get_url(params=params_to_get_obj)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -872,7 +915,6 @@ def process_notes(context, request):
         perform_patch_as_admin(note_atid, note_payload)
         note_patch_count += 1
 
-
     return {
         "status" : "success",
         "patch_results": {
@@ -881,9 +923,6 @@ def process_notes(context, request):
             "Note": note_patch_count,
         }
     }
-
-
-
 
 
 @collection(
@@ -916,11 +955,6 @@ class VariantSampleList(Item):
         # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
         # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
-
-
-
-
-
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
@@ -984,7 +1018,7 @@ def variant_sample_list_spreadsheet(context, request):
 
 
 POPULATION_SUFFIX_TITLE_TUPLES = [
-    ("afr", "African-American/African"), 
+    ("afr", "African-American/African"),
     ("ami", "Amish"),
     ("amr", "Latino"),
     ("asj", "Ashkenazi Jewish"),
@@ -1004,7 +1038,7 @@ def get_spreadsheet_mappings(request = None):
             if transcript.get(field, False) is True:
                 return transcript
         return None
-    
+
     def get_canonical_transcript(variant_sample):
         return get_boolean_transcript_field(variant_sample, "csq_canonical")
 
