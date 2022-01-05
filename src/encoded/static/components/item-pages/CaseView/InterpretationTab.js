@@ -115,7 +115,6 @@ export class InterpretationTabController extends React.Component {
             changedOrdering,
             snvDeletionsLen,
             cnvDeletionsLen,
-            // deletionsLen,
             "toggleVariantSampleSelectionDeletion": this.toggleVariantSampleSelectionDeletion,
             "toggleStructuralVariantSampleSelectionDeletion": this.toggleStructuralVariantSampleSelectionDeletion,
             "resetVariantSampleSelectionDeletionsAndOrdering": this.resetVariantSampleSelectionDeletionsAndOrdering
@@ -173,7 +172,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 </h1>
                 <div className="d-block d-md-flex">
                     <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="mr-08" />
-                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, changedOrdering,
+                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, changedOrdering,
                         resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, snvDeletionsLen, cnvDeletionsLen, fetchVariantSampleListItem }} />
                 </div>
             </div>
@@ -192,8 +191,9 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     const {
         variantSampleListItem,
         deletedVariantSampleSelections,
+        deletedStructuralVariantSampleSelections,
         changedOrdering,
-        resetVariantSampleSelectionDeletionsAndOrdering, //look into this
+        resetVariantSampleSelectionDeletionsAndOrdering,
         anyUnsavedChanges,
         snvDeletionsLen,
         cnvDeletionsLen,
@@ -225,15 +225,16 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
 
             fetchVariantSampleListItem(function(){
                 // Reset `deletedVariantSampleSelections`, `changedOrdering`, & `isPatching`
-                resetVariantSampleSelectionDeletionsAndOrdering();
+                resetVariantSampleSelectionDeletionsAndOrdering(); // resets BOTH SNV and SV selections
                 setIsPatching(false);
             });
         }
 
-        // If can't see even one of the Variant Samples,
+        // If can't see even one of the Variant Samples (SNV or CNV),
         // then can't perform a reliable PATCH.
         let hasPermissionToViewAll = !!(vslAtID);
 
+        // TODO: maybe consolidate the functions for filtering and mapping SVs and SNVs into one
         const variant_samples = originalVariantSamplesList.filter(function(vsSelection){
             const { variant_sample_item: { uuid: vsUUID } } = vsSelection;
             if (!vsUUID) {
@@ -247,6 +248,21 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
             // For PATCHing, convert linkTo from object to string.
             const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
             return { ...vsSelection, "variant_sample_item": vsAtID };
+        });
+
+        const structural_variant_samples = originalStructuralVariantSamplesList.filter(function(cnvSelection){
+            const { structural_variant_sample_item: { uuid: cnvUUID } } = cnvSelection;
+            if (!cnvUUID) {
+                // Cannot proceed further, cancel afterwards.
+                hasPermissionToViewAll = false;
+                return false;
+            }
+            // Exclude if to be deleted.
+            return !deletedStructuralVariantSampleSelections[svUUID];
+        }).map(function(cnvSelection){
+            // For PATCHing, convert linkTo from object to string.
+            const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;
+            return { ...cnvSelection, "structural_variant_sample_item": cnvAtID };
         });
 
         // TODO: Sort; probably create dict of { vsAtID: indexInChangedOrdering } and then sort
@@ -263,8 +279,8 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
 
         setIsPatching(true);
 
-        ajax.load(vslAtID, handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples }));
-    }, [ variantSampleListItem, deletedVariantSampleSelections ]);
+        ajax.load(vslAtID, handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples, structural_variant_samples }));
+    }, [ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections ]);
 
     const titleParts = [];
     if (changedOrdering) {
@@ -302,6 +318,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     );
 }
 
+// Note: Currently only works for SNVs; will need updating of spreadsheet generation code for SVs + UI updates
 const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpretationSpreadsheetButton({ variantSampleListItem, disabled, className }) {
     // const { accession: caseAccession } = context; // Case Item
     const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
