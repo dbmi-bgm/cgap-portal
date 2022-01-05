@@ -71,21 +71,25 @@ function HelpNavItem(props){
  * @todo Test user actions or role for things to have here?
  */
 function LeftNavAuthenticated(props){
-    //const { context, href } = props;
-    // const isCasesLinkActive = useMemo(function(){
-    //     const { "@id": contextID } = context;
-    //     const { query = {} } = url.parse(href || contextID, true);
-    //     return query.type === 'Case';
-    //     // We assume href and context change together, so we memoize on context instead of href
-    //     // since is a more performant comparison.
-    // }, [ context ]);
+    const { context, href } = props;
+    const { isGeneListsLinkActive, isCohortsLinkActive } = useMemo(function(){
+        const { "@id": contextID } = context;
+        const { query = {}, pathname } = url.parse(href || contextID, true);
+        // We assume href and context change together, so we memoize on context instead of href
+        // since is a more performant comparison.
+        return {
+            "isGeneListsLinkActive": pathname.substring(0,7) === "/search" && query.type === "GeneList",
+            "isCohortsLinkActive": pathname.substring(0,16) === "/cohort-analysis"
+        };
+    }, [ context ]);
     return (
         <div className="navbar-nav mr-auto">
-            {/*
-            <a href="/search/?type=Case&proband_case=true" className={"nav-link browse-nav-btn" + (isCasesLinkActive ? " active" : "")}>
-                Cases
+            <a href="/cohort-analysis" className={"nav-link browse-nav-btn" + (isCohortsLinkActive ? " active" : "")}>
+                Cohorts
             </a>
-            */}
+            <a href="/search/?type=GeneList" className={"nav-link browse-nav-btn" + (isGeneListsLinkActive ? " active" : "")}>
+                GeneLists
+            </a>
             <HelpNavItem {...props} />
         </div>
     );
@@ -97,9 +101,11 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
 
     return (
         <div className="navbar-nav mr-auto">
+            {/*
             <a href="/case-studies" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
                 Case Studies
             </a>
+            */}
             <HelpNavItem {...props} />
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
                 About

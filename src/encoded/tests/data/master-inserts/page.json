@@ -52,6 +52,21 @@
         "uuid": "dc3bfa77-b7f4-45d2-a5f2-76269df59169"
     },
     {
+        "name": "cohort-analysis",
+        "title": "Cohorts",
+        "status": "public",
+        "aliases": [
+            "hms-dbmi:top-level-cohorts-page"
+        ],
+        "table-of-contents": {
+            "enabled": false,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "ffa9bc85-2df7-40a0-83f2-d6f55ac456ae"
+    },
+    {
         "name": "help",
         "title": "Help",
         "status": "public",

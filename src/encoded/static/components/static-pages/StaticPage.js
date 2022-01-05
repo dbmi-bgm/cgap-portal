@@ -20,6 +20,8 @@ import { replaceString as replacePlaceholderString } from './placeholders';
  */
 export const parseSectionsContent = memoize(function(context){
 
+    const { content: contextContent = [] } = context;
+
     const markdownCompilerOptions = {
         // Override basic header elements with MarkdownHeading to allow it to be picked up by TableOfContents
         'overrides' : _.object(_.map(['h1','h2','h3','h4', 'h5', 'h6'], function(type){ // => { type : { component, props } }
@@ -50,15 +52,18 @@ export const parseSectionsContent = memoize(function(context){
         return section;
     }
 
-    if (!Array.isArray(context.content)) throw new Error('context.content is not an array.');
+    if (contextContent.length === 0) {
+        throw new Error('No content sections defined for this page, check "content" field.');
+    }
 
-    return _.extend(
-        {}, context, {
-            'content' : _.map(
-                _.filter(context.content || [], function(section){ return section && (section.content || section.viewconfig) && !section.error; }),
-                parse
-            )
-        });
+    return {
+        ...context,
+        "content": contextContent.filter(function(section){
+            const { content, viewconfig, error } = section || {};
+            return (content || viewconfig) && !error;
+        }).map(parse)
+    };
+
 });
 
 
