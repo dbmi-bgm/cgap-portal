@@ -130,7 +130,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             }
         };
-    }, [ originalColExtMap /* , selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem */ ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
