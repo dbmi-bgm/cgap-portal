@@ -6,12 +6,12 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { display, LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
+import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 // TEMPORARY:
 import { projectReportSettings } from './../ReportView/project-settings-draft';
-import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 
 /**
@@ -330,8 +330,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
                             { parentTabType === parentTabTypes.CASEREVIEW ?
-                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle }} />
-                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, caseAccession, variantDisplayTitle }} />
+                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType }} />
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, caseAccession, variantDisplayTitle, searchType }} />
                             }
                         </h4>
                     </div>
@@ -344,7 +344,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
                         { parentTabType === parentTabTypes.CASEREVIEW ?
                             <div className="d-block d-lg-flex align-items-center">
-                                <ClassificationDropdown variantSample={selectedVS} {...{ tableTagsByID, unsavedClassification, updateClassificationForVS }} />
+                                <ClassificationDropdown variantSample={selectedVS} {...{ tableTagsByID, unsavedClassification, updateClassificationForVS, searchType }} />
                                 <button type="button" className={"btn btn-sm d-flex align-items-center btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
                                     onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                     <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
@@ -438,7 +438,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     );
 });
 
-function InterpretationTabVariantSampleTitle(props){
+function InterpretationTabVariantSampleTitle(props){ // used for SVs and SNVs
     const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
     if (anyUnsavedChanges) {
         return (
@@ -461,17 +461,24 @@ function InterpretationTabVariantSampleTitle(props){
 }
 
 const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariantSampleTitle(props){
-    const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle } = props;
+    const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType = "VariantSample" } = props;
+
+    let savedNotesTip;
+    if (searchType === "StructuralVariantSample") {
+        savedNotesTip = "No notes saved for this Structural Variant Sample; SV interpretation ui coming soon...";
+    } else if (noSavedNotes) {
+        savedNotesTip = "No notes saved for this Variant Sample, annotate it under the Interpretation tab.";
+    } else {
+        savedNotesTip = `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`;
+        savedNotesTip += (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".");
+    }
+
     return (
         <React.Fragment>
             <i className={
                 "icon align-middle icon-fw title-prefix-icon fas mr-12 icon-"
                 + (noSavedNotes ? "exclamation-triangle text-warning" : countNotesInReport > 0 ? "file text-secondary" : "minus-circle text-secondary")
-            } data-tip={
-                noSavedNotes ? "No notes saved for this Sample Variant, annotate it under the Interpretation tab."
-                    : `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`
-                        + (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".")
-            } data-html />
+            } data-tip={savedNotesTip} data-html />
             <span className="text-secondary">{ variantDisplayTitle }</span>
             { countNotesInKnowledgeBase > 0 ?
                 <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted" data-html
@@ -508,9 +515,9 @@ function ActionsDropdown(props){
     );
 }
 
-
+// TODO: Will need further updating to work with SVs once data model is solidified; for now just updating tips in case of SV and disabling button
 function ClassificationDropdown(props){
-    const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS } = props;
+    const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS, searchType } = props;
     const {
         finding_table_tag: savedClassification = null,
         uuid: vsUUID,
@@ -582,14 +589,20 @@ function ClassificationDropdown(props){
     );
 
 
+    let tooltip;
+    if (searchType === "StructuralVariantSample") {
+        tooltip = "SV interpretation uicoming soon...";
+    } else {
+        tooltip = !viewClassification? "Select a finding..." : null;
+    }
 
     // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
 
     return (
         <div className="py-1 py-lg-0 pr-lg-12">
             <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
-                disabled={!haveEditPermission || tags.length === 0}
-                data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
+                disabled={!haveEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
+                data-delay={500} data-tip={tooltip}>
                 { renderedOptions }
             </DropdownButton>
         </div>
@@ -607,7 +620,7 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
     );
 });
 
-
+// TODO: May need further updating or splitting to work with SVs depending on data model/note item changes
 const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNotes (props) {
     const {
         variantSample,
