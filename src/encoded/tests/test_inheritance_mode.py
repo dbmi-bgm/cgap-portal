@@ -679,10 +679,12 @@ def test_compute_inheritance_modes_structural_variant(
         structural_variant_sample, chrom=chromosome, structural_variant=True
     ) == result
 
+
 def test_compute_inheritance_modes_csv_tests():
     """ A larger, more involved test that reads test data from a CSV and generates test cases """
     def get_answer(test):
         answer = [test['inheritance_modes'][2:-2]]
+        answer = [x.lower() for x in answer]
         return answer
 
     def infer_sex_of_self(test):
@@ -699,6 +701,8 @@ def test_compute_inheritance_modes_csv_tests():
     def infer_novo(test):
         if 'novocaller high' in test['condition']:
             return .95
+        elif 'novocaller medium' in test['condition']:
+            return 0.5
         elif 'novoPP=0' in test['condition']:
             return 0
         elif 'novoPP=None' in test['condition']:
@@ -743,4 +747,5 @@ def test_compute_inheritance_modes_csv_tests():
             reference = get_answer(test)
             actual = InheritanceMode.compute_inheritance_modes(vs)['inheritance_modes']
             for entry in actual:
+                entry = entry.lower()
                 assert entry in reference or entry in reference[0]  # structure varies

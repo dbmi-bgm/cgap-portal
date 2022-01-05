@@ -2,13 +2,14 @@ import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
-from dcicutils.s3_utils import s3Utils, HealthPageKey
+from dcicutils.s3_utils import HealthPageKey  # , s3Utils
 from dcicutils.env_utils import infer_foursight_url_from_env
-from encoded import APP_VERSION_REGISTRY_KEY
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
 from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
+from .appdefs import APP_VERSION_REGISTRY_KEY
 from .schema_formats import is_accession
+from .util import SettingsKey
 
 
 def includeme(config):
@@ -62,28 +63,6 @@ def uptime_info():
         return "unavailable"
 
 
-class SettingsKey:
-    APPLICATION_BUCKET_PREFIX = 'application_bucket_prefix'
-    BLOB_BUCKET = 'blob_bucket'
-    EB_APP_VERSION = 'eb_app_version'
-    ELASTICSEARCH_SERVER = 'elasticsearch.server'
-    ENCODED_VERSION = 'encoded_version'
-    FILE_UPLOAD_BUCKET = 'file_upload_bucket'
-    FILE_WFOUT_BUCKET = 'file_wfout_bucket'
-    FOURSIGHT_BUCKET_PREFIX = 'foursight_bucket_prefix'
-    IDENTITY = 'identity'
-    INDEXER = 'indexer'
-    INDEXER_NAMESPACE = 'indexer.namespace'
-    INDEX_SERVER = 'index_server'
-    LOAD_TEST_DATA = 'load_test_data'
-    METADATA_BUNDLES_BUCKET = 'metadata_bundles_bucket'
-    SNOVAULT_VERSION = 'snovault_version'
-    SQLALCHEMY_URL = 'sqlalchemy.url'
-    SYSTEM_BUCKET = 'system_bucket'
-    TIBANNA_OUTPUT_BUCKET = 'tibanna_output_bucket'
-    UTILS_VERSION = 'utils_version'
-
-
 def health_check(config):
     """
     Emulate a lite form of Alex's static page routing
@@ -95,7 +74,12 @@ def health_check(config):
 
     def health_page_view(request):
 
-        h = HealthPageKey
+        class ExtendedHealthPageKey(HealthPageKey):
+            # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
+            pass
+
+        h = ExtendedHealthPageKey
+
         s = SettingsKey
 
         response = request.response
@@ -135,8 +119,10 @@ def health_check(config):
             h.NAMESPACE: settings.get(s.INDEXER_NAMESPACE),
             h.PROCESSED_FILE_BUCKET: settings.get(s.FILE_WFOUT_BUCKET),
             h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
+            h.S3_ENCRYPT_KEY_ID: settings.get(s.S3_ENCRYPT_KEY_ID),
             h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
             h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
+            h.TIBANNA_CWLS_BUCKET: settings.get(s.TIBANNA_CWLS_BUCKET),
             h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
             h.UPTIME: uptime_info(),
             h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
@@ -275,7 +261,6 @@ class CGAPRoot(Root):
         #     except KeyError:
         #         pass
         # return return_list
-
 
     @calculated_property(schema={
         "title": "Application version",

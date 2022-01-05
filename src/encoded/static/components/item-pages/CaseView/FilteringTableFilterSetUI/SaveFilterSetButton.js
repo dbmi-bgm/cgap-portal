@@ -227,7 +227,7 @@ export function SaveFilterSetButton(props){
         saveFilterSet,
         isSavingFilterSet,
         hasCurrentFilterSetChanged,
-        className = "btn btn-primary fixed-height d-inline-flex align-items-center"
+        className = "btn btn-primary d-inline-flex align-items-center"
     } = props;
     const disabled = isEditDisabled || isSavingFilterSet || !hasCurrentFilterSetChanged;
 
@@ -247,8 +247,8 @@ export function SaveFilterSetButton(props){
                 : (
                     <React.Fragment>
                         <i className="icon icon-save fas"/>
-                        &nbsp;&nbsp;
-                        Save Case FilterSet
+                        &nbsp;&nbsp;&nbsp;
+                        <span>Save Case FilterSet</span>
                     </React.Fragment>
                 ) }
         </button>

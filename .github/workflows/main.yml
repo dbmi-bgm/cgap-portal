@@ -122,4 +122,6 @@ jobs:
 
       - name: Docker Build
         if: ${{ matrix.test_type == 'Docker' }}
-        run: make build-docker-local
+        run: |
+          touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
+          docker build .

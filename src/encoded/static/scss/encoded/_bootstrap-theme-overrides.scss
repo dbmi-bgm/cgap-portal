@@ -54,6 +54,21 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	}
 }
 
+
+/**** Ports from Bootstrap v5, these can be deleted if/when we upgrade to Bootstrap 5 *****/
+
+.pe-none {
+	/* @see https://getbootstrap.com/docs/5.0/utilities/interactions/#pointer-events */
+	pointer-events: none;
+}
+
+.pe-auto {
+	/* @see https://getbootstrap.com/docs/5.0/utilities/interactions/#pointer-events */
+	pointer-events: auto;
+}
+
+/**** End Ports from Bootstrap5 ****/
+
 /**************************************
  ************* Text Styles ************
  **************************************/
@@ -62,6 +77,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	/* Default was gray-600, which is same as text-secondary. Making text-muted a little lighter */
 	color: $gray-500 !important;
 }
+
 
 
 /**************************************
@@ -82,6 +98,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	/* These must be updated in response to any font, bootstrap, etc. updates. */
 	&.fixed-height {
 		height: 37px;
+		height: 37.15px;
 	}
 
 	&.btn-lg.fixed-height {
@@ -211,7 +228,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
     border-radius: 3px;
 
     // For newer browsers, ensure doesn't go beyond window height
-    max-height: 75vh;
+    max-height: 50vh;
     overflow-y: auto;
 }
 

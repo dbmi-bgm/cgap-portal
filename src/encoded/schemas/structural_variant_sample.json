@@ -254,7 +254,7 @@
             }
         },
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "structural_variant": {
             "title": "Structural Variant",
@@ -428,14 +428,15 @@
                 "Possibly de novo",
                 "Homozygous recessive",
                 "Loss of Heterozygosity",
-                "Dominant (maternal)",
-                "Dominant (paternal)",
-                "X-linked recessive (Maternal)",
+                "Dominant (Maternal)",
+                "Dominant (Paternal)",
+                "X-linked recessive",
                 "X-linked dominant (Maternal)",
                 "X-linked dominant (Paternal)",
                 "Y-linked dominant",
                 "Low relevance, homozygous in a parent",
-                "Low relevance, present in both parent(s)",
+                "Low relevance, hemizygous in a parent",
+                "Low relevance, present in both parents",
                 "Low relevance, missing call(s) in family",
                 "Low relevance, mismatching chrXY genotype(s)",
                 "Low relevance, other"

@@ -110,7 +110,7 @@ export const FilterBlock = React.memo(function FilterBlock(props){
             + (isLoadingBlock ? "circle-notch icon-spin" : "times-circle clickable")
             + (filterBlocksLen > 1 ? "" : " disabled")
         );
-        const titleCls = "text-small" + (
+        const titleCls = "text-small pt-02" + (
             isDuplicateName ? " text-danger"
                 : !filterName ? " text-secondary"
                     : ""
@@ -125,7 +125,7 @@ export const FilterBlock = React.memo(function FilterBlock(props){
                 </span>
                 { typeof filterName === "string" ?
                     // Prevent [attempts at] editing of JSX/non-string 'filterName' values. Should only occur for hardcoded-UI stuff like DummyLoadingFilterBlock
-                    <i className="icon icon-pencil-alt fas ml-1 clickable text-smaller" onClick={onEditClick} />
+                    <i className="icon icon-pencil-alt fas ml-1 clickable text-smaller align-self-start" onClick={onEditClick} />
                     : null }
             </React.Fragment>
         );
@@ -139,12 +139,13 @@ export const FilterBlock = React.memo(function FilterBlock(props){
 
     return (
         <div className={cls} onClick={!isEditingTitle ? onSelectClick : null} data-duplicate-query={isDuplicateQuery}
+            tabIndex={!isEditingTitle && filterBlocksLen > 1 ? 0 : null}
             data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
-            <div className="row px-2 pt-08 pb-04 title-controls-row">
-                <div className="col d-flex align-items-center">
+            <div className="d-flex align-items-center px-2 pt-08 pb-04 title-controls-row">
+                <div className="flex-grow-1 d-flex align-items-center">
                     { title }
                 </div>
-                <div className="col-auto">
+                <div className="flex-grow-0 pl-16">
                     <div className="cached-counts-value" data-count-exists={countExists} data-tip={countExists ? cachedCount + " results found for this filter block." : null}>
                         { cachedCount }
                     </div>

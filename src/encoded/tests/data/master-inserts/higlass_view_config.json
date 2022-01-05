@@ -392,6 +392,11 @@
                                     "plusStrandColor": "#cfd0ff",
                                     "minusStrandColor": "#ffd1d4",
                                     "outlineReadOnHover": true,
+                                    "outlineMateOnHover": true,
+                                    "highlightReadsBy": [
+                                        "insertSize",
+                                        "pairOrientation"
+                                    ],
                                     "axisLabelFormatting": "normal",
                                     "axisPositionHorizontal": "right",
                                     "collapseWhenMaxTileWidthReached": false
@@ -1182,7 +1187,7 @@
                                 "height": 20,
                                 "server": "https://cgap-higlass.com/api/v1",
                                 "options": {
-                                    "text": "GnomAD (allele frequencies)",
+                                    "text": "gnomAD (allele frequencies)",
                                     "align": "left",
                                     "offsetY": 4,
                                     "fontSize": 11,
@@ -1206,7 +1211,7 @@
                                 "height": 45,
                                 "server": "https://cgap-higlass.com/api/v1",
                                 "options": {
-                                    "name": "GnomAd - median coverage",
+                                    "name": "gnomAD - median coverage",
                                     "align": "bottom",
                                     "barOpacity": 1,
                                     "barFillColor": "grey",
