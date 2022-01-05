@@ -258,7 +258,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
                 return false;
             }
             // Exclude if to be deleted.
-            return !deletedStructuralVariantSampleSelections[svUUID];
+            return !deletedStructuralVariantSampleSelections[cnvUUID];
         }).map(function(cnvSelection){
             // For PATCHing, convert linkTo from object to string.
             const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;

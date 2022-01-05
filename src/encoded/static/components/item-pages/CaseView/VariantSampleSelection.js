@@ -166,7 +166,6 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
 const transformSVDisplayTitle = (svs) => {
     const { structural_variant: { END, START, CHROM, SV_TYPE, size_display } = {} } = svs || {};
-    console.log("SVS", svs.structural_variant);
     return `${SV_TYPE} chr${CHROM}:${decorateNumberWithCommas(START)} - ${decorateNumberWithCommas(END)} [${size_display}]`;
 };
 
@@ -272,8 +271,6 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         gene_notes: lastGeneNote = null
     } = selectedVS || {};
 
-    console.log("selectedVS", selectedVS);
-
     const { countNotes, countNotesInReport, countNotesInKnowledgeBase } = useMemo(function(){
         const notes = getAllNotesFromVariantSample(selectedVS);
         const countNotes = notes.length;
@@ -319,8 +316,6 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
     const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
     const geneTranscriptRenderFunc = (variantIsSNV ? geneTranscriptRenderFuncSNV: geneTranscriptRenderFuncSV);
-
-    console.log("display title", snvVariantDisplayTitle, svVariantDisplayTitle, variantDisplayTitle,  (variantIsSNV ? snvVariantDisplayTitle : svVariantDisplayTitle ));
 
     return (
         <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
@@ -465,7 +460,7 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 
     let savedNotesTip;
     if (searchType === "StructuralVariantSample") {
-        savedNotesTip = "No notes saved for this Structural Variant Sample; SV interpretation ui coming soon...";
+        savedNotesTip = "No notes saved for this Structural Variant Sample; SV Interpretation UI coming soon...";
     } else if (noSavedNotes) {
         savedNotesTip = "No notes saved for this Variant Sample, annotate it under the Interpretation tab.";
     } else {
@@ -591,7 +586,7 @@ function ClassificationDropdown(props){
 
     let tooltip;
     if (searchType === "StructuralVariantSample") {
-        tooltip = "SV interpretation uicoming soon...";
+        tooltip = "SV Interpretation UI coming soon...";
     } else {
         tooltip = !viewClassification? "Select a finding..." : null;
     }
