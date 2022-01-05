@@ -124,7 +124,6 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         );
     });
 
-    console.log("selections", cnvSelections);
     const cnvOptions = cnvSelections.map(function(selection, index) {
         const { structural_variant_sample_item: { "@id": vsAtID, uuid: vsUUID, display_title } = {} } = selection;
         if (!vsAtID) {
@@ -223,7 +222,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     } = selection;
 
     const selectedVS = variantSample || structuralVariantSample;
-    const toggleSelectedVSDeletionFx = toggleStructuralVariantSampleSelectionDeletion || toggleVariantSampleSelectionDeletion;
+    const toggleSelectedVSDeletionFx = searchType === "VariantSample" ? toggleVariantSampleSelectionDeletion: toggleStructuralVariantSampleSelectionDeletion;
 
     // TODO: Consider if should just re-use state.isExpanded for "Actions" btn, expanding to show a menu..
     const [ isExpanded, setIsExpanded ] = useState(false); // Can move this state up if have pagination or infinite scroll or something in future.
