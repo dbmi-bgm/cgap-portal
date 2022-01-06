@@ -255,26 +255,16 @@
                                         "SV"
                                     ]
                                 },
-                                "linkto_placement": {
-                                    "title": "LinkTo Placement",
-                                    "description": "Information on where to place a linkTo for this file",
+                                "linkto_location": {
+                                    "title": "LinkTo Location",
+                                    "description": "Location on case on which to place a linkTo",
                                     "type": "array",
                                     "items": {
-                                        "title": "LinkTo Placement",
-                                        "description": "Information on where to place a linkTo for this file",
-                                        "type": "object",
-                                        "additionalProperties": false,
-                                        "properties": {
-                                            "location": {
-                                                "title": "LinkTo Location",
-                                                "description": "Location to place a linkTo",
-                                                "type": "string",
-                                                "enum": [
-                                                    "sample.processed_files",
-                                                    "sample_processing.processed_files"
-                                                ]
-                                            }
-                                        }
+                                        "type": "string",
+                                        "enum": [
+                                            "Sample",
+                                            "SampleProcessing"
+                                        ]
                                     }
                                 }
                             }

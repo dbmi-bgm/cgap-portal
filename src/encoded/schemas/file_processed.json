@@ -177,52 +177,17 @@
                 "SV"
             ]
         },
-        "linkto_placement": {
-            "title": "LinkTo Placement",
-            "description": "Information on where to place a linkTo for this file",
+        "linkto_location": {
+            "title": "LinkTo Location",
+            "description": "Location on case on which to place a linkTo",
             "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
             "type": "array",
             "items": {
-                "title": "LinkTo Placement",
-                "description": "Information on where to place a linkTo for this file",
-                "type": "object",
-                "additionalProperties": false,
-                "properties": {
-                    "item": {
-                        "title": "LinkTo Item",
-                        "description": "Item on which to place a linkTo",
-                        "type": "string",
-                        "format": "uuid"
-                    },
-                    "field": {
-                        "title": "LinkTo Field",
-                        "description": "The field on the item on which to place a linkTo",
-                        "type": "string"
-                    },
-                    "type": {
-                        "title": "Placement type",
-                        "description": "How to create the linkTo on the item's field",
-                        "type": "string",
-                        "enum": [
-                            "replace",
-                            "append"
-                        ]
-                    },
-                    "status": {
-                        "title": "LinkTo Status",
-                        "description": "Status of linkTo placement",
-                        "type": "string",
-                        "enum": [
-                            "success",
-                            "error"
-                        ]
-                    },
-                    "error": {
-                        "title": "LinkTo Placement Error",
-                        "description": "Error during linkTo placement",
-                        "type": "string"
-                    }
-                }
+                "type": "string",
+                "enum": [
+                    "Sample",
+                    "SampleProcessing"
+                ]
             }
         }
     },
