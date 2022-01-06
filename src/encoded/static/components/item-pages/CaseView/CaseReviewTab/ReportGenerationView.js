@@ -3,7 +3,7 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
-import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
 import { GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../../browse/variantSampleColumnExtensionMap';
@@ -14,15 +14,13 @@ import { projectReportSettings } from './../../ReportView/project-settings-draft
 
 export const ReportGenerationView = React.memo(function ReportGenerationView (props) {
     const {
-        context: {
-            sample,
-            sample_processing
-        },
+        context,
         fetchedReportItem,
         onResetForm,
         variantSampleListItem,
         visible = true
     } = props;
+    const { sample, sample_processing } = context || {};
     const { indication: indicationFromSample } = sample || {};
     const { analysis_type: analysisTypeFromSampleProcessing } = sample_processing || {};
     const { report_sections } = projectReportSettings;
@@ -35,7 +33,10 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         "extra_notes": savedExtraNotes,
         "methodology": savedMethodology,
         "references": savedReferences,
+        "findings_texts": savedFindingsTexts
     } = fetchedReportItem || {};
+
+    const [ isPatching, setIsPatching ] = useState(false);
 
     const sortedSectionKeys = useMemo(function(){
         return Object.keys(report_sections).sort(function(a, b){
@@ -147,11 +148,61 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         e.stopPropagation();
         e.preventDefault();
         const formData = new FormData(e.target);
-        console.log("SUBMITTED", e.target, Object.fromEntries(formData));
-    }, []);
+        const patchPayload = {};
+        const deleteFields = [];
+
+        setIsPatching(true);
+
+        sortedSectionKeys.forEach(function(sectionKey){
+            const { [sectionKey]: sectionOptions } = report_sections;
+            const { included = true, title = null, defaultValue } = sectionOptions;
+            if (!included) {
+                return;
+            }
+            if (sectionKey === "findings_table") {
+                // Special case
+                patchPayload.findings_texts = {};
+                for (var k of formData.keys()) {
+                    if (k.substring(0, 17) !== "finding_tag_text_") {
+                        continue;
+                    }
+                    const findingTag = k.substring(17);
+                    patchPayload.findings_texts[findingTag] = formData.get(k);
+                }
+                return;
+            }
+            if (formData.has(sectionKey)) {
+                const formValue = formData.get(sectionKey);
+                if (formValue === "") {
+                    if (fetchedReportItem[sectionKey]) {
+                        deleteFields.push(sectionKey);
+                    }
+                } else {
+                    patchPayload[sectionKey] = formValue;
+                }
+            } else if (sectionKey === "indication") {
+                // If disabled, use default auto-populated value.
+                patchPayload[sectionKey] = indicationFromSample;
+            } else if (sectionKey === "analysis_performed") {
+                patchPayload[sectionKey] = analysisTypeFromSampleProcessing;
+            }
+
+        });
+
+        const targetHref = fetchedReportAtID + (deleteFields.length > 0 ? "?delete_fields=" + deleteFields.join(",") : "");
+        ajax.promise(targetHref, "PATCH", {}, JSON.stringify(patchPayload)).then(function(resp){
+            console.info("PATCHed Report", resp);
+            setIsPatching(false);
+        });
+
+
+        // const formObject = Object.fromEntries(formData);
+        // TODO: Doesn't grab disabled fields, need to grab values from these manually.
+        console.log("SUBMITTED", Object.fromEntries(formData), patchPayload);
+    }, [ projectReportSettings, context ]);
 
     return (
-        <form onSubmit={onSubmit} className="d-block container">
+        <form onSubmit={onSubmit} className="d-block pt-24 px-xl-5">
 
             <div className="row">
 
@@ -161,13 +212,13 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
 
                 <div className="col-auto">
                     <div className="btn-group" role="group">
-                        <button type="submit" className="btn btn-primary align-items-center d-flex">
-                            <i className="icon icon-save fas mr-08"/>
+                        <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
+                            <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
                             Save
                         </button>
                         <button type="button" className="btn btn-primary align-items-center d-flex"
                             onClick={onResetForm} data-tip="Revert unsaved changes">
-                            <i className="icon icon-undo fas mr-08"/>
+                            <i className="icon icon-fw icon-undo fas mr-08"/>
                             Reset
                         </button>
                     </div>
@@ -214,14 +265,6 @@ const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
         }
     } = projectReportSettings;
     const { findings_texts = {} } = reportItem || {};
-
-    // const tagOptionsMapping = useMemo(function(){
-    //     const tagMap = {};
-    //     tableTagOptions.forEach(function(tag){
-    //         tagMap[tag.id] = tag;
-    //     });
-    //     return tagMap;
-    // }, [ tableTagOptions ]);
 
     const findingsTableGroupings = _.groupBy(variantSamples, "finding_table_tag");
     const findingsTableKeysFound = Object.keys(findingsTableGroupings);
@@ -327,27 +370,27 @@ const ReportFindingsFindingTable = React.memo(function ReportFindingsFindingTabl
         } = vs;
         const cols = [];
         if (showGeneCol) cols.push(
-            <td>
+            <td key={0}>
                 <GenesMostSevereDisplayTitle result={vs} align="left" showTips={false} truncate={false} />
             </td>
         );
         if (showVariantCol) cols.push(
-            <td>
+            <td key={1}>
                 <GenesMostSevereHGVSCColumn gene={firstGene} align="left" showTips={false} truncate={false} />
             </td>
         );
         if (showGenotypeCol) cols.push(
-            <td>
+            <td key={2}>
                 <ProbandGenotypeLabelColumn result={vs} align="left" showTips={false} truncate={false} showIcon={show_icons} />
             </td>
         );
         if (showACMGClassificationCol) cols.push(
-            <td>
+            <td key={3}>
                 <ACMGClassificationColumn clinicalInterpretationNote={clinicalInterpretationNote} showIcon={show_icons} />
             </td>
         );
         if (showDiscoveryCol) cols.push(
-            <td>
+            <td key={4}>
                 <DiscoveryCandidacyColumn discoveryInterpretationNote={discoveryInterpretationNote} showIcon={show_icons} />
             </td>
         );
@@ -378,28 +421,29 @@ function ReportFindingsFindingTableHeader({ tagOptions }){
     } = tagOptions || {};
 
     const headerCols = [];
+
     if (showGeneCol) headerCols.push(
-        <th scope="col">
+        <th scope="col" key={0}>
             Gene
         </th>
     );
     if (showVariantCol) headerCols.push(
-        <th scope="col">
+        <th scope="col" key={1}>
             Variant
         </th>
     );
     if (showGenotypeCol) headerCols.push(
-        <th scope="col">
+        <th scope="col" key={2}>
             Genotype
         </th>
     );
     if (showACMGClassificationCol) headerCols.push(
-        <th scope="col">
+        <th scope="col" key={3}>
             Classification
         </th>
     );
     if (showDiscoveryCol) headerCols.push(
-        <th scope="col">
+        <th scope="col" key={4}>
             Strength
         </th>
     );

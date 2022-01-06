@@ -25,10 +25,6 @@ export const projectReportSettings = {
     },
     "table_tags": {
         "show_subsections": true,
-        "subsection_note_order": [
-            "acmg_interpretations",
-            "discovery_intepretations"
-        ],
         "tags": [
             // Will become available as "tags" that can applied to VariantSamples (?)
             // (somewhat more tricky than hardcoded enums… maybe we can hardcode…?)
