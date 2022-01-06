@@ -90,5 +90,27 @@
                 "type": "string"
             }
         }
+    },
+    "columns": {
+        "project.display_title": {
+            "title": "Project",
+            "order": 10
+        }
+    },
+    "facets": {
+        "genes.display_title": {
+            "title": "Gene",
+            "order": 10,
+            "search_type": "sayt_without_terms",
+            "sayt_item_type": "Gene"
+        },
+        "project.display_title": {
+            "title": "Project",
+            "order": 20
+        },
+        "status": {
+            "title": "Status",
+            "order": 30
+        }
     }
 }

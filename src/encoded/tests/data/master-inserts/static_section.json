@@ -248,5 +248,20 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "section_type": "Page Section",
         "uuid": "0aa11521-a521-41f3-80a5-8aabc754df70"
+    },
+    {
+        "name": "cohort-analysis.no-cohorts-available",
+        "title": "No Cohorts Available",
+        "body": "No cohorts are currently available, check back later.",
+        "status": "public",
+        "options": {
+            "filetype": "md",
+            "collapsible": false,
+            "default_open": false
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "0aa11521-a521-41f3-80a5-8aabc754df71"
     }
 ]

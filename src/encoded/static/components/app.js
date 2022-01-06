@@ -1102,16 +1102,6 @@ export default class App extends React.PureComponent {
             status = 'forbidden'; // attempting to view submissions but it's not in users actions
         }
 
-
-        // Google does not update the content of 301 redirected pages
-        // We technically should never hit this condition as we redirect http to https, however leaving in
-        // as not 100% certain.
-        let base;
-        if (canonical === 'http://data.4dnucleome.org/') {
-            base = canonical = 'https://data.4dnucleome.org/';
-            this.historyEnabled = false;
-        }
-
         const isLoading = contextRequest && contextRequest.xhr && contextRequest.xhr.readyState < 4;
         const baseDomain = (hrefParts.protocol || '') + '//' + hrefParts.host;
         const bodyElementProps = _.extend({}, this.state, this.props, { // Complete set of own props, own state, + extras.
@@ -1153,7 +1143,6 @@ export default class App extends React.PureComponent {
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
-                    {base ? <base href={base}/> : null}
                     <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
