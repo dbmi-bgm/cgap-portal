@@ -6,7 +6,7 @@ import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import memoize from "memoize-one";
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 /**
  * Holds datastore=database representation of VariantSampleList Item
@@ -78,7 +78,15 @@ export class VariantSampleListController extends React.PureComponent {
     }
 
     windowMessageEventListener(event){
+        const { href } = this.props;
         const { origin, data: { action } = {} } = event || {};
+
+        const { protocol, host } = memoizedUrlParse(href) || {};
+        const hrefOrigin = protocol + '//' + host;
+        if (origin !== hrefOrigin) {
+            return false;
+        }
+
         // TODO check if origin matches our href domain/origin.
         if (action === "refresh-variant-sample-list") {
             this.fetchVariantSampleListItem();

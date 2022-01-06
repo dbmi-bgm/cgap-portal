@@ -168,7 +168,7 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
 
-    saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard") {
+    saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard", successCallback) {
         const { [stateFieldToUpdate]: lastSavedNote } = this.state;
 
         // Does a draft already exist?
@@ -190,7 +190,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                     })
                     .then((noteWithEmbeds) => {
                         console.log("Successfully retrieved @@embedded representation of note", noteWithEmbeds);
-                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds }, successCallback);
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -236,7 +236,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                         console.log("Successfully retrieved @@embedded representation of note: ", noteWithEmbeds);
 
                         // Full representation of item fetched... add this to state
-                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds }, successCallback);
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -491,6 +491,10 @@ function InterpretationSpaceTabs(props) {
     );
 }
 
+const refreshParentWindowVariantSampleList = _.debounce(function(){
+    window.opener.postMessage({ "action": "refresh-variant-sample-list" });
+}, 1200, false); // Debounced to prevent accidental double-clicks & (too-)rapid changes
+
 class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -551,7 +555,13 @@ class GenericInterpretationPanel extends React.PureComponent {
         const { saveAsDraft, retainWIPStateOnUnmount, noteType, saveToField, wipACMGSelections } = this.props;
         const stateToSave = { ...this.state };
         stateToSave.acmg_rules_invoked = wipACMGSelections;
-        saveAsDraft(stateToSave, saveToField, noteType);
+        saveAsDraft(stateToSave, saveToField, noteType, function(){
+            // Success Callback
+            if (window && window.opener) {
+                // If parent window exists, refresh it (if listener exists in it for this event)
+                refreshParentWindowVariantSampleList();
+            }
+        });
         retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
 
@@ -595,8 +605,6 @@ class GenericInterpretationPanel extends React.PureComponent {
         // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
         const onReturnToCaseClick = function(){
             if (window && window.opener) {
-                // We could also just test for window.opener instead of caseSource and then get rid of caseSource param eventually if works.
-                window.opener.postMessage({ "action": "refresh-variant-sample-list" });
                 window.close();
                 return;
             }

@@ -7,7 +7,7 @@ import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
-import { useChildWindowNavigate } from './../components/child-window-reuser';
+import { navigateChildWindow } from './../components/child-window-reuser';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
@@ -174,13 +174,11 @@ function VariantSampleDisplayTitleColumnWrapper (props) {
         children
     } = props;
 
-    const childWindowNavigate = useChildWindowNavigate();
-
     const onClick = useCallback(function(evt){
         evt.preventDefault();
         evt.stopPropagation(); // Avoid having event bubble up and being caught by App.js onClick.
         const { "@id": resultAtID } = result;
-        childWindowNavigate(resultAtID);
+        navigateChildWindow(resultAtID);
         return false;
     }, [ result ]);
 

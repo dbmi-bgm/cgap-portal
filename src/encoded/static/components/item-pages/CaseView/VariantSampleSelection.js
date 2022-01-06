@@ -7,7 +7,7 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
-import { useChildWindowNavigate } from './../components/child-window-reuser';
+import { navigateChildWindow } from './../components/child-window-reuser';
 import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
@@ -370,11 +370,10 @@ function InterpretationTabVariantSampleTitle(props){
     const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
 
     const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
-    const childWindowNavigate = useChildWindowNavigate();
     const onVSTitleClick = function(e){
         e.stopPropagation();
         e.preventDefault();
-        childWindowNavigate(targetHref);
+        navigateChildWindow(targetHref);
         return false;
     };
 

@@ -367,7 +367,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     );
 });
 CaseInfoTabView.getTabObject = function(props){
-    const { context: { variant_sample_list_id } = {} } = props;
+    const { context: { variant_sample_list_id } = {}, href } = props;
     return {
         "tab" : (
             <React.Fragment>
@@ -378,7 +378,7 @@ CaseInfoTabView.getTabObject = function(props){
         "key" : "case-info",
         "disabled" : false,
         "content" : (
-            <VariantSampleListController id={variant_sample_list_id}>
+            <VariantSampleListController id={variant_sample_list_id} href={href}>
                 <CaseInfoTabView {...props} />
             </VariantSampleListController>
         ),

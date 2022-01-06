@@ -91,6 +91,7 @@ export default class App extends React.PureComponent {
         _.bindAll(this, 'currentAction', 'loadSchemas',
             'setIsSubmitting', 'stayOnSubmissionsPage',
             'updateAppSessionState', 'confirmNavigation', 'navigate',
+            'handleWindowMessage',
             // Global event handlers. These will catch events unless they are caught and prevented from bubbling up earlier.
             'handleClick', 'handleSubmit', 'handlePopState', 'handleBeforeUnload'
         );
@@ -215,6 +216,9 @@ export default class App extends React.PureComponent {
             'navigate'  : navigate
         });
 
+        // Listen to any 'navigate' messages.
+        window.addEventListener("message", this.handleWindowMessage, true);
+
         // Detect browser and save it to state. Show alert to inform people we're too ~lazy~ under-resourced to support MS Edge to the max.
         const browserInfo = detectBrowser();
 
@@ -249,7 +253,9 @@ export default class App extends React.PureComponent {
             window.dispatchEvent(new Event('fourfrontinitialized'));
 
             // CURRENT: If we have parent window, post a message to it as well.
-            if (window.opener) window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
+            if (window.opener) {
+                window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
+            }
 
             // If we have UTM URL parameters in the URI, attempt to set history state (& browser) URL to exclude them after a few seconds
             // after Google Analytics may have stored proper 'source', 'medium', etc. (async)
@@ -352,6 +358,20 @@ export default class App extends React.PureComponent {
 
         }
 
+    }
+
+    handleWindowMessage(event) {
+        const { origin, data } = event;
+        const { href } = this.props;
+        const { protocol, host } = memoizedUrlParse(href) || {};
+        const hrefOrigin = protocol + '//' + host;
+        if (origin !== hrefOrigin) {
+            return false;
+        }
+        const { action, value, options } = data || {};
+        if (action === "navigate" && typeof value === "string") {
+            this.navigate(value,  options);
+        }
     }
 
     /**
