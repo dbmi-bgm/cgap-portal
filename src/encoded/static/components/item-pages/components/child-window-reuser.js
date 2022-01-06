@@ -9,8 +9,8 @@ let childWindow = null;
 
 
 /**
- * Reusable hook which will navigate a child window if one exists already, else opens new one.
- * Maintains just one child window instance.
+ * Reusable hook which will return a function that when called, will navigate a child window
+ * if one exists already, else opens new one. Maintains just one child window instance for entire app.
  *
  * @todo
  * Possibly add support for more simultaneous child windows if this becomes useful/requirement.
