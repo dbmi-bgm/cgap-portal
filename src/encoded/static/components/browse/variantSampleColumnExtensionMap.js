@@ -237,14 +237,14 @@ export const structuralVariantSampleColumnExtensionMap = {
                 const tipGenes = genes.slice(0, lastItemIndex).join(", ");
                 rows.push(
                     <div className="text-small">
-                        <span className="text-muted">List:</span>
+                        <span className="text-muted">List:&nbsp;</span>
                         <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a>
                     </div>);
             }
 
             rows.push(
                 <div className="text-muted">
-                    <i className="icon icon-star fas" />:&nbsp;
+                    <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
                     <span className="text-small">Not Selected</span>
                 </div>);
 

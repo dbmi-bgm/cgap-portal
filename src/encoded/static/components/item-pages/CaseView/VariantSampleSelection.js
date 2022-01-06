@@ -149,13 +149,13 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         <div className="row">
             { !!vsSelections.length &&
                 <div className="col-12">
-                    <h2 className="mb-05 text-600">SNV / Indel Variants</h2>
+                    <h2 className="mb-05 text-600">SNV / Indel - {vsSelections.length} Variant(s)</h2>
                     <hr className="mb-2 mt-0" />
                     {snvOptions}
                 </div> }
             { !!cnvSelections.length &&
                 <div className="col-12">
-                    <h2 className="mb-05 text-600">CNV / SV Variants</h2>
+                    <h2 className="mb-05 text-600">CNV / SV - {cnvSelections.length} Variant(s)</h2>
                     <hr className="mb-2 mt-0" />
                     {cnvOptions}
                 </div> }
