@@ -89,17 +89,25 @@ export function AddToVariantSampleListButton(props){
                 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
                 selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
                     const selection = {
-                        "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
+                        "filter_blocks_request_at_time_of_selection": filterBlocksRequestData,
+                        "variant_sample_item": variantSampleAtID // Will become linkTo (embedded)
                         // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
                         // "selected_by",
                         // "date_selected"
                     };
-                    if (searchType === "VariantSample") {
-                        selection["variant_sample_item"] = variantSampleAtID; // Will become linkTo (embedded),
-                    } else if (searchType === "StructuralVariantSample") {
-                        selection["structural_variant_sample_item"] = variantSampleAtID; // Will become linkTo (embedded),
-                    }
                     variantSampleSelectionsList.push(selection);
+                });
+            }
+
+            /** Convert embedded linkTos into just `@id` strings before PATCHing */
+            function createSelectionListPayload(existingSelections){
+                // Need to convert embedded linkTos into just @ids before PATCHing -
+                return existingSelections.map(function(existingSelection){
+                    const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
+                    if (!vsItemID) {
+                        throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
+                    }
+                    return { ...existingSelection, "variant_sample_item": vsItemID };
                 });
             }
 
@@ -172,32 +180,12 @@ export function AddToVariantSampleListButton(props){
                 let variantSamplesPatchList;
                 const payload = {};
                 // patch existing
+                // Need to convert embedded linkTos into just @ids before PATCHing -
                 if (searchType === "VariantSample") {
-                    // Need to convert embedded linkTos into just @ids before PATCHing -
-                    variantSamplesPatchList = existingVariantSampleSelections.map(function(existingSelection){
-                        const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
-                        if (!vsItemID) {
-                            throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
-                        }
-                        return {
-                            ...existingSelection,
-                            "variant_sample_item": vsItemID
-                        };
-                    });
-                    payload["variant_samples"] = variantSamplesPatchList;
+                    variantSamplesPatchList = createSelectionListPayload(existingVariantSampleSelections);
+                    payload["variant_samples"] = createSelectionListPayload(existingVariantSampleSelections);
                 } else if (searchType === "StructuralVariantSample") {
-                    // Need to convert embedded linkTos into just @ids before PATCHing -
-                    variantSamplesPatchList = existingStructuralVariantSampleSelections.map(function(existingSelection){
-                        const { structural_variant_sample_item: { "@id": cnvItemID } } = existingSelection;
-                        if (!cnvItemID) {
-                            throw new Error("Expected all structural variant samples to have an ID -- likely a view permissions issue.");
-                        }
-                        return {
-                            ...existingSelection,
-                            "structural_variant_sample_item": cnvItemID
-                        };
-                    });
-                    payload["structural_variant_samples"] = variantSamplesPatchList;
+                    payload["structural_variant_samples"] = createSelectionListPayload(existingStructuralVariantSampleSelections);
                 }
 
                 // Add in new selections

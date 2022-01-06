@@ -21,20 +21,15 @@ export class VariantSampleListController extends React.PureComponent {
      */
     static activeVariantSampleIDMap(variant_samples, structural_variant_samples){
         const retDict = {};
-        variant_samples.forEach(function(vsSelection){
+        function addToRetDict(vsSelection){
             const { variant_sample_item: { "@id": vsAtID = null } } = vsSelection;
             if (!vsAtID) {
                 return; // perhaps no view permission
             }
             retDict[vsAtID] = true;
-        });
-        structural_variant_samples.forEach(function(cnvSelection){
-            const { structural_variant_sample_item: { "@id": cnvAtID = null } } = cnvSelection;
-            if (!cnvAtID) {
-                return; // perhaps no view permission
-            }
-            retDict[cnvAtID] = true;
-        });
+        }
+        variant_samples.forEach(addToRetDict);
+        structural_variant_samples.forEach(addToRetDict);
         return retDict;
     }
 
@@ -128,6 +123,7 @@ export class VariantSampleListController extends React.PureComponent {
 
         // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
+
             scopedRequest = this.currentRequest = ajax.load(
                 "/embed",
                 vslFetchCallback,
@@ -164,22 +160,22 @@ export class VariantSampleListController extends React.PureComponent {
 
                         // structural variant sample embeds (TODO: add more as needed)
                         "structural_variant_samples.date_selected",
-                        "structural_variant_samples.structural_variant_sample_item.@id",
-                        "structural_variant_samples.structural_variant_sample_item.uuid",
-                        "structural_variant_samples.structural_variant_sample_item.display_title",
-                        "structural_variant_samples.structural_variant_sample_item.finding_table_tag",
-                        "structural_variant_samples.structural_variant_sample_item.actions",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.@id",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.display_title",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.END",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.START",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.CHROM",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.SV_TYPE",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.size_display",
-                        "structural_variant_samples.structural_variant_sample_item.structural_variant.transcript.csq_gene.display_title",
-                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.father_genotype_label",
+                        "structural_variant_samples.variant_sample_item.@id",
+                        "structural_variant_samples.variant_sample_item.uuid",
+                        "structural_variant_samples.variant_sample_item.display_title",
+                        "structural_variant_samples.variant_sample_item.finding_table_tag",
+                        "structural_variant_samples.variant_sample_item.actions",
+                        "structural_variant_samples.variant_sample_item.structural_variant.@id",
+                        "structural_variant_samples.variant_sample_item.structural_variant.display_title",
+                        "structural_variant_samples.variant_sample_item.structural_variant.END",
+                        "structural_variant_samples.variant_sample_item.structural_variant.START",
+                        "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
+                        "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
+                        "structural_variant_samples.variant_sample_item.structural_variant.size_display",
+                        "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title",
+                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
 
                         // VariantSampleItem Notes (for CaseReviewTab)
                         ...variantSampleListItemNoteEmbeds

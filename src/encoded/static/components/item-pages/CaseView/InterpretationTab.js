@@ -23,32 +23,27 @@ export class InterpretationTabController extends React.Component {
     };
 
     static reorderedVariantSampleListItem(variantSampleListItem, changedOrdering){
-        let useVSItem = variantSampleListItem;
 
-        if (changedOrdering) {
-            const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
-
-            // order SNV/Indel variant samples
+        function orderVSes(vsSelections){
             const vsIDDict = {};
             vsSelections.forEach(function(vsSelection){
                 const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
                 vsIDDict[vsAtID] = vsSelection;
             });
-            const reorderedVSes = changedOrdering.map(function(vsAtID){
+            return changedOrdering.map(function(vsAtID){
                 return vsIDDict[vsAtID];
             });
+        }
 
-            // order CNV/SV variant samples
-            const cnvIDDict = {};
-            cnvSelections.forEach(function(cnvSelection) {
-                const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;
-                cnvIDDict[cnvAtID] = cnvSelection;
-            });
-            const reorderedCNVs = changedOrdering.map(function(cnvAtID) {
-                return cnvIDDict[cnvAtID];
-            });
+        let useVSItem = variantSampleListItem;
 
-            useVSItem = { ...variantSampleListItem, "variant_samples": reorderedVSes, "structural_variant_samples": reorderedCNVs };
+        if (changedOrdering) {
+            const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
+            useVSItem = {
+                ...variantSampleListItem,
+                "variant_samples": orderVSes(vsSelections),
+                "structural_variant_samples": orderVSes(cnvSelections)
+            };
         }
 
         return useVSItem;
@@ -234,39 +229,25 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         // then can't perform a reliable PATCH.
         let hasPermissionToViewAll = !!(vslAtID);
 
-        // TODO: maybe consolidate the functions for filtering and mapping SVs and SNVs into one
-        const variant_samples = originalVariantSamplesList.filter(function(vsSelection){
-            const { variant_sample_item: { uuid: vsUUID } } = vsSelection;
-            if (!vsUUID) {
-                // Cannot proceed further, cancel afterwards.
-                hasPermissionToViewAll = false;
-                return false;
-            }
-            // Exclude if to be deleted.
-            return !deletedVariantSampleSelections[vsUUID];
-        }).map(function(vsSelection){
-            // For PATCHing, convert linkTo from object to string.
-            const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
-            return { ...vsSelection, "variant_sample_item": vsAtID };
-        });
+        function createSelectionListPayload(originalList){
+            return originalList.filter(function(vsSelection){
+                const { variant_sample_item: { uuid: vsUUID } } = vsSelection;
+                if (!vsUUID) {
+                    // Cannot proceed further, cancel afterwards.
+                    hasPermissionToViewAll = false;
+                    return false;
+                }
+                // Exclude if to be deleted.
+                return !deletedVariantSampleSelections[vsUUID];
+            }).map(function(vsSelection){
+                // For PATCHing, convert linkTo from object to string.
+                const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
+                return { ...vsSelection, "variant_sample_item": vsAtID };
+            });
+        }
 
-        const structural_variant_samples = originalStructuralVariantSamplesList.filter(function(cnvSelection){
-            const { structural_variant_sample_item: { uuid: cnvUUID } } = cnvSelection;
-            if (!cnvUUID) {
-                // Cannot proceed further, cancel afterwards.
-                hasPermissionToViewAll = false;
-                return false;
-            }
-            // Exclude if to be deleted.
-            return !deletedStructuralVariantSampleSelections[cnvUUID];
-        }).map(function(cnvSelection){
-            // For PATCHing, convert linkTo from object to string.
-            const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;
-            return { ...cnvSelection, "structural_variant_sample_item": cnvAtID };
-        });
-
-        // TODO: Sort; probably create dict of { vsAtID: indexInChangedOrdering } and then sort
-        // `variant_samples` by it.
+        const variant_samples = createSelectionListPayload(originalVariantSamplesList);
+        const structural_variant_samples = createSelectionListPayload(originalStructuralVariantSamplesList);
 
         if (!hasPermissionToViewAll) {
             Alerts.queue({
@@ -280,6 +261,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         setIsPatching(true);
 
         ajax.load(vslAtID, handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples, structural_variant_samples }));
+
     }, [ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections ]);
 
     const titleParts = [];

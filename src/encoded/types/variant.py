@@ -950,11 +950,22 @@ class VariantSampleList(Item):
         # 'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
-        # 'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
-        # 'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
+        # 'structural_variant_samples.variant_sample_item.structural_variant.display_title',
+        # 'structural_variant_samples.variant_sample_item.interpretation.classification',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
+
+
+@view_config(
+    name='update-selections',
+    context=VariantSample,
+    request_method='PATCH',
+    permission='edit'
+)
+def update_selections(context, request):
+    """Updates order & presence of VariantSampleList Items"""
+    pass
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
