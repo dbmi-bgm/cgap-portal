@@ -183,12 +183,13 @@ export function AddToVariantSampleListButton(props){
                 // Need to convert embedded linkTos into just @ids before PATCHing -
                 if (searchType === "VariantSample") {
                     payload["variant_samples"] = createSelectionListPayload(existingVariantSampleSelections);
+                    // Add in new selections to the existing ones
+                    addToSelectionsList(payload["variant_samples"]);
                 } else {
                     payload["structural_variant_samples"] = createSelectionListPayload(existingStructuralVariantSampleSelections);
+                    // Add in new selections to the existing ones
+                    addToSelectionsList(payload["structural_variant_samples"]);
                 }
-
-                // Add in new selections
-                addToSelectionsList(variantSamplesPatchList);
 
                 console.log("payload", payload);
 
