@@ -33,7 +33,7 @@ export function useChildWindowNavigate(){
             childWindow = window.open(
                 targetHref,
                 'child-window',
-                "directories=0,titlebar=0,toolbar=0,menubar=0,width=800,height=600"
+                "directories=0,titlebar=0,toolbar=0,menubar=0,width=1200,height=900"
             );
         }
     });
