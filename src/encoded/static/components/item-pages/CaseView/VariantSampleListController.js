@@ -46,6 +46,7 @@ export class VariantSampleListController extends React.PureComponent {
         super(props);
         this.fetchVariantSampleListItem = this.fetchVariantSampleListItem.bind(this);
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
+        this.windowMessageEventListener = this.windowMessageEventListener.bind(this);
         const { id: vslID } = props;
         this.state = {
             "fetchedVariantSampleListItem": null,
@@ -65,6 +66,21 @@ export class VariantSampleListController extends React.PureComponent {
     componentDidMount(){
         const { variantSampleListID } = this.state;
         if (variantSampleListID) {
+            this.fetchVariantSampleListItem();
+        }
+        // Add window message event listener
+        window.addEventListener("message", this.windowMessageEventListener, false);
+    }
+
+    componentWillUnmount(){
+        // Add window message event listener
+        window.removeEventListener("message", this.windowMessageEventListener, false);
+    }
+
+    windowMessageEventListener(event){
+        const { origin, data: { action } = {} } = event || {};
+        // TODO check if origin matches our href domain/origin.
+        if (action === "refresh-variant-sample-list") {
             this.fetchVariantSampleListItem();
         }
     }

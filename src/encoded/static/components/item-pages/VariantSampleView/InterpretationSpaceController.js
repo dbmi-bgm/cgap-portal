@@ -592,9 +592,17 @@ class GenericInterpretationPanel extends React.PureComponent {
         // console.log("GenericInterpretationPanel state", stateToSave);
         // console.log("lastSavedNote", lastSavedNote);
 
+        // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
         const onReturnToCaseClick = function(){
+            if (window && window.opener) {
+                // We could also just test for window.opener instead of caseSource and then get rid of caseSource param eventually if works.
+                window.opener.postMessage({ "action": "refresh-variant-sample-list" });
+                window.close();
+                return;
+            }
+            // Fallback if no parent window:
             return navigate(`/cases/${caseSource}/#case-info.interpretation`);
-        }; // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
+        };
 
         return (
             <div className="interpretation-panel">

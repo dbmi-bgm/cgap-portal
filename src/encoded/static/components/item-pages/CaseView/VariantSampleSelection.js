@@ -6,6 +6,8 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
+
+import { useChildWindowNavigate } from './../components/child-window-reuser';
 import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
@@ -361,8 +363,21 @@ export const DiscoveryCandidacyColumn = React.memo(function DiscoveryCandidacyCo
 
 
 
+
+
+
 function InterpretationTabVariantSampleTitle(props){
     const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
+
+    const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
+    const childWindowNavigate = useChildWindowNavigate();
+    const onVSTitleClick = function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        childWindowNavigate(targetHref);
+        return false;
+    };
+
     if (anyUnsavedChanges) {
         return (
             <React.Fragment>
@@ -375,7 +390,7 @@ function InterpretationTabVariantSampleTitle(props){
             <React.Fragment>
                 <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
-                <a href={`${vsID}?showInterpretation=True&interpretationTab=1${caseAccession ? '&caseSource=' + caseAccession : ''}`}>
+                <a href={targetHref} onClick={onVSTitleClick}>
                     { variantDisplayTitle }
                 </a>
             </React.Fragment>

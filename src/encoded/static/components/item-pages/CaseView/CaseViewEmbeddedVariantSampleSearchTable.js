@@ -6,7 +6,8 @@ import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
+import { useChildWindowNavigate } from './../components/child-window-reuser';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
@@ -165,9 +166,6 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
-/** Maintain just 1 child VS window reference (using name 'child-vs-window') **/
-let childVSWindow = null;
-
 /** Open Variant Sample in new window */
 function VariantSampleDisplayTitleColumnWrapper (props) {
     const {
@@ -176,27 +174,13 @@ function VariantSampleDisplayTitleColumnWrapper (props) {
         children
     } = props;
 
+    const childWindowNavigate = useChildWindowNavigate();
+
     const onClick = useCallback(function(evt){
         evt.preventDefault();
         evt.stopPropagation(); // Avoid having event bubble up and being caught by App.js onClick.
         const { "@id": resultAtID } = result;
-        const childWindowNavigate = childVSWindow && !childVSWindow.closed && childVSWindow.fourfront && childVSWindow.fourfront.navigate;
-        if (childWindowNavigate) {
-            // Calling `childVSWindow.fourfront.navigate` doesn't work consistently across browsers,
-            // it's an enhancement to window.open but not replacement for it.
-            // Using `childVSWindow.postMessage` would be safer in long term if we like this UX.
-            childWindowNavigate(resultAtID);
-            // TODO Maybe:
-            // childVSWindow.postMessage({"action" : "navigate", "params" : ["/variant-samples/.../"]});
-            // wherein App.js could create an event listener for posted messages with action===navigate...
-            childVSWindow.focus();
-        } else {
-            childVSWindow = window.open(
-                resultAtID,
-                'child-vs-window',
-                "directories=0,titlebar=0,toolbar=0,menubar=0,width=800,height=600"
-            );
-        }
+        childWindowNavigate(resultAtID);
         return false;
     }, [ result ]);
 
