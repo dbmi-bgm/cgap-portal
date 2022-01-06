@@ -6,7 +6,7 @@ import _ from 'underscore';
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
-import { variantSampleColumnExtensionMap, GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../../browse/variantSampleColumnExtensionMap';
+import { GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../../browse/variantSampleColumnExtensionMap';
 import { DiscoveryCandidacyColumn, ACMGClassificationColumn } from './../VariantSampleSelection';
 import { AutoGrowTextArea } from './../../components/AutoGrowTextArea';
 import { projectReportSettings } from './../../ReportView/project-settings-draft';
@@ -304,16 +304,6 @@ function ReportFindingsTableNoSamplesFallback (props) {
     );
 }
 
-
-/**
- * For now, we just re-use the column render func from some VariantSample columns
- * as value 'cells' of this card.
- */
-const {
-    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
-    "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
-    "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
-} = variantSampleColumnExtensionMap;
 
 const ReportFindingsFindingTable = React.memo(function ReportFindingsFindingTable (props) {
     const { variantSamples = [], tagOptions } = props;

@@ -25,3 +25,14 @@ export function navigateChildWindow(targetHref) {
         );
     }
 }
+
+export function onClickLinkNavigateChildWindow(e){
+    e.stopPropagation();
+    e.preventDefault();
+    const targetHref = (e.currentTarget || e.target).href;
+    if (typeof targetHref !== "string") {
+        return false;
+    }
+    navigateChildWindow(targetHref);
+    return false;
+}

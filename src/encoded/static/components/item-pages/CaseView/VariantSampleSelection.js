@@ -7,8 +7,8 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
-import { navigateChildWindow } from './../components/child-window-reuser';
-import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+import { onClickLinkNavigateChildWindow } from './../components/child-window-reuser';
+import { variantSampleColumnExtensionMap, GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 // TEMPORARY:
@@ -125,15 +125,6 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 });
 
 
-/**
- * For now, we just re-use the column render func from some VariantSample columns
- * as value 'cells' of this card.
- */
-const {
-    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
-    "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
-    "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
-} = variantSampleColumnExtensionMap;
 
 export const VariantSampleSelection = React.memo(function VariantSampleSelection(props){
     const {
@@ -196,7 +187,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const {
         "@id": vsID,
-        variant: { display_title: variantDisplayTitle },
+        variant: { display_title: variantDisplayTitle, genes: [ firstGene = null ] = [] },
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
@@ -281,19 +272,25 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         <label className="mb-04 text-small d-block" data-tip={geneTranscriptColDescription}>
                             { geneTranscriptColTitle || "Gene, Transcript" }
                         </label>
-                        { geneTranscriptRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
+                            onClick={onClickLinkNavigateChildWindow}>
+                            <GenesMostSevereDisplayTitle result={variantSample} align="left" />
+                        </a>
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small d-block" data-tip={variantColDescription}>
                             { variantColTitle || "Variant" }
                         </label>
-                        { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
+                            onClick={onClickLinkNavigateChildWindow}>
+                            <GenesMostSevereHGVSCColumn gene={firstGene} align="left" />
+                        </a>
                     </div>
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small d-block" data-tip={genotypeLabelColDescription}>
                             { genotypeLabelColTitle || "Genotype" }
                         </label>
-                        { genotypeLabelRenderFunc(variantSample, { align: 'left' }) }
+                        <ProbandGenotypeLabelColumn result={variantSample} align="left" showIcon />
                     </div>
                     <div className="col col-sm-4 col-lg-2 py-2">
                         <label className="mb-04 text-small d-block">ACMG Classification</label>
@@ -370,12 +367,6 @@ function InterpretationTabVariantSampleTitle(props){
     const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
 
     const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
-    const onVSTitleClick = function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        navigateChildWindow(targetHref);
-        return false;
-    };
 
     if (anyUnsavedChanges) {
         return (
@@ -389,7 +380,7 @@ function InterpretationTabVariantSampleTitle(props){
             <React.Fragment>
                 <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
-                <a href={targetHref} onClick={onVSTitleClick}>
+                <a href={targetHref} onClick={onClickLinkNavigateChildWindow}>
                     { variantDisplayTitle }
                 </a>
             </React.Fragment>
