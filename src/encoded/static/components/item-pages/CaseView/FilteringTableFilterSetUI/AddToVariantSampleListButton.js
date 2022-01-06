@@ -108,7 +108,8 @@ export function AddToVariantSampleListButton(props){
                 const createVSLPayload = {
                     "variant_samples": [],
                     "institution": caseInstitutionID,
-                    "project": caseProjectID
+                    "project": caseProjectID,
+                    "status": "current"
                 };
 
                 if (caseAccession) {
@@ -205,7 +206,7 @@ export function AddToVariantSampleListButton(props){
                 console.error(error);
                 Alerts.queue({
                     "title" : "Error PATCHing or POSTing VariantSampleList",
-                    "message" : JSON.stringify(err),
+                    "message" : JSON.stringify(error),
                     "style" : "danger"
                 });
             }).finally(function(){
