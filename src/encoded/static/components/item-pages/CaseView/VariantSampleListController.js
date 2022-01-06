@@ -6,7 +6,7 @@ import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import memoize from "memoize-one";
 
-import { console, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, memoizedUrlParse, WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 /**
  * Holds datastore=database representation of VariantSampleList Item
@@ -69,12 +69,12 @@ export class VariantSampleListController extends React.PureComponent {
             this.fetchVariantSampleListItem();
         }
         // Add window message event listener
-        window.addEventListener("message", this.windowMessageEventListener, false);
+        WindowEventDelegator.addHandler("message", this.windowMessageEventListener);
     }
 
     componentWillUnmount(){
-        // Add window message event listener
-        window.removeEventListener("message", this.windowMessageEventListener, false);
+        // Remove window message event listener
+        WindowEventDelegator.removeHandler("message", this.windowMessageEventListener);
     }
 
     windowMessageEventListener(event){

@@ -217,7 +217,7 @@ export default class App extends React.PureComponent {
         });
 
         // Listen to any 'navigate' messages.
-        window.addEventListener("message", this.handleWindowMessage, true);
+        WindowEventDelegator.addHandler("message", this.handleWindowMessage);
 
         // Detect browser and save it to state. Show alert to inform people we're too ~lazy~ under-resourced to support MS Edge to the max.
         const browserInfo = detectBrowser();

@@ -3,7 +3,6 @@
 
 let childWindow = null;
 
-
 /**
  * Reusable function that will navigate a child window if one exists already,
  * else opens new one. Maintains just one child window instance for entire app.
@@ -29,8 +28,8 @@ export function navigateChildWindow(targetHref) {
 export function onClickLinkNavigateChildWindow(e){
     e.stopPropagation();
     e.preventDefault();
-    const targetHref = (e.currentTarget || e.target).href;
-    if (typeof targetHref !== "string") {
+    const { href: targetHref } = e.currentTarget || e.target;
+    if (!targetHref || typeof targetHref !== "string" || targetHref === "#") {
         return false;
     }
     navigateChildWindow(targetHref);
