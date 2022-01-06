@@ -37,40 +37,43 @@ export default class ErrorPage extends React.PureComponent {
     }
 }
 
-const HTTPNotFoundView = React.memo(function(props){
+export const ErrorContainer = React.memo(function({ children, id = "content" }){
     return (
-        <div className="error-page container" id="content">
+        <div className="error-page container" id={id}>
             <div className="error-msg-container mt-3 mb-3 row">
                 <i className="icon icon-exclamation-circle fas col-auto text-larger"/>
                 <div className="title-wrapper col">
-                    <h4 className="text-400 mb-0 mt-0">
-                        {"The page you've requested does not exist."}
-                    </h4>
-                    <p className="mb-0 mt-0">
-                        <a href="/">Return</a> to the homepage.
-                    </p>
+                    { children }
                 </div>
             </div>
         </div>
     );
 });
 
+const HTTPNotFoundView = React.memo(function(props){
+    return (
+        <ErrorContainer>
+            <h4 className="text-400 mb-0 mt-0">
+                {"The page you've requested does not exist."}
+            </h4>
+            <p className="mb-0 mt-0">
+                <a href="/">Return</a> to the homepage.
+            </p>
+        </ErrorContainer>
+    );
+});
+
 const HTTPForbiddenView = React.memo(function HTTPForbiddenView(props){
     return (
-        <div className="error-page container" id="content">
-            <div className="error-msg-container mt-3 mb-3 row">
-                <i className="icon icon-ban fas col-auto text-larger"/>
-                <div className="title-wrapper col">
-                    <h4 className="text-400 mb-0 mt-0">
-                        Access was denied to this resource.
-                    </h4>
-                    <p className="mb-0 mt-0">
-                        If you have an account, please try logging in or return to the <a href="/">homepage</a>.
-                        <br/>
-                        For instructions on how to set up an account, please visit the help page for <a href="/help/account-creation">Creating an Account</a>.
-                    </p>
-                </div>
-            </div>
-        </div>
+        <ErrorContainer>
+            <h4 className="text-400 mb-0 mt-0">
+                Access was denied to this resource.
+            </h4>
+            <p className="mb-0 mt-0">
+                If you have an account, please try logging in or return to the <a href="/">homepage</a>.
+                <br/>
+                For instructions on how to set up an account, please visit the help page for <a href="/help/account-creation">Creating an Account</a>.
+            </p>
+        </ErrorContainer>
     );
 });
