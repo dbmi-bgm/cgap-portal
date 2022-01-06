@@ -125,7 +125,7 @@ export function AddToVariantSampleListButton(props){
                 if (searchType === "VariantSample") {
                     createVSLPayload["variant_samples"] = [];
                     addToSelectionsList(createVSLPayload.variant_samples);
-                } else if (searchType === "StructuralVariantSample") {
+                } else {
                     createVSLPayload["structural_variant_samples"] = [];
                     addToSelectionsList(createVSLPayload.structural_variant_samples);
                 }
@@ -182,9 +182,8 @@ export function AddToVariantSampleListButton(props){
                 // patch existing
                 // Need to convert embedded linkTos into just @ids before PATCHing -
                 if (searchType === "VariantSample") {
-                    variantSamplesPatchList = createSelectionListPayload(existingVariantSampleSelections);
                     payload["variant_samples"] = createSelectionListPayload(existingVariantSampleSelections);
-                } else if (searchType === "StructuralVariantSample") {
+                } else {
                     payload["structural_variant_samples"] = createSelectionListPayload(existingStructuralVariantSampleSelections);
                 }
 
