@@ -398,32 +398,34 @@ export class InterpretationSpaceController extends React.Component {
         const hasEditPermission = this.memoized.haveEditPermission(actions);
 
         let panelToDisplay = null;
+        const commonProps = {
+            ...passProps, hasEditPermission, isFallback,
+            "retainWIPStateOnUnmount": this.retainWIPStateOnUnmount,
+            "noteLabel": InterpretationSpaceController.tabTitles[currentTab],
+            "key": currentTab
+        };
         switch(currentTab) {
             case (0): // Gene Notes
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps } {...{ hasEditPermission, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (1): // Variant Notes
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps } {...{ hasEditPermission, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} saveToField="variant_notes" noteType="note_standard"
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (2): // Interpretation
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} wipACMGSelections={wipACMGSelections}
-                    lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps } {...{ hasEditPermission, autoClassification, toggleInvocation, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps} wipACMGSelections={wipACMGSelections} {...{ autoClassification, toggleInvocation }}
+                    lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} saveToField="interpretation" noteType="note_interpretation"
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (3): // Discovery
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps } {...{ hasEditPermission, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} saveToField="discovery_interpretation" noteType="note_discovery"
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
