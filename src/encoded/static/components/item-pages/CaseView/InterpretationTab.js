@@ -24,7 +24,7 @@ export class InterpretationTabController extends React.Component {
 
     static reorderedVariantSampleListItem(variantSampleListItem, changedOrdering){
 
-        function orderVSes(vsSelections){
+        function reorderSelectionList(vsSelections){
             const vsIDDict = {};
             vsSelections.forEach(function(vsSelection){
                 const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
@@ -41,8 +41,8 @@ export class InterpretationTabController extends React.Component {
             const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
             useVSItem = {
                 ...variantSampleListItem,
-                "variant_samples": orderVSes(vsSelections),
-                "structural_variant_samples": orderVSes(cnvSelections)
+                "variant_samples": reorderSelectionList(vsSelections),
+                "structural_variant_samples": reorderSelectionList(cnvSelections)
             };
         }
 
