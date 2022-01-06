@@ -19,7 +19,7 @@ export class VariantSampleListController extends React.PureComponent {
      * Returns all variant_samples' `@ids` as JS object keys for filtering.
      * @todo Once flags of some kinds are available, filter out "deleted" VS samples.
      */
-    static activeVariantSampleIDMap(variant_samples){
+    static activeVariantSampleIDMap(variant_samples, structural_variant_samples){
         const retDict = {};
         variant_samples.forEach(function(vsSelection){
             const { variant_sample_item: { "@id": vsAtID = null } } = vsSelection;
@@ -27,6 +27,13 @@ export class VariantSampleListController extends React.PureComponent {
                 return; // perhaps no view permission
             }
             retDict[vsAtID] = true;
+        });
+        structural_variant_samples.forEach(function(cnvSelection){
+            const { structural_variant_sample_item: { "@id": cnvAtID = null } } = cnvSelection;
+            if (!cnvAtID) {
+                return; // perhaps no view permission
+            }
+            retDict[cnvAtID] = true;
         });
         return retDict;
     }
@@ -155,6 +162,25 @@ export class VariantSampleListController extends React.PureComponent {
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
 
+                        // structural variant sample embeds (TODO: add more as needed)
+                        "structural_variant_samples.date_selected",
+                        "structural_variant_samples.structural_variant_sample_item.@id",
+                        "structural_variant_samples.structural_variant_sample_item.uuid",
+                        "structural_variant_samples.structural_variant_sample_item.display_title",
+                        "structural_variant_samples.structural_variant_sample_item.finding_table_tag",
+                        "structural_variant_samples.structural_variant_sample_item.actions",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.@id",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.display_title",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.END",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.START",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.CHROM",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.SV_TYPE",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.size_display",
+                        "structural_variant_samples.structural_variant_sample_item.structural_variant.transcript.csq_gene.display_title",
+                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                        "structural_variant_samples.structural_variant_sample_item.associated_genotype_labels.father_genotype_label",
+
                         // VariantSampleItem Notes (for CaseReviewTab)
                         ...variantSampleListItemNoteEmbeds
                     ]
@@ -171,12 +197,12 @@ export class VariantSampleListController extends React.PureComponent {
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
         const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
-        const { variant_samples = [] } = variantSampleListItem || {};
+        const { variant_samples = [], structural_variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
             variantSampleListItem,
             isLoadingVariantSampleListItem,
-            "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples),
+            "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples, structural_variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID,
             "fetchVariantSampleListItem": this.fetchVariantSampleListItem
         };

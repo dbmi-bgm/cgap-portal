@@ -81,7 +81,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            {/* <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} /> */}
+                            <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
                             <VariantSampleDisplayTitleColumnSV />
                         </DisplayTitleColumnWrapper>
                     );
@@ -130,7 +130,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             }
         };
-    }, [ originalColExtMap /* , selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem */ ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
