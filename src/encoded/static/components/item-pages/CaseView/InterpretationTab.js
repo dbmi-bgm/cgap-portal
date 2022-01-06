@@ -26,7 +26,9 @@ export class InterpretationTabController extends React.Component {
         let useVSItem = variantSampleListItem;
 
         if (changedOrdering) {
-            const { variant_samples: vsSelections } = variantSampleListItem;
+            const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
+
+            // order SNV/Indel variant samples
             const vsIDDict = {};
             vsSelections.forEach(function(vsSelection){
                 const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
@@ -36,7 +38,17 @@ export class InterpretationTabController extends React.Component {
                 return vsIDDict[vsAtID];
             });
 
-            useVSItem = { ...variantSampleListItem, "variant_samples": reorderedVSes };
+            // order CNV/SV variant samples
+            const cnvIDDict = {};
+            cnvSelections.forEach(function(cnvSelection) {
+                const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;
+                cnvIDDict[cnvAtID] = cnvSelection;
+            });
+            const reorderedCNVs = changedOrdering.map(function(cnvAtID) {
+                return cnvIDDict[cnvAtID];
+            });
+
+            useVSItem = { ...variantSampleListItem, "variant_samples": reorderedVSes, "structural_variant_samples": reorderedCNVs };
         }
 
         return useVSItem;
@@ -45,9 +57,11 @@ export class InterpretationTabController extends React.Component {
     constructor(props){
         super(props);
         this.toggleVariantSampleSelectionDeletion = this.toggleVariantSampleSelectionDeletion.bind(this);
+        this.toggleStructuralVariantSampleSelectionDeletion = this.toggleStructuralVariantSampleSelectionDeletion.bind(this);
         this.resetVariantSampleSelectionDeletionsAndOrdering = this.resetVariantSampleSelectionDeletionsAndOrdering.bind(this);
         this.state = {
             "deletedVariantSampleSelections": {},
+            "deletedStructuralVariantSampleSelections": {},
             // Not yet implemented fully:
             "changedOrdering": null
         };
@@ -69,24 +83,40 @@ export class InterpretationTabController extends React.Component {
         });
     }
 
+    toggleStructuralVariantSampleSelectionDeletion(vsUUIDToDelete){
+        this.setState(function({ deletedStructuralVariantSampleSelections }){
+            const nextDeletedVSes = { ...deletedStructuralVariantSampleSelections };
+            if (nextDeletedVSes[vsUUIDToDelete]) {
+                delete nextDeletedVSes[vsUUIDToDelete];
+            } else {
+                nextDeletedVSes[vsUUIDToDelete] = true;
+            }
+            return { "deletedStructuralVariantSampleSelections": nextDeletedVSes };
+        });
+    }
+
     resetVariantSampleSelectionDeletionsAndOrdering(){
-        this.setState({ "deletedVariantSampleSelections": {}, "changedOrdering": null });
+        this.setState({ "deletedVariantSampleSelections": {}, "deletedStructuralVariantSampleSelections": {}, "changedOrdering": null });
     }
 
     render(){
         const { children, variantSampleListItem: propVariantSampleListItem, ...passProps } = this.props;
-        const { deletedVariantSampleSelections, changedOrdering } = this.state;
+        const { deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, changedOrdering } = this.state;
 
-        const deletionsLen = this.memoized.deletionsLen(deletedVariantSampleSelections);
+        const snvDeletionsLen = this.memoized.deletionsLen(deletedVariantSampleSelections);
+        const cnvDeletionsLen = this.memoized.deletionsLen(deletedStructuralVariantSampleSelections);
         const variantSampleListItem = this.memoized.reorderedVariantSampleListItem(propVariantSampleListItem, changedOrdering);
 
         const childProps = {
             ...passProps,
             variantSampleListItem, // <- reordered. Might make sense to do reordering elsewhere..
             deletedVariantSampleSelections,
+            deletedStructuralVariantSampleSelections,
             changedOrdering,
-            deletionsLen,
+            snvDeletionsLen,
+            cnvDeletionsLen,
             "toggleVariantSampleSelectionDeletion": this.toggleVariantSampleSelectionDeletion,
+            "toggleStructuralVariantSampleSelectionDeletion": this.toggleStructuralVariantSampleSelectionDeletion,
             "resetVariantSampleSelectionDeletionsAndOrdering": this.resetVariantSampleSelectionDeletionsAndOrdering
         };
 
@@ -114,17 +144,20 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         variantSampleListItem,
         isLoadingVariantSampleListItem = false,
         fetchVariantSampleListItem,
+        deletedStructuralVariantSampleSelections,
         deletedVariantSampleSelections,
         changedOrdering,
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         resetVariantSampleSelectionDeletionsAndOrdering,
-        deletionsLen
+        snvDeletionsLen,
+        cnvDeletionsLen,
     } = props;
 
     console.log("InterpretationTab props", props);
 
 
-    const anyUnsavedChanges = changedOrdering !== null || deletionsLen > 0;
+    const anyUnsavedChanges = changedOrdering !== null || snvDeletionsLen > 0 || cnvDeletionsLen > 0;
 
     if (!isActiveDotRouterTab) {
         return null;
@@ -139,13 +172,14 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
                 </h1>
                 <div className="d-block d-md-flex">
                     <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="mr-08" />
-                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, changedOrdering,
-                        resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, deletionsLen, fetchVariantSampleListItem }} />
+                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, changedOrdering,
+                        resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, snvDeletionsLen, cnvDeletionsLen, fetchVariantSampleListItem }} />
                 </div>
             </div>
             <div>
                 <VariantSampleSelectionList {...{ variantSampleListItem, isLoadingVariantSampleListItem,
-                    deletedVariantSampleSelections, anyUnsavedChanges, schemas, context, toggleVariantSampleSelectionDeletion }} />
+                    deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, anyUnsavedChanges, schemas, context,
+                    toggleVariantSampleSelectionDeletion, toggleStructuralVariantSampleSelectionDeletion }} />
             </div>
         </React.Fragment>
     );
@@ -157,19 +191,24 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     const {
         variantSampleListItem,
         deletedVariantSampleSelections,
+        deletedStructuralVariantSampleSelections,
         changedOrdering,
         resetVariantSampleSelectionDeletionsAndOrdering,
         anyUnsavedChanges,
-        deletionsLen,
+        snvDeletionsLen,
+        cnvDeletionsLen,
         fetchVariantSampleListItem
     } = props;
 
     const [ isPatching, setIsPatching ] = useState(false);
 
+    const deletionsPresent = snvDeletionsLen > 0 || cnvDeletionsLen > 0;
+
     const patchVariantSampleListItem = useCallback(function(e){
         const {
             "@id": vslAtID,
-            variant_samples: originalVariantSamplesList = []
+            variant_samples: originalVariantSamplesList = [],
+            structural_variant_samples: originalStructuralVariantSamplesList = []
         } = variantSampleListItem;
         function handleResponse(resp) {
             const { status } = resp;
@@ -186,15 +225,16 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
 
             fetchVariantSampleListItem(function(){
                 // Reset `deletedVariantSampleSelections`, `changedOrdering`, & `isPatching`
-                resetVariantSampleSelectionDeletionsAndOrdering();
+                resetVariantSampleSelectionDeletionsAndOrdering(); // resets BOTH SNV and SV selections
                 setIsPatching(false);
             });
         }
 
-        // If can't see even one of the Variant Samples,
+        // If can't see even one of the Variant Samples (SNV or CNV),
         // then can't perform a reliable PATCH.
         let hasPermissionToViewAll = !!(vslAtID);
 
+        // TODO: maybe consolidate the functions for filtering and mapping SVs and SNVs into one
         const variant_samples = originalVariantSamplesList.filter(function(vsSelection){
             const { variant_sample_item: { uuid: vsUUID } } = vsSelection;
             if (!vsUUID) {
@@ -208,6 +248,21 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
             // For PATCHing, convert linkTo from object to string.
             const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
             return { ...vsSelection, "variant_sample_item": vsAtID };
+        });
+
+        const structural_variant_samples = originalStructuralVariantSamplesList.filter(function(cnvSelection){
+            const { structural_variant_sample_item: { uuid: cnvUUID } } = cnvSelection;
+            if (!cnvUUID) {
+                // Cannot proceed further, cancel afterwards.
+                hasPermissionToViewAll = false;
+                return false;
+            }
+            // Exclude if to be deleted.
+            return !deletedStructuralVariantSampleSelections[cnvUUID];
+        }).map(function(cnvSelection){
+            // For PATCHing, convert linkTo from object to string.
+            const { structural_variant_sample_item: { "@id": cnvAtID } } = cnvSelection;
+            return { ...cnvSelection, "structural_variant_sample_item": cnvAtID };
         });
 
         // TODO: Sort; probably create dict of { vsAtID: indexInChangedOrdering } and then sort
@@ -224,27 +279,27 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
 
         setIsPatching(true);
 
-        ajax.load(vslAtID, handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples }));
-    }, [ variantSampleListItem, deletedVariantSampleSelections ]);
+        ajax.load(vslAtID, handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples, structural_variant_samples }));
+    }, [ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections ]);
 
     const titleParts = [];
     if (changedOrdering) {
         titleParts.push("Ordering");
     }
-    if (deletionsLen > 0) {
+    if (deletionsPresent) {
         titleParts.push("Deletions");
     }
 
     let iconCls = null;
     if (isPatching) {
         iconCls = "circle-notch icon-spin fas";
-    } else if (deletionsLen > 0) {
+    } else if (deletionsPresent) {
         iconCls = "trash fas";
     } else {
         iconCls = "save fas";
     }
 
-    const btnCls = "btn d-flex align-items-center btn-" + (deletionsLen > 0 ? "danger" : "primary");
+    const btnCls = "btn d-flex align-items-center btn-" + (deletionsPresent ? "danger" : "primary");
     const disabled = !anyUnsavedChanges || isPatching;
 
     return (
@@ -263,6 +318,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     );
 }
 
+// Note: Currently only works for SNVs; will need updating of spreadsheet generation code for SVs + UI updates
 const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpretationSpreadsheetButton({ variantSampleListItem, disabled, className }) {
     // const { accession: caseAccession } = context; // Case Item
     const { "@id": atId, variant_samples: vsObjects = [] } = variantSampleListItem || {};
@@ -272,7 +328,7 @@ const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpre
             title={
                 <span>
                     <i className="icon icon-fw icon-table fas mr-08"/>
-                    Export As...
+                    Export SNVs As...
                 </span>
             }>
             <a href={baseHref + "tsv"} target="_blank" rel="noopener noreferrer" className="dropdown-item" role="button" download>
