@@ -146,10 +146,11 @@ class OverviewTabView extends React.Component {
 
     render() {
         const { newestVariantSample = null, newVSLoading } = this.state;
+        const { context: { variant: { display_title: variantDisplayTitle } = {} } = {} } = this.props;
         return (
             <div>
                 <h3 className="tab-section-title container-wide">
-                    Annotation Space
+                    { variantDisplayTitle || "Annotation Space" }
                 </h3>
                 <hr className="tab-section-title-horiz-divider"/>
                 <div className="container-wide bg-light py-3 mh-inner-tab-height-full">
