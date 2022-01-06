@@ -93,6 +93,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
         {
             "title": "II. Report Generation",
             "onClick": onClickReportGeneration,
+            "disabled": !fetchedReportItem
             // "disabled": true // Under Construction
         }
     ];

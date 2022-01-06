@@ -5,6 +5,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 
 import { GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../../browse/variantSampleColumnExtensionMap';
 import { DiscoveryCandidacyColumn, ACMGClassificationColumn } from './../VariantSampleSelection';
@@ -12,10 +13,12 @@ import { AutoGrowTextArea } from './../../components/AutoGrowTextArea';
 import { projectReportSettings } from './../../ReportView/project-settings-draft';
 
 
+
 export const ReportGenerationView = React.memo(function ReportGenerationView (props) {
     const {
         context,
         fetchedReportItem,
+        fetchReportItem,
         onResetForm,
         variantSampleListItem,
         visible = true
@@ -33,7 +36,8 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         "extra_notes": savedExtraNotes,
         "methodology": savedMethodology,
         "references": savedReferences,
-        "findings_texts": savedFindingsTexts
+        "findings_texts": savedFindingsTexts,
+        "last_modified": { date_modified: reportLastModified = null } = {}
     } = fetchedReportItem || {};
 
     const [ isPatching, setIsPatching ] = useState(false);
@@ -192,14 +196,16 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         const targetHref = fetchedReportAtID + (deleteFields.length > 0 ? "?delete_fields=" + deleteFields.join(",") : "");
         ajax.promise(targetHref, "PATCH", {}, JSON.stringify(patchPayload)).then(function(resp){
             console.info("PATCHed Report", resp);
-            setIsPatching(false);
+            fetchReportItem(function(){
+                setIsPatching(false);
+            });
         });
 
 
         // const formObject = Object.fromEntries(formData);
         // TODO: Doesn't grab disabled fields, need to grab values from these manually.
-        console.log("SUBMITTED", Object.fromEntries(formData), patchPayload);
-    }, [ projectReportSettings, context ]);
+        console.log("SUBMITTING", Object.fromEntries(formData), patchPayload);
+    }, [ projectReportSettings, context, fetchReportItem ]);
 
     return (
         <form onSubmit={onSubmit} className="d-block pt-24 px-xl-5">
@@ -210,17 +216,23 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
                     Input or adjust the fields below to complete your report
                 </h4>
 
-                <div className="col-auto">
-                    <div className="btn-group" role="group">
-                        <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
-                            <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
-                            Save
-                        </button>
-                        <button type="button" className="btn btn-primary align-items-center d-flex"
-                            onClick={onResetForm} data-tip="Revert unsaved changes">
-                            <i className="icon icon-fw icon-undo fas mr-08"/>
-                            Reset
-                        </button>
+                <div className="col-auto d-flex align-items-center">
+                    <div className="last-saved text-small">
+                        <i className="icon icon-clock far mr-06" data-tip="Last Modified" />
+                        <LocalizedTime timestamp={reportLastModified} formatType="date-time-md" />
+                    </div>
+                    <div className="ml-12">
+                        <div className="btn-group" role="group">
+                            <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
+                                <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
+                                Save
+                            </button>
+                            <button type="button" className="btn btn-primary align-items-center d-flex"
+                                onClick={onResetForm} data-tip="Revert unsaved changes">
+                                <i className="icon icon-fw icon-undo fas mr-08"/>
+                                Reset
+                            </button>
+                        </div>
                     </div>
                 </div>
 
