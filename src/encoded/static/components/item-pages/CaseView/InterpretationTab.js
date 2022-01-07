@@ -240,9 +240,9 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
                 // Exclude if to be deleted.
                 return !deletedVariantSampleSelections[vsUUID];
             }).map(function(vsSelection){
-                // For PATCHing, convert linkTo from object to string.
-                const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
-                return { ...vsSelection, "variant_sample_item": vsAtID };
+                // For PATCHing, we PATCH the special endpoint `@@order-delete-selections` with just the UUIDs
+                const { variant_sample_item: { uuid } } = vsSelection;
+                return uuid;
             });
         }
 
@@ -260,7 +260,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
 
         setIsPatching(true);
 
-        ajax.load(vslAtID, handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples, structural_variant_samples }));
+        ajax.load(vslAtID + "@@order-delete-selections", handleResponse, "PATCH", handleResponse, JSON.stringify({ variant_samples, structural_variant_samples }));
 
     }, [ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections ]);
 

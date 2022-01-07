@@ -177,7 +177,6 @@ export function AddToVariantSampleListButton(props){
                     structural_variant_samples: existingStructuralVariantSampleSelections = []
                 } = variantSampleListItem;
 
-                let variantSamplesPatchList;
                 const payload = {};
                 // patch existing
                 // Need to convert embedded linkTos into just @ids before PATCHing -

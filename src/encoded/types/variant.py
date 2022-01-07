@@ -7,7 +7,8 @@ from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
-    HTTPServerError
+    HTTPServerError,
+    HTTPNotModified
 )
 from pyramid.traversal import find_resource
 from pyramid.request import Request
@@ -251,6 +252,7 @@ def perform_patch_as_admin(request, item_atid, patch_payload):
     patch_result = request.invoke_subrequest(subreq).json
     if patch_result["status"] != "success":
         raise HTTPServerError("Couldn't update Item " + item_atid)
+    return patch_result
 
 
 @collection(
@@ -968,30 +970,55 @@ class VariantSampleList(Item):
 
 
 @view_config(
-    name='update-selections',
+    name='order-delete-selections',
     context=VariantSampleList,
     request_method='PATCH',
     permission='edit'
 )
-def update_selections(context, request):
+def order_delete_selections(context, request):
     """
-    In Development.
-
     Updates order & presence of VariantSampleList Items
     """
 
     request_body = request.json
     # We expect lists of UUIDs.
     # We do NOT accept entire items, we preserve existing values for "selected_by" and "date_selected".
-    next_variant_samples = request_body.get("variant_samples", [])
-    next_structural_variant_samples = request_body.get("structural_variant_samples", [])
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
 
-    # TODO: Make into dicts keyed by VS UUID, then map over next_variant_samples to re-order the full items.
-    # Then save.
-    context.properties.get("variant_samples", [])
-    context.properties.get("structural_variant_samples", [])
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
 
-    pass
+    selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        selections_by_uuid[selection["variant_sample_item"]] = selection
+    
+    patch_payload = {}
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = []
+        for vs_uuid in requested_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = []
+        for vs_uuid in requested_structural_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["structural_variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    # TODO: Save who+when deleted VariantSample from VariantSampleList
+
+    perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
