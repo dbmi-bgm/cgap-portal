@@ -7,7 +7,8 @@ from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
-    HTTPServerError
+    HTTPServerError,
+    HTTPNotModified
 )
 from pyramid.traversal import find_resource
 from pyramid.request import Request
@@ -234,6 +235,24 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                     and "properties" in field_schema["items"]):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
+
+def perform_patch_as_admin(request, item_atid, patch_payload):
+    """
+    Patches Items as 'UPGRADER' user/permissions.
+
+    TODO: Seems like this could be re-usable somewhere
+    """
+    if len(patch_payload) == 0:
+        log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
+        return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
+    subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
+    subreq.remote_user = "UPGRADE"
+    if 'HTTP_COOKIE' in subreq.environ:
+        del subreq.environ['HTTP_COOKIE']
+    patch_result = request.invoke_subrequest(subreq).json
+    if patch_result["status"] != "success":
+        raise HTTPServerError("Couldn't update Item " + item_atid)
+    return patch_result
 
 
 @collection(
@@ -694,6 +713,12 @@ def download(context, request):
     raise HTTPTemporaryRedirect(location=location)  # 307
 
 
+
+
+
+
+
+
 @view_config(
     name='process-notes',
     context=VariantSample,
@@ -885,34 +910,21 @@ def process_notes(context, request):
     # This is in part to simplify UI logic where only Note status == "current" is checked to
     # assert if a Note is already saved to Project or not.
 
-    def perform_patch_as_admin(item_atid, patch_payload):
-        """Patches Items as 'UPGRADER' user/permissions."""
-        if len(patch_payload) == 0:
-            log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
-            return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
-        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
-        subreq.remote_user = "UPGRADE"
-        if 'HTTP_COOKIE' in subreq.environ:
-            del subreq.environ['HTTP_COOKIE']
-        patch_result = request.invoke_subrequest(subreq).json
-        if patch_result["status"] != "success":
-            raise HTTPServerError("Couldn't update Item " + item_atid)
-
 
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch_as_admin(gene_atid, gene_payload)
+            perform_patch_as_admin(request, gene_atid, gene_payload)
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch_as_admin(variant["@id"], variant_patch_payload)
+        perform_patch_as_admin(request, variant["@id"], variant_patch_payload)
         variant_patch_count += 1
 
     note_patch_count = 0
     for note_atid, note_payload in note_patch_payloads.items():
-        perform_patch_as_admin(note_atid, note_payload)
+        perform_patch_as_admin(request, note_atid, note_payload)
         note_patch_count += 1
 
     return {
@@ -950,11 +962,63 @@ class VariantSampleList(Item):
         # 'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
-        # 'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
-        # 'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
+        # 'structural_variant_samples.variant_sample_item.structural_variant.display_title',
+        # 'structural_variant_samples.variant_sample_item.interpretation.classification',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
+
+
+@view_config(
+    name='order-delete-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def order_delete_selections(context, request):
+    """
+    Updates order & presence of VariantSampleList Items
+    """
+
+    request_body = request.json
+    # We expect lists of UUIDs.
+    # We do NOT accept entire items, we preserve existing values for "selected_by" and "date_selected".
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
+
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        selections_by_uuid[selection["variant_sample_item"]] = selection
+    
+    patch_payload = {}
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = []
+        for vs_uuid in requested_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = []
+        for vs_uuid in requested_structural_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["structural_variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    # TODO: Save who+when deleted VariantSample from VariantSampleList
+
+    perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',

@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import Popover  from 'react-bootstrap/esm/Popover';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 
@@ -99,7 +99,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
                         <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
-                            /* selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem */ }}>
+                            selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
                             <VariantSampleDisplayTitleColumnSV />
                         </VariantSampleDisplayTitleColumnWrapper>
                     );
@@ -161,7 +161,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             }
         };
-    }, [ originalColExtMap, /* selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, */ currFilterSet ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
