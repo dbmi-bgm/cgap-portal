@@ -189,25 +189,17 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     }, [ currFamily ]);
 
     const anyAnnotatedVariantSamples = useMemo(function(){ // checks for notes on SNVs and CNV/SVs
-        const vsSelectionsLen = vsSelections.length;
-        for (var i = 0; i < vsSelectionsLen; i++) {
-            const { variant_sample_item } = vsSelections[i];
+        const allSelections = vsSelections.concat(cnvSelections);
+        const allSelectionsLen = allSelections.length;
+
+        for (var i = 0; i < allSelectionsLen; i++) {
+            const { variant_sample_item } = allSelections[i];
             const notesForVS = getAllNotesFromVariantSample(variant_sample_item);
             if (notesForVS.length > 0) {
                 return true;
             }
         }
 
-        // TODO: This is mostly placeholder; will probably need to update getAllNotesFromVariantSample or create new f(x)
-        // depending on how much interpretation note data model changes for structural variant interpretation space...
-        const cnvSelectionsLen = cnvSelections.length;
-        for (var j = 0; j < cnvSelectionsLen; j++) {
-            const { structural_variant_sample_item } = cnvSelections[j];
-            const notesForCNV = getAllNotesFromVariantSample(structural_variant_sample_item);
-            if (notesForCNV.length > 0) {
-                return true;
-            }
-        }
         return false;
     }, [ variantSampleListItem ]);
 

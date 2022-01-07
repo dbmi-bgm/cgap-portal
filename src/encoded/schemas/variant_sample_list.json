@@ -97,7 +97,7 @@
                 "title": "Structural Variant Sample Selection",
                 "type": "object",
                 "properties": {
-                    "structural_variant_sample_item": {
+                    "variant_sample_item": {
                         "title": "Structural Variant Sample",
                         "type": "string",
                         "linkTo": "StructuralVariantSample"

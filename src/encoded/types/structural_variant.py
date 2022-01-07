@@ -287,7 +287,7 @@ class StructuralVariantSample(Item):
     rev = {
         "variant_sample_list": (
             "VariantSampleList",
-            "structural_variant_samples.structural_variant_sample_item",
+            "structural_variant_samples.variant_sample_item",
         )
     }
     embedded_list = build_structural_variant_sample_embedded_list()
