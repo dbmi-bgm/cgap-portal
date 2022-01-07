@@ -563,6 +563,12 @@
             "schema_title": "Marrvel",
             "link": "http://v1.marrvel.org/search/gene/<ID>"
         },
+        "medline_plus": {
+            "title": "MedlinePlus",
+            "type": "string",
+            "description": "Formerly Genetics Home Reference, a resource from the National Library of Medicine for features and inheritance of genetic conditions.",
+            "link": "https://medlineplus.gov/genetics/gene/<ID>/"
+        },
         "mgd_id": {
             "title": "MGI",
             "type": "array",
