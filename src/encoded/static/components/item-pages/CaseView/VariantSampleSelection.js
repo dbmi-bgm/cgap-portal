@@ -268,7 +268,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const {
         "@id": vsID,
-        variant: { display_title: snvVariantDisplayTitle, genes: [ firstGene = null ] = [] },
+        variant: { display_title: snvVariantDisplayTitle, genes: [ firstGene = null ] = [] } = {},
         structural_variant: { display_title: svVariantDisplayTitle } = {},
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
@@ -315,7 +315,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const geneTranscriptColTitle = variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle;
     const variantColTitle = (variantIsSNV ? snvVariantColTitle : svVariantColTitle );
     const variantGenotypeLabelColTitle = (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle );
-    const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : transformSVDisplayTitle(structuralVariantSample));
+    const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : transformSVDisplayTitle(variantSample));
     const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
     const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
 
