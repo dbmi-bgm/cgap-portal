@@ -34,6 +34,8 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
         externalDatabaseFieldnames = [
             "genecards",
+            "medline_plus",
+            "gencc",
             "ensgid",
             "entrez_id",
             "hgnc_id",
