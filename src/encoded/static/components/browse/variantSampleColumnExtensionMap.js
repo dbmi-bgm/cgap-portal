@@ -153,43 +153,14 @@ export const structuralVariantSampleColumnExtensionMap = {
     "structural_variant.transcript": {
         render: (result, props) => {
             const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
-            const { align = "left" } = props || {};
+            const { align = "left", link } = props;
+            if (transcripts.length === 0) return null;
 
-            const path = atID + "?annotationTab=0";
-
-            const transcriptsDeduped = {};
-            transcripts.forEach((transcript) => {
-                const { csq_gene: { display_title = null } = {} } = transcript;
-                transcriptsDeduped[display_title] = true;
-            });
-            const genes = Object.keys(transcriptsDeduped);
-
-            const rows = [];
-
-            if (genes.length <= 2) { // show comma separated
-                rows.push(
-                    <div className="text-small">
-                        <span className="text-muted">List:&nbsp;</span>
-                        <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>
-                    </div>);
-            } else {
-                // show first and last gene separated by "..." with first 10 available on hover in first row
-                const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
-                const tipGenes = genes.slice(0, lastItemIndex).join(", ");
-                rows.push(
-                    <div className="text-small">
-                        <span className="text-muted">List:&nbsp;</span>
-                        <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a>
-                    </div>);
-            }
-
-            rows.push(
-                <div className="text-muted">
-                    <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
-                    <span className="text-small">Not Selected</span>
-                </div>);
-
-            return (<div className="w-100"><StackedRowColumn className={"text-" + align} {...{ rows }} /></div>);
+            return (
+                <a href={link ? link : (atID ? atID + '?annotationTab=0' : "#")}>
+                    <StructuralVariantTranscriptColumn {...{ result, align }} />
+                </a>
+            );
         }
     }
 };
@@ -256,7 +227,7 @@ export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSamp
     // (defined in SPC's basicColumnExtensionMap>DisplayTitleColumnWrapper) handle target="_blank".
 
     return (
-        <a key="title" href={link || atID} target="_blank" rel="noopener noreferrer" className="d-block text-truncate">
+        <a key="title" href={link || atID} onClick={onClick} className="d-block text-truncate">
             <StackedRowColumn className={cls} {...{ rows }}  />
         </a>
     );
@@ -321,6 +292,46 @@ export const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGV
             </div>
         );
     }
+
+    return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
+});
+
+export const StructuralVariantTranscriptColumn = React.memo(function StructuralVariantTranscriptColumn({ result, align = "center" }){
+    const { structural_variant: { transcript: transcripts = [] } = {} } = result || {};
+
+    const transcriptsDeduped = {};
+    transcripts.forEach((transcript) => {
+        const { csq_gene: { display_title = null } = {} } = transcript;
+        transcriptsDeduped[display_title] = true;
+    });
+    const genes = Object.keys(transcriptsDeduped);
+
+    const rows = [];
+
+    if (genes.length <= 2) { // show comma separated
+        rows.push(
+            <div className="text-small">
+                <span className="text-muted">List:&nbsp;</span>
+                <span>{genes.join(", ")}</span>
+            </div>);
+    } else {
+        // show first and last gene separated by "..." with first 10 available on hover in first row
+        const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
+        const tipGenes = genes.slice(0, lastItemIndex).join(", ");
+        rows.push(
+            <div className="text-small">
+                <span className="text-muted">List:&nbsp;</span>
+                <span data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</span>
+            </div>
+        );
+    }
+
+    rows.push(
+        <div className="text-muted">
+            <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
+            <span className="text-small">Not Selected</span>
+        </div>
+    );
 
     return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
 });

@@ -10,7 +10,14 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 import { onClickLinkNavigateChildWindow } from './../components/child-window-reuser';
 
-import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, GenesMostSevereDisplayTitle, GenesMostSevereHGVSCColumn, ProbandGenotypeLabelColumn } from './../../browse/variantSampleColumnExtensionMap';
+import {
+    variantSampleColumnExtensionMap,
+    structuralVariantSampleColumnExtensionMap,
+    GenesMostSevereDisplayTitle,
+    GenesMostSevereHGVSCColumn,
+    ProbandGenotypeLabelColumn,
+    StructuralVariantTranscriptColumn
+} from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 // TEMPORARY:
@@ -176,15 +183,9 @@ const transformSVDisplayTitle = (svs) => {
  * For now, we just re-use the column render func from some VariantSample columns
  * as value 'cells' of this card.
  */
-const {
-    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFuncSNV },
-    "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
-    "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
-} = variantSampleColumnExtensionMap;
 
 const {
     "structural_variant.worst_transcript": { render: worstTranscriptRenderFunc },
-    "structural_variant.transcript": { render: geneTranscriptRenderFuncSV }
 } = structuralVariantSampleColumnExtensionMap;
 
 export const VariantSampleSelection = React.memo(function VariantSampleSelection(props){
@@ -253,6 +254,10 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     title: svVariantColTitle,
                     description: svVariantColDescription
                 } = {},
+                "structural_variant.transcript": {
+                    title: svGeneTranscriptColTitle,
+                    description: svGeneTranscriptColDescription
+                } = {},
                 "associated_genotype_labels.proband_genotype_label": {
                     title: svGenotypeLabelColTitle,
                     description: svGenotypeLabelColDescription
@@ -306,14 +311,13 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const variantIsSNV = searchType === "VariantSample";
 
     // Pull values from SV if SV, SNV if SNV
-    const geneTranscriptColDescription = snvGeneTranscriptColDescription; // todo: add sv version
-    const geneTranscriptColTitle = snvGeneTranscriptColTitle; // todo: add sv version
+    const geneTranscriptColDescription = variantIsSNV ? snvGeneTranscriptColDescription : svGeneTranscriptColDescription;
+    const geneTranscriptColTitle = variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle;
     const variantColTitle = (variantIsSNV ? snvVariantColTitle : svVariantColTitle );
     const variantGenotypeLabelColTitle = (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle );
     const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : transformSVDisplayTitle(structuralVariantSample));
     const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
     const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
-    const geneTranscriptRenderFunc = (variantIsSNV ? geneTranscriptRenderFuncSNV: geneTranscriptRenderFuncSV);
 
     return (
         <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
@@ -363,7 +367,11 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         </label>
                         <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
                             onClick={onClickLinkNavigateChildWindow}>
-                            <GenesMostSevereDisplayTitle result={variantSample} align="left" />
+                            { variantIsSNV ?
+                                <GenesMostSevereDisplayTitle result={variantSample} align="left" />
+                                :
+                                <StructuralVariantTranscriptColumn result={variantSample} align="left" />
+                            }
                         </a>
                     </div>
                     { variantIsSNV ?
@@ -387,7 +395,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         : null }
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small d-block" data-tip={genotypeLabelColDescription}>
-                            { genotypeLabelColTitle || "Genotype" }
+                            { variantGenotypeLabelColTitle || "Genotype" }
                         </label>
                         <ProbandGenotypeLabelColumn result={variantSample} align="left" showIcon />
                     </div>
