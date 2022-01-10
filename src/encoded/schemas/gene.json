@@ -398,6 +398,12 @@
             "description": "gene damage prediction (low/medium/high) by GDI for all diseases",
             "schema_title": "Gene damage prediction (all disease-causing genes)"
         },
+        "gencc": {
+            "title": "GenCC",
+            "description": "GenCC provides information pertaining to the validity of gene-disease relationships, with a current focus on Mendelian diseases.",
+            "type": "string",
+            "link": "https://search.thegencc.org/genes/<ID>"
+        },
         "gene_biotype": {
             "title": "Gene biotype",
             "field_name": "gene_biotype",
@@ -562,6 +568,12 @@
             "description": "Integrated information from six human genetic databases and seven model organism databases",
             "schema_title": "Marrvel",
             "link": "http://v1.marrvel.org/search/gene/<ID>"
+        },
+        "medline_plus": {
+            "title": "MedlinePlus",
+            "type": "string",
+            "description": "Formerly Genetics Home Reference, a resource from the National Library of Medicine for features and inheritance of genetic conditions.",
+            "link": "https://medlineplus.gov/genetics/gene/<ID>/"
         },
         "mgd_id": {
             "title": "MGI",

@@ -4,9 +4,10 @@ import React, { useCallback, useMemo, useState } from 'react';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { display, LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
-import { variantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
+import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
 
 // TEMPORARY:
@@ -47,7 +48,9 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
         // From InterpretationTab:
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         deletedVariantSampleSelections,
+        deletedStructuralVariantSampleSelections,
         anyUnsavedChanges,
 
         // From CaseReviewTab:
@@ -64,7 +67,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         sendToReportStore
     } = props;
 
-    const { variant_samples: vsSelections = [] } =  variantSampleListItem || {};
+    const { variant_samples: vsSelections = [], structural_variant_samples: cnvSelections = [] } =  variantSampleListItem || {};
 
     // Used for faster lookups of current tag title.
     const tableTagsByID = useMemo(function(){
@@ -80,7 +83,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         return tableTagsByID;
     }, [ projectReportSettings ]);
 
-    if (vsSelections.length === 0) {
+    if (vsSelections.length === 0 && cnvSelections.length === 0) {
         return (
             <h4 className="text-400 text-center text-secondary py-3">
                 { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
@@ -99,10 +102,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         tableTagsByID,
         updateClassificationForVS,
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         anyUnsavedChanges
     };
 
-    return vsSelections.map(function(selection, index){
+    const snvOptions = vsSelections.map(function(selection, index){
         const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
         if (!vsAtID) {
             // Handle lack of permissions, show some 'no permissions' view, idk..
@@ -115,33 +119,82 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
         const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
         return (
-            <VariantSampleSelection {...commonProps} key={vsUUID || index}
+            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="VariantSample"
                 {...{ selection, index, unsavedClassification, isDeleted }}  />
         );
     });
 
+    const cnvOptions = cnvSelections.map(function(selection, index) {
+        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID, display_title } = {} } = selection;
+        if (!vsAtID) {
+            // Handle lack of permissions, show some 'no permissions' view, idk..
+            return (
+                <div className="text-center p-3">
+                    <em>Item with no view permissions</em>
+                </div>
+            );
+        }
+        const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
+        const isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
+        return (
+            // <div key={vsUUID}>
+            //     { display_title }
+            // </div>
+            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="StructuralVariantSample"
+                {...{ selection, index, unsavedClassification, isDeleted }}  />
+        );
+    });
+
+    return (
+        <div className="row">
+            { !!vsSelections.length &&
+                <div className="col-12">
+                    <h2 className="mb-05 text-600">SNV / Indel - {vsSelections.length} Variant(s)</h2>
+                    <hr className="mb-2 mt-0" />
+                    {snvOptions}
+                </div> }
+            { !!cnvSelections.length &&
+                <div className="col-12">
+                    <h2 className="mb-05 text-600">CNV / SV - {cnvSelections.length} Variant(s)</h2>
+                    <hr className="mb-2 mt-0" />
+                    {cnvOptions}
+                </div> }
+        </div>
+    );
+
 });
 
+const transformSVDisplayTitle = (svs) => {
+    const { structural_variant: { END, START, CHROM, SV_TYPE, size_display } = {} } = svs || {};
+    return `${SV_TYPE} chr${CHROM}:${decorateNumberWithCommas(START)} - ${decorateNumberWithCommas(END)} [${size_display}]`;
+};
 
 /**
  * For now, we just re-use the column render func from some VariantSample columns
  * as value 'cells' of this card.
  */
 const {
-    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFunc },
+    "variant.genes.genes_most_severe_gene.display_title": { render: geneTranscriptRenderFuncSNV },
     "variant.genes.genes_most_severe_hgvsc": { render: variantRenderFunc },
     "associated_genotype_labels.proband_genotype_label": { render: genotypeLabelRenderFunc },
 } = variantSampleColumnExtensionMap;
 
+const {
+    "structural_variant.worst_transcript": { render: worstTranscriptRenderFunc },
+    "structural_variant.transcript": { render: geneTranscriptRenderFuncSV }
+} = structuralVariantSampleColumnExtensionMap;
+
 export const VariantSampleSelection = React.memo(function VariantSampleSelection(props){
     const {
-        selection,  // VariantSample Item
+        selection,  // VariantSample or StructuralVariantSample Item
+        searchType, // VariantSample or StructuralVariantSample (string)
         index,
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
         // From InterpretationTab (if used):
         toggleVariantSampleSelectionDeletion,
+        toggleStructuralVariantSampleSelectionDeletion,
         isDeleted,
         anyUnsavedChanges, // If true, then should prevent navigation to VS items as would lose changes in current view. (Unless we adjust to open in new window.)
         // From CaseReviewTab (if used):
@@ -166,6 +219,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         variant_sample_item: variantSample
     } = selection;
 
+    const toggleSelectedVSDeletionFx = searchType === "VariantSample" ? toggleVariantSampleSelectionDeletion: toggleStructuralVariantSampleSelectionDeletion;
 
     // TODO: Consider if should just re-use state.isExpanded for "Actions" btn, expanding to show a menu..
     const [ isExpanded, setIsExpanded ] = useState(false); // Can move this state up if have pagination or infinite scroll or something in future.
@@ -178,16 +232,28 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         "VariantSample": {
             columns: {
                 "variant.genes.genes_most_severe_gene.display_title": {
-                    title: geneTranscriptColTitle,
-                    description: geneTranscriptColDescription
+                    title: snvGeneTranscriptColTitle,
+                    description: snvGeneTranscriptColDescription
                 } = {},
                 "variant.genes.genes_most_severe_hgvsc": {
-                    title: variantColTitle,
-                    description: variantColDescription
+                    title: snvVariantColTitle,
+                    description: snvVariantColDescription
                 } = {},
                 "associated_genotype_labels.proband_genotype_label": {
-                    title: genotypeLabelColTitle,
-                    description: genotypeLabelColDescription
+                    title: snvGenotypeLabelColTitle,
+                    description: snvGenotypeLabelColDescription
+                } = {}
+            } = {}
+        } = {},
+        "StructuralVariantSample": {
+            columns: {
+                "structural_variant.display_title": {
+                    title: svVariantColTitle,
+                    description: svVariantColDescription
+                } = {},
+                "associated_genotype_labels.proband_genotype_label": {
+                    title: svGenotypeLabelColTitle,
+                    description: svGenotypeLabelColDescription
                 } = {}
             } = {}
         } = {}
@@ -195,7 +261,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const {
         "@id": vsID,
-        variant: { display_title: variantDisplayTitle },
+        variant: { display_title: snvVariantDisplayTitle } = {},
+        structural_variant: { display_title: svVariantDisplayTitle } = {},
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
@@ -236,6 +303,18 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
     }
 
+    const variantIsSNV = searchType === "VariantSample";
+
+    // Pull values from SV if SV, SNV if SNV
+    const geneTranscriptColDescription = snvGeneTranscriptColDescription; // todo: add sv version
+    const geneTranscriptColTitle = snvGeneTranscriptColTitle; // todo: add sv version
+    const variantColTitle = (variantIsSNV ? snvVariantColTitle : svVariantColTitle );
+    const variantGenotypeLabelColTitle = (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle );
+    const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : transformSVDisplayTitle(structuralVariantSample));
+    const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
+    const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
+    const geneTranscriptRenderFunc = (variantIsSNV ? geneTranscriptRenderFuncSNV: geneTranscriptRenderFuncSV);
+
     return (
         <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
             <div className="card-header pr-12">
@@ -244,8 +323,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
                         <h4 className="text-truncate text-600 my-0 selected-vsl-title">
                             { parentTabType === parentTabTypes.CASEREVIEW ?
-                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle }}/>
-                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession }} />
+                                <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType }} />
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, caseAccession, variantDisplayTitle, searchType }} />
                             }
                         </h4>
                     </div>
@@ -258,7 +337,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
                         { parentTabType === parentTabTypes.CASEREVIEW ?
                             <div className="d-block d-lg-flex align-items-center">
-                                <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS }} />
+                                <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS, searchType }} />
                                 <button type="button" className={"btn btn-sm d-flex align-items-center btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
                                     onClick={toggleIsExpanded} disabled={noSavedNotes}>
                                     <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
@@ -269,7 +348,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             : null }
 
                         { parentTabType === parentTabTypes.INTERPRETATION ?
-                            <ActionsDropdown {...{ toggleVariantSampleSelectionDeletion, isDeleted, variantSample }} />
+                            <ActionsDropdown variantSample={variantSample} toggleVariantSampleSelectionDeletion={toggleSelectedVSDeletionFx} {...{ isDeleted }} />
                             : null }
 
                     </div>
@@ -284,15 +363,23 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         </label>
                         { geneTranscriptRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
                     </div>
-                    <div className="col col-sm-4 col-lg-2 py-2">
-                        <label className="mb-04 text-small" data-tip={variantColDescription}>
-                            { variantColTitle || "Variant" }
-                        </label>
-                        { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
-                    </div>
+                    { variantIsSNV &&
+                        <div className="col col-sm-4 col-lg-2 py-2">
+                            <label className="mb-04 text-small" data-tip={variantColDescription}>
+                                { variantColTitle || "Variant" }
+                            </label>
+                            { variantRenderFunc(variantSample, { align: 'left', link: vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '') }) }
+                        </div> }
+                    { !variantIsSNV &&
+                        <div className="col col-sm-4 col-lg-2 py-2">
+                            <label className="mb-04 text-small">
+                                { "Worst Consequence" }
+                            </label>
+                            { worstTranscriptRenderFunc(variantSample)}
+                        </div> }
                     <div className="col col-sm-4 col-lg-3 py-2">
                         <label className="mb-04 text-small" data-tip={genotypeLabelColDescription}>
-                            { genotypeLabelColTitle || "Genotype" }
+                            { variantGenotypeLabelColTitle || "Genotype" }
                         </label>
                         { genotypeLabelRenderFunc(variantSample, { align: 'left' }) }
                     </div>
@@ -344,7 +431,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     );
 });
 
-function InterpretationTabVariantSampleTitle(props){
+function InterpretationTabVariantSampleTitle(props){ // used for SVs and SNVs
     const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
     if (anyUnsavedChanges) {
         return (
@@ -367,17 +454,24 @@ function InterpretationTabVariantSampleTitle(props){
 }
 
 const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariantSampleTitle(props){
-    const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle } = props;
+    const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType = "VariantSample" } = props;
+
+    let savedNotesTip;
+    if (searchType === "StructuralVariantSample") {
+        savedNotesTip = "No notes saved for this Structural Variant Sample; SV Interpretation UI coming soon...";
+    } else if (noSavedNotes) {
+        savedNotesTip = "No notes saved for this Variant Sample, annotate it under the Interpretation tab.";
+    } else {
+        savedNotesTip = `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`;
+        savedNotesTip += (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".");
+    }
+
     return (
         <React.Fragment>
             <i className={
                 "icon align-middle icon-fw title-prefix-icon fas mr-12 icon-"
                 + (noSavedNotes ? "exclamation-triangle text-warning" : countNotesInReport > 0 ? "file text-secondary" : "minus-circle text-secondary")
-            } data-tip={
-                noSavedNotes ? "No notes saved for this Sample Variant, annotate it under the Interpretation tab."
-                    : `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`
-                        + (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".")
-            } data-html />
+            } data-tip={savedNotesTip} data-html />
             <span className="text-secondary">{ variantDisplayTitle }</span>
             { countNotesInKnowledgeBase > 0 ?
                 <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted" data-html
@@ -390,7 +484,7 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 
 function ActionsDropdown(props){
     const { toggleVariantSampleSelectionDeletion, variantSample, isDeleted } = props;
-    const { uuid: vsUUID } = variantSample;
+    const { uuid: vsUUID } = variantSample; // can be StructuralVariantSample OR VariantSample
 
     const onSelect = useCallback(function(evtKey, e){
         if (evtKey === "delete") {
@@ -414,9 +508,9 @@ function ActionsDropdown(props){
     );
 }
 
-
+// TODO: Will need further updating to work with SVs once data model is solidified; for now just updating tips in case of SV and disabling button
 function ClassificationDropdown(props){
-    const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS } = props;
+    const { variantSample, tableTagsByID, unsavedClassification = undefined, updateClassificationForVS, searchType } = props;
     const {
         finding_table_tag: savedClassification = null,
         uuid: vsUUID,
@@ -488,14 +582,20 @@ function ClassificationDropdown(props){
     );
 
 
+    let tooltip;
+    if (searchType === "StructuralVariantSample") {
+        tooltip = "SV Interpretation UI coming soon...";
+    } else {
+        tooltip = !viewClassification? "Select a finding..." : null;
+    }
 
     // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
 
     return (
         <div className="py-1 py-lg-0 pr-lg-12">
             <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
-                disabled={!haveEditPermission || tags.length === 0}
-                data-delay={500} data-tip={!viewClassification? "Select a finding..." : null }>
+                disabled={!haveEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
+                data-delay={500} data-tip={tooltip}>
                 { renderedOptions }
             </DropdownButton>
         </div>
@@ -513,7 +613,7 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
     );
 });
 
-
+// TODO: May need further updating or splitting to work with SVs depending on data model/note item changes
 const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNotes (props) {
     const {
         variantSample,
