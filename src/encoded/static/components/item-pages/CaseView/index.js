@@ -160,7 +160,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         actions: caseActions = []
     } = context;
 
-    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
+    const { variant_samples: vsSelections = [], structural_variant_samples: cnvSelections = [] } = variantSampleListItem || {};
 
     /**
      * Used to inform whether to show edit icons in places.
@@ -188,15 +188,18 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         return { countIndividuals, countIndividualsWSamples };
     }, [ currFamily ]);
 
-    const anyAnnotatedVariantSamples = useMemo(function(){
-        const vsSelectionsLen = vsSelections.length;
-        for (var i = 0; i < vsSelectionsLen; i++) {
-            const { variant_sample_item } = vsSelections[i];
+    const anyAnnotatedVariantSamples = useMemo(function(){ // checks for notes on SNVs and CNV/SVs
+        const allSelections = vsSelections.concat(cnvSelections);
+        const allSelectionsLen = allSelections.length;
+
+        for (var i = 0; i < allSelectionsLen; i++) {
+            const { variant_sample_item } = allSelections[i];
             const notesForVS = getAllNotesFromVariantSample(variant_sample_item);
             if (notesForVS.length > 0) {
                 return true;
             }
         }
+
         return false;
     }, [ variantSampleListItem ]);
 
@@ -269,6 +272,9 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     // Use availability of search query filter string add-ons to determine if Filtering tab should be displayed
     const disableFiltering = !snvFilterHrefAddon && !svFilterHrefAddon;
 
+    // Use currently selected variants and structural variants in VSL to determine if Interpretation and Case Review tabs should be displayed
+    const disableInterpretation = !isLoadingVariantSampleListItem && vsSelections.length === 0 && cnvSelections.length === 0;
+
     // Filtering props shared among both tables, then SV and SNV specific props
     const filteringTableProps = {
         context, windowHeight, session, schemas,
@@ -334,7 +340,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
                         <FilteringTab {...filteringTableProps} />
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".interpretation" cache disabled={!isLoadingVariantSampleListItem && vsSelections.length === 0} tabTitle={
+                    <DotRouterTab dotPath=".interpretation" cache disabled={disableInterpretation} tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
                             { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
                             Interpretation

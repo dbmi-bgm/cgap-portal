@@ -97,7 +97,7 @@
                 "title": "Structural Variant Sample Selection",
                 "type": "object",
                 "properties": {
-                    "structural_variant_sample_item": {
+                    "variant_sample_item": {
                         "title": "Structural Variant Sample",
                         "type": "string",
                         "linkTo": "StructuralVariantSample"
@@ -107,12 +107,13 @@
                         "type": "string",
                         "description": "Stringified JSON representing the compound filter block request made when this Structural Variant Sample was selected"
                     },
-                    "userid": {
-                        "title": "User ID",
+                    "selected_by": {
+                        "title": "Selector",
                         "type": "string",
-                        "description": "User ID of person who made this selection",
+                        "description": "Person who made this selection",
                         "serverDefault": "userid",
-                        "format": "uuid"
+                        "linkTo": "User",
+                        "permission": "restricted_fields"
                     },
                     "date_selected": {
                         "title": "Date Selected",

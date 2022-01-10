@@ -31,9 +31,7 @@ export function AddToVariantSampleListButton(props){
 
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
 
-    if (searchType === "StructuralVariantSample") {
-        return null; // TODO: actually make add to VSL work with Structural Variant Samples.
-    }
+    const mapSearchTypeToDisplay = { VariantSample: "Variant Sample", StructuralVariantSample: "Structural Variant Sample" };
 
     /** PATCH or create new VariantSampleList w. additions */
 
@@ -59,7 +57,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" disabled>
                 <span>
-                    No Sample Variants selected
+                    No {mapSearchTypeToDisplay[searchType]}s selected
                 </span>
             </button>
         );
@@ -90,13 +88,26 @@ export function AddToVariantSampleListButton(props){
                 // These are sorted in order of insertion/selection.
                 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
                 selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
-                    variantSampleSelectionsList.push({
-                        "variant_sample_item": variantSampleAtID, // Will become linkTo (embedded),
-                        "filter_blocks_request_at_time_of_selection": filterBlocksRequestData
+                    const selection = {
+                        "filter_blocks_request_at_time_of_selection": filterBlocksRequestData,
+                        "variant_sample_item": variantSampleAtID // Will become linkTo (embedded)
                         // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
                         // "selected_by",
                         // "date_selected"
-                    });
+                    };
+                    variantSampleSelectionsList.push(selection);
+                });
+            }
+
+            /** Convert embedded linkTos into just `@id` strings before PATCHing */
+            function createSelectionListPayload(existingSelections){
+                // Need to convert embedded linkTos into just @ids before PATCHing -
+                return existingSelections.map(function(existingSelection){
+                    const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
+                    if (!vsItemID) {
+                        throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
+                    }
+                    return { ...existingSelection, "variant_sample_item": vsItemID };
                 });
             }
 
@@ -106,16 +117,22 @@ export function AddToVariantSampleListButton(props){
             if (!variantSampleListItem) {
                 // Create new Item, then PATCH its @id to `Case.variant_sample_list_id` field.
                 const createVSLPayload = {
-                    "variant_samples": [],
                     "institution": caseInstitutionID,
-                    "project": caseProjectID
+                    "project": caseProjectID,
+                    "status": "current"
                 };
+
+                if (searchType === "VariantSample") {
+                    createVSLPayload["variant_samples"] = [];
+                    addToSelectionsList(createVSLPayload.variant_samples);
+                } else {
+                    createVSLPayload["structural_variant_samples"] = [];
+                    addToSelectionsList(createVSLPayload.structural_variant_samples);
+                }
 
                 if (caseAccession) {
                     createVSLPayload.created_for_case = caseAccession;
                 }
-
-                addToSelectionsList(createVSLPayload.variant_samples);
 
                 requestPromiseChain = ajax.promise("/variant-sample-lists/", "POST", {}, JSON.stringify(createVSLPayload))
                     .then(function(respVSL){
@@ -154,28 +171,28 @@ export function AddToVariantSampleListButton(props){
                     });
 
             } else {
-                // patch existing
                 const {
                     "@id": vslAtID,
-                    variant_samples: existingVariantSampleSelections = []
+                    variant_samples: existingVariantSampleSelections = [],
+                    structural_variant_samples: existingStructuralVariantSampleSelections = []
                 } = variantSampleListItem;
 
+                const payload = {};
+                // patch existing
                 // Need to convert embedded linkTos into just @ids before PATCHing -
-                const variantSamplesPatchList = existingVariantSampleSelections.map(function(existingSelection){
-                    const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
-                    if (!vsItemID) {
-                        throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
-                    }
-                    return {
-                        ...existingSelection,
-                        "variant_sample_item": vsItemID
-                    };
-                });
+                if (searchType === "VariantSample") {
+                    payload["variant_samples"] = createSelectionListPayload(existingVariantSampleSelections);
+                    // Add in new selections to the existing ones
+                    addToSelectionsList(payload["variant_samples"]);
+                } else {
+                    payload["structural_variant_samples"] = createSelectionListPayload(existingStructuralVariantSampleSelections);
+                    // Add in new selections to the existing ones
+                    addToSelectionsList(payload["structural_variant_samples"]);
+                }
 
-                // Add in new selections
-                addToSelectionsList(variantSamplesPatchList);
+                console.log("payload", payload);
 
-                requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify({ "variant_samples": variantSamplesPatchList }) )
+                requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify(payload))
                     .then(function(respVSL){
                         console.log('VSL PATCH response', respVSL);
                         const {
@@ -205,7 +222,7 @@ export function AddToVariantSampleListButton(props){
                 console.error(error);
                 Alerts.queue({
                     "title" : "Error PATCHing or POSTing VariantSampleList",
-                    "message" : JSON.stringify(err),
+                    "message" : JSON.stringify(error),
                     "style" : "danger"
                 });
             }).finally(function(){
@@ -217,7 +234,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" onClick={onButtonClick}>
                 <span>
-                    Add <strong>{ selectedVariantSamples.size }</strong> selected Sample Variants to Interpretation
+                    Add <strong>{ selectedVariantSamples.size }</strong> selected { mapSearchTypeToDisplay[searchType] } to Interpretation
                 </span>
             </button>
         );
