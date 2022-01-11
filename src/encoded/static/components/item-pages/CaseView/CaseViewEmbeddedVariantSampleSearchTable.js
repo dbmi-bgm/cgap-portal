@@ -1,10 +1,13 @@
 'use strict';
 
-import React, { useMemo, useCallback, useEffect } from 'react';
+import React, { useMemo, useCallback } from 'react';
+import Popover  from 'react-bootstrap/esm/Popover';
+import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
-import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
+import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
+import { navigateChildWindow } from './../components/child-window-reuser';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
@@ -22,6 +25,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         onSelectVariantSample,
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
+        currFilterSet,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -37,15 +41,28 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 "render": function(result, parentProps){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                            selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
                             <VariantSampleDisplayTitleColumn />
-                        </DisplayTitleColumnWrapper>
+                        </VariantSampleDisplayTitleColumnWrapper>
                     );
+                }
+            },
+            "__matching_filter_block_indices": {
+                // Is only shown when multiple filter blocks requested.
+                "noSort": true,
+                "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
+                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "render": function(result, props) {
+                    const { __matching_filter_block_indices = [] } = result;
+                    if (__matching_filter_block_indices.length === 0) {
+                        return null;
+                    }
+                    return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
@@ -65,6 +82,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         onSelectVariantSample,
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
+        currFilterSet,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -80,11 +98,24 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 "render": function(result, parentProps){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                            selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
                             <VariantSampleDisplayTitleColumnSV />
-                        </DisplayTitleColumnWrapper>
+                        </VariantSampleDisplayTitleColumnWrapper>
                     );
+                }
+            },
+            "__matching_filter_block_indices": {
+                // Is only shown when multiple filter blocks requested.
+                "noSort": true,
+                "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
+                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "render": function(result, props) {
+                    const { __matching_filter_block_indices = [] } = result;
+                    if (__matching_filter_block_indices.length === 0) {
+                        return null;
+                    }
+                    return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
                 }
             },
             // TODO: Move these to variantSampleColumnExtensionMap so we don't create new functions every render (or change to isLoadingVariantSample, ...)
@@ -130,11 +161,38 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
 
     return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
 }
 
+/** Open Variant Sample in new window */
+function VariantSampleDisplayTitleColumnWrapper (props) {
+    const {
+        result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+        selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem,
+        children
+    } = props;
+
+    const onClick = useCallback(function(evt){
+        evt.preventDefault();
+        evt.stopPropagation(); // Avoid having event bubble up and being caught by App.js onClick.
+        const { "@id": resultAtID } = result;
+        navigateChildWindow(resultAtID);
+        return false;
+    }, [ result ]);
+
+    let checkbox = null;
+    if (selectedVariantSamples && onSelectVariantSample && savedVariantSampleIDMap) {
+        checkbox = <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />;
+    }
+
+    return (
+        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen, onClick }}>
+            { checkbox }{ children }
+        </DisplayTitleColumnWrapper>
+    );
+}
 
 
 /** Based mostly on SPC SelectionItemCheckbox w. minor alterations */
@@ -150,4 +208,43 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
     }, [ onSelectVariantSample, result ]);
 
     return <input type="checkbox" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} className="mr-2" />;
+});
+
+const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilterBlockIndicesPopoverColumn(props){
+    const { result, currFilterSet } = props;
+    const { __matching_filter_block_indices = [], uuid: resultUUID } = result;
+    const { filter_blocks = [] } = currFilterSet || {};
+
+    const filterBlockNameList = __matching_filter_block_indices.map(function(fbIdx, idxIdx){
+        const matchingFilterBlock = filter_blocks[parseInt(fbIdx)];
+        const { name } = matchingFilterBlock || {};
+        return name || fbIdx;
+    });
+
+    const popover = (
+        <Popover id={"mi:" + resultUUID}>
+            <Popover.Content className="pt-0 pl-0 pr-0">
+                <Popover.Title className="m-0 text-600" as="h5">Matches Filter Blocks:</Popover.Title>
+                <ul className="mb-0 mt-08">
+                    { filterBlockNameList.map(function(fbName, i){
+                        return <li key={i}>{ fbName }</li>;
+                    }) }
+                </ul>
+            </Popover.Content>
+        </Popover>
+    );
+
+    return (
+        <div className="mx-auto text-truncate">
+            <OverlayTrigger trigger="focus" overlay={popover}>
+                { function({ ref, ...triggerHandlers }){
+                    return (
+                        <button type="button" ref={ref} { ...triggerHandlers } className="btn mx-auto btn-sm btn-link text-decoration-none">
+                            { __matching_filter_block_indices.length }
+                        </button>
+                    );
+                }}
+            </OverlayTrigger>
+        </div>
+    );
 });

@@ -231,13 +231,16 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
 
         function createSelectionListPayload(originalList){
             return originalList.filter(function(vsSelection){
-                const { variant_sample_item: { uuid: vsUUID } } = vsSelection;
+                const { variant_sample_item: { uuid: vsUUID, structural_variant = null } } = vsSelection;
                 if (!vsUUID) {
                     // Cannot proceed further, cancel afterwards.
                     hasPermissionToViewAll = false;
                     return false;
                 }
                 // Exclude if to be deleted.
+                if (structural_variant) {
+                    return !deletedStructuralVariantSampleSelections[vsUUID];
+                }
                 return !deletedVariantSampleSelections[vsUUID];
             }).map(function(vsSelection){
                 // For PATCHing, we PATCH the special endpoint `@@order-delete-selections` with just the UUIDs

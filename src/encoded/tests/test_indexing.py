@@ -380,7 +380,8 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type',
                              'specimen_accession_date', 'specimen_collection_date',
                              'specimen_accession', 'specimen_notes', 'sequence_id',
-                             'sequencing_date', 'completed_processes', 'bam_sample_id']
+                             'sequencing_date', 'completed_processes', 'bam_sample_id',
+                             'indication']
          ),
         ('Family', 'Case',
             DEFAULT_SCOPE + ['institution', 'project', 'tags', 'last_modified.date_modified',
