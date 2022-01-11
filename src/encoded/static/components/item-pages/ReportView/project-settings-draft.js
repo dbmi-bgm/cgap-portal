@@ -155,7 +155,7 @@ export const projectReportSettings = {
             "included": true,
             "readonly": false,
             // Considering something like this -
-            "defaultValue": "Tested ABCD with XYZ and then something or other"
+            "defaultValue": null, // "Tested ABCD with XYZ and then something or other"
         },
         "references": {
             "title": "References",
