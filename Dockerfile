@@ -4,7 +4,7 @@
 
 # python:3.6.15-slim-buster
 # TODO: maybe swap in ubuntu 20.04 and install Python manually?
-FROM python@sha256:19c92ccff70560d0d8c7174402fdfc0f1bc27a833e0f7cf28d4e2c8e05991ea3
+FROM python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
@@ -22,8 +22,8 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.1.4 \
-  NODE_VERSION=12.22.1
+  POETRY_VERSION=1.1.12 \
+  NODE_VERSION=12.22.9
 
 # Install nginx, base system requirements
 COPY deploy/docker/production/install_nginx.sh /
