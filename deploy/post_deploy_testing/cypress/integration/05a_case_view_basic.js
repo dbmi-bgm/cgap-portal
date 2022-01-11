@@ -33,7 +33,7 @@ describe('Case View - Initial', function () {
 
         it("Has panels for patient info and family info with phenotypic features", function(){
             cy.get(".col-stats #case-stats > div:first-child .card-header").contains("Patient Info").end()
-                .get(".col-stats #case-stats > div:first-child .card-footer > div a.badge").should('have.length', 2)
+                .get(".col-stats #case-stats > div:first-child .card-footer > div a.badge").should('have.length', 1)
                 .get(".col-stats #case-stats > div:last-child .card-header").contains("Family Info").end()
                 .get(".col-stats #case-stats > div:last-child .card-footer > div a.badge").should('have.length', 4);
         });
