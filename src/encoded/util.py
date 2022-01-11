@@ -505,3 +505,13 @@ def make_s3_client():
 
     s3_client = boto3.client('s3', **s3_client_extra_args)
     return s3_client
+
+
+def build_s3_presigned_get_url(*, params):
+    """ Helper function that builds a presigned URL. """
+    s3_client = make_s3_client()
+    return s3_client.generate_presigned_url(
+        ClientMethod='get_object',
+        Params=params,
+        ExpiresIn=36 * 60 * 60
+    )

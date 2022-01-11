@@ -43,7 +43,6 @@ class Report(Item):
         "variant_samples.interpretation.conclusion",
         "variant_samples.interpretation.acmg_guidelines",
         "variant_samples.interpretation.note_text",
-        "extra_notes.note_text",
         # Institution used for report footer
         "institution.display_title",
         "institution.address1",

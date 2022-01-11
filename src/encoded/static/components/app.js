@@ -91,6 +91,7 @@ export default class App extends React.PureComponent {
         _.bindAll(this, 'currentAction', 'loadSchemas',
             'setIsSubmitting', 'stayOnSubmissionsPage',
             'updateAppSessionState', 'confirmNavigation', 'navigate',
+            'handleWindowMessage',
             // Global event handlers. These will catch events unless they are caught and prevented from bubbling up earlier.
             'handleClick', 'handleSubmit', 'handlePopState', 'handleBeforeUnload'
         );
@@ -215,6 +216,9 @@ export default class App extends React.PureComponent {
             'navigate'  : navigate
         });
 
+        // Listen to any 'navigate' messages.
+        WindowEventDelegator.addHandler("message", this.handleWindowMessage);
+
         // Detect browser and save it to state. Show alert to inform people we're too ~lazy~ under-resourced to support MS Edge to the max.
         const browserInfo = detectBrowser();
 
@@ -249,7 +253,9 @@ export default class App extends React.PureComponent {
             window.dispatchEvent(new Event('fourfrontinitialized'));
 
             // CURRENT: If we have parent window, post a message to it as well.
-            if (window.opener) window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
+            if (window.opener) {
+                window.opener.postMessage({ 'eventType' : 'fourfrontinitialized' }, '*');
+            }
 
             // If we have UTM URL parameters in the URI, attempt to set history state (& browser) URL to exclude them after a few seconds
             // after Google Analytics may have stored proper 'source', 'medium', etc. (async)
@@ -352,6 +358,20 @@ export default class App extends React.PureComponent {
 
         }
 
+    }
+
+    handleWindowMessage(event) {
+        const { origin, data } = event;
+        const { href } = this.props;
+        const { protocol, host } = memoizedUrlParse(href) || {};
+        const hrefOrigin = protocol + '//' + host;
+        if (origin !== hrefOrigin) {
+            return false;
+        }
+        const { action, value, options } = data || {};
+        if (action === "navigate" && typeof value === "string") {
+            this.navigate(value,  options);
+        }
     }
 
     /**
@@ -1102,16 +1122,6 @@ export default class App extends React.PureComponent {
             status = 'forbidden'; // attempting to view submissions but it's not in users actions
         }
 
-
-        // Google does not update the content of 301 redirected pages
-        // We technically should never hit this condition as we redirect http to https, however leaving in
-        // as not 100% certain.
-        let base;
-        if (canonical === 'http://data.4dnucleome.org/') {
-            base = canonical = 'https://data.4dnucleome.org/';
-            this.historyEnabled = false;
-        }
-
         const isLoading = contextRequest && contextRequest.xhr && contextRequest.xhr.readyState < 4;
         const baseDomain = (hrefParts.protocol || '') + '//' + hrefParts.host;
         const bodyElementProps = _.extend({}, this.state, this.props, { // Complete set of own props, own state, + extras.
@@ -1138,7 +1148,7 @@ export default class App extends React.PureComponent {
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com",
             "worker-src 'self' blob:",
-            "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org"
+            "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org https://eutils.ncbi.nlm.nih.gov"
         ].join("; ");
 
         // `lastCSSBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
@@ -1153,7 +1163,6 @@ export default class App extends React.PureComponent {
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
-                    {base ? <base href={base}/> : null}
                     <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>

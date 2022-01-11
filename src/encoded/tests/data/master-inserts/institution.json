@@ -29,51 +29,5 @@
         "title": "CGAP Backend Team",
         "status": "shared",
         "uuid": "87199845-51b5-4352-bdea-583edae4bb6a"
-    },
-    {
-        "address2": "75 Francis Street",
-        "address1": "Brigham and Women's Hospital",
-        "city": "Boston",
-        "country": "USA",
-        "fax": "000-000-0000",
-        "name": "bwh",
-        "status": "shared",
-        "phone1": "000-000-0000",
-        "phone2": "000-000-0000",
-        "pi": "jkrier@bwh.harvard.edu",
-        "postal_code": "02115",
-        "state": "MA",
-        "title": "BWH",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
-        "contact_persons" : [
-            "jkrier@bwh.harvard.edu"
-        ]
-    },
-    {
-        "address2": "300 Longwood Avenue",
-        "address1": "Boston Children's Hospital",
-        "city": "Boston",
-        "country": "USA",
-        "fax": "000-000-0000",
-        "name": "bch",
-        "status": "shared",
-        "phone1": "000-000-0000",
-        "phone2": "000-000-0000",
-        "pi": "dvuzman@research.bwh.harvard.edu",
-        "postal_code": "02115",
-        "state": "MA",
-        "title": "BCH",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
-        "contact_persons": [
-            "dvuzman@research.bwh.harvard.edu"
-        ]
-    },
-    {
-        "name": "msa-coalition",
-        "title": "Multiple System Atrophy Coalition",
-        "aliases": ["msa:msa-institution"],
-        "status": "shared",
-        "date_created": "2020-11-03T22:19:15.807261+00:00",
-        "uuid": "232539d0-41aa-4cdc-835d-7f164f1462ea"
     }
 ]

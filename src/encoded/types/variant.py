@@ -7,7 +7,8 @@ from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
-    HTTPServerError
+    HTTPServerError,
+    HTTPNotModified
 )
 from pyramid.traversal import find_resource
 from pyramid.request import Request
@@ -32,7 +33,7 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path
+from ..util import resolve_file_path, build_s3_presigned_get_url
 from ..types.base import Item, get_item_or_none
 
 
@@ -235,6 +236,24 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
 
+def perform_patch_as_admin(request, item_atid, patch_payload):
+    """
+    Patches Items as 'UPGRADER' user/permissions.
+
+    TODO: Seems like this could be re-usable somewhere
+    """
+    if len(patch_payload) == 0:
+        log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
+        return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
+    subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
+    subreq.remote_user = "UPGRADE"
+    if 'HTTP_COOKIE' in subreq.environ:
+        del subreq.environ['HTTP_COOKIE']
+    patch_result = request.invoke_subrequest(subreq).json
+    if patch_result["status"] != "success":
+        raise HTTPServerError("Couldn't update Item " + item_atid)
+    return patch_result
+
 
 @collection(
     name='variants',
@@ -279,6 +298,55 @@ class Variant(Item):
     def POS_ABS(self, CHROM, POS):
         chrom_info = nc.get_chrominfo('hg38')
         return nc.chr_pos_to_genome_pos('chr'+CHROM, POS, chrom_info)
+
+    @calculated_property(schema={
+        "title": "Most severe location",
+        "description": "Location of variant in most severe transcript",
+        "type": "string"
+    })
+    def most_severe_location(self, request):
+        """Get relative location of variant per most severe transcript.
+
+        Used in filtering space column, so provide user-friendly
+        read-out.
+        """
+        result = None
+        transcripts = self.properties.get("transcript", [])
+        for transcript in transcripts:
+            if transcript.get("csq_most_severe") is True:
+                exon = transcript.get("csq_exon")
+                intron = transcript.get("csq_intron")
+                distance = transcript.get("csq_distance")
+                consequences = transcript.get("csq_consequence", [])
+                if intron:
+                    result = "Intron " + intron
+                elif exon:
+                    result = "Exon " + exon
+                    for consequence in consequences:
+                        item = get_item_or_none(request, consequence)
+                        if not item:
+                            continue
+                        consequence_title = item.get("var_conseq_name")
+                        if consequence_title == "3_prime_UTR_variant":
+                            result += " (3' UTR)"
+                            break
+                        elif consequence_title == "5_prime_UTR_variant":
+                            result += " (5' UTR)"
+                            break
+                elif distance:
+                    for consequence in consequences:
+                        item = get_item_or_none(request, consequence)
+                        if not item:
+                            continue
+                        consequence_title = item.get("var_conseq_name")
+                        if consequence_title == "downstream_gene_variant":
+                            result = distance + " bp downstream"
+                            break
+                        elif consequence_title == "upstream_gene_variant":
+                            result = distance + " bp upstream"
+                            break
+                break
+        return result
 
 
 @collection(
@@ -621,23 +689,17 @@ class VariantSample(Item):
         return associated_genelists
 
 
-
 @view_config(name='download', context=VariantSample, request_method='GET',
              permission='view', subpath_segments=[0, 1])
 @debug_log
 def download(context, request):
     """ Navigates to the IGV snapshot hrf on the bam_snapshot field. """
     calculated = calculate_properties(context, request)
-    s3_client = boto3.client('s3')
     params_to_get_obj = {
         'Bucket': request.registry.settings.get('file_wfout_bucket'),
         'Key': calculated['bam_snapshot']
     }
-    location = s3_client.generate_presigned_url(
-        ClientMethod='get_object',
-        Params=params_to_get_obj,
-        ExpiresIn=36*60*60
-    )
+    location = build_s3_presigned_get_url(params=params_to_get_obj)
 
     if asbool(request.params.get('soft')):
         expires = int(parse_qs(urlparse(location).query)['Expires'][0])
@@ -649,6 +711,12 @@ def download(context, request):
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)  # 307
+
+
+
+
+
+
 
 
 @view_config(
@@ -842,36 +910,22 @@ def process_notes(context, request):
     # This is in part to simplify UI logic where only Note status == "current" is checked to
     # assert if a Note is already saved to Project or not.
 
-    def perform_patch_as_admin(item_atid, patch_payload):
-        """Patches Items as 'UPGRADER' user/permissions."""
-        if len(patch_payload) == 0:
-            log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
-            return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
-        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
-        subreq.remote_user = "UPGRADE"
-        if 'HTTP_COOKIE' in subreq.environ:
-            del subreq.environ['HTTP_COOKIE']
-        patch_result = request.invoke_subrequest(subreq).json
-        if patch_result["status"] != "success":
-            raise HTTPServerError("Couldn't update Item " + item_atid)
-
 
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch_as_admin(gene_atid, gene_payload)
+            perform_patch_as_admin(request, gene_atid, gene_payload)
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch_as_admin(variant["@id"], variant_patch_payload)
+        perform_patch_as_admin(request, variant["@id"], variant_patch_payload)
         variant_patch_count += 1
 
     note_patch_count = 0
     for note_atid, note_payload in note_patch_payloads.items():
-        perform_patch_as_admin(note_atid, note_payload)
+        perform_patch_as_admin(request, note_atid, note_payload)
         note_patch_count += 1
-
 
     return {
         "status" : "success",
@@ -881,9 +935,6 @@ def process_notes(context, request):
             "Note": note_patch_count,
         }
     }
-
-
-
 
 
 @collection(
@@ -911,15 +962,62 @@ class VariantSampleList(Item):
         # 'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
-        # 'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
-        # 'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
+        # 'structural_variant_samples.variant_sample_item.structural_variant.display_title',
+        # 'structural_variant_samples.variant_sample_item.interpretation.classification',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
 
 
+@view_config(
+    name='order-delete-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def order_delete_selections(context, request):
+    """
+    Updates order & presence of VariantSampleList Items
+    """
 
+    request_body = request.json
+    # We expect lists of UUIDs.
+    # We do NOT accept entire items, we preserve existing values for "selected_by" and "date_selected".
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
 
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        selections_by_uuid[selection["variant_sample_item"]] = selection
+    
+    patch_payload = {}
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = []
+        for vs_uuid in requested_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = []
+        for vs_uuid in requested_structural_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["structural_variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    # TODO: Save who+when deleted VariantSample from VariantSampleList
+
+    perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
 
 
 
@@ -984,7 +1082,7 @@ def variant_sample_list_spreadsheet(context, request):
 
 
 POPULATION_SUFFIX_TITLE_TUPLES = [
-    ("afr", "African-American/African"), 
+    ("afr", "African-American/African"),
     ("ami", "Amish"),
     ("amr", "Latino"),
     ("asj", "Ashkenazi Jewish"),
@@ -1004,7 +1102,7 @@ def get_spreadsheet_mappings(request = None):
             if transcript.get(field, False) is True:
                 return transcript
         return None
-    
+
     def get_canonical_transcript(variant_sample):
         return get_boolean_transcript_field(variant_sample, "csq_canonical")
 

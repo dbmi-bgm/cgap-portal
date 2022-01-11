@@ -12,7 +12,7 @@ import ButtonGroup from 'react-bootstrap/esm/ButtonGroup';
 import { console, navigate, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
-
+import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
 /**
  * Stores and manages global note state for interpretation space. Handles AJAX
@@ -168,7 +168,7 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
 
-    saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard") {
+    saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard", successCallback) {
         const { [stateFieldToUpdate]: lastSavedNote } = this.state;
 
         // Does a draft already exist?
@@ -190,7 +190,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                     })
                     .then((noteWithEmbeds) => {
                         console.log("Successfully retrieved @@embedded representation of note", noteWithEmbeds);
-                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds }, successCallback);
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -236,7 +236,7 @@ export class InterpretationSpaceWrapper extends React.Component {
                         console.log("Successfully retrieved @@embedded representation of note: ", noteWithEmbeds);
 
                         // Full representation of item fetched... add this to state
-                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds });
+                        this.setState({ "loading": false, [stateFieldToUpdate]: noteWithEmbeds }, successCallback);
                     })
                     .catch((err) => {
                         const { error: { message = null } = {} } = err || {};
@@ -398,32 +398,34 @@ export class InterpretationSpaceController extends React.Component {
         const hasEditPermission = this.memoized.haveEditPermission(actions);
 
         let panelToDisplay = null;
+        const commonProps = {
+            ...passProps, hasEditPermission, isFallback,
+            "retainWIPStateOnUnmount": this.retainWIPStateOnUnmount,
+            "noteLabel": InterpretationSpaceController.tabTitles[currentTab],
+            "key": currentTab
+        };
         switch(currentTab) {
             case (0): // Gene Notes
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={1} saveToField="gene_notes" noteType="note_standard" { ...passProps } {...{ hasEditPermission, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (1): // Variant Notes
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={0} saveToField="variant_notes" noteType="note_standard" { ...passProps } {...{ hasEditPermission, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                    lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} saveToField="variant_notes" noteType="note_standard"
                     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (2): // Interpretation
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount} wipACMGSelections={wipACMGSelections}
-                    lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={2} saveToField="interpretation" noteType="note_interpretation" { ...passProps } {...{ hasEditPermission, autoClassification, toggleInvocation, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps} wipACMGSelections={wipACMGSelections} {...{ autoClassification, toggleInvocation }}
+                    lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} saveToField="interpretation" noteType="note_interpretation"
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (3): // Discovery
-                panelToDisplay = (<GenericInterpretationPanel retainWIPStateOnUnmount={this.retainWIPStateOnUnmount}
-                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} noteLabel={InterpretationSpaceController.tabTitles[currentTab]}
-                    key={3} saveToField="discovery_interpretation" noteType="note_discovery" { ...passProps } {...{ hasEditPermission, isFallback }}
+                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                    lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} saveToField="discovery_interpretation" noteType="note_discovery"
                     otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
@@ -491,6 +493,10 @@ function InterpretationSpaceTabs(props) {
     );
 }
 
+const refreshParentWindowVariantSampleList = _.debounce(function(){
+    window.opener.postMessage({ "action": "refresh-variant-sample-list" });
+}, 1200, false); // Debounced to prevent accidental double-clicks & (too-)rapid changes
+
 class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {
         super(props);
@@ -510,7 +516,7 @@ class GenericInterpretationPanel extends React.PureComponent {
         };
 
         this.saveStateAsDraft = this.saveStateAsDraft.bind(this);
-        this.onTextChange = this.onTextChange.bind(this);
+        this.onTextAreaChange = this.onTextAreaChange.bind(this);
         this.onDropOptionChange = this.onDropOptionChange.bind(this);
     }
 
@@ -536,9 +542,9 @@ class GenericInterpretationPanel extends React.PureComponent {
     }
 
     // Will use same update fxn for multiple text fields
-    onTextChange(event, stateToChange) {
+    onTextAreaChange(event) {
         const { value: newValue } = event.target || {};
-        this.setState({ [stateToChange]: newValue });
+        this.setState({ "note_text": newValue });
     }
 
     // Using same update fxn for multiple dropdowns
@@ -551,7 +557,13 @@ class GenericInterpretationPanel extends React.PureComponent {
         const { saveAsDraft, retainWIPStateOnUnmount, noteType, saveToField, wipACMGSelections } = this.props;
         const stateToSave = { ...this.state };
         stateToSave.acmg_rules_invoked = wipACMGSelections;
-        saveAsDraft(stateToSave, saveToField, noteType);
+        saveAsDraft(stateToSave, saveToField, noteType, function(){
+            // Success Callback
+            if (window && window.opener) {
+                // If parent window exists, refresh it (if listener exists in it for this event)
+                refreshParentWindowVariantSampleList();
+            }
+        });
         retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
 
@@ -592,9 +604,15 @@ class GenericInterpretationPanel extends React.PureComponent {
         // console.log("GenericInterpretationPanel state", stateToSave);
         // console.log("lastSavedNote", lastSavedNote);
 
+        // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
         const onReturnToCaseClick = function(){
+            if (window && window.opener) {
+                window.close();
+                return;
+            }
+            // Fallback if no parent window:
             return navigate(`/cases/${caseSource}/#case-info.interpretation`);
-        }; // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
+        };
 
         return (
             <div className="interpretation-panel">
@@ -604,7 +622,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                 { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
-                <AutoGrowTextArea {...{ isFallback }} cls="w-100 mb-1" text={noteText} onTextChange={this.onTextChange} field="note_text" />
+                <AutoGrowTextArea disabled={isFallback} className="w-100 mb-1" value={noteText} onChange={this.onTextAreaChange} placeholder="Required" />
                 { noteType === "note_interpretation" ?
                     <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_rules_invoked', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
                     : null }
@@ -670,102 +688,26 @@ function NoteFieldDrop(props) {
     );
 }
 
-/** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
-class NoGrowTextArea extends React.Component {
-    constructor(props) {
-        super(props);
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
-    }
-    onChangeWrapper(e) {
-        const { onTextChange, field } = this.props;
-        onTextChange(e, field);
-    }
-    render() {
-        const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
-        return (
-            <div className={cls} style={{ minHeight: "135px" }}>
-                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
-                    onChange={this.onChangeWrapper} />
-            </div>
-        );
-    }
-}
-
-class AutoGrowTextArea extends React.Component {
-    constructor(props) {
-        super(props);
-
-        this.state = { textAreaHeight: "100%", parentHeight: "auto" };
-        this.textAreaRef = React.createRef(null);
-
-        this.onChangeWrapper = this.onChangeWrapper.bind(this);
-    }
-
-    componentDidMount() {
-        const { minHeight, maxHeight } = this.props;
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        // if (minHeight > currScrollHeight) {
-        //     this.setState({
-        //         parentHeight: `${minHeight}px`,
-        //         textAreaHeight: `${minHeight}}px`
-        //     });
-        // } else {
-        this.setState({
-            parentHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`,
-            textAreaHeight: `${currScrollHeight > maxHeight ? maxHeight: currScrollHeight}px`
-        });
-        // }
-    }
-
-    onChangeWrapper(e) {
-        const { onTextChange, field, minHeight, maxHeight } = this.props;
-
-        onTextChange(e, field);
-
-        const currScrollHeight = this.textAreaRef.current.scrollHeight;
-        // if (minHeight && minHeight > currScrollHeight) {
-        //     this.setState({ textAreaHeight: "auto", parentHeight: `${minHeight}px` }, () => {
-        //         const newScrollHeight = this.textAreaRef.current.scrollHeight;
-        //         if (minHeight > newScrollHeight) {
-        //             this.setState({
-        //                 parentHeight: `${minHeight}px`,
-        //                 textAreaHeight: `${minHeight}}px`
-        //             });
-        //         }
-        //     });
-        // } else {
-        this.setState({ textAreaHeight: "auto", parentHeight: `${currScrollHeight < maxHeight ? currScrollHeight : maxHeight}px` }, () => {
-            const newScrollHeight = this.textAreaRef.current.scrollHeight;
-            this.setState({
-                parentHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`,
-                textAreaHeight: `${newScrollHeight < maxHeight ? newScrollHeight: maxHeight}px`
-            });
-        });
-        // }
-    }
-
-    render() {
-        const { text, cls, minHeight, maxHeight, isFallback } = this.props;
-        const { textAreaHeight, parentHeight } = this.state;
-
-        const disableField = isFallback;
-
-        return (
-            <div style={{
-                minHeight: parentHeight > maxHeight ? maxHeight: parentHeight,
-                // height: parentHeight
-            }} className={cls}>
-                <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: textAreaHeight > maxHeight ? maxHeight: textAreaHeight, resize: "none" }} className="w-100"
-                    onChange={this.onChangeWrapper} placeholder="Required" disabled={disableField} />
-            </div>
-        );
-    }
-}
-AutoGrowTextArea.defaultProps = {
-    minHeight: 150,
-    maxHeight: 325
-};
+// /** Currently unused; may decide to use a static sized window & style with CSS to autogrow */
+// class NoGrowTextArea extends React.Component {
+//     constructor(props) {
+//         super(props);
+//         this.onChangeWrapper = this.onChangeWrapper.bind(this);
+//     }
+//     onChangeWrapper(e) {
+//         const { onTextChange, field } = this.props;
+//         onTextChange(e, field);
+//     }
+//     render() {
+//         const { text, cls = "w-100 mb-1 flex-grow-1" } = this.props;
+//         return (
+//             <div className={cls} style={{ minHeight: "135px" }}>
+//                 <textarea value={text} ref={this.textAreaRef} rows={5} style={{ height: "100%", resize: "none", minHeight: "70px" }} className="w-100"
+//                     onChange={this.onChangeWrapper} />
+//             </div>
+//         );
+//     }
+// }
 
 
 function noteFieldNameToSchemaFormatted(field) {

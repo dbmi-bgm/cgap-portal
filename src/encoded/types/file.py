@@ -50,6 +50,7 @@ from urllib.parse import (
 )
 from ..authentication import session_properties
 from ..search.search import make_search_subreq
+from ..util import make_s3_client
 from .base import (
     Item,
     get_item_or_none,
@@ -150,6 +151,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
             'upload_url': f's3://{bucket}/{key}',
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
             'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
+            's3_encrypt_key_id': s3_encrypt_key_id,
             'request_id': token.get('ResponseMetadata').get('RequestId'),
             'key': key
         })
@@ -332,7 +334,7 @@ class File(Item):
             if old_creds.get('key') != new_creds.get('key'):
                 try:
                     # delete the old sumabeach
-                    conn = boto3.client('s3')
+                    conn = make_s3_client()
                     bname = old_creds['bucket']
                     conn.delete_object(Bucket=bname, Key=old_creds['key'])
                 except Exception as e:
@@ -795,7 +797,7 @@ def download(context, request):
     if not external:
         external = context.build_external_creds(request.registry, context.uuid, properties)
     if external.get('service') == 's3':
-        conn = boto3.client('s3')
+        conn = make_s3_client()
         param_get_object = {
             'Bucket': external['bucket'],
             'Key': external['key'],

@@ -32,6 +32,7 @@ encoded_version = 100.200.300
 snovault_version = 200.300.400
 utils_version = 300.400.500
 eb_app_version = app-v-development-simulation
+s3_encrypt_key_id = ${S3_ENCRYPT_KEY_ID}
 
 [pipeline:debug]
 pipeline =

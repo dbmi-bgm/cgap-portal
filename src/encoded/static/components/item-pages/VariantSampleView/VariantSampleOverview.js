@@ -42,15 +42,18 @@ export class VariantSampleOverview extends React.PureComponent {
         const initialIndex = getInitialTranscriptIndex(transcript);
 
         this.state = {
-            currentTranscriptIdx: initialIndex,
-            currentGeneItem: null,
-            currentGeneItemLoading: false,
+            "currentTranscriptIdx": initialIndex,
+            "currentGeneItem": null,
+            "currentGeneItemLoading": false,
+            "currentClinVarResponse": null,
+            "currentClinVarResponseLoading": false
         };
         this.loadedGeneCache = {};
     }
 
     componentDidMount(){
         this.loadGene();
+        this.loadClinVarResponse();
     }
 
     componentDidUpdate(pastProps, pastState){
@@ -81,14 +84,51 @@ export class VariantSampleOverview extends React.PureComponent {
 
         const cachedGeneItem = this.loadedGeneCache[currentGeneID];
         if (cachedGeneItem) {
-            this.setState({ currentGeneItem: cachedGeneItem });
+            this.setState({ "currentGeneItem": cachedGeneItem });
             return;
         }
-        this.setState({ currentGeneItemLoading: true }, ()=>{
+        this.setState({ "currentGeneItemLoading": true }, ()=>{
             ajax.load(currentGeneID, (currentGeneItem)=>{
+                const { "@id": geneAtID } = currentGeneItem;
+                if (!geneAtID) {
+                    // No view permission, logged out during request, or similar.
+                    this.setState({ "currentGeneItemLoading": false });
+                    return;
+                }
                 this.loadedGeneCache[currentGeneID] = currentGeneItem;
-                this.setState({ currentGeneItem, currentGeneItemLoading: false });
+                this.setState({ currentGeneItem, "currentGeneItemLoading": false });
             });
+        });
+    }
+
+    loadClinVarResponse(){
+        const { context } = this.props;
+        const { variant: { csq_clinvar = null } = {} } = context;
+
+        if (!csq_clinvar) {
+            // Likely no view permisison or not available.
+            return;
+        }
+
+        this.setState({ "currentClinVarResponseLoading": true }, ()=>{
+            const callback = (currentClinVarResponse) => {
+                const { result: { [csq_clinvar]: { uid } = {} } = {} } = currentClinVarResponse || {};
+                if (!uid) {
+                    // Some error
+                    this.setState({ "currentClinVarResponseLoading": false });
+                    return;
+                }
+                this.setState({ currentClinVarResponse, "currentClinVarResponseLoading": false });
+            };
+            ajax.load(
+                `https://eutils.ncbi.nlm.nih.gov/entrez/eutils/esummary.fcgi?db=clinvar&id=${csq_clinvar}&retmode=json`,
+                callback,
+                "GET",
+                callback,
+                null,
+                {},
+                ["Accept", "Content-Type", "Referer", "X-Requested-With"]
+            );
         });
     }
 
@@ -98,8 +138,8 @@ export class VariantSampleOverview extends React.PureComponent {
 
     render(){
         const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading } = this.props;
-        const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading } = this.state;
-        const passProps = { context, schemas, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, href };
+        const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, currentClinVarResponse, currentClinVarResponseLoading } = this.state;
+        const passProps = { context, schemas, href, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, currentClinVarResponse, currentClinVarResponseLoading };
 
         const {
             query: {
@@ -206,7 +246,12 @@ class VariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading, currentTranscriptIdx } = this.props;
+        const {
+            context, schemas,
+            currentTranscriptIdx,
+            currentGeneItem, currentGeneItemLoading,
+            currentClinVarResponse, currentClinVarResponseLoading
+        } = this.props;
         const { currentTab } = this.state;
 
         const tabTitleElements = [];
@@ -214,10 +259,14 @@ class VariantSampleOverviewTabView extends React.PureComponent {
 
         VariantSampleOverviewTabView.tabNames.forEach((title, index) => {
             const tabTitleElemProps = { currentTab, index, title, "key": index };
-            if (index === 1) {
+            if (index === 0) {
                 // If Gene:
                 tabTitleElemProps.disabled = !currentGeneItem;
                 tabTitleElemProps.loading = currentGeneItemLoading;
+            }
+            if (index === 1) {
+                // If Variant:
+                tabTitleElemProps.loading = currentClinVarResponseLoading;
             }
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
@@ -228,7 +277,7 @@ class VariantSampleOverviewTabView extends React.PureComponent {
                         tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
                         break;
                     case 1:
-                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx }} />);
+                        tabBodyElements.push(<VariantTabBody {...commonBodyProps} {...{ currentTranscriptIdx, currentClinVarResponse, currentClinVarResponseLoading }} />);
                         break;
                     case 2:
                         tabBodyElements.push(<SampleTabBody {...commonBodyProps} />);
@@ -465,7 +514,7 @@ class InterpretationController extends React.PureComponent {
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
-                    { newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
+                    { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
                             <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
@@ -489,8 +538,8 @@ const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpr
             <div className="card interpretation-space">
                 <InterpretationSpaceHeader />
                 <div className="card-body">
-                    <div className="text-center py-3">
-                        <i className="icon icon-spin icon-circle-notch icon-2x text-muted fas"/>
+                    <div className="text-center py-5">
+                        <i className="icon icon-fw icon-spin icon-circle-notch icon-2x text-muted fas"/>
                     </div>
                 </div>
             </div>

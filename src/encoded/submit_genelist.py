@@ -118,7 +118,7 @@ class GeneListSubmission:
                 if line.lower().startswith(term):
                     term_line = line
                     term_idx = term_line.lower().index(term)
-                    term_line = term_line[(term_idx + len(term)) :]
+                    term_line = term_line[(term_idx + len(term) + 1):]
                     term_line = term_line.translate({ord(i): None for i in ':;"\n"'})
                     term_line = term_line.strip()
                     if term_line:
@@ -935,6 +935,9 @@ class CommonUtils:
         API calls and capture all search results (as default behavior
         of vapp.get("/search/") is to return only first 25 items).
 
+        Searches re-directed due to non-URL characters followed
+        for appropriate search results.
+
         :param app: class virtual app for search
         :param item_list: list of str items to include in search query
         :param search_term: str search term for all items in item_list
@@ -975,13 +978,17 @@ class CommonUtils:
                     limit_add_on = "&from=" + from_index + "&limit=" + limit
                     search_string = base_search + batch_string + limit_add_on
                     try:
-                        response = app.get(search_string).json["@graph"]
-                        results.append(response)
-                        if len(response) == search_size:
-                            count += 1
-                        else:
-                            new_search = False
+                        response = app.get(search_string, status=200).json["@graph"]
                     except (VirtualAppError, AppError):
+                        try:
+                            response = app.get(search_string, status=301).follow()
+                            response = response.json["@graph"]
+                        except (VirtualAppError, AppError):
+                            response = []
+                    results.append(response)
+                    if len(response) == search_size:
+                        count += 1
+                    else:
                         new_search = False
                 batch = []
         flat_result = [x for sublist in results for x in sublist]
