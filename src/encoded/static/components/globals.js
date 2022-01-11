@@ -12,7 +12,7 @@ import { default as analyticsConfigurationOptions } from "./../ga_config.json";
 const portalConfig = {
 
     /** Title of app, used as appendix in browser <head> <title> and similar. */
-    "title": "Clinical Genomic Analysis Platform",
+    "title": "Clinical Genome Analysis Platform",
 
     /**
      * Hostnames which are considered to be canonical for 4DN data.
