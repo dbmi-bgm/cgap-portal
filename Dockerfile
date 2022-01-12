@@ -34,7 +34,7 @@ WORKDIR /home/nginx/.nvm
 # Install Node
 ENV NVM_DIR=/home/nginx/.nvm
 RUN apt install -y curl
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
@@ -51,7 +51,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Upgrade pip, install in layer
 RUN pip install --upgrade pip && \
-    pip install poetry==1.1.4
+    pip install poetry==$POETRY_VERSION
 
 # Adjust permissions
 RUN chown -R nginx:nginx /opt/venv && \
