@@ -4,7 +4,7 @@
 
 # python:3.6.15-slim-buster
 # TODO: maybe swap in ubuntu 20.04 and install Python manually?
-FROM python@sha256:912f935132ef6055ed99d7e68a8bff631a65f4e7ea650d7b0f10ed69a626a19a
+FROM python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
