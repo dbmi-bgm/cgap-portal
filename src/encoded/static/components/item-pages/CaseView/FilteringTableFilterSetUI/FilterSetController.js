@@ -65,7 +65,7 @@ export class FilterSetController extends React.PureComponent {
 
     static updateSelectedFilterBlockQueryFromSearchContextResponse(selectedFilterBlockIdx, searchContext, currFilterSet, excludeFacets=["type"]){
         const { filter_blocks = [] } = currFilterSet;
-        const { filters: ctxFilters = [] } = searchContext;
+        const { filters: ctxFilters = [], "@id": searchContextAtID } = searchContext;
         const currFilterBlock = filter_blocks[selectedFilterBlockIdx];
         const { query: filterStrQuery } = currFilterBlock;
         const filterBlockQuery = queryString.parse(filterStrQuery);
@@ -83,6 +83,23 @@ export class FilterSetController extends React.PureComponent {
             if (excludedFieldMap[fieldName]) return false;
             return true;
         });
+
+        if (searchContextAtID) {
+            const searchContextAtIDParts = url.parse(searchContextAtID, true);
+            const { query: searchContextQuery } = searchContextAtIDParts;
+            const { q: textSearchQuery = null } = searchContextQuery || {};
+            if (textSearchQuery) {
+                // Treat "q" (text search param) as a context filter for purposes of FilterBlocks
+                searchContextAtIDParts.search = "?" + queryString.stringify(_.omit(searchContextQuery, "q"));
+                searchFilters.unshift({
+                    "field": "q",
+                    "term": textSearchQuery,
+                    "remove": url.format(searchContextAtIDParts),
+                    "title": "Text Search"
+                });
+            }
+        }
+
         const searchFiltersLen = searchFilters.length;
 
         // Check if context.filters differs from filter_block.query (if so, then can cancel out early) --
@@ -176,7 +193,16 @@ export class FilterSetController extends React.PureComponent {
         // Not particularly necessary, but helps make less redundant since we have the required `search_type` already.
         delete globalFlagsQuery.type;
 
-        const selectedFilterBlocks = selectedIdxCount === 0 ? filter_blocks : filter_blocks.filter(function(fb, fbIdx){
+        const filterBlockQueries = filter_blocks.map(function(fb, fbIdx){
+            const { query } = fb;
+            return {
+                query,
+                "name": fbIdx, // Will be using filter block indices as unique names here.
+                "flags_applied": []
+            };
+        });
+
+        const selectedFilterBlockQueries = selectedIdxCount === 0 ? filterBlockQueries : filterBlockQueries.filter(function(fb, fbIdx){
             return selectedFilterBlockIndices[fbIdx];
         });
 
@@ -193,12 +219,7 @@ export class FilterSetController extends React.PureComponent {
             //         "query": global_flags
             //     }
             // ],
-            "filter_blocks": selectedFilterBlocks.map(function({ query }){
-                return {
-                    query,
-                    "flags_applied": [] // ["CurrentFilterSet"]
-                };
-            })
+            "filter_blocks": selectedFilterBlockQueries
         };
     }
 

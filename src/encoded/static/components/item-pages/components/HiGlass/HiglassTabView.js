@@ -24,7 +24,7 @@ export const HiglassTabView = React.memo(function HiglassTabView(props){
             </div>
             <hr className="tab-section-title-horiz-divider mb-1"/>
             <div className="container-wide">
-            <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} />
+                <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} />
             </div>
         </div>
     );
@@ -35,20 +35,20 @@ HiglassTabView.defaultProps = {
 HiglassTabView.getTabObject = function(props){
 
     const icon = <i className="icon icon-times fas icon-fw"/>;
-    
     return {
-        'tab' : (
+        "tab" : (
             <React.Fragment>
                 { icon }
                 <span>Annotation browser</span>
             </React.Fragment>
         ),
-        'key' : 'higlass',
-        'disabled'  : false,
-        'content' : (
+        "key" : "higlass",
+        "disabled"  : false,
+        "content" : (
             <React.Fragment>
                 <HiglassTabView />
             </React.Fragment>
-        )
+        ),
+        "cache": true
     };
 };

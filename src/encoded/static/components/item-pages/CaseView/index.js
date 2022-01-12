@@ -5,7 +5,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 
-import { console, navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -26,7 +26,8 @@ import { CurrentFamilyController } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { InterpretationTab, InterpretationTabController } from './InterpretationTab';
-import { CaseReviewTab, CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab';
+import { CaseReviewTab } from './CaseReviewTab';
+import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
 
@@ -130,10 +131,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         addToBodyClassList,
         removeFromBodyClassList,
         setIsSubmitting,
+        // Passed in from CaseView or 1 of its controllers
         graphData,
         selectedDiseaseIdxMap,
         idToGraphIdentifier,
         PedigreeVizLibrary = null,
+        // Passed in from TabView
+        isActiveTab,
         // Passed in from VariantSampleListController which wraps this component in `getTabObject`
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
@@ -157,7 +161,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         sample_processing: sampleProcessing = null,
         initial_search_href_filter_addon: snvFilterHrefAddon = "",
         sv_initial_search_href_filter_addon: svFilterHrefAddon = "",
-        actions: caseActions = []
+        actions: caseActions = [],
+        report: { "@id": reportAtID }
     } = context;
 
     const { variant_samples: vsSelections = [], structural_variant_samples: cnvSelections = [] } = variantSampleListItem || {};
@@ -285,24 +290,28 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
 
     return (
         <React.Fragment>
-            <div className="container-wide">
-                <h3 className="tab-section-title">
-                    <div className="pt-12 pb-06">
-                        <span>
-                            { caseNamedTitle || caseNamedID }
-                        </span>
-                        <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
-                            { caseAccession }
-                        </object.CopyWrapper>
-                    </div>
-                </h3>
-            </div>
+            { !isActiveTab ? null : (
+                <div className="container-wide">
+                    <h3 className="tab-section-title">
+                        <div className="pt-12 pb-06">
+                            <span>
+                                { caseNamedTitle || caseNamedID }
+                            </span>
+                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
+                                { caseAccession }
+                            </object.CopyWrapper>
+                        </div>
+                    </h3>
+                </div>
+            ) }
             <hr className="tab-section-title-horiz-divider" />
             <div className="container-wide bg-light pt-36 pb-36">
                 <div className="card-group case-summary-card-row">
-                    <div className="col-stats mb-2 mb-lg-0">
-                        <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
-                    </div>
+                    { !isActiveTab ? null : (
+                        <div className="col-stats mb-2 mb-lg-0">
+                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
+                        </div>
+                    )}
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
                         <div className="card d-flex flex-column">
                             <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
@@ -330,7 +339,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             </div>
 
             { currFamily && caseIndividual ?
-                <DotRouter href={href} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
                         <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
                     </DotRouterTab>
@@ -350,13 +359,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
-                        <CaseReviewSelectedNotesStore {...{ context, variantSampleListItem }}>
-                            <NoteSubSelectionStateController>
-                                <CaseReviewController>
+                        <CaseReviewController {...{ context, variantSampleListItem }}>
+                            <CaseReviewSelectedNotesStore>
+                                <NoteSubSelectionStateController>
                                     <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
-                                </CaseReviewController>
-                            </NoteSubSelectionStateController>
-                        </CaseReviewSelectedNotesStore>
+                                </NoteSubSelectionStateController>
+                            </CaseReviewSelectedNotesStore>
+                        </CaseReviewController>
                     </DotRouterTab>
                 </DotRouter>
                 : null }
@@ -364,21 +373,22 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     );
 });
 CaseInfoTabView.getTabObject = function(props){
-    const { context: { variant_sample_list_id } = {} } = props;
+    const { context: { variant_sample_list_id } = {}, href } = props;
     return {
-        'tab' : (
+        "tab" : (
             <React.Fragment>
                 <i className="icon icon-cogs fas icon-fw"/>
                 <span>Case Info</span>
             </React.Fragment>
         ),
-        'key' : 'case-info',
-        'disabled' : false,
-        'content' : (
-            <VariantSampleListController id={variant_sample_list_id}>
+        "key" : "case-info",
+        "disabled" : false,
+        "content" : (
+            <VariantSampleListController id={variant_sample_list_id} href={href}>
                 <CaseInfoTabView {...props} />
             </VariantSampleListController>
-        )
+        ),
+        "cache": true
     };
 };
 
@@ -404,14 +414,21 @@ class DotRouter extends React.PureComponent {
             throw new Error("Must provide children and ideally default tab to DotRouter via props.");
         }
 
+        let defaultChildTab = null;
+
         for (var i = 0; i < childrenLen; i++) {
-            if (children[i].props.default === true) {
-                return children[i];
+            const currChild = children[i];
+            if (currChild.props.disabled) {
+                continue;
+            }
+            defaultChildTab = currChild;
+            if (currChild.props.default === true) {
+                break;
             }
         }
 
-        // If no default found, use first child component as default.
-        return children[0];
+        // If no default found, use last non-disabled tab.
+        return defaultChildTab;
     }
 
     static defaultProps = {
@@ -423,13 +440,16 @@ class DotRouter extends React.PureComponent {
 
     constructor(props){
         super(props);
+        this.getCurrentTab = this.getCurrentTab.bind(this);
         this.memoized = {
             getDefaultTab: memoize(DotRouter.getDefaultTab),
             getDotPath: memoize(DotRouter.getDotPath)
         };
     }
 
-    /** Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself */
+    /**
+     * Method is not explicitly memoized b.c. this component only has 2 props & is a PureComponent itself
+     */
     getCurrentTab() {
         const { children, href } = this.props;
         const dotPath = this.memoized.getDotPath(href);
@@ -449,7 +469,7 @@ class DotRouter extends React.PureComponent {
     }
 
     render() {
-        const { children, className, prependDotPath, navClassName, contentsClassName, elementID } = this.props;
+        const { children, className, prependDotPath, navClassName, contentsClassName, elementID, isActive = true } = this.props;
         const currentTab = this.getCurrentTab();
         const { props : { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
         const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
@@ -464,10 +484,10 @@ class DotRouter extends React.PureComponent {
                 }
             } = childTab;
 
-            const active = currTabDotPath === dotPath;
+            const active = isActive && (currTabDotPath === dotPath);
 
             if (active || cache) {
-                // If we cache tab contents, then pass down `props.isActiveTab` so select downstream components
+                // If we cache tab contents, then pass down `props.isActiveDotRouterTab` so select downstream components
                 // can hide or unmount themselves when not needed for performance.
                 const transformedChildren = !cache ? tabChildren : React.Children.map(tabChildren, (child)=>{
                     if (!React.isValidElement(child)) {
@@ -952,11 +972,11 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
             <span className="text-400">{ familyDisplayTitle }</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
-            <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right"
+            <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right d-flex align-items-center"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
                 disabled={(!vcfAtId)}>
-                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-1 small" />
-                View <span className="text-600">Provenance Graph</span>
+                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-08 small" />
+                <span className="mr-03">View</span><span className="text-600">Provenance Graph</span>
             </a>
         </h4>
     );

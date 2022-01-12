@@ -25,6 +25,7 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     display: flex;
     align-items: center;
     transition: opacity .3s ease-in-out;
+    line-height: 1;
 
     @include navbar-fixed-position {
         height: inherit;
@@ -77,6 +78,7 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     @include navbar-static-position {
+        /* Sets menu item height when vertically stacked */
         line-height: $navbar-small-height;
         &.big-dropdown-toggle {
             &:after {
@@ -142,9 +144,7 @@ div#top-nav.navbar-fixed-top {
 
         border-radius: 0;
         border: none;
-        //box-sizing: content-box; /* Exclude bottom border from min-height */
         min-height: $navbar-full-height; /* Mobile default - overriden for desktop (fixed-position) size */
-        // line-height: $navbar-small-height; /* Mobile default - overriden for desktop (fixed-position) size */
         position: relative;
 
         padding: 0;
@@ -161,7 +161,6 @@ div#top-nav.navbar-fixed-top {
             padding: 0;
             min-height: $navbar-small-height;
             height: $navbar-full-height;
-            // line-height: $navbar-full-height;
             z-index: 10;
 
             -webkit-backface-visibility: hidden;
@@ -204,6 +203,7 @@ div#top-nav.navbar-fixed-top {
             }
 
             > .img-container {
+                line-height: 1;
                 position: relative;
                 height: 100%;
                 display: flex;
