@@ -1,10 +1,6 @@
 # CGAP-Portal (Production) Dockerfile
-# Note that images are pinned via sha256 as opposed to tag
-# so that we don't pick up new images unintentionally
-
-# python:3.6.15-slim-buster
-# TODO: maybe swap in ubuntu 20.04 and install Python manually?
-FROM python@sha256:d59ee182c4629dd33b240b9bac1a6ff44276e79e66117eba17aed4016845d3b2
+# Take latest 3.6.15 Debian variant
+FROM python:3.6.15-slim-buster
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
