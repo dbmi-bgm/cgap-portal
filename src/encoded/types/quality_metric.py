@@ -361,6 +361,7 @@ def parse_qc_s3_url(url):
     """ Parses the given s3 URL into its pair of bucket, key
         Note that this function works the way it does because of how these
         urls end up in our database. Eventually we should clean this up.
+        TODO: use version in utils
         Format:
             https://s3.amazonaws.com/cgap-devtest-main-application-cgap-devtest-wfout/GAPFI1HVXJ5F/fastqc_report.html
             https://cgap-devtest-main-application-tibanna-logs.s3.amazonaws.com/41c2fJDQcLk3.metrics/metrics.html
