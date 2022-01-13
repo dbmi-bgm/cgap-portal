@@ -17,5 +17,7 @@ pserve production.ini http_port=6544 &
 echo "Starting server 3"
 pserve production.ini http_port=6545 &
 echo "Starting server 4"
-pserve production.ini http_port=6546
+pserve production.ini http_port=6546 &
+echo "Starting server 5"
+pserve production.ini http_port=6547
 
