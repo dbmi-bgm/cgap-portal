@@ -161,12 +161,13 @@ def test_patch_standard_note_fail(workbook, es_testapp, new_standard_note):
     patch_info = {"conclusion": "For these reasons we made a conclusion."}  # not a std note property
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
-def test_link_standard_note_to_report(workbook, es_testapp, new_standard_note, test_report):
-    """ test NoteStandard linkTo on Report item works """
-    note = post_note(es_testapp, new_standard_note, note_type='note_standard').json['@graph'][0]
-    patch = {'extra_notes': [note['@id']]}
-    resp = es_testapp.patch_json('/' + test_report['@id'], patch, status=200).json['@graph'][0]
-    assert resp['extra_notes'] == [note['@id']]
+# Will be possibly re-enabled if data model is updated back to having this field as a linkTo Note.
+# def test_link_standard_note_to_report(workbook, es_testapp, new_standard_note, test_report):
+#     """ test NoteStandard linkTo on Report item works """
+#     note = post_note(es_testapp, new_standard_note, note_type='note_standard').json['@graph'][0]
+#     patch = {'extra_notes': [note['@id']]}
+#     resp = es_testapp.patch_json('/' + test_report['@id'], patch, status=200).json['@graph'][0]
+#     assert resp['extra_notes'] == [note['@id']]
 
 def test_add_note_to_gene(workbook, es_testapp, gene1_es):
     """ test linking note to gene """

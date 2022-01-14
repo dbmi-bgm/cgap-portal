@@ -88,6 +88,11 @@ export function SearchBar (props) {
         setTimeout(toggleTooltip, 50, isValid);
     }, [ isValid ]);
 
+    // Update state.value if our search response has been updated (i.e. FilterSetUI switching btw filterblocks)
+    useEffect(function(){
+        setValue(currentSearchTextQuery);
+    }, [ currentSearchTextQuery ]);
+
     const iconCls = (
         "icon icon-fw align-middle fas"
         + (" icon-" + (isChanging ? "circle-notch icon-spin" : "search"))

@@ -16,7 +16,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     <hr className="border-white" />
                     <h4 className="text-500 text-white">Get Actionable Data, Fast.</h4>
                     <p className="text-white col-12 col-lg-9 px-0">
-                        CGAP (the Clinical Genome Analysis Project) is a web-based clinical and research application
+                        CGAP (the Clinical Genome Analysis Platform) is a web-based clinical and research application
                         for analysis, annotation, visualization and reporting of genomic data. An ongoing effort of
                         Harvard Medical School's Department of Biomedical Informatics and developed in close connection
                         with clinicians at BGM and UDN, CGAP

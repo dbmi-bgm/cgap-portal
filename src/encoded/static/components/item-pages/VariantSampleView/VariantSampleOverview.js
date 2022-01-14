@@ -514,7 +514,7 @@ class InterpretationController extends React.PureComponent {
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
-                    { newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
+                    { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
                             <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
@@ -538,8 +538,8 @@ const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpr
             <div className="card interpretation-space">
                 <InterpretationSpaceHeader />
                 <div className="card-body">
-                    <div className="text-center py-3">
-                        <i className="icon icon-spin icon-circle-notch icon-2x text-muted fas"/>
+                    <div className="text-center py-5">
+                        <i className="icon icon-fw icon-spin icon-circle-notch icon-2x text-muted fas"/>
                     </div>
                 </div>
             </div>

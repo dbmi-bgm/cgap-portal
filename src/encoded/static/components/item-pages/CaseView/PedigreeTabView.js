@@ -183,11 +183,16 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
         // pedigreeFamiliesIdx,
         currFamily: currentFamily,
         // onFamilySelect
+        isActiveTab = false
     } = props;
 
     if (!currentFamily){
         throw new Error("Expected non-empty props.currentFamily.");
     }
+
+    // if (!isActiveTab) {
+    //     return null;
+    // }
 
     const pedigreeTabViewBodyProps = {
         session, href, context, schemas,
