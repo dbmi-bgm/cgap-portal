@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "7.16.2.1b1"  # was "7.16.2", includes "7.17.0", but should be "8.0.0"
+version = "7.16.2.1b2"  # was "7.16.2", includes "7.17.0", but should be "8.0.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -31,7 +31,8 @@ classifiers = [
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.6'
+    'Programming Language :: Python :: 3.6',
+    'Programming Language :: Python :: 3.7'
 ]
 
 [tool.poetry.dependencies]
