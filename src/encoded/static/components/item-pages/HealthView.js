@@ -124,6 +124,10 @@ export default class HealthView extends React.PureComponent {
                 title : "Project Version",
                 description : "Software version for this portal's software."
             },
+            'python_version': {
+                title : "Python Version",
+                description : "Software version of Python used by this portal.",
+            },
             'snovault_version': {
                 title : "Snovault Version",
                 description : "Software version of dcicsnovault being used."
