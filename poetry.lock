@@ -573,7 +573,7 @@ python-versions = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "4.9.0"
+version = "5.0.0b0"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
@@ -583,7 +583,7 @@ python-versions = ">=3.6.1,<3.7"
 aws_requests_auth = ">=0.4.1,<0.5.0"
 "backports.statistics" = "0.1.0"
 boto3 = ">=1.17.53,<2.0.0"
-dcicutils = ">=3.0.0,<4.0.0"
+dcicutils = ">=3.5.0,<4.0.0"
 elasticsearch = "6.8.1"
 elasticsearch_dsl = ">=6.4.0,<7.0.0"
 future = ">=0.15.2,<0.16.0"
@@ -2145,7 +2145,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.6.1,<3.7"
-content-hash = "1a71d17c0813a8d15c581766146d64a70c122fed47941f599287c543f84719f1"
+content-hash = "539d66f31598d1d3bf9409910eceaa8d059c60f0e8212bee933ab8865c52a124"
 
 [metadata.files]
 apipkg = [
@@ -2360,8 +2360,8 @@ dcicpyvcf = [
     {file = "dcicpyvcf-1.0.0.tar.gz", hash = "sha256:c5bf8d585002ab3b95d13a47803376b456b931865e4189c38a18cca47b108449"},
 ]
 dcicsnovault = [
-    {file = "dcicsnovault-4.9.0-py3-none-any.whl", hash = "sha256:2e0d2aee614c37df1ec8da20d08854ad7a7b644c5c834672b76546d9ca477be5"},
-    {file = "dcicsnovault-4.9.0.tar.gz", hash = "sha256:60b4859e327da7b2683bae9c1b45fa7521b2bf626b989283d610e29b04800219"},
+    {file = "dcicsnovault-5.0.0b0-py3-none-any.whl", hash = "sha256:5612a9826a3a6adc2667dde2f24f55ad815c6851485521de004283a8d0407cc9"},
+    {file = "dcicsnovault-5.0.0b0.tar.gz", hash = "sha256:5f5a7fba0cec8e00d24f1967e70f65c70352182800681cae5e3b833527bea812"},
 ]
 dcicutils = [
     {file = "dcicutils-3.5.0-py3-none-any.whl", hash = "sha256:be8feaa68544043811850e6f28aee10bfc4c0694d62ba2f4f90d562555a35cc4"},
