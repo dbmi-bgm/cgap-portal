@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "7.16.2.1b3"  # was "7.16.2", includes "7.17.0", but should be "8.0.0"
+version = "7.16.2.1b4"  # was "7.16.2", includes "7.17.0", but should be "8.0.0"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -49,6 +49,7 @@ elasticsearch = "6.8.1"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
 granite-suite = "0.1.11b0"
+html5lib = "0.9999999"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
 idna = ">=2.10,<3"
@@ -112,7 +113,7 @@ waitress = "^2.0.0"  # 2.0.0 is latest
 watchtower = "^1.0.6"
 WebOb = "^1.8.7"
 WebTest = "^2.0.35"
-wheel = "0.29.0"
+wheel = ">=0.29.0"
 WSGIProxy2 = "0.4.2"
 "zope.deprecation" = "^4.4.0"
 "zope.interface" = "^4.7.2"
