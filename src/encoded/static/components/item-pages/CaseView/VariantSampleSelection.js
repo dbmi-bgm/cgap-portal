@@ -218,7 +218,6 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     } = context; // `context` refers to our Case in here.
     const {
         date_selected,
-        filter_blocks_request_at_time_of_selection,
         variant_sample_item: variantSample
     } = selection;
 

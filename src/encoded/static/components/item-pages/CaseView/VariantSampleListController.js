@@ -164,11 +164,8 @@ export class VariantSampleListController extends React.PureComponent {
                         // This includes "filter_blocks_used", "date_selected", "variant_sample_item.@id", & "selected_by.@id"
                         "variant_samples.filter_blocks_used",
                         "variant_samples.date_selected",
-                        "variant_samples.selected_by",
-                        // For future:
-                        // "variant_samples.filter_blocks_request_at_time_of_selection",
-                        // "variant_samples.selected_by.@id",
-                        // "variant_samples.selected_by.display_title",
+                        "variant_samples.selected_by.@id",
+                        "variant_samples.selected_by.display_title",
                         "variant_samples.variant_sample_item.@id",
                         "variant_samples.variant_sample_item.uuid",
                         "variant_samples.variant_sample_item.display_title",
@@ -189,7 +186,8 @@ export class VariantSampleListController extends React.PureComponent {
                         // structural variant sample embeds (TODO: add more as needed)
                         "structural_variant_samples.filter_blocks_used",
                         "structural_variant_samples.date_selected",
-                        "structural_variant_samples.selected_by",
+                        "structural_variant_samples.selected_by.@id",
+                        "structural_variant_samples.selected_by.display_title",
                         "structural_variant_samples.variant_sample_item.@id",
                         "structural_variant_samples.variant_sample_item.uuid",
                         "structural_variant_samples.variant_sample_item.display_title",

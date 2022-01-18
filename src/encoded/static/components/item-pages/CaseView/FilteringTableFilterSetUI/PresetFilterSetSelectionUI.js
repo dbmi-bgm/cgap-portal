@@ -519,7 +519,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
             const { "preset_for_projects": listOfProjectsPresetFor = [] } = loadedItemView;
             // We assume this doesn't already have userProjectUUID, else option for 'set-project-preset' wouldn't be
             // rendered/available.
-            ajax.promise(presetFSID, "PATCH", {}, JSON.stringify({ "preset_for_projects": listOfProjectsPresetFor.concat([userProjectUUID]) }))
+            ajax.promise(presetFSID, "PATCH", {}, JSON.stringify({ "preset_for_projects": listOfProjectsPresetFor.concat([userProjectUUID]), "status": "in review" }))
                 .then(function(resp){
                     console.info("PATCHed FilterSet", presetFSID);
                     checkForChangedResultsAndRefresh(
