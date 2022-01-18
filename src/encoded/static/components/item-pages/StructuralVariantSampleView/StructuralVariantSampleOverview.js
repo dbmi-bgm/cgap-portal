@@ -109,7 +109,10 @@ function StructuralVariantInfoSection({ context }) {
         SV_TYPE = fallbackElem,
         CHROM = "",
         START = "",
-        END = ""
+        END = "",
+        hg19_chr = "",
+        hg19_start = "",
+        hg19_end = ""
     } = structural_variant;
 
     const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated/just pull from schema in future
@@ -141,7 +144,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">{/* Coming soon */}</span>
+                            <span id="vi_grch37">{`chr${hg19_chr}:${hg19_start}-${hg19_end}`}</span>
                         </div>
                     </div>
                 </div>

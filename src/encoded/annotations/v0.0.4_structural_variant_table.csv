@@ -62,7 +62,7 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 59,csq_variant_5_prime_location,csq_variant_5_prime_location,Variant Location 5' of Transcript,Y,Upstream,variant,sv_cgap_annotations.py,,The location of the variant relative to the 5' end of the transcript,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
 60,csq_variant_3_prime_location,csq_variant_3_prime_location,Variant Location 3' of Transcript,Y,Downstream,variant,sv_cgap_annotations.py,,The location of the variant relative to the 3' end of the transcript,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,,,,,,,,,,,,,,
 61,hg19_chr,hg19_chr,Chromosome (hg19),Y,1,variant,pyliftover,v0.4,Chromosome (hg19),string,,N,,,,,,,,,,,,,,,
-62,hg19_pos,hg19_pos,Start Position (hg19),Y,69511,variant,pyliftover,v0.4,Start position (hg19),integer,,N,,,,,,,,,,,,,,,
+62,hg19_start,hg19_pos,Start Position (hg19),Y,69511,variant,pyliftover,v0.4,Start position (hg19),integer,,N,,,,,,,,,,,,,,,
 63,hg19_end,hg19_end,End Position (hg19),Y,71101,variant,pyliftover,v0.4,End position (hg19),integer,,N,,,,,,,,,,,,,,,
 64,samplegeno_numgt,GT,Sample Genotype (Numeric),Y,0/1,sample_variant,VCF,,Sample genotype (number format),string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,
 65,samplegeno_sampleid,sample,Sample Genotype (Sample ID),Y,NA12877_sample,sample_variant,VCF,,Sample ID,string,"{""key"": ""samplegeno"", ""title"": ""Sample Genotype""}",N,,,,,,,,,,,,,,,

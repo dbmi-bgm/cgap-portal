@@ -439,9 +439,9 @@
             "scope": "variant",
             "schema_title": "End Position (hg19)"
         },
-        "hg19_pos": {
+        "hg19_start": {
             "title": "Start Position (hg19)",
-            "field_name": "hg19_pos",
+            "field_name": "hg19_start",
             "type": "integer",
             "do_import": true,
             "vcf_field": "hg19_pos",

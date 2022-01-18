@@ -288,7 +288,7 @@ function GDNAList({ context }){
             <div className="row pb-1 pb-md-03" key="GCRCh37">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
                 <div className="col-12 col-md-2 ">{ hg19_chr }</div>
-                <div className="col-12 col-md-7">{ hg19_pos }</div>
+                <div className="col-12 col-md-7">{ hgvsg_hg19 }</div>
             </div>
         </React.Fragment>
     );
