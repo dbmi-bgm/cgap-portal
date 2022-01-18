@@ -2526,6 +2526,18 @@
             "scope": "variant",
             "schema_title": "Variant"
         },
+        "hgvsg_hg19": {
+            "title": "Variant",
+            "field_name": "hgvsg_hg19",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "hgvsg_hg19",
+            "source_name": "hgvsg_creator.py",
+            "source_version": "v1",
+            "description": "HGVS genome sequence name for hg19",
+            "scope": "variant",
+            "schema_title": "Variant"
+        },
         "schema_version": {
             "default": "2"
         },

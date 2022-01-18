@@ -267,7 +267,6 @@
             "type": "string",
             "linkTo": "NoteStandard"
         }
-
     },
     "columns": {
         "display_title": {
