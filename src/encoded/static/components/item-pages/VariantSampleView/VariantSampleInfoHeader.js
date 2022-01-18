@@ -273,7 +273,7 @@ function GDNAList({ context }){
         hgvsg = fallbackElem,
         CHROM: chrom = fallbackElem,
         hg19_chr = fallbackElem,
-        hg19_pos = fallbackElem
+        hgvsg_hg19 = fallbackElem
     } = variant;
 
     const renderedRows =  (
