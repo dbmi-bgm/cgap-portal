@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import _ from 'underscore';
 
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 
@@ -16,10 +16,13 @@ export function AddToVariantSampleListButton(props){
         updateVariantSampleListID,
         caseItem = null,
         filterSet,
+        intersectFilterBlocks = false,
         selectedFilterBlockIndices = {},
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem = false,
-        searchType = "VariantSample"
+        searchType = "VariantSample",
+        haveEditPermission = true,
+        isEditDisabled = false
     } = props;
 
     const {
@@ -32,6 +35,8 @@ export function AddToVariantSampleListButton(props){
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
 
     const mapSearchTypeToDisplay = { VariantSample: "Variant Sample", StructuralVariantSample: "Structural Variant Sample" };
+
+    const regularTitle = <React.Fragment>Add <strong>{ selectedVariantSamples.size }</strong> selected { mapSearchTypeToDisplay[searchType] } to Interpretation</React.Fragment>;
 
     /** PATCH or create new VariantSampleList w. additions */
 
@@ -61,6 +66,24 @@ export function AddToVariantSampleListButton(props){
                 </span>
             </button>
         );
+    } else if (!haveEditPermission) {
+        // Primary button style; is possible this Case is public
+        return (
+            <button type="button" className="btn btn-primary" disabled data-tip="No edit permission.">
+                <span>
+                    { regularTitle }
+                </span>
+            </button>
+        );
+    } else if (isEditDisabled) {
+        // Edit disabled for some reason other than lack of edit permission, perhaps an error in FilterSet. Prevent adding.
+        return (
+            <button type="button" className="btn btn-danger" disabled data-tip="Check for any errors above such as duplicate filter block name or changing contents of a filter block that's been used to add a sample already. Otherwise, check user permssions.">
+                <span>
+                    { regularTitle }
+                </span>
+            </button>
+        );
     } else {
 
         const onButtonClick = function(){
@@ -71,25 +94,45 @@ export function AddToVariantSampleListButton(props){
 
             setIsPatchingVSL(true);
 
+            // Used to help generate 'filter_blocks_used' (common to all selections made in this interaction)
+            const { filter_blocks: filterBlocks } = filterSet;
+            const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
+            const selectedFilterBlockIndicesLen = selectedFilterBlockIdxList.length;
+
+
             /** Adds/transforms props.selectedVariantSamples to param `variantSampleSelectionsList` */
             function addToSelectionsList(variantSampleSelectionsList){
-
-                let filterBlocksRequestData = _.pick(filterSet, "filter_blocks", "flags", "uuid");
-
-                // Only keep filter_blocks which were used in this query --
-                filterBlocksRequestData.filter_blocks = filterBlocksRequestData.filter_blocks.filter(function(fb, fbIdx){
-                    return selectedFilterBlockIndices[fbIdx];
-                });
-
-                // Convert to string (avoid needing to add to schema for now)
-                filterBlocksRequestData = JSON.stringify(filterBlocksRequestData);
 
                 // selectedVariantSamples is type (literal) Map, so param signature is `value, key, map`.
                 // These are sorted in order of insertion/selection.
                 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
                 selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
+                    const { __matching_filter_block_names: matchingFilterBlockNamesForVS = [] } = variantSampleItem;
+                    const matchingFilterBlocksLen = matchingFilterBlockNamesForVS.length;
+                    let filterBlocksUsed = null;
+                    if (matchingFilterBlocksLen === 0) {
+                        // Assumed to be only 1 FilterBlock selected
+                        if (selectedFilterBlockIndicesLen !== 1) {
+                            throw new Error("Expected only 1 filter block to be used when no `__matching_filter_block_names` present in result.");
+                        }
+                        filterBlocksUsed = [ filterBlocks[ parseInt(selectedFilterBlockIdxList[0]) ] ];
+                    } else {
+                        // Compound search was performed, multiple selected filter blocks assumed.
+                        // If `selectedFilterBlockIndicesLen` is 0, then all filter blocks are selected.
+                        if (selectedFilterBlockIndicesLen === 1) {
+                            throw new Error("Expected multiple filter blocks to be selected when `__matching_filter_block_names` is present in result.");
+                        }
+                        const matchingFilterBlocksDict = object.listToObj(matchingFilterBlockNamesForVS);
+                        filterBlocksUsed = filterBlocks.filter(function(fb, fbIdx){
+                            return matchingFilterBlocksDict[fbIdx] || false;
+                        });
+                    }
+
                     const selection = {
-                        "filter_blocks_request_at_time_of_selection": filterBlocksRequestData,
+                        "filter_blocks_used": {
+                            "filter_blocks": filterBlocksUsed,
+                            "intersect_selected_blocks": intersectFilterBlocks
+                        },
                         "variant_sample_item": variantSampleAtID // Will become linkTo (embedded)
                         // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
                         // "selected_by",
@@ -234,7 +277,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" onClick={onButtonClick}>
                 <span>
-                    Add <strong>{ selectedVariantSamples.size }</strong> selected { mapSearchTypeToDisplay[searchType] } to Interpretation
+                    { regularTitle }
                 </span>
             </button>
         );

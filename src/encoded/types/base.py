@@ -90,6 +90,11 @@ DELETED_ACL: Acl = [
 
 ALLOW_PROJECT_MEMBER_ADD_ACL: Acl = PROJECT_MEMBER_CREATE_ACL
 
+# Used for 'draft' status
+ALLOW_OWNER_EDIT: Acl = [
+    (Allow, 'role.owner', ['edit', 'view', 'view_details']),
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
+
 
 def get_item_or_none(request, value, itype=None, frame='object'):
     """
@@ -251,8 +256,10 @@ class Item(snovault.Item):
         'uploading': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'deleted': DELETED_ACL,
         'replaced': ONLY_ADMIN_VIEW_ACL,
-        # everyone view - restrict to specific items via schema
-        'public': ALLOW_EVERYONE_VIEW_ACL
+        # Everyone can view - restricted to specific items via schemas.
+        'public': ALLOW_EVERYONE_VIEW_ACL,
+        # Only creator can view - restricted to specific items via schemas.
+        'draft': ALLOW_OWNER_EDIT
     }
     FACET_ORDER_OVERRIDE = {}  # empty by default
 

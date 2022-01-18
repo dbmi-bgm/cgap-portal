@@ -262,7 +262,7 @@ export class SaveFilterSetPresetButton extends React.Component {
                     // Preserves `derived_from_preset_filterset` also for now.
                     _.pick(filterSet, ...filterSetFieldsToKeepPrePatch),
                     "uuid", // We'll POST this as new FilterSet; delete existing UUID if any.
-                    "status" // Editing status is restricted to admins only
+                    "status" // By omitting 'status', the serverDefault value should be set. Which is "draft" status.
                 ),
                 "title": presetTitle,
                 "institution": caseInstitutionID,

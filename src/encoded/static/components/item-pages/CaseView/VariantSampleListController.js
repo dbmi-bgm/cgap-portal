@@ -160,7 +160,11 @@ export class VariantSampleListController extends React.PureComponent {
                         // Fields for list view (for InterpretationTab & CaseReviewTab)
 
                         "@id",
+                        // All immediate fields off of "variant_samples" must be embedded, else they will be lost in subsequent PATCH requests.
+                        // This includes "filter_blocks_used", "date_selected", "variant_sample_item.@id", & "selected_by.@id"
+                        "variant_samples.filter_blocks_used",
                         "variant_samples.date_selected",
+                        "variant_samples.selected_by",
                         // For future:
                         // "variant_samples.filter_blocks_request_at_time_of_selection",
                         // "variant_samples.selected_by.@id",
@@ -183,7 +187,9 @@ export class VariantSampleListController extends React.PureComponent {
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
 
                         // structural variant sample embeds (TODO: add more as needed)
+                        "structural_variant_samples.filter_blocks_used",
                         "structural_variant_samples.date_selected",
+                        "structural_variant_samples.selected_by",
                         "structural_variant_samples.variant_sample_item.@id",
                         "structural_variant_samples.variant_sample_item.uuid",
                         "structural_variant_samples.variant_sample_item.display_title",
@@ -236,39 +242,33 @@ export class VariantSampleListController extends React.PureComponent {
 
 }
 
+
+
+function commonNoteEmbedFields(prefix){
+    return [
+        prefix + ".@id",
+        prefix + ".uuid",
+        prefix + ".last_modified.date_modified",
+        prefix + ".status",
+        prefix + ".associated_items.item_type",
+        prefix + ".associated_items.item_identifier",
+        prefix + ".note_text"
+    ];
+}
+
 /**
  * List of Note item fields to embed from VariantSampleList Items.
  * To be used as a part of `fields` /embed payload(s).
  */
 export const variantSampleListItemNoteEmbeds = [
-    "variant_samples.variant_sample_item.interpretation.@id",
-    "variant_samples.variant_sample_item.interpretation.uuid",
-    "variant_samples.variant_sample_item.interpretation.note_text",
-    "variant_samples.variant_sample_item.interpretation.status",
-    "variant_samples.variant_sample_item.interpretation.associated_items.item_type",
-    "variant_samples.variant_sample_item.interpretation.associated_items.item_identifier",
+    ...commonNoteEmbedFields("variant_samples.variant_sample_item.interpretation"),
     "variant_samples.variant_sample_item.interpretation.classification",
 
-    "variant_samples.variant_sample_item.discovery_interpretation.@id",
-    "variant_samples.variant_sample_item.discovery_interpretation.uuid",
-    "variant_samples.variant_sample_item.discovery_interpretation.note_text",
-    "variant_samples.variant_sample_item.discovery_interpretation.status",
-    "variant_samples.variant_sample_item.discovery_interpretation.associated_items.item_type",
-    "variant_samples.variant_sample_item.discovery_interpretation.associated_items.item_identifier",
+    ...commonNoteEmbedFields("variant_samples.variant_sample_item.discovery_interpretation"),
     "variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy",
     "variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy",
 
-    "variant_samples.variant_sample_item.variant_notes.@id",
-    "variant_samples.variant_sample_item.variant_notes.uuid",
-    "variant_samples.variant_sample_item.variant_notes.note_text",
-    "variant_samples.variant_sample_item.variant_notes.status",
-    "variant_samples.variant_sample_item.variant_notes.associated_items.item_type",
-    "variant_samples.variant_sample_item.variant_notes.associated_items.item_identifier",
+    ...commonNoteEmbedFields("variant_samples.variant_sample_item.variant_notes"),
 
-    "variant_samples.variant_sample_item.gene_notes.@id",
-    "variant_samples.variant_sample_item.gene_notes.uuid",
-    "variant_samples.variant_sample_item.gene_notes.note_text",
-    "variant_samples.variant_sample_item.gene_notes.status",
-    "variant_samples.variant_sample_item.gene_notes.associated_items.item_type",
-    "variant_samples.variant_sample_item.gene_notes.associated_items.item_identifier",
+    ...commonNoteEmbedFields("variant_samples.variant_sample_item.gene_notes"),
 ];

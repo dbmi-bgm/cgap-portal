@@ -157,7 +157,11 @@ function createBlankFilterSetItem(searchType, caseAccession){
                 "name" : "Filter Block 1",
                 "query" : ""
             }
-        ]
+        ],
+        // Any FilterSet saved to Case should have "current" or "in review" by default so others in Project can see/edit it as well.
+        // It may make sense to upgrade to status=shared or similar for public/knowledgebase data, though.
+        // But not any lower than "current", "in review", or "shared to project"
+        "status": "current"
     };
 }
 
