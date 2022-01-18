@@ -797,6 +797,9 @@ def download(context, request):
     if not external:
         external = context.build_external_creds(request.registry, context.uuid, properties)
     if external.get('service') == 's3':
+        external_bucket = external['bucket']
+        registry_bucket = request.registry.settings['file_upload_bucket']
+        log.error(f'Using bucket {external_bucket} from registry value {registry_bucket}')
         conn = make_s3_client()
         param_get_object = {
             'Bucket': external['bucket'],
