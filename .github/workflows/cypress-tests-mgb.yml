@@ -1,6 +1,6 @@
 # Action that Runs Cypress Tests
 
-name: Cypress Tests - MSA 
+name: Cypress Tests - MGB 
 
 # Controls when the action will run. 
 on:
