@@ -1,5 +1,5 @@
-,#FILEFORMAT= ,HGSV Updates (Doug),,,,,,,,,,,,,,,,,,,,,,,,,
-,#FILEDATE= 01.18.2021,,,,,,,,,,,,,,,,,,,,,,,,,,
+,#FILEFORMAT=annV0.5.5,HGSV Updates (Doug),,,,,,,,,,,,,,,,,,,,,,,,,
+,#FILEDATE= 01.18.2022,,,,,,,,,,,,,,,,,,,,,,,,,,
 no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,source_version,description,field_type,sub_embedding_group,is_list,priority,source,pattern,default,min,max,enum_list,links_to,embedded_field,calculated_property,link,comments,annotation_space_location,abbreviation,add_no_value
 1,CHROM,CHROM,Chromosome,Y,1;2;3;4;5;6;22;X;Y;M,variant,VCF,VCFv4.2,Chromosome,string,,N,5,VCF,,,,,"1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,X,Y,M",,,,,,Position,,
 2,POS,POS,Position,Y,949608,variant,VCF,VCFv4.2,Position,integer,,N,5,VCF,,,0,,,,,,,,Position - maybe later,,
@@ -30,7 +30,6 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 27,hgvsg_hg19,hgvsg_hg19,Variant,Y,NC_000001.10:g.1014228G>A,variant,hgvsg_creator.py,v1,HGVS genome sequence name for hg19,string,,N,3,manual,,,,,,,,,,,Position,,
 28,variantClass,variantClass,Variant Type,Y,,variant,VCF,VCFv4.2,"Variant type (SNV, INS, DEL)",string,,N,3,manual,,,,,"SNV,INS,DEL,MNV",,,,,,,,
 29,hg19_chr,hg19_chr,Chromosome (hg19),Y,1,variant,pyliftover,v0.4,hg19 coordinate chromosome,string,,N,3,manual,,,,,,,,,,,Position,,
-30,hg19_pos,hg19_pos,Position (hg19),Y,69511,variant,pyliftover,v0.4,hg19 coordinate position,integer,,N,3,manual,,,,,,,,,,,Position - maybe later,,
 30,hg19_pos,hg19_pos,Position (hg19),Y,69511,variant,pyliftover,v0.4,hg19 coordinate position,integer,,N,3,manual,,,,,,,,,,,Position - maybe later,,
 31,csq_consequence,csq_consequence,,Y,intron_variant&non_coding_transcript_variant,variant,VEP,v101,Consequence type,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",Y,5,vep,,,,,,VariantConsequence,,,,,,,
 32,csq_consequence.var_conseq_id,csq_consequence.var_conseq_id,,Y,,variant,VEP,v101,,string,"{""key"": ""transcript"", ""title"": ""Transcript""}",N,,calculated,,,,,,,Y,,,,,,
