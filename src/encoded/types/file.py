@@ -811,7 +811,7 @@ def download(context, request):
             log.error(f'Encountered s3 bucket mismatch - ignoring metadata and using registry value {external_bucket}')
         conn = make_s3_client()
         param_get_object = {
-            'Bucket': external['bucket'],
+            'Bucket': external_bucket,
             'Key': external['key'],
             'ResponseContentDisposition': "attachment; filename=" + filename
         }
