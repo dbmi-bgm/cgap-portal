@@ -480,11 +480,13 @@ class File(Item):
 
     @classmethod
     def get_bucket(cls, registry):
+        log.error('Getting files bucket %s' % registry.settings['file_upload_bucket'])
         return registry.settings['file_upload_bucket']
 
     @classmethod
     def build_external_creds(cls, registry, uuid, properties):
         bucket = cls.get_bucket(registry)
+        log.error(f'Got bucket {bucket} from registry')
         fformat = properties.get('file_format')
         if fformat.startswith('/file-formats/'):
             fformat = fformat[len('/file-formats/'):-1]
@@ -592,6 +594,7 @@ class FileProcessed(File):
 
     @classmethod
     def get_bucket(cls, registry):
+        log.error('Getting wfoutput bucket: %s' % registry.settings['file_wfout_bucket'])
         return registry.settings['file_wfout_bucket']
 
     @calculated_property(schema={
@@ -798,8 +801,9 @@ def download(context, request):
         external = context.build_external_creds(request.registry, context.uuid, properties)
     if external.get('service') == 's3':
         external_bucket = external['bucket']
-        registry_bucket = request.registry.settings['file_upload_bucket']
-        log.error(f'Using bucket {external_bucket} from registry value {registry_bucket}')
+        wfout_bucket = request.registry.settings['file_wfout_bucket']
+        files_bucket = request.registry.settings['file_upload_bucket']
+        log.error(f'Using bucket {external_bucket} with possible values {files_bucket} and {wfout_bucket}')
         conn = make_s3_client()
         param_get_object = {
             'Bucket': external['bucket'],
