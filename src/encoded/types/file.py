@@ -804,11 +804,12 @@ def download(context, request):
         wfout_bucket = request.registry.settings['file_wfout_bucket']
         files_bucket = request.registry.settings['file_upload_bucket']
         if external_bucket not in [wfout_bucket, files_bucket]:
-            if 'wfout' in external_bucket:
-                external_bucket = wfout_bucket
-            else:
+            if 'wfout' not in external_bucket:
                 external_bucket = files_bucket
-            log.error(f'Encountered s3 bucket mismatch - ignoring metadata and using registry value {external_bucket}')
+            # TODO: enable once wfoutput bucket is transferred
+            # else:
+            #     external_bucket = files_bucket
+                log.error(f'Encountered s3 bucket mismatch - ignoring metadata and using registry value {external_bucket}')
         conn = make_s3_client()
         param_get_object = {
             'Bucket': external_bucket,
