@@ -943,7 +943,7 @@ def pseudo_run(context, request):
     # for testing
     if not env:
         env = ENV_WEBDEV
-    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
+    input_json['output_bucket'] = request.registry.settings['file_wfout_bucket']
     input_json['env_name'] = env
     if input_json.get('app_name', None) is None:
         input_json['app_name'] = 'pseudo-workflow-run'
@@ -951,7 +951,7 @@ def pseudo_run(context, request):
     # ideally select bucket from file metadata itself
     for i, nput in enumerate(input_json['input_files']):
         if not nput.get('bucket_name'):
-            input_json['input_files'][i]['bucket_name'] = 'elasticbeanstalk-%s-files' % env
+            input_json['input_files'][i]['bucket_name'] = request.registry.settings['file_upload_bucket']
 
     # hand-off to tibanna for further processing
     aws_lambda = boto3.client('lambda', region_name='us-east-1')
@@ -991,6 +991,7 @@ def pseudo_run(context, request):
 
 
 def _wfoutput_bucket_for_env(env):
+    # XXX: this function should no longer be used.
     return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
 
 
@@ -1005,7 +1006,7 @@ def run_workflow(context, request):
     # for testing
     if not env:
         env = ENV_WEBDEV
-    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
+    input_json['output_bucket'] = request.registry.settings['file_wfout_bucket']
     input_json['env_name'] = env
 
     # hand-off to tibanna for further processing

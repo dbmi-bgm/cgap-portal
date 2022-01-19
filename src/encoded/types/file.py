@@ -803,7 +803,12 @@ def download(context, request):
         external_bucket = external['bucket']
         wfout_bucket = request.registry.settings['file_wfout_bucket']
         files_bucket = request.registry.settings['file_upload_bucket']
-        log.error(f'Using bucket {external_bucket} with possible values {files_bucket} and {wfout_bucket}')
+        if external_bucket not in [wfout_bucket, files_bucket]:
+            if 'wfout' in external_bucket:
+                external_bucket = wfout_bucket
+            else:
+                external_bucket = files_bucket
+            log.error(f'Encountered s3 bucket mismatch - ignoring metadata and using registry value {external_bucket}')
         conn = make_s3_client()
         param_get_object = {
             'Bucket': external['bucket'],
