@@ -245,7 +245,7 @@ class TestIngestStructuralVariantVCF():
         assert get_top_level_field(result, "cytoband_end") == "p35.2"
         assert get_top_level_field(result, "unrelated_count") == 1
         assert get_top_level_field(result, "hg19_chr") == "1"
-        assert get_top_level_field(result, "hg19_pos") == 32373712
+        assert get_top_level_field(result, "hg19_start") == 32373712
         assert get_top_level_field(result, "hg19_end") == 32373762
         assert len(result["transcript"]) == 6
         assert get_transcript_field(result, 0, "csq_consequence") == [
