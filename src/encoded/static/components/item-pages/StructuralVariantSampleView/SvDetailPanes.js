@@ -133,7 +133,12 @@ function ConsequenceOfSVSection({ currentTranscript }) {
             </div>);
     }
 
-    const { fallbackElem, csq_consequence = [] } = currentTranscript;
+    const {
+        fallbackElem,
+        csq_consequence = [],
+        csq_variant_5_prime_location,
+        csq_variant_3_prime_location
+    } = currentTranscript;
     // TODO: Add breakpoints once they are ready
 
     return (
@@ -155,7 +160,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-con-break1">
-                    <span className="font-italic text-muted">{/*(Coming Soon)*/}</span>
+                    { csq_variant_5_prime_location || fallbackElem }
                 </div>
             </div>
             <div className="row mb-03">
@@ -165,7 +170,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="snv-con-break2">
-                    <span className="font-italic text-muted">{/*(Coming Soon)*/}</span>
+                    { csq_variant_3_prime_location || fallbackElem }
                 </div>
             </div>
         </React.Fragment>

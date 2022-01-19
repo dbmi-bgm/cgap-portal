@@ -2515,7 +2515,7 @@
             "schema_title": "Position (hg19)"
         },
         "hgvsg": {
-            "title": "Variant",
+            "title": "Variant in HGVS format",
             "field_name": "hgvsg",
             "type": "string",
             "do_import": true,
@@ -2527,7 +2527,7 @@
             "schema_title": "Variant"
         },
         "hgvsg_hg19": {
-            "title": "Variant",
+            "title": "Variant in HGVS format (hg19)",
             "field_name": "hgvsg_hg19",
             "type": "string",
             "do_import": true,
