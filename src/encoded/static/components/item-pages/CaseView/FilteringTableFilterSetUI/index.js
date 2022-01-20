@@ -129,12 +129,15 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
     static deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices){
         let singleSelectedFilterBlockIdx = null;
-        const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
+        const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices).map(function(stringIdx){
+            return parseInt(stringIdx);
+        });
         const selectedFilterBlockIdxCount = selectedFilterBlockIdxList.length;
         if (selectedFilterBlockIdxCount === 1) {
-            singleSelectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0]);
+            [ singleSelectedFilterBlockIdx ] = selectedFilterBlockIdxList;
         }
-        return { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount };
+
+        return { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount, selectedFilterBlockIdxList };
     }
 
     constructor(props){
@@ -243,7 +246,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
         const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets, searchType);
         const { duplicateQueryIndices, duplicateNameIndices, haveDuplicateQueries, haveDuplicateNames } = this.memoized.findDuplicateBlocks(filter_blocks);
-        const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
+        const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount, selectedFilterBlockIdxList } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices, filterSet);
 
         const filterBlocksLen = filter_blocks.length;
         const allFilterBlocksSelected = filterBlocksLen > 0 && (selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen);
@@ -303,7 +306,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             aboveTableControls = (
                 <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
                     <div className="col-12 col-lg-4 py-2">
-                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }} />
+                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
+                            placeholder={!currentFilterBlockName ? "Select a single filter-block above to search..." : "Search..."} />
                     </div>
                     <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
                         { typeof totalCount === "number" ?
@@ -325,8 +329,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                     <div className="col col-lg-auto pr-06 d-flex">
                         { selectedVariantSamples instanceof Map ?
                             <div className="pr-14">
-                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices, intersectFilterBlocks,
-                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType, isEditDisabled, haveEditPermission }} />
+                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
+                                    intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
+                                    isEditDisabled, haveEditPermission }} />
                             </div>
                             : null }
                         { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }

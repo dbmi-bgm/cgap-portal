@@ -273,7 +273,8 @@ export class FilterSetController extends React.PureComponent {
         //     });
         // }
 
-        if (selectedFilterBlockIdxCount === filterBlocksLen) {
+        // If only 1 FB, keep selectedFilterBlockIndices populated to simplify grabbing the singly-selected filter-block.
+        if (selectedFilterBlockIdxCount > 1 && selectedFilterBlockIdxCount === filterBlocksLen) {
             selectedFilterBlockIndices = {};
             selectedFilterBlockIdxCount = 0;
             selectedFilterBlockIdxList = [];
@@ -287,12 +288,12 @@ export class FilterSetController extends React.PureComponent {
             return { selectedFilterBlockIndices };
         }
 
-        if (!(selectedFilterBlockIdxCount === 1 || (selectedFilterBlockIdxCount === 0 && filterBlocksLen === 1))){
+        if (selectedFilterBlockIdxCount !== 1){
             // Cancel if compound filterset request.
             return { selectedFilterBlockIndices };
         }
 
-        const selectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0] || 0);
+        const selectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0]);
         const { total: totalCount } = searchContext;
 
         // Get counts to show @ top left of selectable filter blocks

@@ -17,7 +17,8 @@ export function AddToVariantSampleListButton(props){
         caseItem = null,
         filterSet,
         intersectFilterBlocks = false,
-        selectedFilterBlockIndices = {},
+        selectedFilterBlockIdxList = [0],
+        selectedFilterBlockIdxCount = 1,
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem = false,
         searchType = "VariantSample",
@@ -99,13 +100,6 @@ export function AddToVariantSampleListButton(props){
 
             // Used to help generate 'filter_blocks_used' (common to all selections made in this interaction)
             const { filter_blocks: filterBlocks } = filterSet;
-            const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
-            let selectedFilterBlockIndicesLen = selectedFilterBlockIdxList.length;
-            if (filterBlocks.length === 1 && selectedFilterBlockIndicesLen === 0) {
-                // Only 1 filter block and is active (it can never be inactive, as of 2022-01 at least..)
-                selectedFilterBlockIdxList.push(0);
-                selectedFilterBlockIndicesLen++;
-            }
 
 
             /** Adds/transforms props.selectedVariantSamples to param `variantSampleSelectionsList` */
@@ -120,14 +114,14 @@ export function AddToVariantSampleListButton(props){
                     let filterBlocksUsed = null;
                     if (matchingFilterBlocksLen === 0) {
                         // Assumed to be only 1 FilterBlock selected
-                        if (selectedFilterBlockIndicesLen !== 1) {
+                        if (selectedFilterBlockIdxCount !== 1) {
                             throw new Error("Expected only 1 filter block to be used when no `__matching_filter_block_names` present in result.");
                         }
                         filterBlocksUsed = [ filterBlocks[ parseInt(selectedFilterBlockIdxList[0]) ] ];
                     } else {
                         // Compound search was performed, multiple selected filter blocks assumed.
                         // If `selectedFilterBlockIndicesLen` is 0, then all filter blocks are selected.
-                        if (selectedFilterBlockIndicesLen === 1) {
+                        if (selectedFilterBlockIdxCount === 1) {
                             throw new Error("Expected multiple filter blocks to be selected when `__matching_filter_block_names` is present in result.");
                         }
                         const matchingFilterBlocksDict = object.listToObj(matchingFilterBlockNamesForVS);
