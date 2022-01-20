@@ -124,7 +124,7 @@ def test_upgrade_variant_sample_list_2_3(app, variant_sample_list_2_3):
     vsl_to_upgrade = deepcopy(variant_sample_list_2_3)
     upgrader = app.registry["upgrader"]
     upgrader.upgrade(
-        "filter_set", vsl_to_upgrade, current_version="2", target_version="3"
+        "variant_sample_list", vsl_to_upgrade, current_version="2", target_version="3"
     )
     assert variant_sample_list_2_3["schema_version"] == "2"
     assert vsl_to_upgrade["schema_version"] == "3"
