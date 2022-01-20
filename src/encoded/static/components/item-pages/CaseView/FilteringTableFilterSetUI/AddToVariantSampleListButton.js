@@ -29,7 +29,8 @@ export function AddToVariantSampleListButton(props){
         "@id": caseAtID,
         project: { "@id": caseProjectID } = {},
         institution: { "@id" : caseInstitutionID } = {},
-        accession: caseAccession = null
+        accession: caseAccession = null,
+        variant_sample_list_id: caseVSLAtID
     } = caseItem;
 
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
@@ -69,17 +70,19 @@ export function AddToVariantSampleListButton(props){
     } else if (!haveEditPermission) {
         // Primary button style; is possible this Case is public
         return (
-            <button type="button" className="btn btn-primary" disabled data-tip="No edit permission.">
-                <span>
+            <button type="button" className="btn btn-primary" disabled>
+                <span data-tip="No edit permission.">
                     { regularTitle }
                 </span>
             </button>
         );
-    } else if (isEditDisabled) {
+    } else if (isEditDisabled || (!variantSampleListItem && caseVSLAtID)) {
         // Edit disabled for some reason other than lack of edit permission, perhaps an error in FilterSet. Prevent adding.
+        // Also disable if no variantSampleListItem (and it not loading) yet an existing VSL is present.
+        // Indicates lack of view permission for existing VSL (most likely no edit permission disabled for Case anyways, but permissions may change/differ in future)
         return (
-            <button type="button" className="btn btn-danger" disabled data-tip="Check for any errors above such as duplicate filter block name or changing contents of a filter block that's been used to add a sample already. Otherwise, check user permssions.">
-                <span>
+            <button type="button" className="btn btn-danger" disabled>
+                <span data-tip="Check for any errors above such as duplicate filter block name or changing contents of a filter block that's been used to add a sample already. Otherwise, check user permssions.">
                     { regularTitle }
                 </span>
             </button>

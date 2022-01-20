@@ -112,7 +112,7 @@ export class VariantSampleListController extends React.PureComponent {
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
             const [ variantSampleListItem ] = resp;
-            const { "@id": vslID, error = null } = variantSampleListItem;
+            const { "@id": vslID } = variantSampleListItem || {}; // Is `null` if no view permissions for it.
 
             if (scopedRequest !== this.currentRequest) {
                 // Request superseded, cancel it.
@@ -120,9 +120,11 @@ export class VariantSampleListController extends React.PureComponent {
             }
 
             if (!vslID) {
-                throw new Error("Couldn't get VSL");
+                this.setState({ "isLoadingVariantSampleListItem": false }, function(){
+                    setTimeout(ReactTooltip.rebuild, 50);
+                });
+                throw new Error("Couldn't get VSL - check view permissions");
             }
-
 
             this.currentRequest = null;
 

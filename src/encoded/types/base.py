@@ -92,7 +92,7 @@ ALLOW_PROJECT_MEMBER_ADD_ACL: Acl = PROJECT_MEMBER_CREATE_ACL
 
 # Used for 'draft' status
 ALLOW_OWNER_EDIT: Acl = [
-    (Allow, 'role.owner', ['view', 'view_details', 'edit']),
+    (Allow, 'role.owner', ['view', 'edit']),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 
