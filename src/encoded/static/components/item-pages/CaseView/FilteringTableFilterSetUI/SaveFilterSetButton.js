@@ -14,7 +14,7 @@ export function savedVariantSampleListItemFilterBlockQueryDict(variantSampleList
     const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
     const existingNameDict = {};
     vsSelections.forEach(function(vsSelection){
-        const { filter_blocks_used: { filter_blocks: selectionBlocksUsed = [] } } = vsSelection;
+        const { filter_blocks_used: { filter_blocks: selectionBlocksUsed = [] } = {} } = vsSelection;
         selectionBlocksUsed.forEach(function({ name: selectedBlockName, query: selectedBlockQuery }){
             // We assume in an existing VSL, that all saved filter_blocks' names only have 1 set of contents.
             // Use this as an opportunity to parse the newly-encountered queries for comparison, as well.
