@@ -5,7 +5,7 @@
         "institution": "hms-dbmi",
         "variant_samples": [
             {
-                "userid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+                "selected_by": "834559db-a3f6-462c-81a4-f5d7e5e65707",
                 "date_selected": "2021-07-09T16:42:23.690915+00:00",
                 "variant_sample_item": "e43be20e-5dda-4db2-bb23-8c103323fc0f",
                 "filter_blocks_used": {
@@ -19,7 +19,7 @@
                 }
             },
             {
-                "userid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+                "selected_by": "834559db-a3f6-462c-81a4-f5d7e5e65707",
                 "date_selected": "2021-07-09T16:42:23.689035+00:00",
                 "variant_sample_item": "d62836a0-2de3-4970-bf14-eba3ca758a82",
                 "filter_blocks_used": {

@@ -69,7 +69,6 @@
                                 "title": "Filter Blocks Used",
                                 "items": {
                                     "type": "object",
-                                    "additionalProperties": true,
                                     "title": "Filter Block",
                                     "description": "Name and contents must be unique within a Variant Sample List",
                                     "notes": "May also include flags_applied or other properties at some point.",
@@ -145,7 +144,6 @@
                                 "title": "Filter Blocks Used",
                                 "items": {
                                     "type": "object",
-                                    "additionalProperties": true,
                                     "title": "Filter Block",
                                     "description": "Name and contents must be unique within a Variant Sample List",
                                     "notes": "May also include flags_applied or other properties at some point.",
