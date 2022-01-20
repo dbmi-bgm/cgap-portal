@@ -182,6 +182,9 @@ remote-test-unit:  # Note this does the 'indexing' tests
 update:  # updates dependencies
 	poetry update
 
+debug-docker-local:
+	@scripts/debug-docker-local
+
 build-docker-local:
 	docker-compose build
 
