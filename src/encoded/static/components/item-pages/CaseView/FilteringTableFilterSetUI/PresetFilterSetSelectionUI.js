@@ -582,7 +582,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
                 { presetIconsToShow }
 
                 <span data-tip={"Created " + formatDateTime(date_created, "date-time-md") + " by " + presetFSAuthorTitle} data-delay-show={750}>
-                    <LocalizedTime timestamp={date_created} formatType="date-md" />
+                    <LocalizedTime timestamp={date_created} formatType="date-sm" />
                 </span>
 
                 <span className="flex-grow-1 count-indicator-wrapper ml-07 text-right">

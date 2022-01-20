@@ -276,12 +276,13 @@ export class SaveFilterSetButtonController extends React.Component {
 export function SaveFilterSetButton(props){
     const {
         isEditDisabled,
+        haveEditPermission = true,
         saveFilterSet,
         isSavingFilterSet,
         hasCurrentFilterSetChanged,
         className = "btn btn-primary d-inline-flex align-items-center"
     } = props;
-    const disabled = isEditDisabled || isSavingFilterSet || !hasCurrentFilterSetChanged;
+    const disabled = isEditDisabled || isSavingFilterSet || !haveEditPermission || !hasCurrentFilterSetChanged;
 
     const onSaveBtnClick = useCallback(function(e){
         e.stopPropagation();

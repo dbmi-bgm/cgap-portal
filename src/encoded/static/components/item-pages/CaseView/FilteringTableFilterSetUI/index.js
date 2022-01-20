@@ -262,7 +262,6 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         // Always disable if any of following conditions:
         const isEditDisabled = (
-            !haveEditPermission ||
             haveDuplicateQueries || haveDuplicateNames ||
             !allFilterBlockNameQueriesValid ||
             !filterSet || isSettingFilterBlockIdx
@@ -293,7 +292,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 intersectFilterBlocks, toggleIntersectFilterBlocks,
                 savedToVSLFilterBlockQueries, allFilterBlockNameQueriesValid,
                 // Props for Save btn:
-                saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
+                saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+                haveEditPermission
             };
 
             fsuiBlocksBody = <FilterSetUIBody {...bodyProps} />;
@@ -377,6 +377,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
         hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
         toggleOpen, bodyOpen,
         isEditDisabled: propIsEditDisabled,
+        haveEditPermission,
         haveDuplicateQueries, haveDuplicateNames, allFilterBlockNameQueriesValid,
         isFetchingInitialFilterSetItem = false,
         // From SaveFilterSetPresetButtonController
@@ -485,7 +486,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
             <div className="flex-shrink-0 flex-grow-0 pl-16 overflow-hidden">
                 { warnIcon }
                 <div role="group" className="dropdown btn-group">
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission }}
                         className="btn btn-sm btn-outline-light align-items-center d-flex text-truncate" />
                     <SaveFilterSetPresetButton {...savePresetDropdownProps} />
                 </div>
@@ -503,7 +504,7 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
         selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, savedToVSLFilterBlockQueries, allFilterBlockNameQueriesValid,
         isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+        // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission
         ...remainingProps
     } = props;
 
@@ -554,8 +555,8 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
                 </div>
             ) }
 
-            <FilterSetUIBlockBottomUI {...remainingProps}
-                {...{ selectFilterBlockIdx, allFilterBlocksSelected, filterBlocksLen, singleSelectedFilterBlockIdx, currentSingleBlockQuery }} />
+            <FilterSetUIBlockBottomUI {...remainingProps} {...{ selectFilterBlockIdx, allFilterBlocksSelected,
+                filterBlocksLen, singleSelectedFilterBlockIdx, currentSingleBlockQuery }} />
 
         </div>
     );
@@ -570,7 +571,8 @@ function FilterSetUIBlockBottomUI(props){
         filterBlocksLen,
         singleSelectedFilterBlockIdx,
         currentSingleBlockQuery,
-        saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+        saveFilterSet, isSavingFilterSet,
+        isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission,
         intersectFilterBlocks = false
     } = props;
 
@@ -627,7 +629,7 @@ function FilterSetUIBlockBottomUI(props){
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission }}
                     className="btn btn-primary fixed-height d-inline-flex align-items-center" />
             </div>
         </div>

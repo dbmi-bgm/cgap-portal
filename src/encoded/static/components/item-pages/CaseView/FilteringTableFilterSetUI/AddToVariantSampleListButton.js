@@ -146,11 +146,19 @@ export function AddToVariantSampleListButton(props){
             function createSelectionListPayload(existingSelections){
                 // Need to convert embedded linkTos into just @ids before PATCHing -
                 return existingSelections.map(function(existingSelection){
-                    const { variant_sample_item: { "@id": vsItemID } } = existingSelection;
+                    const {
+                        variant_sample_item: { "@id": vsItemID },
+                        selected_by: { "@id": selectedByItemID }
+                    } = existingSelection;
                     if (!vsItemID) {
                         throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
                     }
-                    return { ...existingSelection, "variant_sample_item": vsItemID };
+                    console.log("FFF", selectedByItemID);
+                    return {
+                        ...existingSelection,
+                        "variant_sample_item": vsItemID,
+                        "selected_by": selectedByItemID
+                    };
                 });
             }
 

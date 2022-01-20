@@ -92,7 +92,7 @@ ALLOW_PROJECT_MEMBER_ADD_ACL: Acl = PROJECT_MEMBER_CREATE_ACL
 
 # Used for 'draft' status
 ALLOW_OWNER_EDIT: Acl = [
-    (Allow, 'role.owner', ['edit', 'view', 'view_details']),
+    (Allow, 'role.owner', ['view', 'view_details', 'edit']),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 
@@ -313,6 +313,10 @@ class Item(snovault.Item):
         if 'project' in properties:
             project_editors = 'editor_for.%s' % properties['project']
             roles[project_editors] = 'role.project_editor'
+        # This emulates __ac_local_roles__ of User.py (role.owner) - taken from 4DN in 2022-01
+        if 'submitted_by' in properties:
+            submitter = 'userid.%s' % properties['submitted_by']
+            roles[submitter] = 'role.owner'
         return roles
 
     def add_accession_to_title(self, title):
