@@ -297,23 +297,7 @@ export class SaveFilterSetPresetButton extends React.Component {
                             });
                         });
                     });
-                }).then((newPresetFilterSetItem) => {
-                    // If no "derived_from_preset_filterset" on Case.active_filterset, set it.
-                    const { uuid: newPresetFilterSetItemUUID } = newPresetFilterSetItem;
-                    const { derived_from_preset_filterset = null, "@id": caseFSID } = filterSet || {};
-                    const { status: originalPresetFSStatus } = originalPresetFilterSet || {};
-                    if (derived_from_preset_filterset === null || originalPresetFSStatus === "deleted") {
-                        return ajax.promise(caseFSID, "PATCH", {}, JSON.stringify({ "derived_from_preset_filterset": newPresetFilterSetItemUUID }));
-                    } else {
-                        return false;
-                    }
-                }).then((responseOrFalse) => {
-                    if (responseOrFalse !== false) {
-                        // Assume PATCH Case FilterSet response obtained ...
-                        console.info("PATCHed Case.active_filterset", responseOrFalse);
-                    }
-                })
-                .catch((err)=>{
+                }).catch((err)=>{
                     // TODO: Add analytics.
                     console.error("Error POSTing new preset FilterSet", err);
                     this.setState({ "savingStatus" : -1 });

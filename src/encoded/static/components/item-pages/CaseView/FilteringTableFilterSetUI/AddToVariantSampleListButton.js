@@ -97,7 +97,12 @@ export function AddToVariantSampleListButton(props){
             // Used to help generate 'filter_blocks_used' (common to all selections made in this interaction)
             const { filter_blocks: filterBlocks } = filterSet;
             const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
-            const selectedFilterBlockIndicesLen = selectedFilterBlockIdxList.length;
+            let selectedFilterBlockIndicesLen = selectedFilterBlockIdxList.length;
+            if (filterBlocks.length === 1 && selectedFilterBlockIndicesLen === 0) {
+                // Only 1 filter block and is active (it can never be inactive, as of 2022-01 at least..)
+                selectedFilterBlockIdxList.push(0);
+                selectedFilterBlockIndicesLen++;
+            }
 
 
             /** Adds/transforms props.selectedVariantSamples to param `variantSampleSelectionsList` */
@@ -148,17 +153,17 @@ export function AddToVariantSampleListButton(props){
                 return existingSelections.map(function(existingSelection){
                     const {
                         variant_sample_item: { "@id": vsItemID },
-                        selected_by: { "@id": selectedByItemID }
+                        selected_by: { "@id": selectedByItemID = null } = {}
                     } = existingSelection;
                     if (!vsItemID) {
                         throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
                     }
-                    console.log("FFF", selectedByItemID);
-                    return {
-                        ...existingSelection,
-                        "variant_sample_item": vsItemID,
-                        "selected_by": selectedByItemID
-                    };
+                    const payload = { ...existingSelection, "variant_sample_item": vsItemID };
+                    if (selectedByItemID) {
+                        // Might not be present if an older VSL selection (no selected_by saved/preserved).
+                        payload.selected_by = selectedByItemID;
+                    }
+                    return payload;
                 });
             }
 
