@@ -270,7 +270,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const headerProps = {
             filterSet, bodyOpen, caseItem,
             haveDuplicateQueries, haveDuplicateNames, allFilterBlockNameQueriesValid,
-            isEditDisabled,
+            isEditDisabled, haveEditPermission,
             // setTitleOfFilterSet,
             isFetchingInitialFilterSetItem,
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
