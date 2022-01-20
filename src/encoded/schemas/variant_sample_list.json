@@ -44,7 +44,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "2"
+            "default": "3"
         },
         "variant_samples": {
             "title": "Variant Samples",
@@ -90,11 +90,6 @@
                                 "description": "If true, search results were from intersection of selected blocks"
                             }
                         }
-                    },
-                    "filter_blocks_request_at_time_of_selection": {
-                        "title": "Filter Block Request (Deprecated)",
-                        "type": "string",
-                        "notes": "This field is deprecated and should be removed, along with contents. Many of the existing values lack some if not all information."
                     },
                     "selected_by": {
                         "title": "Selector",

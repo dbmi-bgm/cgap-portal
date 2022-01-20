@@ -49,3 +49,15 @@ def variant_sample_1_2(value, system):
                     if proband_is_male:
                         index = inheritance_modes.index(existing_label)
                         inheritance_modes[index] = replacement_label
+
+
+
+
+@upgrade_step("variant_sample_list", "2", "3")
+def variant_sample_list_2_3(value, system):
+    """Delete `filter_blocks_request_at_time_of_selection` from selection entries"""
+
+    for selection in value.get("variant_samples", []) + value.get("structural_variant_samples", []):
+        if "filter_blocks_request_at_time_of_selection" in selection:
+            del selection["filter_blocks_request_at_time_of_selection"]
+

@@ -1,4 +1,5 @@
 import pytest
+from copy import deepcopy
 
 from ..upgrade.variant_sample import MALE_ONLY_REPLACEMENTS_1_2, REPLACEMENTS_1_2
 
@@ -82,3 +83,49 @@ def test_upgrade_variant_sample_1_2(inheritance_modes, is_male, app, variant_sam
         for existing_value, replacement_value in MALE_ONLY_REPLACEMENTS_1_2:
             if existing_value in existing_inheritance_modes:
                 assert existing_value in inheritance_modes
+
+
+
+@pytest.fixture
+def variant_sample_list_2_3():
+    """Filter set containing query to upgrade in second filter block."""
+    return {
+        "status": "current",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "variant_samples": [
+            {
+                "selected_by": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+                "date_selected": "2021-07-09T16:42:23.694711+00:00",
+                "variant_sample_item": "013bcc47-3885-4682-99c2-800b95765524",
+                "filter_blocks_used": {
+                    "filter_blocks": [
+                        {
+                            "name": "Breast Cancer",
+                            "query": "associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH"
+                        }
+                    ],
+                    "intersect_selected_blocks": False
+                }
+            },
+            {
+                "selected_by": "834559db-a3f6-462c-81a4-f5d7e5e65707",
+                "date_selected": "2021-07-09T16:42:23.696554+00:00",
+                "variant_sample_item": "ac62850f-6f77-4d3b-9644-41699238d0e2",
+                "filter_blocks_request_at_time_of_selection": "some-gibberish"
+            }
+        ],
+        "created_for_case": "GAPCAJQ1L99X",
+        "uuid": "292250e7-5cb7-4543-85b2-80cd318287b2"
+    }
+
+def test_upgrade_variant_sample_list_2_3(app, variant_sample_list_2_3):
+    """Test filter set upgrader to update inheritance mode strings."""
+    vsl_to_upgrade = deepcopy(variant_sample_list_2_3)
+    upgrader = app.registry["upgrader"]
+    upgrader.upgrade(
+        "filter_set", vsl_to_upgrade, current_version="2", target_version="3"
+    )
+    assert variant_sample_list_2_3["schema_version"] == "2"
+    assert vsl_to_upgrade["schema_version"] == "3"
+    assert "filter_blocks_request_at_time_of_selection" not in vsl_to_upgrade
