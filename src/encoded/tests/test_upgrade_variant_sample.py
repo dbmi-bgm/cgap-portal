@@ -90,6 +90,7 @@ def test_upgrade_variant_sample_1_2(inheritance_modes, is_male, app, variant_sam
 def variant_sample_list_2_3():
     """Filter set containing query to upgrade in second filter block."""
     return {
+        "schema_version": "2",
         "status": "current",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
@@ -128,4 +129,5 @@ def test_upgrade_variant_sample_list_2_3(app, variant_sample_list_2_3):
     )
     assert variant_sample_list_2_3["schema_version"] == "2"
     assert vsl_to_upgrade["schema_version"] == "3"
-    assert "filter_blocks_request_at_time_of_selection" not in vsl_to_upgrade
+    for selection in vsl_to_upgrade.get("variant_samples", []) + vsl_to_upgrade.get("structual_variant_samples", []):
+        assert "filter_blocks_request_at_time_of_selection" not in selection
