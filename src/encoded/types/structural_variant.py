@@ -59,6 +59,42 @@ def build_structural_variant_display_title(sv_type, chrom, start, end):
     return display_title
 
 
+def build_comma_formatted_position(chromosome, start, end):
+    """Create more readable position display with comma-formatted
+    numbers.
+
+    :param chromosome: Chromosome of SV.
+    :type chromosome: str
+    :param start: Start position of SV.
+    :type start: int
+    :param end: End position of SV.
+    :type end: int
+    :returns: Comma-formatted position or None.
+    :rtype: str or None
+    """
+    result = None
+    start = convert_integer_to_comma_string(start)
+    end = convert_integer_to_comma_string(end)
+    if chromosome and start is not None and end is not None:
+        result = "chr%s:%s-%s" % (chromosome, start, end)
+    return result
+
+
+def convert_integer_to_comma_string(value):
+    """Convert integer to comma-formatted string for displaying SV
+    position.
+
+    :param value: Value to format.
+    :type value: int
+    :returns: Comma-formatted integer or None
+    :rtype: str or None
+    """
+    result = None
+    if isinstance(value, int):
+        result = format(value, ",d")
+    return result
+
+
 @collection(
     name="structural-variants",
     properties={
@@ -268,6 +304,27 @@ class StructuralVariant(Item):
         result["omim_genes"] = str(omim_count) + "/" + str(gene_count)
         return result
 
+    @calculated_property(
+        schema={
+            "title": "Formatted Position",
+            "description": "The formatted position of this structural variant",
+            "type": "string",
+        }
+    )
+    def position_display(self, CHROM, START, END):
+        """Create formatted position to display in portal."""
+        return build_comma_formatted_position(CHROM, START, END)
+
+    @calculated_property(
+        schema={
+            "title": "Formatted Position",
+            "description": "The formatted position of this structural variant",
+            "type": "string",
+        }
+    )
+    def hg19_position_display(self, hg19_chr=None, hg19_start=None, hg19_end=None):
+        """Create formatted hg19 position to display in portal."""
+        return build_comma_formatted_position(hg19_chr, hg19_start, hg19_end)
 
 @collection(
     name="structural-variant-samples",
