@@ -41,6 +41,30 @@ log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 
+# For adding additional variant nomenclature options
+AMINO_ACID_ABBREVIATIONS = {
+    'Ala': 'A',
+    'Arg': 'R',
+    'Asn': 'N',
+    'Asp': 'D',
+    'Cys': 'C',
+    'Gln': 'Q',
+    'Glu': 'E',
+    'Gly': 'G',
+    'His': 'H',
+    'Ile': 'I',
+    'Leu': 'L',
+    'Lys': 'K',
+    'Met': 'M',
+    'Phe': 'F',
+    'Pro': 'P',
+    'Ser': 'S',
+    'Thr': 'T',
+    'Trp': 'W',
+    'Tyr': 'T',
+    'Val': 'V'
+}
+
 # Compound Het constants
 CMPHET_PHASED_STRONG = 'Compound Het (Phased/strong_pair)'
 CMPHET_PHASED_MED = 'Compound Het (Phased/medium_pair)'
@@ -349,36 +373,73 @@ class Variant(Item):
         return result
 
     @calculated_property(schema={
-        "title": "Coding Sequence Identifier (short)",
-        "description": "Coding sequence change represented by the variant, starting with 'c.'",
-        "type": "string"
+        "title": "Additional Variant Identifiers",
+        "description": "Additional names/aliases this variant is known as",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
     })
-    def most_severe_hgvsc_short(self, request):
-        """Get coding sequence of variant ('c.') without transcript ID prefixed.
-
-        This will allow users to search on this value (full text query search) in the filtering tab.
+    def additional_variant_names(self, request):
+        """This property will allow users to search for specific variants in the filtering tab,
+        using a few different possible variant names.
+         - c. change
+         - p. change
+         - gene + c. change
+         - gene + p. change (3 letter aa codes)
+         TBD: 1 letter aa codes also needed?
+        NB: talk to front end about tooltip/click box for example searches
         """
-        hgvsc = None
+        names = []
         genes = self.properties.get('genes', [])
-        if genes and genes[0].get('genes_most_severe_hgvsc'):
-            hgvsc = genes[0]['genes_most_severe_hgvsc'].split(':')[-1]
-        return hgvsc
+        if genes:
+            if genes[0].get('genes_most_severe_hgvsc'):
+                names.append(genes[0]['genes_most_severe_hgvsc'].split(':')[-1])
+            if genes[0].get('genes_most_severe_hgvsp'):
+                hgvsp_3 = genes[0]['genes_most_severe_hgvsp'].split(':')[-1]
+                hgvsp_1 = None
+                for key, val in AMINO_ACID_ABBREVIATIONS.items():
+                    if key in hgvsp_3:
+                        hgvsp_1 = hgvsp_3.replace(key, val)
+                names.append(hgvsp_3)
+                if hgvsp_1:
+                    names.append(hgvsp_1)
+        if names:
+            return names
+        else:
+            return
 
-    @calculated_property(schema={
-        "title": "Protein Sequence Identifier (short)",
-        "description": "Protein sequence change represented by the variant, starting with 'p.'",
-        "type": "string"
-    })
-    def most_severe_hgvsp_short(self, request):
-        """Get protein sequence of variant ('p.') without transcript ID prefixed.
-
-        This will allow users to search on this value (full text query search) in the filtering tab.
-        """
-        hgvsp = None
-        genes = self.properties.get('genes', [])
-        if genes and genes[0].get('genes_most_severe_hgvsp'):
-            hgvsp = genes[0]['genes_most_severe_hgvsp'].split(':')[-1]
-        return hgvsp
+    # @calculated_property(schema={
+    #     "title": "Coding Sequence Identifier (short)",
+    #     "description": "Coding sequence change represented by the variant, starting with 'c.'",
+    #     "type": "string"
+    # })
+    # def most_severe_hgvsc_short(self, request):
+    #     """Get coding sequence of variant ('c.') without transcript ID prefixed.
+    #
+    #     This will allow users to search on this value (full text query search) in the filtering tab.
+    #     """
+    #     hgvsc = None
+    #     genes = self.properties.get('genes', [])
+    #     if genes and genes[0].get('genes_most_severe_hgvsc'):
+    #         hgvsc = genes[0]['genes_most_severe_hgvsc'].split(':')[-1]
+    #     return hgvsc
+    #
+    # @calculated_property(schema={
+    #     "title": "Protein Sequence Identifier (short)",
+    #     "description": "Protein sequence change represented by the variant, starting with 'p.'",
+    #     "type": "string"
+    # })
+    # def most_severe_hgvsp_short(self, request):
+    #     """Get protein sequence of variant ('p.') without transcript ID prefixed.
+    #
+    #     This will allow users to search on this value (full text query search) in the filtering tab.
+    #     """
+    #     hgvsp = None
+    #     genes = self.properties.get('genes', [])
+    #     if genes and genes[0].get('genes_most_severe_hgvsp'):
+    #         hgvsp = genes[0]['genes_most_severe_hgvsp'].split(':')[-1]
+    #     return hgvsp
 
 
 @collection(
