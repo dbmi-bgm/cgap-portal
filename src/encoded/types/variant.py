@@ -407,38 +407,6 @@ class Variant(Item):
         else:
             return
 
-    # @calculated_property(schema={
-    #     "title": "Coding Sequence Identifier (short)",
-    #     "description": "Coding sequence change represented by the variant, starting with 'c.'",
-    #     "type": "string"
-    # })
-    # def most_severe_hgvsc_short(self, request):
-    #     """Get coding sequence of variant ('c.') without transcript ID prefixed.
-    #
-    #     This will allow users to search on this value (full text query search) in the filtering tab.
-    #     """
-    #     hgvsc = None
-    #     genes = self.properties.get('genes', [])
-    #     if genes and genes[0].get('genes_most_severe_hgvsc'):
-    #         hgvsc = genes[0]['genes_most_severe_hgvsc'].split(':')[-1]
-    #     return hgvsc
-    #
-    # @calculated_property(schema={
-    #     "title": "Protein Sequence Identifier (short)",
-    #     "description": "Protein sequence change represented by the variant, starting with 'p.'",
-    #     "type": "string"
-    # })
-    # def most_severe_hgvsp_short(self, request):
-    #     """Get protein sequence of variant ('p.') without transcript ID prefixed.
-    #
-    #     This will allow users to search on this value (full text query search) in the filtering tab.
-    #     """
-    #     hgvsp = None
-    #     genes = self.properties.get('genes', [])
-    #     if genes and genes[0].get('genes_most_severe_hgvsp'):
-    #         hgvsp = genes[0]['genes_most_severe_hgvsp'].split(':')[-1]
-    #     return hgvsp
-
 
 @collection(
     name='variant-samples',
