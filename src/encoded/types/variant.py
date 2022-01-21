@@ -373,7 +373,7 @@ class Variant(Item):
         return result
 
     @calculated_property(schema={
-        "title": "Additional Variant Identifiers",
+        "title": "Additional Variant Names",
         "description": "Additional names/aliases this variant is known as",
         "type": "array",
         "items": {
@@ -384,10 +384,8 @@ class Variant(Item):
         """This property will allow users to search for specific variants in the filtering tab,
         using a few different possible variant names.
          - c. change
-         - p. change
-         - gene + c. change
-         - gene + p. change (3 letter aa codes)
-         TBD: 1 letter aa codes also needed?
+         - p. change (3 letter aa code)
+         - p. change (1 letter aa code)
         NB: talk to front end about tooltip/click box for example searches
         """
         names = []
@@ -397,12 +395,12 @@ class Variant(Item):
                 names.append(genes[0]['genes_most_severe_hgvsc'].split(':')[-1])
             if genes[0].get('genes_most_severe_hgvsp'):
                 hgvsp_3 = genes[0]['genes_most_severe_hgvsp'].split(':')[-1]
-                hgvsp_1 = None
+                hgvsp_1 = ''.join(hgvsp_3)
                 for key, val in AMINO_ACID_ABBREVIATIONS.items():
                     if key in hgvsp_3:
-                        hgvsp_1 = hgvsp_3.replace(key, val)
+                        hgvsp_1 = hgvsp_1.replace(key, val)
                 names.append(hgvsp_3)
-                if hgvsp_1:
+                if hgvsp_1 != hgvsp_3:
                     names.append(hgvsp_1)
         if names:
             return names
