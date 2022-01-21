@@ -196,6 +196,5 @@ const FilterBlockTitle = React.memo(function FilterBlockTitle (props) {
  * Accepts no props + is memoized to prevent any updates.
  */
 export const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
-    return <FilterBlock filterBlock={{ "query" : "", "name" : <em>Please wait...</em> }}
-        filterBlocksLen={1} index={0} isSettingFilterBlockIdx={true} />;
+    return <FilterBlock filterBlock={{ "query" : "", "name" : <em>Please wait...</em> }} isSettingFilterBlockIdx selected />;
 });
