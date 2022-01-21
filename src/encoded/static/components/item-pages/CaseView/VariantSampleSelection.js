@@ -174,10 +174,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
 });
 
-const transformSVDisplayTitle = (svs) => {
+/** @todo Consider making this the calculated display_title property for SVs? */
+function transformSVDisplayTitle(svs){
     const { structural_variant: { END, START, CHROM, SV_TYPE, size_display } = {} } = svs || {};
     return `${SV_TYPE} chr${CHROM}:${decorateNumberWithCommas(START)} - ${decorateNumberWithCommas(END)} [${size_display}]`;
-};
+}
 
 /**
  * For now, we just re-use the column render func from some VariantSample columns
@@ -218,7 +219,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     } = context; // `context` refers to our Case in here.
     const {
         date_selected,
-        variant_sample_item: variantSample
+        variant_sample_item: variantSample,
+        selected_by: selectedByUser,
     } = selection;
 
     const toggleSelectedVSDeletionFx = searchType === "VariantSample" ? toggleVariantSampleSelectionDeletion: toggleStructuralVariantSampleSelectionDeletion;
@@ -272,37 +274,44 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         interpretation: clinicalInterpretationNote = null,
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
-        gene_notes: lastGeneNote = null
+        gene_notes: lastGeneNote = null,
+        last_modified: vsLastModified
     } = variantSample || {};
 
-    const { countNotes, countNotesInReport, countNotesInKnowledgeBase } = useMemo(function(){
+    const {
+        countNotes, countNotesInReport, countNotesInKnowledgeBase,
+        lastModifiedInfo
+    } = useMemo(function(){
         const notes = getAllNotesFromVariantSample(variantSample);
         const countNotes = notes.length;
         let countNotesInReport = 0;
         let countNotesInKnowledgeBase = 0;
-        notes.forEach(function({ uuid: noteUUID }){
+        let lastModifiedInfo = vsLastModified; // Check/include variantSample.last_modified.date_modified also.
+        notes.forEach(function({ uuid: noteUUID, last_modified }){
             if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
                 countNotesInReport++;
             }
             if (alreadyInProjectNotes && alreadyInProjectNotes[noteUUID]) {
                 countNotesInKnowledgeBase++;
             }
+            if (!lastModifiedInfo || last_modified.date_modified > lastModifiedInfo.date_modified) {
+                lastModifiedInfo = last_modified;
+            }
         });
-        return { countNotes, countNotesInReport, countNotesInKnowledgeBase };
+        return { countNotes, countNotesInReport, countNotesInKnowledgeBase, lastModifiedInfo };
     }, [ context, variantSample ]);
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
+
+    console.log("LAST MODIFIED", lastModifiedInfo);
 
     let expandedNotesSection = null;
     if (isExpanded) {
         const noteSectionProps = {
             variantSample,
-            toggleSendToProjectStoreItems,
-            toggleSendToReportStoreItems,
-            sendToProjectStore,
-            sendToReportStore,
-            alreadyInProjectNotes,
-            alreadyInReportNotes
+            toggleSendToProjectStoreItems, toggleSendToReportStoreItems,
+            sendToProjectStore, sendToReportStore,
+            alreadyInProjectNotes, alreadyInReportNotes
         };
         expandedNotesSection = <VariantSampleExpandedNotes {...noteSectionProps} />;
     }
@@ -310,13 +319,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const variantIsSNV = searchType === "VariantSample";
 
     // Pull values from SV if SV, SNV if SNV
-    const geneTranscriptColDescription = variantIsSNV ? snvGeneTranscriptColDescription : svGeneTranscriptColDescription;
-    const geneTranscriptColTitle = variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle;
-    const variantColTitle = (variantIsSNV ? snvVariantColTitle : svVariantColTitle );
-    const variantGenotypeLabelColTitle = (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle );
     const variantDisplayTitle = (variantIsSNV ? snvVariantDisplayTitle : transformSVDisplayTitle(variantSample));
-    const variantColDescription = (variantIsSNV ? snvVariantColDescription : svVariantColDescription );
-    const genotypeLabelColDescription = (variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription);
 
     return (
         <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
@@ -361,8 +364,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             <div className="card-body pt-04 pb-08">
                 <div className="row flex-column flex-sm-row">
                     <div className="col col-sm-4 col-lg-2 py-2">
-                        <label className="mb-04 text-small d-block" data-tip={geneTranscriptColDescription}>
-                            { geneTranscriptColTitle || "Gene, Transcript" }
+                        <label className="mb-04 text-small d-block" data-tip={variantIsSNV ? snvGeneTranscriptColDescription : svGeneTranscriptColDescription}>
+                            { (variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle) || "Gene, Transcript" }
                         </label>
                         <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
                             onClick={onClickLinkNavigateChildWindow}>
@@ -375,8 +378,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     </div>
                     { variantIsSNV ?
                         <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small" data-tip={variantColDescription}>
-                                { variantColTitle || "Variant" }
+                            <label className="mb-04 text-small" data-tip={snvVariantColDescription}>
+                                { snvVariantColTitle || "Variant" }
                             </label>
                             <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
                                 onClick={onClickLinkNavigateChildWindow}>
@@ -393,8 +396,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         </div>
                         : null }
                     <div className="col col-sm-4 col-lg-3 py-2">
-                        <label className="mb-04 text-small d-block" data-tip={genotypeLabelColDescription}>
-                            { variantGenotypeLabelColTitle || "Genotype" }
+                        <label className="mb-04 text-small d-block" data-tip={variantIsSNV ? snvGenotypeLabelColDescription : svGenotypeLabelColDescription}>
+                            { (variantIsSNV ? snvGenotypeLabelColTitle : svGenotypeLabelColTitle) || "Genotype" }
                         </label>
                         <ProbandGenotypeLabelColumn result={variantSample} align="left" showIcon />
                     </div>

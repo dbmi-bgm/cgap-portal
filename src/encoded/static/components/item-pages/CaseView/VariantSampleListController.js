@@ -150,6 +150,53 @@ export class VariantSampleListController extends React.PureComponent {
         // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
 
+
+            function commonVSEmbeds(prefix){
+                return [
+                    prefix + ".filter_blocks_used",
+                    prefix + ".date_selected",
+                    prefix + ".selected_by.@id",
+                    prefix + ".selected_by.display_title",
+                    prefix + ".variant_sample_item.@id",
+                    prefix + ".variant_sample_item.uuid",
+                    prefix + ".variant_sample_item.display_title",
+                    prefix + ".variant_sample_item.finding_table_tag",
+                    prefix + ".variant_sample_item.actions",
+                    prefix + ".variant_sample_item.last_modified.date_modified",
+                    prefix + ".variant_sample_item.last_modified.modified_by",
+                    prefix + ".variant_sample_item.associated_genotype_labels.proband_genotype_label",
+                    prefix + ".variant_sample_item.associated_genotype_labels.mother_genotype_label",
+                    prefix + ".variant_sample_item.associated_genotype_labels.father_genotype_label",
+                    ...vsItemNoteEmbeds(prefix)
+                ];
+            }
+
+            function commonNoteEmbeds(prefix){
+                return [
+                    prefix + ".@id",
+                    prefix + ".uuid",
+                    prefix + ".last_modified.date_modified",
+                    prefix + ".last_modified.modified_by.@id",
+                    prefix + ".last_modified.modified_by.display_title",
+                    prefix + ".status",
+                    prefix + ".associated_items.item_type",
+                    prefix + ".associated_items.item_identifier",
+                    prefix + ".note_text"
+                ];
+            }
+
+            function vsItemNoteEmbeds(prefix){
+                return [
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.interpretation"),
+                    prefix + ".variant_sample_item.interpretation.classification",
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.discovery_interpretation"),
+                    prefix + ".variant_sample_item.discovery_interpretation.gene_candidacy",
+                    prefix + ".variant_sample_item.discovery_interpretation.variant_candidacy",
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.variant_notes"),
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.gene_notes"),
+                ];
+            }
+
             scopedRequest = this.currentRequest = ajax.load(
                 "/embed",
                 vslFetchCallback,
@@ -164,18 +211,8 @@ export class VariantSampleListController extends React.PureComponent {
                         "@id",
                         // All immediate fields off of "variant_samples" must be embedded, else they will be lost in subsequent PATCH requests.
                         // This includes "filter_blocks_used", "date_selected", "variant_sample_item.@id", & "selected_by.@id"
-                        "variant_samples.filter_blocks_used",
-                        "variant_samples.date_selected",
-                        "variant_samples.selected_by.@id",
-                        "variant_samples.selected_by.display_title",
-                        "variant_samples.variant_sample_item.@id",
-                        "variant_samples.variant_sample_item.uuid",
-                        "variant_samples.variant_sample_item.display_title",
-                        "variant_samples.variant_sample_item.finding_table_tag",
-                        "variant_samples.variant_sample_item.actions",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
+                        ...commonVSEmbeds("variant_samples"),
+                        ...commonVSEmbeds("structural_variant_samples"),
 
                         "variant_samples.variant_sample_item.variant.@id",
                         "variant_samples.variant_sample_item.variant.display_title",
@@ -185,16 +222,6 @@ export class VariantSampleListController extends React.PureComponent {
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
                         "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
 
-                        // structural variant sample embeds (TODO: add more as needed)
-                        "structural_variant_samples.filter_blocks_used",
-                        "structural_variant_samples.date_selected",
-                        "structural_variant_samples.selected_by.@id",
-                        "structural_variant_samples.selected_by.display_title",
-                        "structural_variant_samples.variant_sample_item.@id",
-                        "structural_variant_samples.variant_sample_item.uuid",
-                        "structural_variant_samples.variant_sample_item.display_title",
-                        "structural_variant_samples.variant_sample_item.finding_table_tag",
-                        "structural_variant_samples.variant_sample_item.actions",
                         "structural_variant_samples.variant_sample_item.structural_variant.@id",
                         "structural_variant_samples.variant_sample_item.structural_variant.display_title",
                         "structural_variant_samples.variant_sample_item.structural_variant.END",
@@ -203,12 +230,7 @@ export class VariantSampleListController extends React.PureComponent {
                         "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
                         "structural_variant_samples.variant_sample_item.structural_variant.size_display",
                         "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title",
-                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
 
-                        // VariantSampleItem Notes (for CaseReviewTab)
-                        ...variantSampleListItemNoteEmbeds
                     ]
                 })
             );
@@ -244,31 +266,4 @@ export class VariantSampleListController extends React.PureComponent {
 
 
 
-function commonNoteEmbedFields(prefix){
-    return [
-        prefix + ".@id",
-        prefix + ".uuid",
-        prefix + ".last_modified.date_modified",
-        prefix + ".status",
-        prefix + ".associated_items.item_type",
-        prefix + ".associated_items.item_identifier",
-        prefix + ".note_text"
-    ];
-}
 
-/**
- * List of Note item fields to embed from VariantSampleList Items.
- * To be used as a part of `fields` /embed payload(s).
- */
-export const variantSampleListItemNoteEmbeds = [
-    ...commonNoteEmbedFields("variant_samples.variant_sample_item.interpretation"),
-    "variant_samples.variant_sample_item.interpretation.classification",
-
-    ...commonNoteEmbedFields("variant_samples.variant_sample_item.discovery_interpretation"),
-    "variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy",
-    "variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy",
-
-    ...commonNoteEmbedFields("variant_samples.variant_sample_item.variant_notes"),
-
-    ...commonNoteEmbedFields("variant_samples.variant_sample_item.gene_notes"),
-];
