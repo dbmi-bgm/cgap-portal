@@ -30,6 +30,8 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
             'bamSampleId' : props.bamSampleId ? props.bamSampleId : null,
             'samples' : props.samples ? props.samples : null,
             'higlassSvVcf': props.higlassSvVcf ? props.higlassSvVcf : null,
+            'cohortVcfLocation': props.cohortVcfLocation ? props.cohortVcfLocation : null,
+            'cohortDensityBwLocation': props.cohortDensityBwLocation ? props.cohortDensityBwLocation : null,
             'file' : props.file ? props.file : null,
         };
         this.containerRef = React.createRef();
@@ -126,6 +128,14 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                 };
                 this.getViewconf(payload, fallbackCallback);
             }
+            else if(requestingTab === "cohort"){
+                const { cohortVcfLocation, cohortDensityBwLocation } = this.state;
+                const payload = {
+                    'cohort_vcf_location' : cohortVcfLocation,
+                    'cohort_density_bw_location' : cohortDensityBwLocation
+                };
+                this.getViewconf(payload, fallbackCallback, "/get_higlass_cohort_viewconf/");
+            }
             else{
 
                 const payload = {
@@ -138,10 +148,11 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
         });
     }
 
-    getViewconf(payload, fallbackCallback){
+
+    getViewconf(payload, fallbackCallback, endpoint="/get_higlass_viewconf/"){
 
         ajax.load(
-            "/get_higlass_viewconf/",
+            endpoint,
             (resp) => {
                 const higlassItem = {
                     viewconfig:  resp.viewconfig

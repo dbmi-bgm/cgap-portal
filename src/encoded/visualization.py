@@ -27,6 +27,7 @@ def includeme(config):
         traverse='/{file_uuid}'
     )
     config.add_route('get_higlass_viewconf', '/get_higlass_viewconf/')
+    config.add_route('get_higlass_cohort_viewconf', '/get_higlass_cohort_viewconf/')
     config.scan(__name__)
 
 
@@ -337,6 +338,64 @@ def get_higlass_viewconf(context, request):
         "errors": "",
         "viewconfig" : higlass_viewconfig
     }
+
+@view_config(route_name='get_higlass_cohort_viewconf', request_method='POST')
+@debug_log
+def get_higlass_cohort_viewconf(context, request):
+    """ Get the Higlass cohort viewconf, given the file locations on S3
+    Args:
+        request(obj): Http request object. Assumes request's request is JSON and contains these keys:
+            cohort_vcf_location(str) : location of the VCF file on S3
+            cohort_density_bw_location(str) : location of the density bigwig file on S3
+
+    Returns:
+        A dictionary.
+            success(bool)       : Boolean indicating success.
+            errors(str)         : A string containing errors. Will be None if this is successful.
+            viewconfig(dict)    : Dict representing the new viewconfig.
+    """
+
+    viewconf_uuid = "b87c03bb-6c14-496c-9826-896257ae783f"
+    default_higlass_viewconf = get_item_or_none(request, viewconf_uuid)
+    higlass_viewconfig = default_higlass_viewconf["viewconfig"] if default_higlass_viewconf else None
+
+    # If no view config could be found, fail
+    if not higlass_viewconfig:
+        return {
+            "success" : False,
+            "errors": "No view config found.",
+            "viewconfig": None
+        }
+
+    cohort_vcf_location = request.json_body.get('cohort_vcf_location', None)  
+    cohort_density_bw_location = request.json_body.get('cohort_density_bw_location', None) 
+
+    if not cohort_vcf_location or not cohort_density_bw_location:
+        return {
+            "success" : False,
+            "errors": "Some data files have not been specified.",
+            "viewconfig": None
+        }
+
+    views = higlass_viewconfig['views']
+    for view in views:
+        top_tracks = view['tracks']['top']
+        for track in top_tracks:
+            if track['uid'] == "cohort_track":
+                vcf_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"])
+                track['data']['vcfUrl'] = vcf_url
+                tbi_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"]+".tbi")
+                track['data']['tbiUrl'] = tbi_url
+            elif track['uid'] == "density_track":
+                bw_url = create_presigned_url(cohort_density_bw_location["bucket"], cohort_density_bw_location["key"])
+                track['data']['url'] = bw_url
+
+    return {
+        "success" : True,
+        "errors": "",
+        "viewconfig" : higlass_viewconfig
+    }
+
 
 def create_presigned_url(bucket_name, object_name, expiration=3600):
     """Generate a presigned URL to share an S3 object
