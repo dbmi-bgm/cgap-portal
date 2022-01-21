@@ -1,0 +1,35 @@
+
+<h5>
+    Breakpoint locations are determined relative to the transcript based on VEP
+    annotations.
+</h5>
+
+<p>
+Most transcripts have sufficient annotation information to calculate where the
+structural variant starts and ends relative to the 5 prime and 3 prime ends of the
+transcript. Possible values include:
+</p>
+<ul>
+    <li>
+        <b> Upstream </b>: Breakpoint is located beyond the 5 prime UTR.
+    <li>
+        <b> Downstream </b>: Breakpoint is located beyond the 3 prime UTR.
+    <li>
+        <b> 5 prime UTR </b>: Breakpoint is located within the 5 prime UTR.
+    <li>
+        <b> 3 prime UTR </b>: Breakpoint is located within the 3 prime UTR.
+    <li>
+        <b> Upstream or 5 prime UTR </b>: Breakpoint is located either upstream of or
+        within the 5 prime UTR (insufficient information to determine which).
+    <li>
+        <b> 3 prime UTR or Downstream </b>: Breakpoint is located either in the 3 prime
+        UTR or downstream of it (insufficient information to determine which).
+    <li>
+        <b> Exonic </b>: Breakpoint is located within an exon.
+    <li>
+        <b> Intronic </b>: Breakpoint is located within an intron.
+    <li>
+        <b> Within miRNA </b>: Breakpoint is located within an miRNA coding region.
+    <li>
+        <b> Indeterminate </b>: Insufficient information to determine a location for the
+        breakpoint relative to the transcript.
