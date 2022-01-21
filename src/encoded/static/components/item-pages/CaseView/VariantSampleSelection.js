@@ -4,14 +4,17 @@ import React, { useCallback, useMemo, useState } from 'react';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
+import Popover from 'react-bootstrap/esm/Popover';
+import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+
+import { buildSchemaFacetDictionary } from './../../util/Schemas';
 import { onClickLinkNavigateChildWindow } from './../components/child-window-reuser';
 
 import {
-    variantSampleColumnExtensionMap,
     structuralVariantSampleColumnExtensionMap,
     GenesMostSevereDisplayTitle,
     GenesMostSevereHGVSCColumn,
@@ -19,6 +22,7 @@ import {
     StructuralVariantTranscriptColumn
 } from './../../browse/variantSampleColumnExtensionMap';
 import { getAllNotesFromVariantSample } from './variant-sample-selection-panels';
+import { FilterBlock } from './FilteringTableFilterSetUI/FilterBlock';
 
 // TEMPORARY:
 import { projectReportSettings } from './../ReportView/project-settings-draft';
@@ -93,6 +97,19 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         return tableTagsByID;
     }, [ projectReportSettings ]);
 
+    const { snvFacetDict, cnvFacetDict } = useMemo(function(){
+        const fullSchemaFacetDict = buildSchemaFacetDictionary(schemas);
+        const { "VariantSample": snvFacetDict = {}, "StructuralVariantSample": cnvFacetDict = {} } = fullSchemaFacetDict;
+        // Treat 'q' as a facet/filter when used in filterblocks.
+        snvFacetDict["q"] = cnvFacetDict["q"] = {
+            "title": "Text Search",
+            "field": "q",
+            "order": -100
+        };
+        return { snvFacetDict, cnvFacetDict };
+    }, [ schemas ]);
+
+
     if (vsSelections.length === 0 && cnvSelections.length === 0) {
         return (
             <h4 className="text-400 text-center text-secondary py-3">
@@ -130,7 +147,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
         return (
             <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="VariantSample"
-                {...{ selection, index, unsavedClassification, isDeleted }}  />
+                {...{ selection, index, unsavedClassification, isDeleted }} facetDict={snvFacetDict}  />
         );
     });
 
@@ -147,11 +164,8 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
         const isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
         return (
-            // <div key={vsUUID}>
-            //     { display_title }
-            // </div>
             <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="StructuralVariantSample"
-                {...{ selection, index, unsavedClassification, isDeleted }}  />
+                {...{ selection, index, unsavedClassification, isDeleted }} facetDict={cnvFacetDict}   />
         );
     });
 
@@ -197,6 +211,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         context,    // Case
         schemas,
         parentTabType = parentTabTypes.INTERPRETATION,
+        facetDict,  // Derived from schemas in VariantSampleSelectionList
         // From InterpretationTab (if used):
         toggleVariantSampleSelectionDeletion,
         toggleStructuralVariantSampleSelectionDeletion,
@@ -220,7 +235,9 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const {
         date_selected,
         variant_sample_item: variantSample,
-        selected_by: selectedByUser,
+        selected_by: {
+            display_title: selectedByUserDisplayTitle
+        }
     } = selection;
 
     const toggleSelectedVSDeletionFx = searchType === "VariantSample" ? toggleVariantSampleSelectionDeletion: toggleStructuralVariantSampleSelectionDeletion;
@@ -303,7 +320,12 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
 
-    console.log("LAST MODIFIED", lastModifiedInfo);
+    const {
+        date_modified: dateAnyNoteLastModified,
+        modified_by: {
+            display_title: lastModifiedUserDisplayTitle
+        }
+    } = lastModifiedInfo;
 
     let expandedNotesSection = null;
     if (isExpanded) {
@@ -413,9 +435,17 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             </div>
 
             <div className="card-body border-top attribution-section pt-1 pb-08">
-                <div className="d-flex align-items-center">
-                    <div className="flex-auto text-small" data-tip="Date Selected">
-                        <i className="icon icon-calendar-check far mr-07"/>
+                <div className="row align-items-center">
+                    <div className="col text-small">
+                        <FilterBlocksUsedPopovers {...{ selection, facetDict }} />
+                    </div>
+                    <div className="col-auto text-small"
+                        data-tip={"Last modified (any note or the sample itself)" + (lastModifiedUserDisplayTitle ? " by " + lastModifiedUserDisplayTitle : "")}>
+                        <i className="icon icon-calendar far mr-07"/>
+                        <LocalizedTime timestamp={dateAnyNoteLastModified} />
+                    </div>
+                    <div className="col-auto text-small" data-tip={"Date added to interpretation"  + (selectedByUserDisplayTitle ? " by " + selectedByUserDisplayTitle : "")}>
+                        <i className="icon icon-calendar-plus far mr-07"/>
                         <LocalizedTime timestamp={date_selected} />
                     </div>
                 </div>
@@ -650,6 +680,65 @@ function ClassificationDropdown(props){
 
 
 
+function FilterBlocksUsedPopovers (props) {
+    const {
+        selection: {
+            filter_blocks_used: {
+                filter_blocks: filterBlocksUsed = [],
+                intersect_selected_blocks: filterBlocksIntersected = false
+            }
+        },
+        facetDict = {}
+    } = props;
+
+    const links = filterBlocksUsed.map(function(filterBlock, index){
+        const link = <FilterBlockPopover {...{ filterBlock, index, facetDict }} key={index} />;
+        if (index !== 0) {
+            return (
+                <React.Fragment key={index}>
+                    , { link }
+                </React.Fragment>
+            );
+        }
+        return link;
+    });
+
+    return (
+        <React.Fragment>
+            <i className="icon icon-object-ungroup far mr-07" data-tip="Matched all of the following filter blocks when it was added" />
+            { links }
+        </React.Fragment>
+    );
+}
+
+function FilterBlockPopover(props){
+    const { filterBlock, index, facetDict } = props;
+    const { name } = filterBlock;
+
+    const popover = (
+        <Popover className="filterset-block-popover">
+            <Popover.Title className="m-0 text-400 bg-secondary text-light" as="h5">{ name }</Popover.Title>
+            <Popover.Content className="rounded-bottom p-2">
+                <FilterBlock {...{ filterBlock, index, facetDict }} showTitle={false} />
+            </Popover.Content>
+        </Popover>
+    );
+
+    return (
+        <OverlayTrigger trigger="click" rootClose overlay={popover}>
+            { function({ ref, ...triggerHandlers }){
+                return (
+                    <button type="button" ref={ref} { ...triggerHandlers }
+                        className="btn p-0 btn-sm btn-link">
+                        { name || <em>Untitled Block { index }</em> }
+                    </button>
+                );
+            }}
+        </OverlayTrigger>
+    );
+}
+
+
 const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator({ showIcon = true }){
     return (
         <span className="text-left text-muted text-truncate">
@@ -658,6 +747,7 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
         </span>
     );
 });
+
 
 
 

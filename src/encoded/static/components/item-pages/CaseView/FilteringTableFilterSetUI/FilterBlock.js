@@ -13,43 +13,37 @@ import { FieldBlocks } from './FieldBlocks';
 
 export const FilterBlock = React.memo(function FilterBlock(props){
     const {
-        index,
+        index = 0,
         filterBlock,
         selected = false,
-        // searchContext,
         removeFilterBlockAtIdx,
         setNameOfFilterBlockAtIdx,
         selectFilterBlockIdx,
-        isSettingFilterBlockIdx,
+        isSettingFilterBlockIdx = false,
         facetDict,
-        duplicateQueryIndices,
-        duplicateNameIndices,
-        savedToVSLFilterBlockQueries,
-        cachedCounts,
-        allFilterBlockNameQueriesValid,
-        filterBlocksLen,
-        schemas
+        duplicateQueryIndices = {},
+        duplicateNameIndices = {},
+        savedToVSLFilterBlockQueries = {},
+        cachedCounts = {},
+        allFilterBlockNameQueriesValid = true,
+        filterBlocksLen = 1,
+        schemas = null,
+        showTitle = true,
+        className = null
     } = props;
 
-    const {
-        query: filterStrQuery,
-        name: filterName
-    } = filterBlock;
-
-    const cachedCount = cachedCounts[index];
+    const { query: filterStrQuery, name: filterName } = filterBlock;
 
     /**
-     * The following 3 assignments are memoized since string comparisons are slower than object
-     * reference and integer comparisons.
-     * Also, `duplicateQueryIndices` etc. are objects (not arrays), but for insertion & lookup,
+     * `duplicateQueryIndices` etc. are objects (not arrays), but for insertion & lookup,
      * integer key (`index`) is auto-cast to string in both instances, so works fine. Just
      * keep in mind if do `Object.keys(duplicateQueryIndices)` or similar at any point, that
      * would get back list of strings (not ints) and need to compare `parseInt(key) === index`,
      * if ever necessary.
      */
-    const isDuplicateQuery = useMemo(function(){ return typeof duplicateQueryIndices[index] === "number"; }, [ duplicateQueryIndices, index ]);
-    const isDuplicateName = useMemo(function(){ return typeof duplicateNameIndices[index] === "number"; }, [ duplicateNameIndices, index ]);
-    const countExists = useMemo(function(){ return typeof cachedCount === "number"; }, [ cachedCounts, index ]);
+    const isDuplicateQuery = typeof duplicateQueryIndices[index] === "number";
+    const isLoadingBlock = (selected && isSettingFilterBlockIdx);
+
     const isValidNameContentsToSaveToVariantSampleList = useMemo(function(){
         if (allFilterBlockNameQueriesValid) {
             return true;
@@ -68,12 +62,6 @@ export const FilterBlock = React.memo(function FilterBlock(props){
         setIsEditingTitle(false);
     }
 
-    const onEditClick = useCallback(function(e){
-        e.stopPropagation();
-        e.preventDefault();
-        setIsEditingTitle(true);
-    }, [ setIsEditingTitle ]);
-
     const onRemoveClick = useCallback(function(e){
         e.stopPropagation();
         if (filterStrQuery && !isDuplicateQuery) {
@@ -90,13 +78,54 @@ export const FilterBlock = React.memo(function FilterBlock(props){
             // Workaround to prevent selection of text on shift+mousedown.
             window.document.getSelection().removeAllRanges();
         }
+        if (typeof selectFilterBlockIdx !== "function") {
+            return false;
+        }
         selectFilterBlockIdx(index, !e.shiftKey);
     }, [ index, selectFilterBlockIdx ]);
 
+    const cls = (
+        "filterset-block" +
+        (selected ? " selected" : "") +
+        (!isEditingTitle && filterBlocksLen > 1 && typeof selectFilterBlockIdx === "function" ? " clickable" : "") +
+        (className ? " " + className : "")
+    );
 
-    let title = null;
-    if (isEditingTitle && !isSettingFilterBlockIdx) {
-        title = (
+    return (
+        <div className={cls} onClick={!isEditingTitle ? onSelectClick : null}
+            data-duplicate-query={isDuplicateQuery}
+            data-name-value-differs-in-existing-selection={!isValidNameContentsToSaveToVariantSampleList}
+            tabIndex={!isEditingTitle && filterBlocksLen > 1 ? 0 : null}
+            data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
+            { showTitle ?
+                <FilterBlockTitle onRemoveClick={typeof removeFilterBlockAtIdx === "function" ? onRemoveClick : null}
+                    isOnlyFilterBlock={filterBlocksLen === 1} cachedCount={cachedCounts[index]} {...{ filterName, index, isEditingTitle, setIsEditingTitle,
+                        isLoadingBlock, isValidNameContentsToSaveToVariantSampleList, setNameOfFilterBlockAtIdx, duplicateNameIndices }} />
+                : null }
+            <FieldBlocks {...{ filterBlock, facetDict, schemas }} />
+        </div>
+    );
+});
+
+const FilterBlockTitle = React.memo(function FilterBlockTitle (props) {
+    const {
+        filterName, isOnlyFilterBlock = true, index = 0,
+        isEditingTitle, setIsEditingTitle,
+        isLoadingBlock = false,
+        isValidNameContentsToSaveToVariantSampleList = true,
+        setNameOfFilterBlockAtIdx, onRemoveClick,
+        duplicateNameIndices, cachedCount
+    } = props;
+
+    const onEditClick = useCallback(function(e){
+        e.stopPropagation();
+        e.preventDefault();
+        setIsEditingTitle(true);
+    }, [ setIsEditingTitle ]);
+
+    let innerTitle = null;
+    if (isEditingTitle) {
+        innerTitle = (
             <form className="w-100 d-flex align-items-center mb-0" action="#case-info.filtering" autoComplete="off" onSubmit={function(e){
                 e.stopPropagation();
                 e.preventDefault();
@@ -119,26 +148,25 @@ export const FilterBlock = React.memo(function FilterBlock(props){
             </form>
         );
     } else {
-        const isLoadingBlock = (selected && isSettingFilterBlockIdx);
-        const deleteIconCls = (
-            "icon fas mr-07 icon-"
-            + (isLoadingBlock ? "circle-notch icon-spin" : "times-circle clickable")
-            + (filterBlocksLen > 1 ? "" : " disabled")
-        );
+        const isDuplicateName = typeof duplicateNameIndices[index] === "number";
+        const deleteIconCls = "icon fas mr-07 clickable icon-times-circle" + (!isOnlyFilterBlock ? "" : " disabled");
         const titleCls = "text-small pt-02" + (
             (isDuplicateName || !isValidNameContentsToSaveToVariantSampleList) ? " text-danger"
                 : !filterName ? " text-secondary"
                     : ""
         );
 
-        title = (
+        innerTitle = (
             <React.Fragment>
-                <i className={deleteIconCls} onClick={!isLoadingBlock && filterBlocksLen > 1 ? onRemoveClick : null}
-                    data-tip={!isLoadingBlock && filterBlocksLen > 1 ? "Delete this filter block" : "Can't delete last filter block"} />
+                { !isLoadingBlock && typeof onRemoveClick === "function" ?
+                    <i className={deleteIconCls} onClick={!isOnlyFilterBlock ? onRemoveClick : null}
+                        data-tip={!isOnlyFilterBlock ? "Delete this filter block" : "Can't delete last filter block"} />
+                    : null }
+                { isLoadingBlock ? <i className="icon fas mr-07 icon-circle-notch icon-spin" /> : null }
                 <span className={titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
-                { typeof filterName === "string" ?
+                { typeof setNameOfFilterBlockAtIdx === "function" && typeof filterName === "string" ?
                     // Prevent [attempts at] editing of JSX/non-string 'filterName' values. Should only occur for hardcoded-UI stuff like DummyLoadingFilterBlock
                     <i className="icon icon-pencil-alt fas ml-1 clickable text-smaller align-self-start" onClick={onEditClick} />
                     : null }
@@ -146,29 +174,18 @@ export const FilterBlock = React.memo(function FilterBlock(props){
         );
     }
 
-    const cls = (
-        "filterset-block" +
-        (selected ? " selected" : "") +
-        (!isEditingTitle && filterBlocksLen > 1 ? " clickable" : "")
-    );
+    const countExists = typeof cachedCount === "number";
 
     return (
-        <div className={cls} onClick={!isEditingTitle ? onSelectClick : null}
-            data-duplicate-query={isDuplicateQuery}
-            data-name-value-differs-in-existing-selection={!isValidNameContentsToSaveToVariantSampleList}
-            tabIndex={!isEditingTitle && filterBlocksLen > 1 ? 0 : null}
-            data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
-            <div className="d-flex align-items-center px-2 pt-08 pb-04 title-controls-row">
-                <div className="flex-grow-1 d-flex align-items-center">
-                    { title }
-                </div>
-                <div className="flex-grow-0 pl-16">
-                    <div className="cached-counts-value" data-count-exists={countExists} data-tip={countExists ? cachedCount + " results found for this filter block." : null}>
-                        { cachedCount }
-                    </div>
+        <div className="d-flex align-items-center px-2 pt-08 pb-04 title-controls-row">
+            <div className="flex-grow-1 d-flex align-items-center">
+                { innerTitle }
+            </div>
+            <div className="flex-grow-0 pl-16">
+                <div className="cached-counts-value" data-count-exists={countExists} data-tip={countExists ? cachedCount + " results found for this filter block." : null}>
+                    { cachedCount }
                 </div>
             </div>
-            <FieldBlocks {...{ filterBlock, facetDict, schemas }} />
         </div>
     );
 });
@@ -179,8 +196,6 @@ export const FilterBlock = React.memo(function FilterBlock(props){
  * Accepts no props + is memoized to prevent any updates.
  */
 export const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlock(){
-    const dummyObject = {};
     return <FilterBlock filterBlock={{ "query" : "", "name" : <em>Please wait...</em> }}
-        filterBlocksLen={1} index={0} selected={false} isSettingFilterBlockIdx={true}
-        cachedCounts={dummyObject} duplicateQueryIndices={dummyObject} duplicateNameIndices={dummyObject} savedToVSLFilterBlockQueries={dummyObject} />;
+        filterBlocksLen={1} index={0} isSettingFilterBlockIdx={true} />;
 });
