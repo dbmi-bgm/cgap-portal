@@ -264,7 +264,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
     );
 }
 function GDNAList({ context }){
-    const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const fallbackElem = <em> Not Available </em>;
     const { variant = {} } = context;
     const {
         // mutanno_hgvsg = fallbackElem, // (temporarily?) removed
@@ -285,7 +285,7 @@ function GDNAList({ context }){
                 <div className="col-12 col-md-7">{ hgvsg }</div>
             </div>
             {/* Legacy GRCh37/hg19 support. */}
-            <div className="row pb-1 pb-md-03" key="GCRCh37">
+            <div className="row pb-1 pb-md-03" key="GRCh37">
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
                 <div className="col-12 col-md-2 ">{ hg19_chr }</div>
                 <div className="col-12 col-md-7">{ hgvsg_hg19 }</div>
