@@ -83,7 +83,7 @@ export function AddToVariantSampleListButton(props){
         // Indicates lack of view permission for existing VSL (most likely no edit permission disabled for Case anyways, but permissions may change/differ in future)
         return (
             <button type="button" className="btn btn-danger" disabled>
-                <span data-tip="Check for any errors above such as duplicate filter block name or changing contents of a filter block that's been used to add a sample already. Otherwise, check user permssions.">
+                <span data-tip="Check for any errors above such as a duplicate filter block name or a change to the contents of a filter block that has been used to add a sample already. Otherwise, check user permissions.">
                     { regularTitle }
                 </span>
             </button>
