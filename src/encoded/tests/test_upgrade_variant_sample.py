@@ -129,5 +129,7 @@ def test_upgrade_variant_sample_list_2_3(app, variant_sample_list_2_3):
     )
     assert variant_sample_list_2_3["schema_version"] == "2"
     assert vsl_to_upgrade["schema_version"] == "3"
-    for selection in vsl_to_upgrade.get("variant_samples", []) + vsl_to_upgrade.get("structual_variant_samples", []):
+    all_selections = vsl_to_upgrade.get("variant_samples", []) + vsl_to_upgrade.get("structual_variant_samples", [])
+    assert len(all_selections) == 2
+    for selection in all_selections:
         assert "filter_blocks_request_at_time_of_selection" not in selection

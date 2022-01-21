@@ -63,6 +63,7 @@
                         "type": "object",
                         "title": "Filter Blocks Information",
                         "description": "Information about the FilterSet and its blocks used at time of selection",
+                        "additionalProperties": false,
                         "properties": {
                             "filter_blocks": {
                                 "type": "array",
@@ -72,6 +73,7 @@
                                     "title": "Filter Block",
                                     "description": "Name and contents must be unique within a Variant Sample List",
                                     "notes": "May also include flags_applied or other properties at some point.",
+                                    "additionalProperties": false,
                                     "properties": {
                                         "name": {
                                             "type": "string",
@@ -133,6 +135,7 @@
                         "type": "object",
                         "title": "Filter Blocks Information",
                         "description": "Information about the FilterSet and its blocks used at time of selection",
+                        "additionalProperties": false,
                         "properties": {
                             "filter_blocks": {
                                 "type": "array",
@@ -142,6 +145,7 @@
                                     "title": "Filter Block",
                                     "description": "Name and contents must be unique within a Variant Sample List",
                                     "notes": "May also include flags_applied or other properties at some point.",
+                                    "additionalProperties": false,
                                     "properties": {
                                         "name": {
                                             "type": "string",
