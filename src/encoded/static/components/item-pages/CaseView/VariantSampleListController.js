@@ -167,7 +167,15 @@ export class VariantSampleListController extends React.PureComponent {
                     prefix + ".variant_sample_item.associated_genotype_labels.proband_genotype_label",
                     prefix + ".variant_sample_item.associated_genotype_labels.mother_genotype_label",
                     prefix + ".variant_sample_item.associated_genotype_labels.father_genotype_label",
-                    ...vsItemNoteEmbeds(prefix)
+
+                    // Notes
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.interpretation"),
+                    prefix + ".variant_sample_item.interpretation.classification",
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.discovery_interpretation"),
+                    prefix + ".variant_sample_item.discovery_interpretation.gene_candidacy",
+                    prefix + ".variant_sample_item.discovery_interpretation.variant_candidacy",
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.variant_notes"),
+                    ...commonNoteEmbeds(prefix + ".variant_sample_item.gene_notes"),
                 ];
             }
 
@@ -182,18 +190,6 @@ export class VariantSampleListController extends React.PureComponent {
                     prefix + ".associated_items.item_type",
                     prefix + ".associated_items.item_identifier",
                     prefix + ".note_text"
-                ];
-            }
-
-            function vsItemNoteEmbeds(prefix){
-                return [
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.interpretation"),
-                    prefix + ".variant_sample_item.interpretation.classification",
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.discovery_interpretation"),
-                    prefix + ".variant_sample_item.discovery_interpretation.gene_candidacy",
-                    prefix + ".variant_sample_item.discovery_interpretation.variant_candidacy",
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.variant_notes"),
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.gene_notes"),
                 ];
             }
 
