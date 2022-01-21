@@ -1895,8 +1895,8 @@ i.status-indicator-dot {
 				transition: none;
 			}
 
-
-			&[data-duplicate-query="true"] {
+			&[data-duplicate-query="true"],
+			&[data-name-value-differs-in-existing-selection="true"] {
 				background-color: desaturate(lighten($danger, 45%), 10%);
 				&.selected {
 					border-color: desaturate(lighten($danger, 10%), 20%);
