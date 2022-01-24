@@ -179,9 +179,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 overall_quality_status = "",
                 qc_list = [],
                 "@id": qmId,
-                url: qmUrl = qmId || "",
             } = quality_metric;
 
+            const qmUrl = qmId + '/@@download'; // send to @@download instead of url (deprecated) - Will Jan 24 2022
             const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
 
             let fileOverallQuality = "PASS";
