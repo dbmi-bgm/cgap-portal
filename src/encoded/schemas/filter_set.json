@@ -47,7 +47,7 @@
         "status": {
             "title": "Status",
             "type": "string",
-            "default": "in review",
+            "default": "draft",
             "notes": "Unlike the status definition in mixins, this lacks permission:restricted_fields so people may edit FilterSet statuses they've saved.",
             "enum": [
                 "shared",
@@ -55,6 +55,7 @@
                 "current",
                 "inactive",
                 "in review",
+                "draft",
                 "deleted"
             ]
         },

@@ -88,7 +88,7 @@ class CompoundSearchBuilder:
     @staticmethod
     def format_result_for_endpoint_response(request, es_results, filter_set, result_sort, search_builder_instance):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
-            setting status on the request if needed. Also sets "__matching_filter_block_indices" computed field to identify
+            setting status on the request if needed. Also sets "__matching_filter_block_names" computed field to identify
             which filter block indices the result matched.
 
         :param request: current request
@@ -106,12 +106,12 @@ class CompoundSearchBuilder:
         for hit in es_results['hits'].get("hits", []):
             result = hit['_source']['embedded']
             # Matched query names are returned as string here, regardless of their specified original type.
-            result["__matching_filter_block_indices"] = hit.get("matched_queries", [])
+            result["__matching_filter_block_names"] = hit.get("matched_queries", [])
             result_list.append(result)
 
         columns = SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ])
-        # We used multiple filter blocks, so we add in column for "__matching_filter_block_indices"
-        columns["__matching_filter_block_indices"] = {
+        # We used multiple filter blocks, so we add in column for "__matching_filter_block_names"
+        columns["__matching_filter_block_names"] = {
             "title": "Filter Blocks Matched",
             "order": 1000
         }

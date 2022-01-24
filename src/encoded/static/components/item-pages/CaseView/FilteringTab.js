@@ -157,7 +157,11 @@ function createBlankFilterSetItem(searchType, caseAccession){
                 "name" : "Filter Block 1",
                 "query" : ""
             }
-        ]
+        ],
+        // Any FilterSet saved to Case should have "current" or "in review" by default so others in Project can see/edit it as well.
+        // It may make sense to upgrade to status=shared or similar for public/knowledgebase data, though.
+        // But not any lower than "current", "in review", or "shared to project"
+        "status": "current"
     };
 }
 
@@ -358,7 +362,7 @@ function FilteringTabBody(props) {
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+        <ajax.FetchedItem atId={activeFilterSetID + "?datastore=database"} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
             onFail={onFailInitialFilterSetItemLoad}>
             <FilterSetController {...fsControllerProps}>
                 { embeddedTableHeaderBody }

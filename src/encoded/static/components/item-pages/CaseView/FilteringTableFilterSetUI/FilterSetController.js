@@ -88,8 +88,10 @@ export class FilterSetController extends React.PureComponent {
             const searchContextAtIDParts = url.parse(searchContextAtID, true);
             const { query: searchContextQuery } = searchContextAtIDParts;
             const { q: textSearchQuery = null } = searchContextQuery || {};
+            // Treat "q" (text search param) as a context filter for purposes of FilterBlocks
             if (textSearchQuery) {
-                // Treat "q" (text search param) as a context filter for purposes of FilterBlocks
+                // Generate link to remove 'q' as if were term per existing convention from FacetList
+                // (not really used at time of writing, e.g. useful if 'x' btn next to each entry in filterblock)
                 searchContextAtIDParts.search = "?" + queryString.stringify(_.omit(searchContextQuery, "q"));
                 searchFilters.unshift({
                     "field": "q",
@@ -193,15 +195,17 @@ export class FilterSetController extends React.PureComponent {
         // Not particularly necessary, but helps make less redundant since we have the required `search_type` already.
         delete globalFlagsQuery.type;
 
+        // Set "name" of each filter block to be its index.
         const filterBlockQueries = filter_blocks.map(function(fb, fbIdx){
             const { query } = fb;
             return {
                 query,
-                "name": fbIdx, // Will be using filter block indices as unique names here.
-                "flags_applied": []
+                "name": fbIdx, // Will be using filter block indices as unique names here, rather than the real names.
+                "flags_applied": [] // Needed? Currently unused.
             };
         });
 
+        // Then filter out filter blocks which aren't applied in this request.
         const selectedFilterBlockQueries = selectedIdxCount === 0 ? filterBlockQueries : filterBlockQueries.filter(function(fb, fbIdx){
             return selectedFilterBlockIndices[fbIdx];
         });
@@ -269,7 +273,8 @@ export class FilterSetController extends React.PureComponent {
         //     });
         // }
 
-        if (selectedFilterBlockIdxCount === filterBlocksLen) {
+        // If only 1 FB, keep selectedFilterBlockIndices populated to simplify grabbing the singly-selected filter-block.
+        if (selectedFilterBlockIdxCount > 1 && selectedFilterBlockIdxCount === filterBlocksLen) {
             selectedFilterBlockIndices = {};
             selectedFilterBlockIdxCount = 0;
             selectedFilterBlockIdxList = [];
@@ -283,12 +288,12 @@ export class FilterSetController extends React.PureComponent {
             return { selectedFilterBlockIndices };
         }
 
-        if (!(selectedFilterBlockIdxCount === 1 || (selectedFilterBlockIdxCount === 0 && filterBlocksLen === 1))){
+        if (selectedFilterBlockIdxCount !== 1){
             // Cancel if compound filterset request.
             return { selectedFilterBlockIndices };
         }
 
-        const selectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0] || 0);
+        const selectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0]);
         const { total: totalCount } = searchContext;
 
         // Get counts to show @ top left of selectable filter blocks
