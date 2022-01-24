@@ -161,8 +161,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         sample_processing: sampleProcessing = null,
         initial_search_href_filter_addon: snvFilterHrefAddon = "",
         sv_initial_search_href_filter_addon: svFilterHrefAddon = "",
-        actions: caseActions = [],
-        report: { "@id": reportAtID }
+        actions: caseActions = []
     } = context;
 
     const { variant_samples: vsSelections = [], structural_variant_samples: cnvSelections = [] } = variantSampleListItem || {};

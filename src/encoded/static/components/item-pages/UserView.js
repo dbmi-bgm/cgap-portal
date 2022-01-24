@@ -605,7 +605,8 @@ export function ImpersonateUserForm({ updateAppSessionState }) {
             <div className="row">
                 <div className="col-12 col-lg-6">
                     <form onSubmit={onSubmit}>
-                        <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..." ref={inputFieldRef} />
+                        <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..."
+                            name="impersonate-user-email" ref={inputFieldRef} />
                         <a href="/search/?type=User" target="_blank" className="btn btn-secondary btn-md mt-2 mr-2">
                             <i className="icon icon-fw icon-users fas mr-08"/>
                             View Users

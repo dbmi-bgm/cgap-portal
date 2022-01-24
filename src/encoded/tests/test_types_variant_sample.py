@@ -238,11 +238,35 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
         'variant_samples': [
             {
                 "variant_sample_item": vs1['@id'],
-                "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
+                "filter_blocks_used": {
+                    "filter_blocks": [
+                        {
+                            "name": "Missense",
+                            "query": "variant.genes.genes_most_severe_consequence.coding_effect=Missense"
+                        },
+                        {
+                            "name": "SNV Mutanno",
+                            "query": "variant.mutanno_variant_class=SNV"
+                        }
+                    ],
+                    "intersect_selected_blocks": False
+                }
             },
             {
                 "variant_sample_item": vs2['@id'],
-                "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
+                "filter_blocks_used": {
+                    "filter_blocks": [
+                        {
+                            "name": "Missense",
+                            "query": "variant.genes.genes_most_severe_consequence.coding_effect=Missense"
+                        },
+                        {
+                            "name": "SNV Mutanno",
+                            "query": "variant.mutanno_variant_class=SNV"
+                        }
+                    ],
+                    "intersect_selected_blocks": False
+                },
                 # "date_selected": "2021-01-25T16:41:47.787+00:00", # Should be auto-filled by server.
                 # "selected_by" : ... # <- This should be auto-filled by server, we'll test it .. sometime.
             }
