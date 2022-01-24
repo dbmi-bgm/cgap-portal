@@ -52,7 +52,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
                 "render": function(result, props) {
                     const { __matching_filter_block_names = [] } = result;
                     if (__matching_filter_block_names.length === 0) {
@@ -109,7 +109,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
                 "render": function(result, props) {
                     const { __matching_filter_block_names = [] } = result;
                     if (__matching_filter_block_names.length === 0) {
@@ -239,7 +239,7 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
             <OverlayTrigger trigger="focus" overlay={popover}>
                 { function({ ref, ...triggerHandlers }){
                     return (
-                        <button type="button" ref={ref} { ...triggerHandlers } className="btn mx-auto btn-sm btn-link text-decoration-none">
+                        <button type="button" ref={ref} { ...triggerHandlers } className="btn btn-sm btn-link text-decoration-none">
                             { __matching_filter_block_names.length }
                         </button>
                     );

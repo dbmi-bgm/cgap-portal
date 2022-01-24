@@ -434,9 +434,9 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                 </div>
             </div>
 
-            <div className="card-body border-top attribution-section pt-1 pb-08">
+            <div className="card-body border-top attribution-section py-2">
                 <div className="row align-items-center">
-                    <div className="col text-small">
+                    <div className="col d-flex-align-items-center">
                         <FilterBlocksUsedPopovers {...{ selection, facetDict }} />
                     </div>
                     <div className="col-auto text-small"
@@ -685,13 +685,16 @@ function FilterBlocksUsedPopovers (props) {
         selection: {
             filter_blocks_used: {
                 filter_blocks: filterBlocksUsed = [],
+                // We don't really care about `intersect_selected_blocks` since by default the result will be found in
+                // interesection of blocks it was matched for.
+                // (Consider preserving more info about FilterSet @ time of selection maybe?)
                 intersect_selected_blocks: filterBlocksIntersected = false
-            }
+            } = {} // Might be undefined from older versions of blocks.
         },
         facetDict = {}
     } = props;
 
-    const links = filterBlocksUsed.map(function(filterBlock, index){
+    let links = filterBlocksUsed.map(function(filterBlock, index){
         const link = <FilterBlockPopover {...{ filterBlock, index, facetDict }} key={index} />;
         if (index !== 0) {
             return (
@@ -703,9 +706,16 @@ function FilterBlocksUsedPopovers (props) {
         return link;
     });
 
+    if (links.length === 0) {
+        // Fallback -- most likely an older selection without a 'filter_blocks_used'.
+        links = <em className="text-small text-muted">Not Available</em>;
+    }
+
     return (
         <React.Fragment>
-            <i className="icon icon-object-ungroup far mr-07" data-tip="Matched all of the following filter blocks when it was added" />
+            <i className={`icon icon-object-${filterBlocksIntersected ? "group" : "ungroup"} far mr-07`}
+                data-tip={"Filter blocks matched when this sample was added." +
+                    (filterBlocksIntersected ? " Search result came from intersecting these filter blocks." : "")} />
             { links }
         </React.Fragment>
     );
