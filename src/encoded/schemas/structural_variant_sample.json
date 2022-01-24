@@ -147,9 +147,14 @@
         },
         "gene_notes": {
             "title": "Gene Notes",
-            "description": "Note item related to this Gene",
-            "type": "string",
-            "linkTo": "NoteStandard"
+            "description": "Notes associated with a gene on the structural variant sample.",
+            "type": "array",
+            "items": {
+                "title": "Gene Note",
+                "description": "Note associated with a gene on the structural variant sample.",
+                "type": "string",
+                "linkTo": "NoteStandard"
+            }
         },
         "genotype_labels": {
             "title": "Genotype Labels",
@@ -267,7 +272,6 @@
             "type": "string",
             "linkTo": "NoteStandard"
         }
-
     },
     "columns": {
         "display_title": {
