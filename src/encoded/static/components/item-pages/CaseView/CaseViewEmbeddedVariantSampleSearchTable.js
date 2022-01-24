@@ -48,14 +48,14 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     );
                 }
             },
-            "__matching_filter_block_indices": {
+            "__matching_filter_block_names": {
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-file far"/>,
                 "render": function(result, props) {
-                    const { __matching_filter_block_indices = [] } = result;
-                    if (__matching_filter_block_indices.length === 0) {
+                    const { __matching_filter_block_names = [] } = result;
+                    if (__matching_filter_block_names.length === 0) {
                         return null;
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
@@ -105,14 +105,14 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     );
                 }
             },
-            "__matching_filter_block_indices": {
+            "__matching_filter_block_names": {
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-file far"/>,
                 "render": function(result, props) {
-                    const { __matching_filter_block_indices = [] } = result;
-                    if (__matching_filter_block_indices.length === 0) {
+                    const { __matching_filter_block_names = [] } = result;
+                    if (__matching_filter_block_names.length === 0) {
                         return null;
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
@@ -212,10 +212,10 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
 
 const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilterBlockIndicesPopoverColumn(props){
     const { result, currFilterSet } = props;
-    const { __matching_filter_block_indices = [], uuid: resultUUID } = result;
+    const { __matching_filter_block_names = [], uuid: resultUUID } = result;
     const { filter_blocks = [] } = currFilterSet || {};
 
-    const filterBlockNameList = __matching_filter_block_indices.map(function(fbIdx, idxIdx){
+    const filterBlockNameList = __matching_filter_block_names.map(function(fbIdx, idxIdx){
         const matchingFilterBlock = filter_blocks[parseInt(fbIdx)];
         const { name } = matchingFilterBlock || {};
         return name || fbIdx;
@@ -240,7 +240,7 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
                 { function({ ref, ...triggerHandlers }){
                     return (
                         <button type="button" ref={ref} { ...triggerHandlers } className="btn mx-auto btn-sm btn-link text-decoration-none">
-                            { __matching_filter_block_indices.length }
+                            { __matching_filter_block_names.length }
                         </button>
                     );
                 }}

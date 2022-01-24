@@ -3,8 +3,9 @@
 import React, { useState, useMemo, useCallback, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import queryString from 'query-string';
 
-import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { FieldBlocks } from './FieldBlocks';
 
@@ -23,7 +24,9 @@ export const FilterBlock = React.memo(function FilterBlock(props){
         facetDict,
         duplicateQueryIndices,
         duplicateNameIndices,
+        savedToVSLFilterBlockQueries,
         cachedCounts,
+        allFilterBlockNameQueriesValid,
         filterBlocksLen,
         schemas
     } = props;
@@ -47,6 +50,16 @@ export const FilterBlock = React.memo(function FilterBlock(props){
     const isDuplicateQuery = useMemo(function(){ return typeof duplicateQueryIndices[index] === "number"; }, [ duplicateQueryIndices, index ]);
     const isDuplicateName = useMemo(function(){ return typeof duplicateNameIndices[index] === "number"; }, [ duplicateNameIndices, index ]);
     const countExists = useMemo(function(){ return typeof cachedCount === "number"; }, [ cachedCounts, index ]);
+    const isValidNameContentsToSaveToVariantSampleList = useMemo(function(){
+        if (allFilterBlockNameQueriesValid) {
+            return true;
+        }
+        const existingSavedFilterBlock = savedToVSLFilterBlockQueries[filterName];
+        if (!existingSavedFilterBlock) {
+            return true;
+        }
+        return object.compareQueries(existingSavedFilterBlock, queryString.parse(filterStrQuery));
+    }, [ allFilterBlockNameQueriesValid, savedToVSLFilterBlockQueries, filterBlock ]);
 
     const [ isEditingTitle, setIsEditingTitle ] = useState(false);
 
@@ -84,7 +97,7 @@ export const FilterBlock = React.memo(function FilterBlock(props){
     let title = null;
     if (isEditingTitle && !isSettingFilterBlockIdx) {
         title = (
-            <form className="w-100 d-flex align-items-center mb-0" action="#case-info.filtering" onSubmit={function(e){
+            <form className="w-100 d-flex align-items-center mb-0" action="#case-info.filtering" autoComplete="off" onSubmit={function(e){
                 e.stopPropagation();
                 e.preventDefault();
                 setIsEditingTitle(false);
@@ -100,7 +113,9 @@ export const FilterBlock = React.memo(function FilterBlock(props){
                 }}>
                     <i className="icon icon-fw icon-times fas" />
                 </button>
-                <button type="submit" className="btn btn-sm btn-outline-success ml-08"><i className="icon icon-fw icon-check fas" /></button>
+                <button type="submit" className="btn btn-sm btn-outline-success ml-08">
+                    <i className="icon icon-fw icon-check fas" />
+                </button>
             </form>
         );
     } else {
@@ -111,7 +126,7 @@ export const FilterBlock = React.memo(function FilterBlock(props){
             + (filterBlocksLen > 1 ? "" : " disabled")
         );
         const titleCls = "text-small pt-02" + (
-            isDuplicateName ? " text-danger"
+            (isDuplicateName || !isValidNameContentsToSaveToVariantSampleList) ? " text-danger"
                 : !filterName ? " text-secondary"
                     : ""
         );
@@ -138,7 +153,9 @@ export const FilterBlock = React.memo(function FilterBlock(props){
     );
 
     return (
-        <div className={cls} onClick={!isEditingTitle ? onSelectClick : null} data-duplicate-query={isDuplicateQuery}
+        <div className={cls} onClick={!isEditingTitle ? onSelectClick : null}
+            data-duplicate-query={isDuplicateQuery}
+            data-name-value-differs-in-existing-selection={!isValidNameContentsToSaveToVariantSampleList}
             tabIndex={!isEditingTitle && filterBlocksLen > 1 ? 0 : null}
             data-tip={isDuplicateQuery ? "Duplicate query of filter block #" + (duplicateQueryIndices[index] + 1) : null}>
             <div className="d-flex align-items-center px-2 pt-08 pb-04 title-controls-row">
@@ -165,5 +182,5 @@ export const DummyLoadingFilterBlock = React.memo(function DummyLoadingFilterBlo
     const dummyObject = {};
     return <FilterBlock filterBlock={{ "query" : "", "name" : <em>Please wait...</em> }}
         filterBlocksLen={1} index={0} selected={false} isSettingFilterBlockIdx={true}
-        cachedCounts={dummyObject} duplicateQueryIndices={dummyObject} duplicateNameIndices={dummyObject} />;
+        cachedCounts={dummyObject} duplicateQueryIndices={dummyObject} duplicateNameIndices={dummyObject} savedToVSLFilterBlockQueries={dummyObject} />;
 });

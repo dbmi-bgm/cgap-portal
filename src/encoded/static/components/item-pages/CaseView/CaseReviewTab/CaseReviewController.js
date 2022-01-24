@@ -119,6 +119,7 @@ export class CaseReviewController extends React.Component {
         const { context: { report: { "@id": reportAtID } = {} } } = this.props;
 
         if (!reportAtID) {
+            this.setState({ "isFetchingReportItem": false });
             return null;
         }
 

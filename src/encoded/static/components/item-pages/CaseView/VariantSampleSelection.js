@@ -218,7 +218,6 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     } = context; // `context` refers to our Case in here.
     const {
         date_selected,
-        filter_blocks_request_at_time_of_selection,
         variant_sample_item: variantSample
     } = selection;
 
@@ -413,7 +412,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             <div className="card-body border-top attribution-section pt-1 pb-08">
                 <div className="d-flex align-items-center">
                     <div className="flex-auto text-small" data-tip="Date Selected">
-                        <i className="icon icon-calendar far mr-07"/>
+                        <i className="icon icon-calendar-check far mr-07"/>
                         <LocalizedTime timestamp={date_selected} />
                     </div>
                 </div>
@@ -656,6 +655,10 @@ const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicato
         </span>
     );
 });
+
+
+
+
 
 // TODO: May need further updating or splitting to work with SVs depending on data model/note item changes
 const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNotes (props) {
