@@ -98,6 +98,7 @@ function calculateGenotype(CALL_INFO, labels) {
 
 function StructuralVariantInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
+    const notAvailableFallbackElem = <em> Not Available </em>;
     const {
         structural_variant = {},
         CALL_INFO = null,
@@ -107,12 +108,8 @@ function StructuralVariantInfoSection({ context }) {
         size_display = fallbackElem,
         cytoband_display = fallbackElem,
         SV_TYPE = fallbackElem,
-        CHROM = "",
-        START = "",
-        END = "",
-        hg19_chr = "",
-        hg19_start = "",
-        hg19_end = ""
+        position_display = notAvailableFallbackElem,
+        hg19_position_display = notAvailableFallbackElem,
     } = structural_variant;
 
     const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated/just pull from schema in future
@@ -136,7 +133,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_grch38" className="mb-0">GRCh38:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch38">{`chr${CHROM}:${START}-${END}`}</span>
+                            <span id="vi_grch38">{position_display}</span>
                         </div>
                     </div>
                     <div className="row">
@@ -144,7 +141,7 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">{`chr${hg19_chr}:${hg19_start}-${hg19_end}`}</span>
+                            <span id="vi_grch37">{hg19_position_display}</span>
                         </div>
                     </div>
                 </div>
