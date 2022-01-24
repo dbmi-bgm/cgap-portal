@@ -98,7 +98,6 @@ function calculateGenotype(CALL_INFO, labels) {
 
 function StructuralVariantInfoSection({ context }) {
     const fallbackElem = <em data-tip="Not Available"> - </em>;
-    const notAvailableFallbackElem = <em> Not Available </em>;
     const {
         structural_variant = {},
         CALL_INFO = null,
@@ -108,8 +107,8 @@ function StructuralVariantInfoSection({ context }) {
         size_display = fallbackElem,
         cytoband_display = fallbackElem,
         SV_TYPE = fallbackElem,
-        position_display = notAvailableFallbackElem,
-        hg19_position_display = notAvailableFallbackElem,
+        position_display = fallbackElem,
+        hg19_position_display = fallbackElem,
     } = structural_variant;
 
     const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated/just pull from schema in future
