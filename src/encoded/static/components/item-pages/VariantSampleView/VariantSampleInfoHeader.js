@@ -264,7 +264,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
     );
 }
 function GDNAList({ context }){
-    const fallbackElem = <em> Not Available </em>;
+    const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant = {} } = context;
     const {
         // mutanno_hgvsg = fallbackElem, // (temporarily?) removed

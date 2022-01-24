@@ -139,8 +139,6 @@ function ConsequenceOfSVSection({ currentTranscript }) {
         csq_variant_5_prime_location,
         csq_variant_3_prime_location
     } = currentTranscript;
-    // TODO: Add breakpoints once they are ready
-
     return (
         <React.Fragment>
             <div className="row mb-03">
