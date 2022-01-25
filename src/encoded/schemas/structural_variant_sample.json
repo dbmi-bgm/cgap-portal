@@ -176,6 +176,16 @@
                 }
             }
         },
+        "highlighted_genes": {
+            "title": "Highlighted Genes",
+            "description": "Genes highlighted for the structural variant sample.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "title": "Highlighted Gene",
+                "linkTo": "Gene"
+            }
+        },
         "imprecise": {
             "title": "Imprecise Structural Variant",
             "field_name": "imprecise",
