@@ -39,7 +39,9 @@ We have developed a python package for submission of
  Briefly, the basic commands are as follows:
 
 ```
+
 submit-metadata-bundle <cases.xlsx> -s <CGAP_server_url> -v
+
 ```
 
 The above command will do a validate-only dry run of your submission, to ensure that there
@@ -47,7 +49,9 @@ The above command will do a validate-only dry run of your submission, to ensure 
  all the case metadata:
 
 ```
+
 submit-metadata-bundle <cases.xlsx> -s <CGAP_server_url>
+
 ```
 
 For more information on the commands and their optional arguments, see the

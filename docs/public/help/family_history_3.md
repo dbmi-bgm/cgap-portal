@@ -34,12 +34,16 @@ Briefly, the command is the same as for new case/accessioning CLI submission, bu
  with the added `--ingestion_type` option:
 
 ```
+
 submit-metadata-bundle <pedigree.xlsx> -s <CGAP_server_url> --ingestion_type family_history -v
+
 ```
 
 As with submitting cases, the `-v` flag runs a validate-only dry run to check formatting of the spreadsheet.
  When that passes, the command can be run without that option:
 
 ```
+
 submit-metadata-bundle <pedigree.xlsx> -s <CGAP_server_url> --ingestion_type family_history
+
 ```
