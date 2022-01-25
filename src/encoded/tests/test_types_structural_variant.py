@@ -1,9 +1,6 @@
 import pytest
 
-from ..types.structural_variant import (
-    build_comma_formatted_position,
-    convert_integer_to_comma_string,
-)
+from ..types.structural_variant import build_comma_formatted_position
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 
@@ -132,26 +129,6 @@ def test_build_comma_formatted_position(chromosome, start, end, expected):
     formatted numbers.
     """
     result = build_comma_formatted_position(chromosome, start, end)
-    assert result == expected
-
-
-@pytest.mark.parametrize(
-    "value,expected",
-    [
-        (None, None),
-        ({"foo": "bar"}, None),
-        ([], None),
-        ("foo", None),
-        (1.31, None),
-        ("1", None),
-        (0, "0"),
-        (10000, "10,000"),
-        (123456789, "123,456,789"),
-    ]
-)
-def test_convert_integer_to_comma_string(value, expected):
-    """Test converting integer to comma-formatted string."""
-    result = convert_integer_to_comma_string(value)
     assert result == expected
 
 

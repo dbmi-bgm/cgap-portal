@@ -228,3 +228,26 @@ def test_most_severe_location(
     ).json["@graph"][0]
     most_severe_location = patch_response.get("most_severe_location")
     assert most_severe_location == expected
+
+
+@pytest.mark.parametrize(
+    "POS,expected",
+    [
+        (1, "1"),
+        (100, "100"),
+        (1000, "1,000"),
+        (1000000, "1,000,000"),
+    ]
+)
+def test_alternate_display_title(POS, expected, testapp, variant):
+    """Test building variant display title with comma-separated position."""
+    variant_atid = variant.get("@id")
+    chromosome = variant.get("CHROM")
+    reference = variant.get("REF")
+    alternate = variant.get("ALT")
+    patch_body = {"POS": POS}
+    patch_response = testapp.patch_json(
+        variant_atid, patch_body, status=200
+    ).json["@graph"][0]
+    result = patch_response.get("alternate_display_title")
+    assert result == "chr%s:%s%s>%s" % (chromosome, expected, reference, alternate)

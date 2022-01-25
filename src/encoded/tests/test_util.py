@@ -8,8 +8,15 @@ import tempfile
 from unittest import mock
 from dcicutils.qa_utils import ControlledTime, ignored
 from ..util import (
-    debuglog, deduplicate_list, gunzip_content, resolve_file_path, ENCODED_ROOT_DIR, get_trusted_email,
-    check_user_is_logged_in, vapp_for_email,
+    debuglog,
+    deduplicate_list,
+    gunzip_content,
+    resolve_file_path,
+    ENCODED_ROOT_DIR,
+    get_trusted_email,
+    check_user_is_logged_in,
+    vapp_for_email,
+    convert_integer_to_comma_string,
 )
 from .. import util as util_module
 
@@ -282,3 +289,23 @@ def test_vapp_for_email(testapp, non_admin_persona):
         assert my_uuid == non_admin_persona['uuid']
         print("vapp has proper identity")
     check_me('global')
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        (None, None),
+        ({"foo": "bar"}, None),
+        ([], None),
+        ("foo", None),
+        (1.31, None),
+        ("1", None),
+        (0, "0"),
+        (10000, "10,000"),
+        (123456789, "123,456,789"),
+    ]
+)
+def test_convert_integer_to_comma_string(value, expected):
+    """Test converting integer to comma-formatted string."""
+    result = convert_integer_to_comma_string(value)
+    assert result == expected

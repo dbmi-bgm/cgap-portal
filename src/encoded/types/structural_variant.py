@@ -5,7 +5,7 @@ from snovault import calculated_property, collection, load_schema
 
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path
+from ..util import resolve_file_path, convert_integer_to_comma_string
 from .base import Item, get_item_or_none
 from .variant import (
     ANNOTATION_ID,
@@ -77,21 +77,6 @@ def build_comma_formatted_position(chromosome, start, end):
     end = convert_integer_to_comma_string(end)
     if chromosome and start is not None and end is not None:
         result = "chr%s:%s-%s" % (chromosome, start, end)
-    return result
-
-
-def convert_integer_to_comma_string(value):
-    """Convert integer to comma-formatted string for displaying SV
-    position.
-
-    :param value: Value to format.
-    :type value: int
-    :returns: Comma-formatted integer or None
-    :rtype: str or None
-    """
-    result = None
-    if isinstance(value, int):
-        result = format(value, ",d")
     return result
 
 
