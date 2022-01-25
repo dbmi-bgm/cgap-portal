@@ -42,6 +42,7 @@ ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
 
 # For adding additional variant nomenclature options
+# For reference, see e.g. https://www.insdc.org/documents/feature_table.html#7.4.3
 AMINO_ACID_ABBREVIATIONS = {
     'Ala': 'A',
     'Arg': 'R',
@@ -61,7 +62,7 @@ AMINO_ACID_ABBREVIATIONS = {
     'Ser': 'S',
     'Thr': 'T',
     'Trp': 'W',
-    'Tyr': 'T',
+    'Tyr': 'Y',
     'Val': 'V'
 }
 
@@ -380,7 +381,7 @@ class Variant(Item):
             "type": "string"
         }
     })
-    def additional_variant_names(self, request):
+    def additional_variant_names(self, genes=None):
         """This property will allow users to search for specific variants in the filtering tab,
         using a few different possible variant names.
          - c. change
@@ -389,23 +390,21 @@ class Variant(Item):
         NB: talk to front end about tooltip/click box for example searches
         """
         names = []
-        genes = self.properties.get('genes', [])
         if genes:
-            if genes[0].get('genes_most_severe_hgvsc'):
-                names.append(genes[0]['genes_most_severe_hgvsc'].split(':')[-1])
-            if genes[0].get('genes_most_severe_hgvsp'):
-                hgvsp_3 = genes[0]['genes_most_severe_hgvsp'].split(':')[-1]
-                hgvsp_1 = ''.join(hgvsp_3)
-                for key, val in AMINO_ACID_ABBREVIATIONS.items():
-                    if key in hgvsp_3:
-                        hgvsp_1 = hgvsp_1.replace(key, val)
-                names.append(hgvsp_3)
-                if hgvsp_1 != hgvsp_3:
-                    names.append(hgvsp_1)
+            for gene in genes:
+                if gene.get('genes_most_severe_hgvsc'):
+                    names.append(gene['genes_most_severe_hgvsc'].split(':')[-1])
+                if gene.get('genes_most_severe_hgvsp'):
+                    hgvsp_3 = gene['genes_most_severe_hgvsp'].split(':')[-1]
+                    hgvsp_1 = ''.join(hgvsp_3)
+                    for key, val in AMINO_ACID_ABBREVIATIONS.items():
+                        if key in hgvsp_3:
+                            hgvsp_1 = hgvsp_1.replace(key, val)
+                    names.append(hgvsp_3)
+                    if hgvsp_1 != hgvsp_3:
+                        names.append(hgvsp_1)
         if names:
             return names
-        else:
-            return
 
 
 @collection(

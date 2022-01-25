@@ -257,7 +257,6 @@ def test_most_severe_location(
 def test_additional_variant_names(testapp, gene, variant, hgvsc, hgvsp, result):
     variant_atid = variant.get("@id")
     patch_body = {"genes": [{
-        "genes_most_sever_gene": gene.get("@id"),
         "genes_most_severe_hgvsc": hgvsc
     }]}
     if hgvsp:
