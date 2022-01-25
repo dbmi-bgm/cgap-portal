@@ -180,6 +180,7 @@
             "title": "Highlighted Genes",
             "description": "Genes highlighted for the structural variant sample.",
             "type": "array",
+            "uniqueItems": true,
             "items": {
                 "type": "string",
                 "title": "Highlighted Gene",
