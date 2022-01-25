@@ -64,3 +64,31 @@ def test_rev_link_on_genes(testapp, project, institution, gene1, gene2, gene3, g
     gene1_item = testapp.get(gene1['@id']).json
     assert gene1_item['gene_lists'][0]['title'] == post_body['title']
     assert gene1_item['gene_lists'][0]['display_title'] == post_body['title']
+
+
+@pytest.mark.parametrize(
+    "spos,epos,expected",
+    [
+        (None, None, None),
+        (1, None, None),
+        (None, 1, None),
+        (0, 1, "0-1"),
+        (1000, 2000, "1,000-2,000"),
+        (1000000, 2000000, "1,000,000-2,000,000"),
+    ]
+)
+def test_position_display(spos, epos, expected, testapp, gene):
+    """Test creation of formatted position display."""
+    gene_atid = gene.get("@id")
+    patch_body = {}
+    if isinstance(spos, int):
+        patch_body["spos"] = spos
+    if isinstance(epos, int):
+        patch_body["epos"] = epos
+    patch_result = testapp.patch_json(
+        gene_atid, patch_body, status=200
+    ).json["@graph"][0]
+    result = patch_result.get("position_display")
+    assert result == expected
+    if expected is None:
+        assert "position_display" not in patch_result
