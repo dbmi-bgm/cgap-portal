@@ -31,11 +31,11 @@ We have developed a python package for submission of
  method can be found in the [SubmitCGAP documentation](https://submitcgap.readthedocs.io/en/latest/getting_started.html#family-history).
 
 Briefly, the command is the same as for new case/accessioning CLI submission, but
- with the added `--ingestion_type` option:
+ with the added `-t` or `--ingestion_type` option:
 
 ```
 
-submit-metadata-bundle <pedigree.xlsx> -s <CGAP_server_url> --ingestion_type family_history -v
+submit-metadata-bundle <pedigree.xlsx> -s <CGAP_server_url> -t family_history -v
 
 ```
 
@@ -44,6 +44,6 @@ As with submitting cases, the `-v` flag runs a validate-only dry run to check fo
 
 ```
 
-submit-metadata-bundle <pedigree.xlsx> -s <CGAP_server_url> --ingestion_type family_history
+submit-metadata-bundle <pedigree.xlsx> -s <CGAP_server_url> -t family_history
 
 ```
