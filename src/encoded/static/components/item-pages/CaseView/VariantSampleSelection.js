@@ -292,7 +292,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         discovery_interpretation: discoveryInterpretationNote = null,
         variant_notes: lastVariantNote = null,
         gene_notes: lastGeneNote = null,
-        last_modified: vsLastModified
+        last_modified: vsLastModified = null, // Might not be present from ingestion or similar.. idk
+        date_created: vsDateCreated
     } = variantSample || {};
 
     const {
@@ -303,7 +304,10 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
         const countNotes = notes.length;
         let countNotesInReport = 0;
         let countNotesInKnowledgeBase = 0;
-        let lastModifiedInfo = vsLastModified; // Check/include variantSample.last_modified.date_modified also.
+
+        // Check/include variantSample.last_modified.date_modified also (or date_created, if no last_modified).
+        let lastModifiedInfo = vsLastModified || (vsDateCreated ? { "date_modified": vsDateCreated } : null);
+
         notes.forEach(function({ uuid: noteUUID, last_modified }){
             if (alreadyInReportNotes && alreadyInReportNotes[noteUUID]) {
                 countNotesInReport++;
@@ -321,11 +325,13 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const noSavedNotes = clinicalInterpretationNote === null && discoveryInterpretationNote === null && lastVariantNote === null && lastGeneNote === null;
 
     const {
-        date_modified: dateAnyNoteLastModified,
+        // Might not be present at all in some niche case(s) (?)
+        date_modified: dateAnyNoteLastModified = null,
         modified_by: {
-            display_title: lastModifiedUserDisplayTitle
-        }
-    } = lastModifiedInfo;
+            // May not be present if using date_created or if no view permission.
+            display_title: lastModifiedUserDisplayTitle = null
+        } = {}
+    } = lastModifiedInfo || {};
 
     let expandedNotesSection = null;
     if (isExpanded) {
@@ -441,8 +447,10 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     </div>
                     <div className="col-auto text-small"
                         data-tip={"Last modified (any note or the sample itself)" + (lastModifiedUserDisplayTitle ? " by " + lastModifiedUserDisplayTitle : "")}>
-                        <i className="icon icon-calendar far mr-07"/>
-                        <LocalizedTime timestamp={dateAnyNoteLastModified} />
+                        <i className={"icon icon-calendar far mr-07" + (dateAnyNoteLastModified ? "" : " text-muted")}/>
+                        { dateAnyNoteLastModified ?
+                            <LocalizedTime timestamp={dateAnyNoteLastModified} />
+                            : <em>N/A</em> }
                     </div>
                     <div className="col-auto text-small" data-tip={"Date added to interpretation"  + (selectedByUserDisplayTitle ? " by " + selectedByUserDisplayTitle : "")}>
                         <i className="icon icon-calendar-plus far mr-07"/>

@@ -111,7 +111,14 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                     <h1 className="text-300 mb-0">
                         Case Review
-                        { isFetchingReportItem ? <i className="icon icon-fw icon-circle-notch icon-spin fas ml-12 text-muted" data-tip="Loading Report..." /> : null }
+                        { isFetchingReportItem ?
+                            <i className="icon icon-fw icon-circle-notch icon-spin fas ml-12 text-muted" data-tip="Loading Report..." />
+                            : (
+                                <React.Fragment>
+                                    <i className="icon icon-arrow-right fas icon-xs mx-3"/>
+                                    <span className="text-400">{ currentViewIdx === 0 ? "Note Finalization" : "Report Generation" }</span>
+                                </React.Fragment>
+                            ) }
                     </h1>
 
                     <div className="my-3 my-md-n3">

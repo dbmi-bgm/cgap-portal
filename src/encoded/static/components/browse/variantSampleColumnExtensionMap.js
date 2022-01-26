@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import { onClickLinkNavigateChildWindow } from './../item-pages/components/child-window-reuser';
 
 /**
  * This gets merged into the columnExtensionMap.js.
@@ -387,8 +388,9 @@ export const BAMSnapshotColumn = React.memo(function BAMSnapshotColumn({ result 
     const { "@id": resultAtID = null } = result;
     return (
         <div className="mx-auto text-truncate">
-            <a target="_blank" className="btn btn-outline-dark btn-sm" rel="noreferrer"
-                href={resultAtID + "/@@download/"} data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
+            <a className="btn btn-outline-dark btn-sm" onClick={onClickLinkNavigateChildWindow}
+                href={resultAtID + "@@download/"} data-child-window="bam" data-child-window-message="false"
+                data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
                 <i className="icon icon-fw icon-image fas" />
             </a>
         </div>

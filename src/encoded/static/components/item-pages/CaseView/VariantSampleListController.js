@@ -162,6 +162,7 @@ export class VariantSampleListController extends React.PureComponent {
                     prefix + ".variant_sample_item.display_title",
                     prefix + ".variant_sample_item.finding_table_tag",
                     prefix + ".variant_sample_item.actions",
+                    prefix + ".variant_sample_item.date_created",
                     prefix + ".variant_sample_item.last_modified.date_modified",
                     prefix + ".variant_sample_item.last_modified.modified_by.@id",
                     prefix + ".variant_sample_item.last_modified.modified_by.display_title",

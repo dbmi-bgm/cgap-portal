@@ -1403,13 +1403,13 @@ i.status-indicator-dot {
 			/* 'Current Case' selection marker/styling */
 			&#case-info\.accessioning {
 				.current-case {
-					background-color: lavender;
-					padding: 3px 5px;
+					padding: 0 5px;
 					/* Cancel out the above padding somewhat to align text with other non-selected text */
 					/* Maybe not cleanest approach... */
-					margin: -2px -5px;
-					border: solid 1px #fff;
-					border-radius: $border-radius-base;
+					margin: 0 -5px;
+					outline: 2px solid $primary-dark;
+					outline-offset: 3px;
+					@extend .rounded-pill;
 				}
 			}
 
