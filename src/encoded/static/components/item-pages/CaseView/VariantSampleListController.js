@@ -150,51 +150,6 @@ export class VariantSampleListController extends React.PureComponent {
         // Using embed API instead of datastore=database in order to prevent gene-list related slowdown
         this.setState({ "isLoadingVariantSampleListItem": true }, () => {
 
-
-            function commonVSEmbeds(prefix){
-                return [
-                    prefix + ".filter_blocks_used",
-                    prefix + ".date_selected",
-                    prefix + ".selected_by.@id",
-                    prefix + ".selected_by.display_title",
-                    prefix + ".variant_sample_item.@id",
-                    prefix + ".variant_sample_item.uuid",
-                    prefix + ".variant_sample_item.display_title",
-                    prefix + ".variant_sample_item.finding_table_tag",
-                    prefix + ".variant_sample_item.actions",
-                    prefix + ".variant_sample_item.date_created",
-                    prefix + ".variant_sample_item.last_modified.date_modified",
-                    prefix + ".variant_sample_item.last_modified.modified_by.@id",
-                    prefix + ".variant_sample_item.last_modified.modified_by.display_title",
-                    prefix + ".variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                    prefix + ".variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                    prefix + ".variant_sample_item.associated_genotype_labels.father_genotype_label",
-
-                    // Notes
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.interpretation"),
-                    prefix + ".variant_sample_item.interpretation.classification",
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.discovery_interpretation"),
-                    prefix + ".variant_sample_item.discovery_interpretation.gene_candidacy",
-                    prefix + ".variant_sample_item.discovery_interpretation.variant_candidacy",
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.variant_notes"),
-                    ...commonNoteEmbeds(prefix + ".variant_sample_item.gene_notes"),
-                ];
-            }
-
-            function commonNoteEmbeds(prefix){
-                return [
-                    prefix + ".@id",
-                    prefix + ".uuid",
-                    prefix + ".last_modified.date_modified",
-                    prefix + ".last_modified.modified_by.@id",
-                    prefix + ".last_modified.modified_by.display_title",
-                    prefix + ".status",
-                    prefix + ".associated_items.item_type",
-                    prefix + ".associated_items.item_identifier",
-                    prefix + ".note_text"
-                ];
-            }
-
             scopedRequest = this.currentRequest = ajax.load(
                 "/embed",
                 vslFetchCallback,
@@ -202,34 +157,7 @@ export class VariantSampleListController extends React.PureComponent {
                 vslFetchCallback,
                 JSON.stringify({
                     "ids": [ variantSampleListID ],
-                    "fields": [
-
-                        // Fields for list view (for InterpretationTab & CaseReviewTab)
-
-                        "@id",
-                        // All immediate fields off of "variant_samples" must be embedded, else they will be lost in subsequent PATCH requests.
-                        // This includes "filter_blocks_used", "date_selected", "variant_sample_item.@id", & "selected_by.@id"
-                        ...commonVSEmbeds("variant_samples"),
-                        ...commonVSEmbeds("structural_variant_samples"),
-
-                        "variant_samples.variant_sample_item.variant.@id",
-                        "variant_samples.variant_sample_item.variant.display_title",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
-
-                        "structural_variant_samples.variant_sample_item.structural_variant.@id",
-                        "structural_variant_samples.variant_sample_item.structural_variant.display_title",
-                        "structural_variant_samples.variant_sample_item.structural_variant.END",
-                        "structural_variant_samples.variant_sample_item.structural_variant.START",
-                        "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
-                        "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
-                        "structural_variant_samples.variant_sample_item.structural_variant.size_display",
-                        "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title",
-
-                    ]
+                    "fields": variantSampleListEmbeds
                 })
             );
         });
@@ -264,4 +192,79 @@ export class VariantSampleListController extends React.PureComponent {
 
 
 
+
+
+
+
+function commonVSEmbeds(prefix){
+    return [
+        prefix + ".filter_blocks_used",
+        prefix + ".date_selected",
+        prefix + ".selected_by.@id",
+        prefix + ".selected_by.display_title",
+        prefix + ".variant_sample_item.@id",
+        prefix + ".variant_sample_item.uuid",
+        prefix + ".variant_sample_item.display_title",
+        prefix + ".variant_sample_item.finding_table_tag",
+        prefix + ".variant_sample_item.actions",
+        prefix + ".variant_sample_item.date_created",
+        prefix + ".variant_sample_item.last_modified.date_modified",
+        prefix + ".variant_sample_item.last_modified.modified_by.@id",
+        prefix + ".variant_sample_item.last_modified.modified_by.display_title",
+        prefix + ".variant_sample_item.associated_genotype_labels.proband_genotype_label",
+        prefix + ".variant_sample_item.associated_genotype_labels.mother_genotype_label",
+        prefix + ".variant_sample_item.associated_genotype_labels.father_genotype_label",
+
+        // Notes
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.interpretation"),
+        prefix + ".variant_sample_item.interpretation.classification",
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.discovery_interpretation"),
+        prefix + ".variant_sample_item.discovery_interpretation.gene_candidacy",
+        prefix + ".variant_sample_item.discovery_interpretation.variant_candidacy",
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.variant_notes"),
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.gene_notes"),
+    ];
+}
+
+function commonNoteEmbeds(prefix){
+    return [
+        prefix + ".@id",
+        prefix + ".uuid",
+        prefix + ".last_modified.date_modified",
+        prefix + ".last_modified.modified_by.@id",
+        prefix + ".last_modified.modified_by.display_title",
+        prefix + ".status",
+        prefix + ".associated_items.item_type",
+        prefix + ".associated_items.item_identifier",
+        prefix + ".note_text"
+    ];
+}
+
+
+export const variantSampleListEmbeds = [
+    // Fields for list view (for InterpretationTab & CaseReviewTab)
+
+    "@id",
+    // All immediate fields off of "variant_samples" must be embedded, else they will be lost in subsequent PATCH requests.
+    // This includes "filter_blocks_used", "date_selected", "variant_sample_item.@id", & "selected_by.@id"
+    ...commonVSEmbeds("variant_samples"),
+    ...commonVSEmbeds("structural_variant_samples"),
+
+    "variant_samples.variant_sample_item.variant.@id",
+    "variant_samples.variant_sample_item.variant.display_title",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
+
+    "structural_variant_samples.variant_sample_item.structural_variant.@id",
+    "structural_variant_samples.variant_sample_item.structural_variant.display_title",
+    "structural_variant_samples.variant_sample_item.structural_variant.END",
+    "structural_variant_samples.variant_sample_item.structural_variant.START",
+    "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
+    "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
+    "structural_variant_samples.variant_sample_item.structural_variant.size_display",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title"
+];
 
