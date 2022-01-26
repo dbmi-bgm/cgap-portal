@@ -64,27 +64,34 @@ class Gene(Item):
             return result
 
     @calculated_property(schema={
-        "title": "Position Display",
-        "description": "Formatted gene position in hg38 coordinates",
+        "title": "Start Display",
+        "description": "Formatted gene start position in hg38 coordinates",
         "type": "string",
     })
-    def position_display(self, spos=None, epos=None):
-        """Create comma-formatted gene position, if possible.
+    def start_display(self, spos=None):
+        """Create comma-formatted gene start position, if possible.
 
         :param spos: Starting position
         :type spos: int
-        :param epos: Ending position
+        :returns: Formatted display or None
+        :rtype: str or None
+        """
+        return convert_integer_to_comma_string(spos)
+
+    @calculated_property(schema={
+        "title": "End Display",
+        "description": "Formatted gene end position in hg38 coordinates",
+        "type": "string",
+    })
+    def end_display(self, epos=None):
+        """Create comma-formatted gene end position, if possible.
+
+        :param epos: End position
         :type epos: int
         :returns: Formatted display or None
         :rtype: str or None
         """
-        result = None
-        if spos is not None and epos is not None:
-            start = convert_integer_to_comma_string(spos)
-            end = convert_integer_to_comma_string(epos)
-            if start and end:
-                result = start + "-" + end
-        return result
+        return convert_integer_to_comma_string(epos)
 
 
 @collection(

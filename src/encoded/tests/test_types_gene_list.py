@@ -67,18 +67,17 @@ def test_rev_link_on_genes(testapp, project, institution, gene1, gene2, gene3, g
 
 
 @pytest.mark.parametrize(
-    "spos,epos,expected",
+    "spos,epos,start_expected,end_expected",
     [
-        (None, None, None),
-        (1, None, None),
-        (None, 1, None),
-        (0, 1, "0-1"),
-        (1000, 2000, "1,000-2,000"),
-        (1000000, 2000000, "1,000,000-2,000,000"),
+        (None, None, None, None),
+        (1, None, "1", None),
+        (None, 1, None, "1"),
+        (1000, 2000, "1,000", "2,000"),
+        (1000000, 2000000, "1,000,000", "2,000,000"),
     ]
 )
-def test_position_display(spos, epos, expected, testapp, gene):
-    """Test creation of formatted position display."""
+def test_position_display(spos, epos, start_expected, end_expected, testapp, gene):
+    """Test creation of formatted position displays."""
     gene_atid = gene.get("@id")
     patch_body = {}
     if isinstance(spos, int):
@@ -88,7 +87,11 @@ def test_position_display(spos, epos, expected, testapp, gene):
     patch_result = testapp.patch_json(
         gene_atid, patch_body, status=200
     ).json["@graph"][0]
-    result = patch_result.get("position_display")
-    assert result == expected
-    if expected is None:
-        assert "position_display" not in patch_result
+    start_result = patch_result.get("start_display")
+    end_result = patch_result.get("end_display")
+    assert start_result == start_expected
+    if start_expected is None:
+        assert "start_display" not in patch_result
+    assert end_result == end_expected
+    if end_expected is None:
+        assert "end_display" not in patch_result
