@@ -2464,6 +2464,7 @@
         "hg19": {
             "title": "hg19 Coordinates",
             "type": "array",
+            "comment": "This property is deprecated but retained for testing",
             "items": {
                 "title": "hg19 Coordinates",
                 "enable_nested": true,
