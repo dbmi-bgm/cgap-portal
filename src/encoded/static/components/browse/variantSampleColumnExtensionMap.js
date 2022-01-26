@@ -338,7 +338,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
 });
 
 export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLabelColumn(props){
-    const { result, align = "center", showTips = true, truncate = true, showIcon = true } = props;
+    const { result, align = "left", showTips = true, truncate = true, showIcon = true } = props;
     const {
         associated_genotype_labels: {
             proband_genotype_label = null,
