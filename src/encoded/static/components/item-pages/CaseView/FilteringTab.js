@@ -60,7 +60,8 @@ export function FilteringTab(props) {
             <div className="row flex-column-reverse flex-md-row align-items-center">
                 <h1 className="col my-0 text-300">
                     Variant Filtering and Technical Review
-                    <i className="icon icon-arrow-right fas icon-xs mx-3"/>
+                    {/*<i className="icon icon-arrow-right fas icon-xs mx-3"/>*/}
+                    &nbsp;&ndash;&nbsp;
                     <span className="text-400">{ filteringTabViews[currViewIdx].name }</span>
                 </h1>
                 <div className="col-12 col-md-auto my-3 my-md-n3">
