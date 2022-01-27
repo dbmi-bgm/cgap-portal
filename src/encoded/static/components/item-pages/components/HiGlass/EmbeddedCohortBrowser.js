@@ -118,7 +118,7 @@ export class GeneSearchBar extends React.PureComponent {
             <div className="input-group-prepend">
               <span className="input-group-text" id="basic-addon1"><i className={icon}/></span>
             </div>
-            <input type="text" onChange={evt => this.updateCurrentSearchTerm(evt)} className="form-control" placeholder="Jump to gene" aria-label="Jump to gene" aria-describedby="basic-addon1" />
+            <input type="text" onChange={evt => this.updateCurrentSearchTerm(evt)} className="form-control" placeholder="Search for gene" aria-label="Search for gene" aria-describedby="basic-addon1" />
           </div>
           <GeneSearchResult results={results} error={error} info={info} handleResultClick={this.handleResultClick} />
 
