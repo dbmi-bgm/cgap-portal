@@ -9,6 +9,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { buildSchemaFacetDictionary } from './../../../util/Schemas';
 import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
 import { SearchBar } from './../../../browse/SearchBar';
 import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
@@ -39,60 +40,23 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
      * @param {string[]} excludeFacets - List of field names to be excluded from this UI.
      * @returns {Object.<string, { field: string, title: string, description: string, grouping: string, order: number, aggregation_type: string, field_type: string, EXCLUDED: boolean }>} Dictionary of facet/field-info from schemas+response.
      */
-    static buildFacetDictionary(facets = null, schemas = null, excludeFacets = null, searchType = "VariantSample"){
+    static buildFacetDictionary(schemas = null, excludeFacets = null, searchType = "VariantSample"){
+        const schemaFacetDict = buildSchemaFacetDictionary(schemas)[searchType] || {};
 
-        const excluded = {};
-        if (Array.isArray(excludeFacets)) {
-            excludeFacets.forEach(function(fieldName){
-                excluded[fieldName] = true;
-            });
-        }
-
-        const dict = {
-            // Treat 'q' as a facet/filter when used in filterblocks.
-            "q": {
-                "title": "Text Search",
-                "field": "q",
-                "order": -100
-            }
+        // Treat 'q' as a facet/filter when used in filterblocks.
+        schemaFacetDict["q"] = {
+            "title": "Text Search",
+            "field": "q",
+            "order": -100
         };
 
-        function saveFacetToDict(facetFields){
-            const {
-                field,
-                title, description,
-                grouping, order,
-                aggregation_type = "terms",
-                field_type
-            } = facetFields;
-
-            // We might get duplicate for some reason, leave first since more likely to have title.
-            if (dict[field]) {
-                return;
-            }
-            dict[field] = {
-                field, title, description,
-                grouping, order,
-                aggregation_type, field_type,
-                EXCLUDED: excluded[field] || false
-            };
-        }
-
-        if (Array.isArray(facets)) {
-            facets.forEach(saveFacetToDict);
-        } else if (schemas) {
-            // Fallback for when we launch on compound search / filterset (no context.facets yet available).
-            // Somewhat fragile, maybe we can move calculation of aggregation_type from search.py/_initialize_facets
-            // into same place in code where schemas are augmented to included calculated properties before being served from
-            // /profiles/ endpoint to allow us to definitively just use the single schemas (instead of context.facets, as well)
-            const vsSchemaFacets = schemas[searchType].facets;
-            Object.keys(vsSchemaFacets).forEach(function(field){
-                const facetFields = { ...vsSchemaFacets[field], field };
-                return saveFacetToDict(facetFields);
+        if (Array.isArray(excludeFacets)) {
+            excludeFacets.forEach(function(fieldName){
+                delete schemaFacetDict[fieldName];
             });
         }
 
-        return dict;
+        return schemaFacetDict;
     }
 
     /**
@@ -147,11 +111,11 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         this.memoized = {
             buildFacetDictionary: memoize(FilteringTableFilterSetUI.buildFacetDictionary, function(newArgs, lastArgs){
-                const [ nextFacets, nextSchemas ] = newArgs;
-                const [ lastFacets, lastSchemas ] = lastArgs;
-                // In this component we only want the titles and aggregation_types of facets, not their aggregations,
-                // so we recalculate only if we never calculated them before.
-                if ((!lastFacets && nextFacets) || (!lastSchemas && nextSchemas)) {
+                const [ nextSchemas ] = newArgs;
+                const [ lastSchemas ] = lastArgs;
+                // We recalculate only if we get schemas and didn't have them before.
+                // searchType and excludeFacets not expected to change per instance.
+                if (!lastSchemas && nextSchemas) {
                     return false; // 'is not equal'
                 }
                 return true; // 'is equal'
@@ -244,7 +208,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { bodyOpen } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets, searchType);
+        const facetDict = this.memoized.buildFacetDictionary(schemas, excludeFacets, searchType);
         const { duplicateQueryIndices, duplicateNameIndices, haveDuplicateQueries, haveDuplicateNames } = this.memoized.findDuplicateBlocks(filter_blocks);
         const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount, selectedFilterBlockIdxList } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices, filterSet);
 

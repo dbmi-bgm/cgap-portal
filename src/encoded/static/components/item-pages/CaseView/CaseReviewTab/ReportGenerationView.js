@@ -208,7 +208,7 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
     }, [ projectReportSettings, context, fetchReportItem ]);
 
     return (
-        <form onSubmit={onSubmit} className="d-block pt-24 px-xl-5">
+        <form onSubmit={onSubmit} className="d-block pt-16 container">
 
             <div className="row">
 
@@ -222,6 +222,11 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
                         <LocalizedTime timestamp={reportLastModified} formatType="date-time-md" />
                     </div>
                     <div className="ml-12">
+                        <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
+                            <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
+                            Save
+                        </button>
+                        {/*
                         <div className="btn-group" role="group">
                             <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
                                 <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
@@ -233,6 +238,7 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
                                 Reset
                             </button>
                         </div>
+                        */}
                     </div>
                 </div>
 

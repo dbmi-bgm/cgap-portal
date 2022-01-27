@@ -37,7 +37,7 @@ export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView
                 <hr className="tab-section-title-horiz-divider mb-5"/>
                 <div className="container-wide text-center">
                     { isLoadingGraphSteps?
-                        <i className="icon icon-fw icon-circle-notch icon-spin fas text-larger"/>
+                        <i className="icon icon-fw icon-circle-notch icon-spin fas text-secondary icon-2x"/>
                         :
                         <h5 className="text-400">
                             No steps available
