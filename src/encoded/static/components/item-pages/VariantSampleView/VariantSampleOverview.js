@@ -208,9 +208,10 @@ class VariantSampleOverviewTabView extends React.PureComponent {
     }
 
     componentWillUnmount(){
-        this.openPersistentTabs = [];
+        this.openPersistentTabs = {};
     }
 
+    // TODO: DRY-ify
     annotationTab(){
         const { href, defaultTab = 0 } = this.props;
         const { query: parsedQuery = {} } = memoizedUrlParse(href);
@@ -222,6 +223,7 @@ class VariantSampleOverviewTabView extends React.PureComponent {
         return annotationTab;
     }
 
+    // TODO: DRY-ify
     handleTabClick(e){
         const { href } = this.props;
         // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
@@ -315,7 +317,7 @@ class VariantSampleOverviewTabView extends React.PureComponent {
 }
 
 
-const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
+export const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     const { annotationTab, title, index, disabled = false, loading = false } = props;
     const active = (annotationTab === index);
     return (
