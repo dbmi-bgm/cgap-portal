@@ -290,7 +290,10 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+        position = convert_integer_to_comma_string(POS)
+        if position is None:
+            position = POS
+        return build_variant_display_title(CHROM, position, REF, ALT)  # chr1:1,504A>T
 
     @calculated_property(schema={
         "title": "Position (genome coordinates)",
@@ -356,10 +359,7 @@ class Variant(Item):
         "type": "string"
     })
     def alternate_display_title(self, CHROM, POS, REF, ALT):
-        position = convert_integer_to_comma_string(POS)
-        if position is None:
-            position = POS
-        return build_variant_display_title(CHROM, position, REF, ALT)  # chr1:1,504A>T
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:1504A>T
 
 
 @collection(

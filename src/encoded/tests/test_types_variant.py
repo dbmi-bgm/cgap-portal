@@ -239,8 +239,33 @@ def test_most_severe_location(
         (1000000, "1,000,000"),
     ]
 )
-def test_alternate_display_title(POS, expected, testapp, variant):
+def test_display_title(POS, expected, testapp, variant):
     """Test building variant display title with comma-separated position."""
+    variant_atid = variant.get("@id")
+    chromosome = variant.get("CHROM")
+    reference = variant.get("REF")
+    alternate = variant.get("ALT")
+    patch_body = {"POS": POS}
+    patch_response = testapp.patch_json(
+        variant_atid, patch_body, status=200
+    ).json["@graph"][0]
+    result = patch_response.get("display_title")
+    assert result == "chr%s:%s%s>%s" % (chromosome, expected, reference, alternate)
+
+
+@pytest.mark.parametrize(
+    "POS,expected",
+    [
+        (1, "1"),
+        (100, "100"),
+        (1000, "1000"),
+        (1000000, "1000000"),
+    ]
+)
+def test_alternate_display_title(POS, expected, testapp, variant):
+    """Test building alternate variant display title without
+    comma-separated position.
+    """
     variant_atid = variant.get("@id")
     chromosome = variant.get("CHROM")
     reference = variant.get("REF")

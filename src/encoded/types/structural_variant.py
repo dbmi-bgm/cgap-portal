@@ -117,7 +117,9 @@ class StructuralVariant(Item):
         }
     )
     def display_title(self, SV_TYPE, CHROM, START, END):
-        return build_structural_variant_display_title(SV_TYPE, CHROM, START, END)
+        start = convert_integer_to_comma_string(START)
+        end = convert_integer_to_comma_string(END)
+        return build_structural_variant_display_title(SV_TYPE, CHROM, start, end)
 
     @calculated_property(
         schema={
@@ -291,8 +293,8 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Formatted Position",
-            "description": "The formatted position of this structural variant",
+            "title": "Position Display",
+            "description": "The comma formatted position of this structural variant",
             "type": "string",
         }
     )
@@ -302,14 +304,15 @@ class StructuralVariant(Item):
 
     @calculated_property(
         schema={
-            "title": "Formatted Position",
-            "description": "The formatted position of this structural variant",
+            "title": "Formatted Position (hg19)",
+            "description": "The formatted hg19 position of this structural variant",
             "type": "string",
         }
     )
     def hg19_position_display(self, hg19_chr=None, hg19_start=None, hg19_end=None):
         """Create formatted hg19 position to display in portal."""
         return build_comma_formatted_position(hg19_chr, hg19_start, hg19_end)
+
 
 @collection(
     name="structural-variant-samples",
