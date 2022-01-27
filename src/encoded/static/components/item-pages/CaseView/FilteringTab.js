@@ -58,9 +58,11 @@ export function FilteringTab(props) {
     return (
         <React.Fragment>
             <div className="row flex-column-reverse flex-md-row align-items-center">
-                <h1 className="col my-0">
-                    { filteringTabViews[currViewIdx].name + " " }
-                    <span className="text-300">Variant Filtering and Technical Review</span>
+                <h1 className="col my-0 text-300">
+                    Variant Filtering and Technical Review
+                    {/*<i className="icon icon-arrow-right fas icon-xs mx-3"/>*/}
+                    &nbsp;&ndash;&nbsp;
+                    <span className="text-400">{ filteringTabViews[currViewIdx].name }</span>
                 </h1>
                 <div className="col-12 col-md-auto my-3 my-md-n3">
                     <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
@@ -157,7 +159,11 @@ function createBlankFilterSetItem(searchType, caseAccession){
                 "name" : "Filter Block 1",
                 "query" : ""
             }
-        ]
+        ],
+        // Any FilterSet saved to Case should have "current" or "in review" by default so others in Project can see/edit it as well.
+        // It may make sense to upgrade to status=shared or similar for public/knowledgebase data, though.
+        // But not any lower than "current", "in review", or "shared to project"
+        "status": "current"
     };
 }
 
@@ -358,7 +364,7 @@ function FilteringTabBody(props) {
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+        <ajax.FetchedItem atId={activeFilterSetID + "?datastore=database"} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
             onFail={onFailInitialFilterSetItemLoad}>
             <FilterSetController {...fsControllerProps}>
                 { embeddedTableHeaderBody }

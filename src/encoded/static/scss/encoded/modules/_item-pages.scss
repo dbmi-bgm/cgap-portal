@@ -1267,7 +1267,7 @@ i.status-indicator-dot {
 						padding: 10px;
 						text-decoration: none;
 						width: 100%;
-						box-shadow: none;
+						/* box-shadow: 0px 5px 16px -10px #000c; */
 
 						display: flex;
 						align-items: center;
@@ -1285,6 +1285,7 @@ i.status-indicator-dot {
 						height: 100%;
 						width: $search-results-header-row-height; // Same as height of parent
 						flex: 1 0 0px;
+						z-index: 2;
 						> svg {
 							height: 100%;
 							width: auto;
@@ -1355,6 +1356,7 @@ i.status-indicator-dot {
 
 						> .btn-title {
 							background-color: darken($color: cornflowerblue, $amount: 7.5%) !important;
+							/* box-shadow: 0px 5px 16px -10px #000; */
 						}
 						> .btn-append > svg > path,
 						> .btn-prepend > svg >  path {
@@ -1366,9 +1368,9 @@ i.status-indicator-dot {
 
 						> .btn-title {
 							// background-color: darken($color: cornflowerblue, $amount: 30%) !important;
-							// box-shadow: 0px 13px 16px -16px #000;
 							background-color: $primary-dark;
-							cursor: default; // Since we on tab already, clicking would have no effect, so dissuade somewhat.
+							cursor: default; // Since we're on tab already, clicking would have no effect, so dissuade somewhat.
+							/* box-shadow: 0px 5px 16px -9px transparent; */
 						}
 						> .btn-append > svg > path,
 						> .btn-prepend > svg > path {
@@ -1403,13 +1405,13 @@ i.status-indicator-dot {
 			/* 'Current Case' selection marker/styling */
 			&#case-info\.accessioning {
 				.current-case {
-					background-color: lavender;
-					padding: 3px 5px;
+					padding: 0 5px;
 					/* Cancel out the above padding somewhat to align text with other non-selected text */
 					/* Maybe not cleanest approach... */
-					margin: -2px -5px;
-					border: solid 1px #fff;
-					border-radius: $border-radius-base;
+					margin: 0 -5px;
+					outline: 2px solid $primary-dark;
+					outline-offset: 3px;
+					@extend .rounded-pill;
 				}
 			}
 
@@ -1829,8 +1831,6 @@ i.status-indicator-dot {
 		@include clickable-hoverable-icon;
 	}
 
-	
-
 	.filter-set-ui-header {
 		/** Header **/
 		/* Looks nice, enough to accomodate Save | Save As buttons, and gives us a concrete number to match FS preset selection UI header height to. */
@@ -1846,28 +1846,121 @@ i.status-indicator-dot {
 		}
 	}
 
-	.blocks-container {
+}
 
-		/* min-height: 400px; */
+.filterset-block {
+	padding: 2px;
+	text-rendering: geometricPrecision;
+	// border-radius: $border-radius-lg;
+	// border: 1px solid #8e8e8e;
+	// background-color: #f1f1f1;
+
+	.title-controls-row {
+
+		.cached-counts-value {
+			height: 24px;
+			line-height: 20px;
+			min-width: 24px;
+			border: 2px solid transparent;
+			padding: 0 3px;
+			text-align: center;
+			font-size: 0.75em;
+			border-radius: 50%;
+			&[data-count-exists="true"] {
+				border-color: #0005;
+			}
+		}
+
+	}
+
+	.filter-query-viz-blocks {
+				
+		.field-block {
+			position: relative;
+
+			.value-blocks {
+				.value-block {
+					border-radius: 25px;
+					padding: 5px 10px;
+					background-color: #fff;
+					position: relative;
+					/* box-shadow: 0 2px 8px -3px #000; */
+					white-space: nowrap;
+					margin: 3px 0;
+					flex-grow: 1;
+					text-align: center;
+					&:not(:last-child) {
+						margin-right: 7px;
+						&:after {
+							content: "";
+							height: 16px;
+							top: 10px;
+							top: calc(50% - 8px);
+							border-right: 1px solid $gray-700;
+							//transform: scale3d(0.75, 0.75, 0.75);
+							right: -4px;
+							position: absolute;
+						}
+					}
+				}
+			}
+
+			.field-name {
+				position: relative;
+				padding-top: 5px;
+				font-size: .925em;
+				&:before {
+					content: " ";
+					position: absolute;
+					top: -2px;
+					height: 5px;
+					border: 1px solid #444;
+					left: -4px;
+					right: -4px;
+					border-top: none;
+				}
+			}
+
+			&:not(:last-child) {
+				margin-right: 15px;
+				&:after {
+					content: "&";
+					transform: scale3d(0.75, 0.75, 0.75);
+					right: -12px;
+					top: 10px;
+					top: calc(50% - 24px);
+					position: absolute;
+				}
+
+			}
+
+		}
+	}
+}
+
+.filterset-blocks-container {
+
+	background-color: #dedede;
+	border-radius: 0 0 $border-radius-lg $border-radius-lg;
+	border: 4px solid transparent;
+	border-top: none;
+	transition: background-color .4s .1s ease-in;
+
+
+	/* While present as child of flex-grow-1 'column', stretch self to min-height of left presets column */
+	min-height: 100%;
+	display: flex;
+	flex-direction: column;
+
+	> .blocks-container {
+		flex-grow: 1;
 		overflow: auto;
 
 		.filterset-block {
+
 			border-radius: $border-radius-lg;
 			border: 1px solid #8e8e8e;
-			padding: 2px;
-
 			background-color: #f1f1f1;
-			/* background-color: desaturate(lighten($primary, 50%), 15%); */ // #dce4f5; // TODO: Codify somewhere
-			
-			// border-color: desaturate(lighten($primary-dark, 40%), 25%); /* Same as .filterset-outer-container background-color */
-			// margin: 0 -3px; /* Subtract border-width to align left + right unselected edges properly w. other UI elements */
-			/* transition: border-color .5s, background-color .5s; */
-
-			/* Disabled for now - sometimes can be slow: */
-			/* transition: background-color .5s ease-out; */
-
-
-			/* box-shadow: 0 1px 6px -3px black; */
 
 			&:not(:last-child) {
 				margin-bottom: 16px;
@@ -1895,8 +1988,8 @@ i.status-indicator-dot {
 				transition: none;
 			}
 
-
-			&[data-duplicate-query="true"] {
+			&[data-duplicate-query="true"],
+			&[data-name-value-differs-in-existing-selection="true"] {
 				background-color: desaturate(lighten($danger, 45%), 10%);
 				&.selected {
 					border-color: desaturate(lighten($danger, 10%), 20%);
@@ -1909,163 +2002,52 @@ i.status-indicator-dot {
 					@include clickable-hoverable-icon;
 				}
 
-				.cached-counts-value {
-					height: 24px;
-					line-height: 20px;
-					min-width: 24px;
-					border: 2px solid transparent;
-					padding: 0 3px;
-					text-align: center;
-					font-size: 0.75em;
-					border-radius: 50%;
-					&[data-count-exists="true"] {
-						border-color: #0005;
-					}
-				}
-
-			}
-
-			.filter-query-viz-blocks {
-				
-				.field-block {
-					position: relative;
-
-					.value-blocks {
-						.value-block {
-							border-radius: 25px;
-							padding: 5px 10px;
-							background-color: #fff;
-							position: relative;
-							/* box-shadow: 0 2px 8px -3px #000; */
-							white-space: nowrap;
-							margin: 3px 0;
-							flex-grow: 1;
-							text-align: center;
-							&:not(:last-child) {
-								margin-right: 7px;
-								&:after {
-									content: "";
-									height: 16px;
-									top: 10px;
-									top: calc(50% - 8px);
-									border-right: 1px solid $gray-700;
-									//transform: scale3d(0.75, 0.75, 0.75);
-									right: -4px;
-									position: absolute;
-								}
-							}
-						}
-					}
-
-					.field-name {
-						position: relative;
-						padding-top: 5px;
-						font-size: .925em;
-						&:before {
-							content: " ";
-							position: absolute;
-							top: -2px;
-							height: 5px;
-							border: 1px solid #444;
-							left: -4px;
-							right: -4px;
-							border-top: none;
-						}
-					}
-
-					&:not(:last-child) {
-						margin-right: 15px;
-						&:after {
-							content: "&";
-							transform: scale3d(0.75, 0.75, 0.75);
-							right: -12px;
-							top: 10px;
-							top: calc(50% - 24px);
-							position: absolute;
-						}
-
-					}
-
-				}
 			}
 
 		}
 
 	}
 
-	.filterset-blocks-container {
 
-		background-color: #dedede;
-		border-radius: 0 0 $border-radius-lg $border-radius-lg;
-		border: 4px solid transparent;
-		border-top: none;
-		transition: background-color .4s .1s ease-in;
-
-
-		/* While present as child of flex-grow-1 'column', stretch self to min-height of left presets column */
-		min-height: 100%;
-		display: flex;
-		flex-direction: column;
+	&[data-all-selected="true"] {
+		border-color: $primary-dark;
+		background-color: desaturate(lighten($primary-dark, 40%), 25%);
 
 		> .blocks-container {
-			flex-grow: 1;
-		}
 
+			 .filterset-block.selected {
+				border-width: 1px;
+				padding: 2px;
+				border-radius: $border-radius-lg;
+				border-color: desaturate(lighten($primary-dark, 15%), 25%);;
+			}
 
-		&[data-all-selected="true"] {
-			border-color: $primary-dark;
-			background-color: desaturate(lighten($primary-dark, 40%), 25%);
-
-			.blocks-container {
-	
-				 .filterset-block.selected {
-					 border-width: 1px;
-					padding: 2px;
-					border-radius: $border-radius-lg;
-					border-color: desaturate(lighten($primary-dark, 15%), 25%);;
-				}
-	
-				&:hover {
-					.filterset-block.clickable.selected {
-						&:hover {
-							border-width: 2px;
-							padding: 1px;
-							border-radius: $border-radius-lg + 1px;
-							border-color: $primary-dark;
-						}
+			&:hover {
+				.filterset-block.clickable.selected {
+					&:hover {
+						border-width: 2px;
+						padding: 1px;
+						border-radius: $border-radius-lg + 1px;
+						border-color: $primary-dark;
 					}
 				}
 			}
 		}
-
 	}
 
-	// &[data-all-selected="true"] {
-	// 	border-color: $primary-dark;
-	// 	background-color: desaturate(lighten($primary-dark, 40%), 25%);
-	// 	.blocks-container {
-
-	// 	 	.filterset-block.selected {
-	// 	 		border-width: 1px;
-	// 			padding: 2px;
-	// 			border-radius: $border-radius-lg;
-	// 			border-color: desaturate(lighten($primary-dark, 15%), 25%);;
-	// 		}
-
-	// 		&:hover {
-	// 			.filterset-block.clickable.selected {
-	// 				&:hover {
-	// 					border-width: 2px;
-	// 					padding: 1px;
-	// 					border-radius: $border-radius-lg + 1px;
-	// 					border-color: $primary-dark;
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// }
-
 }
+
+/* Used for Interpretation Tab */
+.filterset-block-popover {
+	> .arrow:after {
+		border-top-color: #dedede;
+	}
+	> .popover-body {
+		background-color: #dedede;
+	}
+}
+
+
 
 /**********************************************************
 	CaseView -> InterpretationTab + CaseReviewTab

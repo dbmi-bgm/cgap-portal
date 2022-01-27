@@ -7,12 +7,13 @@ import queryString from 'query-string';
 import memoize from 'memoize-one';
 import ReactTooltip from 'react-tooltip';
 
-import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { buildSchemaFacetDictionary } from './../../../util/Schemas';
 import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
 import { SearchBar } from './../../../browse/SearchBar';
 import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
-import { SaveFilterSetButton } from './SaveFilterSetButton';
+import { SaveFilterSetButton, validateAllFilterSetBlockNames, savedVariantSampleListItemFilterBlockQueryDict } from './SaveFilterSetButton';
 import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 import { PresetFilterSetSelectionUI } from './PresetFilterSetSelectionUI';
 import { FilterBlock, DummyLoadingFilterBlock } from './FilterBlock';
@@ -39,60 +40,23 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
      * @param {string[]} excludeFacets - List of field names to be excluded from this UI.
      * @returns {Object.<string, { field: string, title: string, description: string, grouping: string, order: number, aggregation_type: string, field_type: string, EXCLUDED: boolean }>} Dictionary of facet/field-info from schemas+response.
      */
-    static buildFacetDictionary(facets = null, schemas = null, excludeFacets = null, searchType = "VariantSample"){
+    static buildFacetDictionary(schemas = null, excludeFacets = null, searchType = "VariantSample"){
+        const schemaFacetDict = buildSchemaFacetDictionary(schemas)[searchType] || {};
 
-        const excluded = {};
-        if (Array.isArray(excludeFacets)) {
-            excludeFacets.forEach(function(fieldName){
-                excluded[fieldName] = true;
-            });
-        }
-
-        const dict = {
-            // Treat 'q' as a facet/filter when used in filterblocks.
-            "q": {
-                "title": "Text Search",
-                "field": "q",
-                "order": -100
-            }
+        // Treat 'q' as a facet/filter when used in filterblocks.
+        schemaFacetDict["q"] = {
+            "title": "Text Search",
+            "field": "q",
+            "order": -100
         };
 
-        function saveFacetToDict(facetFields){
-            const {
-                field,
-                title, description,
-                grouping, order,
-                aggregation_type = "terms",
-                field_type
-            } = facetFields;
-
-            // We might get duplicate for some reason, leave first since more likely to have title.
-            if (dict[field]) {
-                return;
-            }
-            dict[field] = {
-                field, title, description,
-                grouping, order,
-                aggregation_type, field_type,
-                EXCLUDED: excluded[field] || false
-            };
-        }
-
-        if (Array.isArray(facets)) {
-            facets.forEach(saveFacetToDict);
-        } else if (schemas) {
-            // Fallback for when we launch on compound search / filterset (no context.facets yet available).
-            // Somewhat fragile, maybe we can move calculation of aggregation_type from search.py/_initialize_facets
-            // into same place in code where schemas are augmented to included calculated properties before being served from
-            // /profiles/ endpoint to allow us to definitively just use the single schemas (instead of context.facets, as well)
-            const vsSchemaFacets = schemas[searchType].facets;
-            Object.keys(vsSchemaFacets).forEach(function(field){
-                const facetFields = { ...vsSchemaFacets[field], field };
-                return saveFacetToDict(facetFields);
+        if (Array.isArray(excludeFacets)) {
+            excludeFacets.forEach(function(fieldName){
+                delete schemaFacetDict[fieldName];
             });
         }
 
-        return dict;
+        return schemaFacetDict;
     }
 
     /**
@@ -102,34 +66,42 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
     static findDuplicateBlocks(filter_blocks){
         const duplicateQueryIndices = {};
         const duplicateNameIndices = {};
+        let haveDuplicateQueries = false;
+        let haveDuplicateNames = false;
 
+        // For each filter_block, check any of its preceding blocks for equality.
         filter_blocks.forEach(function({ name, query }, idx){
             var i;
             for (i = 0; i < idx; i++) {
                 if (filter_blocks[i].name === name) {
                     duplicateNameIndices[idx] = i; // idx gets converted to str here, self-reminder to parseInt(key) out if need to compare against it.
+                    haveDuplicateNames = true;
                     break;
                 }
             }
             for (i = 0; i < idx; i++) {
-                if (_.isEqual(queryString.parse(filter_blocks[i].query), queryString.parse(query))) {
+                if (object.compareQueries(queryString.parse(filter_blocks[i].query), queryString.parse(query))) {
                     duplicateQueryIndices[idx] = i; // idx gets converted to str here, self-reminder to parseInt(key) out if need to compare against it.
+                    haveDuplicateQueries = true;
                     break;
                 }
             }
         });
 
-        return { duplicateQueryIndices, duplicateNameIndices };
+        return { duplicateQueryIndices, duplicateNameIndices, haveDuplicateQueries, haveDuplicateNames };
     }
 
     static deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices){
         let singleSelectedFilterBlockIdx = null;
-        const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices);
+        const selectedFilterBlockIdxList = Object.keys(selectedFilterBlockIndices).map(function(stringIdx){
+            return parseInt(stringIdx);
+        });
         const selectedFilterBlockIdxCount = selectedFilterBlockIdxList.length;
         if (selectedFilterBlockIdxCount === 1) {
-            singleSelectedFilterBlockIdx = parseInt(selectedFilterBlockIdxList[0]);
+            [ singleSelectedFilterBlockIdx ] = selectedFilterBlockIdxList;
         }
-        return { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount };
+
+        return { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount, selectedFilterBlockIdxList };
     }
 
     constructor(props){
@@ -139,17 +111,19 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         this.memoized = {
             buildFacetDictionary: memoize(FilteringTableFilterSetUI.buildFacetDictionary, function(newArgs, lastArgs){
-                const [ nextFacets, nextSchemas ] = newArgs;
-                const [ lastFacets, lastSchemas ] = lastArgs;
-                // In this component we only want the titles and aggregation_types of facets, not their aggregations,
-                // so we recalculate only if we never calculated them before.
-                if ((!lastFacets && nextFacets) || (!lastSchemas && nextSchemas)) {
+                const [ nextSchemas ] = newArgs;
+                const [ lastSchemas ] = lastArgs;
+                // We recalculate only if we get schemas and didn't have them before.
+                // searchType and excludeFacets not expected to change per instance.
+                if (!lastSchemas && nextSchemas) {
                     return false; // 'is not equal'
                 }
                 return true; // 'is equal'
             }),
             findDuplicateBlocks: memoize(FilteringTableFilterSetUI.findDuplicateBlocks),
-            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo)
+            deriveSelectedFilterBlockIdxInfo: memoize(FilteringTableFilterSetUI.deriveSelectedFilterBlockIdxInfo),
+            savedVariantSampleListItemFilterBlockQueryDict: memoize(savedVariantSampleListItemFilterBlockQueryDict),
+            validateAllFilterSetBlockNames: memoize(validateAllFilterSetBlockNames)
         };
 
         this.state = {
@@ -234,9 +208,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const { bodyOpen } = this.state;
 
         // Only updates if facets is not null since we don't care about aggregated counts from search response.
-        const facetDict = this.memoized.buildFacetDictionary(facets, schemas, excludeFacets, searchType);
-        const { duplicateQueryIndices, duplicateNameIndices } = this.memoized.findDuplicateBlocks(filter_blocks);
-        const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices);
+        const facetDict = this.memoized.buildFacetDictionary(schemas, excludeFacets, searchType);
+        const { duplicateQueryIndices, duplicateNameIndices, haveDuplicateQueries, haveDuplicateNames } = this.memoized.findDuplicateBlocks(filter_blocks);
+        const { singleSelectedFilterBlockIdx, selectedFilterBlockIdxCount, selectedFilterBlockIdxList } = this.memoized.deriveSelectedFilterBlockIdxInfo(selectedFilterBlockIndices, filterSet);
 
         const filterBlocksLen = filter_blocks.length;
         const allFilterBlocksSelected = filterBlocksLen > 0 && (selectedFilterBlockIdxCount === 0 || selectedFilterBlockIdxCount === filterBlocksLen);
@@ -250,17 +224,20 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         //     this.props
         // );
 
-
-        const haveDuplicateQueries = _.keys(duplicateQueryIndices).length > 0;
-        const haveDuplicateNames = _.keys(duplicateNameIndices) > 0;
+        const savedToVSLFilterBlockQueries = this.memoized.savedVariantSampleListItemFilterBlockQueryDict(variantSampleListItem);
+        const allFilterBlockNameQueriesValid = this.memoized.validateAllFilterSetBlockNames(savedToVSLFilterBlockQueries, filterSet);
 
         // Always disable if any of following conditions:
-        const isEditDisabled = !bodyOpen || !haveEditPermission || haveDuplicateQueries || haveDuplicateNames || !filterSet || isSettingFilterBlockIdx;
+        const isEditDisabled = (
+            haveDuplicateQueries || haveDuplicateNames ||
+            !allFilterBlockNameQueriesValid ||
+            !filterSet || isSettingFilterBlockIdx
+        );
 
         const headerProps = {
             filterSet, bodyOpen, caseItem,
-            haveDuplicateQueries, haveDuplicateNames,
-            isEditDisabled,
+            haveDuplicateQueries, haveDuplicateNames, allFilterBlockNameQueriesValid,
+            isEditDisabled, haveEditPermission,
             // setTitleOfFilterSet,
             isFetchingInitialFilterSetItem,
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
@@ -280,8 +257,10 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 addNewFilterBlock, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
                 cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx,
                 intersectFilterBlocks, toggleIntersectFilterBlocks,
+                savedToVSLFilterBlockQueries, allFilterBlockNameQueriesValid,
                 // Props for Save btn:
-                saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged
+                saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+                haveEditPermission
             };
 
             fsuiBlocksBody = <FilterSetUIBody {...bodyProps} />;
@@ -291,7 +270,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             aboveTableControls = (
                 <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
                     <div className="col-12 col-lg-4 py-2">
-                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }} />
+                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
+                            placeholder={!currentFilterBlockName ? "Select a single filter-block above to search..." : "Search..."} />
                     </div>
                     <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
                         { typeof totalCount === "number" ?
@@ -313,8 +293,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                     <div className="col col-lg-auto pr-06 d-flex">
                         { selectedVariantSamples instanceof Map ?
                             <div className="pr-14">
-                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIndices,
-                                    variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType }} />
+                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
+                                    intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
+                                    isEditDisabled, haveEditPermission }} />
                             </div>
                             : null }
                         { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }
@@ -331,6 +312,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             originalPresetFilterSet, refreshOriginalPresetFilterSet, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading,
             isFetchingInitialFilterSetItem, lastSavedPresetFilterSet
         };
+
 
         // console.info("Current Case FilterSet:", filterSet);
 
@@ -363,8 +345,9 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
         filterSet, caseItem,
         hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
         toggleOpen, bodyOpen,
-        isEditDisabled,
-        haveDuplicateQueries, haveDuplicateNames,
+        isEditDisabled: propIsEditDisabled,
+        haveEditPermission,
+        haveDuplicateQueries, haveDuplicateNames, allFilterBlockNameQueriesValid,
         isFetchingInitialFilterSetItem = false,
         // From SaveFilterSetPresetButtonController
         hasFilterSetChangedFromOriginalPreset, hasFilterSetChangedFromLastSavedPreset,
@@ -448,11 +431,20 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
         );
     }
 
+    const isEditDisabled = propIsEditDisabled || !bodyOpen;
+
     const savePresetDropdownProps = {
         filterSet, caseItem, isEditDisabled, originalPresetFilterSet,
         hasFilterSetChangedFromOriginalPreset, hasFilterSetChangedFromLastSavedPreset,
         lastSavedPresetFilterSet, isOriginalPresetFilterSetLoading, setLastSavedPresetFilterSet,
     };
+
+    let warnIcon = null;
+    if (haveDuplicateQueries || haveDuplicateNames || !allFilterBlockNameQueriesValid) {
+        const err = !allFilterBlockNameQueriesValid ? "Filter block with same name but different query value has been saved to Variant Sample selection list already. Please change Filter Block name below to proceed."
+            : `Filter blocks with duplicate ${(haveDuplicateNames ? "names" : "") + (haveDuplicateNames && haveDuplicateQueries ? " and " : "") + (haveDuplicateQueries ? "queries" : "")} exist below.`;
+        warnIcon = <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger" data-tip={err} />;
+    }
 
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
@@ -461,13 +453,9 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
                 { titleBlock }
             </div>
             <div className="flex-shrink-0 flex-grow-0 pl-16 overflow-hidden">
-                { haveDuplicateQueries || haveDuplicateNames ?
-                    <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger"
-                        data-tip={`Filter blocks with duplicate ${haveDuplicateQueries ? "queries" : "names"} exist below`} />
-                    : null }
-
+                { warnIcon }
                 <div role="group" className="dropdown btn-group">
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission }}
                         className="btn btn-sm btn-outline-light align-items-center d-flex text-truncate" />
                     <SaveFilterSetPresetButton {...savePresetDropdownProps} />
                 </div>
@@ -483,8 +471,9 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
         filterSet, filterBlocksLen, facetDict, schemas,
         singleSelectedFilterBlockIdx, selectedFilterBlockIndices, allFilterBlocksSelected, selectedFilterBlockIdxCount,
         selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
-        cachedCounts, duplicateQueryIndices, duplicateNameIndices, isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+        cachedCounts, duplicateQueryIndices, duplicateNameIndices, savedToVSLFilterBlockQueries, allFilterBlockNameQueriesValid,
+        isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
+        // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission
         ...remainingProps
     } = props;
 
@@ -493,9 +482,8 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
 
     const commonProps = {
         facetDict, filterBlocksLen, selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx, isSettingFilterBlockIdx,
-        duplicateQueryIndices, duplicateNameIndices, cachedCounts, schemas
+        duplicateQueryIndices, duplicateNameIndices, savedToVSLFilterBlockQueries, cachedCounts, schemas, allFilterBlockNameQueriesValid
     };
-
 
     return (
         <div className="filterset-blocks-container blocks-outer-container" data-all-selected={allFilterBlocksSelected}>
@@ -536,8 +524,8 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
                 </div>
             ) }
 
-            <FilterSetUIBlockBottomUI {...remainingProps}
-                {...{ selectFilterBlockIdx, allFilterBlocksSelected, filterBlocksLen, singleSelectedFilterBlockIdx, currentSingleBlockQuery }} />
+            <FilterSetUIBlockBottomUI {...remainingProps} {...{ selectFilterBlockIdx, allFilterBlocksSelected,
+                filterBlocksLen, singleSelectedFilterBlockIdx, currentSingleBlockQuery }} />
 
         </div>
     );
@@ -552,7 +540,8 @@ function FilterSetUIBlockBottomUI(props){
         filterBlocksLen,
         singleSelectedFilterBlockIdx,
         currentSingleBlockQuery,
-        saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
+        saveFilterSet, isSavingFilterSet,
+        isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission,
         intersectFilterBlocks = false
     } = props;
 
@@ -609,7 +598,7 @@ function FilterSetUIBlockBottomUI(props){
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged }}
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission }}
                     className="btn btn-primary fixed-height d-inline-flex align-items-center" />
             </div>
         </div>

@@ -48,14 +48,14 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     );
                 }
             },
-            "__matching_filter_block_indices": {
+            "__matching_filter_block_names": {
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
                 "render": function(result, props) {
-                    const { __matching_filter_block_indices = [] } = result;
-                    if (__matching_filter_block_indices.length === 0) {
+                    const { __matching_filter_block_names = [] } = result;
+                    if (__matching_filter_block_names.length === 0) {
                         return null;
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
@@ -105,14 +105,14 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     );
                 }
             },
-            "__matching_filter_block_indices": {
+            "__matching_filter_block_names": {
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
                 "render": function(result, props) {
-                    const { __matching_filter_block_indices = [] } = result;
-                    if (__matching_filter_block_indices.length === 0) {
+                    const { __matching_filter_block_names = [] } = result;
+                    if (__matching_filter_block_names.length === 0) {
                         return null;
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
@@ -212,10 +212,10 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
 
 const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilterBlockIndicesPopoverColumn(props){
     const { result, currFilterSet } = props;
-    const { __matching_filter_block_indices = [], uuid: resultUUID } = result;
+    const { __matching_filter_block_names = [], uuid: resultUUID } = result;
     const { filter_blocks = [] } = currFilterSet || {};
 
-    const filterBlockNameList = __matching_filter_block_indices.map(function(fbIdx, idxIdx){
+    const filterBlockNameList = __matching_filter_block_names.map(function(fbIdx, idxIdx){
         const matchingFilterBlock = filter_blocks[parseInt(fbIdx)];
         const { name } = matchingFilterBlock || {};
         return name || fbIdx;
@@ -223,8 +223,8 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
 
     const popover = (
         <Popover id={"mi:" + resultUUID}>
-            <Popover.Content className="pt-0 pl-0 pr-0">
-                <Popover.Title className="m-0 text-600" as="h5">Matches Filter Blocks:</Popover.Title>
+            <Popover.Title className="m-0 text-600" as="h5">Matches Filter Blocks:</Popover.Title>
+            <Popover.Content className="pt-0 pl-0 pr-04">
                 <ul className="mb-0 mt-08">
                     { filterBlockNameList.map(function(fbName, i){
                         return <li key={i}>{ fbName }</li>;
@@ -239,8 +239,8 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
             <OverlayTrigger trigger="focus" overlay={popover}>
                 { function({ ref, ...triggerHandlers }){
                     return (
-                        <button type="button" ref={ref} { ...triggerHandlers } className="btn mx-auto btn-sm btn-link text-decoration-none">
-                            { __matching_filter_block_indices.length }
+                        <button type="button" ref={ref} { ...triggerHandlers } className="btn btn-sm btn-link text-decoration-none">
+                            { __matching_filter_block_names.length }
                         </button>
                     );
                 }}

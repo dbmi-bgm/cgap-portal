@@ -112,7 +112,7 @@ export class VariantSampleListController extends React.PureComponent {
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
             const [ variantSampleListItem ] = resp;
-            const { "@id": vslID, error = null } = variantSampleListItem;
+            const { "@id": vslID } = variantSampleListItem || {}; // Is `null` if no view permissions for it.
 
             if (scopedRequest !== this.currentRequest) {
                 // Request superseded, cancel it.
@@ -120,9 +120,11 @@ export class VariantSampleListController extends React.PureComponent {
             }
 
             if (!vslID) {
-                throw new Error("Couldn't get VSL");
+                this.setState({ "isLoadingVariantSampleListItem": false }, function(){
+                    setTimeout(ReactTooltip.rebuild, 50);
+                });
+                throw new Error("Couldn't get VSL - check view permissions");
             }
-
 
             this.currentRequest = null;
 
@@ -155,55 +157,7 @@ export class VariantSampleListController extends React.PureComponent {
                 vslFetchCallback,
                 JSON.stringify({
                     "ids": [ variantSampleListID ],
-                    "fields": [
-
-                        // Fields for list view (for InterpretationTab & CaseReviewTab)
-
-                        "@id",
-                        "variant_samples.date_selected",
-                        // For future:
-                        // "variant_samples.filter_blocks_request_at_time_of_selection",
-                        // "variant_samples.selected_by.@id",
-                        // "variant_samples.selected_by.display_title",
-                        "variant_samples.variant_sample_item.@id",
-                        "variant_samples.variant_sample_item.uuid",
-                        "variant_samples.variant_sample_item.display_title",
-                        "variant_samples.variant_sample_item.finding_table_tag",
-                        "variant_samples.variant_sample_item.actions",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
-
-                        "variant_samples.variant_sample_item.variant.@id",
-                        "variant_samples.variant_sample_item.variant.display_title",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
-                        "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
-
-                        // structural variant sample embeds (TODO: add more as needed)
-                        "structural_variant_samples.date_selected",
-                        "structural_variant_samples.variant_sample_item.@id",
-                        "structural_variant_samples.variant_sample_item.uuid",
-                        "structural_variant_samples.variant_sample_item.display_title",
-                        "structural_variant_samples.variant_sample_item.finding_table_tag",
-                        "structural_variant_samples.variant_sample_item.actions",
-                        "structural_variant_samples.variant_sample_item.structural_variant.@id",
-                        "structural_variant_samples.variant_sample_item.structural_variant.display_title",
-                        "structural_variant_samples.variant_sample_item.structural_variant.END",
-                        "structural_variant_samples.variant_sample_item.structural_variant.START",
-                        "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
-                        "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
-                        "structural_variant_samples.variant_sample_item.structural_variant.size_display",
-                        "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title",
-                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label",
-                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label",
-                        "structural_variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label",
-
-                        // VariantSampleItem Notes (for CaseReviewTab)
-                        ...variantSampleListItemNoteEmbeds
-                    ]
+                    "fields": variantSampleListEmbeds
                 })
             );
         });
@@ -236,39 +190,81 @@ export class VariantSampleListController extends React.PureComponent {
 
 }
 
-/**
- * List of Note item fields to embed from VariantSampleList Items.
- * To be used as a part of `fields` /embed payload(s).
- */
-export const variantSampleListItemNoteEmbeds = [
-    "variant_samples.variant_sample_item.interpretation.@id",
-    "variant_samples.variant_sample_item.interpretation.uuid",
-    "variant_samples.variant_sample_item.interpretation.note_text",
-    "variant_samples.variant_sample_item.interpretation.status",
-    "variant_samples.variant_sample_item.interpretation.associated_items.item_type",
-    "variant_samples.variant_sample_item.interpretation.associated_items.item_identifier",
-    "variant_samples.variant_sample_item.interpretation.classification",
 
-    "variant_samples.variant_sample_item.discovery_interpretation.@id",
-    "variant_samples.variant_sample_item.discovery_interpretation.uuid",
-    "variant_samples.variant_sample_item.discovery_interpretation.note_text",
-    "variant_samples.variant_sample_item.discovery_interpretation.status",
-    "variant_samples.variant_sample_item.discovery_interpretation.associated_items.item_type",
-    "variant_samples.variant_sample_item.discovery_interpretation.associated_items.item_identifier",
-    "variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy",
-    "variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy",
 
-    "variant_samples.variant_sample_item.variant_notes.@id",
-    "variant_samples.variant_sample_item.variant_notes.uuid",
-    "variant_samples.variant_sample_item.variant_notes.note_text",
-    "variant_samples.variant_sample_item.variant_notes.status",
-    "variant_samples.variant_sample_item.variant_notes.associated_items.item_type",
-    "variant_samples.variant_sample_item.variant_notes.associated_items.item_identifier",
 
-    "variant_samples.variant_sample_item.gene_notes.@id",
-    "variant_samples.variant_sample_item.gene_notes.uuid",
-    "variant_samples.variant_sample_item.gene_notes.note_text",
-    "variant_samples.variant_sample_item.gene_notes.status",
-    "variant_samples.variant_sample_item.gene_notes.associated_items.item_type",
-    "variant_samples.variant_sample_item.gene_notes.associated_items.item_identifier",
+
+
+
+function commonVSEmbeds(prefix){
+    return [
+        prefix + ".filter_blocks_used",
+        prefix + ".date_selected",
+        prefix + ".selected_by.@id",
+        prefix + ".selected_by.display_title",
+        prefix + ".variant_sample_item.@id",
+        prefix + ".variant_sample_item.uuid",
+        prefix + ".variant_sample_item.display_title",
+        prefix + ".variant_sample_item.finding_table_tag",
+        prefix + ".variant_sample_item.actions",
+        prefix + ".variant_sample_item.date_created",
+        prefix + ".variant_sample_item.last_modified.date_modified",
+        prefix + ".variant_sample_item.last_modified.modified_by.@id",
+        prefix + ".variant_sample_item.last_modified.modified_by.display_title",
+        prefix + ".variant_sample_item.associated_genotype_labels.proband_genotype_label",
+        prefix + ".variant_sample_item.associated_genotype_labels.mother_genotype_label",
+        prefix + ".variant_sample_item.associated_genotype_labels.father_genotype_label",
+
+        // Notes
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.interpretation"),
+        prefix + ".variant_sample_item.interpretation.classification",
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.discovery_interpretation"),
+        prefix + ".variant_sample_item.discovery_interpretation.gene_candidacy",
+        prefix + ".variant_sample_item.discovery_interpretation.variant_candidacy",
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.variant_notes"),
+        ...commonNoteEmbeds(prefix + ".variant_sample_item.gene_notes"),
+    ];
+}
+
+function commonNoteEmbeds(prefix){
+    return [
+        prefix + ".@id",
+        prefix + ".uuid",
+        prefix + ".last_modified.date_modified",
+        prefix + ".last_modified.modified_by.@id",
+        prefix + ".last_modified.modified_by.display_title",
+        prefix + ".status",
+        prefix + ".associated_items.item_type",
+        prefix + ".associated_items.item_identifier",
+        prefix + ".note_text"
+    ];
+}
+
+
+export const variantSampleListEmbeds = [
+    // Fields for list view (for InterpretationTab & CaseReviewTab)
+
+    "@id",
+    // All immediate fields off of "variant_samples" must be embedded, else they will be lost in subsequent PATCH requests.
+    // This includes "filter_blocks_used", "date_selected", "variant_sample_item.@id", & "selected_by.@id"
+    ...commonVSEmbeds("variant_samples"),
+    ...commonVSEmbeds("structural_variant_samples"),
+
+    "variant_samples.variant_sample_item.variant.@id",
+    "variant_samples.variant_sample_item.variant.display_title",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
+
+    "structural_variant_samples.variant_sample_item.structural_variant.@id",
+    "structural_variant_samples.variant_sample_item.structural_variant.display_title",
+    "structural_variant_samples.variant_sample_item.structural_variant.END",
+    "structural_variant_samples.variant_sample_item.structural_variant.START",
+    "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
+    "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
+    "structural_variant_samples.variant_sample_item.structural_variant.size_display",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title"
 ];
+
