@@ -54,7 +54,7 @@ export const variantSampleColumnExtensionMap = {
                 return null;
             }
             return (
-                <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"} className="d-block mx-auto">
+                <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"} className="d-block mx-auto" onClick={onClickLinkNavigateChildWindow}>
                     <GenesMostSevereDisplayTitle {...{ result, align }} />
                 </a>
             );
@@ -75,7 +75,7 @@ export const variantSampleColumnExtensionMap = {
             }
 
             return (
-                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")}>
+                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")} onClick={onClickLinkNavigateChildWindow}>
                     <GenesMostSevereHGVSCColumn gene={firstGene} align={align} />
                 </a>
             );
@@ -158,7 +158,7 @@ export const structuralVariantSampleColumnExtensionMap = {
             if (transcripts.length === 0) return null;
 
             return (
-                <a href={link ? link : (atID ? atID + '?annotationTab=0' : "#")}>
+                <a href={link ? link : (atID ? atID + '?annotationTab=0' : "#")} onClick={onClickLinkNavigateChildWindow}>
                     <StructuralVariantTranscriptColumn {...{ result, align }} />
                 </a>
             );

@@ -10,13 +10,6 @@ h1, h2, h3, h4, h5, h6, th {
 	color: #111;
 }
 
-h1, .h1,
-h2, .h2,
-h3, .h3 {
-    /* Cleaner rendering for header, but leave optimizeSpeed for most other text for performance esp. on mobile devices */
-    text-rendering: geometricPrecision;
-}
-
 h4, .h4 {
     // Font-size for this is set in _base.scss to 1.3rem
     line-height: 140%;
