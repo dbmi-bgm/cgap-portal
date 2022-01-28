@@ -143,14 +143,16 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem
+        fetchVariantSampleListItem,
+        // Passed in from CurrentFamilyController
+        canonicalFamily,
+        currPedigreeFamily,
+        familiesWithViewPermission
     } = props;
 
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
     const {
-        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
-        secondary_families = null,
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
         // actions: permissibleActions = [],
@@ -177,11 +179,22 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         return !!(_.findWhere(caseActions, { "name" : "edit" }));
     }, [ context ]);
 
+
+    console.log("TT", familiesWithViewPermission, canonicalFamily);
+
+    const secondaryFamilies = useMemo(function(){
+        return (familiesWithViewPermission || []).filter(function(spFamily){
+            // canonicalFamily would have been selected from this same list, so object references
+            // should be identical and we don't have to compare uuid strings (slower)
+            return spFamily !== canonicalFamily;
+        });
+    }, [ familiesWithViewPermission, canonicalFamily ]);
+
     const {
         countIndividuals: numIndividuals,
         countIndividualsWSamples: numWithSamples
     } = useMemo(function(){
-        const { members = [] } = currFamily || {};
+        const { members = [] } = canonicalFamily || {};
         let countIndividuals = 0;
         let countIndividualsWSamples = 0;
         members.forEach(function({ samples }){
@@ -191,7 +204,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             countIndividuals++;
         });
         return { countIndividuals, countIndividualsWSamples };
-    }, [ currFamily ]);
+    }, [ canonicalFamily ]);
 
     const anyAnnotatedVariantSamples = useMemo(function(){ // checks for notes on SNVs and CNV/SVs
         const allSelections = vsSelections.concat(cnvSelections);
@@ -211,7 +224,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const onViewPedigreeBtnClick = useCallback(function(evt){
         evt.preventDefault();
         evt.stopPropagation();
-        if (!currFamily) return false;
+        if (!currPedigreeFamily) return false;
         // By default, click on link elements would trigger ajax request to get new context.
         // (unless are external links)
         navigate("#pedigree", { skipRequest: true, replace: true });
@@ -238,7 +251,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const rgs = responsiveGridState(windowWidth);
     let pedWidth;
     let pedBlock = (
-        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
+        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
             <div className="text-center h-100">
                 <i className="icon icon-sitemap icon-4x fas" />
             </div>
@@ -322,7 +335,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                     </h4>
                                 </div>
                                 <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
-                                    onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
+                                    onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
                                     View
                                 </button>
                             </div>
@@ -338,10 +351,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            { currFamily && caseIndividual ?
+            { canonicalFamily && caseIndividual ?
                 <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
-                        <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
+                        <AccessioningTab {...{ context, href, canonicalFamily, secondaryFamilies }} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
                         <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
@@ -570,10 +583,10 @@ const DotRouterTab = React.memo(function DotRouterTab(props) {
 });
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context, currFamily, secondary_families = [] } = props;
-    const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
+    const { context, canonicalFamily, secondaryFamilies = [] } = props;
+    const { display_title: primaryFamilyTitle, '@id': canonicalFamilyAtID } = canonicalFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
-    const secondaryFamiliesLen = secondary_families.length;
+    const secondaryFamiliesLen = secondaryFamilies.length;
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
         <div className="pt-2">
@@ -599,17 +612,17 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                 <div className="card-body">
                     <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
                         persistent={[
-                            <div key={currFamilyID} className="primary-family">
+                            <div key={canonicalFamilyAtID} className="primary-family">
                                 <h4 className="mt-0 mb-16 text-400">
                                     <span className="text-300">Primary Cases from </span>
                                     { primaryFamilyTitle }
                                 </h4>
-                                <FamilyAccessionStackedTable family={currFamily} result={context}
+                                <FamilyAccessionStackedTable family={canonicalFamily} result={context}
                                     fadeIn collapseLongLists collapseShow={1} />
                             </div>
                         ]}
-                        collapsible={
-                            secondary_families.map(function(family){
+                        collapsible={!isSecondaryFamiliesOpen ? null :
+                            secondaryFamilies.map(function(family){
                                 const { display_title, '@id' : familyID } = family;
                                 return (
                                     <div className="py-4 secondary-family" key={familyID}>
@@ -878,7 +891,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     const fallbackElem = "-";
 
     return (
-        <>
+        <React.Fragment>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Total Number of Reads">
                     { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
@@ -926,7 +939,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
-        </>
+        </React.Fragment>
     );
 });
 
