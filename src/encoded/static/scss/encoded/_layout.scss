@@ -21,7 +21,9 @@ html {
 }
 
 body {
-    text-rendering: optimizeLegibility;
+    /* text-rendering: optimizeLegibility; */
+	/* We set this for performance, but override in _print */
+	text-rendering: optimizeSpeed;
 	background: #f8f8f8 !important;
 	overflow-x: hidden;
 }

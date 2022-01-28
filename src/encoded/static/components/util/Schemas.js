@@ -241,3 +241,33 @@ export const Field = {
 
 };
 
+
+/**
+ * Builds dictionaries of facets from schemas.
+ * Will exclude any additionally-calculated facets.
+ * Globally memoized since will have only 1 instance of schemas per app instance.
+ *
+ * @returns {Object<string,{ field: string, aggregation_type: string }>}
+ */
+export const buildSchemaFacetDictionary = memoize(function(schemas){
+    const facetsByType = {};
+    if (!schemas) {
+        return facetsByType;
+    }
+    Object.keys(schemas).forEach(function(typeName){
+        const typeSchema = schemas[typeName];
+        const { facets = {} } = typeSchema;
+        facetsByType[typeName] = {};
+        Object.keys(facets).forEach(function(facetFieldName){
+            const facetObj = facets[facetFieldName];
+            // `facetObj` contains up to but not including: field, title, description, grouping, order, field_type, disabled, default_hidden
+            const { aggregation_type = "terms" } = facetObj;
+            facetsByType[typeName][facetFieldName] = {
+                ...facetObj,
+                aggregation_type,
+                "field": facetFieldName
+            };
+        });
+    });
+    return facetsByType;
+});

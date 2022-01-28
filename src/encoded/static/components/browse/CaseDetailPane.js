@@ -710,12 +710,17 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
                     <div className="d-flex flex-column individual-role pr-2">
                         { atId ?
-                            <a href={atId} className={`name-title text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                            <a href={atId} className={`name-title mx-0 text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
                             </a>
                             :
-                            <span className={`name-title text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>{ role || display_title }</span>}
-                        <span className="d-block text-small mw-100 text-truncate">({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })</span>
+                            <span className={`name-title text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                                { role || display_title }
+                            </span>
+                        }
+                        <span className="d-block pt-04 text-small mw-100 text-truncate">
+                            ({ individual_id ? individual_id : (display_title !== accession) ? display_title : "N/A" })
+                        </span>
                     </div>
                     <div className="w-100" style={{ maxWidth: "70%" }}>
                         <div className="accession-table">
