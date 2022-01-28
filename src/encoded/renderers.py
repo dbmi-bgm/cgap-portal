@@ -21,7 +21,7 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import manager
 from pyramid.traversal import split_path_info, _join_path_tuple
 from subprocess_middleware.worker import TransformWorker
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode
 from webob.cookies import Cookie
 from .util import content_type_allowed
 
@@ -148,8 +148,10 @@ def security_tween_factory(handler, registry):
                         title="No Access",
                         comment="Invalid Authorization header or Auth Challenge response.",
                         headers={
-                            'WWW-Authenticate': ("Bearer realm=\"{}\"; Basic realm=\"{}\""
-                                                 .format(request.domain, request.domain))
+                            'WWW-Authenticate': (
+                                f'Bearer realm="{request.domain}";'
+                                f' Basic realm="{request.domain}"'
+                            )
                         }
                     )
 
@@ -169,21 +171,18 @@ def security_tween_factory(handler, registry):
                 # Especially for initial document requests by browser, but also desired for AJAX and other requests,
                 # unset jwtToken cookie so initial client-side React render has App(instance).state.session = false
                 # to be synced w/ server-side
-
                 response.set_cookie(
                     name='jwtToken',
-                    value=None,
+                    value=None,  # = i.e., same as response.delete_cookie(..)
                     domain=request.domain,
                     max_age=0,
                     path='/',
                     overwrite=True
                 )
-
-                # = Same as response.delete_cookie(..)
                 response.status_code = 401
                 response.headers['WWW-Authenticate'] = (
-                    "Bearer realm=\"{}\", title=\"Session Expired\"; Basic realm=\"{}\""
-                    .format(request.domain, request.domain)
+                    f'Bearer realm="{request.domain}", title="Session Expired";'
+                    f' Basic realm="{request.domain}"'
                 )
             else:
                 # We have JWT and it's not expired. Add 'X-Request-JWT' & 'X-User-Info' header.
@@ -204,22 +203,6 @@ def security_tween_factory(handler, registry):
             return response
 
         return handler(request)
-
-        # This was commented out when we introduced JWT authentication
-        # Theoretically we mitigate CSRF requests now by grabbing JWT for transactional
-        # requests from Authorization header which acts like a CSRF token.
-        # See authentication.py - get_jwt()
-
-        # Alex notes that we do not use request.session so this is probably very old. -kmp 4-Mar-2021
-
-        # token = request.headers.get('X-CSRF-Token')
-        # if token is not None:
-        #     # Avoid dirtying the session and adding a Set-Cookie header
-        #     # XXX Should consider if this is a good idea or not and timeouts
-        #     if token == dict.get(request.session, '_csrft_', None):
-        #         return handler(request)
-        #     raise CSRFTokenError('Incorrect CSRF token')
-        # raise CSRFTokenError('Missing CSRF token')
 
     return security_tween
 
