@@ -181,7 +181,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 "@id": qmId,
             } = quality_metric;
 
-            const qmUrl = qmId + '/@@download'; // send to @@download instead of url (deprecated) - Will Jan 24 2022
+            let qmUrl = qmId + '/@@download'; // send to @@download instead of url (deprecated for standalone QCs) - Will Jan 24 2022
             const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
 
             let fileOverallQuality = "PASS";
@@ -191,6 +191,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
             // figure out the file's overall quality status
             if (qc_list.length > 0) {
+                qmUrl = qmId; // if qc_list item, link to that metadata item (instead of @@download)
                 // loop through all of the quality metrics and count the number of failures and warnings for this file
                 qc_list.forEach((qm) => {
                     const { value : { overall_quality_status = null } } = qm;
