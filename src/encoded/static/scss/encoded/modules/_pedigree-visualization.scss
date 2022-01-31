@@ -120,6 +120,7 @@ $pedigree-disease-colors :
         > .viz-area {
             transform-origin: 0 0;
             transform: scale3d(1,1,1);
+            text-rendering: geometricPrecision;
             position: absolute;
             left: 0;
             top: 0;
