@@ -480,13 +480,11 @@ class File(Item):
 
     @classmethod
     def get_bucket(cls, registry):
-        log.error('Getting files bucket %s' % registry.settings['file_upload_bucket'])
         return registry.settings['file_upload_bucket']
 
     @classmethod
     def build_external_creds(cls, registry, uuid, properties):
         bucket = cls.get_bucket(registry)
-        log.error(f'Got bucket {bucket} from registry')
         fformat = properties.get('file_format')
         if fformat.startswith('/file-formats/'):
             fformat = fformat[len('/file-formats/'):-1]
@@ -594,7 +592,6 @@ class FileProcessed(File):
 
     @classmethod
     def get_bucket(cls, registry):
-        log.error('Getting wfoutput bucket: %s' % registry.settings['file_wfout_bucket'])
         return registry.settings['file_wfout_bucket']
 
     @calculated_property(schema={
@@ -806,15 +803,15 @@ def download(context, request):
         if external_bucket not in [wfout_bucket, files_bucket]:
             if 'wfout' not in external_bucket:
                 external_bucket = files_bucket
-            # TODO: enable once wfoutput bucket is transferred
-            # else:
-            #     external_bucket = files_bucket
-                log.error(f'Encountered s3 bucket mismatch - ignoring metadata and using registry value {external_bucket}')
+            else:
+                external_bucket = wfout_bucket
+            log.error(f'Encountered s3 bucket mismatch - ignoring metadata value {external_bucket}'
+                      f' and using registry value {external_bucket}')
         conn = make_s3_client()
         param_get_object = {
             'Bucket': external_bucket,
             'Key': external['key'],
-            'ResponseContentDisposition': "attachment; filename=" + filename
+            'ResponseContentDisposition': 'attachment; filename=' + filename
         }
         if 'Range' in request.headers:
             tracking_values['range_query'] = True
@@ -853,7 +850,7 @@ def download(context, request):
             raise e
         response_dict = {
             'body': response_body.get('Body').read(),
-            # status_code : 206 if partial, 200 if the ragne covers whole file
+            # status_code : 206 if partial, 200 if the range covers whole file
             'status_code': response_body.get('ResponseMetadata').get('HTTPStatusCode'),
             'accept_ranges': response_body.get('AcceptRanges'),
             'content_length': response_body.get('ContentLength'),
