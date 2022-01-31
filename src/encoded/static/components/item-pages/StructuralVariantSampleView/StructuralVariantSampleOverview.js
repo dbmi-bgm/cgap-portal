@@ -139,7 +139,7 @@ function StructuralVariantInfoSection({ context }) {
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):
-                                <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02" tooltip="Click here for more information">
+                                <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm" tooltip="Click here for more information">
                                     { hg19PopoverContent }
                                 </QuickPopover>
                             </label>
