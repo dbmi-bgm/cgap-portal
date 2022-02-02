@@ -138,8 +138,8 @@ function ConsequenceOfSVSection({ currentTranscript }) {
     const {
         fallbackElem,
         csq_consequence = [],
-        csq_variant_5_prime_location,
-        csq_variant_3_prime_location
+        csq_variant_5_prime_location = "",
+        csq_variant_3_prime_location = ""
     } = currentTranscript;
 
     return (
@@ -164,7 +164,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="sv-con-break1">
-                    { csq_variant_5_prime_location || fallbackElem }
+                    { csq_variant_5_prime_location.split("_").join(" ") || fallbackElem }
                 </div>
             </div>
             <div className="row mb-03">
@@ -177,7 +177,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                     </label>
                 </div>
                 <div className="col-12 col-xl-9" id="sv-con-break2">
-                    { csq_variant_3_prime_location || fallbackElem }
+                    { csq_variant_3_prime_location.split("_").join(" ") || fallbackElem }
                 </div>
             </div>
         </React.Fragment>
