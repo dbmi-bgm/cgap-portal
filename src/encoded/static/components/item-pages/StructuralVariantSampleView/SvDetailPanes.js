@@ -10,6 +10,8 @@ import { object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components
 import { responsiveGridState } from './../../util/layout';
 
 import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection, GeneTranscriptDisplayTitle, getInitialTranscriptIndex } from '../VariantSampleView/AnnotationSections';
+import QuickPopover from '../components/QuickPopover';
+import Popover from 'react-bootstrap/esm/Popover';
 
 export function SvGeneDetailPane(props) {
     const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, propsFromTable, schemas, context } = props;
@@ -136,41 +138,95 @@ function ConsequenceOfSVSection({ currentTranscript }) {
     const {
         fallbackElem,
         csq_consequence = [],
-        csq_variant_5_prime_location,
-        csq_variant_3_prime_location
+        csq_variant_5_prime_location = "",
+        csq_variant_3_prime_location = ""
     } = currentTranscript;
+
     return (
         <React.Fragment>
             <div className="row mb-03">
-                <div className="col-12 col-xl-3">
-                    <label htmlFor="snv-consequence" className="mb-0" data-tip={null}>
+                <div className="col-12 col-xl-3 mb-04">
+                    <label htmlFor="sv-consequence" className="mb-0" data-tip={null}>
                         Consequence:
                     </label>
                 </div>
-                <div className="col-12 col-xl-9" id="snv-consequence">
+                <div className="col-12 col-xl-9" id="sv-consequence">
                     { csq_consequence.map((c) => c.display_title).join(", ") || fallbackElem}
                 </div>
             </div>
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="snv-con-break1" className="mb-0" data-tip={null}>
+                    <label htmlFor="sv-con-break1" className="mb-0" data-tip={null}>
                         Breakpoint 1:
+                        <QuickPopover popID="sv-con-break2-pop" className="p-0 ml-02 icon-sm" tooltip="Click for more information" title={breakpointPopoverTitle}>
+                            { breakpointPopoverContent }
+                        </QuickPopover>
                     </label>
                 </div>
-                <div className="col-12 col-xl-9" id="snv-con-break1">
-                    { csq_variant_5_prime_location || fallbackElem }
+                <div className="col-12 col-xl-9" id="sv-con-break1">
+                    { csq_variant_5_prime_location.split("_").join(" ") || fallbackElem }
                 </div>
             </div>
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
-                    <label htmlFor="snv-con-break2" className="mb-0" data-tip={null}>
+                    <label htmlFor="sv-con-break2" className="mb-0" data-tip={null}>
                         Breakpoint 2:
+                        <QuickPopover popID="sv-con-break2-pop" className="p-0 ml-02 icon-sm" tooltip="Click for more information" title={breakpointPopoverTitle}>
+                            { breakpointPopoverContent }
+                        </QuickPopover>
                     </label>
                 </div>
-                <div className="col-12 col-xl-9" id="snv-con-break2">
-                    { csq_variant_3_prime_location || fallbackElem }
+                <div className="col-12 col-xl-9" id="sv-con-break2">
+                    { csq_variant_3_prime_location.split("_").join(" ") || fallbackElem }
                 </div>
             </div>
         </React.Fragment>
     );
 }
+
+const breakpointPopoverTitle = "Breakpoint locations are determined relative to the transcript based on VEP annotations.";
+
+const breakpointPopoverContent = (
+    <div className="popover-content-inner">
+        <p>
+            Most transcripts have sufficient annotation information to calculate where the
+            structural variant starts and ends relative to the 5 prime and 3 prime ends of the
+            transcript. Possible values include:
+        </p>
+        <ul>
+            <li>
+                <b> Upstream </b>: Breakpoint is located beyond the 5 prime UTR.
+            </li>
+            <li>
+                <b> Downstream </b>: Breakpoint is located beyond the 3 prime UTR.
+            </li>
+            <li>
+                <b> 5 prime UTR </b>: Breakpoint is located within the 5 prime UTR.
+            </li>
+            <li>
+                <b> 3 prime UTR </b>: Breakpoint is located within the 3 prime UTR.
+            </li>
+            <li>
+                <b> Upstream or 5 prime UTR </b>: Breakpoint is located either upstream of or
+                within the 5 prime UTR (insufficient information to determine which).
+            </li>
+            <li>
+                <b> 3 prime UTR or Downstream </b>: Breakpoint is located either in the 3 prime
+                UTR or downstream of it (insufficient information to determine which).
+            </li>
+            <li>
+                <b> Exonic </b>: Breakpoint is located within an exon.
+            </li>
+            <li>
+                <b> Intronic </b>: Breakpoint is located within an intron.
+            </li>
+            <li>
+                <b> Within miRNA </b>: Breakpoint is located within an miRNA coding region.
+            </li>
+            <li>
+                <b> Indeterminate </b>: Insufficient information to determine a location for the
+                breakpoint relative to the transcript.
+            </li>
+        </ul>
+    </div>
+);

@@ -10,6 +10,7 @@ import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
+import QuickPopover from '../components/QuickPopover';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
@@ -67,7 +68,7 @@ function StructuralVariantSampleInfoHeader(props){
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col-lg-4 pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-3 pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
@@ -118,7 +119,7 @@ function StructuralVariantInfoSection({ context }) {
     return (
         <div className="col-12">
             <div className="row pb-1 pb-md-03">
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-7">
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_type" className="mb-0">Type:</label>
@@ -137,14 +138,18 @@ function StructuralVariantInfoSection({ context }) {
                     </div>
                     <div className="row">
                         <div className="col-12 col-md-6">
-                            <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
+                            <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):
+                                <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm" tooltip="Click here for more information">
+                                    { hg19PopoverContent }
+                                </QuickPopover>
+                            </label>
                         </div>
                         <div className="col-12 col-md-6">
                             <span id="vi_grch37">{hg19_position_display}</span>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-md-6 pl-2">
+                <div className="col-12 col-md-5 pl-2">
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_genotype" className="mb-0">Genotype:</label>
@@ -342,3 +347,22 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
+
+// This content is also in src/encoded/docs as an html file; if needed for facets, may use that
+const hg19PopoverTitle = "The hg19 coordinates for structural variants are calculated.";
+
+const hg19PopoverContent = (
+    <div>
+        <p>
+            All variants are currently called for the hg38 reference genome. If the variant in hg19
+            coordinates is not available, the conversion calculation was not successful.
+        </p>
+
+        <p>
+            For structural variants, both the start and end coordinates are converted to hg19 via an
+            implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If
+            either one of these conversions fails, the variant will not be available in hg19
+            coordinates.
+        </p>
+    </div>
+);
