@@ -23,6 +23,38 @@ import { getInitialTranscriptIndex } from './AnnotationSections';
 import QuickPopover from '../components/QuickPopover';
 
 
+/**
+ * Takes in a query from memoizedUrlParse in VSO or SVVSO and returns an object with cleaned fields for interpretation space
+ * @param {Object} query object containing the query value pairs from URL
+ * @returns {Object} containing showInterpretation as bool, annotation & interp tabs parsed as integers, and case source
+ */
+export function convertQueryStringTypes(query) {
+    const {
+        showInterpretation: showInterpretationFromQuery = null, // used only if "True" (toggles showing of interpretation sidebar/pane)
+        annotationTab: annotationTabFromQuery = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
+        interpretationTab: interpretationTabFromQuery = null,   // used only if can be parsed to integer (Variant Notes = 0, Gene Notes = 1, Clinical = 2, Discovery = 3)
+        caseSource = null
+    } = query || {};
+
+    // Change types to bool & int where applicable.
+    const showInterpretation = showInterpretationFromQuery === "True";
+    let annotationTab = null;
+    if (annotationTabFromQuery !== null) {
+        annotationTab = parseInt(annotationTabFromQuery);
+        if (isNaN(annotationTab)) {
+            annotationTab = null;
+        }
+    }
+    let interpretationTab = null;
+    if (interpretationTabFromQuery !== null) {
+        interpretationTab = parseInt(interpretationTabFromQuery);
+        if (isNaN(interpretationTab)) {
+            interpretationTab = null;
+        }
+    }
+
+    return { showInterpretation, annotationTab, interpretationTab, caseSource };
+}
 
 export class VariantSampleOverview extends React.PureComponent {
 
@@ -141,31 +173,8 @@ export class VariantSampleOverview extends React.PureComponent {
         const { currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, currentClinVarResponse, currentClinVarResponseLoading } = this.state;
         const passProps = { context, schemas, href, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, currentClinVarResponse, currentClinVarResponseLoading };
 
-        const {
-            query: {
-                showInterpretation: showInterpretationFromQuery = null, // used only if "True" (toggles showing of interpretation sidebar/pane)
-                annotationTab: annotationTabFromQuery = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
-                interpretationTab: interpretationTabFromQuery = null,   // used only if can be parsed to integer (Variant Notes = 0, Gene Notes = 1, Clinical = 2, Discovery = 3)
-                caseSource = null
-            }
-        } = memoizedUrlParse(href);
-
-        // Change types to bool & int where applicable.
-        const showInterpretation = showInterpretationFromQuery === "True";
-        let annotationTab = null;
-        if (annotationTabFromQuery !== null) {
-            annotationTab = parseInt(annotationTabFromQuery);
-            if (isNaN(annotationTab)) {
-                annotationTab = null;
-            }
-        }
-        let interpretationTab = null;
-        if (interpretationTabFromQuery !== null) {
-            interpretationTab = parseInt(interpretationTabFromQuery);
-            if (isNaN(interpretationTab)) {
-                interpretationTab = null;
-            }
-        }
+        const { query = {} } = memoizedUrlParse(href);
+        const { showInterpretation, annotationTab, interpretationTab, caseSource } = convertQueryStringTypes(query);
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
@@ -532,7 +541,7 @@ class InterpretationController extends React.PureComponent {
     }
 }
 
-const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpretationSpacePlaceHolder () {
+export const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpretationSpacePlaceHolder () {
     return (
         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
             <div className="card interpretation-space">
