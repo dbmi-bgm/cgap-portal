@@ -13,6 +13,8 @@ const mode = (env === 'production' ? 'production' : 'development');
 
 const plugins = [];
 
+console.log("Opened webpack.config.js with env: " + env + " & mode: " + mode);
+
 // don't include momentjs locales (large)
 plugins.push(
     new webpack.IgnorePlugin({
@@ -78,13 +80,13 @@ const resolve = {
 // @see https://blog.maximeheckel.com/posts/duplicate-dependencies-npm-link/
 spcPackageJson = require("@hms-dbmi-bgm/shared-portal-components/package.json");
 spcPeerDependencies = spcPackageJson.peerDependencies || {};
-Object.keys(spcPeerDependencies).forEach(function(packageName){
+Object.keys(spcPeerDependencies).forEach(function(packageName) {
     resolve.alias[packageName] = path.resolve("./node_modules/" + packageName);
 });
+
 // Exclusion -- higlass needs react-bootstrap 0.x but we want 1.x; can remove this line below
 // once update to higlass version w.o. react-bootstrap dependency.
 delete resolve.alias["react-bootstrap"];
-
 
 const optimization = {
     minimize: mode === "production",

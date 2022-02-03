@@ -317,6 +317,8 @@ MIME_TYPE_HTML = 'text/html'
 MIME_TYPE_JSON = 'application/json'
 MIME_TYPE_LD_JSON = 'application/ld+json'
 
+# Note: In cgap-portal, MIME_TYPE_JSON is at the head of this list. In fourfront, MIME_TYPE_HTML is.
+# The cgap-portal behavior might be a bug we should look at bringing into alignment. -kmp 29-Jan-2022
 MIME_TYPES_SUPPORTED = [MIME_TYPE_JSON, MIME_TYPE_HTML, MIME_TYPE_LD_JSON]
 MIME_TYPE_DEFAULT = MIME_TYPES_SUPPORTED[0]
 MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
