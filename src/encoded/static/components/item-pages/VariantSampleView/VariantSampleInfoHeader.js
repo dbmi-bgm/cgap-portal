@@ -185,7 +185,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
         return getTranscriptLocation(currentTranscript, mostSevereConsequence);
     }, [ currentTranscript, mostSevereConsequence ]);
 
-    const { coding_effect: consequenceCodingEffect = fallbackElem } = mostSevereConsequence || {};
+    const { display_title: consequenceTitle = fallbackElem } = mostSevereConsequence || {};
 
     return (
         <div className="row">
@@ -207,13 +207,13 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
                 <div className="row mb-03">
                     <div className="col-12 col-lg-5 col-xl-6">
-                        <label htmlFor="variant.transcript.csq_consequence.coding_effect" className="mb-0"
-                            data-tip={getTipForField("transcript.csq_consequence.coding_effect")}>
-                            Coding Effect:
+                        <label htmlFor="variant.transcript.csq_consequence" className="mb-0"
+                            data-tip={getTipForField("transcript.csq_consequence")}>
+                            Consequence:
                         </label>
                     </div>
-                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_consequence.coding_effect">
-                        { consequenceCodingEffect }
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_consequence">
+                        { consequenceTitle }
                     </div>
                 </div>
 

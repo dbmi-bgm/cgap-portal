@@ -31,5 +31,7 @@ class VariantConsequence(Item):
         "type": "string"
     })
     def display_title(self, request, var_conseq_name):
-        ''' var_conseq_name is a required property '''
-        return var_conseq_name.capitalize().replace('_', ' ')
+        """Create consequence title."""
+        result = var_conseq_name.replace("_", " ")
+        result = result[0].upper() + result[1:]  # Retain existing capital letters
+        return result
