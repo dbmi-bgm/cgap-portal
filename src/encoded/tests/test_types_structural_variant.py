@@ -1,5 +1,7 @@
 import pytest
 
+from ..types.structural_variant import build_comma_formatted_position
+
 pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 
@@ -105,3 +107,36 @@ def test_gene_summary(
         patch_body["transcript"].append({"csq_gene": gene_atid})
     resp = testapp.patch_json(sv_atid, patch_body, status=200).json["@graph"][0]
     assert resp["gene_summary"] == result
+
+
+@pytest.mark.parametrize(
+    "chromosome,start,end,expected",
+    [
+        (None, None, None, None),
+        ("1", None, None, None),
+        (None, 1000, None, None),
+        (None, None, 2000, None),
+        ("1", 1000, None, None),
+        ("1", None, 2000, None),
+        (None, 1000, 2000, None),
+        ("1", "1000", "2000", None),
+        ("1", 1000, 2000, "chr1:1,000-2,000"),
+        ("X", 1000000, 2000000, "chrX:1,000,000-2,000,000"),
+    ]
+)
+def test_build_comma_formatted_position(chromosome, start, end, expected):
+    """Test making more readable position display for SVs with comma-
+    formatted numbers.
+    """
+    result = build_comma_formatted_position(chromosome, start, end)
+    assert result == expected
+
+
+def test_position_displays(testapp, structural_variant, structural_variant_hg19):
+    """Test creation of position_display and h19_position_display on
+    SVs.
+    """
+    assert structural_variant.get("position_display") == "chr1:1,000-2,000"
+    assert structural_variant.get("hg19_position_display") is None
+    assert structural_variant_hg19.get("position_display") == "chr5:123,445-234,556"
+    assert structural_variant_hg19.get("hg19_position_display") == "chr5:123,456-234,567"
