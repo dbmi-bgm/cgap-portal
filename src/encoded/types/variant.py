@@ -33,7 +33,9 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path, build_s3_presigned_get_url
+from ..util import (
+    resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
+)
 from ..types.base import Item, get_item_or_none
 
 
@@ -313,7 +315,10 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+        position = convert_integer_to_comma_string(POS)
+        if position is None:
+            position = POS
+        return build_variant_display_title(CHROM, position, REF, ALT)  # chr1:1,504A>T
 
     @calculated_property(schema={
         "title": "Position (genome coordinates)",
@@ -372,6 +377,14 @@ class Variant(Item):
                             break
                 break
         return result
+
+    @calculated_property(schema={
+        "title": "Alternate Display Title",
+        "description": "Variant display title with comma-separated position",
+        "type": "string"
+    })
+    def alternate_display_title(self, CHROM, POS, REF, ALT):
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:1504A>T
 
     @calculated_property(schema={
         "title": "Additional Variant Names",

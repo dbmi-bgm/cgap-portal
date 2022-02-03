@@ -8,6 +8,7 @@ from snovault import (
 )
 
 from .base import Item, get_item_or_none
+from ..util import convert_integer_to_comma_string
 
 
 log = structlog.getLogger(__name__)
@@ -61,6 +62,36 @@ class Gene(Item):
         result = self.rev_link_atids(request, "gene_lists")
         if result:
             return result
+
+    @calculated_property(schema={
+        "title": "Start Display",
+        "description": "Formatted gene start position in hg38 coordinates",
+        "type": "string",
+    })
+    def start_display(self, spos=None):
+        """Create comma-formatted gene start position, if possible.
+
+        :param spos: Starting position
+        :type spos: int
+        :returns: Formatted display or None
+        :rtype: str or None
+        """
+        return convert_integer_to_comma_string(spos)
+
+    @calculated_property(schema={
+        "title": "End Display",
+        "description": "Formatted gene end position in hg38 coordinates",
+        "type": "string",
+    })
+    def end_display(self, epos=None):
+        """Create comma-formatted gene end position, if possible.
+
+        :param epos: End position
+        :type epos: int
+        :returns: Formatted display or None
+        :rtype: str or None
+        """
+        return convert_integer_to_comma_string(epos)
 
 
 @collection(

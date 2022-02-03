@@ -954,6 +954,7 @@ class VariantTableParser(object):
         schema['properties']['hg19'] = {  # required for testing :( - will 1-8-2021
             "title": "hg19 Coordinates",
             "type": "array",
+            "comment": "This property is deprecated but retained for testing",
             "items": {
                 "title": "hg19 Coordinates",
                 "enable_nested": True,
