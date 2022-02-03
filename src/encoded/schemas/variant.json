@@ -2464,6 +2464,7 @@
         "hg19": {
             "title": "hg19 Coordinates",
             "type": "array",
+            "comment": "This property is deprecated but retained for testing",
             "items": {
                 "title": "hg19 Coordinates",
                 "enable_nested": true,
@@ -2515,7 +2516,7 @@
             "schema_title": "Position (hg19)"
         },
         "hgvsg": {
-            "title": "Variant",
+            "title": "Variant in HGVS format",
             "field_name": "hgvsg",
             "type": "string",
             "do_import": true,
@@ -2523,6 +2524,18 @@
             "source_name": "hgvsg_creator.py",
             "source_version": "v1",
             "description": "HGVS genome sequence name",
+            "scope": "variant",
+            "schema_title": "Variant"
+        },
+        "hgvsg_hg19": {
+            "title": "Variant in HGVS format (hg19)",
+            "field_name": "hgvsg_hg19",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "hgvsg_hg19",
+            "source_name": "hgvsg_creator.py",
+            "source_version": "v1",
+            "description": "HGVS genome sequence name for hg19",
             "scope": "variant",
             "schema_title": "Variant"
         },

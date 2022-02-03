@@ -501,3 +501,18 @@ def build_s3_presigned_get_url(*, params):
         Params=params,
         ExpiresIn=36 * 60 * 60
     )
+
+
+def convert_integer_to_comma_string(value):
+    """Convert integer to comma-formatted string for displaying SV
+    position.
+
+    :param value: Value to format.
+    :type value: int
+    :returns: Comma-formatted integer or None
+    :rtype: str or None
+    """
+    result = None
+    if isinstance(value, int):
+        result = format(value, ",d")
+    return result
