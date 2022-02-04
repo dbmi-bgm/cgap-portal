@@ -180,7 +180,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     }, [ context ]);
 
 
-    console.log("TT", familiesWithViewPermission, canonicalFamily);
+    // console.log("TT", familiesWithViewPermission, canonicalFamily);
 
     const secondaryFamilies = useMemo(function(){
         return (familiesWithViewPermission || []).filter(function(spFamily){
@@ -322,7 +322,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 <div className="card-group case-summary-card-row">
                     { !isActiveTab ? null : (
                         <div className="col-stats mb-2 mb-lg-0">
-                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
+                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission, canonicalFamily }} numFamilies={1} />
                         </div>
                     )}
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
@@ -357,7 +357,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         <AccessioningTab {...{ context, href, canonicalFamily, secondaryFamilies }} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
-                        <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
+                        <BioinformaticsTab {...{ context, idToGraphIdentifier, canonicalFamily }} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
                         <FilteringTab {...filteringTableProps} />
@@ -964,11 +964,10 @@ function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         context,
-        idToGraphIdentifier
+        idToGraphIdentifier,
+        canonicalFamily
     } = props;
     const {
-        display_title: caseDisplayTitle,
-        family = null,
         sample_processing: sampleProcessing = null,
         sample: caseSample = null,
         vcf_file: vcf = null,
@@ -979,7 +978,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
-    } = family;
+    } = canonicalFamily;
 
     const title = (
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
@@ -1011,7 +1010,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
-                    <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                    <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
                 </div>
             </div>
         </React.Fragment>

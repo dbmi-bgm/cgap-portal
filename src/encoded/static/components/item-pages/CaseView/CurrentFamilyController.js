@@ -13,12 +13,17 @@ export function findCanonicalFamilyIndex(familyList, canonicalFamilyPartialItem)
     if (!canonicalFamilyUUID) {
         throw new Error("No canonical family UUID provided. Check view permissions?");
     }
-    return _.findIndex(familyList, function({ uuid: listFamilyUUID }){
+    const len = familyList.length;
+    for (var i = 0; i < len; i++) {
+        const { uuid: listFamilyUUID } = familyList[i];
         if (!listFamilyUUID) {
             return false; // No view permission or similar.
         }
-        return listFamilyUUID === canonicalFamilyUUID;
-    });
+        if (listFamilyUUID === canonicalFamilyUUID) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 
