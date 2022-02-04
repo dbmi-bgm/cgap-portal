@@ -64,7 +64,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
 }
 
 /**
@@ -163,7 +163,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
 }
 
 /** Open Variant Sample in new window */
