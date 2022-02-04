@@ -21,7 +21,9 @@ html {
 }
 
 body {
-    text-rendering: optimizeLegibility;
+    /* text-rendering: optimizeLegibility; */
+	/* We set this for performance, but override in _print */
+	text-rendering: optimizeSpeed;
 	background: #f8f8f8 !important;
 	overflow-x: hidden;
 }
@@ -371,24 +373,9 @@ body.is-full-screen {
 		Utility/Responsive Classes
 ***********************************************************/
 
-.column-margin-offset {
-	margin-left: (math.div($grid-gutter-width, -2));
-	margin-right: -(math.div($grid-gutter-width, -2));
-}
-
-.column-padding {
-	padding-left: (math.div($grid-gutter-width, 2));
-	padding-right : (math.div($grid-gutter-width, 2));
-}
 
 .left { float: left; }
 .right { float: right; }
-
-
-/** This is especially useful for elements with data-tip attribute (for React Tooltip) so that tip is positioned at center. **/
-.inline-block {
-	display: inline-block;
-}
 
 
 .clickable {
@@ -402,57 +389,6 @@ body.is-full-screen {
 	cursor: not-allowed;
 	> label {
 		cursor: not-allowed;
-	}
-}
-
-/** Equal Height Columns in Bootstrap Row on IE9+ **/
-
-.row.row-eq-height-xs {
-	display: -webkit-box;
-    display: -webkit-flex;
-    display: -ms-flexbox;
-    display: flex;
-}
-
-@include media-breakpoint-up(sm) {
-	.row.row-eq-height-sm {
-		display: -webkit-box;
-		display: -webkit-flex;
-		display: -ms-flexbox;
-		display: flex;
-		.panel {
-			margin-top: 0;
-			margin-bottom: 0;
-			height: 100%;
-		}
-	}
-}
-
-@include media-breakpoint-up(md) {
-	.row.row-eq-height-md {
-		display: -webkit-box;
-		display: -webkit-flex;
-		display: -ms-flexbox;
-		display: flex;
-		.panel {
-			margin-top: 0;
-			margin-bottom: 0;
-			height: 100%;
-		}
-	}
-}
-
-@include media-breakpoint-up(lg) {
-	.row.row-eq-height-lg {
-		display: -webkit-box;
-		display: -webkit-flex;
-		display: -ms-flexbox;
-		display: flex;
-		.panel {
-			margin-top: 0;
-			margin-bottom: 0;
-			height: 100%;
-		}
 	}
 }
 

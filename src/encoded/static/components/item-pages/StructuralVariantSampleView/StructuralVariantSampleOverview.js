@@ -10,6 +10,8 @@ import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
+//import { OverviewTabTitle as VSOverviewTabTitle } from './../VariantSampleView/VariantSampleOverview';
+import QuickPopover from './../components/QuickPopover';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
@@ -67,7 +69,7 @@ function StructuralVariantSampleInfoHeader(props){
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col-lg-4 pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-3 pb-2 pb-lg-0">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
@@ -107,9 +109,8 @@ function StructuralVariantInfoSection({ context }) {
         size_display = fallbackElem,
         cytoband_display = fallbackElem,
         SV_TYPE = fallbackElem,
-        CHROM = "",
-        START = "",
-        END = ""
+        position_display = fallbackElem,
+        hg19_position_display = fallbackElem,
     } = structural_variant;
 
     const longFormTypeMap = { DUP: "Duplication", DEL: "Deletion" }; // may need to update if sv schema is updated/just pull from schema in future
@@ -119,7 +120,7 @@ function StructuralVariantInfoSection({ context }) {
     return (
         <div className="col-12">
             <div className="row pb-1 pb-md-03">
-                <div className="col-12 col-md-6">
+                <div className="col-12 col-md-7">
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_type" className="mb-0">Type:</label>
@@ -133,19 +134,23 @@ function StructuralVariantInfoSection({ context }) {
                             <label htmlFor="vi_grch38" className="mb-0">GRCh38:</label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch38">{`chr${CHROM}:${START}-${END}`}</span>
+                            <span id="vi_grch38">{position_display}</span>
                         </div>
                     </div>
                     <div className="row">
                         <div className="col-12 col-md-6">
-                            <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):</label>
+                            <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):
+                                <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm" tooltip="Click here for more information">
+                                    { hg19PopoverContent }
+                                </QuickPopover>
+                            </label>
                         </div>
                         <div className="col-12 col-md-6">
-                            <span id="vi_grch37">{/* Coming soon */}</span>
+                            <span id="vi_grch37">{hg19_position_display}</span>
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-md-6 pl-2">
+                <div className="col-12 col-md-5 pl-2">
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_genotype" className="mb-0">Genotype:</label>
@@ -240,59 +245,67 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { defaultTab = null } = props;
+        this.annotationTab = this.annotationTab.bind(this);
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
-        const numTabs = StructuralVariantSampleOverviewTabView.tabNames.length;
-
-        this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 1 // default to Variant unless otherwise specified
-        };
-
         // Setting persistence requires setting index to true for tab in render + using active prop in tabBody component to trigger d-none class when inactive
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    componentDidUpdate(pastProps, pastState){
-        const { currentTab: pastTab } = pastState;
-        const { currentTab } = this.state;
-        if (currentTab !== pastTab) {
-            // ReactTooltip.rebuild is called by App upon navigation
-            // to rebuild tooltips from current DOM.
-            // However most tabs' DOM contents not visible until switch to them
-            // so we needa rebuild tooltip upon that.
-            // If DotRouter can be reused/integrated here or similar, we can
-            // remove this useEffect.
-            setTimeout(ReactTooltip.rebuild, 200);
-        }
-    }
-
     componentWillUnmount(){
-        this.openPersistentTabs = [];
+        this.openPersistentTabs = {};
     }
 
+    // TODO: DRY-ify
+    annotationTab(){
+        const { href, defaultTab = 0 } = this.props;
+        const { query: parsedQuery = {} } = memoizedUrlParse(href);
+        let { annotationTab = null } = parsedQuery;
+        annotationTab = parseInt(annotationTab);
+        if (isNaN(annotationTab)) {
+            annotationTab = defaultTab;
+        }
+        return annotationTab;
+    }
+
+    // TODO: DRY-ify
     handleTabClick(e){
+        const { href } = this.props;
         // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
         // since it has SyntheticEvents anyway.
+
         if (e.target && e.target.type === "button") {
-            const tabTitle = parseInt(e.target.getAttribute("data-tab-index"));
-            this.setState({ "currentTab": tabTitle });
+            const nextTabIndex = parseInt(e.target.getAttribute("data-tab-index"));
+            const hrefParts = memoizedUrlParse(href);
+            const { query: parsedQuery = {} } = hrefParts;
+            let { annotationTab } = parsedQuery;
+            annotationTab = parseInt(annotationTab);
+            if (!isNaN(annotationTab) && annotationTab === nextTabIndex) {
+                return;
+            }
+            parsedQuery.annotationTab = nextTabIndex;
+            hrefParts.search = "?" + queryString.stringify(parsedQuery);
+            const nextHref = url.format(hrefParts);
+            // ReactTooltip.rebuild is called by App upon navigation
+            // to rebuild tooltips from current DOM.
+            navigate(nextHref, { "replace": true, "skipRequest": true });
         }
     }
 
     render(){
         const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
-        const { currentTab } = this.state;
+
+        const annotationTab = this.annotationTab();
 
         const tabTitleElements = [];
         const tabBodyElements = [];
 
         StructuralVariantSampleOverviewTabView.tabNames.forEach((title, index) => {
-            const tabTitleElemProps = { currentTab, index, title, "key": index };
+            const tabTitleElemProps = { annotationTab, index, title, "key": index };
 
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
-            if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+            if (index === annotationTab || this.openPersistentTabs[index]) {
+                const commonBodyProps = { context, schemas, index, "active": index === annotationTab, "key": index };
                 switch (index) {
                     case 0: // Gene
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
@@ -331,10 +344,10 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
 }
 
-
+// TODO: DRY-ify (maybe import OverviewTabTitle from "./../VariantSampleView/VariantSampleOverview")
 const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title, index, disabled = false, loading = false } = props;
-    const active = (currentTab === index);
+    const { annotationTab, title, index, disabled = false, loading = false } = props;
+    const active = (annotationTab === index);
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
@@ -343,3 +356,22 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
+
+// This content is also in src/encoded/docs as an html file; if needed for facets, may use that
+const hg19PopoverTitle = "The hg19 coordinates for structural variants are calculated.";
+
+const hg19PopoverContent = (
+    <div>
+        <p>
+            All variants are currently called for the hg38 reference genome. If the variant in hg19
+            coordinates is not available, the conversion calculation was not successful.
+        </p>
+
+        <p>
+            For structural variants, both the start and end coordinates are converted to hg19 via an
+            implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If
+            either one of these conversions fails, the variant will not be available in hg19
+            coordinates.
+        </p>
+    </div>
+);

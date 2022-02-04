@@ -1351,7 +1351,7 @@ def structural_variant(testapp, project, institution, gene):
         "SV_TYPE": "DEL",
         "transcript": [{"csq_gene": gene["@id"]}],
     }
-    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+    return testapp.post_json("/structural_variant", item, status=201).json["@graph"][0]
 
 
 @pytest.fixture
@@ -1365,7 +1365,24 @@ def structural_variant_2(testapp, project, institution, gene_2):
         "SV_TYPE": "DUP",
         "transcript": [{"csq_gene": gene_2["@id"]}],
     }
-    return testapp.post_json("/structural_variant", item).json["@graph"][0]
+    return testapp.post_json("/structural_variant", item, status=201).json["@graph"][0]
+
+
+@pytest.fixture
+def structural_variant_hg19(testapp, project, institution):
+    """An SV with hg19 coordinates"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "CHROM": "5",
+        "START": 123445,
+        "END": 234556,
+        "SV_TYPE": "DUP",
+        "hg19_chr": "5",
+        "hg19_start": 123456,
+        "hg19_end": 234567,
+    }
+    return testapp.post_json("/structural_variant", item, status=201).json["@graph"][0]
 
 
 @pytest.fixture

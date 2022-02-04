@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+import { onClickLinkNavigateChildWindow } from './../item-pages/components/child-window-reuser';
 
 /**
  * This gets merged into the columnExtensionMap.js.
@@ -53,7 +54,7 @@ export const variantSampleColumnExtensionMap = {
                 return null;
             }
             return (
-                <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"} className="d-block mx-auto">
+                <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"} className="d-block mx-auto" onClick={onClickLinkNavigateChildWindow}>
                     <GenesMostSevereDisplayTitle {...{ result, align }} />
                 </a>
             );
@@ -74,7 +75,7 @@ export const variantSampleColumnExtensionMap = {
             }
 
             return (
-                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")}>
+                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")} onClick={onClickLinkNavigateChildWindow}>
                     <GenesMostSevereHGVSCColumn gene={firstGene} align={align} />
                 </a>
             );
@@ -157,7 +158,7 @@ export const structuralVariantSampleColumnExtensionMap = {
             if (transcripts.length === 0) return null;
 
             return (
-                <a href={link ? link : (atID ? atID + '?annotationTab=0' : "#")}>
+                <a href={link ? link : (atID ? atID + '?annotationTab=0' : "#")} onClick={onClickLinkNavigateChildWindow}>
                     <StructuralVariantTranscriptColumn {...{ result, align }} />
                 </a>
             );
@@ -216,8 +217,8 @@ export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSamp
 
     const cls = ("title-block" + (className ? " " + className : ""));
 
-    // annotationID structured like <type>_chr...etc; need just the part after underscore
-    const [ , splitAnnotationIDSuffix ] = (annotation_id || display_title).split("_");
+    // display title or annotationID structured like <type>_chr...etc; need just the part after underscore
+    const [ , splitAnnotationIDSuffix ] = (display_title || annotation_id).split("_");
 
     const rows = [
         <span key={0} className="d-block text-600 text-truncate">{ splitAnnotationIDSuffix }</span>
@@ -337,7 +338,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
 });
 
 export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLabelColumn(props){
-    const { result, align = "center", showTips = true, truncate = true, showIcon = true } = props;
+    const { result, align = "left", showTips = true, truncate = true, showIcon = true } = props;
     const {
         associated_genotype_labels: {
             proband_genotype_label = null,
@@ -387,8 +388,9 @@ export const BAMSnapshotColumn = React.memo(function BAMSnapshotColumn({ result 
     const { "@id": resultAtID = null } = result;
     return (
         <div className="mx-auto text-truncate">
-            <a target="_blank" className="btn btn-outline-dark btn-sm" rel="noreferrer"
-                href={resultAtID + "/@@download/"} data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
+            <a className="btn btn-outline-dark btn-sm" onClick={onClickLinkNavigateChildWindow}
+                href={resultAtID + "@@download/"} data-child-window="bam" data-child-window-message="false"
+                data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
                 <i className="icon icon-fw icon-image fas" />
             </a>
         </div>

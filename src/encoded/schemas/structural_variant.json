@@ -415,6 +415,42 @@
             "schema_title": "gnomAD-SV Alt AN - Other",
             "min": 0
         },
+        "hg19_chr": {
+            "title": "Chromosome (hg19)",
+            "field_name": "hg19_chr",
+            "type": "string",
+            "do_import": true,
+            "vcf_field": "hg19_chr",
+            "source_name": "pyliftover",
+            "source_version": "v0.4",
+            "description": "Chromosome (hg19)",
+            "scope": "variant",
+            "schema_title": "Chromosome (hg19)"
+        },
+        "hg19_end": {
+            "title": "End Position (hg19)",
+            "field_name": "hg19_end",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "hg19_end",
+            "source_name": "pyliftover",
+            "source_version": "v0.4",
+            "description": "End position (hg19)",
+            "scope": "variant",
+            "schema_title": "End Position (hg19)"
+        },
+        "hg19_start": {
+            "title": "Start Position (hg19)",
+            "field_name": "hg19_start",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "hg19_pos",
+            "source_name": "pyliftover",
+            "source_version": "v0.4",
+            "description": "Start position (hg19)",
+            "scope": "variant",
+            "schema_title": "Start Position (hg19)"
+        },
         "schema_version": {
             "default": "1"
         },
@@ -637,6 +673,42 @@
                         "description": "Strand of the feature",
                         "scope": "variant",
                         "schema_title": "Strand"
+                    },
+                    "csq_most_severe": {
+                        "title": "Most Severe Transcript (Boolean)",
+                        "field_name": "csq_most_severe",
+                        "type": "boolean",
+                        "do_import": true,
+                        "vcf_field": "csq_most_severe",
+                        "source_name": "sv_cgap_annotations.py",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "Indicates if transcript is most severe for this gene",
+                        "scope": "variant",
+                        "schema_title": "Most Severe Transcript (Boolean)"
+                    },
+                    "csq_variant_5_prime_location": {
+                        "title": "Variant Location 5' of Transcript",
+                        "field_name": "csq_variant_5_prime_location",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_variant_5_prime_location",
+                        "source_name": "sv_cgap_annotations.py",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "The location of the variant relative to the 5' end of the transcript",
+                        "scope": "variant",
+                        "schema_title": "Variant Location 5' of Transcript"
+                    },
+                    "csq_variant_3_prime_location": {
+                        "title": "Variant Location 3' of Transcript",
+                        "field_name": "csq_variant_3_prime_location",
+                        "type": "string",
+                        "do_import": true,
+                        "vcf_field": "csq_variant_3_prime_location",
+                        "source_name": "sv_cgap_annotations.py",
+                        "sub_embedding_group": "{\"key\": \"transcript\", \"title\": \"Transcript\"}",
+                        "description": "The location of the variant relative to the 3' end of the transcript",
+                        "scope": "variant",
+                        "schema_title": "Variant Location 3' of Transcript"
                     }
                 }
             }

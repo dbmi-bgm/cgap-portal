@@ -33,13 +33,40 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path, build_s3_presigned_get_url
+from ..util import (
+    resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
+)
 from ..types.base import Item, get_item_or_none
 
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
+
+# For adding additional variant nomenclature options
+# For reference, see e.g. https://www.insdc.org/documents/feature_table.html#7.4.3
+AMINO_ACID_ABBREVIATIONS = {
+    'Ala': 'A',
+    'Arg': 'R',
+    'Asn': 'N',
+    'Asp': 'D',
+    'Cys': 'C',
+    'Gln': 'Q',
+    'Glu': 'E',
+    'Gly': 'G',
+    'His': 'H',
+    'Ile': 'I',
+    'Leu': 'L',
+    'Lys': 'K',
+    'Met': 'M',
+    'Phe': 'F',
+    'Pro': 'P',
+    'Ser': 'S',
+    'Thr': 'T',
+    'Trp': 'W',
+    'Tyr': 'Y',
+    'Val': 'V'
+}
 
 # Compound Het constants
 CMPHET_PHASED_STRONG = 'Compound Het (Phased/strong_pair)'
@@ -288,7 +315,10 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+        position = convert_integer_to_comma_string(POS)
+        if position is None:
+            position = POS
+        return build_variant_display_title(CHROM, position, REF, ALT)  # chr1:1,504A>T
 
     @calculated_property(schema={
         "title": "Position (genome coordinates)",
@@ -347,6 +377,47 @@ class Variant(Item):
                             break
                 break
         return result
+
+    @calculated_property(schema={
+        "title": "Alternate Display Title",
+        "description": "Variant display title with comma-separated position",
+        "type": "string"
+    })
+    def alternate_display_title(self, CHROM, POS, REF, ALT):
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:1504A>T
+
+    @calculated_property(schema={
+        "title": "Additional Variant Names",
+        "description": "Additional names/aliases this variant is known as",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    })
+    def additional_variant_names(self, genes=None):
+        """This property will allow users to search for specific variants in the filtering tab,
+        using a few different possible variant names.
+         - c. change
+         - p. change (3 letter aa code)
+         - p. change (1 letter aa code)
+        NB: talk to front end about tooltip/click box for example searches
+        """
+        names = []
+        if genes:
+            for gene in genes:
+                if gene.get('genes_most_severe_hgvsc'):
+                    names.append(gene['genes_most_severe_hgvsc'].split(':')[-1])
+                if gene.get('genes_most_severe_hgvsp'):
+                    hgvsp_3 = gene['genes_most_severe_hgvsp'].split(':')[-1]
+                    hgvsp_1 = ''.join(hgvsp_3)
+                    for key, val in AMINO_ACID_ABBREVIATIONS.items():
+                        if key in hgvsp_3:
+                            hgvsp_1 = hgvsp_1.replace(key, val)
+                    names.append(hgvsp_3)
+                    if hgvsp_1 != hgvsp_3:
+                        names.append(hgvsp_1)
+        if names:
+            return names
 
 
 @collection(
@@ -992,7 +1063,7 @@ def order_delete_selections(context, request):
     selections_by_uuid = {}
     for selection in existing_variant_samples + existing_structural_variant_samples:
         selections_by_uuid[selection["variant_sample_item"]] = selection
-    
+
     patch_payload = {}
 
     if requested_variant_samples is not None:

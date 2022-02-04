@@ -1,6 +1,6 @@
 {
-    "structural_variant":{
-        "embedded_field":[
+    "structural_variant": {
+        "embedded_field": [
             "transcript.csq_consequence.var_conseq_id",
             "transcript.csq_consequence.definition",
             "transcript.csq_consequence.impact",

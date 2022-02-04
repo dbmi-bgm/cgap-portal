@@ -52,7 +52,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
                 "render": function(result, props) {
                     const { __matching_filter_block_names = [] } = result;
                     if (__matching_filter_block_names.length === 0) {
@@ -64,7 +64,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
 }
 
 /**
@@ -109,7 +109,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-file far"/>,
+                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
                 "render": function(result, props) {
                     const { __matching_filter_block_names = [] } = result;
                     if (__matching_filter_block_names.length === 0) {
@@ -163,7 +163,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
 }
 
 /** Open Variant Sample in new window */
@@ -223,8 +223,8 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
 
     const popover = (
         <Popover id={"mi:" + resultUUID}>
-            <Popover.Content className="pt-0 pl-0 pr-0">
-                <Popover.Title className="m-0 text-600" as="h5">Matches Filter Blocks:</Popover.Title>
+            <Popover.Title className="m-0 text-600" as="h5">Matches Filter Blocks:</Popover.Title>
+            <Popover.Content className="pt-0 pl-0 pr-04">
                 <ul className="mb-0 mt-08">
                     { filterBlockNameList.map(function(fbName, i){
                         return <li key={i}>{ fbName }</li>;
@@ -239,7 +239,7 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
             <OverlayTrigger trigger="focus" overlay={popover}>
                 { function({ ref, ...triggerHandlers }){
                     return (
-                        <button type="button" ref={ref} { ...triggerHandlers } className="btn mx-auto btn-sm btn-link text-decoration-none">
+                        <button type="button" ref={ref} { ...triggerHandlers } className="btn btn-sm btn-link text-decoration-none">
                             { __matching_filter_block_names.length }
                         </button>
                     );

@@ -228,3 +228,86 @@ def test_most_severe_location(
     ).json["@graph"][0]
     most_severe_location = patch_response.get("most_severe_location")
     assert most_severe_location == expected
+
+
+@pytest.mark.parametrize(
+    "POS,expected",
+    [
+        (1, "1"),
+        (100, "100"),
+        (1000, "1,000"),
+        (1000000, "1,000,000"),
+    ]
+)
+def test_display_title(POS, expected, testapp, variant):
+    """Test building variant display title with comma-separated position."""
+    variant_atid = variant.get("@id")
+    chromosome = variant.get("CHROM")
+    reference = variant.get("REF")
+    alternate = variant.get("ALT")
+    patch_body = {"POS": POS}
+    patch_response = testapp.patch_json(
+        variant_atid, patch_body, status=200
+    ).json["@graph"][0]
+    result = patch_response.get("display_title")
+    assert result == "chr%s:%s%s>%s" % (chromosome, expected, reference, alternate)
+
+
+@pytest.mark.parametrize(
+    "POS,expected",
+    [
+        (1, "1"),
+        (100, "100"),
+        (1000, "1000"),
+        (1000000, "1000000"),
+    ]
+)
+def test_alternate_display_title(POS, expected, testapp, variant):
+    """Test building alternate variant display title without
+    comma-separated position.
+    """
+    variant_atid = variant.get("@id")
+    chromosome = variant.get("CHROM")
+    reference = variant.get("REF")
+    alternate = variant.get("ALT")
+    patch_body = {"POS": POS}
+    patch_response = testapp.patch_json(
+        variant_atid, patch_body, status=200
+    ).json["@graph"][0]
+    result = patch_response.get("alternate_display_title")
+    assert result == "chr%s:%s%s>%s" % (chromosome, expected, reference, alternate)
+
+
+@pytest.mark.parametrize(
+    "hgvsc,hgvsp,result", [
+        (
+            'ENST00000643905.1:c.500_501del',
+            'ENSP00000495949.1:p.Val167GlyfsTer6',
+            ['c.500_501del', 'p.Val167GlyfsTer6', 'p.V167GfsTer6']
+        ),
+        (
+            'ENST00000643905.1:c.*1054C>T',
+            None,
+            ['c.*1054C>T']
+        ),
+        (
+            'ENST00000430580.6:c.2290C>A',
+            'ENSP00000474456.1:p.Gln764Lys',
+            ['c.2290C>A', 'p.Gln764Lys', 'p.Q764K']
+        ),
+        (
+            'ENST00000485362.1:n.41-3C>T',
+            None,
+            ['n.41-3C>T']
+        )
+    ]
+)
+def test_additional_variant_names(testapp, gene, variant, hgvsc, hgvsp, result):
+    variant_atid = variant.get("@id")
+    patch_body = {"genes": [{
+        "genes_most_severe_hgvsc": hgvsc
+    }]}
+    if hgvsp:
+        patch_body["genes"][0]["genes_most_severe_hgvsp"] = hgvsp
+    resp = testapp.patch_json(variant_atid, patch_body, status=200).json['@graph'][0]
+    assert sorted(resp['additional_variant_names']) == sorted(result)
