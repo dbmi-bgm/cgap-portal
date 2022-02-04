@@ -14,6 +14,64 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
+
+function GenericInterpretationSidebar(props) {
+    const {
+        headerTitle = "Interpretation Space",
+        headerIconCls = "icon icon-poll-h fas",
+        children = []
+    } = props;
+
+    return (
+        <div className="card interpretation-space">
+            <InterpretationSpaceHeader {...{ headerTitle, headerIconCls }} />
+            <div className="card-body">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+
+export class SNVIndelInterpretationSpace extends React.Component {
+    render() {
+        const { ...passProps } = this.props;
+        return (
+            <GenericInterpretationSidebar headerTitle="SNV / Indel Interpretation Space">
+                <InterpretationSpaceWrapper {...passProps}/>
+            </GenericInterpretationSidebar>
+        );
+    }
+}
+
+export class CNVInterpretationSpace extends React.Component {
+    render() {
+        console.log("CNVInterpretationSpace this.props", this.props);
+        const { ...passProps } = this.props;
+        return (
+            <GenericInterpretationSidebar headerTitle="SV / CNV Interpretation Space">
+                <InterpretationSpaceWrapper {...passProps} tabsToDisable={{ 2: true }} />
+            </GenericInterpretationSidebar>
+        );
+    }
+}
+
+/**
+ * @todo
+ * Expanded items commented out until V2
+ * We should probably have it expand out horizontally from side (?).
+ */
+export function InterpretationSpaceHeader(props) {
+    const { headerIconCls, headerTitle } = props;
+    return (
+        <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
+            <i className={headerIconCls}></i>
+            <span className="w-100 text-center">{headerTitle}</span>
+        </div>
+    );
+}
+
+
 /**
  * Stores and manages global note state for interpretation space. Handles AJAX
  * requests for posting and patching notes.
@@ -254,9 +312,11 @@ export class InterpretationSpaceWrapper extends React.Component {
 
     render() {
         const { variant_notes, gene_notes, interpretation, discovery_interpretation } = this.state;
-        return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
-            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} lastSavedDiscovery={discovery_interpretation}
-            saveAsDraft={this.saveAsDraft} />;
+        return (
+            <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
+                lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} lastSavedDiscovery={discovery_interpretation}
+                saveAsDraft={this.saveAsDraft} />
+        );
     }
 }
 
@@ -433,16 +493,33 @@ export class InterpretationSpaceController extends React.Component {
                 break;
         }
         return (
-            <div className="card interpretation-space">
-                <InterpretationSpaceHeader {...{ isExpanded }} toggleExpanded={this.toggleExpanded}/>
-                <div className="card-body">
-                    <InterpretationSpaceTabs {...{ currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
-                        switchToTab={this.switchToTab} />
-                    { panelToDisplay }
-                </div>
-            </div>
+            <>
+                <InterpretationSpaceTabs {...{ currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
+                    switchToTab={this.switchToTab} />
+                { panelToDisplay }
+            </>
         );
     }
+}
+
+function GenericInterpretationSpaceTabBtn(props) {
+    const { tabName, tooltip = null, onClick, isActive = false, unsavedDraft = false, cls = "" } = props;
+    const className = `${cls} btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"} ${unsavedDraft ? 'font-italic': ""}`;
+    return (
+        <button type="button" data-tip={tooltip} {...{ onClick, className }}>
+            { tabName }{ unsavedDraft && <span className="text-danger text-600">*</span>}
+        </button>
+    );
+}
+
+function GenericInterpretationSpaceTabNav(props) {
+    const { children = [] } = props;
+
+    return (
+        <div className="interpretation-tabs p-1 d-flex align-items-center justify-content-around">
+            {children}
+        </div>
+    );
 }
 
 /**
@@ -452,24 +529,6 @@ export class InterpretationSpaceController extends React.Component {
  * from InterpretationSpaceController) into new file InterpretationSpaceView.js.
  */
 
-/**
- * @todo
- * Expanded items commented out until V2
- * We should probably have it expand out horizontally from side (?).
- */
-export function InterpretationSpaceHeader(props) {
-    const { toggleExpanded, isExpanded } = props;
-    return (
-        <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
-            <i className="icon icon-poll-h fas"></i>
-            Interpretation Space
-            <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined} style={{ visibility: "hidden" }}>
-                { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
-            </button>
-        </div>
-    );
-}
-
 function InterpretationSpaceTabs(props) {
     const { currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
     const tabIndexToUnsavedDraft = { 0: isDraftGeneNoteUnsaved, 1: isDraftVariantNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
@@ -478,18 +537,17 @@ function InterpretationSpaceTabs(props) {
     const tabsRender = InterpretationSpaceController.tabNames.map((tabName, i) => {
         const isActive = currentTab === i;
         const unsavedDraft = tabIndexToUnsavedDraft[i];
+        const tooltip = unsavedDraft ? "Unsaved changes": null;
+        const onClick = (e) => switchToTab(i);
         return (
-            <button type="button" key={i} data-tip={unsavedDraft ? "Unsaved changes": null} onClick={(e) => switchToTab(i)}
-                className={`btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"}${unsavedDraft ? 'font-italic' : ''}`}>
-                {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
-            </button>
+            <GenericInterpretationSpaceTabBtn key={i} {...{ tooltip, onClick, unsavedDraft, isActive, tabName }} />
         );
     });
 
     return (
-        <div className="interpretation-tabs p-1 d-flex align-items-center justify-content-around">
-            {tabsRender}
-        </div>
+        <GenericInterpretationSpaceTabNav>
+            { tabsRender }
+        </GenericInterpretationSpaceTabNav>
     );
 }
 

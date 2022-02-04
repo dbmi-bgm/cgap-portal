@@ -18,7 +18,7 @@ import { GeneTabBody } from './GeneTabBody';
 import { SampleTabBody } from './SampleTabBody';
 import { AnnotationBrowserTabBody } from './AnnotationBrowserTabBody';
 import { BamFileBrowserTabBody } from './BamFileBrowserTabBody';
-import { InterpretationSpaceWrapper, InterpretationSpaceHeader } from './InterpretationSpaceController';
+import { InterpretationSpaceHeader, SNVIndelInterpretationSpace } from './InterpretationSpaceController';
 import { getInitialTranscriptIndex } from './AnnotationSections';
 import QuickPopover from '../components/QuickPopover';
 
@@ -526,15 +526,9 @@ class InterpretationController extends React.PureComponent {
                     { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
-                            <InterpretationSpaceWrapper {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
+                            <SNVIndelInterpretationSpace {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
                                 wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
                         </div> : null }
-                    {/* showFallbackInterpretationSpace ?
-                        // Deprecated since if viewer can see original context they'll definitely get back the new one?
-                        <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
-                            <InterpretationSpaceWrapper isFallback {...{ autoClassification, actions, context }} toggleInvocation={this.toggleInvocation}
-                                wipACMGSelections={wipACMGSelections} {...passProps} toggleACMGInvoker={this.toggleACMGInvoker} defaultTab={interpretationTab} />
-                        </div> : null */}
                 </div>
             </React.Fragment>
         );
@@ -545,7 +539,7 @@ export const LoadingInterpretationSpacePlaceHolder = React.memo(function Loading
     return (
         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
             <div className="card interpretation-space">
-                <InterpretationSpaceHeader />
+                <InterpretationSpaceHeader headerTitle="SNV/Indel Interpretation Space" />
                 <div className="card-body">
                     <div className="text-center py-5">
                         <i className="icon icon-fw icon-spin icon-circle-notch icon-2x text-muted fas"/>

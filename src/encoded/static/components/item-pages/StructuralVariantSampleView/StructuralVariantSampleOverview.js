@@ -10,7 +10,7 @@ import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
-import { InterpretationSpaceWrapper } from '../VariantSampleView/InterpretationSpaceController';
+import { CNVInterpretationSpace } from '../VariantSampleView/InterpretationSpaceController';
 import { LoadingInterpretationSpacePlaceHolder, convertQueryStringTypes } from '../VariantSampleView/VariantSampleOverview';
 import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 
@@ -429,7 +429,7 @@ class SvInterpretationController extends React.PureComponent {
                     { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
-                            <InterpretationSpaceWrapper {...{ actions }} context={newContext}
+                            <CNVInterpretationSpace {...{ actions }} context={newContext}
                                 {...passProps} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
