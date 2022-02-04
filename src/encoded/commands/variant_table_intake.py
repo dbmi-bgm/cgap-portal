@@ -4,7 +4,9 @@ import logging
 from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 
-from .ingestion.table_utils import StructuralVariantTableParser, VariantTableParser
+from encoded.ingestion.table_utils import (
+    StructuralVariantTableParser, VariantTableParser
+)
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__

@@ -8,6 +8,7 @@ import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax, object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { GeneTranscriptDisplayTitle, getMostSevereConsequence, getTranscriptLocation } from './AnnotationSections';
+import QuickPopover from '../components/QuickPopover';
 
 
 
@@ -184,7 +185,7 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
         return getTranscriptLocation(currentTranscript, mostSevereConsequence);
     }, [ currentTranscript, mostSevereConsequence ]);
 
-    const { coding_effect: consequenceCodingEffect = fallbackElem } = mostSevereConsequence || {};
+    const { display_title: consequenceTitle = fallbackElem } = mostSevereConsequence || {};
 
     return (
         <div className="row">
@@ -206,13 +207,13 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
                 <div className="row mb-03">
                     <div className="col-12 col-lg-5 col-xl-6">
-                        <label htmlFor="variant.transcript.csq_consequence.coding_effect" className="mb-0"
-                            data-tip={getTipForField("transcript.csq_consequence.coding_effect")}>
-                            Coding Effect:
+                        <label htmlFor="variant.transcript.csq_consequence" className="mb-0"
+                            data-tip={getTipForField("transcript.csq_consequence")}>
+                            Consequence:
                         </label>
                     </div>
-                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_consequence.coding_effect">
-                        { consequenceCodingEffect }
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_consequence">
+                        { consequenceTitle }
                     </div>
                 </div>
 
@@ -273,7 +274,7 @@ function GDNAList({ context }){
         hgvsg = fallbackElem,
         CHROM: chrom = fallbackElem,
         hg19_chr = fallbackElem,
-        hg19_pos = fallbackElem
+        hgvsg_hg19 = fallbackElem
     } = variant;
 
     const renderedRows =  (
@@ -285,10 +286,15 @@ function GDNAList({ context }){
                 <div className="col-12 col-md-7">{ hgvsg }</div>
             </div>
             {/* Legacy GRCh37/hg19 support. */}
-            <div className="row pb-1 pb-md-03" key="GCRCh37">
-                <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
+            <div className="row pb-1 pb-md-03" key="GRCh37">
+                <div className="col-12 col-md-3 font-italic">
+                    <em>GRCh37 (hg19)</em>
+                    <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm" tooltip="Click here for more information">
+                        {hg19PopoverContent}
+                    </QuickPopover>
+                </div>
                 <div className="col-12 col-md-2 ">{ hg19_chr }</div>
-                <div className="col-12 col-md-7">{ hg19_pos }</div>
+                <div className="col-12 col-md-7">{ hgvsg_hg19 }</div>
             </div>
         </React.Fragment>
     );
@@ -309,3 +315,20 @@ function GDNAList({ context }){
     return renderedRows;
 }
 
+
+const hg19PopoverTitle = "The HGVS-formatted variant in hg19 coordinates is calculated.";
+const hg19PopoverContent = (
+    <div>
+        <p>
+            All variants are currently called for the hg38 reference genome. If the variant in hg19
+            coordinates is not available, the conversion calculation was not successful.
+        </p>
+        <p>
+            To calculate the variant for hg19 coordinates, the hg38 position is converted to hg19
+            via an implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If the hg19 conversion
+            is successful, the variant is then converted to HGSV format. If the HGSV conversion is
+            also successful, the result will be displayed. Otherwise, only the hg38 coordinates for
+            the variant will be displayed.
+        </p>
+    </div>
+);
