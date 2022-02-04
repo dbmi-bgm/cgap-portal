@@ -82,7 +82,7 @@ export class InterpretationSpaceWrapper extends React.Component {
      * and returns an object to use to initialize state.
      * returns {
      *      "variant_notes": <note_obj>,
-     *      "gene_notes": <note obj>,
+     *      "gene_notes": <note obj> || [<note obj], // for sv, this will be an array of note objs
      *      "interpretation": <note obj>,
      *      "loading": false,
      *      "user": null... etc. }
@@ -92,7 +92,7 @@ export class InterpretationSpaceWrapper extends React.Component {
         const newState = {};
         fields.forEach((field) => {
             const { [field]: note = null } = context;
-            newState[field] = note;
+            newState[field] = note; // for sv gene_notes, this will actually be an array
         });
         newState.loading = false;
         newState.user = null;
@@ -180,6 +180,19 @@ export class InterpretationSpaceWrapper extends React.Component {
 
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
+
+    // postNewMultiNote(notes, noteType) {
+    //     const { context: { institution = null, project = null } = {} } = this.props;
+    //     const { '@id': variantSampleInstitutionID } = institution || {};
+    //     const { '@id': variantSampleProjectID } = project || {};
+
+    //     const notesToSubmit = notes.map((note) => {
+    //         const cleanedNote = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType);
+    //         noteToSubmit.institution = variantSampleInstitutionID;
+    //         noteToSubmit.project = variantSampleProjectID;
+    //         return cleanedNote;
+    //     });
+    // }
 
     patchNewNoteToVS(noteAtID, saveToField) {
         const { context: { '@id': vsAtID = null } = {} } = this.props;
@@ -442,7 +455,7 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { tabsToDisable, isFallback, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
+        const { selectedGenes, onSelectGene, onResetSelectedGenes, tabsToDisable, isFallback, lastSavedHighlightedGenes, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
@@ -466,10 +479,11 @@ export class InterpretationSpaceController extends React.Component {
         };
         switch(currentTab) {
             case (0): // Gene Notes
-                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
-                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
-                );
+                panelToDisplay = <MultiItemInterpretationPanel {...commonProps} {...{ lastSavedHighlightedGenes, context, selectedGenes, onSelectGene, onResetSelectedGenes }} />;
+                // panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                //     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
+                //     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                // );
                 break;
             case (1): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps}
@@ -557,6 +571,98 @@ function InterpretationSpaceTabs(props) {
 const refreshParentWindowVariantSampleList = _.debounce(function(){
     window.opener.postMessage({ "action": "refresh-variant-sample-list" });
 }, 1200, false); // Debounced to prevent accidental double-clicks & (too-)rapid changes
+
+class MultiItemInterpretationPanel extends React.PureComponent {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            gene_notes: [],
+        };
+    }
+
+    render() {
+        const { context, selectedGenes, onSelectGene, onResetSelectedGenes, noteLabel, noteType, schemas, caseSource, hasEditPermission, autoClassification, toggleInvocation, isFallback } = this.props;
+        return (
+            <div className="interpretation-panel">
+                <label className="w-100">{ noteLabel }</label>
+                <HighlightedGenesDrop {...{ context, selectedGenes, onSelectGene, onResetSelectedGenes }}/>
+                {/* { (lastModUsernameFromNew || lastModUsername) ?
+                    <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
+                    : null}
+                <AutoGrowTextArea disabled={isFallback} className="w-100 mb-1" value={noteText} onChange={this.onTextAreaChange} placeholder="Required" />
+                { noteType === "note_interpretation" ?
+                    <GenericFieldForm {...{ isFallback }} fieldsArr={[{ field: 'classification', value: classification }, { field: 'acmg_rules_invoked', value: wipACMGSelections, autoClassification, toggleInvocation }]} {...{ schemas, noteType }} onDropOptionChange={this.onDropOptionChange}/>
+                    : null }
+                { noteType === "note_discovery" ?
+                    <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
+                        {...{ schemas, noteType, isFallback }} onDropOptionChange={this.onDropOptionChange}/>
+                    : null }
+                <GenericInterpretationSubmitButton {...{ hasEditPermission, isFallback, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
+                    saveAsDraft={this.saveStateAsDraft}
+                />
+                { caseSource ?
+                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={onReturnToCaseClick}>
+                        Return to Case
+                    </button> : null} */}
+            </div>
+        );
+    }
+}
+
+function HighlightedGenesDrop(props) {
+    const { context, cls, selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene } = props;
+    const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene = [] } = context;
+
+    const selectedGeneID = selectedGenes.keys().next().value;
+
+    const transcriptsDeduped = {};
+    transcripts.forEach((transcript) => {
+        const { csq_gene = null } = transcript;
+        const { "@id": atID = null } = csq_gene || {};
+        transcriptsDeduped[atID] = csq_gene;
+    });
+
+    let dropOptions;
+    const genes = Object.keys(transcriptsDeduped);
+
+    let value;
+    if (genes.length > 0) {
+        dropOptions = genes.map((geneID) => {
+            const { display_title } = transcriptsDeduped[geneID];
+            return (
+                <Dropdown.Item onClick={() => onSelectGene(transcriptsDeduped[geneID])} key={geneID}>
+                    { display_title }
+                </Dropdown.Item>
+            );
+        });
+
+        if (selectedGeneID) {
+            value = transcriptsDeduped[selectedGeneID].display_title;
+        }
+    }
+
+    return (
+        <>
+            <label className="w-100 text-small">
+                <i className="icon icon-star text-primary fas icon-fw"></i> Selected Gene for Interpretation
+            </label>
+            <div className="w-100 d-flex note-field-drop">
+                <Dropdown as={ButtonGroup} className={cls}>
+                    <Dropdown.Toggle variant="outline-secondary text-left">
+                        { value || "Select an option..." }
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+                </Dropdown>
+                { selectedGeneID ?
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onResetSelectedGenes(highlighted_gene)}>
+                        <i className="icon icon-trash-alt fas" />
+                    </Button>
+                    : null}
+            </div>
+        </>
+    );
+}
 
 class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {

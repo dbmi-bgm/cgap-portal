@@ -399,7 +399,6 @@ class SvInterpretationController extends React.PureComponent {
         const {
             actions = [],
             acmg_rules_invoked = [], // todo
-            highlighted_genes = [],
             interpretation: { error: interpError = null } = {},
             variant_notes: { error: varNoteError = null } = {},
             gene_notes: { error: geneNoteError = null } = {},

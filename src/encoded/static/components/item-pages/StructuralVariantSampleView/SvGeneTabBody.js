@@ -214,7 +214,7 @@ export const CustomCheckboxInput = function(props) {
 
     return (
         <label className={"custom-checkbox-input inline-block " + cls}>
-            <input type="checkbox" {...{ checked, disabled, onChange }} />
+            <input className="d-none" type="checkbox" {...{ checked, disabled, onChange }} />
             <span>
                 { (!checked && !disabled) && <span className="custom-check-unchecked">{ uncheckedJSX }</span>}
                 { (checked && !disabled) && <span className="custom-check-checked">{ checkedJSX }</span>}
