@@ -148,8 +148,6 @@ def get_higlass_viewconf(context, request):
     higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
     s3_bucket = request.registry.settings.get('file_wfout_bucket')
-    #s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
-
 
     if requesting_tab == "bam":
 
@@ -263,7 +261,7 @@ def get_higlass_viewconf(context, request):
             if accession not in bam_visibilty or accession not in sv_vcf_visibilty:
                 continue
 
-            if bam_visibilty[accession] is True or sv_vcf_visibilty[accession] is True:
+            if bam_visibilty[accession] or sv_vcf_visibilty[accession]:
                 empty_track_sample = deepcopy(empty_track_a)
                 empty_track_sample["uid"] = "empty_above_text" + accession
                 top_tracks.append(empty_track_sample)
@@ -273,7 +271,7 @@ def get_higlass_viewconf(context, request):
                 text_track_sample["options"]["text"] = "%s (%s)" % (sample["relationship"].capitalize(), sample["sample_name"])
                 top_tracks.append(text_track_sample)
 
-            if bam_visibilty[accession] is True:
+            if bam_visibilty[accession]:
 
                 empty_track_sample = deepcopy(empty_track_b)
                 empty_track_sample["uid"] = "empty_above_pileup" + accession
@@ -290,7 +288,7 @@ def get_higlass_viewconf(context, request):
                     pileup_track_sample['options'] = deepcopy(original_options['pileup'])
                 top_tracks.append(pileup_track_sample)
 
-            if sv_vcf_visibilty[accession] is True:
+            if sv_vcf_visibilty[accession]:
                 empty_track_sample = deepcopy(empty_track_b)
                 empty_track_sample["uid"] = "empty_above_vcf" + accession
                 top_tracks.append(empty_track_sample)
@@ -310,7 +308,7 @@ def get_higlass_viewconf(context, request):
                     top_tracks.append(cgap_sv_track_sample)
 
         accession = "gnomad-sv"
-        if accession in sv_vcf_visibilty and sv_vcf_visibilty[accession] is True:
+        if accession in sv_vcf_visibilty and sv_vcf_visibilty[accession]:
             empty_track_sample = deepcopy(empty_track_a)
             empty_track_sample["uid"] = "empty_above_text" + accession
             top_tracks.append(empty_track_sample)
