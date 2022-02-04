@@ -10,7 +10,8 @@ import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
-import QuickPopover from '../components/QuickPopover';
+//import { OverviewTabTitle as VSOverviewTabTitle } from './../VariantSampleView/VariantSampleOverview';
+import QuickPopover from './../components/QuickPopover';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
@@ -244,59 +245,67 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { defaultTab = null } = props;
+        this.annotationTab = this.annotationTab.bind(this);
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
-        const numTabs = StructuralVariantSampleOverviewTabView.tabNames.length;
-
-        this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 1 // default to Variant unless otherwise specified
-        };
-
         // Setting persistence requires setting index to true for tab in render + using active prop in tabBody component to trigger d-none class when inactive
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    componentDidUpdate(pastProps, pastState){
-        const { currentTab: pastTab } = pastState;
-        const { currentTab } = this.state;
-        if (currentTab !== pastTab) {
-            // ReactTooltip.rebuild is called by App upon navigation
-            // to rebuild tooltips from current DOM.
-            // However most tabs' DOM contents not visible until switch to them
-            // so we needa rebuild tooltip upon that.
-            // If DotRouter can be reused/integrated here or similar, we can
-            // remove this useEffect.
-            setTimeout(ReactTooltip.rebuild, 200);
-        }
-    }
-
     componentWillUnmount(){
-        this.openPersistentTabs = [];
+        this.openPersistentTabs = {};
     }
 
+    // TODO: DRY-ify
+    annotationTab(){
+        const { href, defaultTab = 0 } = this.props;
+        const { query: parsedQuery = {} } = memoizedUrlParse(href);
+        let { annotationTab = null } = parsedQuery;
+        annotationTab = parseInt(annotationTab);
+        if (isNaN(annotationTab)) {
+            annotationTab = defaultTab;
+        }
+        return annotationTab;
+    }
+
+    // TODO: DRY-ify
     handleTabClick(e){
+        const { href } = this.props;
         // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
         // since it has SyntheticEvents anyway.
+
         if (e.target && e.target.type === "button") {
-            const tabTitle = parseInt(e.target.getAttribute("data-tab-index"));
-            this.setState({ "currentTab": tabTitle });
+            const nextTabIndex = parseInt(e.target.getAttribute("data-tab-index"));
+            const hrefParts = memoizedUrlParse(href);
+            const { query: parsedQuery = {} } = hrefParts;
+            let { annotationTab } = parsedQuery;
+            annotationTab = parseInt(annotationTab);
+            if (!isNaN(annotationTab) && annotationTab === nextTabIndex) {
+                return;
+            }
+            parsedQuery.annotationTab = nextTabIndex;
+            hrefParts.search = "?" + queryString.stringify(parsedQuery);
+            const nextHref = url.format(hrefParts);
+            // ReactTooltip.rebuild is called by App upon navigation
+            // to rebuild tooltips from current DOM.
+            navigate(nextHref, { "replace": true, "skipRequest": true });
         }
     }
 
     render(){
         const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
-        const { currentTab } = this.state;
+
+        const annotationTab = this.annotationTab();
 
         const tabTitleElements = [];
         const tabBodyElements = [];
 
         StructuralVariantSampleOverviewTabView.tabNames.forEach((title, index) => {
-            const tabTitleElemProps = { currentTab, index, title, "key": index };
+            const tabTitleElemProps = { annotationTab, index, title, "key": index };
 
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
-            if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+            if (index === annotationTab || this.openPersistentTabs[index]) {
+                const commonBodyProps = { context, schemas, index, "active": index === annotationTab, "key": index };
                 switch (index) {
                     case 0: // Gene
                         tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
@@ -335,10 +344,10 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
 }
 
-
+// TODO: DRY-ify (maybe import OverviewTabTitle from "./../VariantSampleView/VariantSampleOverview")
 const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title, index, disabled = false, loading = false } = props;
-    const active = (currentTab === index);
+    const { annotationTab, title, index, disabled = false, loading = false } = props;
+    const active = (annotationTab === index);
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?

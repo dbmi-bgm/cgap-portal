@@ -145,6 +145,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         savedVariantSampleIDMap = {},
         fetchVariantSampleListItem
     } = props;
+
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
     const {

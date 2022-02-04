@@ -1,6 +1,8 @@
 'use strict';
 
 import React, { useState, useRef, useCallback } from 'react';
+import url from 'url';
+import queryString from 'query-string';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
@@ -11,7 +13,7 @@ import Popover  from 'react-bootstrap/esm/Popover';
 import Collapse from 'react-bootstrap/esm/Collapse';
 import { console, ajax, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
-import { acmgUtil } from '../../util';
+import { acmgUtil, navigate } from '../../util';
 import { VariantSampleInfoHeader } from './VariantSampleInfoHeader';
 import { VariantTabBody } from './VariantTabBody';
 import { GeneTabBody } from './GeneTabBody';
@@ -144,7 +146,6 @@ export class VariantSampleOverview extends React.PureComponent {
         const {
             query: {
                 showInterpretation: showInterpretationFromQuery = null, // used only if "True" (toggles showing of interpretation sidebar/pane)
-                annotationTab: annotationTabFromQuery = null,           // used only if can be parsed to integer (Variant = 0, Gene = 1, Sample = 2, AnnotationBrowser = 3, BAM Browser = 4)
                 interpretationTab: interpretationTabFromQuery = null,   // used only if can be parsed to integer (Variant Notes = 0, Gene Notes = 1, Clinical = 2, Discovery = 3)
                 caseSource = null
             }
@@ -152,13 +153,7 @@ export class VariantSampleOverview extends React.PureComponent {
 
         // Change types to bool & int where applicable.
         const showInterpretation = showInterpretationFromQuery === "True";
-        let annotationTab = null;
-        if (annotationTabFromQuery !== null) {
-            annotationTab = parseInt(annotationTabFromQuery);
-            if (isNaN(annotationTab)) {
-                annotationTab = null;
-            }
-        }
+
         let interpretationTab = null;
         if (interpretationTabFromQuery !== null) {
             interpretationTab = parseInt(interpretationTabFromQuery);
@@ -171,7 +166,7 @@ export class VariantSampleOverview extends React.PureComponent {
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 <InterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
                     <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
-                    <VariantSampleOverviewTabView {...passProps} defaultTab={annotationTab} />
+                    <VariantSampleOverviewTabView {...passProps} />
                 </InterpretationController>
             </div>
         );
@@ -207,41 +202,48 @@ class VariantSampleOverviewTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { defaultTab = null } = props;
+        this.annotationTab = this.annotationTab.bind(this);
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
-        const numTabs = VariantSampleOverviewTabView.tabNames.length;
-
-        this.state = {
-            // Validate that is 0-5
-            "currentTab": (typeof defaultTab === "number" && defaultTab < numTabs) ? defaultTab : 1
-        };
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    componentDidUpdate(pastProps){
-        const { currentTab: pastTab } = pastProps;
-        const { currentTab } = this.props;
-        if (currentTab !== pastTab) {
-            // ReactTooltip.rebuild is called by App upon navigation
-            // to rebuild tooltips from current DOM.
-            // However most tabs' DOM contents not visible until swithc to them
-            // so we needa rebuild tooltip upon that.
-            // If DotRouter can be reused/integrated here or similar, we can
-            // remove this useEffect.
-            setTimeout(ReactTooltip.rebuild, 200);
-        }
-    }
-
     componentWillUnmount(){
-        this.openPersistentTabs = [];
+        this.openPersistentTabs = {};
     }
 
+    // TODO: DRY-ify
+    annotationTab(){
+        const { href, defaultTab = 0 } = this.props;
+        const { query: parsedQuery = {} } = memoizedUrlParse(href);
+        let { annotationTab = null } = parsedQuery;
+        annotationTab = parseInt(annotationTab);
+        if (isNaN(annotationTab)) {
+            annotationTab = defaultTab;
+        }
+        return annotationTab;
+    }
+
+    // TODO: DRY-ify
     handleTabClick(e){
+        const { href } = this.props;
         // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
         // since it has SyntheticEvents anyway.
+
         if (e.target && e.target.type === "button") {
-            const tabTitle = parseInt(e.target.getAttribute("data-tab-index"));
-            this.setState({ "currentTab": tabTitle });
+            const nextTabIndex = parseInt(e.target.getAttribute("data-tab-index"));
+            const hrefParts = memoizedUrlParse(href);
+            const { query: parsedQuery = {} } = hrefParts;
+            let { annotationTab } = parsedQuery;
+            annotationTab = parseInt(annotationTab);
+            if (!isNaN(annotationTab) && annotationTab === nextTabIndex) {
+                return;
+            }
+            parsedQuery.annotationTab = nextTabIndex;
+            hrefParts.search = "?" + queryString.stringify(parsedQuery);
+            const nextHref = url.format(hrefParts);
+            // ReactTooltip.rebuild is called by App upon navigation
+            // to rebuild tooltips from current DOM.
+            navigate(nextHref, { "replace": true, "skipRequest": true });
         }
     }
 
@@ -252,13 +254,14 @@ class VariantSampleOverviewTabView extends React.PureComponent {
             currentGeneItem, currentGeneItemLoading,
             currentClinVarResponse, currentClinVarResponseLoading
         } = this.props;
-        const { currentTab } = this.state;
+
+        const annotationTab = this.annotationTab();
 
         const tabTitleElements = [];
         const tabBodyElements = []; // [ ...this.cachedTabs ];
 
         VariantSampleOverviewTabView.tabNames.forEach((title, index) => {
-            const tabTitleElemProps = { currentTab, index, title, "key": index };
+            const tabTitleElemProps = { annotationTab, index, title, "key": index };
             if (index === 0) {
                 // If Gene:
                 tabTitleElemProps.disabled = !currentGeneItem;
@@ -270,8 +273,8 @@ class VariantSampleOverviewTabView extends React.PureComponent {
             }
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
-            if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+            if (index === annotationTab || this.openPersistentTabs[index]) {
+                const commonBodyProps = { context, schemas, index, "active": index === annotationTab, "key": index };
                 switch (index) {
                     case 0:
                         tabBodyElements.push(<GeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
@@ -314,9 +317,9 @@ class VariantSampleOverviewTabView extends React.PureComponent {
 }
 
 
-const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title, index, disabled = false, loading = false } = props;
-    const active = (currentTab === index);
+export const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
+    const { annotationTab, title, index, disabled = false, loading = false } = props;
+    const active = (annotationTab === index);
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
