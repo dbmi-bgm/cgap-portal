@@ -442,7 +442,7 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { isFallback, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
+        const { tabsToDisable, isFallback, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
@@ -494,7 +494,7 @@ export class InterpretationSpaceController extends React.Component {
         }
         return (
             <>
-                <InterpretationSpaceTabs {...{ currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
+                <InterpretationSpaceTabs {...{ tabsToDisable, currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
                     switchToTab={this.switchToTab} />
                 { panelToDisplay }
             </>
@@ -503,12 +503,14 @@ export class InterpretationSpaceController extends React.Component {
 }
 
 function GenericInterpretationSpaceTabBtn(props) {
-    const { tabName, tooltip = null, onClick, isActive = false, unsavedDraft = false, cls = "" } = props;
+    const { disabled, tabName, tooltip = null, onClick, isActive = false, unsavedDraft = false, cls = "" } = props;
     const className = `${cls} btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"} ${unsavedDraft ? 'font-italic': ""}`;
     return (
-        <button type="button" data-tip={tooltip} {...{ onClick, className }}>
-            { tabName }{ unsavedDraft && <span className="text-danger text-600">*</span>}
-        </button>
+        <div data-tip={disabled ? "Coming Soon": ""}>
+            <button type="button" data-tip={tooltip} {...{ onClick, className, disabled }}>
+                { tabName }{ unsavedDraft && <span className="text-danger text-600">*</span>}
+            </button>
+        </div>
     );
 }
 
@@ -530,7 +532,7 @@ function GenericInterpretationSpaceTabNav(props) {
  */
 
 function InterpretationSpaceTabs(props) {
-    const { currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
+    const { tabsToDisable, currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
     const tabIndexToUnsavedDraft = { 0: isDraftGeneNoteUnsaved, 1: isDraftVariantNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
 
     // Maybe memoize?
@@ -539,8 +541,9 @@ function InterpretationSpaceTabs(props) {
         const unsavedDraft = tabIndexToUnsavedDraft[i];
         const tooltip = unsavedDraft ? "Unsaved changes": null;
         const onClick = (e) => switchToTab(i);
+        const disabled = tabsToDisable[i] || false;
         return (
-            <GenericInterpretationSpaceTabBtn key={i} {...{ tooltip, onClick, unsavedDraft, isActive, tabName }} />
+            <GenericInterpretationSpaceTabBtn key={i} {...{ tooltip, onClick, unsavedDraft, isActive, tabName, disabled }} />
         );
     });
 
