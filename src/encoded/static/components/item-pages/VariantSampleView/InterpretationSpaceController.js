@@ -579,14 +579,70 @@ class MultiItemInterpretationPanel extends React.PureComponent {
         this.state = {
             gene_notes: [],
         };
+
+        this.selectNewGene = this.selectNewGene.bind(this);
+        this.onTextAreaChange = this.selectNewGene.bind(this);
+    }
+
+    onTextAreaChange(event, idx) {
+        console.log("onTextAreaChange", idx);
+        // const { value: newValue } = event.target || {};
+        // this.setState({ "note_text": newValue });
+
+        // const newState = [...gene_notes]; // todo: may need to deeper clone?
+    }
+
+    selectNewGene(geneId, idx) {
+        const { gene_notes = [] } = this.state;
+
+        if (!gene_notes.length) {
+            // initialize first note object
+            const firstNote = {};
+            const associatedItems = { item_type: "Gene", item_identifier: geneId };
+            firstNote.associated_items = associatedItems;
+
+            // update state with new item
+            const newState = [];
+            newState.push(firstNote);
+            this.setState({ gene_notes: newState });
+        } else {
+            const newState = [...gene_notes]; // todo: may need to deeper clone?
+
+            if (!idx) { throw new Error ("No idx passed into selectNewGene");}
+            if (gene_notes[idx]) { // note exists, update old object
+                const updatedNote = { ...newState[idx] };
+                updatedNote.associated_items.item_identifier = geneId;
+                throw new Error ("Not implemented yet");
+            } else { // note doesn't exist yet; create new obj
+                const associatedItems = { item_type: "Gene", item_identifier: geneId };
+                newNote.associated_items = associatedItems;
+                newState.push(newNote);
+            }
+        }
     }
 
     render() {
+        const { gene_notes } = this.state;
         const { context, selectedGenes, onSelectGene, onResetSelectedGenes, noteLabel, noteType, schemas, caseSource, hasEditPermission, autoClassification, toggleInvocation, isFallback } = this.props;
+
+        const highlightedGeneID = selectedGenes.keys().next().value;
+        // Generate a list of genes for passing into other fields
+        const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene: highlightedGene = [] } = context;
+        const geneAtIDToGeneMap = {};
+        
+        transcripts.forEach((transcript) => {
+            const { csq_gene = null } = transcript;
+            const { "@id": atID = null } = csq_gene || {};
+            geneAtIDToGeneMap[atID] = csq_gene;
+        });
+
+        const genes = Object.keys(geneAtIDToGeneMap);
+
         return (
             <div className="interpretation-panel">
                 <label className="w-100">{ noteLabel }</label>
-                <HighlightedGenesDrop {...{ context, selectedGenes, onSelectGene, onResetSelectedGenes }}/>
+                <HighlightedGenesDrop selectedGeneID={highlightedGeneID} {...{ genes, geneAtIDToGeneMap, selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene }}/>
+                <NoteArray notes={gene_notes} onEditNote={this.onTextAreaChange} selectNewGene={this.selectNewGene} {...{ genes, geneAtIDToGeneMap }} />
                 {/* { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
@@ -610,35 +666,95 @@ class MultiItemInterpretationPanel extends React.PureComponent {
     }
 }
 
-function HighlightedGenesDrop(props) {
-    const { context, cls, selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene } = props;
-    const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene = [] } = context;
+function NoteArray(props) {
+    const { notes = [], onEditNote, genes, geneAtIDToGeneMap, selectNewGene } = props;
 
-    const selectedGeneID = selectedGenes.keys().next().value;
+    if (!notes.length) { return (<div><GenesDrop noteIdx={notes.length} value={null} {...{ genes, geneAtIDToGeneMap, selectNewGene }} /></div>)}
 
-    const transcriptsDeduped = {};
-    transcripts.forEach((transcript) => {
-        const { csq_gene = null } = transcript;
-        const { "@id": atID = null } = csq_gene || {};
-        transcriptsDeduped[atID] = csq_gene;
-    });
+    return (
+        <>
+            {notes.map((note, idx) => {
+                const { associated_items = null, note_text = null } = note;
+                if (!associated_items) return null;
+                const { item_type, item_identifier } = associated_items;
+                console.log("item_type, item_identifier", item_type, item_identifier);
+                const geneDisplayTitle = geneAtIDToGeneMap[item_identifier].display_title;
+
+                return (
+                    <div key={idx}>
+                        <GenesDrop noteIdx={idx} value={item_identifier} {...{ genes, geneAtIDToGeneMap, selectNewGene }} />
+                        <label className="w-100 mt-1">
+                            {geneDisplayTitle} Gene Note
+                        </label>
+                        <AutoGrowTextArea className="w-100 mb-1" value={note_text} onChange={(e) => onEditNote(e, idx)} placeholder="Required" />
+                    </div>
+                );
+            })}
+        </>
+    );
+
+}
+
+function GenesDrop(props) {
+    const { geneAtIDToGeneMap = {}, genes, noteIdx, value, selectNewGene, cls = "" } = props;
 
     let dropOptions;
-    const genes = Object.keys(transcriptsDeduped);
+    let title;
+    if (genes.length > 0) {
+        dropOptions = genes.map((geneID) => {
+            const { display_title, "@id": atID } = geneAtIDToGeneMap[geneID];
+
+            return (
+                <Dropdown.Item onClick={() => selectNewGene(atID, noteIdx)} key={geneID}>
+                    { display_title }
+                </Dropdown.Item>
+            );
+        });
+
+        if (value) {
+            title = geneAtIDToGeneMap[value].display_title;
+        }
+    }
+    return (
+        <>
+            <label className="w-100 text-small mt-1">
+                Add Gene Note
+            </label>
+            <div className="w-100 d-flex note-field-drop">
+                <Dropdown as={ButtonGroup} className={cls}>
+                    <Dropdown.Toggle variant="outline-secondary text-left">
+                        { title || "Select a gene to interpret..." }
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+                </Dropdown>
+                { value ?
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => console.log("clicked")}>
+                        <i className="icon icon-trash-alt fas" />
+                    </Button>
+                    : null}
+            </div>
+        </>
+    );
+}
+
+function HighlightedGenesDrop(props) {
+    const { selectedGeneID, genes, geneAtIDToGeneMap, cls = "", selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene } = props;
+
+    let dropOptions;
 
     let value;
     if (genes.length > 0) {
         dropOptions = genes.map((geneID) => {
-            const { display_title } = transcriptsDeduped[geneID];
+            const { display_title } = geneAtIDToGeneMap[geneID];
             return (
-                <Dropdown.Item onClick={() => onSelectGene(transcriptsDeduped[geneID])} key={geneID}>
+                <Dropdown.Item onClick={() => onSelectGene(geneAtIDToGeneMap[geneID])} key={geneID}>
                     { display_title }
                 </Dropdown.Item>
             );
         });
 
         if (selectedGeneID) {
-            value = transcriptsDeduped[selectedGeneID].display_title;
+            value = geneAtIDToGeneMap[selectedGeneID].display_title;
         }
     }
 
@@ -655,7 +771,7 @@ function HighlightedGenesDrop(props) {
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown>
                 { selectedGeneID ?
-                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onResetSelectedGenes(highlighted_gene)}>
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onResetSelectedGenes(highlightedGene)}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
                     : null}
