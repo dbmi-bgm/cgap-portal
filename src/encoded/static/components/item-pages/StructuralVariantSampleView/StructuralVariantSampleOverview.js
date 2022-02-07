@@ -55,7 +55,7 @@ function StructuralVariantSampleInfoHeader(props){
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
 
-                    { caseID ?
+                    {/* { caseID ?
                         <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4 className="text-truncate">Case ID</h4>
@@ -64,7 +64,7 @@ function StructuralVariantSampleInfoHeader(props){
                                 <h4 className="text-400 text-center w-100">{ caseID }</h4>
                             </div>
                         </div>
-                        : null }
+                        : null } */}
 
                     <div className="inner-card-section col pb-2 pb-lg-0">
                         <div className="info-header-title">
