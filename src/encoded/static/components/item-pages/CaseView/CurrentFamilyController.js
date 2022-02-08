@@ -67,8 +67,6 @@ export class CurrentFamilyController extends React.PureComponent {
             return false;
         }
 
-        console.log("TT2", family);
-
         // if (original_pedigree && !object.isAnItem(original_pedigree)){
         //     // Tests for presence of display_title and @id, lack of which indicates lack of view permission.
         //     return false;
@@ -175,8 +173,6 @@ export class CurrentFamilyController extends React.PureComponent {
             idToGraphIdentifier = graphData && isRelationshipNode ?
                 this.memoized.calculateIdToGraphIdentifier(graphData.objectGraph, isRelationshipNode) : {};
         }
-
-        console.log("TT", spFamilies, familiesWithViewPermission);
 
         const childProps = {
             ...passProps,

@@ -78,9 +78,8 @@ export default class CaseView extends DefaultItemView {
     }
 
     getTabViewContents(controllerProps = {}){
-        const { context = null } = this.props;
-        const { family = null } = context || {};
-        const { members = [] } = family || {};
+        const { currPedigreeFamily } = controllerProps;
+        const { "@id": familyAtID, members } = currPedigreeFamily || {};
 
         const membersLen = members.length;
         const commonTabProps = { ...this.props, ...controllerProps };
@@ -88,7 +87,7 @@ export default class CaseView extends DefaultItemView {
 
         initTabs.push(CaseInfoTabView.getTabObject(commonTabProps));
 
-        if (membersLen > 0) {
+        if (familyAtID && membersLen > 0) {
             // Remove this outer if condition if wanna show disabled '0 Pedigrees'
             initTabs.push(PedigreeTabView.getTabObject(commonTabProps));
         }
@@ -178,9 +177,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const haveCaseEditPermission = useMemo(function(){
         return !!(_.findWhere(caseActions, { "name" : "edit" }));
     }, [ context ]);
-
-
-    // console.log("TT", familiesWithViewPermission, canonicalFamily);
 
     const secondaryFamilies = useMemo(function(){
         return (familiesWithViewPermission || []).filter(function(spFamily){
