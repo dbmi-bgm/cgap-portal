@@ -797,11 +797,21 @@ def download(context, request):
     if not external:
         external = context.build_external_creds(request.registry, context.uuid, properties)
     if external.get('service') == 's3':
+        external_bucket = external['bucket']
+        wfout_bucket = request.registry.settings['file_wfout_bucket']
+        files_bucket = request.registry.settings['file_upload_bucket']
+        if external_bucket not in [wfout_bucket, files_bucket]:
+            if 'wfout' not in external_bucket:
+                external_bucket = files_bucket
+            else:
+                external_bucket = wfout_bucket
+            log.error(f'Encountered s3 bucket mismatch - ignoring metadata value {external_bucket}'
+                      f' and using registry value {external_bucket}')
         conn = make_s3_client()
         param_get_object = {
-            'Bucket': external['bucket'],
+            'Bucket': external_bucket,
             'Key': external['key'],
-            'ResponseContentDisposition': "attachment; filename=" + filename
+            'ResponseContentDisposition': 'attachment; filename=' + filename
         }
         if 'Range' in request.headers:
             tracking_values['range_query'] = True
@@ -840,7 +850,7 @@ def download(context, request):
             raise e
         response_dict = {
             'body': response_body.get('Body').read(),
-            # status_code : 206 if partial, 200 if the ragne covers whole file
+            # status_code : 206 if partial, 200 if the range covers whole file
             'status_code': response_body.get('ResponseMetadata').get('HTTPStatusCode'),
             'accept_ranges': response_body.get('AcceptRanges'),
             'content_length': response_body.get('ContentLength'),
