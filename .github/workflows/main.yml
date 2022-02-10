@@ -99,7 +99,7 @@ jobs:
           poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
-        if: ${{ matrix.test_type == 'Docker' }}
+        if: ${{ matrix.test_type == 'Docker' && matrix.python_version == '3.7' }}
         run: |
           touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
           docker build .
