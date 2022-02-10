@@ -3,9 +3,12 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import url from 'url';
+import queryString from 'query-string';
 import ReactTooltip from 'react-tooltip';
 import { console, layout, ajax, memoizedUrlParse, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { navigate } from '../../util';
 import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
@@ -19,14 +22,10 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
         const { context = null, schemas, href } = this.props;
         const passProps = { context, schemas, href };
 
-        const { query: {
-            annotationTab = null,           // used only if can be parsed to integer (SvBrowser = 0)
-        } } = memoizedUrlParse(href);
-
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
                 <StructuralVariantSampleInfoHeader {...passProps} />
-                <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={1} />
             </div>
         );
     }
@@ -257,7 +256,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     // TODO: DRY-ify
     annotationTab(){
-        const { href, defaultTab = 0 } = this.props;
+        const { href, defaultTab } = this.props;
         const { query: parsedQuery = {} } = memoizedUrlParse(href);
         let { annotationTab = null } = parsedQuery;
         annotationTab = parseInt(annotationTab);

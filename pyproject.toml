@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "7.16.2.1b6"  # was "7.16.2", includes "7.18.1", but should be "8.0.0"
+version = "7.16.2.1b7"  # was "7.16.2", includes "7.18.2", but should be a minor version bump since it's a compatible change
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
