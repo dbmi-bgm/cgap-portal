@@ -13,12 +13,12 @@
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           },
-          "autocompleteSource": "/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "tracks": {
             "top": [
               {
@@ -469,14 +469,14 @@
             "center": [],
             "gallery": []
           },
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "initialXDomain": [594954043.6728096, 2673883060.323411],
           "initialYDomain": [-2681117714.2684245, -2681117686.505896],
-          "autocompleteSource": "/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
+          "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           }
@@ -693,14 +693,14 @@
             "center": [],
             "gallery": []
           },
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "initialXDomain": [1069795.099783097, 1070508.6726894341],
           "initialYDomain": [1350225534.8565273, 1350225534.8565273],
-          "autocompleteSource": "/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
+          "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           }
@@ -803,14 +803,14 @@
             "center": [],
             "gallery": []
           },
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "initialXDomain": [594954043.6728096, 2673883060.323411],
           "initialYDomain": [-2681117714.2684245, -2681117686.505896],
-          "autocompleteSource": "/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
+          "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           }
@@ -1037,14 +1037,14 @@
             "center": [],
             "gallery": []
           },
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "initialXDomain": [1069795.099783097, 1070508.6726894341],
           "initialYDomain": [1350225534.8565273, 1350225534.8565273],
-          "autocompleteSource": "/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
+          "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           }
@@ -1147,14 +1147,14 @@
             "center": [],
             "gallery": []
           },
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "initialXDomain": [594954043.6728096, 2673883060.323411],
           "initialYDomain": [-2681117714.2684245, -2681117686.505896],
-          "autocompleteSource": "/api/v1/suggest/?d=OHJakQICQD6gTD7skx4EWA&",
+          "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           }
@@ -1497,13 +1497,13 @@
             "center": [],
             "gallery": []
           },
-          "chromInfoPath": "//s3.amazonaws.com/pkerp/data/hg38/chromSizes.tsv",
+          "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
           "initialXDomain": [594954043.6728096, 2673883060.323411],
           "initialYDomain": [655540254.4718345, 2044910818.0040488],
           "genomePositionSearchBox": {
             "visible": true,
             "chromInfoId": "hg38",
-            "autocompleteId": "P0PLbQMwTYGy-5uPIQid7A",
+            "autocompleteId": "gene_annotation_hg38",
             "chromInfoServer": "https://cgap-higlass.com/api/v1",
             "autocompleteServer": "https://cgap-higlass.com/api/v1"
           }
