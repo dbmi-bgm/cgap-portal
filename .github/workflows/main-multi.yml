@@ -27,6 +27,7 @@ jobs:
       matrix:
         test_type: ['unit', 'npm', 'Docker']
         python_version: ['3.6', '3.7']
+        node_version: ['12']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -39,7 +40,7 @@ jobs:
       # Per doc for node install at https://github.com/actions/setup-node#usage
       - uses: actions/setup-node@v2
         with:
-          node-version: '12'
+          node-version: ${{ matrix.node_version }}
           check-latest: false
 
       - name: Install/Link Postgres
@@ -74,31 +75,31 @@ jobs:
           # Once the new snovault is in, we should retain these for a little while to make sure the right
           # variable is being used, and then this can go away. -kmp 9-Mar-2021
           # I have named the ID slightly differently so we can see if the old names are in use.
-          TRAVIS_JOB_ID: cgap-${{ matrix.test_type }}-x-test-${{ github.run_number }}-
+          TRAVIS_JOB_ID: cgap-${{ matrix.test_type }}-x-py${{ matrix.python_version }}-test-${{ github.run_number }}-
           # This will be the new environment variable name.
-          TEST_JOB_ID: cgap-${{ matrix.test_type }}-test-${{ github.run_number }}-
+          TEST_JOB_ID: cgap-${{ matrix.test_type }}-py${{ matrix.python_version }}-test-${{ github.run_number }}-
         run: |
           # npm test
           make remote-test-${{ matrix.test_type }}
 
       - name: Cleanup
-        if: ${{ matrix.test_type == 'npm' || matrix.test_type == 'unit' }}
+        if: ${{ always() && ( matrix.test_type == 'npm' || matrix.test_type == 'unit' ) }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           # The need for this old environment variable name will go away soon.
           # Once the new snovault is in, we should retain these for a little while to make sure the right
           # variable is being used, and then this can go away. -kmp 9-Mar-2021
           # I have named the ID slightly differently so we can see if the old names are in use.
-          TRAVIS_JOB_ID: cgap-${{ matrix.test_type }}-x-test-${{ github.run_number }}-
+          TRAVIS_JOB_ID: cgap-${{ matrix.test_type }}-x-py${{ matrix.python_version }}-test-${{ github.run_number }}-
           # This will be the new environment variable name.
-          TEST_JOB_ID: cgap-${{ matrix.test_type }}-test-${{ github.run_number }}-
+          TEST_JOB_ID: cgap-${{ matrix.test_type }}-py${{ matrix.python_version }}-test-${{ github.run_number }}-
         run: |
           poetry run wipe-test-indices $TEST_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
           poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
 
-      - name: Docker Build
+      - name: Docker Build (Python 3.7 only)
         if: ${{ matrix.test_type == 'Docker' && matrix.python_version == '3.7' }}
         run: |
           touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
