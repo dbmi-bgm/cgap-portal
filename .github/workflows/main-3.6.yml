@@ -25,7 +25,7 @@ jobs:
     # Build matrix
     strategy:
       matrix:
-        test_type: ['UNIT', 'NPM', 'Docker']
+        test_type: ['UNIT', 'NPM']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
