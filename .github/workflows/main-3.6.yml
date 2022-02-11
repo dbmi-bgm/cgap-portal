@@ -119,9 +119,3 @@ jobs:
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
           poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
-
-      - name: Docker Build
-        if: ${{ matrix.test_type == 'Docker' }}
-        run: |
-          touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
-          docker build .
