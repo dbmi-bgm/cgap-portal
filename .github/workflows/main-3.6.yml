@@ -1,6 +1,6 @@
 # Build for cgap-portal
 
-name: CI
+name: CI-3.6
 
 # Controls when the action will run.
 on:
@@ -17,7 +17,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    name: Test Suite for cgap-portal
+    name: Test Suite for cgap-portal (Python 3.6, Node 12)
 
     # The type of runner that the job will run on
     runs-on: ubuntu-18.04
