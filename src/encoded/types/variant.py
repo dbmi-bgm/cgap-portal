@@ -1041,6 +1041,64 @@ class VariantSampleList(Item):
 
 
 @view_config(
+    name='add-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def add_selections(context, request):
+    """
+    Adds selections to VariantSampleList, preserving existing data such as selected_by which may not be
+    visible to current 'adder'.
+    """
+
+    request_body = request.json
+    namespace, userid = request.authenticated_userid.split(".", 1)
+
+    # We expect lists of { variant_sample_item: uuid, filter_blocks_used: { filter_blocks: { name: str, query: str }[] } }.
+    # Value for "date_selected" will be set during PATCH by schema serverDefault.
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
+
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    patch_payload = {}
+
+    # Skip adding duplicate selections (shouldn't occur, but just in case)
+    existing_selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        existing_selections_by_uuid[selection["variant_sample_item"]] = selection
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = existing_variant_samples.copy()
+        for vs_sel in requested_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            selection_payload = vs_sel.copy()
+            selection_payload["selected_by"] = userid
+            patch_payload["variant_samples"].append(selection_payload)
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = existing_structural_variant_samples.copy()
+        for vs_sel in requested_structural_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            selection_payload = vs_sel.copy()
+            selection_payload["selected_by"] = userid
+            patch_payload["structural_variant_samples"].append(selection_payload)
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    patch_result = perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
+@view_config(
     name='order-delete-selections',
     context=VariantSampleList,
     request_method='PATCH',
@@ -1089,6 +1147,7 @@ def order_delete_selections(context, request):
         "status": "success",
         "@type": ["result"]
     }
+
 
 
 
