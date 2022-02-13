@@ -1,3 +1,4 @@
+import sys
 import uptime
 
 from collections import OrderedDict
@@ -76,6 +77,7 @@ def health_check(config):
 
         class ExtendedHealthPageKey(HealthPageKey):
             # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
+            PYTHON_VERSION = "python_version"
             pass
 
         h = ExtendedHealthPageKey
@@ -119,6 +121,7 @@ def health_check(config):
             h.NAMESPACE: settings.get(s.INDEXER_NAMESPACE),
             h.PROCESSED_FILE_BUCKET: settings.get(s.FILE_WFOUT_BUCKET),
             h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
+            h.PYTHON_VERSION: f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
             h.S3_ENCRYPT_KEY_ID: settings.get(s.S3_ENCRYPT_KEY_ID),
             h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
             h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
@@ -217,7 +220,7 @@ class CGAPRoot(Root):
         return acl
 
     def get(self, name, default=None):
-        resource = super(CGAPRoot, self).get(name, None)
+        resource = super().get(name, None)
         if resource is not None:
             return resource
         resource = self.connection.get_by_unique_key('page:location', name)
@@ -242,7 +245,7 @@ class CGAPRoot(Root):
 
     def jsonld_type(self):
         """Inherits from '@type' calculated property of Root in snovault/resources.py"""
-        return ['HomePage', 'StaticPage'] + super(CGAPRoot, self).jsonld_type()
+        return ['HomePage', 'StaticPage'] + super().jsonld_type()
 
     @calculated_property(schema={
         "title": "Static Page Content",
