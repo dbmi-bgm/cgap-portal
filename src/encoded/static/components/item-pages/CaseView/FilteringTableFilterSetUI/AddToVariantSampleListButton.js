@@ -218,7 +218,7 @@ export function AddToVariantSampleListButton(props){
 
                 console.log("payload", payload);
 
-                requestPromiseChain = ajax.promise(vslAtID + "/add-selections", "PATCH", {}, JSON.stringify(payload))
+                requestPromiseChain = ajax.promise(vslAtID + "/@@add-selections", "PATCH", {}, JSON.stringify(payload))
                     .then(function(respVSL){
                         console.log('VSL PATCH response', respVSL);
                         const {
