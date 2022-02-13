@@ -1070,23 +1070,27 @@ def add_selections(context, request):
     for selection in existing_variant_samples + existing_structural_variant_samples:
         existing_selections_by_uuid[selection["variant_sample_item"]] = selection
 
+    def make_selection_payload(vs_sel):
+        return {
+            "selected_by": userid,
+            "variant_sample_item": vs_sel["variant_sample_item"],
+            "filter_blocks_used": vs_sel["filter_blocks_used"]
+            # date_selected - will be filled upon PATCH
+        }
+
     if requested_variant_samples is not None:
         patch_payload["variant_samples"] = existing_variant_samples.copy()
         for vs_sel in requested_variant_samples:
             if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
                 continue
-            selection_payload = vs_sel.copy()
-            selection_payload["selected_by"] = userid
-            patch_payload["variant_samples"].append(selection_payload)
+            patch_payload["variant_samples"].append(make_selection_payload(vs_sel))
 
     if requested_structural_variant_samples is not None:
         patch_payload["structural_variant_samples"] = existing_structural_variant_samples.copy()
         for vs_sel in requested_structural_variant_samples:
             if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
                 continue
-            selection_payload = vs_sel.copy()
-            selection_payload["selected_by"] = userid
-            patch_payload["structural_variant_samples"].append(selection_payload)
+            patch_payload["structural_variant_samples"].append(make_selection_payload(vs_sel))
 
     if not patch_payload:
         return HTTPNotModified("Nothing submitted")
