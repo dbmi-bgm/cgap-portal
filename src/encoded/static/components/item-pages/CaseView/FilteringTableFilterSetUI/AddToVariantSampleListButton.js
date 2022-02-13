@@ -109,7 +109,7 @@ export function AddToVariantSampleListButton(props){
                 // These are sorted in order of insertion/selection.
                 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
                 selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
-                    const { __matching_filter_block_names: matchingFilterBlockNamesForVS = [] } = variantSampleItem;
+                    const { __matching_filter_block_names: matchingFilterBlockNamesForVS = [], uuid: vsUUID } = variantSampleItem;
                     const matchingFilterBlocksLen = matchingFilterBlockNamesForVS.length;
                     let filterBlocksUsed = null;
                     if (matchingFilterBlocksLen === 0) {
@@ -135,32 +135,12 @@ export function AddToVariantSampleListButton(props){
                             "filter_blocks": filterBlocksUsed,
                             "intersect_selected_blocks": intersectFilterBlocks
                         },
-                        "variant_sample_item": variantSampleAtID // Will become linkTo (embedded)
+                        "variant_sample_item": vsUUID // Will become linkTo (embedded)
                         // The below 2 fields are filled in on backend (configured via `serverDefaults` in Item schema for these fields)
                         // "selected_by",
                         // "date_selected"
                     };
                     variantSampleSelectionsList.push(selection);
-                });
-            }
-
-            /** Convert embedded linkTos into just `@id` strings before PATCHing */
-            function createSelectionListPayload(existingSelections){
-                // Need to convert embedded linkTos into just @ids before PATCHing -
-                return existingSelections.map(function(existingSelection){
-                    const {
-                        variant_sample_item: { "@id": vsItemID },
-                        selected_by: { "@id": selectedByItemID = null } = {}
-                    } = existingSelection;
-                    if (!vsItemID) {
-                        throw new Error("Expected all variant samples to have an ID -- likely a view permissions issue.");
-                    }
-                    const payload = { ...existingSelection, "variant_sample_item": vsItemID };
-                    if (selectedByItemID) {
-                        // Might not be present if an older VSL selection (no selected_by saved/preserved).
-                        payload.selected_by = selectedByItemID;
-                    }
-                    return payload;
                 });
             }
 
@@ -172,7 +152,7 @@ export function AddToVariantSampleListButton(props){
                 const createVSLPayload = {
                     "institution": caseInstitutionID,
                     "project": caseProjectID,
-                    "status": "current"
+                    // "status": "current" - can't be POSTed due to restricted_fields permission, is set on back-end via schema 'default'.
                 };
 
                 if (searchType === "VariantSample") {
@@ -224,39 +204,30 @@ export function AddToVariantSampleListButton(props){
                     });
 
             } else {
-                const {
-                    "@id": vslAtID,
-                    variant_samples: existingVariantSampleSelections = [],
-                    structural_variant_samples: existingStructuralVariantSampleSelections = []
-                } = variantSampleListItem;
+                const { "@id": vslAtID } = variantSampleListItem;
 
                 const payload = {};
-                // patch existing
-                // Need to convert embedded linkTos into just @ids before PATCHing -
+                // Add in new selections to the existing ones
                 if (searchType === "VariantSample") {
-                    payload["variant_samples"] = createSelectionListPayload(existingVariantSampleSelections);
-                    // Add in new selections to the existing ones
+                    payload["variant_samples"] = [];
                     addToSelectionsList(payload["variant_samples"]);
                 } else {
-                    payload["structural_variant_samples"] = createSelectionListPayload(existingStructuralVariantSampleSelections);
-                    // Add in new selections to the existing ones
+                    payload["structural_variant_samples"] = [];
                     addToSelectionsList(payload["structural_variant_samples"]);
                 }
 
                 console.log("payload", payload);
 
-                requestPromiseChain = ajax.promise(vslAtID, "PATCH", {}, JSON.stringify(payload))
+                requestPromiseChain = ajax.promise(vslAtID + "/@@add-selections", "PATCH", {}, JSON.stringify(payload))
                     .then(function(respVSL){
                         console.log('VSL PATCH response', respVSL);
                         const {
-                            "@graph": [{
-                                "@id": vslAtID
-                            }],
+                            status,
                             error: vslError
                         } = respVSL;
 
-                        if (vslError || !vslAtID) {
-                            throw new Error("Didn't succeed in patching VSL Item");
+                        if (status !== "success" || vslError) {
+                            throw new Error("Didn't succeed in patching VSL Item; check permissions");
                         }
 
                         // Wait to reset selected items until after loading updated VSL so that checkboxes still appear checked during VSL PATCH+GET request.
@@ -275,7 +246,7 @@ export function AddToVariantSampleListButton(props){
                 console.error(error);
                 Alerts.queue({
                     "title" : "Error PATCHing or POSTing VariantSampleList",
-                    "message" : JSON.stringify(error),
+                    "message" : error.toString ? error.toString() : JSON.stringify(error),
                     "style" : "danger"
                 });
             }).finally(function(){
