@@ -14,6 +14,14 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
 
+const onReturnToCaseClick = function(caseSource){
+    if (window && window.opener) {
+        window.close();
+        return;
+    }
+    // Fallback if no parent window:
+    return navigate(`/cases/${caseSource}/#case-info.interpretation`);
+};
 
 function GenericInterpretationSidebar(props) {
     const {
@@ -623,13 +631,29 @@ class MultiItemInterpretationPanel extends React.PureComponent {
 
     render() {
         const { gene_notes } = this.state;
-        const { context, selectedGenes, onSelectGene, onResetSelectedGenes, noteLabel, noteType, schemas, caseSource, hasEditPermission, autoClassification, toggleInvocation, isFallback } = this.props;
+        const {
+            context,
+            selectedGenes,
+            onSelectGene,
+            onResetSelectedGenes,
+            noteLabel,
+            noteType,
+            schemas, // not in use
+            caseSource,
+            hasEditPermission,
+            isFallback, // not in use
+            isCurrent, // not in use yet
+            isApproved, // not in use yet
+            isDraft, // not in use yet
+            noteChangedSinceLastSave // note in use yet
+        } = this.props;
 
+        const noteTextPresent = gene_notes.length > 0 || (gene_notes.length === 1 && gene_notes[0].note_text);
         const highlightedGeneID = selectedGenes.keys().next().value;
         // Generate a list of genes for passing into other fields
         const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene: highlightedGene = [] } = context;
         const geneAtIDToGeneMap = {};
-        
+
         transcripts.forEach((transcript) => {
             const { csq_gene = null } = transcript;
             const { "@id": atID = null } = csq_gene || {};
@@ -653,14 +677,14 @@ class MultiItemInterpretationPanel extends React.PureComponent {
                 { noteType === "note_discovery" ?
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
                         {...{ schemas, noteType, isFallback }} onDropOptionChange={this.onDropOptionChange}/>
-                    : null }
-                <GenericInterpretationSubmitButton {...{ hasEditPermission, isFallback, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
+                    : null } */}
+                <GenericInterpretationSubmitButton className="mt-05" {...{ hasEditPermission, isFallback, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={onReturnToCaseClick}>
+                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
-                    </button> : null} */}
+                    </button> : null}
             </div>
         );
     }
@@ -887,15 +911,6 @@ class GenericInterpretationPanel extends React.PureComponent {
         // console.log("GenericInterpretationPanel state", stateToSave);
         // console.log("lastSavedNote", lastSavedNote);
 
-        // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
-        const onReturnToCaseClick = function(){
-            if (window && window.opener) {
-                window.close();
-                return;
-            }
-            // Fallback if no parent window:
-            return navigate(`/cases/${caseSource}/#case-info.interpretation`);
-        };
 
         return (
             <div className="interpretation-panel">
@@ -917,7 +932,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={onReturnToCaseClick}>
+                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
                     </button> : null}
             </div>
