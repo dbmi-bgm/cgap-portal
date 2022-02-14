@@ -678,7 +678,7 @@ class MultiItemInterpretationPanel extends React.PureComponent {
                     <GenericFieldForm fieldsArr={[{ field: 'gene_candidacy', value: gene_candidacy }, { field: 'variant_candidacy', value: variant_candidacy }]}
                         {...{ schemas, noteType, isFallback }} onDropOptionChange={this.onDropOptionChange}/>
                     : null } */}
-                <GenericInterpretationSubmitButton className="mt-05" {...{ hasEditPermission, isFallback, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
+                <GenericInterpretationSubmitButton cls="mt-05" {...{ hasEditPermission, isFallback, isCurrent, isApproved, isDraft, noteTextPresent, noteChangedSinceLastSave, noteType }}
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
@@ -1154,7 +1154,7 @@ function GenericInterpretationSubmitButton(props) {
         noteTextPresent,            // Is there text in the note space?
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
-        cls,                        // Classes to apply to the button
+        cls = "",                   // Classes to apply to the button
         hasEditPermission,          // Derived from actions
         noteType,                   // "note_interpretation", "note_discovery", etc.
         isFallback                  // Determined on render in VariantSampleOverview - is this using embed api "newContext" or context as fallback
@@ -1170,7 +1170,7 @@ function GenericInterpretationSubmitButton(props) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
             <div data-tip={dataTip}>
-                <Button variant="primary btn-block" disabled className={cls}>
+                <Button variant="primary" disabled className={"btn-block " + cls}>
                     { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
                 </Button>
             </div>
@@ -1178,7 +1178,7 @@ function GenericInterpretationSubmitButton(props) {
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
             <div data-tip={dataTip}>
-                <Button variant="primary btn-block" onClick={saveAsDraft} data-tip={dataTip}
+                <Button variant="primary" className={"btn-block " + cls} onClick={saveAsDraft} data-tip={dataTip}
                     disabled={allButtonsDropsDisabled}>
                     { isDraft ? "Re-save as Draft": "Save as Draft" }
                 </Button>
