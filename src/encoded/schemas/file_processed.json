@@ -181,14 +181,11 @@
             "title": "LinkTo Location",
             "description": "Location on case on which to place a linkTo",
             "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
-            "type": "array",
-            "items": {
-                "type": "string",
-                "enum": [
-                    "Sample",
-                    "SampleProcessing"
-                ]
-            }
+            "type": "string",
+            "enum": [
+                "Sample",
+                "SampleProcessing"
+            ]
         }
     },
     "facets": {
