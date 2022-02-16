@@ -63,6 +63,7 @@
                 "source_name": "HGNC",
                 "source_version": "2020-02-24",
                 "description": "Alias gene name",
+                "annotation_field": "HGNC.alias_name",
                 "schema_title": "Alias gene name"
             }
         },
@@ -78,6 +79,7 @@
                 "source_name": "HGNC",
                 "source_version": "2020-02-24",
                 "description": "Alias gene symbol",
+                "annotation_field": "HGNC.alias_symbol",
                 "schema_title": "Alias gene symbol"
             }
         },
@@ -95,6 +97,7 @@
                 "annotation_category": "dbxref",
                 "description": "BioGRID is an interaction repository with data compiled through comprehensive curation efforts.",
                 "schema_title": "BioGrid",
+                "annotation_field": "BioGRID.BIOGRID_ID",
                 "link": "https://thebiogrid.org/<ID>"
             }
         },
@@ -106,6 +109,7 @@
             "source_name": "BrainAtlas",
             "source_version": "March.2013",
             "schema_title": "BrainAtlas Microarray",
+            "annotation_field": "BrainAtlas.gene_symbol",
             "link": "https://human.brain-map.org/microarray/search/show?exact_match=false&search_term=%22<ID>%22&search_type=gene"
         },
         "brainspan_microarray": {
@@ -116,6 +120,7 @@
             "source_name": "BrainSpan",
             "source_version": "March.2013",
             "schema_title": "BrainSpan Microarray",
+            "annotation_field": "BrainSpanMicroarray.gene_symbol",
             "link": "https://www.brainspan.org/lcm/search?exact_match=false&search_term=<ID>&search_type=gene&page_num=0"
         },
         "brainspan_rnaseq": {
@@ -126,6 +131,7 @@
             "source_name": "BrainSpan",
             "source_version": "March.2013",
             "schema_title": "BrainSpan RNAseq",
+            "annotation_field": "BrainSpanRNASeq.ensembl_gene_id",
             "link": "https://www.brainspan.org/rnaseq/searches?exact_match=false&search_term=<ID>"
         },
         "ccds_id": {
@@ -143,6 +149,7 @@
                 "description": "The Consensus CDS (CCDS) project: a collaborative effort to identify a core set of human and mouse protein coding regions that are consistently annotated and of high quality",
                 "schema_title": "CCDS",
                 "pattern": "^CCDS[0-9]+",
+                "annotation_field": "HGNC.ccds_id",
                 "link": "https://www.ncbi.nlm.nih.gov/CCDS/CcdsBrowse.cgi?REQUEST=CCDS&DATA=<ID>"
             }
         },
@@ -153,6 +160,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.cds_length",
             "schema_title": "CDS length"
         },
         "chrom": {
@@ -190,6 +198,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "description": "name of the chromosome or scaffold; chromosome names without a 'chr'",
+            "annotation_field": "Ensembl.seqname",
             "schema_title": "Chromosome"
         },
         "chrom_hg19": {
@@ -200,6 +209,7 @@
             "source_name": "ENSEMBLgeneGRCh37",
             "source_version": "v75(GRCh37.p13)",
             "description": "name of the chromosome or scaffold in hg19; chromosome names without a 'chr'",
+            "annotation_field": "Ensembl_hg19.seqname",
             "schema_title": "Chromosome (hg19)"
         },
         "clingen": {
@@ -213,7 +223,8 @@
             "description": "ClinGen",
             "schema_title": "ClinGen",
             "pattern": "^[0-9]+$",
-            "link": "https://search.clinicalgenome.org/kb/genes/HGNC:<ID>"
+            "annotation_field": "ClinGen.Gene Symbol",
+            "link": "https://search.clinicalgenome.org/kb/genes/<ID>"
         },
         "clingendis": {
             "title": "ClinGen-Disease",
@@ -232,6 +243,7 @@
                         "sub_embedding_group": "{\"key\": \"clingendis\", \"title\": \"ClinGen-Disease\"}",
                         "schema_title": "Disease ID (MONDO)",
                         "pattern": "^MONDO_[0-9]+$",
+                        "annotation_field": "ClinGenDisease.DISEASE ID (MONDO)",
                         "link": "https://search.clinicalgenome.org/kb/conditions/<ID>"
                     },
                     "disease_label": {
@@ -243,6 +255,7 @@
                         "source_version": "20200309",
                         "sub_embedding_group": "{\"key\": \"clingendis\", \"title\": \"ClinGen-Disease\"}",
                         "description": "Disease label list",
+                        "annotation_field": "ClinGenDisease.DISEASE LABEL",
                         "schema_title": "Disease Label"
                     },
                     "inheritance": {
@@ -255,13 +268,14 @@
                             "Mitochondrial",
                             "Semidominant",
                             "X-linked",
-                            "Undetermined MOI",
+                            "Undetermined",
                             "Other"
                         ],
                         "do_import": true,
                         "source_name": "ClinGenDisease",
                         "source_version": "20200309",
                         "sub_embedding_group": "{\"key\": \"clingendis\", \"title\": \"ClinGen-Disease\"}",
+                        "annotation_field": "ClinGenDisease.MOI",
                         "schema_title": "Inheritance"
                     },
                     "classification": {
@@ -281,6 +295,7 @@
                         "source_name": "ClinGenDisease",
                         "source_version": "20200309",
                         "sub_embedding_group": "{\"key\": \"clingendis\", \"title\": \"ClinGen-Disease\"}",
+                        "annotation_field": "ClinGenDisease.CLASSIFICATION",
                         "schema_title": "Classification"
                     }
                 }
@@ -298,6 +313,7 @@
                 "source_name": "CYTOBAND",
                 "source_version": "2017-07-17",
                 "description": "cytoband",
+                "annotation_field": "cytoband.Ensembl",
                 "schema_title": "Cytoband"
             }
         },
@@ -312,7 +328,8 @@
             "schema_title": "ENSEMBL gene ID",
             "pattern": "^ENSG[0-9]{11}$",
             "link": "https://useast.ensembl.org/Homo_sapiens/Gene/Summary?g=<ID>",
-            "uniqueKey": true
+            "uniqueKey": true,
+            "annotation_field": "Ensembl.attribute.gene_id"
         },
         "entrez_id": {
             "title": "NCBI Gene",
@@ -324,6 +341,7 @@
             "annotation_category": "dbxref",
             "description": "NCBI Gene ID",
             "schema_title": "NCBI Gene",
+            "annotation_field": "NCBIGeneToEnsembl.GeneID",
             "link": "https://www.ncbi.nlm.nih.gov/gene/<ID>"
         },
         "epos": {
@@ -334,6 +352,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "description": "end position (hg38)",
+            "annotation_field": "Ensembl.end",
             "schema_title": "End position"
         },
         "epos_hg19": {
@@ -344,6 +363,7 @@
             "source_name": "ENSEMBLgeneGRCh37",
             "source_version": "v75(GRCh37.p13)",
             "description": "End position (hg19)",
+            "annotation_field": "Ensembl_hg19.end",
             "schema_title": "End position (hg19)"
         },
         "exp_lof": {
@@ -353,6 +373,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.exp_lof",
             "schema_title": "Expected LoF"
         },
         "exp_mis": {
@@ -362,6 +383,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.exp_mis",
             "schema_title": "Expected missense"
         },
         "exp_syn": {
@@ -371,6 +393,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.exp_syn",
             "schema_title": "Expected synonymous"
         },
         "gdi_phred": {
@@ -381,6 +404,7 @@
             "source_name": "dbNSFP",
             "source_version": "4.0c",
             "description": "Phred-scaled GDI scores",
+            "annotation_field": "dbNSFP.GDI-Phred",
             "schema_title": "GDI phred score"
         },
         "gdp": {
@@ -396,12 +420,14 @@
             "source_name": "dbNSFP",
             "source_version": "4.0c",
             "description": "gene damage prediction (low/medium/high) by GDI for all diseases",
+            "annotation_field": "dbNSFP.Gene damage prediction (all disease-causing genes)",
             "schema_title": "Gene damage prediction (all disease-causing genes)"
         },
         "gencc": {
             "title": "GenCC",
             "description": "GenCC provides information pertaining to the validity of gene-disease relationships, with a current focus on Mendelian diseases.",
             "type": "string",
+            "annotation_field": "GenCC.gene_curie",
             "link": "https://search.thegencc.org/genes/<ID>"
         },
         "gene_biotype": {
@@ -454,6 +480,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "description": "The biotype of this gene",
+            "annotation_field": "Ensembl.attribute.gene_biotype",
             "schema_title": "Gene biotype"
         },
         "gene_summary": {
@@ -464,6 +491,7 @@
             "source_name": "RefSeq",
             "source_version": "2020-03-20",
             "description": "Gene summary from RefSeq",
+            "annotation_field": "RefSeqGene.summary",
             "schema_title": "Gene summary"
         },
         "gene_symbol": {
@@ -475,6 +503,7 @@
             "source_version": "v99",
             "description": "The official symbol of this gene",
             "schema_title": "Gene symbol",
+            "annotation_field": "Ensembl.attribute.gene_name",
             "link": "https://www.genecards.org/cgi-bin/carddisp.pl?gene=<ID>"
         },
         "gene_version": {
@@ -485,6 +514,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "description": "The stable identifier version for the gene",
+            "annotation_field": "Ensembl.attribute.gene_version",
             "schema_title": "ENSEMBL gene version"
         },
         "genecards": {
@@ -497,6 +527,7 @@
             "annotation_category": "dbxref",
             "description": "a database of human genes that provides genomic, proteomic, transcriptomic, genetic and functional information on all known and predicted human genes.",
             "schema_title": "GeneCards",
+            "annotation_field": "Ensembl.attribute.gene_id",
             "link": "https://www.genecards.org/cgi-bin/carddisp.pl?gene=<ID>"
         },
         "genereviews": {
@@ -513,6 +544,7 @@
                 "annotation_category": "dbxref",
                 "description": "GeneReviews",
                 "schema_title": "GeneReviews",
+                "annotation_field": "GeneReviews.genesymbol",
                 "link": "https://www.ncbi.nlm.nih.gov/books/NBK1116/?term=<ID>%5BGeneSymbol%5D"
             }
         },
@@ -535,6 +567,7 @@
             "source_name": "GTEx",
             "source_version": "v8",
             "schema_title": "GTEx",
+            "annotation_field": "GTEx.Name",
             "link": "https://gtexportal.org/home/gene/<ID>"
         },
         "hgnc_id": {
@@ -547,7 +580,8 @@
             "annotation_category": "dbxref",
             "description": "A unique ID provided by the HGNC for each gene with an approved symbol.",
             "schema_title": "HGNC ID",
-            "link": "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:<ID>"
+            "annotation_field": "HGNC.hgnc_id_number",
+            "link": "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/<ID>"
         },
         "lof_z": {
             "title": "Z score (LoF)",
@@ -556,6 +590,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.lof_z",
             "schema_title": "Z score (LoF)"
         },
         "marrvel": {
@@ -567,12 +602,14 @@
             "source_version": "v1.2",
             "description": "Integrated information from six human genetic databases and seven model organism databases",
             "schema_title": "Marrvel",
-            "link": "http://v1.marrvel.org/search/gene/<ID>"
+            "annotation_field": "NCBIGeneToEnsembl.GeneID",
+            "link": "http://marrvel.org/human/gene/<ID>"
         },
         "medline_plus": {
             "title": "MedlinePlus",
             "type": "string",
             "description": "Formerly Genetics Home Reference, a resource from the National Library of Medicine for features and inheritance of genetic conditions.",
+            "annotation_field": "MedlinePlus.url_link",
             "link": "https://medlineplus.gov/genetics/gene/<ID>/"
         },
         "mgd_id": {
@@ -590,6 +627,7 @@
                 "description": "Mouse Genome Informatics Database",
                 "schema_title": "MGI",
                 "pattern": "^MGI:[0-9]+",
+                "annotation_field": "HGNC.mgd_id",
                 "link": "http://www.informatics.jax.org/marker/<ID>"
             }
         },
@@ -601,6 +639,7 @@
             "source_name": "dbNSFP",
             "source_version": "4.0c",
             "description": "Homolog mouse gene name from MGI",
+            "annotation_field": "dbNSFP.MGI_mouse_gene",
             "schema_title": "Mouse gene (MGI)"
         },
         "mgi_mouse_phenotype": {
@@ -611,6 +650,7 @@
             "source_name": "dbNSFP",
             "source_version": "4.0c",
             "description": "Phenotype description for the homolog mouse gene from MGI",
+            "annotation_field": "dbNSFP.MGI_mouse_phenotype",
             "schema_title": "Mouse phenotype (MGI)"
         },
         "mis_z": {
@@ -620,6 +660,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.mis_z",
             "schema_title": "Z score (missense)"
         },
         "name": {
@@ -630,6 +671,7 @@
             "source_name": "HGNC",
             "source_version": "2020-02-24",
             "description": "The full gene name approved by the HGNC.",
+            "annotation_field": "HGNC.name",
             "schema_title": "Gene full name"
         },
         "num_coding_exons": {
@@ -639,6 +681,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.num_coding_exons",
             "schema_title": "Number of coding exons"
         },
         "obs_lof": {
@@ -648,6 +691,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.obs_lof",
             "schema_title": "Observed LoF"
         },
         "obs_mis": {
@@ -657,6 +701,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.obs_mis",
             "schema_title": "Observed missense"
         },
         "obs_syn": {
@@ -666,6 +711,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.obs_syn",
             "schema_title": "Observed synonymous"
         },
         "oe_lof": {
@@ -676,6 +722,7 @@
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
             "annotation_category": "gene metrics",
+            "annotation_field": "gnomAD.oe_lof",
             "schema_title": "o/e (LoF)"
         },
         "oe_lof_lower": {
@@ -684,6 +731,7 @@
             "type": "number",
             "do_import": true,
             "source_name": "gnomADmetrics",
+            "annotation_field": "gnomAD.oe_lof_lower",
             "source_version": "v2.1.1"
         },
         "oe_lof_upper": {
@@ -694,6 +742,7 @@
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
             "description": "loss-of-function observed/expected upper bound fraction, is a metric that is developed by the gnomAD team and supersedes pLI. See gnomAD FAQs (https://gnomad.broadinstitute.org/faq) for more information.",
+            "annotation_field": "gnomAD.oe_lof_upper",
             "schema_title": "LOEUF"
         },
         "oe_mis": {
@@ -704,6 +753,7 @@
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
             "annotation_category": "gene metrics",
+            "annotation_field": "gnomAD.oe_mis",
             "schema_title": "o/e (missense)"
         },
         "oe_mis_lower": {
@@ -712,6 +762,7 @@
             "type": "number",
             "do_import": true,
             "source_name": "gnomADmetrics",
+            "annotation_field": "gnomAD.oe_mis_lower",
             "source_version": "v2.1.1"
         },
         "oe_mis_upper": {
@@ -720,6 +771,7 @@
             "type": "number",
             "do_import": true,
             "source_name": "gnomADmetrics",
+            "annotation_field": "gnomAD.oe_mis_upper",
             "source_version": "v2.1.1"
         },
         "oe_syn": {
@@ -730,6 +782,7 @@
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
             "annotation_category": "gene metrics",
+            "annotation_field": "gnomAD.oe_syn",
             "schema_title": "o/e (synonymous)"
         },
         "oe_syn_lower": {
@@ -738,6 +791,7 @@
             "type": "number",
             "do_import": true,
             "source_name": "gnomADmetrics",
+            "annotation_field": "gnomAD.oe_syn_lower",
             "source_version": "v2.1.1"
         },
         "oe_syn_upper": {
@@ -746,6 +800,7 @@
             "type": "number",
             "do_import": true,
             "source_name": "gnomADmetrics",
+            "annotation_field": "gnomAD.oe_syn_upper",
             "source_version": "v2.1.1"
         },
         "omim_id": {
@@ -763,6 +818,7 @@
                 "description": "Online Mendelian Inheritance in Man (OMIM)",
                 "schema_title": "OMIM",
                 "pattern": "^[0-9]+$",
+                "annotation_field": "HGNC.omim_id",
                 "link": "https://omim.org/entry/<ID>"
             }
         },
@@ -777,6 +833,7 @@
             "description": "portal for rare diseases and orphan drugs",
             "schema_title": "OrphaNet",
             "pattern": "^[0-9]+$",
+            "annotation_field": "HGNC.orphanet",
             "link": "https://www.orpha.net/consor/cgi-bin/OC_Exp.php?Lng=GB&Expert=<ID>"
         },
         "pathway_kegg_full": {
@@ -788,6 +845,7 @@
             "source_version": "4.0c",
             "annotation_category": "dbxref",
             "description": "Full name(s) of the Pathway(s) the gene belongs to (from KEGG)",
+            "annotation_field": "dbNSFP.Pathway(KEGG)_full",
             "schema_title": "KEGG pathway"
         },
         "pathway_kegg_id": {
@@ -799,6 +857,7 @@
             "source_version": "4.0c",
             "annotation_category": "dbxref",
             "description": "ID(s) of the Pathway(s) the gene belongs to (from KEGG)",
+            "annotation_field": "dbNSFP.Pathway(KEGG)_id",
             "schema_title": "KEGG"
         },
         "pdb": {
@@ -815,6 +874,7 @@
                 "annotation_category": "dbxref",
                 "description": "The Protein Data Bank (PDB) [1] is a database for the three-dimensional structural data of large biological molecules, such as proteins and nucleic acids.",
                 "schema_title": "PDB",
+                "annotation_field": "UniProt.PDB",
                 "link": "https://www.rcsb.org/structure/<ID>"
             }
         },
@@ -832,6 +892,7 @@
                 "annotation_category": "dbxref",
                 "description": "a publicly available, online knowledgebase responsible for the aggregation, curation, integration and dissemination of knowledge regarding the impact of human genetic variation on drug response.",
                 "schema_title": "PharmGKB",
+                "annotation_field": "PharmGKB.PharmGKB Accession Id",
                 "link": "https://www.pharmgkb.org/gene/<ID>"
             }
         },
@@ -847,6 +908,7 @@
                 "source_name": "HGNC",
                 "source_version": "2020-02-24",
                 "description": "This field displays any names that were previously HGNC-approved nomenclature.",
+                "annotation_field": "HGNC.prev_name",
                 "schema_title": "Previous gene name"
             }
         },
@@ -862,6 +924,7 @@
                 "source_name": "HGNC",
                 "source_version": "2020-02-24",
                 "description": "This field displays any symbols that were previously HGNC-approved nomenclature.",
+                "annotation_field": "HGNC.prev_symbol",
                 "schema_title": "Previous gene symbol"
             }
         },
@@ -880,6 +943,7 @@
                 "description": "The Reference Sequence (RefSeq) collection",
                 "schema_title": "RefSeq",
                 "pattern": "^(A|N|W|X|Y)(C|G|M|P|R|T|W)_[0-9]+",
+                "annotation_field": "NCBIGeneToRefSeq.RNA_nucleotide_accession",
                 "link": "https://www.ncbi.nlm.nih.gov/gene/?term=<ID>"
             }
         },
@@ -891,6 +955,7 @@
             "source_name": "dbNSFP",
             "source_version": "4.0c",
             "description": "ExAC-based RVIS; setting 'common' MAF filter at 0.05% in at least one of the six individual ethnic strata from ExAC.",
+            "annotation_field": "dbNSFP.RVIS_ExAC",
             "schema_title": "RVIS(ExAC)"
         },
         "rvis_percentile_exac": {
@@ -901,6 +966,7 @@
             "source_name": "dbNSFP",
             "source_version": "4.0c",
             "description": "Genome-Wide percentile for the new ExAC-based RVIS; setting 'common' MAF filter at 0.05% in at least one of the six individual ethnic strata from ExAC.",
+            "annotation_field": "dbNSFP.RVIS_percentile_ExAC",
             "schema_title": "RVIS(ExAC) percentile"
         },
         "s_het": {
@@ -911,6 +977,7 @@
             "source_name": "CassaNatGenet2017",
             "source_version": "04/03/2017",
             "description": "s_het estimates based on ExAC should be here http://genetics.bwh.harvard.edu/genescores/",
+            "annotation_field": "BWHHetSelection.s_het",
             "schema_title": "s_het"
         },
         "schema_version": {
@@ -924,6 +991,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "description": "start position (hg38)",
+            "annotation_field": "Ensembl.start",
             "schema_title": "Start position"
         },
         "spos_hg19": {
@@ -934,6 +1002,7 @@
             "source_name": "ENSEMBLgeneGRCh37",
             "source_version": "v75(GRCh37.p13)",
             "description": "Start position (hg19)",
+            "annotation_field": "Ensembl_hg19.start",
             "schema_title": "Start position (hg19)"
         },
         "strand": {
@@ -949,6 +1018,7 @@
             "source_name": "ENSEMBLgene",
             "source_version": "v99",
             "description": "strand (hg38)",
+            "annotation_field": "Ensembl.strand",
             "schema_title": "Strand"
         },
         "strand_hg19": {
@@ -964,6 +1034,7 @@
             "source_name": "ENSEMBLgeneGRCh37",
             "source_version": "v75(GRCh37.p13)",
             "description": "Strand (hg19)",
+            "annotation_field": "Ensembl_hg19.strand",
             "schema_title": "Strand (hg19)"
         },
         "string": {
@@ -980,6 +1051,7 @@
                 "annotation_category": "dbxref",
                 "description": "STRING (Search Tool for the Retrieval of Interacting Genes/Proteins) is a biological database and web resource of known and predicted protein\u2013protein interactions.",
                 "schema_title": "STRING",
+                "annotation_field": "UniProt.STRING",
                 "link": "https://string-db.org/network/<ID>"
             }
         },
@@ -990,6 +1062,7 @@
             "do_import": true,
             "source_name": "gnomADmetrics",
             "source_version": "v2.1.1",
+            "annotation_field": "gnomAD.syn_z",
             "schema_title": "Z score (synonymous)"
         },
         "trait_association_gwas": {
@@ -1004,6 +1077,7 @@
                 "source_name": "dbNSFP",
                 "source_version": "4.0c",
                 "description": "Trait(s) the gene associated with (from GWAS catalog)",
+                "annotation_field": "dbNSFP.trait_association_gwas",
                 "schema_title": "GWAS catalog trait"
             }
         },
@@ -1013,13 +1087,14 @@
             "field_name": "trait_association_gwas_pmid",
             "items": {
                 "title": "GWAS catalog trait PMID",
-                "field_name": "trait_association_gwas_pmid",
+                "field_name": "trait_association_gwas_pmid_list",
                 "type": "string",
                 "do_import": true,
                 "source_name": "dbNSFP",
                 "source_version": "4.0c",
                 "description": "Trait(s) the gene associated with (from GWAS catalog)",
                 "schema_title": "GWAS catalog trait PMID",
+                "annotation_field": "dbNSFP.trait_association_pmid_list",
                 "link": "https://www.ebi.ac.uk/gwas/publications/<ID>"
             }
         },
@@ -1041,6 +1116,7 @@
                         "description": "ENSEMBL protein ID list",
                         "schema_title": "ENSEMBL protein",
                         "pattern": "^ENSP[0-9]{11}$",
+                        "annotation_field": "EnsemblCDS.attribute.protein_id",
                         "link": "http://www.ensembl.org/Homo_sapiens/protview?peptide=<ID>"
                     },
                     "ensembl_trs": {
@@ -1054,6 +1130,7 @@
                         "description": "ENSEMBL transcript ID list",
                         "schema_title": "ENSEMBL transcript",
                         "pattern": "^ENST[0-9]{11}$",
+                        "annotation_field": "EnsemblCDS.attribute.transcript_id",
                         "link": "https://useast.ensembl.org/Homo_sapiens/Transcript/Summary?t=<ID>"
                     }
                 }
@@ -1069,6 +1146,7 @@
             "annotation_category": "dbxref",
             "description": "UCSC genome browser gene ID",
             "schema_title": "UCSC",
+            "annotation_field": "HGNC.ucsc_id",
             "pattern": "^uc[0-9]{3}[a-z]{3}\\.[0-9]$"
         },
         "uniprot_ids": {
@@ -1085,6 +1163,7 @@
                 "annotation_category": "dbxref",
                 "description": "UniProt accession number",
                 "schema_title": "UniProt",
+                "annotation_field": "HGNC.uniprot_ids",
                 "link": "https://www.uniprot.org/uniprot/<ID>"
             }
         },

@@ -5,6 +5,7 @@ import contextlib
 import datetime
 import gzip
 import io
+import json
 import os
 import pyramid.request
 import re
@@ -515,3 +516,13 @@ def build_s3_presigned_get_url(*, params):
         Params=params,
         ExpiresIn=36 * 60 * 60
     )
+
+
+def load_json_file(file_path):
+    """Load JSON file contents from given path."""
+    if file_path.endswith(".gz"):
+        open_function = gzip.open
+    else:
+        open_function = open
+    with open_function(file_path, mode="rb") as file_handle:
+        return json.load(file_handle)

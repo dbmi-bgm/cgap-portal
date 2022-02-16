@@ -2,6 +2,8 @@ import vcf
 import json
 import logging
 from collections import OrderedDict
+
+from .gene_utils import SchemaPropertiesParser
 # from granite.lib import vcf_parser
 
 logger = logging.getLogger(__name__)
@@ -745,7 +747,8 @@ class StructuralVariantVCFParser(VCFParser):
 
         Explicit property to facilitate mocking.
         """
-        return self.parse_props_for_vcf_info(self.variant_props)
+        schema_parser = SchemaPropertiesParser(self.variant_props, self.VCF_FIELD)
+        return schema_parser.parse_schema_properties()
 
     @property
     def variant_sample_vcf_props(self):
@@ -756,7 +759,10 @@ class StructuralVariantVCFParser(VCFParser):
 
         Explicit property to facilitate mocking.
         """
-        return self.parse_props_for_vcf_info(self.variant_sample_props)
+        schema_parser = SchemaPropertiesParser(
+            self.variant_sample_props, self.VCF_FIELD
+        )
+        return schema_parser.parse_schema_properties()
 
     @property
     def variant_sub_embedded_groups(self):
@@ -786,68 +792,6 @@ class StructuralVariantVCFParser(VCFParser):
             sub_embedded_group = value.get(self.SUB_EMBEDDING_GROUP, "")
             if sub_embedded_group and sub_embedded_group not in result:
                 result.append(sub_embedded_group)
-        return result
-
-    def _add_schema_vcf_field(self, key, value, result, array=False):
-        """
-        Helper function to self.parse_props_for_vcf_info that parses
-        a given schema field, checks if it comes from the VCF, and
-        updates result with the schema field and some of its properties
-        as applicable.
-
-        :param key: str schema field name
-        :param value: dict of schema field properties
-        :param result: dict of VCF schema fields/properties to update
-        :param array: bool if schema field nested in array of objects
-        """
-        value_type = value.get(self.TYPE, "")
-        vcf_field = value.get(self.VCF_FIELD, "")
-        sub_embedded_field = value.get(self.SUB_EMBEDDING_GROUP, "")
-        field_default = value.get(self.DEFAULT, None) 
-        if vcf_field:
-            result[key] = {self.VCF_FIELD: vcf_field, self.TYPE: value_type}
-            if sub_embedded_field:
-                sub_embedded_group = json.loads(sub_embedded_field)[self.SUB_EMBED_KEY]
-                result[key][self.SUB_EMBEDDING_GROUP] = sub_embedded_group
-            if array:
-                result[key][self.SUB_TYPE] = value_type
-                result[key][self.TYPE] = self.ARRAY
-            if field_default is not None:
-                result[key][self.DEFAULT] = field_default
-
-    def parse_props_for_vcf_info(self, schema_props): 
-        """
-        Searches through schema self.PROPERTIES fields and extracts those
-        that come from the VCF.
-
-        Note: Assumes all VCF fields in schema are at most nested as
-        array of objects. If the fields can be arbitrarily nested,
-        consider making function recursive.
-
-        :param schema_props: dict of schema self.PROPERTIES field
-        :return result: dict of VCF fields from schema with key,
-            value pairs of schema field name and certain properties
-            of the field (e.g. self.TYPE, self.VCF_FIELD, etc.)
-        """
-        result = {}
-        for key, value in schema_props.items():
-            value_type = value.get(self.TYPE, "")
-            if value_type not in [self.ARRAY, self.OBJECT]:
-                self._add_schema_vcf_field(key, value, result)
-            elif value_type == self.ARRAY:
-                item_dict = value[self.ITEMS]
-                if self.PROPERTIES in item_dict:  # Array of objects
-                    for item_key, item_value in item_dict[self.PROPERTIES].items():
-                        item_type = item_value.get(self.TYPE)
-                        if item_type not in [self.ARRAY]:
-                            self._add_schema_vcf_field(item_key, item_value, result)
-                        elif item_type == self.ARRAY:
-                            item_sub_dict = item_value[self.ITEMS]
-                            self._add_schema_vcf_field(
-                                item_key, item_sub_dict, result, array=True
-                            )
-                else:
-                    self._add_schema_vcf_field(key, item_dict, result, array=True)
         return result
 
     def parse_subembedded_info_header(self, hdr):
@@ -902,7 +846,6 @@ class StructuralVariantVCFParser(VCFParser):
         :param index: int provided for sub-embedded objects from field
             found in annotations
         """
-        vcf_field = schema_props[self.VCF_FIELD]
         field_type = schema_props[self.TYPE]
         field_sub_type = schema_props.get(self.SUB_TYPE, "")
         sub_embedded_group = schema_props.get(self.SUB_EMBEDDING_GROUP, "")
@@ -975,7 +918,7 @@ class StructuralVariantVCFParser(VCFParser):
         found, value extracted and self.add_result_value called to create
         appropriate format according to field type from schema.
 
-        Note: Some SV-specific handling here for ALT key not applicable 
+        Note: Some SV-specific handling here for ALT key not applicable
         to SNVs.
 
         :param schema_vcf_fields: dict of VCF-specific fields from schema
@@ -1008,7 +951,7 @@ class StructuralVariantVCFParser(VCFParser):
                 sample and vcf_field in (
                     sample.data._fields + tuple([self.SAMPLE_ID_VCF_FIELD])
                 )
-            ): # Genotype fields
+            ):  # Genotype fields
                 sample_results = self.get_sample_value(
                     schema_key, schema_props, record, sample
                 )
@@ -1053,7 +996,7 @@ class StructuralVariantVCFParser(VCFParser):
                     # its default, if present.
                     self.add_result_value(result, schema_key, schema_props, None)
         return result
-            
+
     def create_variant_from_record(self, record):
         """
         Process record for variant fields.
@@ -1063,7 +1006,6 @@ class StructuralVariantVCFParser(VCFParser):
         """
         result = self.parse_record_for_schema_vcf_fields(self.variant_vcf_props, record)
         return dict(self.variant_defaults, **result)  # copy defaults, merge in result
-
 
     def create_sample_variant_from_record(self, record):
         """
