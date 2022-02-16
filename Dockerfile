@@ -23,6 +23,7 @@ ENV PYTHONFAULTHANDLER=1 \
   POETRY_VERSION=1.1.12 \
   NODE_VERSION=12.22.9
 
+
 # Install nginx, base system requirements
 COPY deploy/docker/production/install_nginx.sh /
 RUN bash /install_nginx.sh && \
@@ -80,6 +81,7 @@ RUN poetry install && \
     make fix-dist-info
 
 # Build front-end, remove node_modules when done
+ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
     rm -rf node_modules/
