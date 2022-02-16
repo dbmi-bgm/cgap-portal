@@ -14,6 +14,7 @@ export function SearchBar (props) {
         context: searchContext,
         isContextLoading,
         navigate: propNavigate,
+        disabled: propDisabled
     } = props;
     // This should be present & accurate on search response as long as is not compound filterset
     // search with 2+ filterblocks used.
@@ -88,6 +89,11 @@ export function SearchBar (props) {
         setTimeout(toggleTooltip, 50, isValid);
     }, [ isValid ]);
 
+    // Update state.value if our search response has been updated (i.e. FilterSetUI switching btw filterblocks)
+    useEffect(function(){
+        setValue(currentSearchTextQuery);
+    }, [ currentSearchTextQuery ]);
+
     const iconCls = (
         "icon icon-fw align-middle fas"
         + (" icon-" + (isChanging ? "circle-notch icon-spin" : "search"))
@@ -99,7 +105,7 @@ export function SearchBar (props) {
             <input type="search" aria-label="Search"
                 spellCheck={false} name="q" className={"form-control" + (!isValid ? " is-invalid" : "")}
                 data-tip="Search term must have at least 2 characters"
-                data-tip-disable={isValid} data-type="error" disabled={!currentSearchHref}
+                data-tip-disable={isValid} data-type="error" disabled={propDisabled || !currentSearchHref}
                 {...{ onChange, value, placeholder }} ref={searchInputRef} />
             <button type="submit" className="btn fixed-height align-items-center d-flex bg-transparent border-0 px-2 py-1" disabled={!isValid || isChanging || isContextLoading || !isValueChanged}>
                 <i className={iconCls}/>

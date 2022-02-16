@@ -127,7 +127,20 @@ export class HiGlassPlainContainer extends React.PureComponent {
                     'higlass-dependencies'
                 ).then((loadedDeps) =>{
                     higlassDependencies = loadedDeps;
-                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack, PileupTrack, GnomadTrack, SvTrack, GeneralVcfTrack } = higlassDependencies;
+                    const {
+                      higlassRegister,
+                      SequenceTrack,
+                      TranscriptsTrack,
+                      ClinvarTrack,
+                      TextTrack,
+                      OrthologsTrack,
+                      PileupTrack,
+                      GnomadTrack,
+                      SvTrack,
+                      GeneralVcfTrack,
+                      CohortTrack,
+                      BigwigDataFetcher
+                    } = higlassDependencies;
 
                     higlassRegister({
                         name: 'SequenceTrack',
@@ -174,6 +187,18 @@ export class HiGlassPlainContainer extends React.PureComponent {
                         track: GeneralVcfTrack,
                         config: GeneralVcfTrack.config,
                     });
+                    higlassRegister({
+                        name: 'CohortTrack',
+                        track: CohortTrack,
+                        config: CohortTrack.config,
+                    });
+                    higlassRegister(
+                      {
+                        dataFetcher: BigwigDataFetcher,
+                        config: BigwigDataFetcher.config,
+                      },
+                      { pluginType: "dataFetcher" }
+                    );
 
                     finish();
                 });

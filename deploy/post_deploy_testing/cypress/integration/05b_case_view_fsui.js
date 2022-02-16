@@ -51,11 +51,11 @@ describe('Case View - FSUI', function () {
 
 
     it("Save buttons disabled initially", function(){
-        cy.get("div#case-info\\.filtering #snv-filtering .above-variantsample-table-ui .filter-set-ui-header div.ml-16 button:first-child").should(function($btn){
+        cy.get("div#case-info\\.filtering #snv-filtering .above-variantsample-table-ui .filter-set-ui-header div.pl-16 button:first-child").should(function($btn){
             expect($btn.children("span")).to.have.text('Save Case FilterSet');
             expect($btn).to.have.attr('disabled');
         }).end()
-            .get("div#case-info\\.filtering #snv-filtering .above-variantsample-table-ui .filter-set-ui-header div.ml-16 button:last-child").should(function($btn){
+            .get("div#case-info\\.filtering #snv-filtering .above-variantsample-table-ui .filter-set-ui-header div.pl-16 button:last-child").should(function($btn){
                 expect($btn).to.have.text('Save as Preset');
                 expect($btn).to.have.attr('disabled');
             });

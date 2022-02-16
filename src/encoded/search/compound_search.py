@@ -88,7 +88,7 @@ class CompoundSearchBuilder:
     @staticmethod
     def format_result_for_endpoint_response(request, es_results, filter_set, result_sort, search_builder_instance):
         """ Formats es_results from filter_set into a dictionary containing total and @graph,
-            setting status on the request if needed. Also sets "__matching_filter_block_indices" computed field to identify
+            setting status on the request if needed. Also sets "__matching_filter_block_names" computed field to identify
             which filter block indices the result matched.
 
         :param request: current request
@@ -105,16 +105,15 @@ class CompoundSearchBuilder:
         result_list = []
         for hit in es_results['hits'].get("hits", []):
             result = hit['_source']['embedded']
-            filter_block_indices = [ int(query_index) for query_index in hit.get("matched_queries", []) ]
-            result["__matching_filter_block_indices"] = filter_block_indices
+            # Matched query names are returned as string here, regardless of their specified original type.
+            result["__matching_filter_block_names"] = hit.get("matched_queries", [])
             result_list.append(result)
 
         columns = SearchBuilder.build_initial_columns([ request.registry[TYPES][filter_set[CompoundSearchBuilder.TYPE]].schema ])
-        # We used multiple filter blocks, so we add in column for "__matching_filter_block_indices"
-        columns["__matching_filter_block_indices"] = {
-            "title": "Filter Block Indices Matched",
-            "order": 1000,
-            "default_hidden": True # We will remove this flag (and rename column) once can render Filter Block names on UI.
+        # We used multiple filter blocks, so we add in column for "__matching_filter_block_names"
+        columns["__matching_filter_block_names"] = {
+            "title": "Filter Blocks Matched",
+            "order": 1000
         }
 
         return {
@@ -247,7 +246,7 @@ class CompoundSearchBuilder:
                                                             from_=from_, to=to)
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
                 # See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-named-queries-and-filters.html
-                sub_query["bool"]["_name"] = block_index
+                sub_query["bool"]["_name"] = block.get("name", block_index)
                 sub_queries.append(sub_query)
 
 

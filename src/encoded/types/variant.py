@@ -7,7 +7,8 @@ from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
     HTTPBadRequest,
-    HTTPServerError
+    HTTPServerError,
+    HTTPNotModified
 )
 from pyramid.traversal import find_resource
 from pyramid.request import Request
@@ -32,13 +33,40 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path, build_s3_presigned_get_url
+from ..util import (
+    resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
+)
 from ..types.base import Item, get_item_or_none
 
 
 log = structlog.getLogger(__name__)
 ANNOTATION_ID = 'annotation_id'
 ANNOTATION_ID_SEP = '_'
+
+# For adding additional variant nomenclature options
+# For reference, see e.g. https://www.insdc.org/documents/feature_table.html#7.4.3
+AMINO_ACID_ABBREVIATIONS = {
+    'Ala': 'A',
+    'Arg': 'R',
+    'Asn': 'N',
+    'Asp': 'D',
+    'Cys': 'C',
+    'Gln': 'Q',
+    'Glu': 'E',
+    'Gly': 'G',
+    'His': 'H',
+    'Ile': 'I',
+    'Leu': 'L',
+    'Lys': 'K',
+    'Met': 'M',
+    'Phe': 'F',
+    'Pro': 'P',
+    'Ser': 'S',
+    'Thr': 'T',
+    'Trp': 'W',
+    'Tyr': 'Y',
+    'Val': 'V'
+}
 
 # Compound Het constants
 CMPHET_PHASED_STRONG = 'Compound Het (Phased/strong_pair)'
@@ -235,6 +263,24 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
 
+def perform_patch_as_admin(request, item_atid, patch_payload):
+    """
+    Patches Items as 'UPGRADER' user/permissions.
+
+    TODO: Seems like this could be re-usable somewhere
+    """
+    if len(patch_payload) == 0:
+        log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
+        return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
+    subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
+    subreq.remote_user = "UPGRADE"
+    if 'HTTP_COOKIE' in subreq.environ:
+        del subreq.environ['HTTP_COOKIE']
+    patch_result = request.invoke_subrequest(subreq).json
+    if patch_result["status"] != "success":
+        raise HTTPServerError("Couldn't update Item " + item_atid)
+    return patch_result
+
 
 @collection(
     name='variants',
@@ -269,7 +315,10 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+        position = convert_integer_to_comma_string(POS)
+        if position is None:
+            position = POS
+        return build_variant_display_title(CHROM, position, REF, ALT)  # chr1:1,504A>T
 
     @calculated_property(schema={
         "title": "Position (genome coordinates)",
@@ -328,6 +377,47 @@ class Variant(Item):
                             break
                 break
         return result
+
+    @calculated_property(schema={
+        "title": "Alternate Display Title",
+        "description": "Variant display title with comma-separated position",
+        "type": "string"
+    })
+    def alternate_display_title(self, CHROM, POS, REF, ALT):
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:1504A>T
+
+    @calculated_property(schema={
+        "title": "Additional Variant Names",
+        "description": "Additional names/aliases this variant is known as",
+        "type": "array",
+        "items": {
+            "type": "string"
+        }
+    })
+    def additional_variant_names(self, genes=None):
+        """This property will allow users to search for specific variants in the filtering tab,
+        using a few different possible variant names.
+         - c. change
+         - p. change (3 letter aa code)
+         - p. change (1 letter aa code)
+        NB: talk to front end about tooltip/click box for example searches
+        """
+        names = []
+        if genes:
+            for gene in genes:
+                if gene.get('genes_most_severe_hgvsc'):
+                    names.append(gene['genes_most_severe_hgvsc'].split(':')[-1])
+                if gene.get('genes_most_severe_hgvsp'):
+                    hgvsp_3 = gene['genes_most_severe_hgvsp'].split(':')[-1]
+                    hgvsp_1 = ''.join(hgvsp_3)
+                    for key, val in AMINO_ACID_ABBREVIATIONS.items():
+                        if key in hgvsp_3:
+                            hgvsp_1 = hgvsp_1.replace(key, val)
+                    names.append(hgvsp_3)
+                    if hgvsp_1 != hgvsp_3:
+                        names.append(hgvsp_1)
+        if names:
+            return names
 
 
 @collection(
@@ -694,6 +784,12 @@ def download(context, request):
     raise HTTPTemporaryRedirect(location=location)  # 307
 
 
+
+
+
+
+
+
 @view_config(
     name='process-notes',
     context=VariantSample,
@@ -885,34 +981,21 @@ def process_notes(context, request):
     # This is in part to simplify UI logic where only Note status == "current" is checked to
     # assert if a Note is already saved to Project or not.
 
-    def perform_patch_as_admin(item_atid, patch_payload):
-        """Patches Items as 'UPGRADER' user/permissions."""
-        if len(patch_payload) == 0:
-            log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
-            return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
-        subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
-        subreq.remote_user = "UPGRADE"
-        if 'HTTP_COOKIE' in subreq.environ:
-            del subreq.environ['HTTP_COOKIE']
-        patch_result = request.invoke_subrequest(subreq).json
-        if patch_result["status"] != "success":
-            raise HTTPServerError("Couldn't update Item " + item_atid)
-
 
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch_as_admin(gene_atid, gene_payload)
+            perform_patch_as_admin(request, gene_atid, gene_payload)
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch_as_admin(variant["@id"], variant_patch_payload)
+        perform_patch_as_admin(request, variant["@id"], variant_patch_payload)
         variant_patch_count += 1
 
     note_patch_count = 0
     for note_atid, note_payload in note_patch_payloads.items():
-        perform_patch_as_admin(note_atid, note_payload)
+        perform_patch_as_admin(request, note_atid, note_payload)
         note_patch_count += 1
 
     return {
@@ -950,11 +1033,126 @@ class VariantSampleList(Item):
         # 'variant_samples.variant_sample_item.associated_genotype_labels.proband_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.mother_genotype_label',
         # 'variant_samples.variant_sample_item.associated_genotype_labels.father_genotype_label',
-        # 'structural_variant_samples.structural_variant_sample_item.structural_variant.display_title',
-        # 'structural_variant_samples.structural_variant_sample_item.interpretation.classification',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.gene_candidacy',
-        # 'structural_variant_samples.structural_variant_sample_item.discovery_interpretation.variant_candidacy',
+        # 'structural_variant_samples.variant_sample_item.structural_variant.display_title',
+        # 'structural_variant_samples.variant_sample_item.interpretation.classification',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.gene_candidacy',
+        # 'structural_variant_samples.variant_sample_item.discovery_interpretation.variant_candidacy',
     ]
+
+
+@view_config(
+    name='add-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def add_selections(context, request):
+    """
+    Adds selections to VariantSampleList, preserving existing data such as selected_by which may not be
+    visible to current 'adder'.
+    """
+
+    request_body = request.json
+    namespace, userid = request.authenticated_userid.split(".", 1)
+
+    # We expect lists of { variant_sample_item: uuid, filter_blocks_used: { filter_blocks: { name: str, query: str }[] } }.
+    # Value for "date_selected" will be set during PATCH by schema serverDefault.
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
+
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    patch_payload = {}
+
+    # Skip adding duplicate selections (shouldn't occur, but just in case)
+    existing_selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        existing_selections_by_uuid[selection["variant_sample_item"]] = selection
+
+    def make_selection_payload(vs_sel):
+        return {
+            "selected_by": userid,
+            "variant_sample_item": vs_sel["variant_sample_item"],
+            "filter_blocks_used": vs_sel["filter_blocks_used"]
+            # date_selected - will be filled upon PATCH
+        }
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = existing_variant_samples.copy()
+        for vs_sel in requested_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            patch_payload["variant_samples"].append(make_selection_payload(vs_sel))
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = existing_structural_variant_samples.copy()
+        for vs_sel in requested_structural_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            patch_payload["structural_variant_samples"].append(make_selection_payload(vs_sel))
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    patch_result = perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
+@view_config(
+    name='order-delete-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def order_delete_selections(context, request):
+    """
+    Updates order & presence of VariantSampleList Items
+    """
+
+    request_body = request.json
+    # We expect lists of UUIDs.
+    # We do NOT accept entire items, we preserve existing values for "selected_by" and "date_selected".
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
+
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        selections_by_uuid[selection["variant_sample_item"]] = selection
+
+    patch_payload = {}
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = []
+        for vs_uuid in requested_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = []
+        for vs_uuid in requested_structural_variant_samples:
+            # Allow exception & stop if vs_uuid not found in selections_by_uuid
+            patch_payload["structural_variant_samples"].append(selections_by_uuid[vs_uuid])
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    # TODO: Save who+when deleted VariantSample from VariantSampleList
+
+    perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
+
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',

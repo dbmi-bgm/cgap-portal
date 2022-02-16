@@ -238,11 +238,35 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
         'variant_samples': [
             {
                 "variant_sample_item": vs1['@id'],
-                "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
+                "filter_blocks_used": {
+                    "filter_blocks": [
+                        {
+                            "name": "Missense",
+                            "query": "variant.genes.genes_most_severe_consequence.coding_effect=Missense"
+                        },
+                        {
+                            "name": "SNV Mutanno",
+                            "query": "variant.mutanno_variant_class=SNV"
+                        }
+                    ],
+                    "intersect_selected_blocks": False
+                }
             },
             {
                 "variant_sample_item": vs2['@id'],
-                "filter_blocks_request_at_time_of_selection": '{"search_type":"VariantSample","global_flags":"CALL_INFO=NA12879_sample&file=GAPFI2VBKGM7&additional_facet=associated_genotype_labels.mother_genotype_label&additional_facet=associated_genotype_labels.father_genotype_label&sort=date_created","intersect":false,"filter_blocks":[{"query":"variant.genes.genes_most_severe_consequence.coding_effect=Missense","flags_applied":[]},{"query":"variant.mutanno_variant_class=SNV","flags_applied":[]}]}',
+                "filter_blocks_used": {
+                    "filter_blocks": [
+                        {
+                            "name": "Missense",
+                            "query": "variant.genes.genes_most_severe_consequence.coding_effect=Missense"
+                        },
+                        {
+                            "name": "SNV Mutanno",
+                            "query": "variant.mutanno_variant_class=SNV"
+                        }
+                    ],
+                    "intersect_selected_blocks": False
+                },
                 # "date_selected": "2021-01-25T16:41:47.787+00:00", # Should be auto-filled by server.
                 # "selected_by" : ... # <- This should be auto-filled by server, we'll test it .. sometime.
             }
@@ -282,10 +306,10 @@ def test_variant_sample_list_sv_patch(
     ).json["@graph"][0]
     sv_sample_atid = sv_sample["@id"]
     vsl_patch = {
-        "structural_variant_samples": [{"structural_variant_sample_item": sv_sample_atid}]
+        "structural_variant_samples": [{"variant_sample_item": sv_sample_atid}]
     }
     resp = testapp.patch_json(vsl_atid, vsl_patch, status=200).json["@graph"][0]
-    vsl_struct_var = resp["structural_variant_samples"][0]["structural_variant_sample_item"]
+    vsl_struct_var = resp["structural_variant_samples"][0]["variant_sample_item"]
     sv_sample = testapp.get(sv_sample_atid).json
     assert vsl_struct_var == sv_sample["@id"]
     assert "variant_sample_list" in sv_sample.keys()

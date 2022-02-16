@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useCallback, useState } from 'react';
+import React, { useMemo, useCallback, useState, useRef } from 'react';
 import queryString from 'query-string';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -58,9 +58,11 @@ export function FilteringTab(props) {
     return (
         <React.Fragment>
             <div className="row flex-column-reverse flex-md-row align-items-center">
-                <h1 className="col my-0">
-                    { filteringTabViews[currViewIdx].name + " " }
-                    <span className="text-300">Variant Filtering and Technical Review</span>
+                <h1 className="col my-0 text-300">
+                    Variant Filtering and Technical Review
+                    {/*<i className="icon icon-arrow-right fas icon-xs mx-3"/>*/}
+                    &nbsp;&ndash;&nbsp;
+                    <span className="text-400">{ filteringTabViews[currViewIdx].name }</span>
                 </h1>
                 <div className="col-12 col-md-auto my-3 my-md-n3">
                     <FilteringTabTableToggle {...{ currViewIdx, setCurrViewIdx, context }}/>
@@ -157,7 +159,11 @@ function createBlankFilterSetItem(searchType, caseAccession){
                 "name" : "Filter Block 1",
                 "query" : ""
             }
-        ]
+        ],
+        // Any FilterSet saved to Case should have "current" or "in review" by default so others in Project can see/edit it as well.
+        // It may make sense to upgrade to status=shared or similar for public/knowledgebase data, though.
+        // But not any lower than "current", "in review", or "shared to project"
+        "status": "current"
     };
 }
 
@@ -312,6 +318,8 @@ function FilteringTabBody(props) {
         return { onClearFiltersVirtual, isClearFiltersBtnVisible };
     }, [ context ]);
 
+    const filterSetControllerRef = useRef(null);
+
     // We include the button for moving stuff to interpretation tab inside FilteringTableFilterSetUI, so pass in selectedVariantSamples there.
     const fsuiProps = {
         schemas, session,
@@ -323,6 +331,12 @@ function FilteringTabBody(props) {
         isActiveDotRouterTab,
         // setIsSubmitting,
         // "caseItem": context
+    };
+
+    const fsControllerProps = {
+        searchHrefBase, onResetSelectedVariantSamples, searchType,
+        "excludeFacets": hideFacets,
+        "ref": filterSetControllerRef
     };
 
     const embeddedTableHeaderBody = (
@@ -350,18 +364,22 @@ function FilteringTabBody(props) {
     // Load initial filter set Item via AJAX to ensure we get all @@embedded/calculated fields
     // regardless of how much Case embeds.
     const embeddedTableHeader = activeFilterSetID ? (
-        <ajax.FetchedItem atId={activeFilterSetID} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
+        <ajax.FetchedItem atId={activeFilterSetID + "?datastore=database"} fetchedItemPropName="initialFilterSetItem" isFetchingItemPropName="isFetchingInitialFilterSetItem"
             onFail={onFailInitialFilterSetItemLoad}>
-            <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets}>
+            <FilterSetController {...fsControllerProps}>
                 { embeddedTableHeaderBody }
             </FilterSetController>
         </ajax.FetchedItem>
     ) : (
         // Possible to-do, depending on data-model future requirements for FilterSet Item could use initialFilterSetItem.flags[0] instead of using searchHrefBase.
-        <FilterSetController {...{ searchHrefBase, onResetSelectedVariantSamples, searchType }} excludeFacets={hideFacets} initialFilterSetItem={blankFilterSetItem}>
+        <FilterSetController {...fsControllerProps} initialFilterSetItem={blankFilterSetItem}>
             { embeddedTableHeaderBody }
         </FilterSetController>
     );
+
+    // Not an ideal practice/pattern, avoid if possible:
+    const { current: filterSetControllerInstance } = filterSetControllerRef;
+    const currFilterSet = filterSetControllerInstance ? filterSetControllerInstance.state.currFilterSet : null;
 
 
     // This maxHeight is stylistic and dependent on our view design/style
@@ -377,6 +395,7 @@ function FilteringTabBody(props) {
         selectedVariantSamples, onSelectVariantSample,
         savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
+        currFilterSet, // <- Used for Matching Filter Block Indices column
         "key": searchTableKey
     };
 

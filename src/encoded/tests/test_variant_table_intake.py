@@ -14,7 +14,7 @@ from .variant_fixtures import ANNOTATION_FIELD_URL
 
 # XXX: These constants should probably be handled in a more intelligent way -will
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
-MT_LOC = resolve_file_path('annotations/v0.5.4_variant_table.csv')
+MT_LOC = resolve_file_path('annotations/v0.5.5_variant_table.csv')
 ANNOTATION_FIELD_SCHEMA = resolve_file_path('schemas/annotation_field.json')
 EXPECTED_FIELDS = ['no', 'field_name', 'vcf_field', 'source_name', 'source_version', 'sub_embedding_group',
                    'field_type', 'is_list', 'priority', 'source',
@@ -34,11 +34,11 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.5.4'
-VARIANT_TABLE_DATE = '06.23.2021'
-NUMBER_ANNOTATION_FIELDS = 236
+VARIANT_TABLE_VERSION = 'annV0.5.5'
+VARIANT_TABLE_DATE = '01.18.2022'
+NUMBER_ANNOTATION_FIELDS = 237
 SAMPLE_FIELDS_EXPECTED = 26
-VARIANT_FIELDS_EXPECTED = 210
+VARIANT_FIELDS_EXPECTED = 211
 TRANSCRIPT_FIELDS_EXPECTED = 30
 
 

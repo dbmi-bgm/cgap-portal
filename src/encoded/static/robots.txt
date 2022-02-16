@@ -1,14 +1,2 @@
 User-agent: *
-Disallow: /*?*limit=all
-Disallow: /files/*download
-Disallow: /files*@@download
-Disallow: /*@@download
-Disallow: /profiles/
-Disallow: /*@@download*
-Disallow: /cgi-bin/
-User-agent: SemrushBot
-Disallow: /
-User-agent: AhrefsBot
-Disallow: /
-User-agent: PetalBot
 Disallow: /

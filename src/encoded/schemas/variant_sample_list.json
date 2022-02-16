@@ -44,7 +44,10 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "2"
+            "default": "3"
+        },
+        "status": {
+            "default": "current"
         },
         "variant_samples": {
             "title": "Variant Samples",
@@ -59,10 +62,39 @@
                         "type": "string",
                         "linkTo": "VariantSample"
                     },
-                    "filter_blocks_request_at_time_of_selection": {
-                        "title": "Filter Block Request",
-                        "type": "string",
-                        "description": "Stringified JSON representing the compound filter block request made when this Variant Sample was selected"
+                    "filter_blocks_used": {
+                        "type": "object",
+                        "title": "Filter Blocks Information",
+                        "description": "Information about the FilterSet and its blocks used at time of selection",
+                        "additionalProperties": false,
+                        "properties": {
+                            "filter_blocks": {
+                                "type": "array",
+                                "title": "Filter Blocks Used",
+                                "items": {
+                                    "type": "object",
+                                    "title": "Filter Block",
+                                    "description": "Name and contents must be unique within a Variant Sample List",
+                                    "notes": "May also include flags_applied or other properties at some point.",
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "title": "Filter Block Name"
+                                        },
+                                        "query": {
+                                            "type": "string",
+                                            "title": "Filter Block Query"
+                                        }
+                                    }
+                                }
+                            },
+                            "intersect_selected_blocks": {
+                                "type": "boolean",
+                                "title": "Blocks Intersection",
+                                "description": "If true, search results were from intersection of selected blocks"
+                            }
+                        }
                     },
                     "selected_by": {
                         "title": "Selector",
@@ -97,22 +129,57 @@
                 "title": "Structural Variant Sample Selection",
                 "type": "object",
                 "properties": {
-                    "structural_variant_sample_item": {
+                    "variant_sample_item": {
                         "title": "Structural Variant Sample",
                         "type": "string",
                         "linkTo": "StructuralVariantSample"
                     },
-                    "filter_blocks_request_at_time_of_selection": {
-                        "title": "Filter Block Request",
-                        "type": "string",
-                        "description": "Stringified JSON representing the compound filter block request made when this Structural Variant Sample was selected"
+                    "filter_blocks_used": {
+                        "type": "object",
+                        "title": "Filter Blocks Information",
+                        "description": "Information about the FilterSet and its blocks used at time of selection",
+                        "additionalProperties": false,
+                        "properties": {
+                            "filter_blocks": {
+                                "type": "array",
+                                "title": "Filter Blocks Used",
+                                "items": {
+                                    "type": "object",
+                                    "title": "Filter Block",
+                                    "description": "Name and contents must be unique within a Variant Sample List",
+                                    "notes": "May also include flags_applied or other properties at some point.",
+                                    "additionalProperties": false,
+                                    "properties": {
+                                        "name": {
+                                            "type": "string",
+                                            "title": "Filter Block Name"
+                                        },
+                                        "query": {
+                                            "type": "string",
+                                            "title": "Filter Block Query"
+                                        }
+                                    }
+                                }
+                            },
+                            "intersect_selected_blocks": {
+                                "type": "boolean",
+                                "title": "Blocks Intersection",
+                                "description": "If true, search results were from intersection of selected blocks"
+                            }
+                        }
                     },
-                    "userid": {
-                        "title": "User ID",
+                    "filter_blocks_request_at_time_of_selection": {
+                        "title": "Filter Block Request (Deprecated)",
                         "type": "string",
-                        "description": "User ID of person who made this selection",
+                        "notes": "This field is deprecated and should be removed, along with contents. Many of the existing values lack some if not all information."
+                    },
+                    "selected_by": {
+                        "title": "Selector",
+                        "type": "string",
+                        "description": "Person who made this selection",
                         "serverDefault": "userid",
-                        "format": "uuid"
+                        "linkTo": "User",
+                        "permission": "restricted_fields"
                     },
                     "date_selected": {
                         "title": "Date Selected",

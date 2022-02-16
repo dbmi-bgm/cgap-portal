@@ -10,6 +10,7 @@ import pyramid.request
 import re
 import structlog
 import tempfile
+from botocore.client import Config
 
 from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
 from dcicutils.ecs_utils import CGAP_ECS_REGION
@@ -500,6 +501,8 @@ def make_s3_client():
         s3_client_extra_args['aws_secret_access_key'] = identity.get('S3_AWS_SECRET_ACCESS_KEY')
         s3_client_extra_args['region_name'] = CGAP_ECS_REGION
         log.warning(f"make_s3_client using S3 entity ID {key_id[:10]} arguments in `boto3 client creation call.")
+        if 'ENCODED_S3_ENCRYPT_KEY_ID' in identity:
+            s3_client_extra_args['config'] = Config(signature_version='s3v4')
     else:
         log.warning(f'make_s3_client called with no identity')
 
@@ -515,3 +518,18 @@ def build_s3_presigned_get_url(*, params):
         Params=params,
         ExpiresIn=36 * 60 * 60
     )
+
+
+def convert_integer_to_comma_string(value):
+    """Convert integer to comma-formatted string for displaying SV
+    position.
+
+    :param value: Value to format.
+    :type value: int
+    :returns: Comma-formatted integer or None
+    :rtype: str or None
+    """
+    result = None
+    if isinstance(value, int):
+        result = format(value, ",d")
+    return result

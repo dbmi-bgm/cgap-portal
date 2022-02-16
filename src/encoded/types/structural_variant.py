@@ -5,7 +5,7 @@ from snovault import calculated_property, collection, load_schema
 
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path
+from ..util import resolve_file_path, convert_integer_to_comma_string
 from .base import Item, get_item_or_none
 from .variant import (
     ANNOTATION_ID,
@@ -59,6 +59,27 @@ def build_structural_variant_display_title(sv_type, chrom, start, end):
     return display_title
 
 
+def build_comma_formatted_position(chromosome, start, end):
+    """Create more readable position display with comma-formatted
+    numbers.
+
+    :param chromosome: Chromosome of SV.
+    :type chromosome: str
+    :param start: Start position of SV.
+    :type start: int
+    :param end: End position of SV.
+    :type end: int
+    :returns: Comma-formatted position or None.
+    :rtype: str or None
+    """
+    result = None
+    start = convert_integer_to_comma_string(start)
+    end = convert_integer_to_comma_string(end)
+    if chromosome and start is not None and end is not None:
+        result = "chr%s:%s-%s" % (chromosome, start, end)
+    return result
+
+
 @collection(
     name="structural-variants",
     properties={
@@ -96,7 +117,9 @@ class StructuralVariant(Item):
         }
     )
     def display_title(self, SV_TYPE, CHROM, START, END):
-        return build_structural_variant_display_title(SV_TYPE, CHROM, START, END)
+        start = convert_integer_to_comma_string(START)
+        end = convert_integer_to_comma_string(END)
+        return build_structural_variant_display_title(SV_TYPE, CHROM, start, end)
 
     @calculated_property(
         schema={
@@ -268,6 +291,28 @@ class StructuralVariant(Item):
         result["omim_genes"] = str(omim_count) + "/" + str(gene_count)
         return result
 
+    @calculated_property(
+        schema={
+            "title": "Position Display",
+            "description": "The comma formatted position of this structural variant",
+            "type": "string",
+        }
+    )
+    def position_display(self, CHROM, START, END):
+        """Create formatted position to display in portal."""
+        return build_comma_formatted_position(CHROM, START, END)
+
+    @calculated_property(
+        schema={
+            "title": "Formatted Position (hg19)",
+            "description": "The formatted hg19 position of this structural variant",
+            "type": "string",
+        }
+    )
+    def hg19_position_display(self, hg19_chr=None, hg19_start=None, hg19_end=None):
+        """Create formatted hg19 position to display in portal."""
+        return build_comma_formatted_position(hg19_chr, hg19_start, hg19_end)
+
 
 @collection(
     name="structural-variant-samples",
@@ -287,7 +332,7 @@ class StructuralVariantSample(Item):
     rev = {
         "variant_sample_list": (
             "VariantSampleList",
-            "structural_variant_samples.structural_variant_sample_item",
+            "structural_variant_samples.variant_sample_item",
         )
     }
     embedded_list = build_structural_variant_sample_embedded_list()
@@ -354,11 +399,13 @@ class StructuralVariantSample(Item):
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"
         )
+        start = convert_integer_to_comma_string(structural_variant["START"])
+        end = convert_integer_to_comma_string(structural_variant["END"])
         structural_variant_display_title = build_structural_variant_display_title(
             structural_variant["SV_TYPE"],
             structural_variant["CHROM"],
-            structural_variant["START"],
-            structural_variant["END"],
+            start,
+            end,
         )
         if structural_variant:
             return CALL_INFO + ":" + structural_variant_display_title

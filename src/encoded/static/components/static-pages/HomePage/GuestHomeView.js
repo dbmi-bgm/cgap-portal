@@ -16,7 +16,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     <hr className="border-white" />
                     <h4 className="text-500 text-white">Get Actionable Data, Fast.</h4>
                     <p className="text-white col-12 col-lg-9 px-0">
-                        CGAP (the Clinical Genome Analysis Project) is a web-based clinical and research application
+                        CGAP (the Clinical Genome Analysis Platform) is a web-based clinical and research application
                         for analysis, annotation, visualization and reporting of genomic data. An ongoing effort of
                         Harvard Medical School's Department of Biomedical Informatics and developed in close connection
                         with clinicians at BGM and UDN, CGAP
@@ -69,11 +69,6 @@ const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
             <h4 className="text-400 mb-15 mt-25">Our Partners</h4>
             <div className="links-wrapper clearfix">
                 <div className="link-block">
-                    <a href="https://dbmi.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
-                        <span>HMS DBMI</span>
-                    </a>
-                </div>
-                <div className="link-block">
                     <a href="https://www.brighamandwomens.org/medicine/genetics/genetics-genomic-medicine-service" target="_blank" rel="noopener noreferrer" className="external-link">
                         <span>Brigham Genomic Medicine</span>
                     </a>
@@ -89,7 +84,14 @@ const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
                     </a>
                 </div>
             </div>
-            <br/>
+            <h4 className="text-400">Who We Are</h4>
+            <div className="links-wrapper clearfix">
+                <div className="link-block">
+                    <a href="https://dbmi.hms.harvard.edu/" target="_blank" rel="noopener noreferrer" className="external-link">
+                        <span>HMS DBMI</span>
+                    </a>
+                </div>
+            </div>
         </div>
     );
 });

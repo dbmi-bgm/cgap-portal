@@ -1,10 +1,8 @@
 # CGAP-Portal (Production) Dockerfile
-# Note that images are pinned via sha256 as opposed to tag
-# so that we don't pick up new images unintentionally
-
-# python:3.6.15-slim-buster
-# TODO: maybe swap in ubuntu 20.04 and install Python manually?
-FROM python@sha256:912f935132ef6055ed99d7e68a8bff631a65f4e7ea650d7b0f10ed69a626a19a
+# Take latest 3.6.15 Debian variant
+# FROM python:3.6.15-slim-buster
+# Take latest 3.7.12 Debian variant
+FROM python:3.7.12-slim-buster
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
@@ -22,8 +20,8 @@ ENV PYTHONFAULTHANDLER=1 \
   PIP_NO_CACHE_DIR=off \
   PIP_DISABLE_PIP_VERSION_CHECK=on \
   PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.1.4 \
-  NODE_VERSION=12.22.1
+  POETRY_VERSION=1.1.12 \
+  NODE_VERSION=12.22.9
 
 # Install nginx, base system requirements
 COPY deploy/docker/production/install_nginx.sh /
@@ -38,7 +36,7 @@ WORKDIR /home/nginx/.nvm
 # Install Node
 ENV NVM_DIR=/home/nginx/.nvm
 RUN apt install -y curl
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | bash
+RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
 RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
 RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
@@ -55,7 +53,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Upgrade pip, install in layer
 RUN pip install --upgrade pip && \
-    pip install poetry==1.1.4
+    pip install poetry==$POETRY_VERSION
 
 # Adjust permissions
 RUN chown -R nginx:nginx /opt/venv && \

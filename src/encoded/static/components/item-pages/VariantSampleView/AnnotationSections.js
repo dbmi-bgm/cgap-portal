@@ -34,6 +34,8 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
         externalDatabaseFieldnames = [
             "genecards",
+            "medline_plus",
+            "gencc",
             "ensgid",
             "entrez_id",
             "hgnc_id",
@@ -206,8 +208,8 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
         alias_name          = fallbackElem,
         gene_summary        = <em>No summary available</em>,
         chrom = null,
-        spos = null,
-        epos = null
+        start_display = null,
+        end_display = null
     } = currentGeneItem || {};
 
 
@@ -215,9 +217,9 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
     const prevSymbolRendered = prev_symbol.length === 0 ? <em> - </em> : prev_symbol.join(", ");
 
     const geneLocation = (
-        (chrom? chrom : "") +
-        ((epos || spos) && chrom ? ": " : "") +
-        (spos || 'unknown') + "-" + (epos || 'unknown')
+        (chrom ? chrom : "") +
+        ((end_display || start_display) && chrom ? ": " : "") +
+        (start_display || 'unknown') + "-" + (end_display || 'unknown')
     );
 
     return (

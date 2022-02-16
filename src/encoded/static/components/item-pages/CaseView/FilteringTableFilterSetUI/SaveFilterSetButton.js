@@ -4,8 +4,57 @@ import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import memoize from 'memoize-one';
-import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import queryString from 'query-string';
+import { console, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+
+
+
+export function savedVariantSampleListItemFilterBlockQueryDict(variantSampleListItem){
+    const { variant_samples: vsSelections = [] } = variantSampleListItem || {};
+    const existingNameDict = {};
+    vsSelections.forEach(function(vsSelection){
+        const { filter_blocks_used: { filter_blocks: selectionBlocksUsed = [] } = {} } = vsSelection;
+        selectionBlocksUsed.forEach(function({ name: selectedBlockName, query: selectedBlockQuery }){
+            // We assume in an existing VSL, that all saved filter_blocks' names only have 1 set of contents.
+            // Use this as an opportunity to parse the newly-encountered queries for comparison, as well.
+            existingNameDict[selectedBlockName] = existingNameDict[selectedBlockName] || queryString.parse(selectedBlockQuery);
+        });
+    });
+    return existingNameDict;
+}
+
+
+/**
+ * Check every filter block name in `existingVariantSampleListItem.variant_samples`
+ * and if present in filterSetToSave, ensure has same filters value, else is invalid.
+ *
+ * @param {{ selections: {}[] }} existingVariantSampleListItem
+ * @param {{ filter_blocks: { name: string, query: string }[] }} filterSetToSave
+ */
+export function validateAllFilterSetBlockNames(savedToVSLFilterBlockQueryNameDict, filterSetToSave) {
+    const { filter_blocks: currentFilterBlocks = [] } = filterSetToSave || {};
+    const fbLen = currentFilterBlocks.length;
+    if (fbLen === 0) {
+        // Technically true, but parent button/component should still be correctly disabled if is loading, etc.
+        return true;
+    }
+
+    for (var i = 0; i < fbLen; i++) {
+        const { name: currentFilterBlockName, query: fbQueryString } = currentFilterBlocks[i];
+        const existingSavedFilterBlock = savedToVSLFilterBlockQueryNameDict[currentFilterBlockName];
+        if (existingSavedFilterBlock) {
+            const parsedQuery = queryString.parse(fbQueryString);
+            const isEqual = object.compareQueries(existingSavedFilterBlock, parsedQuery);
+            if (!isEqual) {
+                return false;
+            } // else continue
+        }
+    }
+    return true;
+}
+
+
 
 
 /**
@@ -16,7 +65,9 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 export class SaveFilterSetButtonController extends React.Component {
 
     static haveEditPermission(caseActions){
-        return _.findWhere(caseActions, { "name" : "edit" });
+        const result = !!(_.findWhere(caseActions, { "name" : "edit" }));
+        console.log("SaveFilterSetButtonController - have edit permission?", result);
+        return result;
     }
 
     /**
@@ -62,6 +113,7 @@ export class SaveFilterSetButtonController extends React.Component {
             return true;
         }
 
+        // We don't use object.compareQueries here because we want to enable save if filter orders have changed (even if no substantative content/value change).
         return !_.isEqual(
             // Skip over comparing fields that differ between frame=embed and frame=raw
             _.pick(savedFilterSet, ...fieldsToCompare),
@@ -224,12 +276,13 @@ export class SaveFilterSetButtonController extends React.Component {
 export function SaveFilterSetButton(props){
     const {
         isEditDisabled,
+        haveEditPermission = true,
         saveFilterSet,
         isSavingFilterSet,
         hasCurrentFilterSetChanged,
         className = "btn btn-primary d-inline-flex align-items-center"
     } = props;
-    const disabled = isEditDisabled || isSavingFilterSet || !hasCurrentFilterSetChanged;
+    const disabled = isEditDisabled || isSavingFilterSet || !haveEditPermission || !hasCurrentFilterSetChanged;
 
     const onSaveBtnClick = useCallback(function(e){
         e.stopPropagation();
@@ -268,5 +321,6 @@ export const filterSetFieldsToKeepPrePatch = [
     "flags",
     "created_in_case_accession",
     "uuid",
-    "derived_from_preset_filterset"
+    "derived_from_preset_filterset",
+    "status"
 ];
