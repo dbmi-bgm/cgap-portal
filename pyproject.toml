@@ -89,6 +89,8 @@ python_magic = ">=0.4.24,<1"
 pytz = ">=2021.3"
 rdflib = "^4.2.2"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
+# repoze.debug is needed to use pyramid.pserve - Will Feb 17 2022
+"repoze.debug" = ">=1.0.2"
 requests = "^2.23.0"
 rfc3986 = "^1.4.0"
 rsa = "3.3"
@@ -119,8 +121,6 @@ WSGIProxy2 = "0.4.2"
 "zope.deprecation" = "^4.4.0"
 "zope.interface" = "^4.7.2"
 "zope.sqlalchemy" = "1.3"
-
-
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
@@ -154,7 +154,6 @@ pytest-instafail = ">=0.3.0"
 pytest-mock = ">=0.11.0"
 pytest-timeout = ">=1.0.0"
 pytest-xdist = ">=1.14"
-"repoze.debug" = ">=1.0.2"
 
 # In pytest 6.0, we'll be able to use this instead of a separate pytest.ini configuration.
 # -kmp 18-Jan-2021
