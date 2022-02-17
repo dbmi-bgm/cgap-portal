@@ -1,7 +1,7 @@
 import logging
 import argparse
 import structlog
-from dcicutils.qa_utils import override_environ
+from dcicutils.misc_utils import override_environ
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.beanstalk_utils import get_beanstalk_environment_variables
 from deploy.generate_production_ini import ProductionIniFileManager
