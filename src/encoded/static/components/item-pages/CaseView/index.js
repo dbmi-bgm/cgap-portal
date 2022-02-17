@@ -860,16 +860,16 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     // Predicted Sex and Ancestry found in qclist
                     // TODO: At some point see if URL can be moved to qmsummary - if so, move this into above block
                     qc_list.forEach(function(qc) {
-                        const { value: { "ancestry and sex prediction": predictions = [], url } = {}, qc_type } = qc;
-
+                        const { value: { "@id": qmId, "ancestry and sex prediction": predictions = [] } = {}, qc_type } = qc;
+                        const qmUrl = qmId + '/@@download';
                         if (qc_type === "quality_metric_peddyqc") {
                             predictions.forEach(function(prediction) {
                                 const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
                                 const shortFormPredictedSex = mapLongFormSexToLetter(predictedSex);
 
                                 if (name === caseSampleId) { // double check that it's the prediction for the current case
-                                    msaStats.predictedSex = { value: shortFormPredictedSex, url, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
-                                    msaStats.predictedAncestry = { value: predictedAncestry, url };
+                                    msaStats.predictedSex = { value: shortFormPredictedSex, url: qmUrl, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
+                                    msaStats.predictedAncestry = { value: predictedAncestry, url: qmUrl };
                                 }
                             });
                         }
