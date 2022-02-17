@@ -11,36 +11,36 @@ ARG INI_BASE
 ENV INI_BASE=${INI_BASE:-"cgap_any_alpha.ini"}
 
 # Configure (global) Env
-ENV NGINX_USER=nginx
-ENV DEBIAN_FRONTEND=noninteractive
-ENV CRYPTOGRAPHY_DONT_BUILD_RUST=1
-ENV PYTHONFAULTHANDLER=1 \
-  PYTHONUNBUFFERED=1 \
-  PYTHONHASHSEED=random \
-  PIP_NO_CACHE_DIR=off \
-  PIP_DISABLE_PIP_VERSION_CHECK=on \
-  PIP_DEFAULT_TIMEOUT=100 \
-  POETRY_VERSION=1.1.12 \
-  NODE_VERSION=12.22.9
+# Note that some important versions are pinned in this statement
+ENV NGINX_USER=nginx \
+    DEBIAN_FRONTEND=noninteractive \
+    CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_NO_CACHE_DIR=off \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    POETRY_VERSION=1.1.12 \
+    NVM_VERSION=v0.39.1 \
+    NODE_VERSION=12.22.9
 
-
-# Install nginx, base system requirements
-COPY deploy/docker/production/install_nginx.sh /
-RUN bash /install_nginx.sh && \
-    apt-get update && \
-    apt-get install -y curl vim emacs net-tools ca-certificates \
-    gcc zlib1g-dev postgresql-client libpq-dev git make
-
-# Configure CGAP User (nginx)
+# Install system level dependencies (nginx, nvm)
+# Note that the ordering of these operations is intentional
 WORKDIR /home/nginx/.nvm
-
-# Install Node
 ENV NVM_DIR=/home/nginx/.nvm
-RUN apt install -y curl
-RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
-RUN . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm use v${NODE_VERSION}
-RUN . "$NVM_DIR/nvm.sh" && nvm alias default v${NODE_VERSION}
+COPY deploy/docker/production/install_nginx.sh /
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
+    gcc zlib1g-dev postgresql-client libpq-dev git make curl && \
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
+    . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
+    nvm use v${NODE_VERSION} && \
+    nvm alias default v${NODE_VERSION} && \
+    bash /install_nginx.sh && \
+    apt-get clean
+
+# Link, verify node installation
 ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 RUN node --version
 RUN npm --version
@@ -65,7 +65,7 @@ WORKDIR /home/nginx/cgap-portal
 # Do the back-end dependency install
 COPY pyproject.toml .
 COPY poetry.lock .
-RUN poetry install --no-root
+RUN poetry install --no-root --no-dev
 
 # Do the front-end dependency install
 COPY package.json .
@@ -76,7 +76,7 @@ RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/b
 COPY . .
 
 # Build remaining back-end
-RUN poetry install && \
+RUN poetry install --no-dev && \
     python setup_eb.py develop && \
     make fix-dist-info
 
