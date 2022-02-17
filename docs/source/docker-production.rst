@@ -8,19 +8,19 @@ The CGAP Application has been orchestrated into the ECS Service/Task paradigm. A
 +------------+--------------------------------+-----+------+------+-----+--------------------------+
 | Kind       | Use                            | Num | Spot | vCPU | Mem | Notes                    |
 +============+================================+=====+======+======+=====+==========================+
-| Portal     | Services standard API requests | 4   | Yes  | .25  | 512 | Needs autoscaling        |
+| Portal     | Services standard API requests | 1-4 | Yes  |  4   |8192 | Needs autoscaling        |
 +------------+--------------------------------+-----+------+------+-----+--------------------------+
 | Indexer    | Hits /index at 1sec            | 4 + | Yes  | .25  | 512 | Can auto-scale based on  |
 |            | intervals indefinitely.        |     |      |      |     | Queue Depth              |
 +------------+--------------------------------+-----+------+------+-----+--------------------------+
-| Ingester   | Polls SQS for ingestion tasks  | 1   | No   | .5   | 1024| Need API to add tasks    |
-+------------+--------------------------------+-----+------+------+-----+--------------------------+
-| Deployment | Triggers the standard          | 0   | Yes  | .24  | 512 | Run explicitly or (TODO) |
-|            | deployment actions.            |     |      |      |     | by API                   |
+| Ingester   | Polls SQS for ingestion tasks  | 1   | No   |   1  | 2048| Need API to add tasks    |
 +------------+--------------------------------+-----+------+------+-----+--------------------------+
 
 Building an Image
 ^^^^^^^^^^^^^^^^^
+
+NOTE: the following documentation is preserved for historical reasons in order to understand the build process.
+YOU SHOULD NOT BUILD PRODUCTION IMAGES LOCALLY. ALWAYS USE CODEBUILD.
 
 The production application configuration is in ``deploy/docker/production``. A description of all the relevant files follows.
 
@@ -33,22 +33,16 @@ The production application configuration is in ``deploy/docker/production``. A d
     * entrypoint_indexer.sh - indexer entrypoint
     * entrypoint_ingester.sh - ingester entrypoint
     * install_nginx.sh - script for pulling in nginx
-    * mastertest.ini - base ini file used to build production.ini on the server
+    * cgap_any_alpha.ini - base ini file used to build production.ini on the server given variables set in the GAC
     * nginx.conf - nginx configuration
 
 
 The following instructions describe how to build and push images. Note though that we assume an existing ECS setup. For instructions on how to orchestrate ECS, see 4dn-cloud-infra, but that is not the focus of this documentation.
 
     1. Ensure the orchestrator credentials are sourced, or that your IAM user has been granted sufficient perms to push to ECR.
-    2. In the Makefile under ``build-docker-production``, replace "cgap-mastertest" with the env.name configured for the environment. This name should match the ECR repo name if you navigate to the ECR Console.
-    3. Again in the Makefile, replace the ECR Repo URL (NOT the tag) with the one from the output of the ECR stack in the account.
-    4. Run ``make ecr-login``, which should pull ECR credentials using the currently active AWS credentials.
-    5. Run ``make build-docker-production``.
-    6. Navigate to Foursight and queue the cluster update check. After around 5 minutes, the new images should be coming online. You can monitor the progress
-
-
-Note that steps 4 and 6 are all that are needed to be repeated once initial setup is done, assuming you are continuously pushing to the same location. To change which ECS orchestration you are effectively deploying to, all steps must be repeated in the relevant account.
-
+    2. Run ``make ecr-login``, which should pull ECR credentials using the currently active AWS credentials.
+    3. Run ``make build-docker-production``.
+    4. Navigate to Foursight and queue the cluster update check. After around 5 minutes, the new images should be coming online. You can monitor the progress from the Target Groups console on AWS.
 
 Tagging Strategy
 ^^^^^^^^^^^^^^^^

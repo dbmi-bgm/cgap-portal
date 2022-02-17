@@ -6,8 +6,7 @@ import re
 import openpyxl
 
 from dcicutils.lang_utils import n_of
-from dcicutils.qa_utils import ignored
-from dcicutils.misc_utils import VirtualAppError
+from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
 from .util import s3_local_file, debuglog
 

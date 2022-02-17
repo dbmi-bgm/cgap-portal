@@ -21,7 +21,7 @@ from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
 from dcicutils.secrets_utils import assume_identity
-from dcicutils.qa_utils import override_environ
+from dcicutils.misc_utils import override_environ
 from snovault import (
     AfterModified,
     BeforeModified,
