@@ -29,7 +29,7 @@ RUN python -m venv /opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
 # Install system level dependencies (poetry, nvm, nginx)
-# Note that the ordering of these operations is intentional
+# Note that the ordering of these operations is intentional to minimize package footprint
 WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
 COPY deploy/docker/production/install_nginx.sh /
@@ -42,13 +42,15 @@ RUN apt-get update && apt-get upgrade -y && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
     nvm alias default v${NODE_VERSION} && \
+    curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json && \
     bash /install_nginx.sh && \
+    chown -R nginx:nginx /opt/venv && \
+    mkdir -p /home/nginx/cgap-portal && \
+    mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \
     apt-get clean
 
 # Link, verify installations
 ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-RUN chown -R nginx:nginx /opt/venv && \
-    mkdir -p /home/nginx/cgap-portal
 #RUN node --version
 #RUN npm --version
 #RUN nginx --version
@@ -81,8 +83,7 @@ RUN npm run build && \
     rm -rf node_modules/
 
 # Misc
-RUN make aws-ip-ranges && \
-    cat /dev/urandom | head -c 256 | base64 > session-secret.b64
+RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
