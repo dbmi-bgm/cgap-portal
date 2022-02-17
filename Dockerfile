@@ -1,6 +1,4 @@
 # CGAP-Portal (Production) Dockerfile
-# Take latest 3.6.15 Debian variant
-# FROM python:3.6.15-slim-buster
 # Take latest 3.7.12 Debian variant
 FROM python:3.7.12-slim-buster
 
@@ -25,7 +23,12 @@ ENV NGINX_USER=nginx \
     NVM_VERSION=v0.39.1 \
     NODE_VERSION=12.22.9
 
-# Install system level dependencies (nginx, nvm)
+# Configure Python3.7 venv
+ENV VIRTUAL_ENV=/opt/venv
+RUN python -m venv /opt/venv
+ENV PATH="$VIRTUAL_ENV/bin:$PATH"
+
+# Install system level dependencies (poetry, nvm, nginx)
 # Note that the ordering of these operations is intentional
 WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
@@ -33,6 +36,8 @@ COPY deploy/docker/production/install_nginx.sh /
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl && \
+    pip install --upgrade pip && \
+    curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
@@ -40,26 +45,15 @@ RUN apt-get update && apt-get upgrade -y && \
     bash /install_nginx.sh && \
     apt-get clean
 
-# Link, verify node installation
+# Link, verify installations
 ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-RUN node --version
-RUN npm --version
-
-WORKDIR /home/nginx
-
-# Configure venv
-ENV VIRTUAL_ENV=/opt/venv
-RUN python -m venv /opt/venv
-ENV PATH="$VIRTUAL_ENV/bin:$PATH"
-
-# Upgrade pip, install in layer
-RUN pip install --upgrade pip && \
-    pip install poetry==$POETRY_VERSION
-
-# Adjust permissions
 RUN chown -R nginx:nginx /opt/venv && \
     mkdir -p /home/nginx/cgap-portal
+#RUN node --version
+#RUN npm --version
+#RUN nginx --version
 
+# Build application
 WORKDIR /home/nginx/cgap-portal
 
 # Do the back-end dependency install
