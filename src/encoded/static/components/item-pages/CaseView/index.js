@@ -79,7 +79,7 @@ export default class CaseView extends DefaultItemView {
 
     getTabViewContents(controllerProps = {}){
         const { currPedigreeFamily } = controllerProps;
-        const { "@id": familyAtID, members } = currPedigreeFamily || {};
+        const { "@id": familyAtID, members = [] } = currPedigreeFamily || {};
 
         const membersLen = members.length;
         const commonTabProps = { ...this.props, ...controllerProps };
@@ -377,7 +377,11 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                         </CaseReviewController>
                     </DotRouterTab>
                 </DotRouter>
-                : null }
+                :
+                <div className="error-placeholder bg-light py-5 px-3 border-top border-bottom">
+                    <h4 className="text-400 text-center">No family or no individual defined for this case.</h4>
+                </div>
+            }
         </React.Fragment>
     );
 });
