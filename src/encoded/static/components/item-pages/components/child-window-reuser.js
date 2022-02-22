@@ -23,7 +23,7 @@ export function navigateChildWindow(targetHref, windowName = null, postMessage =
         childWindowByName[childWindowName] = window.open(
             targetHref,
             "cw-" + childWindowName,
-            "directories=0,toolbar=0,menubar=0,width=1200,height=900"
+            "width=1200,height=900"
         );
     }
 }

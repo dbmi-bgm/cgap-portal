@@ -5,6 +5,8 @@ import React, { useState, useMemo, useCallback } from 'react';
 import PropTypes from 'prop-types';
 import memoize from 'memoize-one';
 import _ from 'underscore';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
@@ -133,7 +135,7 @@ export function usePhenotypicFeatureStrings(currFamily){
 
 export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabViewOptionsController(props){
     const { children, ...passProps } = props;
-    const { currFamily: currentFamily } = passProps;
+    const { currPedigreeFamily } = passProps;
 
     const [ showOrderBasedName, setShowOrderBasedName ] = useState(true);
     //const [ showAsDiseases, setShowAsDiseases ] = useState("Case Phenotypic Features");
@@ -147,9 +149,9 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
         return false;
     }
 
-    const { selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currentFamily);
+    const { selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currPedigreeFamily);
 
-    if (currentFamily) {
+    if (currPedigreeFamily) {
         const childProps = {
             ...props,
             availableDiseases,
@@ -179,15 +181,15 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
         availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, onTogglePedigreeOptionCheckbox,
         showOrderBasedName,
         // showAsDiseases, setShowAsDiseases,
-        // pedigreeFamilies: families,
-        // pedigreeFamiliesIdx,
-        currFamily: currentFamily,
-        // onFamilySelect
+        familiesWithViewPermission,
+        pedigreeFamiliesIdx,
+        currPedigreeFamily,
+        onFamilySelect,
         isActiveTab = false
     } = props;
 
-    if (!currentFamily){
-        throw new Error("Expected non-empty props.currentFamily.");
+    if (!currPedigreeFamily){
+        throw new Error("Expected non-empty props.currPedigreeFamily.");
     }
 
     // if (!isActiveTab) {
@@ -214,7 +216,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                         <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={onTogglePedigreeOptionCheckbox} />
                         {/* <SelectDiseasesDropdown {...{ selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease }} /> */}
                         {/* <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  /> */}
-                        {/* <FamilySelectionDropdown {...{ families, currentFamilyIdx: pedigreeFamiliesIdx }} onSelect={onFamilySelect} /> */}
+                        <FamilySelectionDropdown {...{ familiesWithViewPermission, pedigreeFamiliesIdx }} onSelect={onFamilySelect} />
                         <PedigreeFullScreenBtn />
                     </CollapsibleItemViewButtonToolbar>
                 </h3>
@@ -225,7 +227,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
     );
 });
 PedigreeTabView.getTabObject = function(props){
-    const { currFamily } = props;
+    const { currPedigreeFamily } = props;
     return {
         'tab' : (
             <React.Fragment>
@@ -234,7 +236,7 @@ PedigreeTabView.getTabObject = function(props){
             </React.Fragment>
         ),
         'key' : 'pedigree',
-        'disabled' : !(currFamily),
+        'disabled' : !(currPedigreeFamily),
         'content' : <PedigreeTabView {...props} />
     };
 };
@@ -264,30 +266,30 @@ const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox(
 // });
 
 
-// const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(props){
-//     const { families, currentFamilyIdx = 0, onSelect } = props;
-//     if (families.length < 2) {
-//         return null;
-//     }
-//     const title = (
-//         <span>Family <strong>{currentFamilyIdx + 1}</strong></span>
-//     );
-//     return (
-//         <DropdownButton onSelect={onSelect} title={title} variant="outline-dark" className="ml-05" alignRight>
-//             {
-//                 families.map(function(family, i){
-//                     const { original_pedigree: pf = null } = family;
-//                     const pedFileStr = pf && (" (" + pf.display_title + ")");
-//                     return (
-//                         <DropdownItem key={i} eventKey={i} active={i === currentFamilyIdx}>
-//                             Family {i + 1}{ pedFileStr }
-//                         </DropdownItem>
-//                     );
-//                 })
-//             }
-//         </DropdownButton>
-//     );
-// });
+const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(props){
+    const { familiesWithViewPermission, pedigreeFamiliesIdx = 0, onSelect } = props;
+    if (familiesWithViewPermission.length < 2) {
+        return null;
+    }
+    const title = (
+        <span>Family <strong>{pedigreeFamiliesIdx + 1}</strong></span>
+    );
+    return (
+        <DropdownButton onSelect={onSelect} title={title} variant="outline-dark" className="ml-05" alignRight>
+            {
+                familiesWithViewPermission.map(function(family, i){
+                    const { original_pedigree: pf = null } = family;
+                    const pedFileStr = pf && (" (" + pf.display_title + ")");
+                    return (
+                        <DropdownItem key={i} eventKey={i} active={i === pedigreeFamiliesIdx}>
+                            Family {i + 1}{ pedFileStr }
+                        </DropdownItem>
+                    );
+                })
+            }
+        </DropdownButton>
+    );
+});
 
 
 // const ColorAllDiseasesCheckbox = React.memo(function ShowAllDiseasesCheckbox({ checked, onChange }){

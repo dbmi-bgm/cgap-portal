@@ -303,7 +303,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_gerp_rs")}>GERP++</label>
+                                <label className="mb-0">GERP++</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_gerp_rs")}/>
                             </td>
                             <td className="text-left">{ csq_gerp_rs }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -311,7 +312,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
+                                <label className="mb-0">CADD</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_cadd_phred")}/>
                             </td>
                             <td className="text-left">{ csq_cadd_phred }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -319,7 +321,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>phyloP (30 Mammals)</label>
+                                <label className="mb-0">phyloP (30 Mammals)</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_phylop30way_mammalian")}/>
                             </td>
                             <td className="text-left">{ csq_phylop30way_mammalian }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -327,7 +330,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>phyloP (100 Vertebrates)</label>
+                                <label className="mb-0">phyloP (100 Vertebrates)</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_phylop100way_vertebrate")}/>
                             </td>
                             <td className="text-left">{ csq_phylop100way_vertebrate }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -335,7 +339,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}>phastCons (100 Vertebrates)</label>
+                                <label className="mb-0">phastCons (100 Vertebrates)</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_phastcons100way_vertebrate")}/>
                             </td>
                             <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -358,7 +363,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
+                                <label className="mb-0">SIFT</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_sift_score")}/>
                             </td>
                             <td className="text-left">{ csq_sift_score }</td>
                             <td className="text-left">{ csq_sift_pred }</td>
@@ -366,7 +372,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_polyphen2_hvar_score")}>PolyPhen2</label>
+                                <label className="mb-0">PolyPhen2</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_polyphen2_hvar_score")}/>
                             </td>
                             <td className="text-left">{ csq_polyphen2_hvar_score }</td>
                             <td className="text-left">{ csq_polyphen2_hvar_pred }</td>
@@ -374,7 +381,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_primateai_score")}>PrimateAI DL Score</label>
+                                <label className="mb-0">PrimateAI DL Score</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_primateai_score")}/>
                             </td>
                             <td className="text-left">{ csq_primateai_score }</td>
                             <td className="text-left">{ csq_primateai_pred }</td>
@@ -382,7 +390,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_revel_score")}>REVEL</label>
+                                <label className="mb-0">REVEL</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("csq_revel_score")}/>
                             </td>
                             <td className="text-left">{ csq_revel_score }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -410,7 +419,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("spliceaiMaxds")}>SpliceAI</label>
+                                <label className="mb-0">SpliceAI</label>
+                                <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm" data-tip={getTipForField("spliceaiMaxds")}/>
                             </td>
                             <td className="text-left">{ spliceaiMaxds }</td>
                         </tr>
