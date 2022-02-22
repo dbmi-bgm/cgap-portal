@@ -113,6 +113,16 @@
                 }
             }
         },
+        "meta_workflow_runs": {
+            "title": "MetaWorkflowRuns",
+            "description": "Bioinformatics analysis pipelines associated with this item",
+            "type": "array",
+            "items": {
+                "title": "MetaWorkflowRun",
+                "type": "string",
+                "linkTo": "MetaWorkflowRun"
+            }
+        },
         "processed_files": {
             "title": "Processed Files",
             "description": "Processed files that are combined results for the sample analysis.",
