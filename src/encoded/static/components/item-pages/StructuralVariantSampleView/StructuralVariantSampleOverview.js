@@ -304,7 +304,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     render(){
         const { context, schemas, currentGeneItem, currentGeneItemLoading,
             selectedGenes, onSelectGene, onResetSelectedGenes } = this.props;
-        const { currentTab } = this.state;
+
         const annotationTab = this.annotationTab();
 
         const tabTitleElements = [];
