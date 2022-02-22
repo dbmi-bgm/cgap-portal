@@ -324,8 +324,6 @@ const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
             );
         }
 
-        // console.log("TTT", tagOptions, samplesForTag);
-
         return (
             <div className="mb-24" key={idx}>
                 { header }
