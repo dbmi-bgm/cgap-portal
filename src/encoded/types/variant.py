@@ -33,7 +33,9 @@ from ..batch_download_utils import (
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import resolve_file_path, build_s3_presigned_get_url
+from ..util import (
+    resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
+)
 from ..types.base import Item, get_item_or_none
 
 
@@ -313,7 +315,10 @@ class Variant(Item):
         "type": "string"
     })
     def display_title(self, CHROM, POS, REF, ALT):
-        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:504A>T
+        position = convert_integer_to_comma_string(POS)
+        if position is None:
+            position = POS
+        return build_variant_display_title(CHROM, position, REF, ALT)  # chr1:1,504A>T
 
     @calculated_property(schema={
         "title": "Position (genome coordinates)",
@@ -372,6 +377,14 @@ class Variant(Item):
                             break
                 break
         return result
+
+    @calculated_property(schema={
+        "title": "Alternate Display Title",
+        "description": "Variant display title with comma-separated position",
+        "type": "string"
+    })
+    def alternate_display_title(self, CHROM, POS, REF, ALT):
+        return build_variant_display_title(CHROM, POS, REF, ALT)  # chr1:1504A>T
 
     @calculated_property(schema={
         "title": "Additional Variant Names",
@@ -1028,6 +1041,68 @@ class VariantSampleList(Item):
 
 
 @view_config(
+    name='add-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def add_selections(context, request):
+    """
+    Adds selections to VariantSampleList, preserving existing data such as selected_by which may not be
+    visible to current 'adder'.
+    """
+
+    request_body = request.json
+    namespace, userid = request.authenticated_userid.split(".", 1)
+
+    # We expect lists of { variant_sample_item: uuid, filter_blocks_used: { filter_blocks: { name: str, query: str }[] } }.
+    # Value for "date_selected" will be set during PATCH by schema serverDefault.
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
+
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    patch_payload = {}
+
+    # Skip adding duplicate selections (shouldn't occur, but just in case)
+    existing_selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        existing_selections_by_uuid[selection["variant_sample_item"]] = selection
+
+    def make_selection_payload(vs_sel):
+        return {
+            "selected_by": userid,
+            "variant_sample_item": vs_sel["variant_sample_item"],
+            "filter_blocks_used": vs_sel["filter_blocks_used"]
+            # date_selected - will be filled upon PATCH
+        }
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = existing_variant_samples.copy()
+        for vs_sel in requested_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            patch_payload["variant_samples"].append(make_selection_payload(vs_sel))
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = existing_structural_variant_samples.copy()
+        for vs_sel in requested_structural_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            patch_payload["structural_variant_samples"].append(make_selection_payload(vs_sel))
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    patch_result = perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
+@view_config(
     name='order-delete-selections',
     context=VariantSampleList,
     request_method='PATCH',
@@ -1076,6 +1151,7 @@ def order_delete_selections(context, request):
         "status": "success",
         "@type": ["result"]
     }
+
 
 
 

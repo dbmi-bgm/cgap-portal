@@ -78,12 +78,12 @@ const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, wi
     return (
         <div className="recent-cases-table-section mb-36">
             <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} embeddedTableHeader={<AboveCasesTableOptions />}
-                hideFacets={["project.display_title", "report.uuid", "proband_case"]}/>
+                hideFacets={["project.display_title", "report.uuid", "proband_case"]} stickyFirstColumn />
         </div>
     );
 });
 
-function AboveCasesTableOptions(props){
+const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props){
     const {
         context,
         onFilter, isContextLoading, navigate,
@@ -164,7 +164,7 @@ function AboveCasesTableOptions(props){
             </div>
         </React.Fragment>
     );
-}
+});
 
 
 class ProjectFilterCheckbox extends React.PureComponent {

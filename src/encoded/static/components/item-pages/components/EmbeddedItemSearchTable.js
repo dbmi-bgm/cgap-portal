@@ -36,6 +36,7 @@ export function EmbeddedItemSearchTable (props){
         onLoad,
         rowHeight = 90, // Keep in sync w CSS
         openRowHeight = 90,
+        stickyFirstColumn = false,
         tableColumnClassName: propTableColumnClassName,
         facetColumnClassName: propFacetColumnClassName,
         // Used for FacetList / ExtendedDescriptionPopover:
@@ -56,7 +57,7 @@ export function EmbeddedItemSearchTable (props){
     const passProps = {
         facets, columns, columnExtensionMap, searchHref, session,
         schemas, renderDetailPane, defaultOpenIndices, maxHeight,
-        rowHeight, openRowHeight,
+        rowHeight, openRowHeight, stickyFirstColumn,
         onClearFiltersVirtual, isClearFiltersBtnVisible,
         aboveTableComponent, aboveFacetListComponent,
         embeddedTableHeader, embeddedTableFooter,

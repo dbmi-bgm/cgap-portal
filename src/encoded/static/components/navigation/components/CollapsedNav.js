@@ -107,9 +107,11 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
             </a>
             */}
             <HelpNavItem {...props} />
+            {/*
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
                 About
             </a>
+            */}
         </div>
     );
 });

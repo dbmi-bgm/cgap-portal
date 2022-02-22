@@ -1081,7 +1081,7 @@ def etree_to_dict(ele, ref_container=None, ref_field=''):
     ret = None
 
     # represent the element with a dict if there are children or attributes
-    children = ele.getchildren()
+    children = list(ele)  # ele.getchildren() - .getchildren() is deprecated
     if children or ele.attrib:
         ret = {}
         # add child elements and attributes from this element

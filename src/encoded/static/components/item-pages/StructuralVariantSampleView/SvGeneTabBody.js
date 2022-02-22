@@ -40,8 +40,8 @@ export function SvGeneTabBody (props){
             },
             "spos": {
                 "render": function(result, parentProps){
-                    const { spos, epos } = result || {};
-                    return <div className="text-center w-100 text-truncate">{spos} - <br/>{epos}</div>;
+                    const { start_display, end_display } = result || {};
+                    return <div className="text-center w-100 text-truncate">{start_display} - <br/>{end_display}</div>;
                 }
             },
             "consequence": {
