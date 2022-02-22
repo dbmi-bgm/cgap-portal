@@ -258,11 +258,14 @@
                                 "linkto_location": {
                                     "title": "LinkTo Location",
                                     "description": "Location on case on which to place a linkTo",
-                                    "type": "string",
-                                    "enum": [
-                                        "Sample",
-                                        "SampleProcessing"
-                                    ]
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Sample",
+                                            "SampleProcessing"
+                                        ]
+                                    }
                                 }
                             }
                         }
