@@ -463,7 +463,8 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { selectedGenes, onSelectGene, onResetSelectedGenes, tabsToDisable, isFallback, lastSavedHighlightedGenes, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
+        const { selectedGenes, onSelectGene, onResetSelectedGenes, tabsToDisable = {}, isFallback, lastSavedHighlightedGenes, lastSavedGeneNote, isCNV,
+            lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
 
         const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
@@ -487,11 +488,14 @@ export class InterpretationSpaceController extends React.Component {
         };
         switch(currentTab) {
             case (0): // Gene Notes
-                panelToDisplay = <MultiItemInterpretationPanel {...commonProps} {...{ lastSavedHighlightedGenes, context, selectedGenes, onSelectGene, onResetSelectedGenes }} />;
-                // panelToDisplay = (<GenericInterpretationPanel {...commonProps}
-                //     lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
-                //     otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
-                // );
+                if (isCNV) {
+                    panelToDisplay = <SVGeneNotePanel {...commonProps} {...{ lastSavedHighlightedGenes, context, selectedGenes, onSelectGene, onResetSelectedGenes }} />;
+                } else {
+                    panelToDisplay = (<GenericInterpretationPanel {...commonProps}
+                        lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
+                        otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                    );
+                }
                 break;
             case (1): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps}
@@ -580,7 +584,7 @@ const refreshParentWindowVariantSampleList = _.debounce(function(){
     window.opener.postMessage({ "action": "refresh-variant-sample-list" });
 }, 1200, false); // Debounced to prevent accidental double-clicks & (too-)rapid changes
 
-class MultiItemInterpretationPanel extends React.PureComponent {
+class SVGeneNotePanel extends React.PureComponent {
     constructor(props) {
         super(props);
 

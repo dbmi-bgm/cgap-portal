@@ -176,11 +176,11 @@ export class VariantSampleOverview extends React.PureComponent {
         const passProps = { context, schemas, href, currentTranscriptIdx, currentGeneItem, currentGeneItemLoading, currentClinVarResponse, currentClinVarResponseLoading };
 
         const { query = { } } = memoizedUrlParse(href);
-        const { showInterpretationFromQuery, annotationTabFromQuery, interpretationTabFromQuery, caseSource } = convertQueryStringTypes(query);
+        const { showInterpretation, annotationTab, interpretationTab, caseSource } = convertQueryStringTypes(query);
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <InterpretationController {...passProps} {...{ showInterpretationFromQuery, interpretationTabFromQuery, annotationTabFromQuery, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
+                <InterpretationController {...passProps} {...{ showInterpretation, interpretationTab, annotationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
                     <VariantSampleInfoHeader {...passProps} onSelectTranscript={this.onSelectTranscript} />
                     <VariantSampleOverviewTabView {...passProps} />
                 </InterpretationController>
@@ -493,7 +493,7 @@ class InterpretationController extends React.PureComponent {
 
     render() {
         const { showACMGInvoker, globalACMGSelections, autoClassification } = this.state;
-        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation, interpretationTab, href,
+        const { newVSLoading, newContext = null, context, schemas, children, showInterpretation: showInterpretationFromQuery, interpretationTab, href,
             caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen } = this.props;
         const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen };
 
@@ -511,7 +511,8 @@ class InterpretationController extends React.PureComponent {
 
         const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
 
-        const showInterpretationSpace = showInterpretation && !anyNotePermErrors && newContext && !newVSLoading;
+        const showInterpretationSpace = showInterpretationFromQuery && !anyNotePermErrors && newContext && !newVSLoading;
+        console.log(`showInterpretation:${showInterpretationFromQuery}, anyNotePermErrors: ${anyNotePermErrors}, newContext: ${!!newContext}, newVSLoading: ${newVSLoading}`)
         // const showFallbackInterpretationSpace = showInterpretation && !anyNotePermErrors && !newContext && !newVSLoading;
 
         // TODOs:
@@ -533,7 +534,7 @@ class InterpretationController extends React.PureComponent {
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
-                    { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
+                    { showInterpretationFromQuery && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
                             <SNVIndelInterpretationSpace {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
