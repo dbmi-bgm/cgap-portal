@@ -94,6 +94,8 @@ class OverviewTabView extends React.PureComponent {
                     "gene_notes.last_modified.date_modified",
                     "gene_notes.last_modified.modified_by.display_title",
                     "gene_notes.principles_allowed",
+                    "gene_notes.associated_items.item_type",
+                    "gene_notes.associated_items.item_identifier",
 
                     "variant_notes.@id",
                     "variant_notes.status",

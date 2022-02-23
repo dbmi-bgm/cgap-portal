@@ -489,7 +489,7 @@ export class InterpretationSpaceController extends React.Component {
         switch(currentTab) {
             case (0): // Gene Notes
                 if (isCNV) {
-                    panelToDisplay = <SVGeneNotePanel {...commonProps} {...{ lastSavedHighlightedGenes, context, selectedGenes, onSelectGene, onResetSelectedGenes }} />;
+                    panelToDisplay = <SVGeneNotePanel {...commonProps} {...{ lastSavedGeneNote, lastSavedHighlightedGenes, context, selectedGenes, onSelectGene, onResetSelectedGenes }} />;
                 } else {
                     panelToDisplay = (<GenericInterpretationPanel {...commonProps}
                         lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
@@ -588,8 +588,10 @@ class SVGeneNotePanel extends React.PureComponent {
     constructor(props) {
         super(props);
 
+        const { lastSavedGeneNote = [] } = this.props;
+
         this.state = {
-            gene_notes: [],
+            gene_notes: lastSavedGeneNote,
         };
 
         this.selectNewGene = this.selectNewGene.bind(this);
@@ -599,7 +601,7 @@ class SVGeneNotePanel extends React.PureComponent {
 
     onTextAreaChange(value, idx) {
         /** Needs to be updated to work with multiple indeces of notes in future */
-        const { gene_notes: [ { associated_items } = {} ] = [] } = this.state;
+        const { gene_notes: [ { associated_items = [] } = {} ] = [] } = this.state;
         const newState = [{ note_text: value, associated_items }];
         this.setState({ gene_notes: newState });
     }
@@ -613,7 +615,7 @@ class SVGeneNotePanel extends React.PureComponent {
             // initialize first note object
             const firstNote = {};
             const associatedItems = { item_type: "Gene", item_identifier: geneId };
-            firstNote.associated_items = associatedItems;
+            firstNote.associated_items = [associatedItems];
 
             // update state with new item
             const newState = [];
@@ -625,11 +627,11 @@ class SVGeneNotePanel extends React.PureComponent {
             if (idx !== 0 && !idx) { throw new Error ("No idx passed into selectNewGene");}
             if (gene_notes[idx]) { // note exists, update old object
                 const updatedNote = { ...newState[idx] };
-                updatedNote.associated_items.item_identifier = geneId;
+                updatedNote.associated_items[0].item_identifier = geneId;
                 this.setState({ gene_notes: [updatedNote] });
             } else { // note doesn't exist yet; create new obj
                 const associatedItems = { item_type: "Gene", item_identifier: geneId };
-                newNote.associated_items = associatedItems;
+                newNote.associated_items = [associatedItems];
                 newState.push(newNote);
             }
         }
@@ -715,9 +717,9 @@ function NoteArray(props) {
     return (
         <>
             {notes.map((note, idx) => {
-                const { associated_items = null, note_text = "" } = note;
-                if (!associated_items) return null;
-                const { item_type, item_identifier } = associated_items;
+                const { associated_items: [associated_item] = [], note_text = "" } = note;
+                if (!associated_item) return null;
+                const { item_type, item_identifier } = associated_item;
                 console.log("item_type, item_identifier", item_type, item_identifier);
                 const geneDisplayTitle = geneAtIDToGeneMap[item_identifier].display_title;
 
