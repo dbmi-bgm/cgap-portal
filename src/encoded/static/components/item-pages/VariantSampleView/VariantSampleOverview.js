@@ -534,7 +534,7 @@ class InterpretationController extends React.PureComponent {
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
-                    { showInterpretationFromQuery && newVSLoading ? <LoadingInterpretationSpacePlaceHolder/> : null }
+                    { showInterpretationFromQuery && newVSLoading ? <LoadingInterpretationSpacePlaceHolder headerTitle="SNV / Indel Interpretation Space" /> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
                             <SNVIndelInterpretationSpace {...{ autoClassification, actions }} context={newContext} toggleInvocation={this.toggleInvocation}
@@ -546,11 +546,11 @@ class InterpretationController extends React.PureComponent {
     }
 }
 
-export const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpretationSpacePlaceHolder () {
+export const LoadingInterpretationSpacePlaceHolder = React.memo(function LoadingInterpretationSpacePlaceHolder(headerTitle) {
     return (
         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
             <div className="card interpretation-space">
-                <InterpretationSpaceHeader headerTitle="SNV/Indel Interpretation Space" />
+                <InterpretationSpaceHeader {...headerTitle} headerIconCls = "icon icon-poll-h fas" />
                 <div className="card-body">
                     <div className="text-center py-5">
                         <i className="icon icon-fw icon-spin icon-circle-notch icon-2x text-muted fas"/>
