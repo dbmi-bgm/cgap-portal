@@ -590,6 +590,7 @@ class MultiItemInterpretationPanel extends React.PureComponent {
 
         this.selectNewGene = this.selectNewGene.bind(this);
         this.onTextAreaChange = this.onTextAreaChange.bind(this);
+        this.clearSelectedGene = this.clearSelectedGene.bind(this);
     }
 
     onTextAreaChange(value, idx) {
@@ -630,6 +631,11 @@ class MultiItemInterpretationPanel extends React.PureComponent {
         }
     }
 
+    clearSelectedGene(idx) {
+        /** Needs to be updated to work with multiple indeces of notes in future */
+        this.setState({ gene_notes: [] });
+    }
+
     render() {
         const { gene_notes } = this.state;
         const {
@@ -667,7 +673,7 @@ class MultiItemInterpretationPanel extends React.PureComponent {
             <div className="interpretation-panel">
                 <label className="w-100">{ noteLabel }</label>
                 <HighlightedGenesDrop selectedGeneID={highlightedGeneID} {...{ genes, geneAtIDToGeneMap, selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene }}/>
-                <NoteArray notes={gene_notes} onEditNote={this.onTextAreaChange} selectNewGene={this.selectNewGene} {...{ genes, geneAtIDToGeneMap }} />
+                <NoteArray notes={gene_notes} onEditNote={this.onTextAreaChange} selectNewGene={this.selectNewGene} clearSelectedGene={this.clearSelectedGene} {...{ genes, geneAtIDToGeneMap }} />
                 {/* { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
                     : null}
@@ -692,7 +698,7 @@ class MultiItemInterpretationPanel extends React.PureComponent {
 }
 
 function NoteArray(props) {
-    const { notes = [], onEditNote, genes, geneAtIDToGeneMap, selectNewGene } = props;
+    const { notes = [], onEditNote, genes, geneAtIDToGeneMap, selectNewGene, clearSelectedGene } = props;
 
     if (!notes.length) {
         return (
@@ -713,7 +719,7 @@ function NoteArray(props) {
 
                 return (
                     <div key={idx}>
-                        <GenesDrop noteIdx={idx} value={item_identifier} {...{ genes, geneAtIDToGeneMap, selectNewGene }} />
+                        <GenesDrop noteIdx={idx} value={item_identifier} {...{ genes, geneAtIDToGeneMap, selectNewGene, clearSelectedGene }} />
                         <label className="w-100 mt-1">
                             {geneDisplayTitle} Gene Note
                         </label>
@@ -727,7 +733,7 @@ function NoteArray(props) {
 }
 
 function GenesDrop(props) {
-    const { geneAtIDToGeneMap = {}, genes, noteIdx, value, selectNewGene, cls = "" } = props;
+    const { geneAtIDToGeneMap = {}, genes, noteIdx, value, selectNewGene, clearSelectedGene, cls = "" } = props;
 
     let dropOptions;
     let title;
@@ -759,7 +765,7 @@ function GenesDrop(props) {
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown>
                 { value ?
-                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => console.log("clicked")}>
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => clearSelectedGene()}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
                     : null}
