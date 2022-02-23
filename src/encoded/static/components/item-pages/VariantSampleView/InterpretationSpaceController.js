@@ -589,21 +589,22 @@ class MultiItemInterpretationPanel extends React.PureComponent {
         };
 
         this.selectNewGene = this.selectNewGene.bind(this);
-        this.onTextAreaChange = this.selectNewGene.bind(this);
+        this.onTextAreaChange = this.onTextAreaChange.bind(this);
     }
 
-    onTextAreaChange(event, idx) {
-        console.log("onTextAreaChange", idx);
-        // const { value: newValue } = event.target || {};
-        // this.setState({ "note_text": newValue });
-
-        // const newState = [...gene_notes]; // todo: may need to deeper clone?
+    onTextAreaChange(value, idx) {
+        /** Needs to be updated to work with multiple indeces of notes in future */
+        const { gene_notes: [ { associated_items } = {} ] = [] } = this.state;
+        const newState = [{ note_text: value, associated_items }];
+        this.setState({ gene_notes: newState });
     }
 
     selectNewGene(geneId, idx) {
+        /** Needs to be updated to work with multiple indeces of notes in future */
         const { gene_notes = [] } = this.state;
+        const numNotes = gene_notes.length;
 
-        if (!gene_notes.length) {
+        if (!numNotes) {
             // initialize first note object
             const firstNote = {};
             const associatedItems = { item_type: "Gene", item_identifier: geneId };
@@ -616,11 +617,11 @@ class MultiItemInterpretationPanel extends React.PureComponent {
         } else {
             const newState = [...gene_notes]; // todo: may need to deeper clone?
 
-            if (!idx) { throw new Error ("No idx passed into selectNewGene");}
+            if (idx !== 0 && !idx) { throw new Error ("No idx passed into selectNewGene");}
             if (gene_notes[idx]) { // note exists, update old object
                 const updatedNote = { ...newState[idx] };
                 updatedNote.associated_items.item_identifier = geneId;
-                throw new Error ("Not implemented yet");
+                this.setState({ gene_notes: [updatedNote] });
             } else { // note doesn't exist yet; create new obj
                 const associatedItems = { item_type: "Gene", item_identifier: geneId };
                 newNote.associated_items = associatedItems;
@@ -693,12 +694,18 @@ class MultiItemInterpretationPanel extends React.PureComponent {
 function NoteArray(props) {
     const { notes = [], onEditNote, genes, geneAtIDToGeneMap, selectNewGene } = props;
 
-    if (!notes.length) { return (<div><GenesDrop noteIdx={notes.length} value={null} {...{ genes, geneAtIDToGeneMap, selectNewGene }} /></div>)}
+    if (!notes.length) {
+        return (
+            <div>
+                <GenesDrop noteIdx={notes.length} value={null} {...{ genes, geneAtIDToGeneMap, selectNewGene }} />
+            </div>
+        );
+    }
 
     return (
         <>
             {notes.map((note, idx) => {
-                const { associated_items = null, note_text = null } = note;
+                const { associated_items = null, note_text = "" } = note;
                 if (!associated_items) return null;
                 const { item_type, item_identifier } = associated_items;
                 console.log("item_type, item_identifier", item_type, item_identifier);
@@ -710,7 +717,7 @@ function NoteArray(props) {
                         <label className="w-100 mt-1">
                             {geneDisplayTitle} Gene Note
                         </label>
-                        <AutoGrowTextArea className="w-100 mb-1" value={note_text} onChange={(e) => onEditNote(e, idx)} placeholder="Required" />
+                        <AutoGrowTextArea className="w-100 mb-1" value={note_text} onChange={(e) => onEditNote(e.target.value, idx)} placeholder="Required" />
                     </div>
                 );
             })}
