@@ -303,25 +303,31 @@
                 }
             }
         },
+        "input_samples": {
+            "title": "Input Samples",
+            "description": "Sample UUIDs (ordered per input files)",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "format": "uuid"
+            }
+        },
+        "associated_sample_processing": {
+            "title": "Associated SampleProcessing",
+            "description": "Associated SampleProcessing UUID",
+            "type": "string",
+            "format": "uuid"
+        },
         "output_files_linked_status": {
             "title": "Status of Output File Links",
             "description": "The status of links created for all output files of this MWFR",
             "type": "string",
             "enum": [
                 "success",
-                "error"
+                "error",
+                "qc_failure",
+                "no_output_files"
             ]
-        },
-        "output_files_linked_errors": {
-            "title": "Output Files with LinkTo Errors",
-            "description": "Associated output files with errors while creating links to the associated case",
-            "type": "array",
-            "items": {
-                "title": "File with LinkTo Errors",
-                "description": "Associated output file with errors while creating links to the associated case",
-                "type": "string",
-                "linkTo": "FileProcessed"
-            }
         }
     },
     "facets": {
