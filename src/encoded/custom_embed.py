@@ -25,7 +25,7 @@ KEYS_TO_IGNORE = [
     "actions",
 ]
 FORBIDDEN_MSG = {"error": "no view permissions"}
-DATABASE_ITEM_KEY = "@type"  #Key specific to JSON objects that are CGAP items
+DATABASE_ITEM_KEY = "@type"  # Key specific to JSON objects that are CGAP items
 
 
 def includeme(config):
@@ -259,17 +259,16 @@ class CustomEmbed:
         :param field_keys: list of keys of a requested field
         :return field_dict: existing dict updated with new field_keys
         """
-        key = field_keys[0]
-        if key == field_keys[-1]:
+        key = field_keys.pop(0)
+        if not field_keys:
             if "fields_to_keep" in field_dict:
                 field_dict["fields_to_keep"].append(key)
             else:
                 field_dict["fields_to_keep"] = [key]
-            return field_dict
-        if key not in field_dict:
-            field_dict[key] = {}
-        field_keys = field_keys[1:]
-        field_dict[key] = self.build_nested_dict(field_dict[key], field_keys)
+        else:
+            if key not in field_dict:
+                field_dict[key] = {}
+            field_dict[key] = self.build_nested_dict(field_dict[key], field_keys)
         return field_dict
 
     def field_embed(self, item, field_dict, initial_item=False):
