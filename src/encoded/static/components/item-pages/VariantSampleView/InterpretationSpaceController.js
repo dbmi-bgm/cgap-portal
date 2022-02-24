@@ -163,6 +163,7 @@ export class InterpretationSpaceWrapper extends React.Component {
     constructor(props) {
         super(props);
         this.postNewNote = this.postNewNote.bind(this);
+        // this.postNewMultiNote = this.postNewMultiNote.bind(this);
         this.patchNewNoteToVS = this.patchNewNoteToVS.bind(this);
         this.patchPreviouslySavedNote = this.patchPreviouslySavedNote.bind(this);
         this.saveAsDraft = this.saveAsDraft.bind(this);
@@ -200,6 +201,7 @@ export class InterpretationSpaceWrapper extends React.Component {
     //         noteToSubmit.project = variantSampleProjectID;
     //         return cleanedNote;
     //     });
+    //     return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(notesToSubmit));
     // }
 
     patchNewNoteToVS(noteAtID, saveToField) {
@@ -591,7 +593,7 @@ class SVGeneNotePanel extends React.PureComponent {
         const { lastSavedGeneNote = [] } = this.props;
 
         this.state = {
-            gene_notes: lastSavedGeneNote,
+            gene_notes: lastSavedGeneNote || [],
         };
 
         this.selectNewGene = this.selectNewGene.bind(this);
