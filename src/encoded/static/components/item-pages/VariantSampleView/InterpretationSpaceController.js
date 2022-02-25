@@ -628,9 +628,14 @@ class SVGeneNotePanel extends React.PureComponent {
 
             if (idx !== 0 && !idx) { throw new Error ("No idx passed into selectNewGene");}
             if (gene_notes[idx]) { // note exists, update old object
-                const updatedNote = { ...newState[idx] };
-                updatedNote.associated_items[0].item_identifier = geneId;
-                this.setState({ gene_notes: [updatedNote] });
+                // query user to confirm they want to overwrite old note
+                const okToOverwrite = confirm("Switching genes will delete current gene note. Is this okay?");
+                if (okToOverwrite) {
+                    const updatedNote = { ...newState[idx] };
+                    updatedNote.associated_items[0].item_identifier = geneId;
+                    updatedNote.note_text = "";
+                    this.setState({ gene_notes: [updatedNote] });
+                }
             } else { // note doesn't exist yet; create new obj
                 const associatedItems = { item_type: "Gene", item_identifier: geneId };
                 newNote.associated_items = [associatedItems];
