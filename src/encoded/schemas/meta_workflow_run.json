@@ -230,7 +230,8 @@
                 "running",
                 "completed",
                 "failed",
-                "inactive"
+                "inactive",
+                "stopped"
             ]
         },
         "failed_jobs": {

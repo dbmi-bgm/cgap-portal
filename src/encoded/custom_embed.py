@@ -84,8 +84,8 @@ class CustomEmbed:
     def user_embed(self, item_id, initial_item=False):
         """
         Use request's embed method to find given item in the database.
-        
-        If the user who made the call to the API does not have 
+
+        If the user who made the call to the API does not have
         permissions to view the item, the item will not be embedded.
         Instead, if the item is the initial ID given to the API, nothing is
         embedded; if the item is to be embedded at a subsequent depth, a
@@ -351,7 +351,6 @@ def embed(context, request):
     ids = []
     ignored_embeds = []
     desired_embeds = []
-    cache = {}
     requested_fields = []
     results = []
     invalid_ids = []
