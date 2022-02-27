@@ -44,9 +44,6 @@
         },
         {
             "$ref": "mixins.json#/modified"
-        },
-        {
-            "$ref": "mixins.json#/associated_case"
         }
     ],
     "mixinFacets": [
@@ -267,12 +264,6 @@
                     "description": "Project associated with the MWFR",
                     "type": "string",
                     "format": "uuid"
-                },
-                "associated_case": {
-                    "title": "Associated Case",
-                    "description": "The case accession associated with this MWFR",
-                    "type": "string",
-                    "format": "accession"
                 }
             }
         },

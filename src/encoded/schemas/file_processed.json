@@ -50,7 +50,7 @@
             "$ref": "file.json#/properties"
         },
         {
-            "$ref": "mixins.json#/associated_case"
+            "$ref": "mixins.json#/associated_meta_workflow_run"
         }
     ],
     "mixinFacets": [

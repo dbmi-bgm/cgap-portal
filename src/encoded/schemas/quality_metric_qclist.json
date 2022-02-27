@@ -43,9 +43,6 @@
         },
         {
             "$ref": "quality_metric.json#/properties"
-        },
-        {
-            "$ref": "mixins.json#/associated_case"
         }
     ],
     "mixinFacets": [
