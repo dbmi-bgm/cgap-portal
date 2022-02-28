@@ -473,13 +473,5 @@
                 }
             }
         }
-    },
-    "associated_meta_workflow_run": {
-        "associated_meta_workflow_run": {
-            "title": "Associated MetaWorkflowRun",
-            "description": "The MetaWorkflowRun that produced this item",
-            "type": "string",
-            "format": "uuid"
-        }
     }
 }

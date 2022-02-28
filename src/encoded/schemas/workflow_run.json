@@ -44,9 +44,6 @@
         },
         {
             "$ref": "mixins.json#/modified"
-        },
-        {
-            "$ref": "mixins.json#/associated_meta_workflow_run"
         }
     ],
     "mixinFacets": [
@@ -249,6 +246,12 @@
                 "description": "one of the commands that are run for the workflow run",
                 "type": "string"
             }
+        },
+        "associated_meta_workflow_run": {
+            "title": "Associated MetaWorkflowRun",
+            "description": "The MetaWorkflowRun that produced this item",
+            "type": "string",
+            "format": "uuid"
         }
     },
     "facets": {

@@ -48,9 +48,6 @@
         },
         {
             "$ref": "file.json#/properties"
-        },
-        {
-            "$ref": "mixins.json#/associated_meta_workflow_run"
         }
     ],
     "mixinFacets": [
@@ -189,6 +186,12 @@
                     "SampleProcessing"
                 ]
             }
+        },
+        "associated_meta_workflow_run": {
+            "title": "Associated MetaWorkflowRun",
+            "description": "The MetaWorkflowRun that produced this item",
+            "type": "string",
+            "format": "uuid"
         }
     },
     "facets": {
