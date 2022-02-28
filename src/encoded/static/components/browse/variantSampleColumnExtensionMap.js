@@ -1,7 +1,7 @@
 'use strict';
 
 import React from 'react';
-// import { getInitialTranscriptIndex } from '../item-pages/VariantSampleView/AnnotationSections';
+import { getInitialTranscriptIndex, getMostSevereConsequence } from '../item-pages/VariantSampleView/AnnotationSections';
 import { onClickLinkNavigateChildWindow } from './../item-pages/components/child-window-reuser';
 
 /**
@@ -149,36 +149,40 @@ export const structuralVariantSampleColumnExtensionMap = {
     // Worst Transcript col
     "structural_variant.worst_transcript": {
         render: (result, props) =>  {
-            const { transcript = [], highlighted_genes = [] } = result;
+            const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_genes = [] } = result;
 
             if (highlighted_genes.length === 0) {
                 return <div className="text-muted text-small">Highlighted Gene <br/>Not Selected</div>;
             } else {
+                const { 0: { ensgid: highlighted_ensgid } = [] } = highlighted_genes;
 
-                // const { 0: { ensgid: highlighted_ensgid } = [] } = highlighted_genes;
-                // // Filter out transcripts that are not for the current gene
-                // const filteredTranscripts = transcript.filter((t) => {
-                //     const {
-                //         csq_gene: { ensgid = "" } = {},
-                //     } = t;
-                //     return ensgid === highlighted_ensgid;
-                // });
+                // Filter out transcripts that are not for the current gene
+                const filteredTranscripts = transcripts.filter((transcript) => {
+                    const {
+                        csq_gene: { ensgid = "" } = {},
+                    } = transcript;
+                    return ensgid === highlighted_ensgid;
+                });
 
-                // let worstTranscript;
+                let worstConsequence;
 
-                // // Displaying the canonical transcript; and if no canon available, the first transcript/same displayed under worst consequence
-                // if (filteredTranscripts.length > 0) {
-                //     const transcriptIndex = getInitialTranscriptIndex(filteredTranscripts);
-                //     const { csq_mane = null, csq_feature = null } = filteredTranscripts[transcriptIndex || 0];
-                //     const transcriptDisplay = csq_mane || csq_feature;
-                //     worstTranscript = transcriptDisplay;
-                // }
+                // Using the canonical transcript; and if no canon available, the first transcript/same displayed under worst consequence
+                if (filteredTranscripts.length > 0) {
 
-                // return (
-                //     <div className="text-small">
-                //         {worstTranscript}
-                //     </div>
-                // );
+                    // Get idx of most severe, canonical, or the first in the array
+                    const transcriptIndex = getInitialTranscriptIndex(filteredTranscripts);
+                    const { csq_consequence = [] } = filteredTranscripts[transcriptIndex || 0];
+                    worstConsequence = getMostSevereConsequence(csq_consequence);
+                }
+
+
+                if (!worstConsequence) { return null; }
+                const { display_title: worstConsequenceDisplay } = worstConsequence;
+                return (
+                    <div className="text-small">
+                        { worstConsequenceDisplay }
+                    </div>
+                );
             }
         }
     },

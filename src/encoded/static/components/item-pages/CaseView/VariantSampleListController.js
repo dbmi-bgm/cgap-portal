@@ -269,6 +269,13 @@ export const variantSampleListEmbeds = [
     "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
     "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
     "structural_variant_samples.variant_sample_item.structural_variant.size_display",
-    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title"
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.ensgid",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_canonical",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_consequence.display_title",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_most_severe",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_mane",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_feature",
+
 ];
 
