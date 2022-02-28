@@ -373,16 +373,13 @@ class SvInterpretationController extends React.PureComponent {
 
     componentDidUpdate(pastProps, pastState) {
         const { newVSLoading: pastVSLoading, newContext: pastNewContext = null } = pastProps;
-        const { isMultiSelect, newVSLoading, newContext, onSelectItem: onSelectGene, selectedItems: selectedGenes } = this.props;
+        const { isMultiSelect, newVSLoading, newContext, onSelectItem: onSelectGene } = this.props;
 
-        console.log("component did update selectedGenes", selectedGenes, onSelectGene);
         // Finished loading new VS, now initialize highlighted gene selections.
         if ((pastVSLoading && !newVSLoading) && (newContext && !pastNewContext)) {
             const { highlighted_genes: [ highlightedGene = null ] = [] } = newContext;
             if (highlightedGene) {
-                console.log("highlighted Gene", highlightedGene);
                 onSelectGene(highlightedGene, isMultiSelect);
-                console.log("selectedItems", selectedGenes);
             }
         }
     }
