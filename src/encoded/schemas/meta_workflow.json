@@ -274,7 +274,13 @@
                         "title": "Custom QC fields",
                         "description": "Custom fields to be added to QC items through Tibanna",
                         "type": "object",
-                        "additionalProperties": false
+                        "additionalProperties": false,
+                        "properties": {
+                            "filtering_condition": {
+                                "title": "Filtering Condition",
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
