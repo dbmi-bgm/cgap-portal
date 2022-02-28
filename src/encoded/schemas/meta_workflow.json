@@ -344,9 +344,9 @@
                             }
                         }
                     },
-                    "dimensions": {
-                        "title": "Dimensions",
-                        "description": "The maximum dimension of input files",
+                    "dimensionality": {
+                        "title": "Dimensionality",
+                        "description": "The number of dimensions of input files",
                         "type": "integer",
                         "enum": [
                             1,
