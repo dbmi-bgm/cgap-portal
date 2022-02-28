@@ -134,6 +134,7 @@ export class VariantSampleListController extends React.PureComponent {
                     "fetchedVariantSampleListItem": variantSampleListItem,
                     "isLoadingVariantSampleListItem": false
                 };
+                console.log("new variant sample item, ", variantSampleListItem);
                 if (prevAtID && vslID !== prevAtID) {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
@@ -258,6 +259,9 @@ export const variantSampleListEmbeds = [
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
 
+    "structural_variant_samples.variant_sample_item.highlighted_genes.@id",
+    "structural_variant_samples.variant_sample_item.highlighted_genes.display_title",
+    "structural_variant_samples.variant_sample_item.highlighted_genes.ensgid",
     "structural_variant_samples.variant_sample_item.structural_variant.@id",
     "structural_variant_samples.variant_sample_item.structural_variant.display_title",
     "structural_variant_samples.variant_sample_item.structural_variant.END",

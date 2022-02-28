@@ -1,6 +1,7 @@
 'use strict';
 
 import React from 'react';
+// import { getInitialTranscriptIndex } from '../item-pages/VariantSampleView/AnnotationSections';
 import { onClickLinkNavigateChildWindow } from './../item-pages/components/child-window-reuser';
 
 /**
@@ -147,8 +148,39 @@ export const variantSampleColumnExtensionMap = {
 export const structuralVariantSampleColumnExtensionMap = {
     // Worst Transcript col
     "structural_variant.worst_transcript": {
-        /** TODO: Update worst consequence with data from SV col ext map once highlighted gene functionality is added to interpretation space */
-        render: (result, props) => <div className="text-muted text-small">Highlighted Gene <br/>Not Selected</div>,
+        render: (result, props) =>  {
+            const { transcript = [], highlighted_genes = [] } = result;
+
+            if (highlighted_genes.length === 0) {
+                return <div className="text-muted text-small">Highlighted Gene <br/>Not Selected</div>;
+            } else {
+
+                // const { 0: { ensgid: highlighted_ensgid } = [] } = highlighted_genes;
+                // // Filter out transcripts that are not for the current gene
+                // const filteredTranscripts = transcript.filter((t) => {
+                //     const {
+                //         csq_gene: { ensgid = "" } = {},
+                //     } = t;
+                //     return ensgid === highlighted_ensgid;
+                // });
+
+                // let worstTranscript;
+
+                // // Displaying the canonical transcript; and if no canon available, the first transcript/same displayed under worst consequence
+                // if (filteredTranscripts.length > 0) {
+                //     const transcriptIndex = getInitialTranscriptIndex(filteredTranscripts);
+                //     const { csq_mane = null, csq_feature = null } = filteredTranscripts[transcriptIndex || 0];
+                //     const transcriptDisplay = csq_mane || csq_feature;
+                //     worstTranscript = transcriptDisplay;
+                // }
+
+                // return (
+                //     <div className="text-small">
+                //         {worstTranscript}
+                //     </div>
+                // );
+            }
+        }
     },
     // Gene, Transcript col
     "structural_variant.transcript": {
@@ -298,7 +330,7 @@ export const GenesMostSevereHGVSCColumn = React.memo(function GenesMostSevereHGV
 });
 
 export const StructuralVariantTranscriptColumn = React.memo(function StructuralVariantTranscriptColumn({ result, align = "center" }){
-    const { structural_variant: { transcript: transcripts = [] } = {} } = result || {};
+    const { highlighted_genes = [], structural_variant: { transcript: transcripts = [] } = {} } = result || {};
 
     const transcriptsDeduped = {};
     transcripts.forEach((transcript) => {
@@ -327,12 +359,25 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
         );
     }
 
-    rows.push(
-        <div className="text-muted">
-            <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
-            <span className="text-small">Not Selected</span>
-        </div>
-    );
+    // Display highlighted gene or placeholder
+    if (highlighted_genes.length === 0) {
+        rows.push(
+            <div className="text-muted">
+                <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
+                <span className="text-small">Not Selected</span>
+            </div>
+        );
+    } else { // TODO: styles may need to be adjusted to accomodate more than a few at a time
+        rows.push(
+            <div>
+                <i className="icon icon-star fas text-primary" data-tip="Highlighted gene" />:&nbsp;
+                { highlighted_genes.map((gene) => {
+                    const { display_title, "@id": atID } = gene;
+                    return <span key="atID" className="text-small ml-02"><a href={atID}>{display_title}</a></span>;
+                })}
+            </div>
+        );
+    }
 
     return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
 });
