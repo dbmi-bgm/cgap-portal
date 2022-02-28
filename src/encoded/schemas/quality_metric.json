@@ -13,11 +13,6 @@
         "uuid",
         "aliases"
     ],
-    "mixinProperties": [
-        {
-            "$ref": "mixins.json#/associated_meta_workflow_run"
-        }
-    ],
     "properties": {
         "overall_quality_status": {
             "description": "Overall QC decision",
