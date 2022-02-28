@@ -8,6 +8,7 @@ import memoize from 'memoize-one';
 import { object, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { StackedBlockTable, StackedBlock, StackedBlockList, StackedBlockName, StackedBlockNameLabel } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/StackedBlockTable';
 import { responsiveGridState } from './../util/layout';
+import { findCanonicalFamilyIndex } from './../item-pages/CaseView/CurrentFamilyController';
 
 
 export class CaseDetailPane extends React.PureComponent {
@@ -36,6 +37,15 @@ export class CaseDetailPane extends React.PureComponent {
         this.state = detailPaneStateCache[resultID] || {
             // Keyed by family index (b.c. unsure if a family "@id" exists, and if so, if lack of view permission for it is possible)
             familiesOpen: {}
+        };
+
+        this.memoized = {
+            findCanonicalFamilyIndex: memoize(findCanonicalFamilyIndex),
+            getSecondaryFamilies: memoize(function(familyList, canonicalFamilyReference){
+                return familyList.filter(function(family){
+                    return family !== canonicalFamilyReference;
+                });
+            })
         };
     }
 
@@ -69,7 +79,19 @@ export class CaseDetailPane extends React.PureComponent {
     render(){
         const { paddingWidthMap, paddingWidth, containerWidth, windowWidth, result, minimumWidth, detailPaneStateCache, updateDetailPaneStateCache } = this.props;
         const { familiesOpen } = this.state;
-        const { family = null, secondary_families = null, cohort, project } = result;
+        const {
+            family: partialFamilyEmbed,
+            sample_processing: {
+                families: spFamilies = [],
+            },
+            cohort,
+            project
+        } = result;
+
+        // Allow to throw error if not found -- or should we support Cases without any families present/visible?
+        const canonicalFamilyIndex = this.memoized.findCanonicalFamilyIndex(spFamilies, partialFamilyEmbed);
+        const canonicalFamily = canonicalFamilyIndex > -1 ? spFamilies[canonicalFamilyIndex] : null;
+        const secondaryFamilies = this.memoized.getSecondaryFamilies(spFamilies, canonicalFamily);
 
         let usePadWidth = paddingWidth || 0;
         if (paddingWidthMap){
@@ -81,10 +103,11 @@ export class CaseDetailPane extends React.PureComponent {
         };
 
         let families = [];
-        if (family !== null) {
-            families.push(family);
-            if (secondary_families !== null && secondary_families.length > 0) {
-                families = families.concat(secondary_families);
+        if (canonicalFamily !== null) {
+            // Reorder + ensure we add canonical family first to this list.
+            families.push(canonicalFamily);
+            if (secondaryFamilies.length > 0) {
+                families = families.concat(secondaryFamilies);
             }
         }
 

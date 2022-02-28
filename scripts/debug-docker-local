@@ -8,9 +8,9 @@ fi
 container=`docker ps | grep '.*_app-portal' | cut -d ' ' -f 1`
 
 if [ -z "${container}" ]; then
-    echo "No local cgap-portal docker container seems to be running."
+    echo "No local app-portal docker container seems to be running."
 else
-    echo "Debugging local portal docker container ${container} ..."
+    echo "Debugging local app-portal docker container ${container} ..."
     docker exec -it "${container}" /bin/bash
-    echo "Done debugging local portal docker container ${container}."
+    echo "Done debugging local app-portal docker container ${container}."
 fi

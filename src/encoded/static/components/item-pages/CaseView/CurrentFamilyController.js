@@ -1,11 +1,30 @@
 import React from 'react';
 import memoize from 'memoize-one';
+import _ from 'underscore';
 
 import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { parseFamilyIntoDataset } from './family-parsing';
 
 
+
+export function findCanonicalFamilyIndex(familyList, canonicalFamilyPartialItem) {
+    const { uuid: canonicalFamilyUUID } = canonicalFamilyPartialItem || {};
+    if (!canonicalFamilyUUID) {
+        throw new Error("No canonical family UUID provided. Check view permissions?");
+    }
+    const len = familyList.length;
+    for (var i = 0; i < len; i++) {
+        const { uuid: listFamilyUUID } = familyList[i];
+        if (!listFamilyUUID) {
+            return false; // No view permission or similar.
+        }
+        if (listFamilyUUID === canonicalFamilyUUID) {
+            return i;
+        }
+    }
+    return -1;
+}
 
 
 /**
@@ -23,7 +42,7 @@ function calculateIdToGraphIdentifier(objectGraph, isRelationshipNodeFunc){
         if (isRelationshipNodeFunc(node)) return;
         // We use Individual's `@id` as their dataset entry `id`.
         // If this changes, can change to get from `node.data.individualItem['@id']` instead.
-        console.log("id mapped to ", node.id, " : ", node.orderBasedName);
+        // console.log("id mapped to ", node.id, " : ", node.orderBasedName);
         mapping[node.id] = node.orderBasedName;
     });
     return mapping;
@@ -37,8 +56,17 @@ function calculateIdToGraphIdentifier(objectGraph, isRelationshipNodeFunc){
 export class CurrentFamilyController extends React.PureComponent {
 
     static haveFullViewPermissionForFamily(family){
-        if (!family) { return false; }
-        const { original_pedigree = null, proband = null, members = [] } = family;
+        const {
+            original_pedigree = null,
+            proband = null,
+            members = [],
+            "@id": familyAtID
+        } = family || {};
+
+        if (!familyAtID) {
+            return false;
+        }
+
         // if (original_pedigree && !object.isAnItem(original_pedigree)){
         //     // Tests for presence of display_title and @id, lack of which indicates lack of view permission.
         //     return false;
@@ -64,133 +92,101 @@ export class CurrentFamilyController extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        // this.onAddedFamily = this.onAddedFamily.bind(this);
-        // this.handleFamilySelect = _.throttle(this.handleFamilySelect.bind(this), 1000);
-        // const pedigreeFamilies = (props.context.sample_processing.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-        // this.state = {
-        //     pedigreeFamilies,
-        //     pedigreeFamiliesIdx: 0 // familiesLen - 1
-        // };
+        const {
+            context: {
+                sample_processing: { families: spFamilies = [] } = {},
+                family: canonicalFamilyPartialEmbed = {}
+            }
+        } = props;
+
+        this.handleFamilySelect = _.throttle(this.handleFamilySelect.bind(this), 1000);
+
         this.memoized = {
             haveFullViewPermissionForFamily: memoize(CurrentFamilyController.haveFullViewPermissionForFamily),
+            filterFamiliesWithViewPermission: memoize(function(spFamilies){
+                if (!Array.isArray(spFamilies)) return [];
+                return spFamilies.filter(CurrentFamilyController.haveFullViewPermissionForFamily);
+            }),
             buildGraphData: memoize(CurrentFamilyController.buildGraphData),
             parseFamilyIntoDataset: memoize(parseFamilyIntoDataset),
-            calculateIdToGraphIdentifier: memoize(calculateIdToGraphIdentifier)
+            calculateIdToGraphIdentifier: memoize(calculateIdToGraphIdentifier),
+            findCanonicalFamilyIndex: memoize(findCanonicalFamilyIndex)
+        };
+
+        const familiesWithViewPermission = this.memoized.filterFamiliesWithViewPermission(spFamilies);
+        const canonicalFamilyIdx = this.memoized.findCanonicalFamilyIndex(familiesWithViewPermission, canonicalFamilyPartialEmbed);
+
+        this.state = {
+            // Visualize the canonical family by default, but allow users to select different one to view in Pedigree visualizer afterwards.
+            "pedigreeFamiliesIdx": canonicalFamilyIdx
         };
     }
 
-    // componentDidUpdate(pastProps, pastState){
-    //     const { context } = this.props;
-    //     const { context: pastContext } = pastProps;
+    handleFamilySelect(key, callback){
+        const callable = () => {
+            this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) }, function(){
+                if (typeof callback === "function") {
+                    callback();
+                }
+            });
+        };
 
-    //     if (pastContext !== context){
-    //         const pedigreeFamilies = (context.sample_processing.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-    //         const pastPedigreeFamilies = (pastContext.sample_processing.families || []).filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-    //         const familiesLen = pedigreeFamilies.length;
-    //         const pastFamiliesLen = pastPedigreeFamilies.length;
-    //         if (familiesLen !== pastFamiliesLen){
-    //             this.setState({
-    //                 pedigreeFamilies,
-    //                 pedigreeFamiliesIdx: familiesLen - 1
-    //             });
-    //         }
-    //     }
-    // }
-
-    // onAddedFamily(response){
-    //     const { context, status, title } = response;
-    //     if (!context || status !== "success") return;
-
-    //     const { families = [] } = context || {};
-    //     const familiesLen = families.length;
-    //     const newestFamily = families[familiesLen - 1];
-
-    //     if (!newestFamily) return;
-
-    //     const {
-    //         original_pedigree : {
-    //             '@id' : pedigreeID,
-    //             display_title: pedigreeTitle
-    //         } = {},
-    //         pedigree_source
-    //     } = newestFamily;
-    //     let message = null;
-
-    //     if (pedigreeTitle && pedigreeID){
-    //         message = (
-    //             <React.Fragment>
-    //                 <p className="mb-0">Added family from pedigree <a href={pedigreeID}>{ pedigreeTitle }</a>.</p>
-    //                 { pedigree_source? <p className="mb-0 text-small">Source of pedigree: <em>{ pedigree_source }</em></p> : null }
-    //             </React.Fragment>
-    //         );
-    //     }
-    //     Alerts.queue({
-    //         "title" : "Added family " + familiesLen,
-    //         message,
-    //         "style" : "success"
-    //     });
-
-    //     store.dispatch({ type: { context } });
-    // }
-
-    // handleFamilySelect(key, callback){
-    //     const callable = () => {
-    //         this.setState({ 'pedigreeFamiliesIdx' : parseInt(key) }, function(){
-    //             if (typeof callback === "function") {
-    //                 callback();
-    //             }
-    //         });
-    //     };
-
-    //     // Try to defer change to background execution to
-    //     // avoid 'blocking'/'hanging' UI thread while new
-    //     // objectGraph is calculated.
-    //     // @todo Later - maybe attempt to offload PedigreeViz graph-transformer
-    //     // stuff to a WebWorker instead.
-    //     if (window && window.requestIdleCallback) {
-    //         window.requestIdleCallback(callable);
-    //     } else {
-    //         setTimeout(callable, 0);
-    //     }
-    // }
+        // Try to defer change to background execution to
+        // avoid 'blocking'/'hanging' UI thread while new
+        // objectGraph is calculated.
+        // @todo Later - maybe attempt to offload PedigreeViz graph-transformer
+        // stuff to a WebWorker instead.
+        if (window && window.requestIdleCallback) {
+            window.requestIdleCallback(callable);
+        } else {
+            setTimeout(callable, 0);
+        }
+    }
 
     render(){
         const { children, context, PedigreeVizLibrary, ...passProps } = this.props;
         const { buildPedigreeGraphData = null, isRelationshipNode } = PedigreeVizLibrary || {};
-        // const { pedigreeFamilies = [], pedigreeFamiliesIdx } = this.state;
-        // const familiesLen = pedigreeFamilies.length;
-        // let currFamily, graphData, idToGraphIdentifier;
-        // if (familiesLen > 0){
-        //     currFamily = pedigreeFamilies[pedigreeFamiliesIdx];
-        //     graphData = this.memoized.buildPedigreeGraphData(this.memoized.parseFamilyIntoDataset(currFamily));
-        //     idToGraphIdentifier = this.memoized.idToGraphIdentifier(graphData.objectGraph);
-        // }
+        const {
+            family: canonicalFamilyPartialEmbed,
+            sample_processing: {
+                families: spFamilies = []
+            } = {},
+        } = context;
+        const { pedigreeFamiliesIdx } = this.state;
 
-        const { family } = context;
-        let currFamily = null, graphData, idToGraphIdentifier;
-        if (this.memoized.haveFullViewPermissionForFamily(family)) {
-            currFamily = family;
+
+        const familiesWithViewPermission = this.memoized.filterFamiliesWithViewPermission(spFamilies);
+        const familiesLen = familiesWithViewPermission.length;
+        const canonicalFamilyIdx = this.memoized.findCanonicalFamilyIndex(familiesWithViewPermission, canonicalFamilyPartialEmbed);
+
+        // TODO: Throw error if canonicalFamilyIdx is -1? It will throw index out of bounds error anyway below.
+        // Not sure if we should support lack of ability to view family (or no family present..)
+
+        let canonicalFamily, currPedigreeFamily, graphData, idToGraphIdentifier;
+        if (familiesLen > 0){
+            canonicalFamily = familiesWithViewPermission[canonicalFamilyIdx];
+            currPedigreeFamily = familiesWithViewPermission[pedigreeFamiliesIdx];
             graphData = this.memoized.buildGraphData(
-                this.memoized.parseFamilyIntoDataset(currFamily),
+                this.memoized.parseFamilyIntoDataset(currPedigreeFamily),
                 buildPedigreeGraphData
             );
-            idToGraphIdentifier = graphData && isRelationshipNode ? this.memoized.calculateIdToGraphIdentifier(
-                graphData.objectGraph,
-                isRelationshipNode
-            ) : {};
+            idToGraphIdentifier = graphData && isRelationshipNode ?
+                this.memoized.calculateIdToGraphIdentifier(graphData.objectGraph, isRelationshipNode) : {};
         }
 
         const childProps = {
             ...passProps,
             PedigreeVizLibrary,
             context,
-            currFamily,
+            canonicalFamily,
+            currPedigreeFamily,
             graphData,
             idToGraphIdentifier,
-            // pedigreeFamilies,
-            // pedigreeFamiliesIdx,
-            // onFamilySelect: this.handleFamilySelect,
+            familiesWithViewPermission,
+            pedigreeFamiliesIdx,
+            onFamilySelect: this.handleFamilySelect
         };
+
         return React.Children.map(children, function(child){
             return React.cloneElement(child, childProps);
         });

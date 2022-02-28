@@ -148,8 +148,12 @@ clean-python:
 	pip uninstall -y -r <(pip freeze)
 
 test:
+	@git log -1 --decorate | head -1
+	@date
 	make test-unit || echo "unit tests failed"
 	make test-npm
+	@git log -1 --decorate | head -1
+	@date
 
 retest:
 	poetry run python -m pytest -vv -r w --last-failed
