@@ -208,15 +208,6 @@
                                 }
                             }
                         }
-                    },
-                    "dimensions": {
-                        "title": "Dimensions",
-                        "description": "The maximum dimensions of input files",
-                        "type": "integer",
-                        "enum": [
-                            1,
-                            2
-                        ]
                     }
                 }
             }
