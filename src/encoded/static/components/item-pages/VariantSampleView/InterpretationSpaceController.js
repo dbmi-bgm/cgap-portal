@@ -251,7 +251,7 @@ export class InterpretationSpaceWrapper extends React.Component {
         return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
 
-    saveHighlightedGene(highlightedGeneToPatch) {
+    saveHighlightedGene(highlightedGeneToPatch, successCallback) {
         const { context: { "@id": vsAtID, highlighted_genes: lastSavedHighlighted = [] } = {} } = this.props;
         let patchURL = vsAtID;
         let payload = JSON.stringify({});
@@ -275,9 +275,10 @@ export class InterpretationSpaceWrapper extends React.Component {
                     const { '@graph': graph = [], status } = response;
                     console.log("response", response);
                     if (graph.length === 0 || status === "error") {
+                        this.setState({ "loading": false });
                         throw new Error(response);
                     }
-                    this.setState({ "loading": false, "highlighted_genes": postPatchState });
+                    this.setState({ "loading": false, "highlighted_genes": postPatchState }, successCallback);
                 });
         });
     }
@@ -695,6 +696,7 @@ class SVGeneNotePanel extends React.PureComponent {
         this.selectNewGene = this.selectNewGene.bind(this);
         this.onTextAreaChange = this.onTextAreaChange.bind(this);
         this.clearSelectedGene = this.clearSelectedGene.bind(this);
+        this.saveHighlightedGeneWrapper = this.saveHighlightedGeneWrapper.bind(this);
     }
 
     onTextAreaChange(value, idx) {
@@ -752,6 +754,19 @@ class SVGeneNotePanel extends React.PureComponent {
         this.setState({ gene_notes: [] });
     }
 
+    // Wrapping passed in functions so as to call them with this component's state, then pass down to children
+    saveHighlightedGeneWrapper(highlightedGene) {
+        const { saveHighlightedGene, retainWIPStateOnUnmount, noteType, saveToField } = this.props;
+        saveHighlightedGene(highlightedGene, function(){
+            // Success Callback
+            if (window && window.opener) {
+                // If parent window exists, refresh it (if listener exists in it for this event)
+                refreshParentWindowVariantSampleList();
+            }
+        });
+        // retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
+    }
+
     render() {
         const { gene_notes } = this.state;
         const {
@@ -797,7 +812,7 @@ class SVGeneNotePanel extends React.PureComponent {
                     noteChangedSinceLastSave={isHighlightedGeneUnsaved}
                 /> */}
                 <SVGeneInterpretationSubmitButton highlightedGeneChangedSinceLastSave={isHighlightedGeneUnsaved} selectedGeneID={highlightedGeneID_wip}
-                    {...{ saveHighlightedGene, hasEditPermission, geneAtIDToGeneMap }} />
+                    {...{ hasEditPermission, geneAtIDToGeneMap }} saveHighlightedGene={this.saveHighlightedGeneWrapper} />
                 { caseSource ?
                     <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
