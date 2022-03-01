@@ -439,7 +439,7 @@ class SvInterpretationController extends React.PureComponent {
                     { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder headerTitle="SV / CNV Interpretation Space" /> : null }
                     { showInterpretationSpace ?
                         <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
-                            <CNVInterpretationSpace {...{ actions }} context={newContext} isCNV
+                            <CNVInterpretationSpace {...{ actions }} context={newContext}
                                 {...passProps} defaultTab={interpretationTab} />
                         </div> : null }
                 </div>
