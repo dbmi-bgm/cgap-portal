@@ -450,6 +450,7 @@ export class InterpretationSpaceController extends React.Component {
      * @returns {boolean} True if highlighted gene has changed, False if it hasn't
      */
     static hasHighlightedGeneChanged(wipHighlightedGene, lastSavedHighlightedGene) {
+        if (!wipHighlightedGene && !lastSavedHighlightedGene) { return false; } // probably on snv
         if (wipHighlightedGene.size === 0 && !lastSavedHighlightedGene) {
             return false;
         } else if (
@@ -565,6 +566,10 @@ export class InterpretationSpaceController extends React.Component {
         const isDraftGeneNoteUnsaved = InterpretationSpaceController.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
         const isDraftDiscoveryUnsaved = InterpretationSpaceController.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
 
+        // Handle SV specific changes
+        const isHighlightedGeneUnsaved = InterpretationSpaceController.hasHighlightedGeneChanged(selectedGenes, lastSavedHighlightedGene);
+        const isGeneTabUnsaved = isCNV ? (isDraftGeneNoteUnsaved || isHighlightedGeneUnsaved) : isDraftGeneNoteUnsaved;
+
         // Check for ACMG changes from WIP
         const interpretationWIP = { ...interpretation_wip };
         interpretationWIP["acmg_rules_invoked"] = wipACMGSelections;
@@ -575,8 +580,6 @@ export class InterpretationSpaceController extends React.Component {
         switch(currentTab) {
             case (0): // Gene Notes
                 if (isCNV) {
-                    // Check for changes in Highlighted Gene
-                    const isHighlightedGeneUnsaved = InterpretationSpaceController.hasHighlightedGeneChanged(selectedGenes, lastSavedHighlightedGene);
                     const highlightedGeneID_wip = selectedGenes.keys().next().value || null;
 
                     panelToDisplay = <SVGeneNotePanel {...commonProps} {...{
@@ -599,19 +602,19 @@ export class InterpretationSpaceController extends React.Component {
             case (1): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} saveToField="variant_notes" noteType="note_standard"
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isGeneTabUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (2): // Interpretation
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps} wipACMGSelections={wipACMGSelections} {...{ autoClassification, toggleInvocation }}
                     lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} saveToField="interpretation" noteType="note_interpretation"
-                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                    otherDraftsUnsaved={isGeneTabUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (3): // Discovery
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps}
                     lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} saveToField="discovery_interpretation" noteType="note_discovery"
-                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
+                    otherDraftsUnsaved={isGeneTabUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
             default:
@@ -619,8 +622,8 @@ export class InterpretationSpaceController extends React.Component {
         }
         return (
             <>
-                <InterpretationSpaceTabs {...{ tabsToDisable, currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
-                    switchToTab={this.switchToTab} />
+                <InterpretationSpaceTabs {...{ tabsToDisable, currentTab, isDraftDiscoveryUnsaved, isDraftVariantNoteUnsaved,
+                    isDraftInterpretationUnsaved, isGeneTabUnsaved }} switchToTab={this.switchToTab} />
                 { panelToDisplay }
             </>
         );
@@ -657,8 +660,13 @@ function GenericInterpretationSpaceTabNav(props) {
  */
 
 function InterpretationSpaceTabs(props) {
-    const { tabsToDisable, currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
-    const tabIndexToUnsavedDraft = { 0: isDraftGeneNoteUnsaved, 1: isDraftVariantNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
+    const { tabsToDisable, currentTab, switchToTab, isDraftDiscoveryUnsaved, isGeneTabUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
+    const tabIndexToUnsavedDraft = {
+        0: isGeneTabUnsaved, // includes changes to highlighted gene and gene note
+        1: isDraftVariantNoteUnsaved,
+        2: isDraftInterpretationUnsaved,
+        3: isDraftDiscoveryUnsaved
+    };
 
     // Maybe memoize?
     const tabsRender = InterpretationSpaceController.tabNames.map((tabName, i) => {
