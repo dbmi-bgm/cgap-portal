@@ -253,29 +253,31 @@ export class InterpretationSpaceWrapper extends React.Component {
 
     saveHighlightedGene(highlightedGeneToPatch) {
         const { context: { "@id": vsAtID, highlighted_genes: lastSavedHighlighted = [] } = {} } = this.props;
-        const { "@id": highlightedGeneAtID, display_title: highlightedGeneDisplayTitle } = highlightedGeneToPatch;
-
         let patchURL = vsAtID;
-        let payload = null;
+        let payload = JSON.stringify({});
+        let postPatchState = null;
 
-        // Check for deleted fields and add to patch URL
-        if (lastSavedHighlighted.length > 0 && !highlightedGeneAtID) {
-            patchURL += '?delete_fields=highlighted_genes';
-        } else {
+        if (!highlightedGeneToPatch) { // deleting previous value
+            if (lastSavedHighlighted.length > 0) {
+                patchURL += '?delete_fields=highlighted_genes';
+            } else {
+                throw new Error("Attempting to delete highlighted gene when there was no previous value.");
+            }
+        } else { // adding new value
+            const { "@id": highlightedGeneAtID } = highlightedGeneToPatch;
             payload = JSON.stringify({ highlighted_genes: [ highlightedGeneAtID ] });
+            postPatchState = [highlightedGeneToPatch];
         }
 
-        console.log("saveHighlightedGene", this.state);
         this.setState({ "loading": true }, () => {
             ajax.promise(patchURL, 'PATCH', {}, payload)
                 .then((response) => {
                     const { '@graph': graph = [], status } = response;
+                    console.log("response", response);
                     if (graph.length === 0 || status === "error") {
                         throw new Error(response);
                     }
-                    this.setState({ "loading": false, "highlighted_genes": [highlightedGeneToPatch] }, function(newState) {
-                        console.log("final state?", newState);
-                    });
+                    this.setState({ "loading": false, "highlighted_genes": postPatchState });
                 });
         });
     }
@@ -1274,11 +1276,9 @@ function SVGeneInterpretationSubmitButton(props) {
         cls = ""
     } = props;
 
-    const toSubmitGeneItem = { "@id": selectedGeneID, display_title: geneAtIDToGeneMap[selectedGeneID] };
-
     return (
         <div data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item.": null }>
-            <Button variant="primary" className={"btn-block " + cls} onClick={() => saveHighlightedGene(toSubmitGeneItem)}
+            <Button variant="primary" className={"btn-block " + cls} onClick={() => saveHighlightedGene(geneAtIDToGeneMap[selectedGeneID])}
                 disabled={!hasEditPermission || !highlightedGeneChangedSinceLastSave}>
                 { !hasEditPermission ? "Need Edit Permission": "Save Highlighted Gene" }
             </Button>
