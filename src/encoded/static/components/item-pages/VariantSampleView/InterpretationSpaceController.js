@@ -551,22 +551,18 @@ export class InterpretationSpaceController extends React.Component {
         } = this.props;
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
+        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
         const commonProps = {
             ...passProps, hasEditPermission, isFallback,
             "retainWIPStateOnUnmount": this.retainWIPStateOnUnmount,
             "noteLabel": InterpretationSpaceController.tabTitles[currentTab],
             "key": currentTab
         };
-        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
 
         // Check for changes in basic notes
         const isDraftVariantNoteUnsaved = InterpretationSpaceController.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
         const isDraftGeneNoteUnsaved = InterpretationSpaceController.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
         const isDraftDiscoveryUnsaved = InterpretationSpaceController.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
-
-        // Check for changes in Highlighted Gene
-        const isHighlightedGeneUnsaved = InterpretationSpaceController.hasHighlightedGeneChanged(selectedGenes, lastSavedHighlightedGene);
-        const highlightedGeneID_wip = selectedGenes.keys().next().value || null;
 
         // Check for ACMG changes from WIP
         const interpretationWIP = { ...interpretation_wip };
@@ -578,6 +574,10 @@ export class InterpretationSpaceController extends React.Component {
         switch(currentTab) {
             case (0): // Gene Notes
                 if (isCNV) {
+                    // Check for changes in Highlighted Gene
+                    const isHighlightedGeneUnsaved = InterpretationSpaceController.hasHighlightedGeneChanged(selectedGenes, lastSavedHighlightedGene);
+                    const highlightedGeneID_wip = selectedGenes.keys().next().value || null;
+
                     panelToDisplay = <SVGeneNotePanel {...commonProps} {...{
                         saveHighlightedGene,
                         lastSavedGeneNote,
