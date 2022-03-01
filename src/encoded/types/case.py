@@ -25,13 +25,21 @@ def _build_family_embeds(*, base_path):
 
         # Individual linkTo
         "proband.accession",
+        "proband.individual_id",
+
+        # Individual linkTo
+        "mother.accession",
+        "mother.individual_id",
+
+        # Individual linkTo
+        "father.accession",
+        "father.individual_id",
 
         # Array of phenotypes linkTo
         "family_phenotypic_features.phenotype_name",
 
         # Individual linkTo
         "members.*",
-        # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
 
         # Case linkTo
         "members.case.case_title",
@@ -40,7 +48,9 @@ def _build_family_embeds(*, base_path):
         "members.case.report",
         "members.case.report.accession",
         "members.case.family",
+        "members.case.family.family_id",
         "members.case.individual",
+        "members.case.individual.individual_id",
         "members.case.sample_processing",
         "members.case.sample.accession",
         "members.case.sample.workup_type",
@@ -94,7 +104,18 @@ def _build_case_embedded_list():
     """ Helper function intended to be used to create the embedded list for case.
         All types should implement a function like this going forward.
     """
-    return _build_family_embeds(base_path='family') + [
+    return [
+
+        ## Canonical Family, grab UUID and @ID to help ID it within sample_processing.families on UI
+        "family.@id",
+        "family.uuid",
+
+        # Used for search column
+        "family.accession",
+        "family.family_id",
+        "family.title",
+        "family.last_modified.date_modified",
+
         # Individual linkTo
         "individual.accession",
         "individual.date_created",
@@ -214,38 +235,10 @@ def _build_case_embedded_list():
         "sample_processing.completed_processes",
         "sample_processing.samples_pedigree.*",
 
-        # Family linkTo
-        "sample_processing.families.family_id",
-        "sample_processing.families.title",
-        "sample_processing.families.accession",
-        "sample_processing.families.analysis_groups",
 
-        # Individual linkTo
-        "sample_processing.families.proband.accession",
-        "sample_processing.families.proband.individual_id",
+        # Sample Processing - Family[] linkTo
+        *_build_family_embeds(base_path='sample_processing.families'),
 
-        # Individual linkTo
-        "sample_processing.families.mother.accession",
-        "sample_processing.families.mother.individual_id",
-
-        # Individual linkTo
-        "sample_processing.families.father.accession",
-        "sample_processing.families.father.individual_id",
-
-        # Individual linkTo
-        "sample_processing.families.members.accession",
-        "sample_processing.families.members.individual_id",
-
-        # Sample linkTo
-        "sample_processing.families.members.samples.accession",
-
-        # Case linkTo
-        # XXX: should it embed sample processing as well?
-        "sample_processing.families.members.case.case_id",
-        "sample_processing.families.members.case.report.accession",
-        "sample_processing.families.members.case.family.family_id",
-        "sample_processing.families.members.case.individual.individual_id",
-        "sample_processing.families.members.case.sample.accession",
 
         # Sample linkTo
         "sample_processing.samples.accession",
