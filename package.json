@@ -128,13 +128,6 @@
     "underscore": "^1.10.2",
     "url": "^0.11.0"
   },
-  "overrides": {
-    "auth0-lock": {
-      "react": "^17.0.2",
-      "react-dom": "^17.0.2",
-      "react-transition-group": "^4.4.2"
-    }
-  },
   "optionalDependencies": {
     "cypress": "^9.5.0"
   }
