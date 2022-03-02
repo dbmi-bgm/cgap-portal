@@ -65,6 +65,17 @@
                 "linkTo": "VariantSample"
             }
         },
+        "structural_variant_samples": {
+            "title": "Structural Variant Samples",
+            "description": "The CNV/SV samples included in this report",
+            "type": "array",
+            "items": {
+                "title": "Structural Variant Sample",
+                "description": "A structural variant sample included in this report",
+                "type": "string",
+                "linkTo": "StructuralVariantSample"
+            }
+        },
         "indication": {
             "title": "Indication",
             "type": "string"
