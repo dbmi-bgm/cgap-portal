@@ -579,10 +579,9 @@ export class InterpretationSpaceController extends React.Component {
         let panelToDisplay = null;
         switch(currentTab) {
             case (0): // Gene Notes
+                var otherDraftsUnsaved = isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved;
                 if (isCNV) {
                     const highlightedGeneID_wip = selectedGenes.keys().next().value || null;
-                    const otherDraftsUnsaved = isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved;
-
                     panelToDisplay = <SVGeneNotePanel {...commonProps} {...{
                         otherDraftsUnsaved,
                         saveHighlightedGene,
