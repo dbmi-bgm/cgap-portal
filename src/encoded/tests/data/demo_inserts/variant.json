@@ -1,0 +1,4996 @@
+[
+    {
+        "ID": "rs879015290",
+        "ALT": "C",
+        "POS": 15454,
+        "REF": "T",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "genes_most_severe_hgvsc": "ENST00000361789.2:c.708T>C",
+                "genes_most_severe_hgvsp": "ENSP00000354554.2:p.Leu236=",
+                "genes_most_severe_transcript": "ENST00000361789",
+                "genes_most_severe_amino_acids": "L"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.15454T>C",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 15455,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:26.711753+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:15454T_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:37.807042+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -2.92899990081787,
+        "csq_phylop100way_vertebrate": -9.7180004119873,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "599f476b-712c-4162-aa13-ff83075a6b64"
+    },
+    {
+        "ID": "rs2853508",
+        "ALT": "G",
+        "POS": 15326,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "genes_most_severe_hgvsc": "ENST00000361789.2:c.580A>G",
+                "genes_most_severe_hgvsp": "ENSP00000354554.2:p.Thr194Ala",
+                "genes_most_severe_transcript": "ENST00000361789",
+                "genes_most_severe_amino_acids": "T/A"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.15326A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "csq_clinvar": "140592",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-05T16:57:13.984364+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:15326A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-13T22:43:05.313812+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_mc": [
+            "SO:0001583",
+            "missense_variant"
+        ],
+        "csq_clinvar_clndn": [
+            "Leigh_syndrome",
+            "Familial_cancer_of_breast"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0009723",
+            "MedGen:C0023264",
+            "OMIM:256000",
+            "Orphanet:ORPHA506",
+            "SNOMED_CT:29570005",
+            "MONDO:MONDO:0016419",
+            "MedGen:C0006142",
+            "OMIM:114480",
+            "Orphanet:ORPHA227535",
+            "SNOMED_CT:254843006"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-CYB:4519"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -1.50100004673004,
+        "csq_phylop100way_vertebrate": -5.38899993896484,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "f5ca02a2-9278-4f49-9106-5997e8ec6d12"
+    },
+    {
+        "ID": "rs193302980;rs527236041",
+        "ALT": "T",
+        "POS": 14766,
+        "REF": "C",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "genes_most_severe_hgvsc": "ENST00000361789.2:c.20C>T",
+                "genes_most_severe_hgvsp": "ENSP00000354554.2:p.Thr7Ile",
+                "genes_most_severe_transcript": "ENST00000361789",
+                "genes_most_severe_amino_acids": "T/I"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.14766C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 14767,
+        "csq_clinvar": "140587",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-05T16:57:13.396556+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:14766C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-13T22:43:00.357369+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_mc": [
+            "SO:0001583",
+            "missense_variant"
+        ],
+        "csq_clinvar_clndn": [
+            "Leigh_syndrome",
+            "Familial_cancer_of_breast"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0009723",
+            "MedGen:C0023264",
+            "OMIM:256000",
+            "Orphanet:ORPHA506",
+            "SNOMED_CT:29570005",
+            "MONDO:MONDO:0016419",
+            "MedGen:C0006142",
+            "OMIM:114480",
+            "Orphanet:ORPHA227535",
+            "SNOMED_CT:254843006"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-CYB:4519"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -1.46399998664856,
+        "csq_phylop100way_vertebrate": 0.11599999666214,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "44dee9e5-8e0d-45dc-9603-3b399be8ce46"
+    },
+    {
+        "ID": "rs878918283",
+        "ALT": "G",
+        "POS": 14139,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "genes_most_severe_hgvsc": "ENST00000361567.2:c.1803A>G",
+                "genes_most_severe_hgvsp": "ENSP00000354813.2:p.Leu601=",
+                "genes_most_severe_transcript": "ENST00000361567",
+                "genes_most_severe_amino_acids": "L"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.14139A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 14140,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:25.654291+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:14139A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:36.426211+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -0.061999998986721,
+        "csq_phylop100way_vertebrate": -3.25200009346008,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "af0ed65b-5315-4c0c-a12c-7d436610d14b"
+    },
+    {
+        "ALT": "C",
+        "POS": 13743,
+        "REF": "T",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "genes_most_severe_hgvsc": "ENST00000361567.2:c.1407T>C",
+                "genes_most_severe_hgvsp": "ENSP00000354813.2:p.Thr469=",
+                "genes_most_severe_transcript": "ENST00000361567",
+                "genes_most_severe_amino_acids": "T"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.13743T>C",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 13744,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:25.448411+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:13743T_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:36.096876+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -2.67199993133545,
+        "csq_phylop100way_vertebrate": -3.74300003051758,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "1027d4f2-afc7-4647-9931-7050d5103148"
+    },
+    {
+        "ID": "rs2853499",
+        "ALT": "A",
+        "POS": 12372,
+        "REF": "G",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "genes_most_severe_hgvsc": "ENST00000361567.2:c.36G>A",
+                "genes_most_severe_hgvsp": "ENSP00000354813.2:p.Leu12=",
+                "genes_most_severe_transcript": "ENST00000361567",
+                "genes_most_severe_amino_acids": "L"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.12372G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 12373,
+        "csq_clinvar": "522717",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-08T21:51:59.661115+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:12372G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-11-28T22:24:02.370344+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_clndn": [
+            "Mitochondrial_diseases"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Likely_pathogenic",
+        "csq_clinvar_origin": 4,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0044970",
+            "MedGen:C0751651",
+            "Orphanet:ORPHA68380"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ND5:4540"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -12.6370000839233,
+        "csq_phylop100way_vertebrate": -5.06599998474121,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "4a0e1d9f-9b21-4705-aba1-dd2b30ad75a1"
+    },
+    {
+        "ID": "rs2853495",
+        "ALT": "A",
+        "POS": 11719,
+        "REF": "G",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "genes_most_severe_hgvsc": "ENST00000361381.2:c.960G>A",
+                "genes_most_severe_hgvsp": "ENSP00000354961.2:p.Gly320=",
+                "genes_most_severe_transcript": "ENST00000361381",
+                "genes_most_severe_amino_acids": "G"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.11719G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-05T16:57:12.496784+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:11719G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-13T22:42:56.785750+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -2.21399998664856,
+        "csq_phylop100way_vertebrate": -12.2799997329712,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "b8e72016-d556-40bf-ba9e-54aa00e5eb37"
+    },
+    {
+        "ID": "rs2853493",
+        "ALT": "G",
+        "POS": 11467,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "genes_most_severe_hgvsc": "ENST00000361381.2:c.708A>G",
+                "genes_most_severe_hgvsp": "ENSP00000354961.2:p.Leu236=",
+                "genes_most_severe_transcript": "ENST00000361381",
+                "genes_most_severe_amino_acids": "L"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.11467A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 11468,
+        "csq_clinvar": "522716",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-08T21:51:57.746159+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:11467A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-11-28T22:23:59.004461+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_clndn": [
+            "Mitochondrial_diseases"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Likely_pathogenic",
+        "csq_clinvar_origin": 4,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0044970",
+            "MedGen:C0751651",
+            "Orphanet:ORPHA68380"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ND4:4538"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -0.741999983787537,
+        "csq_phylop100way_vertebrate": -3.02999997138977,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "2d662ba6-4bf3-4e71-90b5-e4911470f3ec"
+    },
+    {
+        "ID": "rs879015842",
+        "ALT": "A",
+        "POS": 10775,
+        "REF": "G",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "genes_most_severe_hgvsc": "ENST00000361381.2:c.16G>A",
+                "genes_most_severe_hgvsp": "ENSP00000354961.2:p.Val6Ile",
+                "genes_most_severe_sift_score": 0.974,
+                "genes_most_severe_transcript": "ENST00000361381",
+                "genes_most_severe_amino_acids": "V/I"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.10775G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 10776,
+        "csq_clinvar": "693315",
+        "csq_gerp_rs": -10.1,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:22.501437+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:10775G_A",
+        "csq_sift_pred": "T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:31.515893+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_mc": [
+            "SO:0001583",
+            "missense_variant"
+        ],
+        "csq_sift_score": 0.974,
+        "csq_clinvar_clndn": [
+            "Leigh_syndrome"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Likely_benign",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0009723",
+            "MedGen:C0023264",
+            "OMIM:256000",
+            "Orphanet:ORPHA506",
+            "SNOMED_CT:29570005"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ND4:4538"
+        ],
+        "csq_gerp_rs_rankscore": 0.0033,
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -3.56299996376038,
+        "csq_phylop100way_vertebrate": -4.10900020599365,
+        "csq_sift_converted_rankscore": 0.02034,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "csq_phylop100way_vertebrate_rankscore": 0.00332,
+        "uuid": "02d6cd06-1c5f-41dd-a606-fad39c64dcd2"
+    },
+    {
+        "ALT": "C",
+        "POS": 9656,
+        "REF": "T",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+                "genes_most_severe_hgvsc": "ENST00000362079.2:c.450T>C",
+                "genes_most_severe_hgvsp": "ENSP00000354982.2:p.Ser150=",
+                "genes_most_severe_transcript": "ENST00000362079",
+                "genes_most_severe_amino_acids": "S"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.9656T>C",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 9657,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:22.308527+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:9656T_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:31.055477+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -2.67899990081787,
+        "csq_phylop100way_vertebrate": -0.870000004768372,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "8a62962d-a7ba-400c-a47d-5841f54f95fc"
+    },
+    {
+        "ALT": "T",
+        "POS": 9426,
+        "REF": "C",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+                "genes_most_severe_hgvsc": "ENST00000362079.2:c.220C>T",
+                "genes_most_severe_hgvsp": "ENSP00000354982.2:p.Pro74Ser",
+                "genes_most_severe_sift_score": 0.039,
+                "genes_most_severe_transcript": "ENST00000362079",
+                "genes_most_severe_amino_acids": "P/S"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.9426C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 9427,
+        "csq_gerp_rs": -8.92,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:22.077485+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:9426C_T",
+        "csq_sift_pred": "D",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:30.623163+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_sift_score": 0.039,
+        "csq_gerp_rs_rankscore": 0.00666,
+        "csq_phylop30way_mammalian": -2.80699992179871,
+        "csq_phylop100way_vertebrate": -0.529999971389771,
+        "csq_sift_converted_rankscore": 0.42487,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "csq_phylop100way_vertebrate_rankscore": 0.06266,
+        "uuid": "60964e18-4243-414c-b680-2340fdcf4569"
+    },
+    {
+        "ID": "rs2001031",
+        "ALT": "G",
+        "POS": 8860,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "5c4b026b-4ff6-4b65-a8d7-74a07d003305",
+                "genes_most_severe_hgvsc": "ENST00000361899.2:c.334A>G",
+                "genes_most_severe_hgvsp": "ENSP00000354632.2:p.Thr112Ala",
+                "genes_most_severe_transcript": "ENST00000361899",
+                "genes_most_severe_amino_acids": "T/A"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.8860A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 8861,
+        "csq_clinvar": "693004",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-05T16:57:10.895392+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:8860A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-13T22:42:53.324451+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_mc": [
+            "SO:0001583",
+            "missense_variant"
+        ],
+        "csq_clinvar_clndn": [
+            "Leigh_syndrome"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0009723",
+            "MedGen:C0023264",
+            "OMIM:256000",
+            "Orphanet:ORPHA506",
+            "SNOMED_CT:29570005"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ATP6:4508"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -6.15199995040894,
+        "csq_phylop100way_vertebrate": 0.266000002622604,
+        "csq_phastcons100way_vertebrate": 0.00100000004749745,
+        "csq_phylop100way_vertebrate_rankscore": 0.183,
+        "uuid": "86bc4c32-2ad5-4951-b521-16130d7b0237"
+    },
+    {
+        "ID": "rs2015062",
+        "ALT": "T",
+        "POS": 7028,
+        "REF": "C",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "efff4aff-ded4-4468-9e6f-d3902738a5fd",
+                "genes_most_severe_hgvsc": "ENST00000361624.2:c.1125C>T",
+                "genes_most_severe_hgvsp": "ENSP00000354499.2:p.Ala375=",
+                "genes_most_severe_transcript": "ENST00000361624",
+                "genes_most_severe_amino_acids": "A"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.7028C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 7029,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-05T16:57:10.361086+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:7028C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-13T22:42:50.456268+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -2.69700002670288,
+        "csq_phylop100way_vertebrate": -9.19799995422363,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "9fb07c67-4469-431a-b27a-09254b673e3d"
+    },
+    {
+        "ID": "rs3021086",
+        "ALT": "G",
+        "POS": 4769,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "33933818-0664-4e9d-83d2-cb44a5e59222",
+                "genes_most_severe_hgvsc": "ENST00000361453.3:c.300A>G",
+                "genes_most_severe_hgvsp": "ENSP00000355046.4:p.Met100=",
+                "genes_most_severe_transcript": "ENST00000361453",
+                "genes_most_severe_amino_acids": "M"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.4769A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 4770,
+        "csq_clinvar": "441150",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-05T16:57:09.645154+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:4769A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-13T22:42:49.065785+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_clndn": [
+            "not_provided"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "not_provided",
+        "csq_clinvar_origin": 0,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "MedGen:CN517202"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ND2:4536"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "no_assertion_provided"
+        ],
+        "csq_phylop30way_mammalian": -8.92500019073486,
+        "csq_phylop100way_vertebrate": -20.0,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "c6087bf1-7e85-4442-92e8-0ffe8f7040af"
+    },
+    {
+        "ID": "rs387906426",
+        "ALT": "A",
+        "POS": 4640,
+        "REF": "C",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "33933818-0664-4e9d-83d2-cb44a5e59222",
+                "genes_most_severe_hgvsc": "ENST00000361453.3:c.171C>A",
+                "genes_most_severe_hgvsp": "ENSP00000355046.4:p.Ile57Met",
+                "genes_most_severe_transcript": "ENST00000361453",
+                "genes_most_severe_amino_acids": "I/M"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.4640C>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 4641,
+        "csq_clinvar": "9718",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:20.777138+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:4640C_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:28.578763+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_clndn": [
+            "Leber's_optic_atrophy",
+            "Leigh_syndrome"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "Human_Phenotype_Ontology:HP:0001086",
+            "Human_Phenotype_Ontology:HP:0001112",
+            "MONDO:MONDO:0010788",
+            "MedGen:C0917796",
+            "OMIM:535000",
+            "Orphanet:ORPHA104",
+            "SNOMED_CT:58610003",
+            "MONDO:MONDO:0009723",
+            "MedGen:C0023264",
+            "OMIM:256000",
+            "Orphanet:ORPHA506",
+            "SNOMED_CT:29570005"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ND2:4536"
+        ],
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": -7.12799978256226,
+        "csq_phylop100way_vertebrate": -9.1870002746582,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "fa06439e-5cb4-49fb-9de2-6c3944de0203"
+    },
+    {
+        "ALT": "G",
+        "POS": 4188,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "339e3421-a617-4f05-b1ff-4f8ea27743f1",
+                "genes_most_severe_hgvsc": "ENST00000361390.2:c.882A>G",
+                "genes_most_severe_hgvsp": "ENSP00000354687.2:p.Leu294=",
+                "genes_most_severe_transcript": "ENST00000361390",
+                "genes_most_severe_amino_acids": "L"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.4188A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 4189,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:20.574939+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:4188A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:28.143964+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_phylop30way_mammalian": -4.69199991226196,
+        "csq_phylop100way_vertebrate": -8.50100040435791,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "788173b6-45dc-4e2f-8b09-e42d07b6eacd"
+    },
+    {
+        "ID": "rs199476120",
+        "ALT": "G",
+        "POS": 3397,
+        "REF": "A",
+        "CHROM": "M",
+        "genes": [
+            {
+                "genes_most_severe_gene": "339e3421-a617-4f05-b1ff-4f8ea27743f1",
+                "genes_most_severe_hgvsc": "ENST00000361390.2:c.91A>G",
+                "genes_most_severe_hgvsp": "ENSP00000354687.2:p.Met31Val",
+                "genes_most_severe_transcript": "ENST00000361390",
+                "genes_most_severe_amino_acids": "M/V"
+            }
+        ],
+        "hgvsg": "NC_012920.1:m.3397A>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "M",
+        "hg19_pos": 3398,
+        "csq_clinvar": "9726",
+        "csq_gerp_rs": 4.53,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:20.386095+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrM:3397A_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:27.793412+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_clinvar_clndn": [
+            "Alzheimer_disease",
+            "Parkinson_disease",
+            "_late-onset",
+            "Leigh_syndrome"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_clinvar_clndisdb": [
+            "Human_Phenotype_Ontology:HP:0002511",
+            "Human_Phenotype_Ontology:HP:0006878",
+            "Human_Phenotype_Ontology:HP:0007213",
+            "MONDO:MONDO:0004975",
+            "MedGen:C0002395",
+            "OMIM:104300",
+            "SNOMED_CT:26929004",
+            "MONDO:MONDO:0008199",
+            "MedGen:C3160718",
+            "OMIM:168600",
+            "SNOMED_CT:49049000",
+            "MONDO:MONDO:0009723",
+            "MedGen:C0023264",
+            "OMIM:256000",
+            "Orphanet:ORPHA506",
+            "SNOMED_CT:29570005"
+        ],
+        "csq_clinvar_geneinfo": [
+            "MT-ND1:4535"
+        ],
+        "csq_gerp_rs_rankscore": 0.55009,
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_phylop30way_mammalian": 1.2039999961853,
+        "csq_phylop100way_vertebrate": 8.72900009155273,
+        "csq_phastcons100way_vertebrate": 1.0,
+        "csq_phylop100way_vertebrate_rankscore": 0.91217,
+        "uuid": "86bab7ec-05bd-4b77-9de2-40c5e98a2bf4"
+    },
+    {
+        "ID": "rs782437119",
+        "ALT": "T",
+        "POS": 154564863,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "genes_most_severe_hgvsc": "ENST00000618670.4:c.*402C>T",
+                "genes_most_severe_transcript": "ENST00000618670"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.154564863C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-08T19:56:51.271095+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:154564863C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:26.667986+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 2.16,
+        "csq_gnomadg_ac": 0,
+        "csq_gnomadg_an": 0,
+        "csq_gnomadg_ac-xx": 0,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_an-xx": 0,
+        "csq_gnomadg_an-xy": 0,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 0,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_an-afr": 0,
+        "csq_gnomadg_an-ami": 0,
+        "csq_gnomadg_an-amr": 0,
+        "csq_gnomadg_an-asj": 0,
+        "csq_gnomadg_an-eas": 0,
+        "csq_gnomadg_an-fin": 0,
+        "csq_gnomadg_an-mid": 0,
+        "csq_gnomadg_an-nfe": 0,
+        "csq_gnomadg_an-oth": 0,
+        "csq_gnomadg_an-sas": 0,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_phylop30way_mammalian": -1.12300002574921,
+        "csq_phylop100way_vertebrate": -0.29899999499321,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "fe2debb1-8417-4021-93d9-f349a6dcdc9a"
+    },
+    {
+        "ID": "rs1374906416",
+        "ALT": "A",
+        "POS": 154564829,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "genes_most_severe_hgvsc": "ENST00000618670.4:c.*368C>A",
+                "genes_most_severe_transcript": "ENST00000618670"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.154564829C>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-08T19:56:50.854178+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:154564829C_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:25.459397+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 1.167,
+        "csq_gnomadg_ac": 0,
+        "csq_gnomadg_an": 0,
+        "csq_gnomadg_ac-xx": 0,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_an-xx": 0,
+        "csq_gnomadg_an-xy": 0,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 0,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_an-afr": 0,
+        "csq_gnomadg_an-ami": 0,
+        "csq_gnomadg_an-amr": 0,
+        "csq_gnomadg_an-asj": 0,
+        "csq_gnomadg_an-eas": 0,
+        "csq_gnomadg_an-fin": 0,
+        "csq_gnomadg_an-mid": 0,
+        "csq_gnomadg_an-nfe": 0,
+        "csq_gnomadg_an-oth": 0,
+        "csq_gnomadg_an-sas": 0,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_phylop30way_mammalian": -0.151999995112419,
+        "csq_phylop100way_vertebrate": -0.321999996900558,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "cec425cd-ce90-4649-8a4a-98a7c31ee723"
+    },
+    {
+        "ID": "rs782678149",
+        "ALT": "A",
+        "POS": 154534478,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "genes_most_severe_hgvsc": "ENST00000393562.10:c.504C>T",
+                "genes_most_severe_hgvsp": "ENSP00000377192.3:p.Ile168=",
+                "genes_most_severe_transcript": "ENST00000393562",
+                "genes_most_severe_amino_acids": "I",
+                "genes_most_severe_feature_ncbi": "NM_001360016.2"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.154534478G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153762693,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:18.299113+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:154534478G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:24.346335+00:00"
+        },
+        "spliceaiMaxds": 0.01,
+        "csq_cadd_phred": 2.303,
+        "csq_gnomade2_ac": [
+            1
+        ],
+        "csq_gnomade2_af": [
+            5.48146e-06
+        ],
+        "csq_gnomade2_an": [
+            182433
+        ],
+        "csq_gnomade2_ac-xx": [
+            0
+        ],
+        "csq_gnomade2_ac-xy": [
+            1
+        ],
+        "csq_gnomade2_af-xx": [
+            0.0
+        ],
+        "csq_gnomade2_af-xy": [
+            1.48958e-05
+        ],
+        "csq_gnomade2_an-xx": [
+            115300
+        ],
+        "csq_gnomade2_an-xy": [
+            67133
+        ],
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            0
+        ],
+        "csq_gnomade2_ac-asj": [
+            0
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            0
+        ],
+        "csq_gnomade2_ac-nfe": [
+            1
+        ],
+        "csq_gnomade2_ac-oth": [
+            0
+        ],
+        "csq_gnomade2_ac-sas": [
+            0
+        ],
+        "csq_gnomade2_af-afr": [
+            0.0
+        ],
+        "csq_gnomade2_af-amr": [
+            0.0
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.0
+        ],
+        "csq_gnomade2_af-nfe": [
+            1.22918e-05
+        ],
+        "csq_gnomade2_af-oth": [
+            0.0
+        ],
+        "csq_gnomade2_af-sas": [
+            0.0
+        ],
+        "csq_gnomade2_an-afr": [
+            13152
+        ],
+        "csq_gnomade2_an-amr": [
+            27413
+        ],
+        "csq_gnomade2_an-asj": [
+            7471
+        ],
+        "csq_gnomade2_an-eas": [
+            13860
+        ],
+        "csq_gnomade2_an-fin": [
+            15596
+        ],
+        "csq_gnomade2_an-nfe": [
+            81355
+        ],
+        "csq_gnomade2_an-oth": [
+            4512
+        ],
+        "csq_gnomade2_an-sas": [
+            19074
+        ],
+        "csq_gnomade2_nhomalt": [
+            0
+        ],
+        "csq_gnomade2_af_popmax": [
+            1.22918e-05
+        ],
+        "csq_gnomade2_nhomalt-xx": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_spliceai_pred_dp_ag": 21,
+        "csq_spliceai_pred_dp_al": 18,
+        "csq_spliceai_pred_dp_dg": 45,
+        "csq_spliceai_pred_dp_dl": -1,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.01,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_spliceai_pred_symbol": "G6PD",
+        "csq_phylop30way_mammalian": -0.129999995231628,
+        "csq_phylop100way_vertebrate": -2.75799989700317,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "f861d4a0-95a9-413e-aa86-0df0d9f398c9"
+    },
+    {
+        "ALT": "T",
+        "POS": 154437186,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
+                "genes_most_severe_hgvsc": "ENST00000447750.7:c.-69G>T",
+                "genes_most_severe_transcript": "ENST00000447750",
+                "genes_most_severe_feature_ncbi": "NM_001493.3"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.154437186G>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153665532,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:17.805253+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:154437186G_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:23.344526+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 13.69,
+        "csq_spliceai_pred_dp_ag": -19,
+        "csq_spliceai_pred_dp_al": 27,
+        "csq_spliceai_pred_dp_dg": -2,
+        "csq_spliceai_pred_dp_dl": -1,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "GDI1",
+        "csq_phylop30way_mammalian": 0.0920000001788139,
+        "csq_phylop100way_vertebrate": 2.48600006103516,
+        "csq_phastcons100way_vertebrate": 0.186000004410744,
+        "uuid": "db1c11a5-7804-4808-866c-1825df3817a9"
+    },
+    {
+        "ALT": "T",
+        "POS": 154436377,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "752cff3a-80bf-4dad-9858-786af410ced4",
+                "genes_most_severe_hgvsc": "ENST00000369762.7:c.*486C>T",
+                "genes_most_severe_transcript": "ENST00000369762",
+                "genes_most_severe_feature_ncbi": "NM_001183.6"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.154436377C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153664723,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:17.479542+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:154436377C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:22.647624+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 14.29,
+        "csq_spliceai_pred_dp_ag": 8,
+        "csq_spliceai_pred_dp_al": -25,
+        "csq_spliceai_pred_dp_dg": -48,
+        "csq_spliceai_pred_dp_dl": 26,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "ATP6AP1",
+        "csq_phylop30way_mammalian": 1.02600002288818,
+        "csq_phylop100way_vertebrate": 0.0450000017881393,
+        "csq_phastcons100way_vertebrate": 0.00999999977648258,
+        "uuid": "50c84bcf-6b31-404a-8b77-1cf177f1f899"
+    },
+    {
+        "ID": "rs781906895",
+        "ALT": "A",
+        "POS": 154029453,
+        "REF": "T",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "314f1ac8-8842-4645-bfac-f3054bdeabdd",
+                "genes_most_severe_hgvsc": "ENST00000453960.7:c.*914A>T",
+                "genes_most_severe_transcript": "ENST00000453960",
+                "genes_most_severe_feature_ncbi": "NM_001110792.2"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.154029453T>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153294904,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:17.128508+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:154029453T_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:22.076779+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 4.901,
+        "csq_gnomadg_ac": 37,
+        "csq_gnomadg_af": 0.000330862,
+        "csq_gnomadg_an": 111829,
+        "csq_gnomadg_ac-xx": 23,
+        "csq_gnomadg_ac-xy": 14,
+        "csq_gnomadg_af-xx": 0.000295584,
+        "csq_gnomadg_af-xy": 0.000411559,
+        "csq_gnomadg_an-xx": 77812,
+        "csq_gnomadg_an-xy": 34017,
+        "csq_gnomadg_ac-afr": 1,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 9,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 24,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 3,
+        "csq_gnomadg_af-afr": 3.25277e-05,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.000846422,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.00045277,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.00111773,
+        "csq_gnomadg_an-afr": 30743,
+        "csq_gnomadg_an-ami": 681,
+        "csq_gnomadg_an-amr": 10633,
+        "csq_gnomadg_an-asj": 2648,
+        "csq_gnomadg_an-eas": 3549,
+        "csq_gnomadg_an-fin": 6148,
+        "csq_gnomadg_an-mid": 235,
+        "csq_gnomadg_an-nfe": 53007,
+        "csq_gnomadg_an-oth": 1501,
+        "csq_gnomadg_an-sas": 2684,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.00111773,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": -45,
+        "csq_spliceai_pred_dp_al": 42,
+        "csq_spliceai_pred_dp_dg": 35,
+        "csq_spliceai_pred_dp_dl": -12,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "MECP2",
+        "csq_phylop30way_mammalian": 1.12000000476837,
+        "csq_phylop100way_vertebrate": 0.223000004887581,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "f8789a98-d987-425d-aeb7-90d9fd76fb2b"
+    },
+    {
+        "ID": "rs201770950",
+        "ALT": "T",
+        "POS": 153949297,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "3a96dd3c-0fa1-44b7-bad8-5b20cd6b8047",
+                "genes_most_severe_hgvsc": "ENST00000310441.12:c.*50G>A",
+                "genes_most_severe_transcript": "ENST00000310441",
+                "genes_most_severe_feature_ncbi": "NM_005334.3"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153949297C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153214748,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:16.809594+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153949297C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:21.231414+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 13.41,
+        "csq_gnomadg_ac": 468,
+        "csq_gnomadg_af": 0.00424459,
+        "csq_gnomadg_an": 110258,
+        "csq_gnomade2_ac": [
+            851
+        ],
+        "csq_gnomade2_af": [
+            0.00512743
+        ],
+        "csq_gnomade2_an": [
+            165970
+        ],
+        "csq_gnomadg_ac-xx": 353,
+        "csq_gnomadg_ac-xy": 115,
+        "csq_gnomadg_af-xx": 0.00454183,
+        "csq_gnomadg_af-xy": 0.00353455,
+        "csq_gnomadg_an-xx": 77722,
+        "csq_gnomadg_an-xy": 32536,
+        "csq_gnomade2_ac-xx": [
+            567
+        ],
+        "csq_gnomade2_ac-xy": [
+            284
+        ],
+        "csq_gnomade2_af-xx": [
+            0.00514603
+        ],
+        "csq_gnomade2_af-xy": [
+            0.0050907
+        ],
+        "csq_gnomade2_an-xx": [
+            110182
+        ],
+        "csq_gnomade2_an-xy": [
+            55788
+        ],
+        "csq_gnomadg_ac-afr": 20,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 36,
+        "csq_gnomadg_ac-asj": 62,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 22,
+        "csq_gnomadg_ac-mid": 2,
+        "csq_gnomadg_ac-nfe": 313,
+        "csq_gnomadg_ac-oth": 6,
+        "csq_gnomadg_ac-sas": 7,
+        "csq_gnomadg_af-afr": 0.000661857,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.00344234,
+        "csq_gnomadg_af-asj": 0.023628,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.00373832,
+        "csq_gnomadg_af-mid": 0.00847458,
+        "csq_gnomadg_af-nfe": 0.00595419,
+        "csq_gnomadg_af-oth": 0.00399202,
+        "csq_gnomadg_af-sas": 0.00270898,
+        "csq_gnomadg_an-afr": 30218,
+        "csq_gnomadg_an-ami": 676,
+        "csq_gnomadg_an-amr": 10458,
+        "csq_gnomadg_an-asj": 2624,
+        "csq_gnomadg_an-eas": 3506,
+        "csq_gnomadg_an-fin": 5885,
+        "csq_gnomadg_an-mid": 236,
+        "csq_gnomadg_an-nfe": 52568,
+        "csq_gnomadg_an-oth": 1503,
+        "csq_gnomadg_an-sas": 2584,
+        "csq_gnomade2_ac-afr": [
+            8
+        ],
+        "csq_gnomade2_ac-amr": [
+            51
+        ],
+        "csq_gnomade2_ac-asj": [
+            173
+        ],
+        "csq_gnomade2_ac-eas": [
+            1
+        ],
+        "csq_gnomade2_ac-fin": [
+            105
+        ],
+        "csq_gnomade2_ac-nfe": [
+            443
+        ],
+        "csq_gnomade2_ac-oth": [
+            35
+        ],
+        "csq_gnomade2_ac-sas": [
+            35
+        ],
+        "csq_gnomade2_af-afr": [
+            0.000664783
+        ],
+        "csq_gnomade2_af-amr": [
+            0.002107
+        ],
+        "csq_gnomade2_af-asj": [
+            0.02768
+        ],
+        "csq_gnomade2_af-eas": [
+            7.8235e-05
+        ],
+        "csq_gnomade2_af-fin": [
+            0.00685379
+        ],
+        "csq_gnomade2_af-nfe": [
+            0.00590132
+        ],
+        "csq_gnomade2_af-oth": [
+            0.00865052
+        ],
+        "csq_gnomade2_af-sas": [
+            0.00215186
+        ],
+        "csq_gnomade2_an-afr": [
+            12034
+        ],
+        "csq_gnomade2_an-amr": [
+            24205
+        ],
+        "csq_gnomade2_an-asj": [
+            6250
+        ],
+        "csq_gnomade2_an-eas": [
+            12782
+        ],
+        "csq_gnomade2_an-fin": [
+            15320
+        ],
+        "csq_gnomade2_an-nfe": [
+            75068
+        ],
+        "csq_gnomade2_an-oth": [
+            4046
+        ],
+        "csq_gnomade2_an-sas": [
+            16265
+        ],
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomade2_nhomalt": [
+            5
+        ],
+        "csq_gnomadg_af_popmax": 0.00595419,
+        "csq_gnomade2_af_popmax": [
+            0.00590132
+        ],
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            5
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": -39,
+        "csq_spliceai_pred_dp_al": 15,
+        "csq_spliceai_pred_dp_dg": 0,
+        "csq_spliceai_pred_dp_dl": 1,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            2
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            1
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            2
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_spliceai_pred_symbol": "HCFC1",
+        "csq_phylop30way_mammalian": 1.00600004196167,
+        "csq_phylop100way_vertebrate": 2.48799991607666,
+        "csq_phastcons100way_vertebrate": 0.986999988555908,
+        "uuid": "9553a7a8-b5b3-45a3-bebe-9e025d051b88"
+    },
+    {
+        "ID": "rs374487946",
+        "ALT": "A",
+        "POS": 153905623,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "e66ae150-f51d-4976-b20d-029e701bbee4",
+                "genes_most_severe_hgvsc": "ENST00000646375.1:c.117G>A",
+                "genes_most_severe_hgvsp": "ENSP00000496396.1:p.Ala39=",
+                "genes_most_severe_transcript": "ENST00000646375",
+                "genes_most_severe_amino_acids": "A",
+                "genes_most_severe_feature_ncbi": "NM_000054.6"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153905623G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153171077,
+        "csq_clinvar": "735248",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:16.383283+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153905623G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:20.160221+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.209,
+        "csq_clinvar_mc": [
+            "SO:0001819",
+            "synonymous_variant"
+        ],
+        "csq_gnomadg_ac": 80,
+        "csq_gnomadg_af": 0.000705934,
+        "csq_gnomadg_an": 113325,
+        "csq_gnomade2_ac": [
+            108
+        ],
+        "csq_gnomade2_af": [
+            0.000618776
+        ],
+        "csq_gnomade2_an": [
+            174538
+        ],
+        "csq_clinvar_clndn": [
+            "Nephrogenic_diabetes_insipidus",
+            "_X-linked",
+            "not_provided"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_gnomadg_ac-xx": 58,
+        "csq_gnomadg_ac-xy": 22,
+        "csq_gnomadg_af-xx": 0.000744831,
+        "csq_gnomadg_af-xy": 0.000620505,
+        "csq_gnomadg_an-xx": 77870,
+        "csq_gnomadg_an-xy": 35455,
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_gnomade2_ac-xx": [
+            61
+        ],
+        "csq_gnomade2_ac-xy": [
+            47
+        ],
+        "csq_gnomade2_af-xx": [
+            0.00054593
+        ],
+        "csq_gnomade2_af-xy": [
+            0.000748384
+        ],
+        "csq_gnomade2_an-xx": [
+            111736
+        ],
+        "csq_gnomade2_an-xy": [
+            62802
+        ],
+        "csq_gnomadg_ac-afr": 4,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 66,
+        "csq_gnomadg_ac-oth": 1,
+        "csq_gnomadg_ac-sas": 9,
+        "csq_gnomadg_af-afr": 0.000128078,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.00123755,
+        "csq_gnomadg_af-oth": 0.000655308,
+        "csq_gnomadg_af-sas": 0.00318471,
+        "csq_gnomadg_an-afr": 31231,
+        "csq_gnomadg_an-ami": 687,
+        "csq_gnomadg_an-amr": 10868,
+        "csq_gnomadg_an-asj": 2659,
+        "csq_gnomadg_an-eas": 3596,
+        "csq_gnomadg_an-fin": 6362,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 53331,
+        "csq_gnomadg_an-oth": 1526,
+        "csq_gnomadg_an-sas": 2826,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            3
+        ],
+        "csq_gnomade2_ac-asj": [
+            0
+        ],
+        "csq_gnomade2_ac-eas": [
+            2
+        ],
+        "csq_gnomade2_ac-fin": [
+            1
+        ],
+        "csq_gnomade2_ac-nfe": [
+            75
+        ],
+        "csq_gnomade2_ac-oth": [
+            4
+        ],
+        "csq_gnomade2_ac-sas": [
+            23
+        ],
+        "csq_gnomade2_af-afr": [
+            0.0
+        ],
+        "csq_gnomade2_af-amr": [
+            0.000110824
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0
+        ],
+        "csq_gnomade2_af-eas": [
+            0.00015024
+        ],
+        "csq_gnomade2_af-fin": [
+            6.63174e-05
+        ],
+        "csq_gnomade2_af-nfe": [
+            0.000975191
+        ],
+        "csq_gnomade2_af-oth": [
+            0.00092614
+        ],
+        "csq_gnomade2_af-sas": [
+            0.00123516
+        ],
+        "csq_gnomade2_an-afr": [
+            11925
+        ],
+        "csq_gnomade2_an-amr": [
+            27070
+        ],
+        "csq_gnomade2_an-asj": [
+            7304
+        ],
+        "csq_gnomade2_an-eas": [
+            13312
+        ],
+        "csq_gnomade2_an-fin": [
+            15079
+        ],
+        "csq_gnomade2_an-nfe": [
+            76908
+        ],
+        "csq_gnomade2_an-oth": [
+            4319
+        ],
+        "csq_gnomade2_an-sas": [
+            18621
+        ],
+        "csq_gnomadg_nhomalt": 1,
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0010581",
+            "MedGen:C1563705",
+            "OMIM:304800",
+            "MedGen:CN517202"
+        ],
+        "csq_clinvar_geneinfo": [
+            "AVPR2:554"
+        ],
+        "csq_gnomade2_nhomalt": [
+            0
+        ],
+        "csq_gnomadg_af_popmax": 0.00318471,
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_multiple_submitters",
+            "_no_conflicts"
+        ],
+        "csq_gnomade2_af_popmax": [
+            0.00123516
+        ],
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 1,
+        "csq_spliceai_pred_dp_ag": 23,
+        "csq_spliceai_pred_dp_al": 4,
+        "csq_spliceai_pred_dp_dg": 2,
+        "csq_spliceai_pred_dp_dl": 27,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_spliceai_pred_symbol": "AVPR2",
+        "csq_phylop30way_mammalian": -1.58500003814697,
+        "csq_phylop100way_vertebrate": -5.65899991989136,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "f373e87c-c887-4197-84af-bccf69d1ebe8"
+    },
+    {
+        "ID": "rs191831224",
+        "ALT": "A",
+        "POS": 153803035,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "2a649655-30ed-4339-b02f-5c079d2c9850",
+                "genes_most_severe_hgvsc": "ENST00000393758.6:c.*318G>T",
+                "genes_most_severe_transcript": "ENST00000393758"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153803035C>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153068490,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:16.113109+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153803035C_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:19.385291+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 1.584,
+        "csq_gnomadg_ac": 102,
+        "csq_gnomadg_af": 0.000908192,
+        "csq_gnomadg_an": 112311,
+        "csq_gnomadg_ac-xx": 76,
+        "csq_gnomadg_ac-xy": 26,
+        "csq_gnomadg_af-xx": 0.000976914,
+        "csq_gnomadg_af-xy": 0.000753296,
+        "csq_gnomadg_an-xx": 77796,
+        "csq_gnomadg_an-xy": 34515,
+        "csq_gnomadg_ac-afr": 7,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 1,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 81,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 11,
+        "csq_gnomadg_af-afr": 0.000226332,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.000283126,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.00152675,
+        "csq_gnomadg_af-oth": 0.00130634,
+        "csq_gnomadg_af-sas": 0.0039884,
+        "csq_gnomadg_an-afr": 30928,
+        "csq_gnomadg_an-ami": 678,
+        "csq_gnomadg_an-amr": 10750,
+        "csq_gnomadg_an-asj": 2656,
+        "csq_gnomadg_an-eas": 3532,
+        "csq_gnomadg_an-fin": 6184,
+        "csq_gnomadg_an-mid": 240,
+        "csq_gnomadg_an-nfe": 53054,
+        "csq_gnomadg_an-oth": 1531,
+        "csq_gnomadg_an-sas": 2758,
+        "csq_gnomadg_nhomalt": 1,
+        "csq_gnomadg_af_popmax": 0.0039884,
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 1,
+        "csq_spliceai_pred_dp_ag": -22,
+        "csq_spliceai_pred_dp_al": 0,
+        "csq_spliceai_pred_dp_dg": 47,
+        "csq_spliceai_pred_dp_dl": 5,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "PDZD4",
+        "csq_phylop30way_mammalian": -0.0179999992251396,
+        "csq_phylop100way_vertebrate": -0.781000018119812,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "8b7d6cc7-777d-4019-b4b2-57beba8a1c99"
+    },
+    {
+        "ID": "rs193922096",
+        "ALT": "A",
+        "POS": 153743687,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "980af2b3-0500-461c-bc33-9ad3d0f89464",
+                "genes_most_severe_hgvsc": "ENST00000218104.6:c.2190G>A",
+                "genes_most_severe_hgvsp": "ENSP00000218104.3:p.Pro730=",
+                "genes_most_severe_transcript": "ENST00000218104",
+                "genes_most_severe_amino_acids": "P",
+                "genes_most_severe_feature_ncbi": "NM_000033.4"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153743687G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 153009141,
+        "csq_clinvar": "35640",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-09T22:04:51.293626+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153743687G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:18.884847+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 2.042,
+        "csq_clinvar_mc": [
+            "SO:0001819",
+            "synonymous_variant"
+        ],
+        "csq_gnomadg_ac": 105,
+        "csq_gnomadg_af": 0.000938749,
+        "csq_gnomadg_an": 111851,
+        "csq_gnomade2_ac": [
+            92
+        ],
+        "csq_gnomade2_af": [
+            0.000805068
+        ],
+        "csq_gnomade2_an": [
+            114276
+        ],
+        "csq_clinvar_clndn": [
+            "Adrenoleukodystrophy",
+            "History_of_neurodevelopmental_disorder"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_gnomadg_ac-xx": 77,
+        "csq_gnomadg_ac-xy": 28,
+        "csq_gnomadg_af-xx": 0.000989946,
+        "csq_gnomadg_af-xy": 0.000821862,
+        "csq_gnomadg_an-xx": 77782,
+        "csq_gnomadg_an-xy": 34069,
+        "csq_clinvar_clnsig": "Likely_benign",
+        "csq_clinvar_origin": 1,
+        "csq_gnomade2_ac-xx": [
+            53
+        ],
+        "csq_gnomade2_ac-xy": [
+            39
+        ],
+        "csq_gnomade2_af-xx": [
+            0.000687544
+        ],
+        "csq_gnomade2_af-xy": [
+            0.00104867
+        ],
+        "csq_gnomade2_an-xx": [
+            77086
+        ],
+        "csq_gnomade2_an-xy": [
+            37190
+        ],
+        "csq_gnomadg_ac-afr": 8,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 1,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 85,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 9,
+        "csq_gnomadg_af-afr": 0.000259437,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.000284657,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.00160553,
+        "csq_gnomadg_af-oth": 0.0013245,
+        "csq_gnomadg_af-sas": 0.00331492,
+        "csq_gnomadg_an-afr": 30836,
+        "csq_gnomadg_an-ami": 682,
+        "csq_gnomadg_an-amr": 10649,
+        "csq_gnomadg_an-asj": 2644,
+        "csq_gnomadg_an-eas": 3513,
+        "csq_gnomadg_an-fin": 6121,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 52942,
+        "csq_gnomadg_an-oth": 1510,
+        "csq_gnomadg_an-sas": 2715,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            3
+        ],
+        "csq_gnomade2_ac-asj": [
+            0
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            0
+        ],
+        "csq_gnomade2_ac-nfe": [
+            61
+        ],
+        "csq_gnomade2_ac-oth": [
+            6
+        ],
+        "csq_gnomade2_ac-sas": [
+            22
+        ],
+        "csq_gnomade2_af-afr": [
+            0.0
+        ],
+        "csq_gnomade2_af-amr": [
+            0.000145546
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.0
+        ],
+        "csq_gnomade2_af-nfe": [
+            0.00136866
+        ],
+        "csq_gnomade2_af-oth": [
+            0.00184388
+        ],
+        "csq_gnomade2_af-sas": [
+            0.00154234
+        ],
+        "csq_gnomade2_an-afr": [
+            6411
+        ],
+        "csq_gnomade2_an-amr": [
+            20612
+        ],
+        "csq_gnomade2_an-asj": [
+            6150
+        ],
+        "csq_gnomade2_an-eas": [
+            8766
+        ],
+        "csq_gnomade2_an-fin": [
+            10250
+        ],
+        "csq_gnomade2_an-nfe": [
+            44569
+        ],
+        "csq_gnomade2_an-oth": [
+            3254
+        ],
+        "csq_gnomade2_an-sas": [
+            14264
+        ],
+        "csq_gnomadg_nhomalt": 1,
+        "csq_clinvar_clndisdb": [
+            "MONDO:MONDO:0018544",
+            "MedGen:C0162309",
+            "OMIM:300100",
+            "Orphanet:ORPHA43",
+            "SNOMED_CT:65389002",
+            "MedGen:C2711754"
+        ],
+        "csq_clinvar_geneinfo": [
+            "ABCD1:215"
+        ],
+        "csq_gnomade2_nhomalt": [
+            1
+        ],
+        "csq_gnomadg_af_popmax": 0.00331492,
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_multiple_submitters",
+            "_no_conflicts"
+        ],
+        "csq_gnomade2_af_popmax": [
+            0.00154234
+        ],
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            1
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 1,
+        "csq_spliceai_pred_dp_ag": 2,
+        "csq_spliceai_pred_dp_al": 9,
+        "csq_spliceai_pred_dp_dg": 11,
+        "csq_spliceai_pred_dp_dl": 34,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            1
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_spliceai_pred_symbol": "ABCD1",
+        "csq_phylop30way_mammalian": -0.846000015735626,
+        "csq_phylop100way_vertebrate": -0.00100000004749745,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "10410bd1-03e7-48b4-9c0b-33577b165623"
+    },
+    {
+        "ID": "rs781894072",
+        "ALT": "A",
+        "POS": 153397690,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "c6ec8ff0-150e-494e-85f4-a5b2b1284ddd",
+                "genes_most_severe_hgvsc": "ENST00000633844.1:c.326C>T",
+                "genes_most_severe_hgvsp": "ENSP00000488404.1:p.Ala109Val",
+                "genes_most_severe_transcript": "ENST00000633844",
+                "genes_most_severe_amino_acids": "A/V"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153397690G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 152663148,
+        "csq_gerp_rs": -2.91,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:15.352164+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153397690G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:18.245938+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.056,
+        "csq_gnomadg_ac": 42,
+        "csq_gnomadg_af": 0.000371369,
+        "csq_gnomadg_an": 113095,
+        "csq_gnomadg_ac-xx": 31,
+        "csq_gnomadg_ac-xy": 11,
+        "csq_gnomadg_af-xx": 0.000398161,
+        "csq_gnomadg_af-xy": 0.000312172,
+        "csq_gnomadg_an-xx": 77858,
+        "csq_gnomadg_an-xy": 35237,
+        "csq_gnomadg_ac-afr": 2,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 1,
+        "csq_gnomadg_ac-asj": 2,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 2,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 34,
+        "csq_gnomadg_ac-oth": 1,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 6.41211e-05,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 9.22679e-05,
+        "csq_gnomadg_af-asj": 0.000754432,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.000318776,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.000637624,
+        "csq_gnomadg_af-oth": 0.000653595,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 31191,
+        "csq_gnomadg_an-ami": 687,
+        "csq_gnomadg_an-amr": 10838,
+        "csq_gnomadg_an-asj": 2651,
+        "csq_gnomadg_an-eas": 3590,
+        "csq_gnomadg_an-fin": 6274,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 53323,
+        "csq_gnomadg_an-oth": 1530,
+        "csq_gnomadg_an-sas": 2772,
+        "csq_siphy_29way_pi": 0.0,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gerp_rs_rankscore": 0.05294,
+        "csq_gnomadg_af_popmax": 0.000637624,
+        "csq_cadd_raw_rankscore": 0.01134,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_siphy_29way_logodds": 9.8776,
+        "csq_spliceai_pred_dp_ag": -29,
+        "csq_spliceai_pred_dp_al": -28,
+        "csq_spliceai_pred_dp_dg": 6,
+        "csq_spliceai_pred_dp_dl": -28,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "U82695.5",
+        "csq_phylop30way_mammalian": -0.256999999284744,
+        "csq_phylop100way_vertebrate": -2.58800005912781,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "csq_phylop100way_vertebrate_rankscore": 0.00975,
+        "uuid": "5f274294-9256-423a-a422-8c50e374e16f"
+    },
+    {
+        "ALT": "G",
+        "POS": 153276560,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "2dbdcf1d-c1e1-4a6e-8e59-8a76a9dd0f8a",
+                "genes_most_severe_hgvsc": "ENST00000458091.4:c.4943C>G",
+                "genes_most_severe_hgvsp": "ENSP00000498408.1:p.Pro1648Arg",
+                "genes_most_severe_transcript": "ENST00000458091",
+                "genes_most_severe_amino_acids": "P/R"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153276560C>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 152542017,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:15.163405+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153276560C_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:17.868506+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 1.97,
+        "csq_phylop30way_mammalian": -0.976999998092651,
+        "csq_phylop100way_vertebrate": -0.0469999983906746,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "bb73e849-2222-4509-8c3a-782c85835c96"
+    },
+    {
+        "ID": "rs1362168707",
+        "ALT": "T",
+        "POS": 153056488,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "0e48ec2a-cb98-4213-92b8-cdf0cec77751",
+                "genes_most_severe_hgvsc": "ENST00000424805.1:c.-257C>T",
+                "genes_most_severe_transcript": "ENST00000424805"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.153056488C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 152224845,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:14.886334+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:153056488C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:17.353477+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 4.926,
+        "csq_gnomadg_ac": 3,
+        "csq_gnomadg_af": 2.70307e-05,
+        "csq_gnomadg_an": 110985,
+        "csq_gnomadg_ac-xx": 3,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 3.86907e-05,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 77538,
+        "csq_gnomadg_an-xy": 33447,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 3,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 5.70407e-05,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30584,
+        "csq_gnomadg_an-ami": 667,
+        "csq_gnomadg_an-amr": 10722,
+        "csq_gnomadg_an-asj": 2620,
+        "csq_gnomadg_an-eas": 3433,
+        "csq_gnomadg_an-fin": 5964,
+        "csq_gnomadg_an-mid": 231,
+        "csq_gnomadg_an-nfe": 52594,
+        "csq_gnomadg_an-oth": 1491,
+        "csq_gnomadg_an-sas": 2679,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 5.70407e-05,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_phylop30way_mammalian": -0.514999985694885,
+        "csq_phylop100way_vertebrate": -0.391999989748001,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "f8c888bc-1a71-4e68-afeb-ae44d4b420bf"
+    },
+    {
+        "ID": "rs782424428",
+        "ALT": "A",
+        "POS": 152922195,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "genes_most_severe_hgvsc": "ENST00000535861.5:c.676G>A",
+                "genes_most_severe_hgvsp": "ENSP00000440847.1:p.Gly226Arg",
+                "genes_most_severe_sift_score": 0.271,
+                "genes_most_severe_transcript": "ENST00000535861",
+                "genes_most_severe_amino_acids": "G/R"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.152922195G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 152090739,
+        "csq_gerp_rs": 1.97,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:14.016383+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:152922195G_A",
+        "csq_sift_pred": "T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:15.603699+00:00"
+        },
+        "spliceaiMaxds": 0.04,
+        "csq_cadd_phred": 13.32,
+        "csq_gnomadg_ac": 5,
+        "csq_gnomadg_af": 4.48801e-05,
+        "csq_gnomadg_an": 111408,
+        "csq_sift_score": 0.288,
+        "csq_gnomade2_ac": [
+            3
+        ],
+        "csq_gnomade2_af": [
+            2.0055e-05
+        ],
+        "csq_gnomade2_an": [
+            149589
+        ],
+        "csq_revel_score": 0.017,
+        "csq_gnomadg_ac-xx": 4,
+        "csq_gnomadg_ac-xy": 1,
+        "csq_gnomadg_af-xx": 5.1402e-05,
+        "csq_gnomadg_af-xy": 2.97708e-05,
+        "csq_gnomadg_an-xx": 77818,
+        "csq_gnomadg_an-xy": 33590,
+        "csq_gnomade2_ac-xx": [
+            3
+        ],
+        "csq_gnomade2_ac-xy": [
+            0
+        ],
+        "csq_gnomade2_af-xx": [
+            2.90242e-05
+        ],
+        "csq_gnomade2_af-xy": [
+            0.0
+        ],
+        "csq_gnomade2_an-xx": [
+            103362
+        ],
+        "csq_gnomade2_an-xy": [
+            46227
+        ],
+        "csq_gnomadg_ac-afr": 1,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 1,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 3,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 3.26968e-05,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.000377929,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 5.65696e-05,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30584,
+        "csq_gnomadg_an-ami": 685,
+        "csq_gnomadg_an-amr": 10491,
+        "csq_gnomadg_an-asj": 2646,
+        "csq_gnomadg_an-eas": 3537,
+        "csq_gnomadg_an-fin": 6077,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 53032,
+        "csq_gnomadg_an-oth": 1498,
+        "csq_gnomadg_an-sas": 2619,
+        "csq_primateai_pred": "T",
+        "csq_siphy_29way_pi": 0.0,
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            1
+        ],
+        "csq_gnomade2_ac-asj": [
+            0
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            0
+        ],
+        "csq_gnomade2_ac-nfe": [
+            2
+        ],
+        "csq_gnomade2_ac-oth": [
+            0
+        ],
+        "csq_gnomade2_ac-sas": [
+            0
+        ],
+        "csq_gnomade2_af-afr": [
+            0.0
+        ],
+        "csq_gnomade2_af-amr": [
+            4.095e-05
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.0
+        ],
+        "csq_gnomade2_af-nfe": [
+            3.13544e-05
+        ],
+        "csq_gnomade2_af-oth": [
+            0.0
+        ],
+        "csq_gnomade2_af-sas": [
+            0.0
+        ],
+        "csq_gnomade2_an-afr": [
+            10005
+        ],
+        "csq_gnomade2_an-amr": [
+            24420
+        ],
+        "csq_gnomade2_an-asj": [
+            6865
+        ],
+        "csq_gnomade2_an-eas": [
+            11484
+        ],
+        "csq_gnomade2_an-fin": [
+            13400
+        ],
+        "csq_gnomade2_an-nfe": [
+            63787
+        ],
+        "csq_gnomade2_an-oth": [
+            3858
+        ],
+        "csq_gnomade2_an-sas": [
+            15770
+        ],
+        "csq_gnomadg_nhomalt": 0,
+        "csq_primateai_score": 0.274374872446,
+        "csq_revel_rankscore": 0.02902,
+        "csq_gnomade2_nhomalt": [
+            0
+        ],
+        "csq_gerp_rs_rankscore": 0.25278,
+        "csq_gnomadg_af_popmax": 5.65696e-05,
+        "csq_cadd_raw_rankscore": 0.17117,
+        "csq_gnomade2_af_popmax": [
+            4.095e-05
+        ],
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_polyphen2_hvar_pred": "B",
+        "csq_primateai_rankscore": 0.0672,
+        "csq_siphy_29way_logodds": 6.5137,
+        "csq_spliceai_pred_dp_ag": -15,
+        "csq_spliceai_pred_dp_al": -22,
+        "csq_spliceai_pred_dp_dg": -22,
+        "csq_spliceai_pred_dp_dl": 35,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.04,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_polyphen2_hvar_score": 0.023,
+        "csq_spliceai_pred_symbol": "ZNF185",
+        "csq_phylop30way_mammalian": -0.12899999320507,
+        "csq_phylop100way_vertebrate": 0.878000020980835,
+        "csq_polyphen2_hvar_rankscore": 0.19966,
+        "csq_sift_converted_rankscore": 0.19225,
+        "csq_phastcons100way_vertebrate": 0.00300000002607703,
+        "csq_phylop100way_vertebrate_rankscore": 0.2777,
+        "uuid": "d935e116-2fd3-4793-a1c7-48f18fa109dd"
+    },
+    {
+        "ID": "rs144366408",
+        "ALT": "T",
+        "POS": 151739696,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "42c83a8e-6c1f-4e48-a8f1-001c495d5388",
+                "genes_most_severe_hgvsc": "ENST00000329903.4:c.338G>T",
+                "genes_most_severe_hgvsp": "ENSP00000328478.4:p.Gly113Val",
+                "genes_most_severe_sift_score": 0.414,
+                "genes_most_severe_transcript": "ENST00000329903",
+                "genes_most_severe_amino_acids": "G/V",
+                "genes_most_severe_polyphen_score": 0.015
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.151739696G>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 150908168,
+        "csq_clinvar": "728382",
+        "csq_gerp_rs": 2.75,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:13.782501+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:151739696G_T",
+        "csq_sift_pred": "T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:15.063339+00:00"
+        },
+        "spliceaiMaxds": 0.01,
+        "csq_cadd_phred": 13.3,
+        "csq_clinvar_mc": [
+            "SO:0001583",
+            "missense_variant"
+        ],
+        "csq_gnomadg_ac": 561,
+        "csq_gnomadg_af": 0.0050213,
+        "csq_gnomadg_an": 111724,
+        "csq_sift_score": 0.414,
+        "csq_gnomade2_ac": [
+            1047
+        ],
+        "csq_gnomade2_af": [
+            0.00571401
+        ],
+        "csq_gnomade2_an": [
+            183234
+        ],
+        "csq_revel_score": 0.193,
+        "csq_clinvar_clndn": [
+            "not_provided"
+        ],
+        "csq_clinvar_clnvc": "single_nucleotide_variant",
+        "csq_gnomadg_ac-xx": 404,
+        "csq_gnomadg_ac-xy": 157,
+        "csq_gnomadg_af-xx": 0.00519013,
+        "csq_gnomadg_af-xy": 0.00463346,
+        "csq_gnomadg_an-xx": 77840,
+        "csq_gnomadg_an-xy": 33884,
+        "csq_clinvar_clnsig": "Benign",
+        "csq_clinvar_origin": 1,
+        "csq_gnomade2_ac-xx": [
+            592
+        ],
+        "csq_gnomade2_ac-xy": [
+            455
+        ],
+        "csq_gnomade2_af-xx": [
+            0.00512421
+        ],
+        "csq_gnomade2_af-xy": [
+            0.00672043
+        ],
+        "csq_gnomade2_an-xx": [
+            115530
+        ],
+        "csq_gnomade2_an-xy": [
+            67704
+        ],
+        "csq_gnomadg_ac-afr": 31,
+        "csq_gnomadg_ac-ami": 3,
+        "csq_gnomadg_ac-amr": 27,
+        "csq_gnomadg_ac-asj": 41,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 5,
+        "csq_gnomadg_ac-mid": 3,
+        "csq_gnomadg_ac-nfe": 423,
+        "csq_gnomadg_ac-oth": 16,
+        "csq_gnomadg_ac-sas": 12,
+        "csq_gnomadg_af-afr": 0.00100951,
+        "csq_gnomadg_af-ami": 0.00439239,
+        "csq_gnomadg_af-amr": 0.00256337,
+        "csq_gnomadg_af-asj": 0.0154951,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.000823452,
+        "csq_gnomadg_af-mid": 0.0128205,
+        "csq_gnomadg_af-nfe": 0.00795786,
+        "csq_gnomadg_af-oth": 0.0107023,
+        "csq_gnomadg_af-sas": 0.00453686,
+        "csq_gnomadg_an-afr": 30708,
+        "csq_gnomadg_an-ami": 683,
+        "csq_gnomadg_an-amr": 10533,
+        "csq_gnomadg_an-asj": 2646,
+        "csq_gnomadg_an-eas": 3553,
+        "csq_gnomadg_an-fin": 6072,
+        "csq_gnomadg_an-mid": 234,
+        "csq_gnomadg_an-nfe": 53155,
+        "csq_gnomadg_an-oth": 1495,
+        "csq_gnomadg_an-sas": 2645,
+        "csq_primateai_pred": "T",
+        "csq_siphy_29way_pi": 0.0,
+        "csq_clinvar_clnvcso": "SO:0001483",
+        "csq_gnomade2_ac-afr": [
+            9
+        ],
+        "csq_gnomade2_ac-amr": [
+            88
+        ],
+        "csq_gnomade2_ac-asj": [
+            112
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            16
+        ],
+        "csq_gnomade2_ac-nfe": [
+            641
+        ],
+        "csq_gnomade2_ac-oth": [
+            47
+        ],
+        "csq_gnomade2_ac-sas": [
+            134
+        ],
+        "csq_gnomade2_af-afr": [
+            0.000683995
+        ],
+        "csq_gnomade2_af-amr": [
+            0.00321121
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0149733
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.00100006
+        ],
+        "csq_gnomade2_af-nfe": [
+            0.00784117
+        ],
+        "csq_gnomade2_af-oth": [
+            0.010389
+        ],
+        "csq_gnomade2_af-sas": [
+            0.00702896
+        ],
+        "csq_gnomade2_an-afr": [
+            13158
+        ],
+        "csq_gnomade2_an-amr": [
+            27404
+        ],
+        "csq_gnomade2_an-asj": [
+            7480
+        ],
+        "csq_gnomade2_an-eas": [
+            13857
+        ],
+        "csq_gnomade2_an-fin": [
+            15999
+        ],
+        "csq_gnomade2_an-nfe": [
+            81748
+        ],
+        "csq_gnomade2_an-oth": [
+            4524
+        ],
+        "csq_gnomade2_an-sas": [
+            19064
+        ],
+        "csq_gnomadg_nhomalt": 3,
+        "csq_primateai_score": 0.346496105194,
+        "csq_revel_rankscore": 0.47723,
+        "csq_clinvar_clndisdb": [
+            "MedGen:CN517202"
+        ],
+        "csq_clinvar_geneinfo": [
+            "CNGA2:1260"
+        ],
+        "csq_gnomade2_nhomalt": [
+            6
+        ],
+        "csq_gerp_rs_rankscore": 0.31439,
+        "csq_gnomadg_af_popmax": 0.00795786,
+        "csq_cadd_raw_rankscore": 0.17076,
+        "csq_clinvar_clnrevstat": [
+            "criteria_provided",
+            "_single_submitter"
+        ],
+        "csq_gnomade2_af_popmax": [
+            0.00784117
+        ],
+        "csq_gnomadg_nhomalt-xx": 3,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            6
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 2,
+        "csq_gnomadg_nhomalt-oth": 1,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_polyphen2_hvar_pred": "B",
+        "csq_primateai_rankscore": 0.17404,
+        "csq_siphy_29way_logodds": 2.2593,
+        "csq_spliceai_pred_dp_ag": -10,
+        "csq_spliceai_pred_dp_al": 37,
+        "csq_spliceai_pred_dp_dg": 36,
+        "csq_spliceai_pred_dp_dl": -23,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.01,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            1
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            3
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            2
+        ],
+        "csq_polyphen2_hvar_score": 0.015,
+        "csq_spliceai_pred_symbol": "CNGA2",
+        "csq_phylop30way_mammalian": -0.150000005960464,
+        "csq_phylop100way_vertebrate": 0.245000004768372,
+        "csq_polyphen2_hvar_rankscore": 0.17295,
+        "csq_sift_converted_rankscore": 0.1002,
+        "csq_phastcons100way_vertebrate": 0.851000010967255,
+        "csq_phylop100way_vertebrate_rankscore": 0.17917,
+        "uuid": "403aa4de-bd6f-4a9d-9449-2a0eaf3d57de"
+    },
+    {
+        "ID": "rs781816901",
+        "ALT": "T",
+        "POS": 150766502,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "cf0245eb-0f2f-4cad-a785-371a1ed69d9c",
+                "genes_most_severe_hgvsc": "ENST00000613030.4:c.*2532G>A",
+                "genes_most_severe_transcript": "ENST00000613030"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.150766502C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 149934975,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:13.384643+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:150766502C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:14.288729+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.633,
+        "csq_gnomadg_ac": 5,
+        "csq_gnomadg_af": 4.48217e-05,
+        "csq_gnomadg_an": 111553,
+        "csq_gnomadg_ac-xx": 2,
+        "csq_gnomadg_ac-xy": 3,
+        "csq_gnomadg_af-xx": 2.5699e-05,
+        "csq_gnomadg_af-xy": 8.89442e-05,
+        "csq_gnomadg_an-xx": 77824,
+        "csq_gnomadg_an-xy": 33729,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 5,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 9.41495e-05,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30577,
+        "csq_gnomadg_an-ami": 685,
+        "csq_gnomadg_an-amr": 10588,
+        "csq_gnomadg_an-asj": 2647,
+        "csq_gnomadg_an-eas": 3523,
+        "csq_gnomadg_an-fin": 6066,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 53107,
+        "csq_gnomadg_an-oth": 1500,
+        "csq_gnomadg_an-sas": 2621,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 9.41495e-05,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_phylop30way_mammalian": -0.0900000035762787,
+        "csq_phylop100way_vertebrate": -0.563000023365021,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "89c0d893-c25d-4c17-8efb-2eebbf1fdeb0"
+    },
+    {
+        "ID": "rs140788054",
+        "ALT": "A",
+        "POS": 148719213,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "50ac9d21-2a3a-42c0-9834-d56cf128b874",
+                "genes_most_severe_hgvsc": "ENST00000286437.7:c.33G>A",
+                "genes_most_severe_hgvsp": "ENSP00000286437.5:p.Pro11=",
+                "genes_most_severe_transcript": "ENST00000286437",
+                "genes_most_severe_amino_acids": "P"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.148719213G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 147800737,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-09T22:04:37.537816+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:148719213G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:13.694663+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 1.729,
+        "csq_gnomadg_ac": 827,
+        "csq_gnomadg_af": 0.00745105,
+        "csq_gnomadg_an": 110991,
+        "csq_gnomade2_ac": [
+            738
+        ],
+        "csq_gnomade2_af": [
+            0.00728637
+        ],
+        "csq_gnomade2_an": [
+            101285
+        ],
+        "csq_gnomadg_ac-xx": 611,
+        "csq_gnomadg_ac-xy": 216,
+        "csq_gnomadg_af-xx": 0.00786176,
+        "csq_gnomadg_af-xy": 0.00649175,
+        "csq_gnomadg_an-xx": 77718,
+        "csq_gnomadg_an-xy": 33273,
+        "csq_gnomade2_ac-xx": [
+            473
+        ],
+        "csq_gnomade2_ac-xy": [
+            265
+        ],
+        "csq_gnomade2_af-xx": [
+            0.00734929
+        ],
+        "csq_gnomade2_af-xy": [
+            0.00717671
+        ],
+        "csq_gnomade2_an-xx": [
+            64360
+        ],
+        "csq_gnomade2_an-xy": [
+            36925
+        ],
+        "csq_gnomadg_ac-afr": 50,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 67,
+        "csq_gnomadg_ac-asj": 24,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 14,
+        "csq_gnomadg_ac-mid": 2,
+        "csq_gnomadg_ac-nfe": 653,
+        "csq_gnomadg_ac-oth": 16,
+        "csq_gnomadg_ac-sas": 1,
+        "csq_gnomadg_af-afr": 0.00163607,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.00644975,
+        "csq_gnomadg_af-asj": 0.00908747,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.00235373,
+        "csq_gnomadg_af-mid": 0.00847458,
+        "csq_gnomadg_af-nfe": 0.0123368,
+        "csq_gnomadg_af-oth": 0.0106952,
+        "csq_gnomadg_af-sas": 0.000379651,
+        "csq_gnomadg_an-afr": 30561,
+        "csq_gnomadg_an-ami": 683,
+        "csq_gnomadg_an-amr": 10388,
+        "csq_gnomadg_an-asj": 2641,
+        "csq_gnomadg_an-eas": 3473,
+        "csq_gnomadg_an-fin": 5948,
+        "csq_gnomadg_an-mid": 236,
+        "csq_gnomadg_an-nfe": 52931,
+        "csq_gnomadg_an-oth": 1496,
+        "csq_gnomadg_an-sas": 2634,
+        "csq_gnomade2_ac-afr": [
+            13
+        ],
+        "csq_gnomade2_ac-amr": [
+            97
+        ],
+        "csq_gnomade2_ac-asj": [
+            74
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            23
+        ],
+        "csq_gnomade2_ac-nfe": [
+            500
+        ],
+        "csq_gnomade2_ac-oth": [
+            26
+        ],
+        "csq_gnomade2_ac-sas": [
+            5
+        ],
+        "csq_gnomade2_af-afr": [
+            0.00213675
+        ],
+        "csq_gnomade2_af-amr": [
+            0.00501033
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0120364
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.00566084
+        ],
+        "csq_gnomade2_af-nfe": [
+            0.0123695
+        ],
+        "csq_gnomade2_af-oth": [
+            0.00838439
+        ],
+        "csq_gnomade2_af-sas": [
+            0.000352908
+        ],
+        "csq_gnomade2_an-afr": [
+            6084
+        ],
+        "csq_gnomade2_an-amr": [
+            19360
+        ],
+        "csq_gnomade2_an-asj": [
+            6148
+        ],
+        "csq_gnomade2_an-eas": [
+            7939
+        ],
+        "csq_gnomade2_an-fin": [
+            4063
+        ],
+        "csq_gnomade2_an-nfe": [
+            40422
+        ],
+        "csq_gnomade2_an-oth": [
+            3101
+        ],
+        "csq_gnomade2_an-sas": [
+            14168
+        ],
+        "csq_gnomadg_nhomalt": 5,
+        "csq_gnomade2_nhomalt": [
+            6
+        ],
+        "csq_gnomadg_af_popmax": 0.0123368,
+        "csq_gnomade2_af_popmax": [
+            0.0123695
+        ],
+        "csq_gnomadg_nhomalt-xx": 5,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            6
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 5,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 2,
+        "csq_spliceai_pred_dp_al": -26,
+        "csq_spliceai_pred_dp_dg": -3,
+        "csq_spliceai_pred_dp_dl": 18,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            6
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_spliceai_pred_symbol": "AFF2",
+        "csq_phylop30way_mammalian": 0.796999990940094,
+        "csq_phylop100way_vertebrate": 0.194000005722046,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "10b1e199-1505-4e74-906f-35b766201b41"
+    },
+    {
+        "ID": "rs548873120",
+        "ALT": "C",
+        "POS": 138623639,
+        "REF": "T",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "679ec201-fa0e-4bff-860b-e97ceceed2cd",
+                "genes_most_severe_hgvsc": "ENST00000315930.11:c.*9211A>G",
+                "genes_most_severe_transcript": "ENST00000315930",
+                "genes_most_severe_feature_ncbi": "NM_004114.5"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.138623639T>C",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 137705800,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:12.743675+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:138623639T_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:13.175809+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 2.707,
+        "csq_gnomadg_ac": 56,
+        "csq_gnomadg_af": 0.00051039,
+        "csq_gnomadg_an": 109720,
+        "csq_gnomadg_ac-xx": 40,
+        "csq_gnomadg_ac-xy": 16,
+        "csq_gnomadg_af-xx": 0.000515105,
+        "csq_gnomadg_af-xy": 0.000498971,
+        "csq_gnomadg_an-xx": 77654,
+        "csq_gnomadg_an-xy": 32066,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 12,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 33,
+        "csq_gnomadg_ac-oth": 1,
+        "csq_gnomadg_ac-sas": 10,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.00209937,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.000626245,
+        "csq_gnomadg_af-oth": 0.000683995,
+        "csq_gnomadg_af-sas": 0.00394011,
+        "csq_gnomadg_an-afr": 30109,
+        "csq_gnomadg_an-ami": 683,
+        "csq_gnomadg_an-amr": 10200,
+        "csq_gnomadg_an-asj": 2627,
+        "csq_gnomadg_an-eas": 3455,
+        "csq_gnomadg_an-fin": 5716,
+        "csq_gnomadg_an-mid": 235,
+        "csq_gnomadg_an-nfe": 52695,
+        "csq_gnomadg_an-oth": 1462,
+        "csq_gnomadg_an-sas": 2538,
+        "csq_gnomadg_nhomalt": 1,
+        "csq_gnomadg_af_popmax": 0.00394011,
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 1,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": -27,
+        "csq_spliceai_pred_dp_al": -30,
+        "csq_spliceai_pred_dp_dg": 1,
+        "csq_spliceai_pred_dp_dl": -1,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "FGF13",
+        "csq_phylop30way_mammalian": 0.40599998831749,
+        "csq_phylop100way_vertebrate": 0.301999986171722,
+        "csq_phastcons100way_vertebrate": 0.0020000000949949,
+        "uuid": "f6b53d24-a8e1-4c44-a5fe-5d2fb967582c"
+    },
+    {
+        "ID": "rs200716302",
+        "ALT": "T",
+        "POS": 136497782,
+        "REF": "A",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "c2a0d7ab-6c70-4083-88fb-c170c4a5e74e",
+                "genes_most_severe_hgvsc": "ENST00000535601.5:c.98A>T",
+                "genes_most_severe_hgvsp": "ENSP00000442699.1:p.Asp33Val",
+                "genes_most_severe_sift_score": 0.019,
+                "genes_most_severe_transcript": "ENST00000535601",
+                "genes_most_severe_amino_acids": "D/V",
+                "genes_most_severe_polyphen_score": 0.184
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.136497782A>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 135579941,
+        "csq_gerp_rs": 0.805,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:12.380833+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:136497782A_T",
+        "csq_sift_pred": "D",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:12.135345+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 18.44,
+        "csq_gnomadg_ac": 4,
+        "csq_gnomadg_af": 3.55492e-05,
+        "csq_gnomadg_an": 112520,
+        "csq_sift_score": 0.019,
+        "csq_gnomade2_ac": [
+            3
+        ],
+        "csq_gnomade2_af": [
+            1.67087e-05
+        ],
+        "csq_gnomade2_an": [
+            179547
+        ],
+        "csq_revel_score": 0.18,
+        "csq_gnomadg_ac-xx": 4,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 5.13782e-05,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 77854,
+        "csq_gnomadg_an-xy": 34666,
+        "csq_gnomade2_ac-xx": [
+            2
+        ],
+        "csq_gnomade2_ac-xy": [
+            1
+        ],
+        "csq_gnomade2_af-xx": [
+            1.73608e-05
+        ],
+        "csq_gnomade2_af-xy": [
+            1.55412e-05
+        ],
+        "csq_gnomade2_an-xx": [
+            115202
+        ],
+        "csq_gnomade2_an-xy": [
+            64345
+        ],
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 4,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 7.51922e-05,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30981,
+        "csq_gnomadg_an-ami": 686,
+        "csq_gnomadg_an-amr": 10813,
+        "csq_gnomadg_an-asj": 2652,
+        "csq_gnomadg_an-eas": 3570,
+        "csq_gnomadg_an-fin": 6149,
+        "csq_gnomadg_an-mid": 240,
+        "csq_gnomadg_an-nfe": 53197,
+        "csq_gnomadg_an-oth": 1504,
+        "csq_gnomadg_an-sas": 2728,
+        "csq_primateai_pred": "T",
+        "csq_siphy_29way_pi": 0.0,
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            0
+        ],
+        "csq_gnomade2_ac-asj": [
+            0
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            0
+        ],
+        "csq_gnomade2_ac-nfe": [
+            3
+        ],
+        "csq_gnomade2_ac-oth": [
+            0
+        ],
+        "csq_gnomade2_ac-sas": [
+            0
+        ],
+        "csq_gnomade2_af-afr": [
+            0.0
+        ],
+        "csq_gnomade2_af-amr": [
+            0.0
+        ],
+        "csq_gnomade2_af-asj": [
+            0.0
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.0
+        ],
+        "csq_gnomade2_af-nfe": [
+            3.74135e-05
+        ],
+        "csq_gnomade2_af-oth": [
+            0.0
+        ],
+        "csq_gnomade2_af-sas": [
+            0.0
+        ],
+        "csq_gnomade2_an-afr": [
+            12901
+        ],
+        "csq_gnomade2_an-amr": [
+            26752
+        ],
+        "csq_gnomade2_an-asj": [
+            7401
+        ],
+        "csq_gnomade2_an-eas": [
+            13247
+        ],
+        "csq_gnomade2_an-fin": [
+            15953
+        ],
+        "csq_gnomade2_an-nfe": [
+            80185
+        ],
+        "csq_gnomade2_an-oth": [
+            4409
+        ],
+        "csq_gnomade2_an-sas": [
+            18699
+        ],
+        "csq_gnomadg_nhomalt": 0,
+        "csq_primateai_score": 0.355113863945,
+        "csq_revel_rankscore": 0.45523,
+        "csq_gnomade2_nhomalt": [
+            0
+        ],
+        "csq_gerp_rs_rankscore": 0.17845,
+        "csq_gnomadg_af_popmax": 7.51922e-05,
+        "csq_cadd_raw_rankscore": 0.2853,
+        "csq_gnomade2_af_popmax": [
+            3.74135e-05
+        ],
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_polyphen2_hvar_pred": "B",
+        "csq_primateai_rankscore": 0.18672,
+        "csq_siphy_29way_logodds": 5.7028,
+        "csq_spliceai_pred_dp_ag": 32,
+        "csq_spliceai_pred_dp_al": -19,
+        "csq_spliceai_pred_dp_dg": -36,
+        "csq_spliceai_pred_dp_dl": 1,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_polyphen2_hvar_score": 0.184,
+        "csq_spliceai_pred_symbol": "HTATSF1",
+        "csq_phylop30way_mammalian": 0.30799999833107,
+        "csq_phylop100way_vertebrate": 3.17000007629395,
+        "csq_polyphen2_hvar_rankscore": 0.35999,
+        "csq_sift_converted_rankscore": 0.65419,
+        "csq_phastcons100way_vertebrate": 0.50900000333786,
+        "csq_phylop100way_vertebrate_rankscore": 0.50516,
+        "uuid": "20b2b73c-67b3-4e22-b5db-14766ac2886e"
+    },
+    {
+        "ID": "rs1387618144",
+        "ALT": "C",
+        "POS": 135889051,
+        "REF": "T",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
+                "genes_most_severe_hgvsc": "ENST00000611668.4:c.-210A>G",
+                "genes_most_severe_transcript": "ENST00000611668"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.135889051T>C",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 134971209,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:12.180102+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:135889051T_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:11.686801+00:00"
+        },
+        "spliceaiMaxds": 0.02,
+        "csq_cadd_phred": 2.462,
+        "csq_gnomadg_ac": 45,
+        "csq_gnomadg_af": 0.000648032,
+        "csq_gnomadg_an": 69441,
+        "csq_gnomadg_ac-xx": 45,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 0.000765984,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 58748,
+        "csq_gnomadg_an-xy": 10693,
+        "csq_gnomadg_ac-afr": 14,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 2,
+        "csq_gnomadg_ac-asj": 1,
+        "csq_gnomadg_ac-eas": 2,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 23,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 1,
+        "csq_gnomadg_af-afr": 0.000810842,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.000334169,
+        "csq_gnomadg_af-asj": 0.000559597,
+        "csq_gnomadg_af-eas": 0.00105263,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.000626549,
+        "csq_gnomadg_af-oth": 0.00232288,
+        "csq_gnomadg_af-sas": 0.000879507,
+        "csq_gnomadg_an-afr": 17266,
+        "csq_gnomadg_an-ami": 488,
+        "csq_gnomadg_an-amr": 5985,
+        "csq_gnomadg_an-asj": 1787,
+        "csq_gnomadg_an-eas": 1900,
+        "csq_gnomadg_an-fin": 3140,
+        "csq_gnomadg_an-mid": 168,
+        "csq_gnomadg_an-nfe": 36709,
+        "csq_gnomadg_an-oth": 861,
+        "csq_gnomadg_an-sas": 1137,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.00105263,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 17,
+        "csq_spliceai_pred_dp_al": -35,
+        "csq_spliceai_pred_dp_dg": 5,
+        "csq_spliceai_pred_dp_dl": -48,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.02,
+        "csq_spliceai_pred_symbol": "CT45A6",
+        "csq_phylop30way_mammalian": -1.50300002098083,
+        "csq_phylop100way_vertebrate": -3.11299991607666,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "e6b1c72c-ea8f-44a7-a4a7-9f52f5d7f9f0"
+    },
+    {
+        "ID": "rs1433887222",
+        "ALT": "A",
+        "POS": 135889030,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
+                "genes_most_severe_hgvsc": "ENST00000611668.4:c.-189C>T",
+                "genes_most_severe_transcript": "ENST00000611668"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.135889030G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 134971188,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-04-02T16:07:50.933377+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:135889030G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:11.261503+00:00"
+        },
+        "spliceaiMaxds": 0.02,
+        "csq_cadd_phred": 4.69,
+        "csq_gnomadg_ac": 41,
+        "csq_gnomadg_af": 0.000916631,
+        "csq_gnomadg_an": 44729,
+        "csq_gnomadg_ac-xx": 41,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 0.00108443,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 37808,
+        "csq_gnomadg_an-xy": 6921,
+        "csq_gnomadg_ac-afr": 12,
+        "csq_gnomadg_ac-ami": 1,
+        "csq_gnomadg_ac-amr": 2,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 3,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 21,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.00119403,
+        "csq_gnomadg_af-ami": 0.00265957,
+        "csq_gnomadg_af-amr": 0.000537779,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0013369,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.000844493,
+        "csq_gnomadg_af-oth": 0.00361011,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 10050,
+        "csq_gnomadg_an-ami": 376,
+        "csq_gnomadg_an-amr": 3719,
+        "csq_gnomadg_an-asj": 1221,
+        "csq_gnomadg_an-eas": 981,
+        "csq_gnomadg_an-fin": 2244,
+        "csq_gnomadg_an-mid": 101,
+        "csq_gnomadg_an-nfe": 24867,
+        "csq_gnomadg_an-oth": 554,
+        "csq_gnomadg_an-sas": 616,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.00119403,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": -14,
+        "csq_spliceai_pred_dp_al": -27,
+        "csq_spliceai_pred_dp_dg": -27,
+        "csq_spliceai_pred_dp_dl": 39,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.02,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "CT45A6",
+        "csq_phylop30way_mammalian": -0.439000010490417,
+        "csq_phylop100way_vertebrate": -0.518999993801117,
+        "csq_phastcons100way_vertebrate": 0.0020000000949949,
+        "uuid": "6756826d-a23e-4c4c-9ef0-7eb411b0a57a"
+    },
+    {
+        "ID": "rs1433690176",
+        "ALT": "T",
+        "POS": 135889025,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
+                "genes_most_severe_hgvsc": "ENST00000611668.4:c.-184G>A",
+                "genes_most_severe_transcript": "ENST00000611668"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.135889025C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 134971183,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-04-02T16:07:50.683811+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:135889025C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:10.832878+00:00"
+        },
+        "spliceaiMaxds": 0.12,
+        "csq_cadd_phred": 5.858,
+        "csq_gnomadg_ac": 34,
+        "csq_gnomadg_af": 0.000766042,
+        "csq_gnomadg_an": 44384,
+        "csq_gnomadg_ac-xx": 34,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 0.000904352,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 37596,
+        "csq_gnomadg_an-xy": 6788,
+        "csq_gnomadg_ac-afr": 8,
+        "csq_gnomadg_ac-ami": 1,
+        "csq_gnomadg_ac-amr": 1,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 3,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 19,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.000805072,
+        "csq_gnomadg_af-ami": 0.00268817,
+        "csq_gnomadg_af-amr": 0.000270709,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.00135624,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.000769293,
+        "csq_gnomadg_af-oth": 0.00353982,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 9937,
+        "csq_gnomadg_an-ami": 372,
+        "csq_gnomadg_an-amr": 3694,
+        "csq_gnomadg_an-asj": 1215,
+        "csq_gnomadg_an-eas": 980,
+        "csq_gnomadg_an-fin": 2212,
+        "csq_gnomadg_an-mid": 105,
+        "csq_gnomadg_an-nfe": 24698,
+        "csq_gnomadg_an-oth": 565,
+        "csq_gnomadg_an-sas": 606,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.000805072,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": -9,
+        "csq_spliceai_pred_dp_al": -22,
+        "csq_spliceai_pred_dp_dg": -22,
+        "csq_spliceai_pred_dp_dl": 44,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.12,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "CT45A6",
+        "csq_phylop30way_mammalian": 0.351999998092651,
+        "csq_phylop100way_vertebrate": 0.300000011920929,
+        "csq_phastcons100way_vertebrate": 0.00300000002607703,
+        "uuid": "4deee0dd-3d83-4004-9f16-767b81f4897b"
+    },
+    {
+        "ID": "rs1345818400",
+        "ALT": "A",
+        "POS": 135777699,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "3f0a4904-1911-49d7-9d0f-39d928d30758",
+                "genes_most_severe_hgvsc": "ENST00000487941.6:c.513-6C>T",
+                "genes_most_severe_transcript": "ENST00000487941",
+                "genes_most_severe_maxentscan_diff": -0.6
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.135777699G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 134873992,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-08T19:56:38.938105+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:135777699G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:10.195899+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 3.445,
+        "csq_gnomadg_ac": 0,
+        "csq_gnomadg_an": 0,
+        "csq_gnomade2_ac": [
+            0
+        ],
+        "csq_gnomade2_af": [
+            0.0
+        ],
+        "csq_gnomade2_an": [
+            12
+        ],
+        "csq_gnomadg_ac-xx": 0,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_an-xx": 0,
+        "csq_gnomadg_an-xy": 0,
+        "csq_gnomade2_ac-xx": [
+            0
+        ],
+        "csq_gnomade2_ac-xy": [
+            0
+        ],
+        "csq_gnomade2_af-xx": [
+            0.0
+        ],
+        "csq_gnomade2_an-xx": [
+            12
+        ],
+        "csq_gnomade2_an-xy": [
+            0
+        ],
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 0,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_an-afr": 0,
+        "csq_gnomadg_an-ami": 0,
+        "csq_gnomadg_an-amr": 0,
+        "csq_gnomadg_an-asj": 0,
+        "csq_gnomadg_an-eas": 0,
+        "csq_gnomadg_an-fin": 0,
+        "csq_gnomadg_an-mid": 0,
+        "csq_gnomadg_an-nfe": 0,
+        "csq_gnomadg_an-oth": 0,
+        "csq_gnomadg_an-sas": 0,
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            0
+        ],
+        "csq_gnomade2_ac-asj": [
+            0
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            0
+        ],
+        "csq_gnomade2_ac-nfe": [
+            0
+        ],
+        "csq_gnomade2_ac-oth": [
+            0
+        ],
+        "csq_gnomade2_ac-sas": [
+            0
+        ],
+        "csq_gnomade2_af-amr": [
+            0.0
+        ],
+        "csq_gnomade2_af-sas": [
+            0.0
+        ],
+        "csq_gnomade2_an-afr": [
+            0
+        ],
+        "csq_gnomade2_an-amr": [
+            8
+        ],
+        "csq_gnomade2_an-asj": [
+            0
+        ],
+        "csq_gnomade2_an-eas": [
+            0
+        ],
+        "csq_gnomade2_an-fin": [
+            0
+        ],
+        "csq_gnomade2_an-nfe": [
+            0
+        ],
+        "csq_gnomade2_an-oth": [
+            0
+        ],
+        "csq_gnomade2_an-sas": [
+            4
+        ],
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomade2_nhomalt": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_phylop30way_mammalian": 0.017000000923872,
+        "csq_phylop100way_vertebrate": 0.538999974727631,
+        "csq_phastcons100way_vertebrate": 0.00700000021606684,
+        "uuid": "48fddb06-feb9-4691-9327-5ef298e5ca5e"
+    },
+    {
+        "ID": "rs868969691",
+        "ALT": "G",
+        "POS": 135759900,
+        "REF": "T",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "54964667-49ac-4dc8-a3e5-15002b1f5d05",
+                "genes_most_severe_hgvsc": "ENST00000597510.6:c.*452A>C",
+                "genes_most_severe_transcript": "ENST00000597510"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.135759900T>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 134928438,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-08T19:56:38.661968+00:00",
+        "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:135759900T_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:09.667177+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 1.298,
+        "csq_gnomadg_ac": 6,
+        "csq_gnomadg_af": 0.00359066,
+        "csq_gnomadg_an": 1671,
+        "csq_gnomadg_ac-xx": 6,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 0.00460123,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 1304,
+        "csq_gnomadg_an-xy": 367,
+        "csq_gnomadg_ac-afr": 6,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 0,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.00389864,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-nfe": 0.0,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 1539,
+        "csq_gnomadg_an-ami": 0,
+        "csq_gnomadg_an-amr": 56,
+        "csq_gnomadg_an-asj": 0,
+        "csq_gnomadg_an-eas": 0,
+        "csq_gnomadg_an-fin": 0,
+        "csq_gnomadg_an-mid": 0,
+        "csq_gnomadg_an-nfe": 47,
+        "csq_gnomadg_an-oth": 28,
+        "csq_gnomadg_an-sas": 1,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.00389864,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_phylop30way_mammalian": -2.10400009155273,
+        "csq_phylop100way_vertebrate": -0.386000007390976,
+        "csq_phastcons100way_vertebrate": 0.0020000000949949,
+        "uuid": "ecc3af46-7b74-4267-8763-64bc1a739f16"
+    },
+    {
+        "ALT": "GGTGCGTGGCGTAAC",
+        "POS": 133218350,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "fe34c28e-cde4-491c-8547-05c49ed80570",
+                "genes_most_severe_hgvsc": "ENST00000310125.5:c.-92_-91insGTTACGCCACGCAC",
+                "genes_most_severe_transcript": "ENST00000310125",
+                "genes_most_severe_feature_ncbi": "NM_016521.3"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.133218350_133218351insGTGCGTGGCGTAAC",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 132352378,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-02-09T03:03:51.196608+00:00",
+        "variantClass": "INS",
+        "annotation_id": "chrX:133218350G_GGTGCGTGGCGTAAC",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:09.238435+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.903,
+        "csq_gnomadg_ac": 81,
+        "csq_gnomadg_af": 0.00103978,
+        "csq_gnomadg_an": 77901,
+        "csq_gnomadg_ac-xx": 81,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 0.00137339,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 58978,
+        "csq_gnomadg_an-xy": 18923,
+        "csq_gnomadg_ac-afr": 26,
+        "csq_gnomadg_ac-ami": 1,
+        "csq_gnomadg_ac-amr": 10,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 4,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 37,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 1,
+        "csq_gnomadg_af-afr": 0.00117297,
+        "csq_gnomadg_af-ami": 0.00251889,
+        "csq_gnomadg_af-amr": 0.00138217,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0018018,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.000981901,
+        "csq_gnomadg_af-oth": 0.00196657,
+        "csq_gnomadg_af-sas": 0.000607165,
+        "csq_gnomadg_an-afr": 22166,
+        "csq_gnomadg_an-ami": 397,
+        "csq_gnomadg_an-amr": 7235,
+        "csq_gnomadg_an-asj": 1793,
+        "csq_gnomadg_an-eas": 2220,
+        "csq_gnomadg_an-fin": 3582,
+        "csq_gnomadg_an-mid": 162,
+        "csq_gnomadg_an-nfe": 37682,
+        "csq_gnomadg_an-oth": 1017,
+        "csq_gnomadg_an-sas": 1647,
+        "csq_gnomadg_nhomalt": 2,
+        "csq_gnomadg_af_popmax": 0.0018018,
+        "csq_gnomadg_nhomalt-xx": 2,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 1,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 1,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "uuid": "f60ed4cf-3b4a-4ffc-8080-276747cbc1f9"
+    },
+    {
+        "ID": "rs1449303873",
+        "ALT": "G",
+        "POS": 132217725,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "8a813563-d2cb-4d88-9ea4-d3de38c5966f",
+                "genes_most_severe_hgvsc": "ENST00000370874.2:c.-457G>C",
+                "genes_most_severe_transcript": "ENST00000370874",
+                "genes_most_severe_feature_ncbi": "NM_001271186.2"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.132217725C>G",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 131351753,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:10.097610+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:132217725C_G",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:08.686776+00:00"
+        },
+        "spliceaiMaxds": 0.02,
+        "csq_cadd_phred": 10.05,
+        "csq_gnomadg_ac": 2,
+        "csq_gnomadg_af": 1.76985e-05,
+        "csq_gnomadg_an": 113004,
+        "csq_gnomadg_ac-xx": 2,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 2.57023e-05,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 77814,
+        "csq_gnomadg_an-xy": 35190,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 2,
+        "csq_gnomadg_ac-oth": 0,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 3.76166e-05,
+        "csq_gnomadg_af-oth": 0.0,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 31162,
+        "csq_gnomadg_an-ami": 678,
+        "csq_gnomadg_an-amr": 10906,
+        "csq_gnomadg_an-asj": 2658,
+        "csq_gnomadg_an-eas": 3519,
+        "csq_gnomadg_an-fin": 6311,
+        "csq_gnomadg_an-mid": 236,
+        "csq_gnomadg_an-nfe": 53168,
+        "csq_gnomadg_an-oth": 1544,
+        "csq_gnomadg_an-sas": 2822,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 3.76166e-05,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 32,
+        "csq_spliceai_pred_dp_al": 33,
+        "csq_spliceai_pred_dp_dg": 32,
+        "csq_spliceai_pred_dp_dl": -26,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.02,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "RAP2C",
+        "csq_phylop30way_mammalian": -0.245000004768372,
+        "csq_phylop100way_vertebrate": -1.20299994945526,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "d6f6b80c-1929-432f-bbb1-536f53c1dabd"
+    },
+    {
+        "ALT": "C",
+        "POS": 130128926,
+        "REF": "CATTT",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "c3882cf7-30d8-4d4c-a8a0-7b996331678f",
+                "genes_most_severe_hgvsc": "ENST00000674957.1:c.*1286_*1289del",
+                "genes_most_severe_transcript": "ENST00000674957"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.130128927_130128930del",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 129262901,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:09.825889+00:00",
+        "variantClass": "DEL",
+        "annotation_id": "chrX:130128926CATTT_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:07.669820+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "uuid": "01e4f07e-5749-4cff-891c-7ead7d641e03"
+    },
+    {
+        "ID": "rs141937550",
+        "ALT": "T",
+        "POS": 129647625,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "ad67b635-eaf5-4eae-b64a-7b8ca55a9bb5",
+                "genes_most_severe_hgvsc": "ENST00000429967.3:c.*298G>A",
+                "genes_most_severe_transcript": "ENST00000429967",
+                "genes_most_severe_feature_ncbi": "NM_017413.5"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.129647625C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 128781602,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:09.630516+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:129647625C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:07.229655+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.043,
+        "csq_gnomadg_ac": 212,
+        "csq_gnomadg_af": 0.00190504,
+        "csq_gnomadg_an": 111284,
+        "csq_gnomadg_ac-xx": 161,
+        "csq_gnomadg_ac-xy": 51,
+        "csq_gnomadg_af-xx": 0.00206946,
+        "csq_gnomadg_af-xy": 0.00152302,
+        "csq_gnomadg_an-xx": 77798,
+        "csq_gnomadg_an-xy": 33486,
+        "csq_gnomadg_ac-afr": 8,
+        "csq_gnomadg_ac-ami": 7,
+        "csq_gnomadg_ac-amr": 15,
+        "csq_gnomadg_ac-asj": 2,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 12,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 166,
+        "csq_gnomadg_ac-oth": 2,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.000261421,
+        "csq_gnomadg_af-ami": 0.010219,
+        "csq_gnomadg_af-amr": 0.00143609,
+        "csq_gnomadg_af-asj": 0.000757863,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.00200635,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.00312948,
+        "csq_gnomadg_af-oth": 0.0013369,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30602,
+        "csq_gnomadg_an-ami": 685,
+        "csq_gnomadg_an-amr": 10445,
+        "csq_gnomadg_an-asj": 2639,
+        "csq_gnomadg_an-eas": 3527,
+        "csq_gnomadg_an-fin": 5981,
+        "csq_gnomadg_an-mid": 238,
+        "csq_gnomadg_an-nfe": 53044,
+        "csq_gnomadg_an-oth": 1496,
+        "csq_gnomadg_an-sas": 2627,
+        "csq_gnomadg_nhomalt": 1,
+        "csq_gnomadg_af_popmax": 0.00312948,
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 1,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": -7,
+        "csq_spliceai_pred_dp_al": 9,
+        "csq_spliceai_pred_dp_dg": 10,
+        "csq_spliceai_pred_dp_dl": -5,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "APLN",
+        "csq_phylop30way_mammalian": -1.7150000333786,
+        "csq_phylop100way_vertebrate": -2.79500007629395,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "6c55d3af-28ea-478f-8310-f6d347c55a6e"
+    },
+    {
+        "ID": "rs768459791",
+        "ALT": "T",
+        "POS": 120575406,
+        "REF": "C",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "f158d746-0a90-4c0d-a0e8-d3ea6a619f2e",
+                "genes_most_severe_hgvsc": "ENST00000404115.7:c.-14G>A",
+                "genes_most_severe_transcript": "ENST00000404115"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.120575406C>T",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 119709261,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:09.312225+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:120575406C_T",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:06.269134+00:00"
+        },
+        "spliceaiMaxds": 0.32,
+        "csq_cadd_phred": 17.23,
+        "csq_gnomadg_ac": 35,
+        "csq_gnomadg_af": 0.000311826,
+        "csq_gnomadg_an": 112242,
+        "csq_gnomadg_ac-xx": 25,
+        "csq_gnomadg_ac-xy": 10,
+        "csq_gnomadg_af-xx": 0.000321196,
+        "csq_gnomadg_af-xy": 0.00029063,
+        "csq_gnomadg_an-xx": 77834,
+        "csq_gnomadg_an-xy": 34408,
+        "csq_gnomadg_ac-afr": 3,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 9,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 1,
+        "csq_gnomadg_ac-nfe": 18,
+        "csq_gnomadg_ac-oth": 4,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 9.72227e-05,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.000844674,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.00420168,
+        "csq_gnomadg_af-nfe": 0.000338193,
+        "csq_gnomadg_af-oth": 0.00264026,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30857,
+        "csq_gnomadg_an-ami": 685,
+        "csq_gnomadg_an-amr": 10655,
+        "csq_gnomadg_an-asj": 2645,
+        "csq_gnomadg_an-eas": 3574,
+        "csq_gnomadg_an-fin": 6129,
+        "csq_gnomadg_an-mid": 238,
+        "csq_gnomadg_an-nfe": 53224,
+        "csq_gnomadg_an-oth": 1515,
+        "csq_gnomadg_an-sas": 2720,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.000844674,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 46,
+        "csq_spliceai_pred_dp_al": 50,
+        "csq_spliceai_pred_dp_dg": 10,
+        "csq_spliceai_pred_dp_dl": 0,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.01,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.32,
+        "csq_spliceai_pred_symbol": "CUL4B",
+        "csq_phylop30way_mammalian": -0.528999984264374,
+        "csq_phylop100way_vertebrate": -0.529999971389771,
+        "csq_phastcons100way_vertebrate": 0.00100000004749745,
+        "uuid": "6daabdbb-c377-4734-9cfa-034f5b66d455"
+    },
+    {
+        "ID": "rs188382921",
+        "ALT": "A",
+        "POS": 120437919,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "7f8f9fcd-681e-4ae9-a2ad-757ed08f7583",
+                "genes_most_severe_hgvsc": "ENST00000371335.4:c.*1235C>T",
+                "genes_most_severe_transcript": "ENST00000371335"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.120437919G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 119571774,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:09.076948+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:120437919G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:05.687166+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 0.938,
+        "csq_gnomadg_ac": 416,
+        "csq_gnomadg_af": 0.00371588,
+        "csq_gnomadg_an": 111952,
+        "csq_gnomadg_ac-xx": 314,
+        "csq_gnomadg_ac-xy": 102,
+        "csq_gnomadg_af-xx": 0.0040364,
+        "csq_gnomadg_af-xy": 0.00298595,
+        "csq_gnomadg_an-xx": 77792,
+        "csq_gnomadg_an-xy": 34160,
+        "csq_gnomadg_ac-afr": 266,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 27,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 5,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 1,
+        "csq_gnomadg_ac-nfe": 112,
+        "csq_gnomadg_ac-oth": 5,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.00865069,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.00254645,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.00139431,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.0041841,
+        "csq_gnomadg_af-nfe": 0.00210804,
+        "csq_gnomadg_af-oth": 0.00333333,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30749,
+        "csq_gnomadg_an-ami": 685,
+        "csq_gnomadg_an-amr": 10603,
+        "csq_gnomadg_an-asj": 2641,
+        "csq_gnomadg_an-eas": 3586,
+        "csq_gnomadg_an-fin": 6080,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 53130,
+        "csq_gnomadg_an-oth": 1500,
+        "csq_gnomadg_an-sas": 2739,
+        "csq_gnomadg_nhomalt": 1,
+        "csq_gnomadg_af_popmax": 0.00865069,
+        "csq_gnomadg_nhomalt-xx": 1,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 1,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 13,
+        "csq_spliceai_pred_dp_al": -18,
+        "csq_spliceai_pred_dp_dg": 13,
+        "csq_spliceai_pred_dp_dl": -22,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "LAMP2",
+        "csq_phylop30way_mammalian": -0.361000001430511,
+        "csq_phylop100way_vertebrate": -0.194999992847443,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "5dc1fb8b-3e7f-4ee8-b24c-c21ef62d9bdd"
+    },
+    {
+        "ID": "rs751454620",
+        "ALT": "AT",
+        "POS": 119471072,
+        "REF": "A",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "b3972a2b-f008-402e-aa50-d9a6a797258c",
+                "genes_most_severe_hgvsc": "ENST00000317881.9:c.*19dup",
+                "genes_most_severe_transcript": "ENST00000317881",
+                "genes_most_severe_feature_ncbi": "NM_001152.5"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.119471072_119471073insT",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 118605035,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:08.762038+00:00",
+        "variantClass": "INS",
+        "annotation_id": "chrX:119471072A_AT",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:05.137592+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 1.262,
+        "csq_gnomadg_ac": 4,
+        "csq_gnomadg_af": 3.48129e-05,
+        "csq_gnomadg_an": 114900,
+        "csq_gnomade2_ac": [
+            20
+        ],
+        "csq_gnomade2_af": [
+            0.000121199
+        ],
+        "csq_gnomade2_an": [
+            165018
+        ],
+        "csq_gnomadg_ac-xx": 4,
+        "csq_gnomadg_ac-xy": 0,
+        "csq_gnomadg_af-xx": 5.13597e-05,
+        "csq_gnomadg_af-xy": 0.0,
+        "csq_gnomadg_an-xx": 77882,
+        "csq_gnomadg_an-xy": 37018,
+        "csq_gnomade2_ac-xx": [
+            18
+        ],
+        "csq_gnomade2_ac-xy": [
+            2
+        ],
+        "csq_gnomade2_af-xx": [
+            0.000159481
+        ],
+        "csq_gnomade2_af-xy": [
+            3.83494e-05
+        ],
+        "csq_gnomade2_an-xx": [
+            112866
+        ],
+        "csq_gnomade2_an-xy": [
+            52152
+        ],
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 0,
+        "csq_gnomadg_ac-asj": 1,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 2,
+        "csq_gnomadg_ac-mid": 0,
+        "csq_gnomadg_ac-nfe": 0,
+        "csq_gnomadg_ac-oth": 1,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.0,
+        "csq_gnomadg_af-asj": 0.000374672,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.000304832,
+        "csq_gnomadg_af-mid": 0.0,
+        "csq_gnomadg_af-nfe": 0.0,
+        "csq_gnomadg_af-oth": 0.000639795,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 31788,
+        "csq_gnomadg_an-ami": 691,
+        "csq_gnomadg_an-amr": 11019,
+        "csq_gnomadg_an-asj": 2669,
+        "csq_gnomadg_an-eas": 3720,
+        "csq_gnomadg_an-fin": 6561,
+        "csq_gnomadg_an-mid": 239,
+        "csq_gnomadg_an-nfe": 53660,
+        "csq_gnomadg_an-oth": 1563,
+        "csq_gnomadg_an-sas": 2990,
+        "csq_gnomade2_ac-afr": [
+            0
+        ],
+        "csq_gnomade2_ac-amr": [
+            5
+        ],
+        "csq_gnomade2_ac-asj": [
+            7
+        ],
+        "csq_gnomade2_ac-eas": [
+            0
+        ],
+        "csq_gnomade2_ac-fin": [
+            8
+        ],
+        "csq_gnomade2_ac-nfe": [
+            0
+        ],
+        "csq_gnomade2_ac-oth": [
+            0
+        ],
+        "csq_gnomade2_ac-sas": [
+            0
+        ],
+        "csq_gnomade2_af-afr": [
+            0.0
+        ],
+        "csq_gnomade2_af-amr": [
+            0.000206058
+        ],
+        "csq_gnomade2_af-asj": [
+            0.00108544
+        ],
+        "csq_gnomade2_af-eas": [
+            0.0
+        ],
+        "csq_gnomade2_af-fin": [
+            0.000535296
+        ],
+        "csq_gnomade2_af-nfe": [
+            0.0
+        ],
+        "csq_gnomade2_af-oth": [
+            0.0
+        ],
+        "csq_gnomade2_af-sas": [
+            0.0
+        ],
+        "csq_gnomade2_an-afr": [
+            12307
+        ],
+        "csq_gnomade2_an-amr": [
+            24265
+        ],
+        "csq_gnomade2_an-asj": [
+            6449
+        ],
+        "csq_gnomade2_an-eas": [
+            12638
+        ],
+        "csq_gnomade2_an-fin": [
+            14945
+        ],
+        "csq_gnomade2_an-nfe": [
+            75075
+        ],
+        "csq_gnomade2_an-oth": [
+            4045
+        ],
+        "csq_gnomade2_an-sas": [
+            15294
+        ],
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomade2_nhomalt": [
+            0
+        ],
+        "csq_gnomade2_af_popmax": [
+            0.000206058
+        ],
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomade2_nhomalt-xx": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-xy": [
+            0
+        ],
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 49,
+        "csq_spliceai_pred_dp_al": 20,
+        "csq_spliceai_pred_dp_dg": 19,
+        "csq_spliceai_pred_dp_dl": 31,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_gnomade2_nhomalt-afr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-amr": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-asj": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-eas": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-fin": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-nfe": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-oth": [
+            0
+        ],
+        "csq_gnomade2_nhomalt-sas": [
+            0
+        ],
+        "csq_spliceai_pred_symbol": "SLC25A5",
+        "uuid": "b2cd5f66-90de-4c62-863c-5e4e705ef693"
+    },
+    {
+        "ID": "rs985632307",
+        "ALT": "C",
+        "POS": 118826923,
+        "REF": "CAA",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "6217a293-13ea-4c82-9a7e-d29ca10fb9f4",
+                "genes_most_severe_hgvsc": "ENST00000310164.3:c.*471_*472del",
+                "genes_most_severe_transcript": "ENST00000310164",
+                "genes_most_severe_feature_ncbi": "NM_173798.4"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.118826924_118826925del",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 117960886,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:08.534165+00:00",
+        "variantClass": "DEL",
+        "annotation_id": "chrX:118826923CAA_C",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:04.609878+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 4.804,
+        "csq_gnomadg_ac": 6,
+        "csq_gnomadg_af": 5.39413e-05,
+        "csq_gnomadg_an": 111232,
+        "csq_gnomadg_ac-xx": 4,
+        "csq_gnomadg_ac-xy": 2,
+        "csq_gnomadg_af-xx": 5.14271e-05,
+        "csq_gnomadg_af-xy": 5.97872e-05,
+        "csq_gnomadg_an-xx": 77780,
+        "csq_gnomadg_an-xy": 33452,
+        "csq_gnomadg_ac-afr": 0,
+        "csq_gnomadg_ac-ami": 0,
+        "csq_gnomadg_ac-amr": 2,
+        "csq_gnomadg_ac-asj": 0,
+        "csq_gnomadg_ac-eas": 0,
+        "csq_gnomadg_ac-fin": 0,
+        "csq_gnomadg_ac-mid": 1,
+        "csq_gnomadg_ac-nfe": 2,
+        "csq_gnomadg_ac-oth": 1,
+        "csq_gnomadg_ac-sas": 0,
+        "csq_gnomadg_af-afr": 0.0,
+        "csq_gnomadg_af-ami": 0.0,
+        "csq_gnomadg_af-amr": 0.000192493,
+        "csq_gnomadg_af-asj": 0.0,
+        "csq_gnomadg_af-eas": 0.0,
+        "csq_gnomadg_af-fin": 0.0,
+        "csq_gnomadg_af-mid": 0.00420168,
+        "csq_gnomadg_af-nfe": 3.76705e-05,
+        "csq_gnomadg_af-oth": 0.000665779,
+        "csq_gnomadg_af-sas": 0.0,
+        "csq_gnomadg_an-afr": 30537,
+        "csq_gnomadg_an-ami": 680,
+        "csq_gnomadg_an-amr": 10390,
+        "csq_gnomadg_an-asj": 2649,
+        "csq_gnomadg_an-eas": 3565,
+        "csq_gnomadg_an-fin": 5904,
+        "csq_gnomadg_an-mid": 238,
+        "csq_gnomadg_an-nfe": 53092,
+        "csq_gnomadg_an-oth": 1502,
+        "csq_gnomadg_an-sas": 2675,
+        "csq_gnomadg_nhomalt": 0,
+        "csq_gnomadg_af_popmax": 0.000192493,
+        "csq_gnomadg_nhomalt-xx": 0,
+        "csq_gnomadg_nhomalt-xy": 0,
+        "csq_gnomadg_nhomalt-afr": 0,
+        "csq_gnomadg_nhomalt-ami": 0,
+        "csq_gnomadg_nhomalt-amr": 0,
+        "csq_gnomadg_nhomalt-asj": 0,
+        "csq_gnomadg_nhomalt-eas": 0,
+        "csq_gnomadg_nhomalt-fin": 0,
+        "csq_gnomadg_nhomalt-mid": 0,
+        "csq_gnomadg_nhomalt-nfe": 0,
+        "csq_gnomadg_nhomalt-oth": 0,
+        "csq_gnomadg_nhomalt-sas": 0,
+        "csq_spliceai_pred_dp_ag": 44,
+        "csq_spliceai_pred_dp_al": 16,
+        "csq_spliceai_pred_dp_dg": 10,
+        "csq_spliceai_pred_dp_dl": 36,
+        "csq_spliceai_pred_ds_ag": 0.0,
+        "csq_spliceai_pred_ds_al": 0.0,
+        "csq_spliceai_pred_ds_dg": 0.0,
+        "csq_spliceai_pred_ds_dl": 0.0,
+        "csq_spliceai_pred_symbol": "ZCCHC12",
+        "uuid": "b0b155a5-34a7-4b88-b018-431bd9855ca2"
+    },
+    {
+        "ALT": "A",
+        "POS": 118727317,
+        "REF": "G",
+        "CHROM": "X",
+        "genes": [
+            {
+                "genes_most_severe_gene": "b5d213f0-12b6-4d1e-8648-b50161066b21",
+                "genes_most_severe_hgvsc": "ENST00000652600.1:c.-46G>A",
+                "genes_most_severe_transcript": "ENST00000652600"
+            }
+        ],
+        "hgvsg": "NC_000023.11:g.118727317G>A",
+        "status": "shared",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "hg19_chr": "X",
+        "hg19_pos": 117861280,
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-06-28T18:06:08.298098+00:00",
+        "variantClass": "SNV",
+        "annotation_id": "chrX:118727317G_A",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-27T16:47:03.980793+00:00"
+        },
+        "spliceaiMaxds": 0,
+        "csq_cadd_phred": 5.491,
+        "csq_phylop30way_mammalian": -1.10399997234344,
+        "csq_phylop100way_vertebrate": -0.266000002622604,
+        "csq_phastcons100way_vertebrate": 0.0,
+        "uuid": "d1e9f126-b79c-41f7-9902-2fc0560761d8"
+    }
+]
