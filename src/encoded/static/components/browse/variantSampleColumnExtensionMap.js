@@ -353,7 +353,7 @@ export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLab
         // <div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>
         <div key={0} className={rowCls}>
             { showIcon ?
-                <i className="icon icon-user icon-fw fas mr-04" data-tip={showTips ? "Proband Genotype" : null}/>
+                <i className="text-small icon icon-user icon-fw fas mr-04" data-tip={showTips ? "Proband Genotype" : null}/>
                 : null }
             { proband_genotype_label }
         </div>
