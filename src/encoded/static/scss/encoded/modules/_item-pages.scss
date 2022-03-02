@@ -2526,6 +2526,13 @@ table.report-findings-table {
 }
 
 .sample-variant-annotation-space-body {
+
+	.sv-annotation { 
+		@media (min-width:992px) {
+			max-width: calc(100% - 375px);
+		}
+	}
+
 	.card .inner-card-section {
 		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
 		// this (since their defaults look somewhat like disabled - but maybe useful idk)

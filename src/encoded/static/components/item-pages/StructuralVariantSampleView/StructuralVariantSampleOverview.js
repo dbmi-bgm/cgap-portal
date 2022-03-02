@@ -69,7 +69,7 @@ function StructuralVariantSampleInfoHeader(props){
                         </div>
                         : null } */}
 
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-12 col-xl-7 pb-2">
                         <div className="info-header-title">
                             <h4>Variant Info</h4>
                         </div>
@@ -79,7 +79,7 @@ function StructuralVariantSampleInfoHeader(props){
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col-lg-3 pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-12 col-xl-5 pb-2">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
@@ -432,7 +432,7 @@ class SvInterpretationController extends React.PureComponent {
                 {/** ACMG Invoker will go here once new ACMG rules for SVs are determined; might be able to re-use components
                  * from VariantSampleOverview and just use a new class for handling auto-classification. But also possibility that will need entirely new rules. */}
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
-                    <div className="col">
+                    <div className="col sv-annotation">
                         {/* Annotation Space passed as child */}
                         { childrenWithSelectionProps }
                     </div>
