@@ -272,8 +272,8 @@ def big_family_rows():
 
 
 @pytest.fixture
-def example_rows_obj(example_rows, project, institution):
-    return AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+def example_rows_obj(testapp, example_rows, project, institution):
+    return AccessionMetadata(testapp, example_rows, project, institution, TEST_INGESTION_ID1)
 
 
 @pytest.fixture
