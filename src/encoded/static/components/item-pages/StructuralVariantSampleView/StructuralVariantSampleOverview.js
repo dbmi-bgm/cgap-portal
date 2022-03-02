@@ -432,7 +432,7 @@ class SvInterpretationController extends React.PureComponent {
                 {/** ACMG Invoker will go here once new ACMG rules for SVs are determined; might be able to re-use components
                  * from VariantSampleOverview and just use a new class for handling auto-classification. But also possibility that will need entirely new rules. */}
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
-                    <div className="col sv-annotation">
+                    <div className={`${showInterpretation || showInterpretationSpace ? "sv-snv-annotation": ""} col`} >
                         {/* Annotation Space passed as child */}
                         { childrenWithSelectionProps }
                     </div>
