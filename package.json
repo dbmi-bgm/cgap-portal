@@ -130,9 +130,9 @@
   },
   "overrides": {
     "auth0-lock": {
-      "react": "$react",
-      "react-dom": "$react-dom",
-      "react-transition-group": "$react-transition-group"
+      "react": "^17.0.2",
+      "react-dom": "^17.0.2",
+      "react-transition-group": "^4.4.2"
     }
   },
   "optionalDependencies": {
