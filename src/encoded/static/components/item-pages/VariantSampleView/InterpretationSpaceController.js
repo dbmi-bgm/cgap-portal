@@ -965,7 +965,7 @@ function HighlightedGenesDrop(props) {
             <label className="w-100 text-small">
                 <i className="icon icon-star text-primary fas icon-fw"></i> Selected Gene for Interpretation
             </label>
-            <div className="w-100 d-flex note-field-drop">
+            <div className="w-100 d-flex note-field-drop mb-1">
                 <Dropdown as={ButtonGroup} className={cls}>
                     <Dropdown.Toggle variant="outline-secondary text-left">
                         { value || "Select an option..." }
