@@ -581,8 +581,10 @@ export class InterpretationSpaceController extends React.Component {
             case (0): // Gene Notes
                 if (isCNV) {
                     const highlightedGeneID_wip = selectedGenes.keys().next().value || null;
+                    const otherDraftsUnsaved = isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved;
 
                     panelToDisplay = <SVGeneNotePanel {...commonProps} {...{
+                        otherDraftsUnsaved,
                         saveHighlightedGene,
                         lastSavedGeneNote,
                         isHighlightedGeneUnsaved,
@@ -593,9 +595,8 @@ export class InterpretationSpaceController extends React.Component {
                         onResetSelectedGenes
                     }} />;
                 } else {
-                    panelToDisplay = (<GenericInterpretationPanel {...commonProps}
-                        lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
-                        otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                    panelToDisplay = (<GenericInterpretationPanel {...commonProps} {...{ otherDraftsUnsaved }}
+                        lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard" />
                     );
                 }
                 break;
@@ -707,6 +708,24 @@ class SVGeneNotePanel extends React.PureComponent {
         this.saveHighlightedGeneWrapper = this.saveHighlightedGeneWrapper.bind(this);
     }
 
+    componentDidUpdate(prevProps, prevState) {
+        const { setIsSubmitting, isSubmitting, isHighlightedGeneUnsaved, otherDraftsUnsaved } = this.props;
+
+        // TODO: will need to check for updates to gene_notes field itself in future
+        const anyNotesUnsaved = otherDraftsUnsaved || isHighlightedGeneUnsaved;
+
+        // Only trigger if switching from no unsaved to unsaved present or vice versa
+        if (!isSubmitting && anyNotesUnsaved) {
+            // started submitting (warning will appear on navigate)
+            setIsSubmitting({
+                modal: <UnsavedInterpretationModal {...{ setIsSubmitting }}/>
+            });
+        } else if (isSubmitting && !anyNotesUnsaved) {
+            // no longer submitting (warning will no longer appear on navigate)
+            setIsSubmitting(false); // unset
+        }
+    }
+
     onTextAreaChange(value, idx) {
         /** Needs to be updated to work with multiple indeces of notes in future */
         const { gene_notes: [ { associated_items = [] } = {} ] = [] } = this.state;
@@ -775,13 +794,25 @@ class SVGeneNotePanel extends React.PureComponent {
         // retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
     }
 
+    /**
+    componentWillUnmount() {
+        // TODO: Before unmounting (as in switching tabs), will need to save unsaved changes in controller state
+        const { saveToField, retainWIPStateOnUnmount, lastWIPNote } = this.props;
+
+        // Only trigger if note has changed since last soft save (WIP)
+        if (InterpretationSpaceController.hasNoteChanged(lastWIPNote, this.state)) {
+            // console.log("note has changed since last soft save... updating WIP");
+            retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
+        }
+    }
+    **/
+
     render() {
         const { gene_notes } = this.state;
         const {
             context,
             highlightedGeneID_wip,
             isHighlightedGeneUnsaved,
-            saveHighlightedGene,
             onSelectGene,
             onResetSelectedGenes,
             noteLabel,
@@ -796,6 +827,7 @@ class SVGeneNotePanel extends React.PureComponent {
         } = this.props;
 
         const noteTextPresent = gene_notes.length > 0 || (gene_notes.length === 1 && gene_notes[0].note_text);
+
         // Generate a list of genes for passing into other fields
         const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene: highlightedGene = [] } = context;
         const geneAtIDToGeneMap = {};
