@@ -47,7 +47,7 @@ RUN apt-get update && apt-get upgrade -y && \
     mkdir -p /home/nginx/cgap-portal && \
     mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \
     # uninstalled by nginx install, but needed later for npm install
-    apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
     apt-get clean
 
 # Link, verify installations
