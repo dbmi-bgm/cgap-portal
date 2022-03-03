@@ -34,7 +34,7 @@ ENV NVM_DIR=/home/nginx/.nvm
 COPY deploy/docker/production/install_nginx.sh /
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
-    gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
+    gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev ssh-client && \
     pip install --upgrade pip && \
     curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
@@ -80,9 +80,6 @@ ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
     rm -rf node_modules/
-
-# Misc
-RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
