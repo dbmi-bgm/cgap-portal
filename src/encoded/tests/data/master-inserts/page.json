@@ -27,8 +27,10 @@
             "e22fbe49-863d-1156-9107-b703556f15ba"
         ],
         "table-of-contents": {
-            "enabled": false,
-            "header-depth": 4
+            "enabled": true,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
         },
         "uuid": "fa46e080-9952-40cd-9038-c174b72efbd2"
     },
