@@ -34,7 +34,7 @@ ENV NVM_DIR=/home/nginx/.nvm
 COPY deploy/docker/production/install_nginx.sh /
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
-    gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev ssh-client && \
+    gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
     pip install --upgrade pip && \
     curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
@@ -46,13 +46,12 @@ RUN apt-get update && apt-get upgrade -y && \
     chown -R nginx:nginx /opt/venv && \
     mkdir -p /home/nginx/cgap-portal && \
     mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \
+    # uninstalled by nginx install, but needed later for npm install
+    apt-get install -y --no-install-recommends ca-certificates && \
     apt-get clean
 
 # Link, verify installations
 ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-#RUN node --version
-#RUN npm --version
-#RUN nginx --version
 
 # Build application
 WORKDIR /home/nginx/cgap-portal
