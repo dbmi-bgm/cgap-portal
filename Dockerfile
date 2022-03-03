@@ -46,13 +46,12 @@ RUN apt-get update && apt-get upgrade -y && \
     chown -R nginx:nginx /opt/venv && \
     mkdir -p /home/nginx/cgap-portal && \
     mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \
+    # uninstalled by nginx install, but needed later for npm install
+    apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
     apt-get clean
 
 # Link, verify installations
 ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
-#RUN node --version
-#RUN npm --version
-#RUN nginx --version
 
 # Build application
 WORKDIR /home/nginx/cgap-portal
@@ -80,9 +79,6 @@ ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
     rm -rf node_modules/
-
-# Misc
-RUN cat /dev/urandom | head -c 256 | base64 > session-secret.b64
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
@@ -116,6 +112,8 @@ RUN chmod +x entrypoint_local.sh
 
 # Production setup
 RUN touch production.ini
+RUN touch session-secret.b64
+RUN chown nginx:nginx session-secret.b64
 RUN chown nginx:nginx production.ini
 RUN chown nginx:nginx poetry.toml
 COPY deploy/docker/production/$INI_BASE deploy/ini_files/.
