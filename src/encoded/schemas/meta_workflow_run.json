@@ -318,14 +318,21 @@
         },
         "output_files_linked_status": {
             "title": "Status of Output File Links",
-            "description": "The status of links created for all output files of this MWFR",
+            "description": "The status of links created for all output files",
             "type": "string",
             "enum": [
                 "success",
-                "error",
-                "qc_failure",
-                "no_output_files"
+                "error"
             ]
+        },
+        "output_files_linked_errors": {
+            "title": "Output File Link Creation Errors",
+            "description": "Output files that could not be linked successfully",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "linkto": "FileProcessed"
+            }
         }
     },
     "facets": {

@@ -176,7 +176,7 @@
         },
         "linkto_location": {
             "title": "LinkTo Location",
-            "description": "Location on case on which to place a linkTo",
+            "description": "Location on which to place a linkTo for this file",
             "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
             "type": "array",
             "items": {
@@ -185,6 +185,15 @@
                     "Sample",
                     "SampleProcessing"
                 ]
+            }
+        },
+        "linkto_creation_error": {
+            "title": "LinkTo Creation Errors",
+            "description": "Description of the error(s) that occurred when attempting to place a linkTo for this file",
+            "type": "array",
+            "items": {
+                "title": "LinkTo Creation Error",
+                "type": "string"
             }
         },
         "associated_meta_workflow_run": {
