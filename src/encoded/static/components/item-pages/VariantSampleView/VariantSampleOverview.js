@@ -513,7 +513,7 @@ class InterpretationController extends React.PureComponent {
                     </div>
                 </Collapse>
                 <div className="row flex-column-reverse flex-lg-row flex-nowrap">
-                    <div className="col">
+                    <div className={`${showInterpretation || showInterpretationSpace ? "sv-snv-annotation": ""} col`}>
                         {/* Annotation Space passed as child */}
                         { children }
                     </div>
