@@ -228,7 +228,8 @@
                 "completed",
                 "failed",
                 "inactive",
-                "stopped"
+                "stopped",
+                "quality metric failed"
             ]
         },
         "failed_jobs": {
@@ -315,6 +316,12 @@
             "description": "Associated SampleProcessing UUID",
             "type": "string",
             "format": "uuid"
+        },
+        "ignore_output_quality_metrics": {
+            "title": "Ignore Output QualityMetrics",
+            "description": "If true, ignore the status of output QualityMetrics",
+            "type": "boolean",
+            "default": false
         },
         "output_files_linked_status": {
             "title": "Status of Output File Links",
