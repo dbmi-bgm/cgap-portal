@@ -113,6 +113,7 @@ RUN chmod +x entrypoint_local.sh
 # Production setup
 RUN touch production.ini
 RUN touch session-secret.b64
+RUN chown nginx:nginx session-secret.b64
 RUN chown nginx:nginx production.ini
 RUN chown nginx:nginx poetry.toml
 COPY deploy/docker/production/$INI_BASE deploy/ini_files/.
