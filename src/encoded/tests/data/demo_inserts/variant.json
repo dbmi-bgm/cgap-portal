@@ -11,7 +11,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361789.2:c.708T>C",
                 "genes_most_severe_hgvsp": "ENSP00000354554.2:p.Leu236=",
                 "genes_most_severe_transcript": "ENST00000361789",
-                "genes_most_severe_amino_acids": "L"
+                "genes_most_severe_amino_acids": "L",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.15454T>C",
@@ -19,6 +20,48 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 15455,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354554",
+                "csq_exon": "1/1",
+                "csq_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "csq_hgvsc": "ENST00000361789.2:c.708T>C",
+                "csq_hgvsp": "ENSP00000354554.2:p.Leu236=",
+                "csq_codons": "ctT/ctC",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFD6",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.810.10",
+                    "PDB-ENSP_mappings:5xte.J",
+                    "PDB-ENSP_mappings:5xte.V",
+                    "PDB-ENSP_mappings:5xth.AJ",
+                    "PDB-ENSP_mappings:5xth.AV",
+                    "PDB-ENSP_mappings:5xti.AJ",
+                    "PDB-ENSP_mappings:5xti.AV",
+                    "PIRSF:PIRSF038885",
+                    "PROSITE_profiles:PS51003",
+                    "PANTHER:PTHR19271",
+                    "PANTHER:PTHR19271:SF5",
+                    "Superfamily:SSF81342",
+                    "Transmembrane_helices:TMhelix",
+                    "CDD:cd00290",
+                    "Low_complexity_(Seg):seg"
+                ],
+                "csq_feature": "ENST00000361789",
+                "csq_uniparc": "UPI0000DA7DCA",
+                "csq_canonical": true,
+                "csq_swissprot": "P00156",
+                "csq_amino_acids": "L",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "708",
+                "csq_cdna_position": "708",
+                "csq_protein_position": "236"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:26.711753+00:00",
         "variantClass": "SNV",
@@ -45,12 +88,59 @@
                 "genes_most_severe_hgvsc": "ENST00000361789.2:c.580A>G",
                 "genes_most_severe_hgvsp": "ENSP00000354554.2:p.Thr194Ala",
                 "genes_most_severe_transcript": "ENST00000361789",
-                "genes_most_severe_amino_acids": "T/A"
+                "genes_most_severe_amino_acids": "T/A",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.15326A>G",
         "status": "shared",
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354554",
+                "csq_exon": "1/1",
+                "csq_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "csq_hgvsc": "ENST00000361789.2:c.580A>G",
+                "csq_hgvsp": "ENSP00000354554.2:p.Thr194Ala",
+                "csq_codons": "Aca/Gca",
+                "csq_pubmed": [
+                    "31267007"
+                ],
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFD6",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.810.10",
+                    "PDB-ENSP_mappings:5xte.J",
+                    "PDB-ENSP_mappings:5xte.V",
+                    "PDB-ENSP_mappings:5xth.AJ",
+                    "PDB-ENSP_mappings:5xth.AV",
+                    "PDB-ENSP_mappings:5xti.AJ",
+                    "PDB-ENSP_mappings:5xti.AV",
+                    "Pfam:PF00033",
+                    "PIRSF:PIRSF038885",
+                    "PROSITE_profiles:PS51002",
+                    "PANTHER:PTHR19271",
+                    "PANTHER:PTHR19271:SF5",
+                    "Superfamily:SSF81342",
+                    "Transmembrane_helices:TMhelix",
+                    "CDD:cd00284",
+                    "Low_complexity_(Seg):seg"
+                ],
+                "csq_feature": "ENST00000361789",
+                "csq_uniparc": "UPI0000DA7DCA",
+                "csq_canonical": true,
+                "csq_swissprot": "P00156",
+                "csq_amino_acids": "T/A",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "580",
+                "csq_cdna_position": "580",
+                "csq_protein_position": "194"
+            }
+        ],
         "csq_clinvar": "140592",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-05T16:57:13.984364+00:00",
@@ -110,7 +200,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361789.2:c.20C>T",
                 "genes_most_severe_hgvsp": "ENSP00000354554.2:p.Thr7Ile",
                 "genes_most_severe_transcript": "ENST00000361789",
-                "genes_most_severe_amino_acids": "T/I"
+                "genes_most_severe_amino_acids": "T/I",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.14766C>T",
@@ -118,6 +209,45 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 14767,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354554",
+                "csq_exon": "1/1",
+                "csq_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "csq_hgvsc": "ENST00000361789.2:c.20C>T",
+                "csq_hgvsp": "ENSP00000354554.2:p.Thr7Ile",
+                "csq_codons": "aCt/aTt",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFD6",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.810.10",
+                    "PDB-ENSP_mappings:5xte.J",
+                    "PDB-ENSP_mappings:5xte.V",
+                    "PDB-ENSP_mappings:5xth.AJ",
+                    "PDB-ENSP_mappings:5xth.AV",
+                    "PDB-ENSP_mappings:5xti.AJ",
+                    "PDB-ENSP_mappings:5xti.AV",
+                    "PIRSF:PIRSF038885",
+                    "PROSITE_profiles:PS51002",
+                    "PANTHER:PTHR19271",
+                    "PANTHER:PTHR19271:SF5",
+                    "Superfamily:SSF81342"
+                ],
+                "csq_feature": "ENST00000361789",
+                "csq_uniparc": "UPI0000DA7DCA",
+                "csq_canonical": true,
+                "csq_swissprot": "P00156",
+                "csq_amino_acids": "T/I",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "20",
+                "csq_cdna_position": "20",
+                "csq_protein_position": "7"
+            }
+        ],
         "csq_clinvar": "140587",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-05T16:57:13.396556+00:00",
@@ -177,7 +307,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361567.2:c.1803A>G",
                 "genes_most_severe_hgvsp": "ENSP00000354813.2:p.Leu601=",
                 "genes_most_severe_transcript": "ENST00000361567",
-                "genes_most_severe_amino_acids": "L"
+                "genes_most_severe_amino_acids": "L",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.14139A>G",
@@ -185,6 +316,43 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 14140,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354813",
+                "csq_exon": "1/1",
+                "csq_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "csq_hgvsc": "ENST00000361567.2:c.1803A>G",
+                "csq_hgvsp": "ENSP00000354813.2:p.Leu601=",
+                "csq_codons": "ctA/ctG",
+                "csq_strand": true,
+                "csq_trembl": "U5ZC31",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.l",
+                    "PDB-ENSP_mappings:5xtd.l",
+                    "PDB-ENSP_mappings:5xth.l",
+                    "PDB-ENSP_mappings:5xti.Bl",
+                    "PDB-ENSP_mappings:5xti.l",
+                    "Pfam:PF06455",
+                    "PANTHER:PTHR42829",
+                    "PANTHER:PTHR42829:SF11",
+                    "Transmembrane_helices:TMhelix",
+                    "Low_complexity_(Seg):seg"
+                ],
+                "csq_feature": "ENST00000361567",
+                "csq_uniparc": "UPI0000000A9D",
+                "csq_canonical": true,
+                "csq_swissprot": "P03915",
+                "csq_amino_acids": "L",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "1803",
+                "csq_cdna_position": "1803",
+                "csq_protein_position": "601"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:25.654291+00:00",
         "variantClass": "SNV",
@@ -210,7 +378,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361567.2:c.1407T>C",
                 "genes_most_severe_hgvsp": "ENSP00000354813.2:p.Thr469=",
                 "genes_most_severe_transcript": "ENST00000361567",
-                "genes_most_severe_amino_acids": "T"
+                "genes_most_severe_amino_acids": "T",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.13743T>C",
@@ -218,6 +387,43 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 13744,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354813",
+                "csq_exon": "1/1",
+                "csq_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "csq_hgvsc": "ENST00000361567.2:c.1407T>C",
+                "csq_hgvsp": "ENSP00000354813.2:p.Thr469=",
+                "csq_codons": "acT/acC",
+                "csq_strand": true,
+                "csq_trembl": "U5ZC31",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.l",
+                    "PDB-ENSP_mappings:5xtd.l",
+                    "PDB-ENSP_mappings:5xth.l",
+                    "PDB-ENSP_mappings:5xti.Bl",
+                    "PDB-ENSP_mappings:5xti.l",
+                    "Pfam:PF06455",
+                    "PANTHER:PTHR42829",
+                    "PANTHER:PTHR42829:SF11",
+                    "TIGRFAM:TIGR01974",
+                    "Transmembrane_helices:TMhelix"
+                ],
+                "csq_feature": "ENST00000361567",
+                "csq_uniparc": "UPI0000000A9D",
+                "csq_canonical": true,
+                "csq_swissprot": "P03915",
+                "csq_amino_acids": "T",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "1407",
+                "csq_cdna_position": "1407",
+                "csq_protein_position": "469"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:25.448411+00:00",
         "variantClass": "SNV",
@@ -244,7 +450,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361567.2:c.36G>A",
                 "genes_most_severe_hgvsp": "ENSP00000354813.2:p.Leu12=",
                 "genes_most_severe_transcript": "ENST00000361567",
-                "genes_most_severe_amino_acids": "L"
+                "genes_most_severe_amino_acids": "L",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.12372G>A",
@@ -252,6 +459,204 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 12373,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000355206",
+                "csq_gene": "d6a61d62-2283-4538-8cca-19604bc02552",
+                "csq_strand": true,
+                "csq_trembl": "Q7GXZ5",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361227",
+                "csq_uniparc": "UPI0000000AA6",
+                "csq_distance": "1968",
+                "csq_canonical": true,
+                "csq_swissprot": "P03897",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354728",
+                "csq_gene": "21f35995-e4d3-4066-96af-f4c0d01e6952",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RC16&Q7GXZ4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361335",
+                "csq_uniparc": "UPI0000000AA7",
+                "csq_distance": "1606",
+                "csq_canonical": true,
+                "csq_swissprot": "P03901",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354961",
+                "csq_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBN5&H9EC08",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361381",
+                "csq_uniparc": "UPI0000000AA8",
+                "csq_distance": "235",
+                "csq_canonical": true,
+                "csq_swissprot": "P03905",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354813",
+                "csq_exon": "1/1",
+                "csq_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "csq_hgvsc": "ENST00000361567.2:c.36G>A",
+                "csq_hgvsp": "ENSP00000354813.2:p.Leu12=",
+                "csq_codons": "ctG/ctA",
+                "csq_strand": true,
+                "csq_trembl": "U5ZC31",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.l",
+                    "PDB-ENSP_mappings:5xtd.l",
+                    "PDB-ENSP_mappings:5xth.l",
+                    "PDB-ENSP_mappings:5xti.Bl",
+                    "PDB-ENSP_mappings:5xti.l",
+                    "PANTHER:PTHR42829",
+                    "PANTHER:PTHR42829:SF11",
+                    "Cleavage_site_(Signalp):SignalP-TM",
+                    "TIGRFAM:TIGR01974",
+                    "Low_complexity_(Seg):seg"
+                ],
+                "csq_feature": "ENST00000361567",
+                "csq_uniparc": "UPI0000000A9D",
+                "csq_canonical": true,
+                "csq_swissprot": "P03915",
+                "csq_amino_acids": "L",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "36",
+                "csq_cdna_position": "36",
+                "csq_protein_position": "12"
+            },
+            {
+                "csq_ensp": "ENSP00000354499",
+                "csq_gene": "efff4aff-ded4-4468-9e6f-d3902738a5fd",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBG2&U5YWV7",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361624",
+                "csq_uniparc": "UPI0000000AA3",
+                "csq_distance": "4927",
+                "csq_canonical": true,
+                "csq_swissprot": "P00395",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354665",
+                "csq_gene": "e485fd60-2381-4712-9a7b-7674531b697f",
+                "csq_strand": false,
+                "csq_trembl": "A0A1X7RCR6&U5Z977",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361681",
+                "csq_uniparc": "UPI0000000AA9",
+                "csq_distance": "1777",
+                "csq_canonical": true,
+                "csq_swissprot": "P03923",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354876",
+                "csq_gene": "ccc49ef4-abf0-49ee-b02d-f6bd5000bbae",
+                "csq_strand": true,
+                "csq_trembl": "U5Z487&A0A1X7RBF7",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361739",
+                "csq_uniparc": "UPI0000000AA4",
+                "csq_distance": "4103",
+                "csq_canonical": true,
+                "csq_swissprot": "P00403",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354554",
+                "csq_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFD6",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361789",
+                "csq_uniparc": "UPI0000DA7DCA",
+                "csq_distance": "2375",
+                "csq_canonical": true,
+                "csq_swissprot": "P00156",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_most_severe": false,
+                "csq_tssdistance": 2375
+            },
+            {
+                "csq_ensp": "ENSP00000355265",
+                "csq_gene": "47475d0a-30d7-48d9-b5f3-5544b727f073",
+                "csq_strand": true,
+                "csq_trembl": "U5YV54&A0A1X7RCP4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361851",
+                "csq_uniparc": "UPI0000000AA5",
+                "csq_distance": "3800",
+                "csq_canonical": true,
+                "csq_swissprot": "P03928",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354632",
+                "csq_gene": "5c4b026b-4ff6-4b65-a8d7-74a07d003305",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFE3",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361899",
+                "csq_uniparc": "UPI0000001709",
+                "csq_distance": "3165",
+                "csq_canonical": true,
+                "csq_swissprot": "P00846",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354982",
+                "csq_gene": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+                "csq_strand": true,
+                "csq_trembl": "Q7GIM7&A0A1X7RBF0",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000362079",
+                "csq_uniparc": "UPI0000000369",
+                "csq_distance": "2382",
+                "csq_canonical": true,
+                "csq_swissprot": "P00414",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            }
+        ],
         "csq_clinvar": "522717",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-08T21:51:59.661115+00:00",
@@ -299,12 +704,55 @@
                 "genes_most_severe_hgvsc": "ENST00000361381.2:c.960G>A",
                 "genes_most_severe_hgvsp": "ENSP00000354961.2:p.Gly320=",
                 "genes_most_severe_transcript": "ENST00000361381",
-                "genes_most_severe_amino_acids": "G"
+                "genes_most_severe_amino_acids": "G",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.11719G>A",
         "status": "shared",
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354961",
+                "csq_exon": "1/1",
+                "csq_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "csq_hgvsc": "ENST00000361381.2:c.960G>A",
+                "csq_hgvsp": "ENSP00000354961.2:p.Gly320=",
+                "csq_codons": "ggG/ggA",
+                "csq_pubmed": [
+                    "27716073",
+                    "27877219"
+                ],
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBN5&H9EC08",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.r",
+                    "PDB-ENSP_mappings:5xtd.r",
+                    "PDB-ENSP_mappings:5xth.r",
+                    "PDB-ENSP_mappings:5xti.Br",
+                    "PDB-ENSP_mappings:5xti.r",
+                    "Pfam:PF00361",
+                    "Prints:PR01437",
+                    "PANTHER:PTHR43507",
+                    "PANTHER:PTHR43507:SF1",
+                    "TIGRFAM:TIGR01972",
+                    "Transmembrane_helices:TMhelix"
+                ],
+                "csq_feature": "ENST00000361381",
+                "csq_uniparc": "UPI0000000AA8",
+                "csq_canonical": true,
+                "csq_swissprot": "P03905",
+                "csq_amino_acids": "G",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "960",
+                "csq_cdna_position": "960",
+                "csq_protein_position": "320"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-05T16:57:12.496784+00:00",
         "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
@@ -332,7 +780,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361381.2:c.708A>G",
                 "genes_most_severe_hgvsp": "ENSP00000354961.2:p.Leu236=",
                 "genes_most_severe_transcript": "ENST00000361381",
-                "genes_most_severe_amino_acids": "L"
+                "genes_most_severe_amino_acids": "L",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.11467A>G",
@@ -340,6 +789,206 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 11468,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000355206",
+                "csq_gene": "d6a61d62-2283-4538-8cca-19604bc02552",
+                "csq_strand": true,
+                "csq_trembl": "Q7GXZ5",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361227",
+                "csq_uniparc": "UPI0000000AA6",
+                "csq_distance": "1063",
+                "csq_canonical": true,
+                "csq_swissprot": "P03897",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354728",
+                "csq_gene": "21f35995-e4d3-4066-96af-f4c0d01e6952",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RC16&Q7GXZ4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361335",
+                "csq_uniparc": "UPI0000000AA7",
+                "csq_distance": "701",
+                "csq_canonical": true,
+                "csq_swissprot": "P03901",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354961",
+                "csq_exon": "1/1",
+                "csq_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "csq_hgvsc": "ENST00000361381.2:c.708A>G",
+                "csq_hgvsp": "ENSP00000354961.2:p.Leu236=",
+                "csq_codons": "ttA/ttG",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBN5&H9EC08",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.r",
+                    "PDB-ENSP_mappings:5xtd.r",
+                    "PDB-ENSP_mappings:5xth.r",
+                    "PDB-ENSP_mappings:5xti.Br",
+                    "PDB-ENSP_mappings:5xti.r",
+                    "Pfam:PF00361",
+                    "Prints:PR01437",
+                    "PANTHER:PTHR43507",
+                    "PANTHER:PTHR43507:SF1",
+                    "TIGRFAM:TIGR01972",
+                    "Transmembrane_helices:TMhelix"
+                ],
+                "csq_feature": "ENST00000361381",
+                "csq_uniparc": "UPI0000000AA8",
+                "csq_canonical": true,
+                "csq_swissprot": "P03905",
+                "csq_amino_acids": "L",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "708",
+                "csq_cdna_position": "708",
+                "csq_protein_position": "236"
+            },
+            {
+                "csq_ensp": "ENSP00000354813",
+                "csq_gene": "d2efe801-fa0b-4ef0-84c0-cf269a8ff5a3",
+                "csq_strand": true,
+                "csq_trembl": "U5ZC31",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361567",
+                "csq_uniparc": "UPI0000000A9D",
+                "csq_distance": "870",
+                "csq_canonical": true,
+                "csq_swissprot": "P03915",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_most_severe": false,
+                "csq_tssdistance": 870
+            },
+            {
+                "csq_ensp": "ENSP00000354499",
+                "csq_gene": "efff4aff-ded4-4468-9e6f-d3902738a5fd",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBG2&U5YWV7",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361624",
+                "csq_uniparc": "UPI0000000AA3",
+                "csq_distance": "4022",
+                "csq_canonical": true,
+                "csq_swissprot": "P00395",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354665",
+                "csq_gene": "e485fd60-2381-4712-9a7b-7674531b697f",
+                "csq_strand": false,
+                "csq_trembl": "A0A1X7RCR6&U5Z977",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361681",
+                "csq_uniparc": "UPI0000000AA9",
+                "csq_distance": "2682",
+                "csq_canonical": true,
+                "csq_swissprot": "P03923",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354876",
+                "csq_gene": "ccc49ef4-abf0-49ee-b02d-f6bd5000bbae",
+                "csq_strand": true,
+                "csq_trembl": "U5Z487&A0A1X7RBF7",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361739",
+                "csq_uniparc": "UPI0000000AA4",
+                "csq_distance": "3198",
+                "csq_canonical": true,
+                "csq_swissprot": "P00403",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354554",
+                "csq_gene": "ef814482-e49c-433a-823c-4c07879f6a38",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFD6",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361789",
+                "csq_uniparc": "UPI0000DA7DCA",
+                "csq_distance": "3280",
+                "csq_canonical": true,
+                "csq_swissprot": "P00156",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_most_severe": false,
+                "csq_tssdistance": 3280
+            },
+            {
+                "csq_ensp": "ENSP00000355265",
+                "csq_gene": "47475d0a-30d7-48d9-b5f3-5544b727f073",
+                "csq_strand": true,
+                "csq_trembl": "U5YV54&A0A1X7RCP4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361851",
+                "csq_uniparc": "UPI0000000AA5",
+                "csq_distance": "2895",
+                "csq_canonical": true,
+                "csq_swissprot": "P03928",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354632",
+                "csq_gene": "5c4b026b-4ff6-4b65-a8d7-74a07d003305",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFE3",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361899",
+                "csq_uniparc": "UPI0000001709",
+                "csq_distance": "2260",
+                "csq_canonical": true,
+                "csq_swissprot": "P00846",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            },
+            {
+                "csq_ensp": "ENSP00000354982",
+                "csq_gene": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+                "csq_strand": true,
+                "csq_trembl": "Q7GIM7&A0A1X7RBF0",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000362079",
+                "csq_uniparc": "UPI0000000369",
+                "csq_distance": "1477",
+                "csq_canonical": true,
+                "csq_swissprot": "P00414",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": false
+            }
+        ],
         "csq_clinvar": "522716",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-08T21:51:57.746159+00:00",
@@ -388,7 +1037,8 @@
                 "genes_most_severe_hgvsp": "ENSP00000354961.2:p.Val6Ile",
                 "genes_most_severe_sift_score": 0.974,
                 "genes_most_severe_transcript": "ENST00000361381",
-                "genes_most_severe_amino_acids": "V/I"
+                "genes_most_severe_amino_acids": "V/I",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.10775G>A",
@@ -396,6 +1046,41 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 10776,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354961",
+                "csq_exon": "1/1",
+                "csq_gene": "9fc98bcc-b202-43ff-bc3b-d21062eb34f5",
+                "csq_hgvsc": "ENST00000361381.2:c.16G>A",
+                "csq_hgvsp": "ENSP00000354961.2:p.Val6Ile",
+                "csq_codons": "Gtc/Atc",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBN5&H9EC08",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.r",
+                    "PDB-ENSP_mappings:5xtd.r",
+                    "PDB-ENSP_mappings:5xth.r",
+                    "PDB-ENSP_mappings:5xti.Br",
+                    "PDB-ENSP_mappings:5xti.r",
+                    "Pfam:PF01059",
+                    "PANTHER:PTHR43507",
+                    "PANTHER:PTHR43507:SF1"
+                ],
+                "csq_feature": "ENST00000361381",
+                "csq_uniparc": "UPI0000000AA8",
+                "csq_canonical": true,
+                "csq_swissprot": "P03905",
+                "csq_amino_acids": "V/I",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "16",
+                "csq_cdna_position": "16",
+                "csq_protein_position": "6"
+            }
+        ],
         "csq_clinvar": "693315",
         "csq_gerp_rs": -10.1,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
@@ -453,7 +1138,8 @@
                 "genes_most_severe_hgvsc": "ENST00000362079.2:c.450T>C",
                 "genes_most_severe_hgvsp": "ENSP00000354982.2:p.Ser150=",
                 "genes_most_severe_transcript": "ENST00000362079",
-                "genes_most_severe_amino_acids": "S"
+                "genes_most_severe_amino_acids": "S",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.9656T>C",
@@ -461,6 +1147,41 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 9657,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354982",
+                "csq_exon": "1/1",
+                "csq_gene": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+                "csq_hgvsc": "ENST00000362079.2:c.450T>C",
+                "csq_hgvsp": "ENSP00000354982.2:p.Ser150=",
+                "csq_codons": "agT/agC",
+                "csq_strand": true,
+                "csq_trembl": "Q7GIM7&A0A1X7RBF0",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.120.80",
+                    "PDB-ENSP_mappings:5z62.C",
+                    "Pfam:PF00510",
+                    "PROSITE_profiles:PS50253",
+                    "PANTHER:PTHR11403",
+                    "PANTHER:PTHR11403:SF7",
+                    "Superfamily:SSF81452",
+                    "CDD:cd01665"
+                ],
+                "csq_feature": "ENST00000362079",
+                "csq_uniparc": "UPI0000000369",
+                "csq_canonical": true,
+                "csq_swissprot": "P00414",
+                "csq_amino_acids": "S",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "450",
+                "csq_cdna_position": "450",
+                "csq_protein_position": "150"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:22.308527+00:00",
         "variantClass": "SNV",
@@ -487,7 +1208,8 @@
                 "genes_most_severe_hgvsp": "ENSP00000354982.2:p.Pro74Ser",
                 "genes_most_severe_sift_score": 0.039,
                 "genes_most_severe_transcript": "ENST00000362079",
-                "genes_most_severe_amino_acids": "P/S"
+                "genes_most_severe_amino_acids": "P/S",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.9426C>T",
@@ -495,6 +1217,41 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 9427,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354982",
+                "csq_exon": "1/1",
+                "csq_gene": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+                "csq_hgvsc": "ENST00000362079.2:c.220C>T",
+                "csq_hgvsp": "ENSP00000354982.2:p.Pro74Ser",
+                "csq_codons": "Cct/Tct",
+                "csq_strand": true,
+                "csq_trembl": "Q7GIM7&A0A1X7RBF0",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.120.80",
+                    "PDB-ENSP_mappings:5z62.C",
+                    "Pfam:PF00510",
+                    "PROSITE_profiles:PS50253",
+                    "PANTHER:PTHR11403",
+                    "PANTHER:PTHR11403:SF7",
+                    "Superfamily:SSF81452",
+                    "CDD:cd01665"
+                ],
+                "csq_feature": "ENST00000362079",
+                "csq_uniparc": "UPI0000000369",
+                "csq_canonical": true,
+                "csq_swissprot": "P00414",
+                "csq_amino_acids": "P/S",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "220",
+                "csq_cdna_position": "220",
+                "csq_protein_position": "74"
+            }
+        ],
         "csq_gerp_rs": -8.92,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:22.077485+00:00",
@@ -527,7 +1284,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361899.2:c.334A>G",
                 "genes_most_severe_hgvsp": "ENSP00000354632.2:p.Thr112Ala",
                 "genes_most_severe_transcript": "ENST00000361899",
-                "genes_most_severe_amino_acids": "T/A"
+                "genes_most_severe_amino_acids": "T/A",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.8860A>G",
@@ -535,6 +1293,41 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 8861,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354632",
+                "csq_exon": "1/1",
+                "csq_gene": "5c4b026b-4ff6-4b65-a8d7-74a07d003305",
+                "csq_hgvsc": "ENST00000361899.2:c.334A>G",
+                "csq_hgvsp": "ENSP00000354632.2:p.Thr112Ala",
+                "csq_codons": "Aca/Gca",
+                "csq_strand": true,
+                "csq_trembl": "Q0ZFE3",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.120.220",
+                    "Pfam:PF00119",
+                    "PANTHER:PTHR11410",
+                    "PANTHER:PTHR11410:SF0",
+                    "Superfamily:SSF81336",
+                    "TIGRFAM:TIGR01131",
+                    "Transmembrane_helices:TMhelix",
+                    "CDD:cd00310"
+                ],
+                "csq_feature": "ENST00000361899",
+                "csq_uniparc": "UPI0000001709",
+                "csq_canonical": true,
+                "csq_swissprot": "P00846",
+                "csq_amino_acids": "T/A",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "334",
+                "csq_cdna_position": "334",
+                "csq_protein_position": "112"
+            }
+        ],
         "csq_clinvar": "693004",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-05T16:57:10.895392+00:00",
@@ -589,7 +1382,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361624.2:c.1125C>T",
                 "genes_most_severe_hgvsp": "ENSP00000354499.2:p.Ala375=",
                 "genes_most_severe_transcript": "ENST00000361624",
-                "genes_most_severe_amino_acids": "A"
+                "genes_most_severe_amino_acids": "A",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.7028C>T",
@@ -597,6 +1391,43 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 7029,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354499",
+                "csq_exon": "1/1",
+                "csq_gene": "efff4aff-ded4-4468-9e6f-d3902738a5fd",
+                "csq_hgvsc": "ENST00000361624.2:c.1125C>T",
+                "csq_hgvsp": "ENSP00000354499.2:p.Ala375=",
+                "csq_codons": "gcC/gcT",
+                "csq_strand": true,
+                "csq_trembl": "A0A1X7RBG2&U5YWV7",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5z62.A",
+                    "Transmembrane_helices:TMhelix",
+                    "PROSITE_profiles:PS50855",
+                    "CDD:cd01663",
+                    "PANTHER:PTHR10422",
+                    "PANTHER:PTHR10422:SF18",
+                    "Pfam:PF00115",
+                    "Gene3D:1.20.210.10",
+                    "Superfamily:SSF81442",
+                    "Prints:PR01165"
+                ],
+                "csq_feature": "ENST00000361624",
+                "csq_uniparc": "UPI0000000AA3",
+                "csq_canonical": true,
+                "csq_swissprot": "P00395",
+                "csq_amino_acids": "A",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "1125",
+                "csq_cdna_position": "1125",
+                "csq_protein_position": "375"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-05T16:57:10.361086+00:00",
         "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
@@ -624,7 +1455,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361453.3:c.300A>G",
                 "genes_most_severe_hgvsp": "ENSP00000355046.4:p.Met100=",
                 "genes_most_severe_transcript": "ENST00000361453",
-                "genes_most_severe_amino_acids": "M"
+                "genes_most_severe_amino_acids": "M",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.4769A>G",
@@ -632,6 +1464,42 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 4770,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000355046",
+                "csq_exon": "1/1",
+                "csq_gene": "33933818-0664-4e9d-83d2-cb44a5e59222",
+                "csq_hgvsc": "ENST00000361453.3:c.300A>G",
+                "csq_hgvsp": "ENSP00000355046.4:p.Met100=",
+                "csq_codons": "atA/atG",
+                "csq_strand": true,
+                "csq_trembl": "Q7GXY9&A0A1X7RBG6",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.i",
+                    "PDB-ENSP_mappings:5xtd.i",
+                    "PDB-ENSP_mappings:5xth.i",
+                    "PDB-ENSP_mappings:5xti.Bi",
+                    "PDB-ENSP_mappings:5xti.i",
+                    "Low_complexity_(Seg):seg",
+                    "Transmembrane_helices:TMhelix",
+                    "PANTHER:PTHR46552",
+                    "Pfam:PF00361"
+                ],
+                "csq_feature": "ENST00000361453",
+                "csq_uniparc": "UPI0000000AA2",
+                "csq_canonical": true,
+                "csq_swissprot": "P03891",
+                "csq_amino_acids": "M",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "300",
+                "csq_cdna_position": "300",
+                "csq_protein_position": "100"
+            }
+        ],
         "csq_clinvar": "441150",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-05T16:57:09.645154+00:00",
@@ -676,7 +1544,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361453.3:c.171C>A",
                 "genes_most_severe_hgvsp": "ENSP00000355046.4:p.Ile57Met",
                 "genes_most_severe_transcript": "ENST00000361453",
-                "genes_most_severe_amino_acids": "I/M"
+                "genes_most_severe_amino_acids": "I/M",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.4640C>A",
@@ -684,6 +1553,44 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 4641,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000355046",
+                "csq_exon": "1/1",
+                "csq_gene": "33933818-0664-4e9d-83d2-cb44a5e59222",
+                "csq_hgvsc": "ENST00000361453.3:c.171C>A",
+                "csq_hgvsp": "ENSP00000355046.4:p.Ile57Met",
+                "csq_codons": "atC/atA",
+                "csq_pubmed": [
+                    "20301353",
+                    "11479733"
+                ],
+                "csq_strand": true,
+                "csq_trembl": "Q7GXY9&A0A1X7RBG6",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.i",
+                    "PDB-ENSP_mappings:5xtd.i",
+                    "PDB-ENSP_mappings:5xth.i",
+                    "PDB-ENSP_mappings:5xti.Bi",
+                    "PDB-ENSP_mappings:5xti.i",
+                    "PANTHER:PTHR46552",
+                    "Pfam:PF00361"
+                ],
+                "csq_feature": "ENST00000361453",
+                "csq_uniparc": "UPI0000000AA2",
+                "csq_canonical": true,
+                "csq_swissprot": "P03891",
+                "csq_amino_acids": "I/M",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "171",
+                "csq_cdna_position": "171",
+                "csq_protein_position": "57"
+            }
+        ],
         "csq_clinvar": "9718",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:20.777138+00:00",
@@ -739,7 +1646,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361390.2:c.882A>G",
                 "genes_most_severe_hgvsp": "ENSP00000354687.2:p.Leu294=",
                 "genes_most_severe_transcript": "ENST00000361390",
-                "genes_most_severe_amino_acids": "L"
+                "genes_most_severe_amino_acids": "L",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_012920.1:m.4188A>G",
@@ -747,6 +1655,40 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 4189,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354687",
+                "csq_exon": "1/1",
+                "csq_gene": "339e3421-a617-4f05-b1ff-4f8ea27743f1",
+                "csq_hgvsc": "ENST00000361390.2:c.882A>G",
+                "csq_hgvsp": "ENSP00000354687.2:p.Leu294=",
+                "csq_codons": "ctA/ctG",
+                "csq_strand": true,
+                "csq_trembl": "U5Z754",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.s",
+                    "PDB-ENSP_mappings:5xtd.s",
+                    "Transmembrane_helices:TMhelix",
+                    "HAMAP:MF_01350",
+                    "PANTHER:PTHR11432:SF3",
+                    "PANTHER:PTHR11432",
+                    "Pfam:PF00146"
+                ],
+                "csq_feature": "ENST00000361390",
+                "csq_uniparc": "UPI0000000AA1",
+                "csq_canonical": true,
+                "csq_swissprot": "P03886",
+                "csq_amino_acids": "L",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "882",
+                "csq_cdna_position": "882",
+                "csq_protein_position": "294"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:20.574939+00:00",
         "variantClass": "SNV",
@@ -773,7 +1715,8 @@
                 "genes_most_severe_hgvsc": "ENST00000361390.2:c.91A>G",
                 "genes_most_severe_hgvsp": "ENSP00000354687.2:p.Met31Val",
                 "genes_most_severe_transcript": "ENST00000361390",
-                "genes_most_severe_amino_acids": "M/V"
+                "genes_most_severe_amino_acids": "M/V",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_012920.1:m.3397A>G",
@@ -781,6 +1724,42 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "M",
         "hg19_pos": 3398,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000354687",
+                "csq_exon": "1/1",
+                "csq_gene": "339e3421-a617-4f05-b1ff-4f8ea27743f1",
+                "csq_hgvsc": "ENST00000361390.2:c.91A>G",
+                "csq_hgvsp": "ENSP00000354687.2:p.Met31Val",
+                "csq_codons": "Ata/Gta",
+                "csq_pubmed": [
+                    "7624338"
+                ],
+                "csq_strand": true,
+                "csq_trembl": "U5Z754",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:5xtc.s",
+                    "PDB-ENSP_mappings:5xtd.s",
+                    "HAMAP:MF_01350",
+                    "PANTHER:PTHR11432:SF3",
+                    "PANTHER:PTHR11432",
+                    "Pfam:PF00146"
+                ],
+                "csq_feature": "ENST00000361390",
+                "csq_uniparc": "UPI0000000AA1",
+                "csq_canonical": true,
+                "csq_swissprot": "P03886",
+                "csq_amino_acids": "M/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "91",
+                "csq_cdna_position": "91",
+                "csq_protein_position": "31"
+            }
+        ],
         "csq_clinvar": "9726",
         "csq_gerp_rs": 4.53,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
@@ -844,12 +1823,135 @@
             {
                 "genes_most_severe_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
                 "genes_most_severe_hgvsc": "ENST00000618670.4:c.*402C>T",
-                "genes_most_severe_transcript": "ENST00000618670"
+                "genes_most_severe_transcript": "ENST00000618670",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.154564863C>T",
         "status": "shared",
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14757.1",
+                "csq_ensp": "ENSP00000471166",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000594239.5:c.*402C>T",
+                "csq_pubmed": [
+                    "28654673"
+                ],
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000594239",
+                "csq_uniparc": "UPI0000000CC4",
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2116"
+            },
+            {
+                "csq_ccds": "CCDS14757.1",
+                "csq_ensp": "ENSP00000479662",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000611071.4:c.*402C>T",
+                "csq_pubmed": [
+                    "28654673"
+                ],
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611071",
+                "csq_uniparc": "UPI0000000CC4",
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1920"
+            },
+            {
+                "csq_ccds": "CCDS48197.1",
+                "csq_ensp": "ENSP00000478616",
+                "csq_exon": "8/8",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000611176.4:c.*402C>T",
+                "csq_pubmed": [
+                    "28654673"
+                ],
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611176",
+                "csq_uniparc": "UPI0000370010",
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1484"
+            },
+            {
+                "csq_ensp": "ENSP00000480431",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000612051.1:c.*1654C>T",
+                "csq_pubmed": [
+                    "28654673"
+                ],
+                "csq_strand": true,
+                "csq_trembl": "A0A087WWQ9",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000612051",
+                "csq_uniparc": "UPI0000E0C8E3",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1802"
+            },
+            {
+                "csq_ccds": "CCDS83513.1",
+                "csq_ensp": "ENSP00000484023",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000617207.4:c.*402C>T",
+                "csq_pubmed": [
+                    "28654673"
+                ],
+                "csq_strand": true,
+                "csq_trembl": "A0A087X1B1",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000617207",
+                "csq_uniparc": "UPI0001B791CB",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1779"
+            },
+            {
+                "csq_ccds": "CCDS48196.1",
+                "csq_ensp": "ENSP00000483825",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000618670.4:c.*402C>T",
+                "csq_pubmed": [
+                    "28654673"
+                ],
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000618670",
+                "csq_uniparc": "UPI00001A36E3",
+                "csq_canonical": true,
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "1886"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-08T19:56:51.271095+00:00",
         "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
@@ -915,12 +2017,117 @@
             {
                 "genes_most_severe_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
                 "genes_most_severe_hgvsc": "ENST00000618670.4:c.*368C>A",
-                "genes_most_severe_transcript": "ENST00000618670"
+                "genes_most_severe_transcript": "ENST00000618670",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.154564829C>A",
         "status": "shared",
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14757.1",
+                "csq_ensp": "ENSP00000471166",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000594239.5:c.*368C>A",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000594239",
+                "csq_uniparc": "UPI0000000CC4",
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2082"
+            },
+            {
+                "csq_ccds": "CCDS14757.1",
+                "csq_ensp": "ENSP00000479662",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000611071.4:c.*368C>A",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611071",
+                "csq_uniparc": "UPI0000000CC4",
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1886"
+            },
+            {
+                "csq_ccds": "CCDS48197.1",
+                "csq_ensp": "ENSP00000478616",
+                "csq_exon": "8/8",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000611176.4:c.*368C>A",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611176",
+                "csq_uniparc": "UPI0000370010",
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1450"
+            },
+            {
+                "csq_ensp": "ENSP00000480431",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000612051.1:c.*1620C>A",
+                "csq_strand": true,
+                "csq_trembl": "A0A087WWQ9",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000612051",
+                "csq_uniparc": "UPI0000E0C8E3",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1768"
+            },
+            {
+                "csq_ccds": "CCDS83513.1",
+                "csq_ensp": "ENSP00000484023",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000617207.4:c.*368C>A",
+                "csq_strand": true,
+                "csq_trembl": "A0A087X1B1",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000617207",
+                "csq_uniparc": "UPI0001B791CB",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1745"
+            },
+            {
+                "csq_ccds": "CCDS48196.1",
+                "csq_ensp": "ENSP00000483825",
+                "csq_exon": "10/10",
+                "csq_gene": "c65e0f93-e10d-4c6f-a162-081c3a9bc071",
+                "csq_hgvsc": "ENST00000618670.4:c.*368C>A",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000618670",
+                "csq_uniparc": "UPI00001A36E3",
+                "csq_canonical": true,
+                "csq_swissprot": "Q9Y6K9",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "1852"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-08T19:56:50.854178+00:00",
         "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
@@ -989,6 +2196,7 @@
                 "genes_most_severe_hgvsp": "ENSP00000377192.3:p.Ile168=",
                 "genes_most_severe_transcript": "ENST00000393562",
                 "genes_most_severe_amino_acids": "I",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba",
                 "genes_most_severe_feature_ncbi": "NM_001360016.2"
             }
         ],
@@ -997,6 +2205,239 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153762693,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000358633",
+                "csq_exon": "6/13",
+                "csq_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "csq_hgvsc": "ENST00000369620.6:c.504C>T",
+                "csq_hgvsp": "ENSP00000358633.2:p.Ile168=",
+                "csq_codons": "atC/atT",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "HAMAP:MF_00966",
+                    "PANTHER:PTHR23429:SF0",
+                    "PANTHER:PTHR23429",
+                    "Pfam:PF00479",
+                    "Gene3D:3.40.50.720",
+                    "PIRSF:PIRSF000110",
+                    "Superfamily:SSF51735",
+                    "Prints:PR00079"
+                ],
+                "csq_feature": "ENST00000369620",
+                "csq_uniparc": "UPI00004578BB",
+                "csq_swissprot": "P11413",
+                "csq_amino_acids": "I",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "504",
+                "csq_cdna_position": "617",
+                "csq_protein_position": "168"
+            },
+            {
+                "csq_ccds": "CCDS44023.1",
+                "csq_ensp": "ENSP00000377192",
+                "csq_exon": "6/13",
+                "csq_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "csq_mane": "NM_001360016.2",
+                "csq_hgvsc": "ENST00000393562.10:c.504C>T",
+                "csq_hgvsp": "ENSP00000377192.3:p.Ile168=",
+                "csq_codons": "atC/atT",
+                "csq_strand": false,
+                "csq_trembl": "A0A384NL00",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:1qki.A",
+                    "PDB-ENSP_mappings:1qki.B",
+                    "PDB-ENSP_mappings:1qki.C",
+                    "PDB-ENSP_mappings:1qki.D",
+                    "PDB-ENSP_mappings:1qki.E",
+                    "PDB-ENSP_mappings:1qki.F",
+                    "PDB-ENSP_mappings:1qki.G",
+                    "PDB-ENSP_mappings:1qki.H",
+                    "PDB-ENSP_mappings:2bh9.A",
+                    "PDB-ENSP_mappings:2bhl.A",
+                    "PDB-ENSP_mappings:2bhl.B",
+                    "Gene3D:3.40.50.720",
+                    "PDB-ENSP_mappings:5ukw.A",
+                    "PDB-ENSP_mappings:6e07.B",
+                    "PDB-ENSP_mappings:6e07.C",
+                    "PDB-ENSP_mappings:6e07.F",
+                    "PDB-ENSP_mappings:6e07.L",
+                    "PDB-ENSP_mappings:6e07.N",
+                    "PDB-ENSP_mappings:6e07.Q",
+                    "PDB-ENSP_mappings:6e07.T",
+                    "PDB-ENSP_mappings:6e07.W",
+                    "PDB-ENSP_mappings:6e08.L",
+                    "HAMAP:MF_00966",
+                    "Pfam:PF00479",
+                    "PIRSF:PIRSF000110",
+                    "Prints:PR00079",
+                    "PANTHER:PTHR23429",
+                    "PANTHER:PTHR23429:SF0",
+                    "Superfamily:SSF51735",
+                    "TIGRFAM:TIGR00871"
+                ],
+                "csq_feature": "ENST00000393562",
+                "csq_uniparc": "UPI0000061E0E",
+                "csq_canonical": true,
+                "csq_swissprot": "P11413",
+                "csq_amino_acids": "I",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "504",
+                "csq_cdna_position": "570",
+                "csq_protein_position": "168"
+            },
+            {
+                "csq_ccds": "CCDS44023.1",
+                "csq_ensp": "ENSP00000377194",
+                "csq_exon": "6/13",
+                "csq_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "csq_hgvsc": "ENST00000393564.6:c.504C>T",
+                "csq_hgvsp": "ENSP00000377194.2:p.Ile168=",
+                "csq_codons": "atC/atT",
+                "csq_strand": false,
+                "csq_trembl": "A0A384NL00",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PDB-ENSP_mappings:2bhl.B",
+                    "PDB-ENSP_mappings:2bhl.A",
+                    "PDB-ENSP_mappings:2bh9.A",
+                    "PDB-ENSP_mappings:1qki.H",
+                    "PDB-ENSP_mappings:1qki.G",
+                    "PDB-ENSP_mappings:1qki.F",
+                    "PDB-ENSP_mappings:1qki.E",
+                    "PDB-ENSP_mappings:1qki.D",
+                    "PDB-ENSP_mappings:1qki.C",
+                    "PDB-ENSP_mappings:1qki.B",
+                    "PDB-ENSP_mappings:1qki.A",
+                    "PDB-ENSP_mappings:5ukw.A",
+                    "PDB-ENSP_mappings:6e07.B",
+                    "PDB-ENSP_mappings:6e07.C",
+                    "PDB-ENSP_mappings:6e07.F",
+                    "PDB-ENSP_mappings:6e07.L",
+                    "PDB-ENSP_mappings:6e07.N",
+                    "PDB-ENSP_mappings:6e07.Q",
+                    "PDB-ENSP_mappings:6e07.T",
+                    "PDB-ENSP_mappings:6e07.W",
+                    "PDB-ENSP_mappings:6e08.L",
+                    "HAMAP:MF_00966",
+                    "PANTHER:PTHR23429:SF0",
+                    "PANTHER:PTHR23429",
+                    "Gene3D:3.40.50.720",
+                    "Pfam:PF00479",
+                    "PIRSF:PIRSF000110",
+                    "TIGRFAM:TIGR00871",
+                    "Superfamily:SSF51735",
+                    "Prints:PR00079"
+                ],
+                "csq_feature": "ENST00000393564",
+                "csq_uniparc": "UPI0000061E0E",
+                "csq_swissprot": "P11413",
+                "csq_amino_acids": "I",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "504",
+                "csq_cdna_position": "617",
+                "csq_protein_position": "168"
+            },
+            {
+                "csq_ensp": "ENSP00000394690",
+                "csq_exon": "6/7",
+                "csq_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "csq_hgvsc": "ENST00000433845.1:c.504C>T",
+                "csq_hgvsp": "ENSP00000394690.1:p.Ile168=",
+                "csq_codons": "atC/atT",
+                "csq_strand": false,
+                "csq_trembl": "E9PD92",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR23429",
+                    "PANTHER:PTHR23429:SF0",
+                    "Gene3D:3.40.50.720",
+                    "Pfam:PF00479",
+                    "Superfamily:SSF51735",
+                    "Prints:PR00079"
+                ],
+                "csq_feature": "ENST00000433845",
+                "csq_uniparc": "UPI000059DBF4",
+                "csq_amino_acids": "I",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "504",
+                "csq_cdna_position": "552",
+                "csq_protein_position": "168"
+            },
+            {
+                "csq_ensp": "ENSP00000395599",
+                "csq_exon": "6/9",
+                "csq_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "csq_hgvsc": "ENST00000439227.5:c.507C>T",
+                "csq_hgvsp": "ENSP00000395599.1:p.Ile169=",
+                "csq_codons": "atC/atT",
+                "csq_strand": false,
+                "csq_trembl": "E7EUI8",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR23429",
+                    "PANTHER:PTHR23429:SF0",
+                    "Gene3D:3.40.50.720",
+                    "Pfam:PF00479",
+                    "Superfamily:SSF51735",
+                    "Prints:PR00079"
+                ],
+                "csq_feature": "ENST00000439227",
+                "csq_uniparc": "UPI0003F48440",
+                "csq_amino_acids": "I",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "507",
+                "csq_cdna_position": "565",
+                "csq_protein_position": "169"
+            },
+            {
+                "csq_ensp": "ENSP00000400648",
+                "csq_exon": "6/9",
+                "csq_gene": "68aae3a6-5a3a-49a9-b40d-e5ad284c6cb1",
+                "csq_hgvsc": "ENST00000440967.5:c.507C>T",
+                "csq_hgvsp": "ENSP00000400648.1:p.Ile169=",
+                "csq_codons": "atC/atT",
+                "csq_strand": false,
+                "csq_trembl": "E7EM57",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR23429:SF0",
+                    "PANTHER:PTHR23429",
+                    "Pfam:PF00479",
+                    "Gene3D:3.40.50.720",
+                    "TIGRFAM:TIGR00871",
+                    "Superfamily:SSF51735",
+                    "Prints:PR00079"
+                ],
+                "csq_feature": "ENST00000440967",
+                "csq_uniparc": "UPI000059DBF6",
+                "csq_amino_acids": "I",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "507",
+                "csq_cdna_position": "601",
+                "csq_protein_position": "169"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:18.299113+00:00",
         "variantClass": "SNV",
@@ -1166,6 +2607,7 @@
                 "genes_most_severe_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
                 "genes_most_severe_hgvsc": "ENST00000447750.7:c.-69G>T",
                 "genes_most_severe_transcript": "ENST00000447750",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
                 "genes_most_severe_feature_ncbi": "NM_001493.3"
             }
         ],
@@ -1174,6 +2616,92 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153665532,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000396215",
+                "csq_exon": "1/5",
+                "csq_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
+                "csq_hgvsc": "ENST00000415109.5:c.-69G>T",
+                "csq_strand": true,
+                "csq_trembl": "F8WCU0",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000415109",
+                "csq_uniparc": "UPI0001610C89",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "21"
+            },
+            {
+                "csq_ensp": "ENSP00000416195",
+                "csq_exon": "1/6",
+                "csq_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
+                "csq_hgvsc": "ENST00000434049.1:c.-69G>T",
+                "csq_strand": true,
+                "csq_trembl": "G5E9U5",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000434049",
+                "csq_uniparc": "UPI0000EE7C27",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "23"
+            },
+            {
+                "csq_ensp": "ENSP00000394752",
+                "csq_exon": "1/5",
+                "csq_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
+                "csq_hgvsc": "ENST00000445564.5:c.-69G>T",
+                "csq_strand": true,
+                "csq_trembl": "F8WE59",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000445564",
+                "csq_uniparc": "UPI0001610C88",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "33"
+            },
+            {
+                "csq_ccds": "CCDS35452.1",
+                "csq_ensp": "ENSP00000394071",
+                "csq_exon": "1/11",
+                "csq_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
+                "csq_mane": "NM_001493.3",
+                "csq_hgvsc": "ENST00000447750.7:c.-69G>T",
+                "csq_strand": true,
+                "csq_trembl": "A0A0S2Z3X8",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000447750",
+                "csq_uniparc": "UPI000012B39B",
+                "csq_canonical": true,
+                "csq_swissprot": "P31150",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "33"
+            },
+            {
+                "csq_ensp": "ENSP00000486715",
+                "csq_exon": "1/5",
+                "csq_gene": "b4d7f3cc-02a3-4e0c-a7ae-b5d0a62b8789",
+                "csq_hgvsc": "ENST00000630693.2:c.-69G>T",
+                "csq_strand": true,
+                "csq_trembl": "G5E9U5",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000630693",
+                "csq_uniparc": "UPI0000EE7C27",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "274"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:17.805253+00:00",
         "variantClass": "SNV",
@@ -1208,6 +2736,7 @@
                 "genes_most_severe_gene": "752cff3a-80bf-4dad-9858-786af410ced4",
                 "genes_most_severe_hgvsc": "ENST00000369762.7:c.*486C>T",
                 "genes_most_severe_transcript": "ENST00000369762",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_001183.6"
             }
         ],
@@ -1216,6 +2745,60 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153664723,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS35451.1",
+                "csq_ensp": "ENSP00000358777",
+                "csq_exon": "10/10",
+                "csq_gene": "752cff3a-80bf-4dad-9858-786af410ced4",
+                "csq_mane": "NM_001183.6",
+                "csq_hgvsc": "ENST00000369762.7:c.*486C>T",
+                "csq_strand": true,
+                "csq_trembl": "A0A384MQW4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000369762",
+                "csq_uniparc": "UPI000013811E",
+                "csq_canonical": true,
+                "csq_swissprot": "Q15904",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "1915"
+            },
+            {
+                "csq_ensp": "ENSP00000396643",
+                "csq_exon": "10/10",
+                "csq_gene": "752cff3a-80bf-4dad-9858-786af410ced4",
+                "csq_hgvsc": "ENST00000455205.5:c.*3977C>T",
+                "csq_strand": true,
+                "csq_trembl": "H7C0T7",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000455205",
+                "csq_uniparc": "UPI0001610C84",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "4377"
+            },
+            {
+                "csq_ensp": "ENSP00000482243",
+                "csq_exon": "9/9",
+                "csq_gene": "752cff3a-80bf-4dad-9858-786af410ced4",
+                "csq_hgvsc": "ENST00000619046.4:c.*486C>T",
+                "csq_strand": true,
+                "csq_trembl": "A0A0C4DGX8",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000619046",
+                "csq_uniparc": "UPI000016B31D",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2685"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:17.479542+00:00",
         "variantClass": "SNV",
@@ -1251,6 +2834,7 @@
                 "genes_most_severe_gene": "314f1ac8-8842-4645-bfac-f3054bdeabdd",
                 "genes_most_severe_hgvsc": "ENST00000453960.7:c.*914A>T",
                 "genes_most_severe_transcript": "ENST00000453960",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_001110792.2"
             }
         ],
@@ -1259,6 +2843,46 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153294904,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14741.1",
+                "csq_ensp": "ENSP00000301948",
+                "csq_exon": "4/4",
+                "csq_gene": "314f1ac8-8842-4645-bfac-f3054bdeabdd",
+                "csq_hgvsc": "ENST00000303391.11:c.*914A>T",
+                "csq_strand": false,
+                "csq_trembl": "D3YJ43",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000303391",
+                "csq_uniparc": "UPI000012EEA5",
+                "csq_swissprot": "P51608",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2587"
+            },
+            {
+                "csq_ccds": "CCDS48193.1",
+                "csq_ensp": "ENSP00000395535",
+                "csq_exon": "3/3",
+                "csq_gene": "314f1ac8-8842-4645-bfac-f3054bdeabdd",
+                "csq_mane": "NM_001110792.2",
+                "csq_hgvsc": "ENST00000453960.7:c.*914A>T",
+                "csq_strand": false,
+                "csq_trembl": "A0A140VKC4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000453960",
+                "csq_uniparc": "UPI0000253F1B",
+                "csq_canonical": true,
+                "csq_swissprot": "P51608",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "2463"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:17.128508+00:00",
         "variantClass": "SNV",
@@ -1347,6 +2971,7 @@
                 "genes_most_severe_gene": "3a96dd3c-0fa1-44b7-bad8-5b20cd6b8047",
                 "genes_most_severe_hgvsc": "ENST00000310441.12:c.*50G>A",
                 "genes_most_severe_transcript": "ENST00000310441",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_005334.3"
             }
         ],
@@ -1355,6 +2980,59 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153214748,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS44020.1",
+                "csq_ensp": "ENSP00000309555",
+                "csq_exon": "26/26",
+                "csq_gene": "3a96dd3c-0fa1-44b7-bad8-5b20cd6b8047",
+                "csq_mane": "NM_005334.3",
+                "csq_hgvsc": "ENST00000310441.12:c.*50G>A",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000310441",
+                "csq_uniparc": "UPI0000142F1F",
+                "csq_canonical": true,
+                "csq_swissprot": "P51610",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "7136"
+            },
+            {
+                "csq_ensp": "ENSP00000359001",
+                "csq_exon": "26/26",
+                "csq_gene": "3a96dd3c-0fa1-44b7-bad8-5b20cd6b8047",
+                "csq_hgvsc": "ENST00000369984.4:c.*50G>A",
+                "csq_strand": false,
+                "csq_trembl": "A6NEM2",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000369984",
+                "csq_uniparc": "UPI0000E5B00E",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "6637"
+            },
+            {
+                "csq_ensp": "ENSP00000399589",
+                "csq_exon": "10/10",
+                "csq_gene": "3a96dd3c-0fa1-44b7-bad8-5b20cd6b8047",
+                "csq_hgvsc": "ENST00000444191.5:c.*50G>A",
+                "csq_strand": false,
+                "csq_trembl": "H7C1C4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000444191",
+                "csq_uniparc": "UPI0000E5B00D",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "1884"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:16.809594+00:00",
         "variantClass": "SNV",
@@ -1580,6 +3258,7 @@
                 "genes_most_severe_hgvsp": "ENSP00000496396.1:p.Ala39=",
                 "genes_most_severe_transcript": "ENST00000646375",
                 "genes_most_severe_amino_acids": "A",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba",
                 "genes_most_severe_feature_ncbi": "NM_000054.6"
             }
         ],
@@ -1588,6 +3267,127 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153171077,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14735.1",
+                "csq_ensp": "ENSP00000338072",
+                "csq_exon": "2/3",
+                "csq_gene": "e66ae150-f51d-4976-b20d-029e701bbee4",
+                "csq_hgvsc": "ENST00000337474.5:c.117G>A",
+                "csq_hgvsp": "ENSP00000338072.5:p.Ala39=",
+                "csq_codons": "gcG/gcA",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.1070.10",
+                    "Prints:PR00237",
+                    "Prints:PR00896",
+                    "PANTHER:PTHR24241",
+                    "PANTHER:PTHR24241:SF20",
+                    "Superfamily:SSF81321"
+                ],
+                "csq_feature": "ENST00000337474",
+                "csq_uniparc": "UPI000005043B",
+                "csq_swissprot": "P30518",
+                "csq_amino_acids": "A",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "117",
+                "csq_cdna_position": "188",
+                "csq_protein_position": "39"
+            },
+            {
+                "csq_ccds": "CCDS55539.1",
+                "csq_ensp": "ENSP00000359066",
+                "csq_exon": "2/2",
+                "csq_gene": "e66ae150-f51d-4976-b20d-029e701bbee4",
+                "csq_hgvsc": "ENST00000370049.1:c.117G>A",
+                "csq_hgvsp": "ENSP00000359066.1:p.Ala39=",
+                "csq_codons": "gcG/gcA",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.1070.10",
+                    "Prints:PR00237",
+                    "Prints:PR00896",
+                    "PANTHER:PTHR24241",
+                    "PANTHER:PTHR24241:SF20",
+                    "Superfamily:SSF81321"
+                ],
+                "csq_feature": "ENST00000370049",
+                "csq_uniparc": "UPI0000073F71",
+                "csq_swissprot": "P30518",
+                "csq_amino_acids": "A",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "117",
+                "csq_cdna_position": "149",
+                "csq_protein_position": "39"
+            },
+            {
+                "csq_ensp": "ENSP00000393513",
+                "csq_exon": "2/3",
+                "csq_gene": "e66ae150-f51d-4976-b20d-029e701bbee4",
+                "csq_hgvsc": "ENST00000430697.1:c.117G>A",
+                "csq_hgvsp": "ENSP00000393513.1:p.Ala39=",
+                "csq_codons": "gcG/gcA",
+                "csq_strand": true,
+                "csq_trembl": "C9JV81",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.1070.10",
+                    "Prints:PR00237",
+                    "Prints:PR00896",
+                    "PANTHER:PTHR24241",
+                    "PANTHER:PTHR24241:SF20",
+                    "Superfamily:SSF81321"
+                ],
+                "csq_feature": "ENST00000430697",
+                "csq_uniparc": "UPI0001610C69",
+                "csq_amino_acids": "A",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "117",
+                "csq_cdna_position": "262",
+                "csq_protein_position": "39"
+            },
+            {
+                "csq_ccds": "CCDS14735.1",
+                "csq_ensp": "ENSP00000496396",
+                "csq_exon": "3/4",
+                "csq_gene": "e66ae150-f51d-4976-b20d-029e701bbee4",
+                "csq_mane": "NM_000054.6",
+                "csq_hgvsc": "ENST00000646375.1:c.117G>A",
+                "csq_hgvsp": "ENSP00000496396.1:p.Ala39=",
+                "csq_codons": "gcG/gcA",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Gene3D:1.20.1070.10",
+                    "Superfamily:SSF81321",
+                    "Prints:PR00237",
+                    "Prints:PR00896"
+                ],
+                "csq_feature": "ENST00000646375",
+                "csq_uniparc": "UPI000005043B",
+                "csq_canonical": true,
+                "csq_swissprot": "P30518",
+                "csq_amino_acids": "A",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "117",
+                "csq_cdna_position": "347",
+                "csq_protein_position": "39"
+            }
+        ],
         "csq_clinvar": "735248",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:16.383283+00:00",
@@ -1838,7 +3638,8 @@
             {
                 "genes_most_severe_gene": "2a649655-30ed-4339-b02f-5c079d2c9850",
                 "genes_most_severe_hgvsc": "ENST00000393758.6:c.*318G>T",
-                "genes_most_severe_transcript": "ENST00000393758"
+                "genes_most_severe_transcript": "ENST00000393758",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.153803035C>A",
@@ -1846,6 +3647,60 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153068490,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14732.1",
+                "csq_ensp": "ENSP00000164640",
+                "csq_exon": "8/8",
+                "csq_gene": "2a649655-30ed-4339-b02f-5c079d2c9850",
+                "csq_hgvsc": "ENST00000164640.8:c.*318G>T",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000164640",
+                "csq_uniparc": "UPI0000211CAA",
+                "csq_swissprot": "Q76G19",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2820"
+            },
+            {
+                "csq_ccds": "CCDS78518.1",
+                "csq_ensp": "ENSP00000377355",
+                "csq_exon": "8/8",
+                "csq_gene": "2a649655-30ed-4339-b02f-5c079d2c9850",
+                "csq_hgvsc": "ENST00000393758.6:c.*318G>T",
+                "csq_strand": false,
+                "csq_trembl": "Q17RL8",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000393758",
+                "csq_uniparc": "UPI0000211CB2",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "2896"
+            },
+            {
+                "csq_ccds": "CCDS78517.1",
+                "csq_ensp": "ENSP00000442033",
+                "csq_exon": "6/6",
+                "csq_gene": "2a649655-30ed-4339-b02f-5c079d2c9850",
+                "csq_hgvsc": "ENST00000544474.5:c.*318G>T",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000544474",
+                "csq_uniparc": "UPI000004A103",
+                "csq_swissprot": "Q76G19",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2551"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:16.113109+00:00",
         "variantClass": "SNV",
@@ -1936,6 +3791,7 @@
                 "genes_most_severe_hgvsp": "ENSP00000218104.3:p.Pro730=",
                 "genes_most_severe_transcript": "ENST00000218104",
                 "genes_most_severe_amino_acids": "P",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba",
                 "genes_most_severe_feature_ncbi": "NM_000033.4"
             }
         ],
@@ -1944,6 +3800,35 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 153009141,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14728.1",
+                "csq_ensp": "ENSP00000218104",
+                "csq_exon": "10/10",
+                "csq_gene": "980af2b3-0500-461c-bc33-9ad3d0f89464",
+                "csq_mane": "NM_000033.4",
+                "csq_hgvsc": "ENST00000218104.6:c.2190G>A",
+                "csq_hgvsp": "ENSP00000218104.3:p.Pro730=",
+                "csq_codons": "ccG/ccA",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Low_complexity_(Seg):seg"
+                ],
+                "csq_feature": "ENST00000218104",
+                "csq_uniparc": "UPI0000000DF5",
+                "csq_canonical": true,
+                "csq_swissprot": "P33897",
+                "csq_amino_acids": "P",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "2190",
+                "csq_cdna_position": "2601",
+                "csq_protein_position": "730"
+            }
+        ],
         "csq_clinvar": "35640",
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-09T22:04:51.293626+00:00",
@@ -2197,7 +4082,8 @@
                 "genes_most_severe_hgvsc": "ENST00000633844.1:c.326C>T",
                 "genes_most_severe_hgvsp": "ENSP00000488404.1:p.Ala109Val",
                 "genes_most_severe_transcript": "ENST00000633844",
-                "genes_most_severe_amino_acids": "A/V"
+                "genes_most_severe_amino_acids": "A/V",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_000023.11:g.153397690G>A",
@@ -2205,6 +4091,63 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 152663148,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000488500",
+                "csq_exon": "2/2",
+                "csq_gene": "c6ec8ff0-150e-494e-85f4-a5b2b1284ddd",
+                "csq_mane": "NM_001367770.1",
+                "csq_hgvsc": "ENST00000445091.3:c.1160C>T",
+                "csq_hgvsp": "ENSP00000488500.1:p.Ala387Val",
+                "csq_codons": "gCg/gTg",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Pfam:PF14893",
+                    "PANTHER:PTHR23095",
+                    "PANTHER:PTHR23095:SF20"
+                ],
+                "csq_feature": "ENST00000445091",
+                "csq_uniparc": "UPI0006454748",
+                "csq_swissprot": "A0A0J9YXQ4",
+                "csq_amino_acids": "A/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "1160",
+                "csq_cdna_position": "1338",
+                "csq_protein_position": "387"
+            },
+            {
+                "csq_ccds": "CCDS87793.1",
+                "csq_ensp": "ENSP00000488404",
+                "csq_exon": "3/3",
+                "csq_gene": "c6ec8ff0-150e-494e-85f4-a5b2b1284ddd",
+                "csq_hgvsc": "ENST00000633844.1:c.326C>T",
+                "csq_hgvsp": "ENSP00000488404.1:p.Ala109Val",
+                "csq_codons": "gCg/gTg",
+                "csq_strand": false,
+                "csq_trembl": "A0A0J9YXH5",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Pfam:PF14893",
+                    "PANTHER:PTHR23095",
+                    "PANTHER:PTHR23095:SF44"
+                ],
+                "csq_feature": "ENST00000633844",
+                "csq_uniparc": "UPI0002742DF2",
+                "csq_canonical": true,
+                "csq_amino_acids": "A/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "326",
+                "csq_cdna_position": "546",
+                "csq_protein_position": "109"
+            }
+        ],
         "csq_gerp_rs": -2.91,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:15.352164+00:00",
@@ -2299,7 +4242,8 @@
                 "genes_most_severe_hgvsc": "ENST00000458091.4:c.4943C>G",
                 "genes_most_severe_hgvsp": "ENSP00000498408.1:p.Pro1648Arg",
                 "genes_most_severe_transcript": "ENST00000458091",
-                "genes_most_severe_amino_acids": "P/R"
+                "genes_most_severe_amino_acids": "P/R",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_000023.11:g.153276560C>G",
@@ -2307,6 +4251,35 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 152542017,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000498408",
+                "csq_exon": "1/1",
+                "csq_gene": "2dbdcf1d-c1e1-4a6e-8e59-8a76a9dd0f8a",
+                "csq_hgvsc": "ENST00000458091.4:c.4943C>G",
+                "csq_hgvsp": "ENSP00000498408.1:p.Pro1648Arg",
+                "csq_codons": "cCg/cGg",
+                "csq_strand": true,
+                "csq_trembl": "A0A494C071",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR31333",
+                    "PANTHER:PTHR31333:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000458091",
+                "csq_uniparc": "UPI00108ECA93",
+                "csq_canonical": true,
+                "csq_amino_acids": "P/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "4943",
+                "csq_cdna_position": "4943",
+                "csq_protein_position": "1648"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:15.163405+00:00",
         "variantClass": "SNV",
@@ -2332,7 +4305,8 @@
             {
                 "genes_most_severe_gene": "0e48ec2a-cb98-4213-92b8-cdf0cec77751",
                 "genes_most_severe_hgvsc": "ENST00000424805.1:c.-257C>T",
-                "genes_most_severe_transcript": "ENST00000424805"
+                "genes_most_severe_transcript": "ENST00000424805",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
             }
         ],
         "hgvsg": "NC_000023.11:g.153056488C>T",
@@ -2340,6 +4314,42 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 152224845,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS35435.2",
+                "csq_ensp": "ENSP00000390576",
+                "csq_exon": "1/3",
+                "csq_gene": "0e48ec2a-cb98-4213-92b8-cdf0cec77751",
+                "csq_hgvsc": "ENST00000424805.1:c.-257C>T",
+                "csq_strand": true,
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000424805",
+                "csq_uniparc": "UPI0000070F18",
+                "csq_swissprot": "Q9UL41",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "7"
+            },
+            {
+                "csq_ccds": "CCDS65344.1",
+                "csq_ensp": "ENSP00000480719",
+                "csq_exon": "1/3",
+                "csq_gene": "0e48ec2a-cb98-4213-92b8-cdf0cec77751",
+                "csq_hgvsc": "ENST00000619635.1:c.-257C>T",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000619635",
+                "csq_uniparc": "UPI0000072B89",
+                "csq_swissprot": "Q9UL41",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "80"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:14.886334+00:00",
         "variantClass": "SNV",
@@ -2421,7 +4431,8 @@
                 "genes_most_severe_hgvsp": "ENSP00000440847.1:p.Gly226Arg",
                 "genes_most_severe_sift_score": 0.271,
                 "genes_most_severe_transcript": "ENST00000535861",
-                "genes_most_severe_amino_acids": "G/R"
+                "genes_most_severe_amino_acids": "G/R",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9"
             }
         ],
         "hgvsg": "NC_000023.11:g.152922195G>A",
@@ -2429,6 +4440,291 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 152090739,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS55531.1",
+                "csq_ensp": "ENSP00000312782",
+                "csq_exon": "10/21",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000318504.11:c.676G>A",
+                "csq_hgvsp": "ENSP00000312782.7:p.Gly226Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15468",
+                    "PANTHER:PTHR15468:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000318504",
+                "csq_uniparc": "UPI0001895B93",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "676",
+                "csq_cdna_position": "724",
+                "csq_protein_position": "226"
+            },
+            {
+                "csq_ccds": "CCDS55532.1",
+                "csq_ensp": "ENSP00000313919",
+                "csq_exon": "4/15",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000318529.12:c.190G>A",
+                "csq_hgvsp": "ENSP00000313919.8:p.Gly64Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15468",
+                    "PANTHER:PTHR15468:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000318529",
+                "csq_uniparc": "UPI0001D27F80",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "190",
+                "csq_cdna_position": "454",
+                "csq_protein_position": "64"
+            },
+            {
+                "csq_ensp": "ENSP00000325307",
+                "csq_exon": "5/15",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000324823.10:c.259G>A",
+                "csq_hgvsp": "ENSP00000325307.7:p.Gly87Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15468",
+                    "PANTHER:PTHR15468:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000324823",
+                "csq_uniparc": "UPI0000140358",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "259",
+                "csq_cdna_position": "299",
+                "csq_protein_position": "87"
+            },
+            {
+                "csq_ccds": "CCDS48184.1",
+                "csq_ensp": "ENSP00000359291",
+                "csq_exon": "10/23",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000370268.8:c.676G>A",
+                "csq_hgvsp": "ENSP00000359291.4:p.Gly226Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15468",
+                    "PANTHER:PTHR15468:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000370268",
+                "csq_uniparc": "UPI00015294FA",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "676",
+                "csq_cdna_position": "713",
+                "csq_protein_position": "226"
+            },
+            {
+                "csq_ccds": "CCDS55529.1",
+                "csq_ensp": "ENSP00000359293",
+                "csq_exon": "10/23",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000370270.6:c.676G>A",
+                "csq_hgvsp": "ENSP00000359293.2:p.Gly226Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15468",
+                    "PANTHER:PTHR15468:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000370270",
+                "csq_uniparc": "UPI0001D27F7E",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "676",
+                "csq_cdna_position": "676",
+                "csq_protein_position": "226"
+            },
+            {
+                "csq_ensp": "ENSP00000409121",
+                "csq_exon": "3/14",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000426821.6:c.130G>A",
+                "csq_hgvsp": "ENSP00000409121.2:p.Gly44Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_trembl": "H0Y704",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "MobiDB_lite:mobidb-lite",
+                    "PANTHER:PTHR15468:SF2",
+                    "PANTHER:PTHR15468"
+                ],
+                "csq_feature": "ENST00000426821",
+                "csq_uniparc": "UPI0003B9280A",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "130",
+                "csq_cdna_position": "128",
+                "csq_protein_position": "44"
+            },
+            {
+                "csq_ensp": "ENSP00000391272",
+                "csq_exon": "10/22",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000436731.6:c.676G>A",
+                "csq_hgvsp": "ENSP00000391272.2:p.Gly226Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_trembl": "H7BZT5",
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000436731",
+                "csq_uniparc": "UPI0003B92803",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "676",
+                "csq_cdna_position": "676",
+                "csq_protein_position": "226"
+            },
+            {
+                "csq_ensp": "ENSP00000401766",
+                "csq_exon": "2/6",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000447792.2:c.67G>A",
+                "csq_hgvsp": "ENSP00000401766.2:p.Gly23Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_trembl": "H7C1R1",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000447792",
+                "csq_uniparc": "UPI0003B928C8",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "67",
+                "csq_cdna_position": "65",
+                "csq_protein_position": "23"
+            },
+            {
+                "csq_ccds": "CCDS55528.1",
+                "csq_ensp": "ENSP00000395228",
+                "csq_exon": "10/23",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000449285.6:c.679G>A",
+                "csq_hgvsp": "ENSP00000395228.2:p.Gly227Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15468",
+                    "PANTHER:PTHR15468:SF2",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000449285",
+                "csq_uniparc": "UPI00017A74DD",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "679",
+                "csq_cdna_position": "727",
+                "csq_protein_position": "227"
+            },
+            {
+                "csq_ccds": "CCDS55529.1",
+                "csq_ensp": "ENSP00000440847",
+                "csq_exon": "10/24",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000535861.5:c.676G>A",
+                "csq_hgvsp": "ENSP00000440847.1:p.Gly226Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000535861",
+                "csq_uniparc": "UPI0001D27F7E",
+                "csq_canonical": true,
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "676",
+                "csq_cdna_position": "724",
+                "csq_protein_position": "226"
+            },
+            {
+                "csq_ccds": "CCDS55530.1",
+                "csq_ensp": "ENSP00000444367",
+                "csq_exon": "10/23",
+                "csq_gene": "6b3feae5-05b0-4d0d-b009-df540ff17dae",
+                "csq_hgvsc": "ENST00000539731.5:c.676G>A",
+                "csq_hgvsp": "ENSP00000444367.1:p.Gly226Arg",
+                "csq_codons": "Ggg/Agg",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000539731",
+                "csq_uniparc": "UPI0001D27F7F",
+                "csq_swissprot": "O15231",
+                "csq_amino_acids": "G/R",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "676",
+                "csq_cdna_position": "724",
+                "csq_protein_position": "226"
+            }
+        ],
         "csq_gerp_rs": 1.97,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:14.016383+00:00",
@@ -2672,6 +4968,7 @@
                 "genes_most_severe_sift_score": 0.414,
                 "genes_most_severe_transcript": "ENST00000329903",
                 "genes_most_severe_amino_acids": "G/V",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9",
                 "genes_most_severe_polyphen_score": 0.015
             }
         ],
@@ -2680,6 +4977,36 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 150908168,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14701.1",
+                "csq_ensp": "ENSP00000328478",
+                "csq_exon": "3/6",
+                "csq_gene": "42c83a8e-6c1f-4e48-a8f1-001c495d5388",
+                "csq_hgvsc": "ENST00000329903.4:c.338G>T",
+                "csq_hgvsp": "ENSP00000328478.4:p.Gly113Val",
+                "csq_codons": "gGc/gTc",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "Low_complexity_(Seg):seg",
+                    "PANTHER:PTHR45638",
+                    "PANTHER:PTHR45638:SF3"
+                ],
+                "csq_feature": "ENST00000329903",
+                "csq_uniparc": "UPI000003E7AE",
+                "csq_canonical": true,
+                "csq_swissprot": "Q16280",
+                "csq_amino_acids": "G/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "338",
+                "csq_cdna_position": "371",
+                "csq_protein_position": "113"
+            }
+        ],
         "csq_clinvar": "728382",
         "csq_gerp_rs": 2.75,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
@@ -2941,7 +5268,8 @@
             {
                 "genes_most_severe_gene": "cf0245eb-0f2f-4cad-a785-371a1ed69d9c",
                 "genes_most_severe_hgvsc": "ENST00000613030.4:c.*2532G>A",
-                "genes_most_severe_transcript": "ENST00000613030"
+                "genes_most_severe_transcript": "ENST00000613030",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.150766502C>T",
@@ -2949,6 +5277,78 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 149934975,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000489222",
+                "csq_exon": "12/12",
+                "csq_gene": "cf0245eb-0f2f-4cad-a785-371a1ed69d9c",
+                "csq_hgvsc": "ENST00000346693.8:c.*4290G>A",
+                "csq_strand": false,
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000346693",
+                "csq_uniparc": "UPI000007145B",
+                "csq_swissprot": "Q8TCZ2",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "4770"
+            },
+            {
+                "csq_ccds": "CCDS35427.1",
+                "csq_ensp": "ENSP00000359403",
+                "csq_exon": "11/11",
+                "csq_gene": "cf0245eb-0f2f-4cad-a785-371a1ed69d9c",
+                "csq_mane": "NM_031462.4",
+                "csq_hgvsc": "ENST00000370377.8:c.*2532G>A",
+                "csq_strand": false,
+                "csq_trembl": "A0A024RC16",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000370377",
+                "csq_uniparc": "UPI0000034CC0",
+                "csq_swissprot": "Q8TCZ2",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "3401"
+            },
+            {
+                "csq_ccds": "CCDS55527.1",
+                "csq_ensp": "ENSP00000394858",
+                "csq_exon": "8/8",
+                "csq_gene": "cf0245eb-0f2f-4cad-a785-371a1ed69d9c",
+                "csq_hgvsc": "ENST00000437787.6:c.*2532G>A",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000437787",
+                "csq_uniparc": "UPI0001AE7005",
+                "csq_swissprot": "Q8TCZ2",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "3330"
+            },
+            {
+                "csq_ccds": "CCDS76044.1",
+                "csq_ensp": "ENSP00000480322",
+                "csq_exon": "12/12",
+                "csq_gene": "cf0245eb-0f2f-4cad-a785-371a1ed69d9c",
+                "csq_hgvsc": "ENST00000613030.4:c.*2532G>A",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000613030",
+                "csq_uniparc": "UPI0002065B16",
+                "csq_canonical": true,
+                "csq_swissprot": "Q8TCZ2",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "3579"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:13.384643+00:00",
         "variantClass": "SNV",
@@ -3029,7 +5429,8 @@
                 "genes_most_severe_hgvsc": "ENST00000286437.7:c.33G>A",
                 "genes_most_severe_hgvsp": "ENSP00000286437.5:p.Pro11=",
                 "genes_most_severe_transcript": "ENST00000286437",
-                "genes_most_severe_amino_acids": "P"
+                "genes_most_severe_amino_acids": "P",
+                "genes_most_severe_consequence": "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
             }
         ],
         "hgvsg": "NC_000023.11:g.148719213G>A",
@@ -3037,6 +5438,30 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 147800737,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS55521.1",
+                "csq_ensp": "ENSP00000286437",
+                "csq_exon": "1/18",
+                "csq_gene": "50ac9d21-2a3a-42c0-9834-d56cf128b874",
+                "csq_hgvsc": "ENST00000286437.7:c.33G>A",
+                "csq_hgvsp": "ENSP00000286437.5:p.Pro11=",
+                "csq_codons": "ccG/ccA",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000286437",
+                "csq_uniparc": "UPI00017A80C4",
+                "csq_swissprot": "P51816",
+                "csq_amino_acids": "P",
+                "csq_consequence": [
+                    "3c1a33c5-5899-4299-ae4f-a3b0b14771ba"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "33",
+                "csq_cdna_position": "123",
+                "csq_protein_position": "11"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-09T22:04:37.537816+00:00",
         "variantClass": "SNV",
@@ -3260,6 +5685,7 @@
                 "genes_most_severe_gene": "679ec201-fa0e-4bff-860b-e97ceceed2cd",
                 "genes_most_severe_hgvsc": "ENST00000315930.11:c.*9211A>G",
                 "genes_most_severe_transcript": "ENST00000315930",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_004114.5"
             }
         ],
@@ -3268,6 +5694,27 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 137705800,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14665.1",
+                "csq_ensp": "ENSP00000322390",
+                "csq_exon": "5/5",
+                "csq_gene": "679ec201-fa0e-4bff-860b-e97ceceed2cd",
+                "csq_mane": "NM_004114.5",
+                "csq_hgvsc": "ENST00000315930.11:c.*9211A>G",
+                "csq_strand": false,
+                "csq_trembl": "A8K1P5",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000315930",
+                "csq_uniparc": "UPI00000359FC",
+                "csq_swissprot": "Q92913",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "10663"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:12.743675+00:00",
         "variantClass": "SNV",
@@ -3359,6 +5806,7 @@
                 "genes_most_severe_sift_score": 0.019,
                 "genes_most_severe_transcript": "ENST00000535601",
                 "genes_most_severe_amino_acids": "D/V",
+                "genes_most_severe_consequence": "a4d8e291-6993-4250-be4a-0574f4be76e9",
                 "genes_most_severe_polyphen_score": 0.184
             }
         ],
@@ -3367,6 +5815,116 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 135579941,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14657.1",
+                "csq_ensp": "ENSP00000218364",
+                "csq_exon": "1/9",
+                "csq_gene": "c2a0d7ab-6c70-4083-88fb-c170c4a5e74e",
+                "csq_mane": "NM_014500.5",
+                "csq_hgvsc": "ENST00000218364.5:c.98A>T",
+                "csq_hgvsp": "ENSP00000218364.4:p.Asp33Val",
+                "csq_codons": "gAt/gTt",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15608",
+                    "MobiDB_lite:mobidb-lite",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000218364",
+                "csq_uniparc": "UPI000006D876",
+                "csq_swissprot": "O43719",
+                "csq_amino_acids": "D/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "98",
+                "csq_cdna_position": "191",
+                "csq_protein_position": "33"
+            },
+            {
+                "csq_ensp": "ENSP00000412420",
+                "csq_exon": "2/6",
+                "csq_gene": "c2a0d7ab-6c70-4083-88fb-c170c4a5e74e",
+                "csq_hgvsc": "ENST00000425695.5:c.98A>T",
+                "csq_hgvsp": "ENSP00000412420.1:p.Asp33Val",
+                "csq_codons": "gAt/gTt",
+                "csq_strand": true,
+                "csq_trembl": "Q5H919",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "MobiDB_lite:mobidb-lite",
+                    "MobiDB_lite:mobidb-lite",
+                    "PANTHER:PTHR15608"
+                ],
+                "csq_feature": "ENST00000425695",
+                "csq_uniparc": "UPI00004A3B89",
+                "csq_amino_acids": "D/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "98",
+                "csq_cdna_position": "313",
+                "csq_protein_position": "33"
+            },
+            {
+                "csq_ensp": "ENSP00000411381",
+                "csq_exon": "2/6",
+                "csq_gene": "c2a0d7ab-6c70-4083-88fb-c170c4a5e74e",
+                "csq_hgvsc": "ENST00000448450.5:c.98A>T",
+                "csq_hgvsp": "ENSP00000411381.1:p.Asp33Val",
+                "csq_codons": "gAt/gTt",
+                "csq_strand": true,
+                "csq_trembl": "Q5H918",
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "MobiDB_lite:mobidb-lite",
+                    "MobiDB_lite:mobidb-lite",
+                    "PANTHER:PTHR15608"
+                ],
+                "csq_feature": "ENST00000448450",
+                "csq_uniparc": "UPI00004A3B8A",
+                "csq_amino_acids": "D/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": false,
+                "csq_cds_position": "98",
+                "csq_cdna_position": "378",
+                "csq_protein_position": "33"
+            },
+            {
+                "csq_ccds": "CCDS14657.1",
+                "csq_ensp": "ENSP00000442699",
+                "csq_exon": "2/10",
+                "csq_gene": "c2a0d7ab-6c70-4083-88fb-c170c4a5e74e",
+                "csq_hgvsc": "ENST00000535601.5:c.98A>T",
+                "csq_hgvsp": "ENSP00000442699.1:p.Asp33Val",
+                "csq_codons": "gAt/gTt",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_domains": [
+                    "PANTHER:PTHR15608",
+                    "MobiDB_lite:mobidb-lite",
+                    "MobiDB_lite:mobidb-lite"
+                ],
+                "csq_feature": "ENST00000535601",
+                "csq_uniparc": "UPI000006D876",
+                "csq_canonical": true,
+                "csq_swissprot": "O43719",
+                "csq_amino_acids": "D/V",
+                "csq_consequence": [
+                    "a4d8e291-6993-4250-be4a-0574f4be76e9"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "98",
+                "csq_cdna_position": "520",
+                "csq_protein_position": "33"
+            }
+        ],
         "csq_gerp_rs": 0.805,
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:12.380833+00:00",
@@ -3606,7 +6164,8 @@
             {
                 "genes_most_severe_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
                 "genes_most_severe_hgvsc": "ENST00000611668.4:c.-210A>G",
-                "genes_most_severe_transcript": "ENST00000611668"
+                "genes_most_severe_transcript": "ENST00000611668",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
             }
         ],
         "hgvsg": "NC_000023.11:g.135889051T>C",
@@ -3614,6 +6173,26 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 134971209,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS76035.1",
+                "csq_ensp": "ENSP00000484601",
+                "csq_exon": "1/5",
+                "csq_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
+                "csq_hgvsc": "ENST00000611668.4:c.-210A>G",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611668",
+                "csq_uniparc": "UPI00002125B4",
+                "csq_canonical": true,
+                "csq_swissprot": "P0DMU9",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "36"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:12.180102+00:00",
         "variantClass": "SNV",
@@ -3701,7 +6280,8 @@
             {
                 "genes_most_severe_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
                 "genes_most_severe_hgvsc": "ENST00000611668.4:c.-189C>T",
-                "genes_most_severe_transcript": "ENST00000611668"
+                "genes_most_severe_transcript": "ENST00000611668",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
             }
         ],
         "hgvsg": "NC_000023.11:g.135889030G>A",
@@ -3709,6 +6289,26 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 134971188,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS76035.1",
+                "csq_ensp": "ENSP00000484601",
+                "csq_exon": "1/5",
+                "csq_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
+                "csq_hgvsc": "ENST00000611668.4:c.-189C>T",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611668",
+                "csq_uniparc": "UPI00002125B4",
+                "csq_canonical": true,
+                "csq_swissprot": "P0DMU9",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "57"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-04-02T16:07:50.933377+00:00",
         "variantClass": "SNV",
@@ -3796,7 +6396,8 @@
             {
                 "genes_most_severe_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
                 "genes_most_severe_hgvsc": "ENST00000611668.4:c.-184G>A",
-                "genes_most_severe_transcript": "ENST00000611668"
+                "genes_most_severe_transcript": "ENST00000611668",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
             }
         ],
         "hgvsg": "NC_000023.11:g.135889025C>T",
@@ -3804,6 +6405,26 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 134971183,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS76035.1",
+                "csq_ensp": "ENSP00000484601",
+                "csq_exon": "1/5",
+                "csq_gene": "e04acd17-91bb-4ef5-90d8-9cde9947ef3e",
+                "csq_hgvsc": "ENST00000611668.4:c.-184G>A",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000611668",
+                "csq_uniparc": "UPI00002125B4",
+                "csq_canonical": true,
+                "csq_swissprot": "P0DMU9",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "62"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-04-02T16:07:50.683811+00:00",
         "variantClass": "SNV",
@@ -3892,6 +6513,7 @@
                 "genes_most_severe_gene": "3f0a4904-1911-49d7-9d0f-39d928d30758",
                 "genes_most_severe_hgvsc": "ENST00000487941.6:c.513-6C>T",
                 "genes_most_severe_transcript": "ENST00000487941",
+                "genes_most_severe_consequence": "aab001e0-907d-4979-b9a9-c71a82e57d02",
                 "genes_most_severe_maxentscan_diff": -0.6
             }
         ],
@@ -3900,6 +6522,47 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 134873992,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS35406.1",
+                "csq_ensp": "ENSP00000427342",
+                "csq_gene": "3f0a4904-1911-49d7-9d0f-39d928d30758",
+                "csq_hgvsc": "ENST00000487941.6:c.513-6C>T",
+                "csq_intron": "4/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000487941",
+                "csq_uniparc": "UPI000292EE5F",
+                "csq_canonical": true,
+                "csq_swissprot": "P0DMU8",
+                "csq_consequence": [
+                    "aab001e0-907d-4979-b9a9-c71a82e57d02"
+                ],
+                "csq_most_severe": true,
+                "csq_maxentscan_alt": 11.924,
+                "csq_maxentscan_ref": 11.324,
+                "csq_maxentscan_diff": -0.6
+            },
+            {
+                "csq_ccds": "CCDS35406.1",
+                "csq_ensp": "ENSP00000483658",
+                "csq_gene": "3f0a4904-1911-49d7-9d0f-39d928d30758",
+                "csq_hgvsc": "ENST00000617203.1:c.513-6C>T",
+                "csq_intron": "3/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000617203",
+                "csq_uniparc": "UPI000292EE5F",
+                "csq_swissprot": "P0DMU8",
+                "csq_consequence": [
+                    "aab001e0-907d-4979-b9a9-c71a82e57d02"
+                ],
+                "csq_most_severe": false,
+                "csq_maxentscan_alt": 11.924,
+                "csq_maxentscan_ref": 11.324,
+                "csq_maxentscan_diff": -0.6
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-08T19:56:38.938105+00:00",
         "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
@@ -4076,7 +6739,8 @@
             {
                 "genes_most_severe_gene": "54964667-49ac-4dc8-a3e5-15002b1f5d05",
                 "genes_most_severe_hgvsc": "ENST00000597510.6:c.*452A>C",
-                "genes_most_severe_transcript": "ENST00000597510"
+                "genes_most_severe_transcript": "ENST00000597510",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.135759900T>G",
@@ -4084,6 +6748,26 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 134928438,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS76030.1",
+                "csq_ensp": "ENSP00000471418",
+                "csq_exon": "4/4",
+                "csq_gene": "54964667-49ac-4dc8-a3e5-15002b1f5d05",
+                "csq_hgvsc": "ENST00000597510.6:c.*452A>C",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000597510",
+                "csq_uniparc": "UPI000006D8C7",
+                "csq_canonical": true,
+                "csq_swissprot": "Q8NHU0",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "1022"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-08T19:56:38.661968+00:00",
         "submitted_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
@@ -4158,6 +6842,7 @@
                 "genes_most_severe_gene": "fe34c28e-cde4-491c-8547-05c49ed80570",
                 "genes_most_severe_hgvsc": "ENST00000310125.5:c.-92_-91insGTTACGCCACGCAC",
                 "genes_most_severe_transcript": "ENST00000310125",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
                 "genes_most_severe_feature_ncbi": "NM_016521.3"
             }
         ],
@@ -4166,6 +6851,27 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 132352378,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14636.2",
+                "csq_ensp": "ENSP00000385461",
+                "csq_exon": "1/1",
+                "csq_gene": "fe34c28e-cde4-491c-8547-05c49ed80570",
+                "csq_mane": "NM_016521.3",
+                "csq_hgvsc": "ENST00000310125.5:c.-92_-91insGTTACGCCACGCAC",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000310125",
+                "csq_uniparc": "UPI0000212570",
+                "csq_canonical": true,
+                "csq_swissprot": "Q5H9I0",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "4-5"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-02-09T03:03:51.196608+00:00",
         "variantClass": "INS",
@@ -4242,6 +6948,7 @@
                 "genes_most_severe_gene": "8a813563-d2cb-4d88-9ea4-d3de38c5966f",
                 "genes_most_severe_hgvsc": "ENST00000370874.2:c.-457G>C",
                 "genes_most_severe_transcript": "ENST00000370874",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
                 "genes_most_severe_feature_ncbi": "NM_001271186.2"
             }
         ],
@@ -4250,6 +6957,44 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 131351753,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14632.1",
+                "csq_ensp": "ENSP00000340274",
+                "csq_exon": "2/4",
+                "csq_gene": "8a813563-d2cb-4d88-9ea4-d3de38c5966f",
+                "csq_hgvsc": "ENST00000342983.6:c.-457G>C",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000342983",
+                "csq_uniparc": "UPI00000236AB",
+                "csq_swissprot": "Q9Y3L5",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "291"
+            },
+            {
+                "csq_ccds": "CCDS14632.1",
+                "csq_ensp": "ENSP00000359911",
+                "csq_exon": "4/6",
+                "csq_gene": "8a813563-d2cb-4d88-9ea4-d3de38c5966f",
+                "csq_mane": "NM_001271186.2",
+                "csq_hgvsc": "ENST00000370874.2:c.-457G>C",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000370874",
+                "csq_uniparc": "UPI00000236AB",
+                "csq_canonical": true,
+                "csq_swissprot": "Q9Y3L5",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "367"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:10.097610+00:00",
         "variantClass": "SNV",
@@ -4336,7 +7081,8 @@
             {
                 "genes_most_severe_gene": "c3882cf7-30d8-4d4c-a8a0-7b996331678f",
                 "genes_most_severe_hgvsc": "ENST00000674957.1:c.*1286_*1289del",
-                "genes_most_severe_transcript": "ENST00000674957"
+                "genes_most_severe_transcript": "ENST00000674957",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.130128927_130128930del",
@@ -4344,6 +7090,38 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 129262901,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000501985",
+                "csq_exon": "14/14",
+                "csq_gene": "c3882cf7-30d8-4d4c-a8a0-7b996331678f",
+                "csq_hgvsc": "ENST00000674957.1:c.*1286_*1289del",
+                "csq_strand": false,
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000674957",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "2166-2169"
+            },
+            {
+                "csq_ccds": "CCDS14619.1",
+                "csq_ensp": "ENSP00000502184",
+                "csq_exon": "16/16",
+                "csq_gene": "c3882cf7-30d8-4d4c-a8a0-7b996331678f",
+                "csq_hgvsc": "ENST00000676229.1:c.*627_*630del",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000676229",
+                "csq_uniparc": "UPI000014072E",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "2680-2683"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:09.825889+00:00",
         "variantClass": "DEL",
@@ -4366,6 +7144,7 @@
                 "genes_most_severe_gene": "ad67b635-eaf5-4eae-b64a-7b8ca55a9bb5",
                 "genes_most_severe_hgvsc": "ENST00000429967.3:c.*298G>A",
                 "genes_most_severe_transcript": "ENST00000429967",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_017413.5"
             }
         ],
@@ -4374,6 +7153,27 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 128781602,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS48165.1",
+                "csq_ensp": "ENSP00000391800",
+                "csq_exon": "3/3",
+                "csq_gene": "ad67b635-eaf5-4eae-b64a-7b8ca55a9bb5",
+                "csq_mane": "NM_017413.5",
+                "csq_hgvsc": "ENST00000429967.3:c.*298G>A",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000429967",
+                "csq_uniparc": "UPI0000125C4A",
+                "csq_canonical": true,
+                "csq_swissprot": "Q9ULZ1",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "858"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:09.630516+00:00",
         "variantClass": "SNV",
@@ -4461,7 +7261,8 @@
             {
                 "genes_most_severe_gene": "f158d746-0a90-4c0d-a0e8-d3ea6a619f2e",
                 "genes_most_severe_hgvsc": "ENST00000404115.7:c.-14G>A",
-                "genes_most_severe_transcript": "ENST00000404115"
+                "genes_most_severe_transcript": "ENST00000404115",
+                "genes_most_severe_consequence": "aab001e0-907d-4979-b9a9-c71a82e57d02"
             }
         ],
         "hgvsg": "NC_000023.11:g.120575406C>T",
@@ -4469,6 +7270,40 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 119709261,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS35379.1",
+                "csq_ensp": "ENSP00000384109",
+                "csq_exon": "1/22",
+                "csq_gene": "f158d746-0a90-4c0d-a0e8-d3ea6a619f2e",
+                "csq_hgvsc": "ENST00000404115.7:c.-14G>A",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000404115",
+                "csq_uniparc": "UPI0000246E48",
+                "csq_canonical": true,
+                "csq_swissprot": "Q13620",
+                "csq_consequence": [
+                    "aab001e0-907d-4979-b9a9-c71a82e57d02",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "389"
+            },
+            {
+                "csq_exon": "1/3",
+                "csq_gene": "f158d746-0a90-4c0d-a0e8-d3ea6a619f2e",
+                "csq_hgvsc": "ENST00000486604.1:n.119G>A",
+                "csq_strand": false,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000486604",
+                "csq_consequence": [
+                    "aab001e0-907d-4979-b9a9-c71a82e57d02"
+                ],
+                "csq_most_severe": false,
+                "csq_cdna_position": "119"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:09.312225+00:00",
         "variantClass": "SNV",
@@ -4556,7 +7391,8 @@
             {
                 "genes_most_severe_gene": "7f8f9fcd-681e-4ae9-a2ad-757ed08f7583",
                 "genes_most_severe_hgvsc": "ENST00000371335.4:c.*1235C>T",
-                "genes_most_severe_transcript": "ENST00000371335"
+                "genes_most_severe_transcript": "ENST00000371335",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
             }
         ],
         "hgvsg": "NC_000023.11:g.120437919G>A",
@@ -4564,6 +7400,25 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 119571774,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14600.1",
+                "csq_ensp": "ENSP00000360386",
+                "csq_exon": "9/9",
+                "csq_gene": "7f8f9fcd-681e-4ae9-a2ad-757ed08f7583",
+                "csq_hgvsc": "ENST00000371335.4:c.*1235C>T",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000371335",
+                "csq_uniparc": "UPI000002AD57",
+                "csq_swissprot": "P13473",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "2605"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:09.076948+00:00",
         "variantClass": "SNV",
@@ -4652,6 +7507,7 @@
                 "genes_most_severe_gene": "b3972a2b-f008-402e-aa50-d9a6a797258c",
                 "genes_most_severe_hgvsc": "ENST00000317881.9:c.*19dup",
                 "genes_most_severe_transcript": "ENST00000317881",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_001152.5"
             }
         ],
@@ -4660,6 +7516,27 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 118605035,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14578.1",
+                "csq_ensp": "ENSP00000360671",
+                "csq_exon": "4/4",
+                "csq_gene": "b3972a2b-f008-402e-aa50-d9a6a797258c",
+                "csq_mane": "NM_001152.5",
+                "csq_hgvsc": "ENST00000317881.9:c.*19dup",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000317881",
+                "csq_uniparc": "UPI000013C4ED",
+                "csq_canonical": true,
+                "csq_swissprot": "P05141",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "983-984"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:08.762038+00:00",
         "variantClass": "INS",
@@ -4879,6 +7756,7 @@
                 "genes_most_severe_gene": "6217a293-13ea-4c82-9a7e-d29ca10fb9f4",
                 "genes_most_severe_hgvsc": "ENST00000310164.3:c.*471_*472del",
                 "genes_most_severe_transcript": "ENST00000310164",
+                "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_173798.4"
             }
         ],
@@ -4887,6 +7765,27 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 117960886,
+        "transcript": [
+            {
+                "csq_ccds": "CCDS14574.1",
+                "csq_ensp": "ENSP00000308921",
+                "csq_exon": "4/4",
+                "csq_gene": "6217a293-13ea-4c82-9a7e-d29ca10fb9f4",
+                "csq_mane": "NM_173798.4",
+                "csq_hgvsc": "ENST00000310164.3:c.*471_*472del",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000310164",
+                "csq_uniparc": "UPI00000373C7",
+                "csq_canonical": true,
+                "csq_swissprot": "Q6PEW1",
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "2153-2154"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:08.534165+00:00",
         "variantClass": "DEL",
@@ -4970,7 +7869,8 @@
             {
                 "genes_most_severe_gene": "b5d213f0-12b6-4d1e-8648-b50161066b21",
                 "genes_most_severe_hgvsc": "ENST00000652600.1:c.-46G>A",
-                "genes_most_severe_transcript": "ENST00000652600"
+                "genes_most_severe_transcript": "ENST00000652600",
+                "genes_most_severe_consequence": "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
             }
         ],
         "hgvsg": "NC_000023.11:g.118727317G>A",
@@ -4978,6 +7878,24 @@
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
         "hg19_chr": "X",
         "hg19_pos": 117861280,
+        "transcript": [
+            {
+                "csq_ensp": "ENSP00000498980",
+                "csq_exon": "1/12",
+                "csq_gene": "b5d213f0-12b6-4d1e-8648-b50161066b21",
+                "csq_hgvsc": "ENST00000652600.1:c.-46G>A",
+                "csq_strand": true,
+                "csq_trembl": "A0A494C1C4",
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000652600",
+                "csq_uniparc": "UPI00108B3173",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "185"
+            }
+        ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "date_created": "2021-06-28T18:06:08.298098+00:00",
         "variantClass": "SNV",
