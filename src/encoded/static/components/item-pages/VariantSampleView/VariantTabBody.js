@@ -519,7 +519,7 @@ const hgmdSearchLink = [
     <div className="row mb-03" key="POS">
         <div className="col-12 col-lg">
             <label className="mb-0 black-label" htmlFor="external_resource_for_hgmdidsearch" data-tip="HGMD Public (Human Gene Mutation Database)">
-                HGMD Professional
+                HGMD (Professional)
             </label>
         </div>
         <div className="col-12 col-lg-auto">
