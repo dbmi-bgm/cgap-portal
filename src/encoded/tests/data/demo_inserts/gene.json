@@ -173,6 +173,176 @@
             "5XTC",
             "5XTD"
         ],
+        "epos": 10404,
+        "name": "mitochondrially encoded NADH:ubiquinone oxidoreductase core subunit 3",
+        "spos": 10059,
+        "chrom": "M",
+        "ensgid": "ENSG00000198840",
+        "mgd_id": [
+            "MGI:102499"
+        ],
+        "status": "shared",
+        "strand": "+",
+        "string": [
+            "9606.ENSP00000355206"
+        ],
+        "biogrid": [
+            "110633"
+        ],
+        "hgnc_id": "7458",
+        "marrvel": "MT-ND3",
+        "omim_id": [
+            "516002"
+        ],
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "ucsc_id": "uc022bqu.3",
+        "cytoband": [
+            "M"
+        ],
+        "orphanet": "123547",
+        "entrez_id": "4537",
+        "epos_hg19": 10404,
+        "genecards": "ENSG00000198840",
+        "prev_name": [
+            "NADH dehydrogenase 3",
+            "mitochondrially encoded NADH dehydrogenase 3"
+        ],
+        "spos_hg19": 10059,
+        "alias_name": [
+            "complex I ND3 subunit",
+            "NADH-ubiquinone oxidoreductase chain 3"
+        ],
+        "chrom_hg19": "MT",
+        "gene_symbol": "MT-ND3",
+        "genereviews": [
+            "MT-ND3"
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "prev_symbol": [
+            "MTND3"
+        ],
+        "strand_hg19": "+",
+        "uniprot_ids": [
+            "P03897"
+        ],
+        "alias_symbol": [
+            "ND3",
+            "NAD3"
+        ],
+        "date_created": "2020-08-14T13:57:15.057353+00:00",
+        "gene_biotype": "protein_coding",
+        "gene_version": "2",
+        "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000355206",
+                "ensembl_trs": "ENST00000361227"
+            }
+        ],
+        "last_modified": {
+            "modified_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+            "date_modified": "2020-10-30T18:47:26.402930+00:00"
+        },
+        "mgi_mouse_gene": "mt-Nd3",
+        "gtex_expression": "ENSG00000198840.2",
+        "pathway_kegg_id": "hsa00130;hsa00190",
+        "brainspan_rnaseq": "ENSG00000198840",
+        "pathway_kegg_full": "Ubiquinone biosynthesis;Oxidative phosphorylation",
+        "uuid": "d6a61d62-2283-4538-8cca-19604bc02552",
+        "hgmd_id": "MT-ND3"
+    },
+    {
+        "pdb": [
+            "5XTC",
+            "5XTD"
+        ],
+        "epos": 10766,
+        "name": "mitochondrially encoded NADH:ubiquinone oxidoreductase core subunit 4L",
+        "spos": 10470,
+        "chrom": "M",
+        "ensgid": "ENSG00000212907",
+        "mgd_id": [
+            "MGI:102497"
+        ],
+        "status": "shared",
+        "strand": "+",
+        "string": [
+            "9606.ENSP00000354728"
+        ],
+        "biogrid": [
+            "110635"
+        ],
+        "hgnc_id": "7460",
+        "marrvel": "MT-ND4L",
+        "omim_id": [
+            "516004"
+        ],
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "ucsc_id": "uc033dmm.2",
+        "cytoband": [
+            "M"
+        ],
+        "orphanet": "123557",
+        "pharmgkb": [
+            "PA31264"
+        ],
+        "entrez_id": "4539",
+        "epos_hg19": 10766,
+        "genecards": "ENSG00000212907",
+        "prev_name": [
+            "NADH dehydrogenase 4L",
+            "mitochondrially encoded NADH dehydrogenase 4L"
+        ],
+        "spos_hg19": 10470,
+        "alias_name": [
+            "complex I ND4L subunit",
+            "NADH-ubiquinone oxidoreductase chain 4L"
+        ],
+        "chrom_hg19": "MT",
+        "gene_symbol": "MT-ND4L",
+        "genereviews": [
+            "MT-ND4L"
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "prev_symbol": [
+            "MTND4L"
+        ],
+        "strand_hg19": "+",
+        "uniprot_ids": [
+            "P03901"
+        ],
+        "alias_symbol": [
+            "ND4L",
+            "NAD4L"
+        ],
+        "date_created": "2020-08-14T13:57:15.103456+00:00",
+        "gene_biotype": "protein_coding",
+        "gene_version": "2",
+        "medline_plus": "mt-nd4l",
+        "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000354728",
+                "ensembl_trs": "ENST00000361335"
+            }
+        ],
+        "last_modified": {
+            "modified_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+            "date_modified": "2022-01-11T12:39:32.924448+00:00"
+        },
+        "mgi_mouse_gene": "mt-Nd4l",
+        "gtex_expression": "ENSG00000212907.2",
+        "pathway_kegg_id": "hsa00130;hsa00190",
+        "brainspan_rnaseq": "ENSG00000212907",
+        "pathway_kegg_full": "Ubiquinone biosynthesis;Oxidative phosphorylation",
+        "uuid": "21f35995-e4d3-4066-96af-f4c0d01e6952",
+        "hgmd_id": "MT-ND4L"
+    },
+    {
+        "pdb": [
+            "5XTC",
+            "5XTD"
+        ],
         "epos": 12137,
         "name": "mitochondrially encoded NADH:ubiquinone oxidoreductase core subunit 4",
         "spos": 10760,
@@ -261,80 +431,332 @@
         "pdb": [
             "5Z62"
         ],
-        "epos": 9990,
-        "name": "mitochondrially encoded cytochrome c oxidase III",
-        "spos": 9207,
+        "epos": 7445,
+        "name": "mitochondrially encoded cytochrome c oxidase I",
+        "spos": 5904,
         "chrom": "M",
-        "gencc": "HGNC:7422",
-        "ensgid": "ENSG00000198938",
+        "gencc": "HGNC:7419",
+        "ensgid": "ENSG00000198804",
         "mgd_id": [
-            "MGI:102502"
+            "MGI:102504"
         ],
         "status": "shared",
         "strand": "+",
         "string": [
-            "9606.ENSP00000354982"
+            "9606.ENSP00000354499"
         ],
         "biogrid": [
-            "110617"
+            "110615"
         ],
-        "hgnc_id": "7422",
-        "marrvel": "MT-CO3",
+        "hgnc_id": "7419",
+        "marrvel": "MT-CO1",
         "omim_id": [
-            "516050"
+            "516030"
         ],
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
-        "ucsc_id": "uc064xpg.1",
+        "ucsc_id": "uc031tga.3",
         "cytoband": [
             "M"
         ],
-        "orphanet": "123520",
-        "entrez_id": "4514",
-        "epos_hg19": 9990,
-        "genecards": "ENSG00000198938",
-        "prev_name": [
-            "cytochrome c oxidase III"
+        "orphanet": "123512",
+        "pharmgkb": [
+            "PA31225"
         ],
-        "spos_hg19": 9207,
+        "entrez_id": "4512",
+        "epos_hg19": 7445,
+        "genecards": "ENSG00000198804",
+        "prev_name": [
+            "cytochrome c oxidase I"
+        ],
+        "spos_hg19": 5904,
         "chrom_hg19": "MT",
-        "gene_symbol": "MT-CO3",
+        "gene_symbol": "MT-CO1",
         "genereviews": [
-            "MT-CO3"
+            "MT-CO1"
         ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "prev_symbol": [
-            "MTCO3"
+            "MTCO1"
         ],
         "strand_hg19": "+",
         "uniprot_ids": [
-            "P00414"
+            "P00395"
         ],
         "alias_symbol": [
-            "COX3",
-            "COIII",
-            "CO3"
+            "COX1",
+            "COI"
         ],
-        "date_created": "2020-08-14T13:57:14.988876+00:00",
+        "date_created": "2020-08-14T13:57:14.734876+00:00",
         "gene_biotype": "protein_coding",
         "gene_version": "2",
         "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
         "transcriptid": [
             {
-                "ensembl_pro": "ENSP00000354982",
-                "ensembl_trs": "ENST00000362079"
+                "ensembl_pro": "ENSP00000354499",
+                "ensembl_trs": "ENST00000361624"
             }
         ],
         "last_modified": {
             "modified_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
-            "date_modified": "2022-01-11T12:49:24.084214+00:00"
+            "date_modified": "2022-01-11T12:52:12.807952+00:00"
         },
-        "mgi_mouse_gene": "mt-Co3",
-        "gtex_expression": "ENSG00000198938.2",
+        "mgi_mouse_gene": "mt-Co1",
+        "gtex_expression": "ENSG00000198804.2",
         "pathway_kegg_id": "hsa00190",
-        "brainspan_rnaseq": "ENSG00000198938",
+        "brainspan_rnaseq": "ENSG00000198804",
         "pathway_kegg_full": "Oxidative phosphorylation",
-        "uuid": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
-        "hgmd_id": "MT-CO3"
+        "mgi_mouse_phenotype": "muscle phenotype; cellular phenotype; homeostasis/metabolism phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); growth/size/body region phenotype; immune system phenotype",
+        "uuid": "efff4aff-ded4-4468-9e6f-d3902738a5fd",
+        "hgmd_id": "MT-CO1"
+    },
+    {
+        "pdb": [
+            "5XTC",
+            "5XTD"
+        ],
+        "epos": 14673,
+        "name": "mitochondrially encoded NADH:ubiquinone oxidoreductase core subunit 6",
+        "spos": 14149,
+        "chrom": "M",
+        "ensgid": "ENSG00000198695",
+        "mgd_id": [
+            "MGI:102495"
+        ],
+        "status": "shared",
+        "strand": "-",
+        "string": [
+            "9606.ENSP00000354665"
+        ],
+        "biogrid": [
+            "110637"
+        ],
+        "hgnc_id": "7462",
+        "marrvel": "MT-ND6",
+        "omim_id": [
+            "516006"
+        ],
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "ucsc_id": "uc064xpm.1",
+        "cytoband": [
+            "M"
+        ],
+        "orphanet": "123567",
+        "pharmgkb": [
+            "PA31266"
+        ],
+        "entrez_id": "4541",
+        "epos_hg19": 14673,
+        "genecards": "ENSG00000198695",
+        "prev_name": [
+            "NADH dehydrogenase 6",
+            "mitochondrially encoded NADH dehydrogenase 6"
+        ],
+        "spos_hg19": 14149,
+        "alias_name": [
+            "complex I ND6 subunit",
+            "NADH-ubiquinone oxidoreductase chain 6"
+        ],
+        "chrom_hg19": "MT",
+        "gene_symbol": "MT-ND6",
+        "genereviews": [
+            "MT-ND6"
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "prev_symbol": [
+            "MTND6"
+        ],
+        "strand_hg19": "-",
+        "uniprot_ids": [
+            "P03923"
+        ],
+        "alias_symbol": [
+            "NAD6",
+            "ND6"
+        ],
+        "date_created": "2020-08-14T13:57:15.283459+00:00",
+        "gene_biotype": "protein_coding",
+        "gene_version": "2",
+        "medline_plus": "mt-nd6",
+        "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000354665",
+                "ensembl_trs": "ENST00000361681"
+            }
+        ],
+        "last_modified": {
+            "modified_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+            "date_modified": "2022-01-11T12:34:57.277853+00:00"
+        },
+        "mgi_mouse_gene": "mt-Nd6",
+        "gtex_expression": "ENSG00000198695.2",
+        "pathway_kegg_id": "hsa00130;hsa00190",
+        "brainspan_rnaseq": "ENSG00000198695",
+        "pathway_kegg_full": "Ubiquinone biosynthesis;Oxidative phosphorylation",
+        "mgi_mouse_phenotype": "reproductive system phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); nervous system phenotype (the observable morphological and physiological characteristics of the extensive, intricate network of electochemical structures in the body that is comprised of the brain, spinal cord, nerves, ganglia and parts of the receptor organs that are manifested through development and lifespan); vision/eye phenotype; growth/size/body region phenotype; adipose tissue phenotype (the observable morphological and physiological characteristics of mammalian fat tissue that are manifested through development and lifespan); cellular phenotype; homeostasis/metabolism phenotype; muscle phenotype",
+        "uuid": "e485fd60-2381-4712-9a7b-7674531b697f",
+        "hgmd_id": "MT-ND6"
+    },
+    {
+        "pdb": [
+            "3VRJ",
+            "5Z62"
+        ],
+        "epos": 8269,
+        "name": "mitochondrially encoded cytochrome c oxidase II",
+        "spos": 7586,
+        "chrom": "M",
+        "gencc": "HGNC:7421",
+        "ensgid": "ENSG00000198712",
+        "mgd_id": [
+            "MGI:102503"
+        ],
+        "status": "shared",
+        "strand": "+",
+        "string": [
+            "9606.ENSP00000354876"
+        ],
+        "biogrid": [
+            "110616"
+        ],
+        "hgnc_id": "7421",
+        "marrvel": "MT-CO2",
+        "omim_id": [
+            "516040"
+        ],
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "ucsc_id": "uc064xpd.1",
+        "cytoband": [
+            "M"
+        ],
+        "orphanet": "123516",
+        "pharmgkb": [
+            "PA31227"
+        ],
+        "entrez_id": "4513",
+        "epos_hg19": 8269,
+        "genecards": "ENSG00000198712",
+        "prev_name": [
+            "cytochrome c oxidase II"
+        ],
+        "spos_hg19": 7586,
+        "chrom_hg19": "MT",
+        "gene_symbol": "MT-CO2",
+        "genereviews": [
+            "MT-CO2"
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "prev_symbol": [
+            "MTCO2"
+        ],
+        "strand_hg19": "+",
+        "uniprot_ids": [
+            "P00403"
+        ],
+        "alias_symbol": [
+            "COX2",
+            "CO2"
+        ],
+        "date_created": "2020-08-14T13:57:14.791838+00:00",
+        "gene_biotype": "protein_coding",
+        "gene_version": "1",
+        "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000354876",
+                "ensembl_trs": "ENST00000361739"
+            }
+        ],
+        "last_modified": {
+            "modified_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
+            "date_modified": "2022-01-11T13:01:08.812486+00:00"
+        },
+        "mgi_mouse_gene": "mt-Co2",
+        "gtex_expression": "ENSG00000198712.1",
+        "pathway_kegg_id": "hsa00190",
+        "brainspan_rnaseq": "ENSG00000198712",
+        "pathway_kegg_full": "Oxidative phosphorylation",
+        "uuid": "ccc49ef4-abf0-49ee-b02d-f6bd5000bbae",
+        "hgmd_id": "MT-CO2"
+    },
+    {
+        "epos": 8572,
+        "name": "mitochondrially encoded ATP synthase membrane subunit 8",
+        "spos": 8366,
+        "chrom": "M",
+        "ensgid": "ENSG00000228253",
+        "mgd_id": [
+            "MGI:99926"
+        ],
+        "status": "shared",
+        "strand": "+",
+        "string": [
+            "9606.ENSP00000355265"
+        ],
+        "biogrid": [
+            "110613"
+        ],
+        "hgnc_id": "7415",
+        "marrvel": "MT-ATP8",
+        "omim_id": [
+            "516070"
+        ],
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "ucsc_id": "uc064xpe.1",
+        "cytoband": [
+            "M"
+        ],
+        "orphanet": "159773",
+        "pharmgkb": [
+            "PA31222"
+        ],
+        "entrez_id": "4509",
+        "epos_hg19": 8572,
+        "genecards": "ENSG00000228253",
+        "prev_name": [
+            "ATP synthase 8",
+            "mitochondrially encoded ATP synthase 8"
+        ],
+        "spos_hg19": 8366,
+        "alias_name": [
+            "mitochondrially encoded ATP synthase membrane subunit A6L"
+        ],
+        "chrom_hg19": "MT",
+        "gene_symbol": "MT-ATP8",
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "prev_symbol": [
+            "MTATP8"
+        ],
+        "strand_hg19": "+",
+        "uniprot_ids": [
+            "P03928"
+        ],
+        "alias_symbol": [
+            "ATP8",
+            "A6L"
+        ],
+        "date_created": "2020-08-14T13:57:14.858627+00:00",
+        "gene_biotype": "protein_coding",
+        "gene_version": "1",
+        "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+        "transcriptid": [
+            {
+                "ensembl_pro": "ENSP00000355265",
+                "ensembl_trs": "ENST00000361851"
+            }
+        ],
+        "last_modified": {
+            "modified_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
+            "date_modified": "2020-10-30T18:47:27.019815+00:00"
+        },
+        "mgi_mouse_gene": "mt-Atp8",
+        "gtex_expression": "ENSG00000228253.1",
+        "pathway_kegg_id": "hsa00190",
+        "brainspan_rnaseq": "ENSG00000228253",
+        "pathway_kegg_full": "Oxidative phosphorylation",
+        "mgi_mouse_phenotype": "behavior/neurological phenotype (the observable actions or reactions of mammalian organisms that are manifested through development and lifespan)",
+        "uuid": "47475d0a-30d7-48d9-b5f3-5544b727f073",
+        "hgmd_id": "MT-ATP8"
     },
     {
         "epos": 9207,
@@ -423,83 +845,80 @@
         "pdb": [
             "5Z62"
         ],
-        "epos": 7445,
-        "name": "mitochondrially encoded cytochrome c oxidase I",
-        "spos": 5904,
+        "epos": 9990,
+        "name": "mitochondrially encoded cytochrome c oxidase III",
+        "spos": 9207,
         "chrom": "M",
-        "gencc": "HGNC:7419",
-        "ensgid": "ENSG00000198804",
+        "gencc": "HGNC:7422",
+        "ensgid": "ENSG00000198938",
         "mgd_id": [
-            "MGI:102504"
+            "MGI:102502"
         ],
         "status": "shared",
         "strand": "+",
         "string": [
-            "9606.ENSP00000354499"
+            "9606.ENSP00000354982"
         ],
         "biogrid": [
-            "110615"
+            "110617"
         ],
-        "hgnc_id": "7419",
-        "marrvel": "MT-CO1",
+        "hgnc_id": "7422",
+        "marrvel": "MT-CO3",
         "omim_id": [
-            "516030"
+            "516050"
         ],
         "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
-        "ucsc_id": "uc031tga.3",
+        "ucsc_id": "uc064xpg.1",
         "cytoband": [
             "M"
         ],
-        "orphanet": "123512",
-        "pharmgkb": [
-            "PA31225"
-        ],
-        "entrez_id": "4512",
-        "epos_hg19": 7445,
-        "genecards": "ENSG00000198804",
+        "orphanet": "123520",
+        "entrez_id": "4514",
+        "epos_hg19": 9990,
+        "genecards": "ENSG00000198938",
         "prev_name": [
-            "cytochrome c oxidase I"
+            "cytochrome c oxidase III"
         ],
-        "spos_hg19": 5904,
+        "spos_hg19": 9207,
         "chrom_hg19": "MT",
-        "gene_symbol": "MT-CO1",
+        "gene_symbol": "MT-CO3",
         "genereviews": [
-            "MT-CO1"
+            "MT-CO3"
         ],
         "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
         "prev_symbol": [
-            "MTCO1"
+            "MTCO3"
         ],
         "strand_hg19": "+",
         "uniprot_ids": [
-            "P00395"
+            "P00414"
         ],
         "alias_symbol": [
-            "COX1",
-            "COI"
+            "COX3",
+            "COIII",
+            "CO3"
         ],
-        "date_created": "2020-08-14T13:57:14.734876+00:00",
+        "date_created": "2020-08-14T13:57:14.988876+00:00",
         "gene_biotype": "protein_coding",
         "gene_version": "2",
         "submitted_by": "b5f738b6-455a-42e5-bc1c-77fbfd9b15d2",
         "transcriptid": [
             {
-                "ensembl_pro": "ENSP00000354499",
-                "ensembl_trs": "ENST00000361624"
+                "ensembl_pro": "ENSP00000354982",
+                "ensembl_trs": "ENST00000362079"
             }
         ],
         "last_modified": {
             "modified_by": "e34b090e-aa4e-494c-9bb3-79d0dbce0301",
-            "date_modified": "2022-01-11T12:52:12.807952+00:00"
+            "date_modified": "2022-01-11T12:49:24.084214+00:00"
         },
-        "mgi_mouse_gene": "mt-Co1",
-        "gtex_expression": "ENSG00000198804.2",
+        "mgi_mouse_gene": "mt-Co3",
+        "gtex_expression": "ENSG00000198938.2",
         "pathway_kegg_id": "hsa00190",
-        "brainspan_rnaseq": "ENSG00000198804",
+        "brainspan_rnaseq": "ENSG00000198938",
         "pathway_kegg_full": "Oxidative phosphorylation",
-        "mgi_mouse_phenotype": "muscle phenotype; cellular phenotype; homeostasis/metabolism phenotype; cardiovascular system phenotype (the observable morphological and physiological characteristics of the mammalian heart, blood vessels, or circulatory system that are manifested through development and lifespan); growth/size/body region phenotype; immune system phenotype",
-        "uuid": "efff4aff-ded4-4468-9e6f-d3902738a5fd",
-        "hgmd_id": "MT-CO1"
+        "uuid": "60e30c3c-273b-46a7-ba9b-556b0aad96bb",
+        "hgmd_id": "MT-CO3"
     },
     {
         "pdb": [
