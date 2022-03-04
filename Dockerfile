@@ -1,6 +1,6 @@
 # CGAP-Portal (Production) Dockerfile
 # Take latest 3.7.12 Debian variant
-FROM python:3.7.12-slim-buster
+FROM python:3.7.12-slim-bullseye
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
