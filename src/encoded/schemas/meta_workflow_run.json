@@ -334,11 +334,27 @@
         },
         "output_files_linked_errors": {
             "title": "Output File Link Creation Errors",
-            "description": "Output files that could not be linked successfully",
+            "description": "Output files that could not be linked successfully and their associated errors",
             "type": "array",
             "items": {
-                "type": "string",
-                "linkTo": "FileProcessed"
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "output_file": {
+                        "title": "Output File",
+                        "description": "Output file with link error",
+                        "type": "string",
+                        "linkTo": "FileProcessed"
+                    },
+                    "errors": {
+                        "title": "Errors",
+                        "description": "Errors that occurred on link creation",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
             }
         }
     },

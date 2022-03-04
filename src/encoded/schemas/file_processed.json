@@ -187,15 +187,6 @@
                 ]
             }
         },
-        "linkto_creation_error": {
-            "title": "LinkTo Creation Errors",
-            "description": "Description of the error(s) that occurred when attempting to place a linkTo for this file",
-            "type": "array",
-            "items": {
-                "title": "LinkTo Creation Error",
-                "type": "string"
-            }
-        },
         "associated_meta_workflow_run": {
             "title": "Associated MetaWorkflowRun",
             "description": "The MetaWorkflowRun that produced this item",
