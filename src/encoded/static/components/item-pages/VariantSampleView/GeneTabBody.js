@@ -58,22 +58,6 @@ export function GeneTabBody(props){
         );
     }
 
-    const hgmdSearchLink = [
-        <div className="row mb-03" key="POS">
-            <div className="col-12 col-lg">
-                <label className="mb-0 black-label" htmlFor="external_resource_for_hgmdidsearch" data-tip="HGMD Public (Human Gene Mutation Database)">
-                    HGMD Professional
-                </label>
-            </div>
-            <div className="col-12 col-lg-auto">
-                <a href="https://my.qiagendigitalinsights.com/bbp/view/hgmd/pro/search_mut.php" className="d-block" target="_blank" rel="noopener noreferrer" id="external_resource_for_hgmdidsearch">
-                    <span className="align-middle">Search</span>
-                    <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
-                </a>
-            </div>
-        </div>
-    ];
-
     return (
         <div className="gene-tab-body card-body">
             <div className="row">
@@ -111,7 +95,7 @@ export function GeneTabBody(props){
                         </div>
                         <div className="info-body">
                             {/* maybe Gene Resources sub-header here */}
-                            <ExternalDatabasesSection {...{ schemas, currentGeneItem }} currentItem={currentGeneItem} appendItems={hgmdSearchLink} />
+                            <ExternalDatabasesSection {...{ schemas }} currentItem={currentGeneItem} />
                         </div>
                     </div>
 
