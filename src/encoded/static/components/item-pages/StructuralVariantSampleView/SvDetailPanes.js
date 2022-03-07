@@ -49,6 +49,31 @@ export function SvGeneDetailPane(props) {
         };
     }, [ schemas ]);
 
+    const externalDatabaseFieldnames = [
+        "genecards",
+        "medline_plus",
+        "gencc",
+        "ensgid",
+        "entrez_id",
+        "hgnc_id",
+        "genereviews",
+        "uniprot_ids",
+        "pdb",
+        "mgi_id",
+        "marrvel",
+        "omim_id",
+        "orphanet",
+        "clingen",
+        "pharmgkb",
+        "gtex_expression",
+        "brainspan_microarray",
+        "brainspan_rnaseq",
+        "brainatlas_microarray",
+        "biogrid",
+        "string",
+        "hgmd_id" // specific to sv detail pane
+    ];
+
     return (
         <div className="gene-tab-body card-body">
             <div className="row">
@@ -79,7 +104,7 @@ export function SvGeneDetailPane(props) {
                             <h4>External Databases</h4>
                         </div>
                         <div className="info-body">
-                            <ExternalDatabasesSection currentItem={result} {...{ schemas }}/>
+                            <ExternalDatabasesSection currentItem={result} {...{ schemas, externalDatabaseFieldnames }}/>
                         </div>
                     </div>
 

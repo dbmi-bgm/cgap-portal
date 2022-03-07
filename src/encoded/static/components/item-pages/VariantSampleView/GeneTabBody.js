@@ -95,7 +95,7 @@ export function GeneTabBody(props){
                         </div>
                         <div className="info-body">
                             {/* maybe Gene Resources sub-header here */}
-                            <ExternalDatabasesSection {...{ schemas, currentGeneItem }} currentItem={currentGeneItem} />
+                            <ExternalDatabasesSection {...{ schemas }} currentItem={currentGeneItem} />
                         </div>
                     </div>
 
