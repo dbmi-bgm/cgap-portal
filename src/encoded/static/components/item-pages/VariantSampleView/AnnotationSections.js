@@ -339,14 +339,23 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
             <thead className="bg-transparent">
                 <tr>
                     <th className="text-left">Constraint</th>
-                    <th data-tip="Score as applied to synonymous variants only. A dot (•) indicates the score is not applicable to synonymous variants.">
+                    <th>
                         Synonymous
+                        <span data-tip="Score as applied to synonymous variants only. A dot (•) indicates the score is not applicable to synonymous variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
                     </th>
-                    <th data-tip="Score as applied to missense variants only. A dot (•) indicates the score is not applicable to missense variants.">
+                    <th>
                         Missense
+                        <span data-tip="Score as applied to missense variants only. A dot (•) indicates the score is not applicable to missense variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
                     </th>
-                    <th data-tip="Score as applied to loss-of-function variants only. A dot (•) indicates the score is not applicable to LoF variants.">
+                    <th>
                         LoF
+                        <span data-tip="Score as applied to loss-of-function variants only. A dot (•) indicates the score is not applicable to LoF variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
                     </th>
                 </tr>
             </thead>
