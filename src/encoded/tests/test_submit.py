@@ -63,6 +63,22 @@ def row_dict():
 
 
 @pytest.fixture
+def row_dict_uncle():
+    return {
+        'individual id': '455',
+        'family id': '333',
+        'sex': 'M',
+        'relation to proband': 'uncle',
+        'analysis id': '999',
+        'report required': 'N',
+        'specimen id': '3464460',
+        'specimen type': 'Peripheral_Blood',
+        'test requested': 'WGS',
+        'test number': '1'
+    }
+
+
+@pytest.fixture
 def row_dict_pedigree():
     return {
         'family id': '333',
@@ -410,6 +426,30 @@ class TestAccessionRow:
         assert not obj.errors == (not error)  # check presence of errors
         # check for correct error message
         assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
+
+    def test_extract_family_metadata_extended_fail(self, testapp, row_dict_uncle, project, institution):
+        """
+        Currently without pedigree processing, can only parse proband/mother/father/sibling relationships
+        without pedigree file (but may pass if pedigree file has already been uploaded with the relevant individual).
+        This tests that a relationship like "uncle" fails if pedigree hasn't been submitted first.
+        """
+        obj = AccessionRow(testapp, row_dict_uncle, 1, 'test-proj:fam1', project['name'], institution['name'])
+        assert obj.family.alias == 'test-proj:fam1'
+        assert obj.family.metadata['members'] == ['encode-project:individual-455']
+        assert len(obj.errors) > 0  # check presence of errors
+        # check for correct error message
+        assert 'Row 1 - Invalid relation' in ''.join(obj.errors)
+
+    def test_extract_family_metadata_extended_pass(self, workbook, es_testapp, row_dict_uncle):
+        """
+        Currently without pedigree processing, can only parse proband/mother/father/sibling relationships
+        without pedigree file (but may pass if pedigree file has already been uploaded with the relevant individual).
+        This tests that a relationship like "uncle" passes if pedigree has been submitted first.
+        """
+        obj = AccessionRow(es_testapp, row_dict_uncle, 1, 'hms-dbmi:family-456', 'hms-dbmi', 'hms-dbmi')
+        # assert obj.family.alias == 'test-proj:fam1'
+        assert obj.family.metadata['members'] == ['hms-dbmi:individual-455']
+        assert not obj.errors  # check presence of errors
 
     def test_extract_sample_metadata(self, testapp, row_dict, project, institution):
         """
