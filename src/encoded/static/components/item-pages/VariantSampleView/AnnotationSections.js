@@ -57,6 +57,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
             "brainatlas_microarray",
             "biogrid",
             "string",
+            "hgmd_id"
             // "gene_symbol", - duplicate/excluded
             // "refseq_accession", - duplicate/excluded
             // "clingendis.disease_id", // removed for now ('user can find through clingen')
