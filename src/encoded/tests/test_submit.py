@@ -427,11 +427,13 @@ class TestAccessionRow:
         # check for correct error message
         assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
 
-    def test_extract_family_metadata_extended_fail(self, testapp, row_dict_uncle, project, institution):
+    def test_extract_family_metadata_extended_fail(self, testapp, row_dict_uncle,
+                                                   project, institution):
         """
-        Currently without pedigree processing, can only parse proband/mother/father/sibling relationships
-        without pedigree file (but may pass if pedigree file has already been uploaded with the relevant individual).
-        This tests that a relationship like "uncle" fails if pedigree hasn't been submitted first.
+        Currently without pedigree processing, can only parse proband/mother/father/sibling
+        relationships without pedigree file (but may pass if pedigree file has already been
+        uploaded with the relevant individual). This tests that a relationship like "uncle"
+        fails if pedigree hasn't been submitted first.
         """
         obj = AccessionRow(testapp, row_dict_uncle, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.family.alias == 'test-proj:fam1'
@@ -442,14 +444,14 @@ class TestAccessionRow:
 
     def test_extract_family_metadata_extended_pass(self, workbook, es_testapp, row_dict_uncle):
         """
-        Currently without pedigree processing, can only parse proband/mother/father/sibling relationships
-        without pedigree file (but may pass if pedigree file has already been uploaded with the relevant individual).
-        This tests that a relationship like "uncle" passes if pedigree has been submitted first.
+        Currently without pedigree processing, can only parse proband/mother/father/sibling
+        relationships without pedigree file (but may pass if pedigree file has already been
+        uploaded with the relevant individual). This tests that a relationship like "uncle"
+        passes if pedigree has been submitted first.
         """
         obj = AccessionRow(es_testapp, row_dict_uncle, 1, 'hms-dbmi:family-456', 'hms-dbmi', 'hms-dbmi')
-        # assert obj.family.alias == 'test-proj:fam1'
         assert obj.family.metadata['members'] == ['hms-dbmi:individual-455']
-        assert not obj.errors  # check presence of errors
+        assert not obj.errors
 
     def test_extract_sample_metadata(self, testapp, row_dict, project, institution):
         """

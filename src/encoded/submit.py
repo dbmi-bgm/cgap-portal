@@ -1047,7 +1047,6 @@ class SpreadsheetProcessing:
 
     REQUIRED_COLUMNS = []
     METADATA_CLASS = None
-    # SKIP = 0  # handles number of args required to instantiate relevant Metadata class
 
     def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
         self.virtualapp = vapp
@@ -1119,7 +1118,6 @@ class AccessionProcessing(SpreadsheetProcessing):
     """
     REQUIRED_COLUMNS = REQUIRED_COLS_FOR_ACCESSIONING
     METADATA_CLASS = AccessionMetadata
-    #SKIP = 1  # vapp arg not needed for instantiation of this class (only PedigreeMetadata)
 
 
 class PedigreeProcessing(SpreadsheetProcessing):
