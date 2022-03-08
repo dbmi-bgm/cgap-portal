@@ -549,6 +549,15 @@
             "schema_title": "HGNC ID",
             "link": "https://www.genenames.org/data/gene-symbol-report/#!/hgnc_id/HGNC:<ID>"
         },
+        "hgmd_id": {
+            "title": "HGMD ID",
+            "field_name": "hgmd_id",
+            "type": "string",
+            "annotation_category": "dbxref",
+            "description": "HGMD Public (Human Gene Mutation Database)",
+            "schema_title": "HGMD ID",
+            "link": "http://www.hgmd.cf.ac.uk/ac/gene.php?gene=<ID>"
+        },
         "lof_z": {
             "title": "Z score (LoF)",
             "field_name": "lof_z",
