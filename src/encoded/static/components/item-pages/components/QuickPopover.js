@@ -26,7 +26,7 @@ export default function QuickPopover(props) {
         <OverlayTrigger trigger="focus" overlay={popover} {...{ placement }}>
             { function({ ref, ...triggerHandlers }){
                 return (
-                    <button type="button" ref={ref} { ...triggerHandlers } className={cls} data-tip={tooltip || "Click for citation info"}>
+                    <button type="button" ref={ref} { ...triggerHandlers } className={cls} data-tip={tooltip || "Click for more information"}>
                         <i className="icon icon-info-circle fas" />
                     </button>
                 );

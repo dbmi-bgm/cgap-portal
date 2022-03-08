@@ -364,7 +364,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         Expected
-                        <QuickPopover popID="gene_exp" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.expected}</QuickPopover>
+                        <QuickPopover popID="gene_exp" className="p-0 icon-sm ml-02">{genePopoverContents.expected}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("exp_syn")}>{ falsyZeroCheck(exp_syn, fallbackNotPresent)}</span>
@@ -379,7 +379,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         Observed
-                        <QuickPopover popID="gene_obs" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.observed}</QuickPopover>
+                        <QuickPopover popID="gene_obs" className="p-0 icon-sm ml-02">{genePopoverContents.observed}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("obs_syn")}>{ falsyZeroCheck(obs_syn, fallbackNotPresent)}</span>
@@ -394,7 +394,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         O/E (range)
-                        <QuickPopover popID="gene_oerange" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.oerange}</QuickPopover>
+                        <QuickPopover popID="gene_oerange" className="p-0 icon-sm ml-02">{genePopoverContents.oerange}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("oe_syn")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_syn), fallbackNotPresent)}</span>
@@ -412,7 +412,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         Z-score
-                        <QuickPopover popID="gene_zscore" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.zscore}</QuickPopover>
+                        <QuickPopover popID="gene_zscore" className="p-0 icon-sm ml-02">{genePopoverContents.zscore}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("syn_z")}>{ falsyZeroCheck(shortenToSignificantDigits(syn_z), fallbackNotPresent)}</span>
@@ -427,7 +427,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         LOEUF
-                        <QuickPopover popID="gene_loeuf" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.loeuf}</QuickPopover>
+                        <QuickPopover popID="gene_loeuf" className="p-0 icon-sm ml-02">{genePopoverContents.loeuf}</QuickPopover>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
@@ -438,7 +438,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         S-Het
-                        <QuickPopover popID="gene_shet" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.shet}</QuickPopover>
+                        <QuickPopover popID="gene_shet" className="p-0 icon-sm ml-02">{genePopoverContents.shet}</QuickPopover>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
@@ -449,7 +449,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                 <tr>
                     <td className="text-600 text-left">
                         RVIS (ExAC)
-                        <QuickPopover popID="gene_rvis" className="p-0 icon-sm ml-02" tooltip="Click for more information">{genePopoverContents.rvis}</QuickPopover>
+                        <QuickPopover popID="gene_rvis" className="p-0 icon-sm ml-02">{genePopoverContents.rvis}</QuickPopover>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
