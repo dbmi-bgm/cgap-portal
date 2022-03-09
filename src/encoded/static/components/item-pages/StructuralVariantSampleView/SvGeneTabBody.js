@@ -88,7 +88,7 @@ export function SvGeneTabBody (props){
                     </div>
                     <div className="info-body">
                         <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref, columnExtensionMap }} columns={geneTableColumns} selectedItems={selectedGenes} isMultiSelect={false} currentAction="selection"
-                            renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
+                            maxHeight={1400} renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
                     </div>
                 </div>
             </div>
