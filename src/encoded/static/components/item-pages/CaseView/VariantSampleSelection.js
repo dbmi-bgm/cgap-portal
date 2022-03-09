@@ -539,8 +539,10 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
     const { noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType = "VariantSample" } = props;
 
     let savedNotesTip;
-    if (noSavedNotes) {
-        savedNotesTip = `No notes saved for this ${searchType}, annotate it under the Interpretation tab.`;
+    if (searchType === "StructuralVariantSample") {
+        savedNotesTip = "No notes saved for this Structural Variant Sample; SV Interpretation UI coming soon...";
+    } else if (noSavedNotes) {
+        savedNotesTip = "No notes saved for this Variant Sample, annotate it under the Interpretation tab.";
     } else {
         savedNotesTip = `This sample has <b>${countNotesInReport}</b> (of ${countNotes}) note${countNotesInReport === 1 ? "" : "s"} saved to the report`;
         savedNotesTip += (countNotesInReport === 0 ? " and thus will be <b>excluded from report</b> entirely." : ".");
@@ -664,14 +666,19 @@ function ClassificationDropdown(props){
     );
 
 
-    const tooltip = !viewClassification? "Select a finding..." : null;
+    let tooltip;
+    if (searchType === "StructuralVariantSample") {
+        tooltip = "SV Interpretation UI coming soon...";
+    } else {
+        tooltip = !viewClassification? "Select a finding..." : null;
+    }
 
     // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
 
     return (
         <div className="py-1 py-lg-0 pr-lg-12">
             <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
-                disabled={!haveEditPermission || tags.length === 0}
+                disabled={!haveEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
                 data-delay={500} data-tip={tooltip}>
                 { renderedOptions }
             </DropdownButton>

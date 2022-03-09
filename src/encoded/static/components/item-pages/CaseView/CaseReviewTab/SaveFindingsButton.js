@@ -13,66 +13,19 @@ export class SaveFindingsButton extends React.Component {
     constructor(props){
         super(props);
         this.onClick = this.onClick.bind(this);
-        this.createPayload = this.createPayload.bind(this);
-    }
-
-    createPayload(vsObject){
-        const { changedClassificationsByVS, alreadyInReportNotes } = this.props;
-        const { variant_sample_item } = vsObject;
-        const {
-            "@id": vsAtID,
-            uuid: vsUUID,
-        } = variant_sample_item;
-        const { [vsUUID]: classificationToSaveForVS = undefined } = changedClassificationsByVS;
-
-        const allNotes = getAllNotesFromVariantSample(variant_sample_item);
-        const viewPermissionForAllNotes = _.all(allNotes, function({ uuid }){ return !!(uuid); });
-        const anySavedToReportNotes = _.any(allNotes, function({ uuid: noteUUID }){
-            return noteUUID && alreadyInReportNotes[noteUUID];
-        });
-
-        if (!vsAtID) {
-            // Filter out any VSes without view permissions, if any.
-            // TODO: check actions for edit ability, perhaps.
-            return;
-        }
-
-        if (classificationToSaveForVS === undefined) {
-            // Preserve if === null, which means to delete the value.
-            return;
-        }
-
-        let removeFromReport;
-        let addToReport;
-        const payload = [ vsAtID, {} ];
-        if (classificationToSaveForVS === null) {
-            payload[0] += "?delete_fields=finding_table_tag";
-            if (!anySavedToReportNotes && viewPermissionForAllNotes) {
-                // Be extra careful to not remove any VSes, e.g. due to some permissions err
-                // or similar.
-                removeFromReport = vsUUID;
-                console.log("removeFromReport vsUUID", vsUUID, removeFromReport);
-            }
-        } else {
-            payload[1].finding_table_tag = classificationToSaveForVS;
-            if (!anySavedToReportNotes) {
-                addToReport = vsUUID;
-                console.log("addToReport vsUUID", vsUUID, addToReport);
-            }
-        }
-
-        return { payload, removeFromReport, addToReport };
     }
 
     onClick(e){
         e.stopPropagation();
         const {
             patchItems,
+            changedClassificationsByVS,
             changedClassificationsCount,
             variantSampleListItem,
             fetchVariantSampleListItem,
             isLoadingVariantSampleListItem,
             disabled: propDisabled,
+            alreadyInReportNotes,
             fetchedReportItem,
             fetchReportItem
         } = this.props;
@@ -83,29 +36,54 @@ export class SaveFindingsButton extends React.Component {
 
         const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
 
-        const snvPayloads = []; // [ [path, payload], ... ]
-        const cnvPayloads = [];
+        const payloads = []; // [ [path, payload], ... ]
 
         const vsItemsToAddToReport = [];
         const vsItemsToRemoveFromReport = [];
-        const cnvItemsToAddToReport = [];
-        const cnvItemsToRemoveFromReport = [];
 
-        console.log("typeof", typeof this.createPayload);
+        vsObjects.forEach(function(vsObject){
+            const { variant_sample_item } = vsObject;
+            const {
+                "@id": vsAtID,
+                uuid: vsUUID,
+            } = variant_sample_item;
+            const { [vsUUID]: classificationToSaveForVS = undefined } = changedClassificationsByVS;
 
-        vsObjects.forEach((vs) => {
-            console.log("vs", vs, typeof this.createPayload);
-            const payloadInfo = this.createPayload(vs);
-            const { payload, removeFromReport = false, addToReport = false } = payloadInfo || {};
-            if (payload){ snvPayloads.push(payload); }
+            const allNotes = getAllNotesFromVariantSample(variant_sample_item);
+            const viewPermissionForAllNotes = _.all(allNotes, function({ uuid }){ return !!(uuid); });
+            const anySavedToReportNotes = _.any(allNotes, function({ uuid: noteUUID }){
+                return noteUUID && alreadyInReportNotes[noteUUID];
+            });
 
-            console.log("removeFromReport", removeFromReport);
-            console.log("addToReport", addToReport);
-            if (removeFromReport) { vsItemsToRemoveFromReport.push(removeFromReport); }
-            if (addToReport) { vsItemsToAddToReport.push(addToReport);}
+            if (!vsAtID) {
+                // Filter out any VSes without view permissions, if any.
+                // TODO: check actions for edit ability, perhaps.
+                return;
+            }
+
+            if (classificationToSaveForVS === undefined) {
+                // Preserve if === null, which means to delete the value.
+                return;
+            }
+
+            const payload = [ vsAtID, {} ];
+            if (classificationToSaveForVS === null) {
+                payload[0] += "?delete_fields=finding_table_tag";
+                if (!anySavedToReportNotes && viewPermissionForAllNotes) {
+                    // Be extra careful to not remove any VSes, e.g. due to some permissions err
+                    // or similar.
+                    vsItemsToRemoveFromReport.push(vsUUID);
+                }
+            } else {
+                payload[1].finding_table_tag = classificationToSaveForVS;
+                if (!anySavedToReportNotes) {
+                    vsItemsToAddToReport.push(vsUUID);
+                }
+            }
+
+            payloads.push(payload);
         });
 
-        console.log("snvPayloads before adjustment", snvPayloads);
         const shouldAdjustReportVariantSamples = vsItemsToAddToReport.length > 0 || vsItemsToRemoveFromReport.length > 0;
 
         if (shouldAdjustReportVariantSamples) {
@@ -117,12 +95,11 @@ export class SaveFindingsButton extends React.Component {
                 ),
                 vsItemsToAddToReport
             );
-            snvPayloads.unshift([ reportAtID, { "variant_samples": nextVariantSampleUUIDs } ]);
+            payloads.unshift([ reportAtID, { "variant_samples": nextVariantSampleUUIDs } ]);
         }
 
-        console.log("snvPayloads after adjustment", snvPayloads);
 
-        patchItems(snvPayloads, (countCompleted, patchErrors) => {
+        patchItems(payloads, (countCompleted, patchErrors) => {
             if (countCompleted > 0) {
                 // We don't need to call updateClassificationForVS(...) here, since
                 // changedClassificationsByVS will be updated in CaseReviewController componentDidUpdate.
