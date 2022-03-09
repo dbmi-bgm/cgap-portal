@@ -13,6 +13,7 @@ import { console, navigate, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
+import { SearchAsYouTypeLocal } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/SearchAsYouTypeLocal';
 
 const onReturnToCaseClick = function(caseSource){
     if (window && window.opener) {
@@ -829,20 +830,26 @@ class SVGeneNotePanel extends React.PureComponent {
 
         // Generate a list of genes for passing into other fields
         const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene: highlightedGene = [] } = context;
+
         const geneAtIDToGeneMap = {};
+
+        let geneEnsgids = []; // needed for calculating Saytajax searchhref
 
         transcripts.forEach((transcript) => {
             const { csq_gene = null } = transcript;
-            const { "@id": atID = null } = csq_gene || {};
+            const { "@id": atID = null, ensgid } = csq_gene || {};
             geneAtIDToGeneMap[atID] = csq_gene;
+            geneEnsgids.push(ensgid);
         });
 
         const genes = Object.keys(geneAtIDToGeneMap);
+        geneEnsgids = _.uniq(geneEnsgids, false); // free of duplicates
+
 
         return (
             <div className="interpretation-panel">
                 <label className="w-100">{ noteLabel }</label>
-                <HighlightedGenesDrop selectedGeneID={highlightedGeneID_wip} {...{ genes, geneAtIDToGeneMap, onSelectGene, onResetSelectedGenes, highlightedGene }}/>
+                <HighlightedGenesDrop selectedGeneID={highlightedGeneID_wip} {...{ geneEnsgids, genes, geneAtIDToGeneMap, onSelectGene, onResetSelectedGenes, highlightedGene }}/>
                 {/* <NoteArray notes={gene_notes} onEditNote={this.onTextAreaChange} selectNewGene={this.selectNewGene} clearSelectedGene={this.clearSelectedGene} {...{ genes, geneAtIDToGeneMap }} /> */}
                 {/* { (lastModUsernameFromNew || lastModUsername) ?
                     <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
@@ -959,12 +966,20 @@ function HighlightedGenesDrop(props) {
         }
     }
 
+    let searchHref = "/search/?type=Gene";
+    genes.forEach((gene) => {
+        searchHref += ("&ensgid=" + gene);
+    });
+
+
     return (
         <>
             <label className="w-100 text-small">
                 <i className="icon icon-star text-primary fas icon-fw"></i> Selected Gene for Interpretation
             </label>
             <div className="w-100 d-flex note-field-drop mb-1">
+                <SearchAsYouTypeLocal searchList={genes} value={selectedGeneID} allowCustomValue={false}
+                    filterMethod="includes" onChange={(test) => {console.log("test",test); onSelectGene((geneAtIDToGeneMap[test]));} } maxResults={3}/>
                 <Dropdown as={ButtonGroup} className={cls}>
                     <Dropdown.Toggle variant="outline-secondary text-left">
                         { value || "Select an option..." }

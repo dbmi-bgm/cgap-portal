@@ -84,6 +84,7 @@ class OverviewTabView extends React.PureComponent {
                     "highlighted_genes.display_title",
                     "structural_variant.transcript.csq_gene.@id",
                     "structural_variant.transcript.csq_gene.display_title",
+                    "structural_variant.transcript.csq_gene.ensgid",
 
                     // Variant and Gene Notes
                     "gene_notes.@id",
