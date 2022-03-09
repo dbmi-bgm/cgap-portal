@@ -112,7 +112,7 @@ export function SvGeneDetailPane(props) {
                         <div className="info-header-title">
                             <h4>Constraint Scores</h4>
                         </div>
-                        <div className="info-body mb-2">
+                        <div className="info-body mb-2 overflow-auto">
                             <ConstraintScoresSection currentGeneItem={result} {...{ schemas, getTipForField }} />
                         </div>
                     </div>
