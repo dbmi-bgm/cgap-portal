@@ -512,7 +512,7 @@ class InterpretationController extends React.PureComponent {
         const wipACMGSelections = this.memoized.flattenGlobalACMGStateIntoArray(globalACMGSelections);
 
         const showInterpretationSpace = showInterpretationFromQuery && !anyNotePermErrors && newContext && !newVSLoading;
-        console.log(`showInterpretation:${showInterpretationFromQuery}, anyNotePermErrors: ${anyNotePermErrors}, newContext: ${!!newContext}, newVSLoading: ${newVSLoading}`)
+        console.log(`showInterpretation:${showInterpretationFromQuery}, anyNotePermErrors: ${anyNotePermErrors}, newContext: ${!!newContext}, newVSLoading: ${newVSLoading}`);
         // const showFallbackInterpretationSpace = showInterpretation && !anyNotePermErrors && !newContext && !newVSLoading;
 
         // TODOs:

@@ -16,6 +16,25 @@
         "uuid": "de46e080-b53b-40cd-9038-c174b72eacc2"
     },
     {
+        "name": "help/tutorials",
+        "title": "Video Tutorials",
+        "status": "public",
+        "aliases": [
+            "cgap-core:video-tutorials-page"
+        ],
+        "content": [
+            "e11fbe38-863d-4370-9107-b703556f15fd",
+            "e22fbe49-863d-1156-9107-b703556f15ba"
+        ],
+        "table-of-contents": {
+            "enabled": true,
+            "skip-depth": 1,
+            "header-depth": 4,
+            "include-top-link": false
+        },
+        "uuid": "fa46e080-9952-40cd-9038-c174b72efbd2"
+    },
+    {
         "name": "help/portal_ontology_usage",
         "title": "Ontology Usage",
         "status": "public",
@@ -81,6 +100,7 @@
             "a892e8f0-e163-4202-8731-555e4880e337",
             "59acc805-4833-4d2c-be00-fb0947f133e4",
             "9204be0a-98d4-4794-84a2-a05daefecc7c",
+            "fa46e080-9952-40cd-9038-c174b72efbd2",
             "10d94dca-824f-4988-9516-8acf8d723107"
         ],
         "table-of-contents": {
