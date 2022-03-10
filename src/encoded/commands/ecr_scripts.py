@@ -1,8 +1,8 @@
 import argparse
+import boto3
 import datetime
-import json
-import subprocess
 
+from dcicutils.common import REGION
 from dcicutils.misc_utils import PRINT, full_class_name
 
 
@@ -13,58 +13,28 @@ def make_string_list(elements):
     return ",".join(elements)
 
 
-def _run_aws_command(command_args, expected_errors):
-    """
-    Runs an AWS command with given arguments as a subprocess.
-
-    Args:
-        command_args: a list of arguments to be given the 'aws' command.
-        expected_errors: a dictionary of substrings to match and error messages to use instead if one matches.
-
-    Returns:
-        parsed JSON resulting from the command
-    """
-    # TODO: This function could go elsewhere. Perhaps dcicutils.
-    #       The name has an "_" here so no one gets used to importing it from here before we move it.
-    #       -kmp 9-Mar-2022
-    try:
-        binary_result = subprocess.check_output(['aws'] + list(command_args),
-                                                # Send error messages to stdout so they can be captured
-                                                stderr=subprocess.STDOUT)
-        # In the successful case, the output captured is JSON to be parsed
-        result = binary_result.decode('utf-8')
-        result_json = json.loads(result)
-    except subprocess.CalledProcessError as e:
-        # In the unsuccessful case, there might be an error message on stdout.
-        error_output = e.output.decode('utf-8').strip()
-        if error_output:
-            # Show the output if it wasn't something we recognize, but then allow original error to continue raising.
-            PRINT(error_output)  # This may be a better error message.
-        for substring, message in expected_errors.items():
-            if substring in error_output:
-                # If we have a better message, use it.
-                raise RuntimeError(message)
-        raise
-    return result_json
-
-
-def get_images_descriptions(ecs_repository, sort_results=False):
-    result_json = _run_aws_command(command_args=['ecr', 'describe-images', '--repository-name', ecs_repository],
-                                   expected_errors={
-                                       "ExpiredTokenException": "Your AWS security token seems to have expired."})
-    image_details = result_json['imageDetails']
+def get_images_descriptions(ecs_repository, sort_results=True, ecr_client=None):
+    ecr_client = ecr_client or boto3.client('ecr', region_name=REGION)
+    next_token = None
+    image_descriptions = []
+    while True:
+        options = {'repositoryName': ecs_repository, 'maxResults': 10}
+        if next_token:
+            options['nextToken'] = next_token
+        response = ecr_client.describe_images(**options)
+        image_descriptions.extend(response['imageDetails'])
+        next_token = response.get('nextToken')
+        if not next_token:
+            break
     if sort_results:
-        image_details = sorted(image_details, key=lambda x: x['imagePushedAt'], reverse=True)
-    return image_details
+        image_descriptions = sorted(image_descriptions, key=lambda x: x['imagePushedAt'], reverse=True)
+    return image_descriptions
 
 
 def describe_images(ecs_repository):
     # Refer to
     for image_detail in get_images_descriptions(ecs_repository, sort_results=True):
         image_pushed_at = image_detail['imagePushedAt']
-        if isinstance(image_pushed_at, (float, int)):
-            # The raw API call returns a float, but higher level interfaces probably don't
-            image_pushed_at = datetime.datetime.utcfromtimestamp(image_pushed_at)
         image_tags = image_detail.get('imageTags', [])
         image_digest = image_detail['imageDigest']
         print(f"{image_digest} {image_pushed_at} {make_string_list(image_tags)}")
