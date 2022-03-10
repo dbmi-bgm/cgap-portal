@@ -26,7 +26,6 @@ from ..submit import (
     xls_to_json
 )
 
-pytestmark = [pytest.mark.working]
 
 TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
@@ -813,25 +812,25 @@ class TestPedigreeMetadata:
         assert len(fam['members']) == len(example_rows_pedigree)
 
     def test_add_family_metadata_db_single(self, workbook, es_testapp, example_rows_pedigree,
-                                           project, institution):
+                                           wb_project, wb_institution):
         """Tests that if a family ID is already in the database, the atid is used as an identifier instead
         of the new alias. Additionally, if the proband designation is missing from the family history rows,
         the PedigreeMetadata object still gets created without error messages when the family is in the DB already.
         """
         example_rows_pedigree[0]['proband'] == 'N'
-        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, wb_project, wb_institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
         assert list(submission.families.keys())[0] == WORKBOOK_FAMILY_ID1
         assert len(fam['members']) == len(example_rows_pedigree)
         assert len(submission.errors) == 0
 
-    def test_add_family_metadata_db_multi(self, workbook, es_testapp, example_rows_pedigree, project, institution):
+    def test_add_family_metadata_db_multi(self, workbook, es_testapp, example_rows_pedigree, wb_project, wb_institution):
         """Tests that if 2 items are in the DB with same familyID, that both of these are reflected in the
         PedigreeMetadata object. Checks that both items have all members and proband of each isn't changed."""
         for row in example_rows_pedigree:
             row['family id'] = '0102'
-        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, wb_project, wb_institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 2
         assert sorted(list(submission.families.keys())) == sorted([WORKBOOK_FAMILY_ID2, WORKBOOK_FAMILY_ID3])
         for fam in submission.families.values():
