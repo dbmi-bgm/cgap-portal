@@ -580,7 +580,7 @@ const ACMGInvoker = React.memo(function ACMGInvoker(props) {
     return (
         <div className="card flex-row my-3 mt-0">
             <div className="text-600 acmg-guidelines-title">ACMG Rules
-                <QuickPopover className="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" placement="right">
+                <QuickPopover className="p-1" popID="acmg-info-popover" title="Note on ACMG Tooltips and Auto-Classification" placement="right" tooltip="Click for citation info">
                     <div>
                         <div className="mb-05">
                             The algorithm used to autoclassify variants based on ACMG rules, and the information contained within the ACMG tooltips is based on <a href="https://rdcu.be/cloqS" target="_blank" rel="noreferrer">this publication</a>.
