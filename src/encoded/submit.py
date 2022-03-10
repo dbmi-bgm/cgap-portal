@@ -377,6 +377,8 @@ class AccessionRow:
                 self.row, self.metadata.get(SS_RELATION), self.metadata.get(SS_INDIVIDUAL_ID),
                 ', '.join(RELATIONS)
             )
+            msg += ('. To submit extended relations (grandparent, uncle, aunt, cousin, etc.),'
+                    ' please submit family history first.')
             self.errors.append(msg)
         return MetadataItem(info, self.row, 'family')
 

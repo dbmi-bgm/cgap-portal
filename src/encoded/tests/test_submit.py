@@ -440,6 +440,7 @@ class TestAccessionRow:
         assert len(obj.errors) > 0  # check presence of errors
         # check for correct error message
         assert 'Row 1 - Invalid relation' in ''.join(obj.errors)
+        assert 'please submit family history first' in ''.join(obj.errors)
 
     def test_extract_family_metadata_extended_pass(self, workbook, es_testapp, row_dict_uncle):
         """
