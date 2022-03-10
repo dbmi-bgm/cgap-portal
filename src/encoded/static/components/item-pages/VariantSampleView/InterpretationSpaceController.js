@@ -948,29 +948,59 @@ function GenesDrop(props) {
 function HighlightedGenesDrop(props) {
     const { selectedGeneID, genes, geneAtIDToGeneMap, cls = "", selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene } = props;
 
-    let dropOptions;
+    // let dropOptions;
 
-    let value;
-    if (genes.length > 0) {
-        dropOptions = genes.map((geneID) => {
-            const { display_title } = geneAtIDToGeneMap[geneID];
-            return (
-                <Dropdown.Item onClick={() => onSelectGene(geneAtIDToGeneMap[geneID])} key={geneID}>
-                    { display_title }
-                </Dropdown.Item>
-            );
-        });
+    // let value;
+    // if (genes.length > 0) {
+    //     dropOptions = genes.map((geneID) => {
+    //         const { display_title } = geneAtIDToGeneMap[geneID];
+    //         return (
+    //             <Dropdown.Item onClick={() => onSelectGene(geneAtIDToGeneMap[geneID])} key={geneID}>
+    //                 { display_title }
+    //             </Dropdown.Item>
+    //         );
+    //     });
 
-        if (selectedGeneID) {
-            value = geneAtIDToGeneMap[selectedGeneID].display_title;
-        }
+    //     if (selectedGeneID) {
+    //         value = geneAtIDToGeneMap[selectedGeneID].display_title;
+    //     }
+    // }
+
+    function optionRenderFunction(resultAtID) {
+        const { display_title } = geneAtIDToGeneMap[resultAtID];
+        return (
+            <div key={resultAtID} className="py-1">
+                <h5 className="text-300 text-truncate my-0">{ display_title }</h5>
+                {/* <h6 className="text-mono text-400 text-truncate my-0">{ resultAtID }</h6> */}
+            </div>
+        );
     }
 
-    let searchHref = "/search/?type=Gene";
-    genes.forEach((gene) => {
-        searchHref += ("&ensgid=" + gene);
-    });
+    function titleRenderFunction(resultAtID){
+        const { display_title } = geneAtIDToGeneMap[resultAtID];
+        return display_title;
+    }
 
+    /** TODO: get more feedback on how @id version should work - consequence of SV shown on transcript col or actual gene id? 
+     * This should also probably be memoized somehow for performance, if possible
+    */
+    function customFilterFunction(currentTextValue, searchList, filterMethodForDisplayTitle) {
+        // const regexQueryForAtID = SearchAsYouTypeLocal.getRegexQuery(currentTextValue, "includes"); // always needs to be this because of way ensgid is structured
+        const regexQueryForDisplayTitle = SearchAsYouTypeLocal.getRegexQuery(currentTextValue, filterMethodForDisplayTitle);
+
+        return searchList.filter(function(atID){
+            // match if atID is a match
+            // const lowerAtID = atID.toLowerCase();
+            // const atIDMatches = lowerAtID.match(regexQueryForAtID);
+
+            // also check if display_title is a match
+            const { display_title } = geneAtIDToGeneMap[atID];
+            const lowerDisplayTitle = display_title.toLowerCase();
+            const displayTitleMatches = lowerDisplayTitle.match(regexQueryForDisplayTitle);
+
+            return !!(displayTitleMatches); // !!(atIDMatches || displayTitleMatches)
+        });
+    }
 
     return (
         <>
@@ -978,14 +1008,15 @@ function HighlightedGenesDrop(props) {
                 <i className="icon icon-star text-primary fas icon-fw"></i> Selected Gene for Interpretation
             </label>
             <div className="w-100 d-flex note-field-drop mb-1">
-                <SearchAsYouTypeLocal searchList={genes} value={selectedGeneID} allowCustomValue={false}
-                    filterMethod="includes" onChange={(test) => {console.log("test",test); onSelectGene((geneAtIDToGeneMap[test]));} } maxResults={3}/>
-                <Dropdown as={ButtonGroup} className={cls}>
+                <SearchAsYouTypeLocal className={cls} searchList={genes} value={selectedGeneID} allowCustomValue={false}
+                    filterMethod="includes" onChange={(atID) => { onSelectGene((geneAtIDToGeneMap[atID])); } }
+                    maxResults={3} {...{ optionRenderFunction, titleRenderFunction, customFilterFunction }} />
+                {/* <Dropdown as={ButtonGroup} className={cls}> // keeping this around in case there are issues.
                     <Dropdown.Toggle variant="outline-secondary text-left">
                         { value || "Select an option..." }
                     </Dropdown.Toggle>
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
-                </Dropdown>
+                </Dropdown> */}
                 { selectedGeneID ?
                     <Button variant="danger" className={cls + ' ml-03'} onClick={() => onResetSelectedGenes(highlightedGene)}>
                         <i className="icon icon-trash-alt fas" />
