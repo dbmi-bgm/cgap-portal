@@ -294,7 +294,7 @@ class Variant(Item):
 
     item_type = 'variant'
     name_key = 'annotation_id'
-    schema = load_schema('encoded:schemas/variant.json')
+    schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant.json'))
     embedded_list = build_variant_embedded_list()
 
     @classmethod
