@@ -364,14 +364,17 @@ class AccessionRow:
             # check if family is already in db
             # if family in db and member in family, ok
             try:
-                family_match = self.virtualapp.get(f'/search/?type=Family&aliases={parse.quote_plus(self.fam_alias)}&frame=object')
-                individual_match = self.virtualapp.get(f'/search/?type=Individual&aliases={parse.quote_plus(self.indiv_alias)}&frame=object')
-            except Exception as e:  # if family and individual not already in DB
-                relation_found = False
+                family_match = self.virtualapp.get(
+                    f'/search/?type=Family&aliases={parse.quote_plus(self.fam_alias)}&frame=object'
+                ).json['@graph'][0]
+                individual_match = self.virtualapp.get(
+                    f'/search/?type=Individual&aliases={parse.quote_plus(self.indiv_alias)}&frame=object'
+                ).json['@graph'][0]
+            except Exception:  # if family and individual not already in DB
+                pass  # relation_found remains False
             else:
-                if '@graph' in individual_match.json and '@graph' in family_match.json:
-                    if individual_match.json['@graph'][0].get('@id', '') in family_match.json['@graph'][0].get('members', []):
-                        relation_found = True
+                if individual_match.get('@id', '') in family_match.get('members', []):
+                    relation_found = True
         if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
                 self.row, self.metadata.get(SS_RELATION), self.metadata.get(SS_INDIVIDUAL_ID),
