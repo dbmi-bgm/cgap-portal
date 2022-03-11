@@ -266,6 +266,16 @@
                                             "SampleProcessing"
                                         ]
                                     }
+                                },
+                                "vcf_to_be_ingested": {
+                                    "title": "VCF to Ingest",
+                                    "description": "Whether file is a VCF with contents to ingest",
+                                    "type": "boolean"
+                                },
+                                "higlass_file": {
+                                    "title": "File for HiGlass Display",
+                                    "description": "Whether file is used for HiGlass",
+                                    "type": "boolean"
                                 }
                             }
                         }

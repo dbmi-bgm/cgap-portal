@@ -226,8 +226,8 @@ class SampleProcessing(Item):
             sample_processed_files = sample_info.get('processed_files', [])
             sample_bam_file = ''
             # no info about file formats on object frame of sample
-            # cycle through files and check the format
-            for a_file in sample_processed_files:
+            # cycle through files (starting at most recent) and check the format
+            for a_file in sample_processed_files[::-1]:
                 file_info = get_item_or_none(request, a_file, 'files-processed')
                 if not file_info:
                     continue

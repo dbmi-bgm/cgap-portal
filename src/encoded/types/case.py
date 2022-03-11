@@ -305,10 +305,6 @@ def _build_case_embedded_list():
         # File linkTo
         "structural_variant_vcf_file.file_ingestion_status",
         "structural_variant_vcf_file.accession",
-
-        # MetaWorkflowRun linkTo
-        "meta_workflow_run.meta_workflow.name",
-        "meta_workflow_run.meta_workflow.version"
     ]
 
 
@@ -399,13 +395,16 @@ class Case(Item):
         files_processed = sp_data.get('processed_files', [])
         if not files_processed:
             return vcf_file
-        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
+        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
+            # Look for appropriate file_type (old method) or vcf_to_be_ingested
             file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type != "SV":
-                vcf_file = file_data["@id"]
-                break
+            file_type = file_data.get("file_type")
+            file_vcf_to_ingest = file_data.get("vcf_to_be_ingested", False)
+            file_variant_type = file_data.get("variant_type", "SNV")
+            if file_variant_type == "SNV":
+                if file_vcf_to_ingest or file_type == "full annotated VCF":
+                    vcf_file = file_data["@id"]
+                    break
         return vcf_file
 
     @calculated_property(schema={
@@ -427,13 +426,16 @@ class Case(Item):
         files_processed = sp_data.get('processed_files', [])
         if not files_processed:
             return sv_vcf_file
-        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
+        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
+            # Look for appropriate file_type (old method) or vcf_to_be_ingested
             file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type == "SV":
-                sv_vcf_file = file_data["@id"]
-                break
+            file_type = file_data.get("file_type")
+            file_vcf_to_ingest = file_data.get("vcf_to_be_ingested", False)
+            file_variant_type = file_data.get("variant_type")
+            if file_variant_type == "SV":
+                if file_vcf_to_ingest or file_type == "full annotated VCF":
+                    sv_vcf_file = file_data["@id"]
+                    break
         return sv_vcf_file
 
     @calculated_property(schema={

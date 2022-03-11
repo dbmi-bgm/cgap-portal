@@ -116,7 +116,7 @@ export class SvBrowser extends React.PureComponent {
                     // Get the Higlass SV vcf location
                     let higlassSvVcf = null;
                     processedFiles.forEach(function(file){
-                        if (file["file_type"] === "Higlass SV VCF") {
+                        if (file["file_type"] === "Higlass SV VCF" || file.higlass_file) {
                             higlassSvVcf = file["upload_key"];
                         }
                     });
