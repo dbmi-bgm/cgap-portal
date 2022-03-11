@@ -83,6 +83,27 @@ def another_institution(testapp):
 
 
 @pytest.fixture
+def wb_project(es_testapp, workbook):
+    search_string = "/search/?type=Project&title=Test+Project"
+    project = es_testapp.get(search_string).json["@graph"][0]
+    return project
+
+
+@pytest.fixture
+def core_project(es_testapp, workbook):
+    search_string = "/search/?type=Project&title=Core+Project"
+    project = es_testapp.get(search_string).json["@graph"][0]
+    return project
+
+
+@pytest.fixture
+def wb_institution(es_testapp, workbook):
+    search_string = "/search/?type=Institution&title=HMS+DBMI"
+    institution = es_testapp.get(search_string).json["@graph"][0]
+    return institution
+
+
+@pytest.fixture
 def admin(testapp):
     item = {
         'first_name': 'Test',
