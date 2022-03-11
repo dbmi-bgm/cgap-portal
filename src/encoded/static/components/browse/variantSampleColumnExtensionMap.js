@@ -152,7 +152,7 @@ export const structuralVariantSampleColumnExtensionMap = {
             const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_genes = [] } = result;
 
             if (highlighted_genes.length === 0) {
-                return <div className="text-muted text-small">Highlighted Gene <br/>Not Selected</div>;
+                return <div className="text-muted">Highlighted Gene <br/>Not Selected</div>;
             } else {
                 const { 0: { ensgid: highlighted_ensgid } = [] } = highlighted_genes;
 
@@ -179,7 +179,7 @@ export const structuralVariantSampleColumnExtensionMap = {
                 if (!worstConsequence) { return null; }
                 const { display_title: worstConsequenceDisplay } = worstConsequence;
                 return (
-                    <div className="text-small">
+                    <div>
                         { worstConsequenceDisplay }
                     </div>
                 );
@@ -347,7 +347,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
 
     if (genes.length <= 2) { // show comma separated
         rows.push(
-            <div className="text-small">
+            <div>
                 <span className="text-muted">List:&nbsp;</span>
                 <span>{genes.join(", ")}</span>
             </div>);
@@ -356,7 +356,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
         const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
         const tipGenes = genes.slice(0, lastItemIndex).join(", ");
         rows.push(
-            <div className="text-small">
+            <div>
                 <span className="text-muted">List:&nbsp;</span>
                 <span data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</span>
             </div>
@@ -368,7 +368,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
         rows.push(
             <div className="text-muted">
                 <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
-                <span className="text-small">Not Selected</span>
+                <span>Not Selected</span>
             </div>
         );
     } else { // TODO: styles may need to be adjusted to accomodate more than a few at a time
@@ -377,7 +377,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
                 <i className="icon icon-star fas text-primary" data-tip="Highlighted gene" />:&nbsp;
                 { highlighted_genes.map((gene) => {
                     const { display_title, "@id": atID } = gene;
-                    return <span key="atID" className="text-small ml-02"><a href={atID}>{display_title}</a></span>;
+                    return <span key="atID" className="ml-02"><a href={atID}>{display_title}</a></span>;
                 })}
             </div>
         );
