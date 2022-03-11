@@ -354,7 +354,10 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
     } else {
         // show first and last gene separated by "..." with first 10 available on hover in first row
         const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
-        const tipGenes = genes.slice(0, lastItemIndex).join(", ");
+        let tipGenes = genes.slice(0, lastItemIndex).join(", ");
+        if (genes.length > 10) {
+            tipGenes += (" + " + (genes.length - 10).toString() + " more");
+        }
         rows.push(
             <div>
                 <span className="text-muted">List:&nbsp;</span>
