@@ -13,6 +13,73 @@ import { console, navigate, ajax, schemaTransforms } from '@hms-dbmi-bgm/shared-
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { AutoGrowTextArea } from './../components/AutoGrowTextArea';
+import { SearchAsYouTypeLocal } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/SearchAsYouTypeLocal';
+
+const onReturnToCaseClick = function(caseSource){
+    if (window && window.opener) {
+        window.close();
+        return;
+    }
+    // Fallback if no parent window:
+    return navigate(`/cases/${caseSource}/#case-info.interpretation`);
+};
+
+function GenericInterpretationSidebar(props) {
+    const {
+        headerTitle = "Interpretation Space",
+        headerIconCls = "icon icon-poll-h fas",
+        children = []
+    } = props;
+
+    return (
+        <div className="card interpretation-space">
+            <InterpretationSpaceHeader {...{ headerTitle, headerIconCls }} />
+            <div className="card-body">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+
+export class SNVIndelInterpretationSpace extends React.Component {
+    render() {
+        const { ...passProps } = this.props;
+        return (
+            <GenericInterpretationSidebar headerTitle="SNV / Indel Interpretation Space">
+                <InterpretationSpaceWrapper {...passProps}/>
+            </GenericInterpretationSidebar>
+        );
+    }
+}
+
+export class CNVInterpretationSpace extends React.Component {
+    render() {
+        console.log("CNVInterpretationSpace this.props", this.props);
+        const { ...passProps } = this.props;
+        return (
+            <GenericInterpretationSidebar headerTitle="SV / CNV Interpretation Space">
+                <InterpretationSpaceWrapper {...passProps} tabsToDisable={{ 2: true }} isCNV />
+            </GenericInterpretationSidebar>
+        );
+    }
+}
+
+/**
+ * @todo
+ * Expanded items commented out until V2
+ * We should probably have it expand out horizontally from side (?).
+ */
+export function InterpretationSpaceHeader(props) {
+    const { headerIconCls, headerTitle } = props;
+    return (
+        <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
+            <i className={headerIconCls}></i>
+            <span className="w-100 text-center">{headerTitle}</span>
+        </div>
+    );
+}
+
 
 /**
  * Stores and manages global note state for interpretation space. Handles AJAX
@@ -24,17 +91,18 @@ export class InterpretationSpaceWrapper extends React.Component {
      * and returns an object to use to initialize state.
      * returns {
      *      "variant_notes": <note_obj>,
-     *      "gene_notes": <note obj>,
+     *      "gene_notes": <note obj> || [<note obj], // for sv, this will be an array of note objs
      *      "interpretation": <note obj>,
+     *      "highlighted_genes": [ {"@id", "display_title"}] // only used for sv gene notes
      *      "loading": false,
      *      "user": null... etc. }
      */
     static initializeNoteState(context = {}) {
-        const fields = ["variant_notes", "gene_notes", "interpretation", "discovery_interpretation"];
+        const fields = ["variant_notes", "gene_notes", "interpretation", "discovery_interpretation", "highlighted_genes"];
         const newState = {};
         fields.forEach((field) => {
             const { [field]: note = null } = context;
-            newState[field] = note;
+            newState[field] = note; // for sv gene_notes, this will actually be an array
         });
         newState.loading = false;
         newState.user = null;
@@ -97,6 +165,8 @@ export class InterpretationSpaceWrapper extends React.Component {
     constructor(props) {
         super(props);
         this.postNewNote = this.postNewNote.bind(this);
+        this.saveHighlightedGene = this.saveHighlightedGene.bind(this);
+        // this.postNewMultiNote = this.postNewMultiNote.bind(this);
         this.patchNewNoteToVS = this.patchNewNoteToVS.bind(this);
         this.patchPreviouslySavedNote = this.patchPreviouslySavedNote.bind(this);
         this.saveAsDraft = this.saveAsDraft.bind(this);
@@ -122,6 +192,20 @@ export class InterpretationSpaceWrapper extends React.Component {
 
         return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(noteToSubmit));
     }
+
+    // postNewMultiNote(notes, noteType) {
+    //     const { context: { institution = null, project = null } = {} } = this.props;
+    //     const { '@id': variantSampleInstitutionID } = institution || {};
+    //     const { '@id': variantSampleProjectID } = project || {};
+
+    //     const notesToSubmit = notes.map((note) => {
+    //         const cleanedNote = InterpretationSpaceWrapper.cleanUpNoteStateForPostPatch(note, noteType);
+    //         noteToSubmit.institution = variantSampleInstitutionID;
+    //         noteToSubmit.project = variantSampleProjectID;
+    //         return cleanedNote;
+    //     });
+    //     return ajax.promise(`/${noteType}/`, 'POST', {}, JSON.stringify(notesToSubmit));
+    // }
 
     patchNewNoteToVS(noteAtID, saveToField) {
         const { context: { '@id': vsAtID = null } = {} } = this.props;
@@ -167,6 +251,42 @@ export class InterpretationSpaceWrapper extends React.Component {
 
         return ajax.promise(patchURL, 'PATCH', {}, JSON.stringify(cleanedNoteToPatch));
     }
+
+    saveHighlightedGene(highlightedGeneToPatch, successCallback) {
+        const { context: { "@id": vsAtID, highlighted_genes: lastSavedHighlighted = [] } = {} } = this.props;
+        let patchURL = vsAtID;
+        let payload = JSON.stringify({});
+        let postPatchState = null;
+
+        if (!highlightedGeneToPatch) { // deleting previous value
+            if (lastSavedHighlighted.length > 0) {
+                patchURL += '?delete_fields=highlighted_genes';
+            } else {
+                throw new Error("Attempting to delete highlighted gene when there was no previous value.");
+            }
+        } else { // adding new value
+            const { "@id": highlightedGeneAtID } = highlightedGeneToPatch;
+            payload = JSON.stringify({ highlighted_genes: [ highlightedGeneAtID ] });
+            postPatchState = [highlightedGeneToPatch];
+        }
+
+        this.setState({ "loading": true }, () => {
+            ajax.promise(patchURL, 'PATCH', {}, payload)
+                .then((response) => {
+                    const { '@graph': graph = [], status } = response;
+                    console.log("response", response);
+                    if (graph.length === 0 || status === "error") {
+                        this.setState({ "loading": false });
+                        throw new Error(response);
+                    }
+                    this.setState({ "loading": false, "highlighted_genes": postPatchState }, successCallback);
+                });
+        });
+    }
+
+    // saveMultinoteAsDraft(note, stateFieldToUpdate, noteType = "note_standard", successCallback) {
+
+    // }
 
     saveAsDraft(note, stateFieldToUpdate, noteType = "note_standard", successCallback) {
         const { [stateFieldToUpdate]: lastSavedNote } = this.state;
@@ -253,10 +373,18 @@ export class InterpretationSpaceWrapper extends React.Component {
     }
 
     render() {
-        const { variant_notes, gene_notes, interpretation, discovery_interpretation } = this.state;
-        return <InterpretationSpaceController {...this.props} lastSavedVariantNote={variant_notes}
-            lastSavedGeneNote={gene_notes} lastSavedInterpretation={interpretation} lastSavedDiscovery={discovery_interpretation}
-            saveAsDraft={this.saveAsDraft} />;
+        const { variant_notes, gene_notes, interpretation, discovery_interpretation, highlighted_genes } = this.state;
+        console.log("log2 this.state", this.state);
+        return (
+            <InterpretationSpaceController {...this.props}
+                lastSavedHighlightedGene={highlighted_genes}
+                lastSavedVariantNote={variant_notes}
+                lastSavedGeneNote={gene_notes}
+                lastSavedInterpretation={interpretation}
+                lastSavedDiscovery={discovery_interpretation}
+                saveAsDraft={this.saveAsDraft}
+                saveHighlightedGene={this.saveHighlightedGene}/>
+        );
     }
 }
 
@@ -315,6 +443,29 @@ export class InterpretationSpaceController extends React.Component {
 
         // console.log("note has not changed");
         return false;
+    }
+
+    /**
+     * @param {Map} wipHighlightedGene - map with highlighted gene passed down from SelectItemsController
+     * @param {Array} lastSavedHighlightedGene - array of objects with highlighted gene atID and display title from InterpretationSpaceWrapper
+     * @returns {boolean} True if highlighted gene has changed, False if it hasn't
+     */
+    static hasHighlightedGeneChanged(wipHighlightedGene, lastSavedHighlightedGene) {
+        if (!wipHighlightedGene && !lastSavedHighlightedGene) { return false; } // probably on snv
+        if (wipHighlightedGene.size === 0 && !lastSavedHighlightedGene) {
+            return false;
+        } else if (
+            (wipHighlightedGene.size !== 0 && !lastSavedHighlightedGene) ||
+            (wipHighlightedGene.size === 0 && lastSavedHighlightedGene)
+        ) {
+            return true;
+        } else {
+            // WIP is actually a version of "selectedItems"/is a Map
+            const wipGeneAtID = wipHighlightedGene.keys().next().value || null;
+            // If not null, lastSavedHighlightedGene is an object w/@id & display title
+            const { 0: { "@id": lastSavedHighlightedGeneID } = [] } = lastSavedHighlightedGene || {};
+            return wipGeneAtID !== lastSavedHighlightedGeneID;
+        }
     }
 
     constructor(props) {
@@ -382,67 +533,124 @@ export class InterpretationSpaceController extends React.Component {
 
     render() {
         const { isExpanded, currentTab, variant_notes_wip, gene_notes_wip, interpretation_wip, discovery_interpretation_wip } = this.state;
-        const { isFallback, lastSavedGeneNote, lastSavedInterpretation, lastSavedVariantNote, lastSavedDiscovery, context, wipACMGSelections, autoClassification, toggleInvocation, actions } = this.props;
-
-        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
-
-        const isDraftVariantNoteUnsaved = InterpretationSpaceController.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
-        const isDraftGeneNoteUnsaved = InterpretationSpaceController.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
-        const isDraftDiscoveryUnsaved = InterpretationSpaceController.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
-
-        // Add ACMG from WIP
-        const interpretationWIP = { ...interpretation_wip };
-        interpretationWIP["acmg_rules_invoked"] = wipACMGSelections;
-        const isDraftInterpretationUnsaved = InterpretationSpaceController.hasNoteChanged(interpretationWIP, lastSavedInterpretation);
+        const {
+            lastSavedHighlightedGene,   // state from InterpretationSpaceWrapper
+            lastSavedGeneNote,          // state from InterpretationSpaceWrapper
+            lastSavedVariantNote,       // state from InterpretationSpaceWrapper
+            lastSavedInterpretation,    // state from InterpretationSpaceWrapper
+            lastSavedDiscovery,         // state from InterpretationSpaceWrapper
+            saveHighlightedGene,        // method from InterpretationSpaceWrapper
+            selectedGenes,              // from selectedItemsController
+            onSelectGene,               // from selectedItemsController
+            onResetSelectedGenes,       // from selectedItemsController
+            tabsToDisable = {},         // from CNVInterpretationSpace
+            isFallback,                 // unused
+            isCNV,                      // from CNVInterpretationSpace
+            context,
+            wipACMGSelections,          // from VariantSampleOverview
+            autoClassification,         // from VariantSampleOverview
+            toggleInvocation,           // from VariantSampleOverview
+            actions
+        } = this.props;
 
         const hasEditPermission = this.memoized.haveEditPermission(actions);
-
-        let panelToDisplay = null;
+        const passProps = _.pick(this.props, 'saveAsDraft', 'schemas', 'caseSource', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen' );
         const commonProps = {
             ...passProps, hasEditPermission, isFallback,
             "retainWIPStateOnUnmount": this.retainWIPStateOnUnmount,
             "noteLabel": InterpretationSpaceController.tabTitles[currentTab],
             "key": currentTab
         };
+
+        // Check for changes in basic notes
+        const isDraftVariantNoteUnsaved = InterpretationSpaceController.hasNoteChanged(variant_notes_wip, lastSavedVariantNote);
+        const isDraftGeneNoteUnsaved = InterpretationSpaceController.hasNoteChanged(gene_notes_wip, lastSavedGeneNote);
+        const isDraftDiscoveryUnsaved = InterpretationSpaceController.hasNoteChanged(discovery_interpretation_wip, lastSavedDiscovery);
+
+        // Handle SV specific changes
+        const isHighlightedGeneUnsaved = InterpretationSpaceController.hasHighlightedGeneChanged(selectedGenes, lastSavedHighlightedGene);
+        const isGeneTabUnsaved = isCNV ? (isDraftGeneNoteUnsaved || isHighlightedGeneUnsaved) : isDraftGeneNoteUnsaved;
+
+        // Check for ACMG changes from WIP
+        const interpretationWIP = { ...interpretation_wip };
+        interpretationWIP["acmg_rules_invoked"] = wipACMGSelections;
+        const isDraftInterpretationUnsaved = InterpretationSpaceController.hasNoteChanged(interpretationWIP, lastSavedInterpretation);
+
+        // Decide what panel to display based on currently selected tab index
+        let panelToDisplay = null;
         switch(currentTab) {
             case (0): // Gene Notes
-                panelToDisplay = (<GenericInterpretationPanel {...commonProps}
-                    lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard"
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
-                );
+                var otherDraftsUnsaved = isDraftInterpretationUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved;
+                if (isCNV) {
+                    const highlightedGeneID_wip = selectedGenes.keys().next().value || null;
+                    panelToDisplay = <SVGeneNotePanel {...commonProps} {...{
+                        otherDraftsUnsaved,
+                        saveHighlightedGene,
+                        lastSavedGeneNote,
+                        isHighlightedGeneUnsaved,
+                        lastSavedHighlightedGene,
+                        context,
+                        highlightedGeneID_wip,
+                        onSelectGene,
+                        onResetSelectedGenes
+                    }} />;
+                } else {
+                    panelToDisplay = (<GenericInterpretationPanel {...commonProps} {...{ otherDraftsUnsaved }}
+                        lastWIPNote={gene_notes_wip} lastSavedNote={lastSavedGeneNote} saveToField="gene_notes" noteType="note_standard" />
+                    );
+                }
                 break;
             case (1): // Variant Notes
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps}
                     lastWIPNote={variant_notes_wip} lastSavedNote={lastSavedVariantNote} saveToField="variant_notes" noteType="note_standard"
-                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isDraftGeneNoteUnsaved || isDraftDiscoveryUnsaved} />
+                    otherDraftsUnsaved={isDraftInterpretationUnsaved || isGeneTabUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (2): // Interpretation
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps} wipACMGSelections={wipACMGSelections} {...{ autoClassification, toggleInvocation }}
                     lastWIPNote={interpretationWIP} lastSavedNote={lastSavedInterpretation} saveToField="interpretation" noteType="note_interpretation"
-                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
+                    otherDraftsUnsaved={isGeneTabUnsaved || isDraftVariantNoteUnsaved || isDraftDiscoveryUnsaved} />
                 );
                 break;
             case (3): // Discovery
                 panelToDisplay = (<GenericInterpretationPanel {...commonProps}
                     lastWIPNote={discovery_interpretation_wip} lastSavedNote={lastSavedDiscovery} saveToField="discovery_interpretation" noteType="note_discovery"
-                    otherDraftsUnsaved={isDraftGeneNoteUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
+                    otherDraftsUnsaved={isGeneTabUnsaved || isDraftVariantNoteUnsaved || isDraftInterpretationUnsaved} />
                 );
                 break;
             default:
                 break;
         }
         return (
-            <div className="card interpretation-space">
-                <InterpretationSpaceHeader {...{ isExpanded }} toggleExpanded={this.toggleExpanded}/>
-                <div className="card-body">
-                    <InterpretationSpaceTabs {...{ currentTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftVariantNoteUnsaved, isDraftInterpretationUnsaved }}
-                        switchToTab={this.switchToTab} />
-                    { panelToDisplay }
-                </div>
-            </div>
+            <>
+                <InterpretationSpaceTabs {...{ tabsToDisable, currentTab, isDraftDiscoveryUnsaved, isDraftVariantNoteUnsaved,
+                    isDraftInterpretationUnsaved, isGeneTabUnsaved }} switchToTab={this.switchToTab} />
+                { panelToDisplay }
+            </>
         );
     }
+}
+
+function GenericInterpretationSpaceTabBtn(props) {
+    const { disabled, tabName, tooltip = null, onClick, isActive = false, unsavedDraft = false, cls = "" } = props;
+    const className = `${cls} btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"} ${unsavedDraft ? 'font-italic': ""}`;
+    return (
+        <div data-tip={disabled ? "Coming Soon": ""}>
+            <button type="button" data-tip={tooltip} {...{ onClick, className, disabled }}>
+                { tabName }{ unsavedDraft && <span className="text-danger text-600">*</span>}
+            </button>
+        </div>
+    );
+}
+
+function GenericInterpretationSpaceTabNav(props) {
+    const { children = [] } = props;
+
+    return (
+        <div className="interpretation-tabs p-1 d-flex align-items-center justify-content-around">
+            {children}
+        </div>
+    );
 }
 
 /**
@@ -452,50 +660,372 @@ export class InterpretationSpaceController extends React.Component {
  * from InterpretationSpaceController) into new file InterpretationSpaceView.js.
  */
 
-/**
- * @todo
- * Expanded items commented out until V2
- * We should probably have it expand out horizontally from side (?).
- */
-export function InterpretationSpaceHeader(props) {
-    const { toggleExpanded, isExpanded } = props;
-    return (
-        <div className="interpretation-header card-header d-flex align-items-center justify-content-between">
-            <i className="icon icon-poll-h fas"></i>
-            Interpretation Space
-            <button type="button" className="btn btn-link" onClick={toggleExpanded || undefined} style={{ visibility: "hidden" }}>
-                { isExpanded ? <i className="icon icon-compress fas"></i> : <i className="icon icon-expand fas"></i> }
-            </button>
-        </div>
-    );
-}
-
 function InterpretationSpaceTabs(props) {
-    const { currentTab, switchToTab, isDraftDiscoveryUnsaved, isDraftGeneNoteUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
-    const tabIndexToUnsavedDraft = { 0: isDraftGeneNoteUnsaved, 1: isDraftVariantNoteUnsaved, 2: isDraftInterpretationUnsaved, 3: isDraftDiscoveryUnsaved };
+    const { tabsToDisable, currentTab, switchToTab, isDraftDiscoveryUnsaved, isGeneTabUnsaved, isDraftInterpretationUnsaved, isDraftVariantNoteUnsaved } = props;
+    const tabIndexToUnsavedDraft = {
+        0: isGeneTabUnsaved, // includes changes to highlighted gene and gene note
+        1: isDraftVariantNoteUnsaved,
+        2: isDraftInterpretationUnsaved,
+        3: isDraftDiscoveryUnsaved
+    };
 
     // Maybe memoize?
     const tabsRender = InterpretationSpaceController.tabNames.map((tabName, i) => {
         const isActive = currentTab === i;
         const unsavedDraft = tabIndexToUnsavedDraft[i];
+        const tooltip = unsavedDraft ? "Unsaved changes": null;
+        const onClick = (e) => switchToTab(i);
+        const disabled = tabsToDisable[i] || false;
         return (
-            <button type="button" key={i} data-tip={unsavedDraft ? "Unsaved changes": null} onClick={(e) => switchToTab(i)}
-                className={`btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"}${unsavedDraft ? 'font-italic' : ''}`}>
-                {tabName}{unsavedDraft ? <span className="text-danger text-600">*</span>: ''}
-            </button>
+            <GenericInterpretationSpaceTabBtn key={i} {...{ tooltip, onClick, unsavedDraft, isActive, tabName, disabled }} />
         );
     });
 
     return (
-        <div className="interpretation-tabs p-1 d-flex align-items-center justify-content-around">
-            {tabsRender}
-        </div>
+        <GenericInterpretationSpaceTabNav>
+            { tabsRender }
+        </GenericInterpretationSpaceTabNav>
     );
 }
 
 const refreshParentWindowVariantSampleList = _.debounce(function(){
     window.opener.postMessage({ "action": "refresh-variant-sample-list" });
 }, 1200, false); // Debounced to prevent accidental double-clicks & (too-)rapid changes
+
+class SVGeneNotePanel extends React.PureComponent {
+    constructor(props) {
+        super(props);
+
+        const { lastSavedGeneNote = [] } = this.props;
+
+        this.state = {
+            gene_notes: lastSavedGeneNote || [],
+        };
+
+        this.selectNewGene = this.selectNewGene.bind(this);
+        this.onTextAreaChange = this.onTextAreaChange.bind(this);
+        this.clearSelectedGene = this.clearSelectedGene.bind(this);
+        this.saveHighlightedGeneWrapper = this.saveHighlightedGeneWrapper.bind(this);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        const { setIsSubmitting, isSubmitting, isHighlightedGeneUnsaved, otherDraftsUnsaved } = this.props;
+
+        // TODO: will need to check for updates to gene_notes field itself in future
+        const anyNotesUnsaved = otherDraftsUnsaved || isHighlightedGeneUnsaved;
+
+        // Only trigger if switching from no unsaved to unsaved present or vice versa
+        if (!isSubmitting && anyNotesUnsaved) {
+            // started submitting (warning will appear on navigate)
+            setIsSubmitting({
+                modal: <UnsavedInterpretationModal {...{ setIsSubmitting }}/>
+            });
+        } else if (isSubmitting && !anyNotesUnsaved) {
+            // no longer submitting (warning will no longer appear on navigate)
+            setIsSubmitting(false); // unset
+        }
+    }
+
+    onTextAreaChange(value, idx) {
+        /** Needs to be updated to work with multiple indeces of notes in future */
+        const { gene_notes: [ { associated_items = [] } = {} ] = [] } = this.state;
+        const newState = [{ note_text: value, associated_items }];
+        this.setState({ gene_notes: newState });
+    }
+
+    selectNewGene(geneId, idx) {
+        /** Needs to be updated to work with multiple indeces of notes in future */
+        const { gene_notes = [] } = this.state;
+        const numNotes = gene_notes.length;
+
+        if (!numNotes) {
+            // initialize first note object
+            const firstNote = {};
+            const associatedItems = { item_type: "Gene", item_identifier: geneId };
+            firstNote.associated_items = [associatedItems];
+
+            // update state with new item
+            const newState = [];
+            newState.push(firstNote);
+            this.setState({ gene_notes: newState });
+        } else {
+            const newState = [...gene_notes]; // todo: may need to deeper clone?
+
+            if (idx !== 0 && !idx) { throw new Error ("No idx passed into selectNewGene");}
+            if (gene_notes[idx]) { // note exists, update old object
+                if (gene_notes[idx].note_text) { // check for note text
+                    // query user to confirm they want to overwrite old note
+                    const okToOverwrite = confirm("Switching genes will delete current gene note. Is this okay?");
+                    if (okToOverwrite) {
+                        const updatedNote = { ...newState[idx] };
+                        updatedNote.associated_items[0].item_identifier = geneId;
+                        updatedNote.note_text = "";
+                        this.setState({ gene_notes: [updatedNote] });
+                    }
+                } else {
+                    const updatedNote = { ...newState[idx] };
+                    updatedNote.associated_items[0].item_identifier = geneId;
+                    updatedNote.note_text = "";
+                    this.setState({ gene_notes: [updatedNote] });
+                }
+            } else { // note doesn't exist yet; create new obj
+                const associatedItems = { item_type: "Gene", item_identifier: geneId };
+                newNote.associated_items = [associatedItems];
+                newState.push(newNote);
+            }
+        }
+    }
+
+    clearSelectedGene(idx) {
+        /** Needs to be updated to work with multiple indeces of notes in future */
+        this.setState({ gene_notes: [] });
+    }
+
+    // Wrapping passed in functions so as to call them with this component's state, then pass down to children
+    saveHighlightedGeneWrapper(highlightedGene) {
+        const { saveHighlightedGene, retainWIPStateOnUnmount, noteType, saveToField } = this.props;
+        saveHighlightedGene(highlightedGene, function(){
+            // Success Callback
+            if (window && window.opener) {
+                // If parent window exists, refresh it (if listener exists in it for this event)
+                refreshParentWindowVariantSampleList();
+            }
+        });
+        // retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
+    }
+
+    /**
+    componentWillUnmount() {
+        // TODO: Before unmounting (as in switching tabs), will need to save unsaved changes in controller state
+        const { saveToField, retainWIPStateOnUnmount, lastWIPNote } = this.props;
+
+        // Only trigger if note has changed since last soft save (WIP)
+        if (InterpretationSpaceController.hasNoteChanged(lastWIPNote, this.state)) {
+            // console.log("note has changed since last soft save... updating WIP");
+            retainWIPStateOnUnmount(this.state, `${saveToField}_wip`);
+        }
+    }
+    **/
+
+    render() {
+        const { gene_notes } = this.state;
+        const {
+            context,
+            highlightedGeneID_wip,
+            isHighlightedGeneUnsaved,
+            onSelectGene,
+            onResetSelectedGenes,
+            noteLabel,
+            noteType,
+            schemas, // not in use
+            caseSource,
+            hasEditPermission,
+            isCurrent, // not in use yet
+            isApproved, // not in use yet
+            isDraft, // not in use yet
+            // noteChangedSinceLastSave // not in use yet
+        } = this.props;
+
+        const noteTextPresent = gene_notes.length > 0 || (gene_notes.length === 1 && gene_notes[0].note_text);
+
+        // Generate a list of genes for passing into other fields
+        const { structural_variant: { transcript: transcripts = [] } = {}, highlighted_gene: highlightedGene = [] } = context;
+
+        const geneAtIDToGeneMap = {};
+
+        let geneEnsgids = []; // needed for calculating Saytajax searchhref
+
+        transcripts.forEach((transcript) => {
+            const { csq_gene = null } = transcript;
+            const { "@id": atID = null, ensgid } = csq_gene || {};
+            geneAtIDToGeneMap[atID] = csq_gene;
+            geneEnsgids.push(ensgid);
+        });
+
+        const genes = Object.keys(geneAtIDToGeneMap);
+        geneEnsgids = _.uniq(geneEnsgids, false); // free of duplicates
+
+
+        return (
+            <div className="interpretation-panel">
+                <label className="w-100">{ noteLabel }</label>
+                <HighlightedGenesDrop selectedGeneID={highlightedGeneID_wip} {...{ geneEnsgids, genes, geneAtIDToGeneMap, onSelectGene, onResetSelectedGenes, highlightedGene }}/>
+                {/* <NoteArray notes={gene_notes} onEditNote={this.onTextAreaChange} selectNewGene={this.selectNewGene} clearSelectedGene={this.clearSelectedGene} {...{ genes, geneAtIDToGeneMap }} /> */}
+                {/* { (lastModUsernameFromNew || lastModUsername) ?
+                    <div className="text-muted text-smaller my-1">Last Saved: <LocalizedTime timestamp={ date_modified } formatType="date-time-md" dateTimeSeparator=" at " /> by {lastModUsernameFromNew || lastModUsername} </div>
+                : null*/}
+                {/* <GenericInterpretationSubmitButton cls="mt-05" {...{ hasEditPermission, isCurrent, isApproved, isDraft, noteTextPresent, noteType }}
+                    noteChangedSinceLastSave={isHighlightedGeneUnsaved}
+                /> */}
+                <SVGeneInterpretationSubmitButton highlightedGeneChangedSinceLastSave={isHighlightedGeneUnsaved} selectedGeneID={highlightedGeneID_wip}
+                    {...{ hasEditPermission, geneAtIDToGeneMap }} saveHighlightedGene={this.saveHighlightedGeneWrapper} />
+                { caseSource ?
+                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
+                        Return to Case
+                    </button> : null}
+            </div>
+        );
+    }
+}
+
+function NoteArray(props) {
+    const { notes = [], onEditNote, genes, geneAtIDToGeneMap, selectNewGene, clearSelectedGene } = props;
+
+    if (!notes.length) {
+        return (
+            <div>
+                <GenesDrop noteIdx={notes.length} value={null} {...{ genes, geneAtIDToGeneMap, selectNewGene }} />
+            </div>
+        );
+    }
+
+    return (
+        <>
+            {notes.map((note, idx) => {
+                const { associated_items: [associated_item] = [], note_text = "" } = note;
+                if (!associated_item) return null;
+                const { item_type, item_identifier } = associated_item;
+                console.log("item_type, item_identifier", item_type, item_identifier);
+                const geneDisplayTitle = geneAtIDToGeneMap[item_identifier].display_title;
+
+                return (
+                    <div key={idx}>
+                        <GenesDrop noteIdx={idx} value={item_identifier} {...{ genes, geneAtIDToGeneMap, selectNewGene, clearSelectedGene }} />
+                        <label className="w-100 mt-1">
+                            {geneDisplayTitle} Gene Note
+                        </label>
+                        <AutoGrowTextArea className="w-100 mb-1" value={note_text} onChange={(e) => onEditNote(e.target.value, idx)} placeholder="Required" />
+                    </div>
+                );
+            })}
+        </>
+    );
+
+}
+
+function GenesDrop(props) {
+    const { geneAtIDToGeneMap = {}, genes, noteIdx, value, selectNewGene, clearSelectedGene, cls = "" } = props;
+
+    let dropOptions;
+    let title;
+    if (genes.length > 0) {
+        dropOptions = genes.map((geneID) => {
+            const { display_title, "@id": atID } = geneAtIDToGeneMap[geneID];
+
+            return (
+                <Dropdown.Item onClick={() => selectNewGene(atID, noteIdx)} key={geneID}>
+                    { display_title }
+                </Dropdown.Item>
+            );
+        });
+
+        if (value) {
+            title = geneAtIDToGeneMap[value].display_title;
+        }
+    }
+    return (
+        <>
+            <label className="w-100 text-small mt-1">
+                Add Gene Note
+            </label>
+            <div className="w-100 d-flex note-field-drop">
+                <Dropdown as={ButtonGroup} className={cls}>
+                    <Dropdown.Toggle variant="outline-secondary text-left">
+                        { title || "Select a gene to interpret..." }
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+                </Dropdown>
+                { value ?
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => clearSelectedGene()}>
+                        <i className="icon icon-trash-alt fas" />
+                    </Button>
+                    : null}
+            </div>
+        </>
+    );
+}
+
+function HighlightedGenesDrop(props) {
+    const { selectedGeneID, genes, geneAtIDToGeneMap, cls = "", selectedGenes, onSelectGene, onResetSelectedGenes, highlightedGene } = props;
+
+    // let dropOptions;
+
+    // let value;
+    // if (genes.length > 0) {
+    //     dropOptions = genes.map((geneID) => {
+    //         const { display_title } = geneAtIDToGeneMap[geneID];
+    //         return (
+    //             <Dropdown.Item onClick={() => onSelectGene(geneAtIDToGeneMap[geneID])} key={geneID}>
+    //                 { display_title }
+    //             </Dropdown.Item>
+    //         );
+    //     });
+
+    //     if (selectedGeneID) {
+    //         value = geneAtIDToGeneMap[selectedGeneID].display_title;
+    //     }
+    // }
+
+    function optionRenderFunction(resultAtID) {
+        const { display_title } = geneAtIDToGeneMap[resultAtID];
+        return (
+            <div key={resultAtID} className="py-1">
+                <h5 className="text-300 text-truncate my-0">{ display_title }</h5>
+                {/* <h6 className="text-mono text-400 text-truncate my-0">{ resultAtID }</h6> */}
+            </div>
+        );
+    }
+
+    function titleRenderFunction(resultAtID){
+        const { display_title } = geneAtIDToGeneMap[resultAtID];
+        return display_title;
+    }
+
+    /** TODO: get more feedback on how @id version should work - consequence of SV shown on transcript col or actual gene id? 
+     * This should also probably be memoized somehow for performance, if possible
+    */
+    function customFilterFunction(currentTextValue, searchList, filterMethodForDisplayTitle) {
+        // const regexQueryForAtID = SearchAsYouTypeLocal.getRegexQuery(currentTextValue, "includes"); // always needs to be this because of way ensgid is structured
+        const regexQueryForDisplayTitle = SearchAsYouTypeLocal.getRegexQuery(currentTextValue, filterMethodForDisplayTitle);
+
+        return searchList.filter(function(atID){
+            // match if atID is a match
+            // const lowerAtID = atID.toLowerCase();
+            // const atIDMatches = lowerAtID.match(regexQueryForAtID);
+
+            // also check if display_title is a match
+            const { display_title } = geneAtIDToGeneMap[atID];
+            const lowerDisplayTitle = display_title.toLowerCase();
+            const displayTitleMatches = lowerDisplayTitle.match(regexQueryForDisplayTitle);
+
+            return !!(displayTitleMatches); // !!(atIDMatches || displayTitleMatches)
+        });
+    }
+
+    return (
+        <>
+            <label className="w-100 text-small">
+                <i className="icon icon-star text-primary fas icon-fw"></i> Selected Gene for Interpretation
+            </label>
+            <div className="w-100 d-flex note-field-drop mb-1">
+                <SearchAsYouTypeLocal className={cls} searchList={genes} value={selectedGeneID} allowCustomValue={false}
+                    filterMethod="includes" onChange={(atID) => { onSelectGene((geneAtIDToGeneMap[atID])); } }
+                    maxResults={3} {...{ optionRenderFunction, titleRenderFunction, customFilterFunction }} />
+                {/* <Dropdown as={ButtonGroup} className={cls}> // keeping this around in case there are issues.
+                    <Dropdown.Toggle variant="outline-secondary text-left">
+                        { value || "Select an option..." }
+                    </Dropdown.Toggle>
+                    <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
+                </Dropdown> */}
+                { selectedGeneID ?
+                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onResetSelectedGenes(highlightedGene)}>
+                        <i className="icon icon-trash-alt fas" />
+                    </Button>
+                    : null}
+            </div>
+        </>
+    );
+}
 
 class GenericInterpretationPanel extends React.PureComponent {
     constructor(props) {
@@ -604,15 +1134,6 @@ class GenericInterpretationPanel extends React.PureComponent {
         // console.log("GenericInterpretationPanel state", stateToSave);
         // console.log("lastSavedNote", lastSavedNote);
 
-        // We presume props.caseSource doesnt' change in this component, if does, we can add `[ caseSource ]` as 2nd param to useCallback.
-        const onReturnToCaseClick = function(){
-            if (window && window.opener) {
-                window.close();
-                return;
-            }
-            // Fallback if no parent window:
-            return navigate(`/cases/${caseSource}/#case-info.interpretation`);
-        };
 
         return (
             <div className="interpretation-panel">
@@ -634,7 +1155,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={onReturnToCaseClick}>
+                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
                     </button> : null}
             </div>
@@ -845,6 +1366,26 @@ function getTooltipPerNoteType(noteType) {
     }
 }
 
+function SVGeneInterpretationSubmitButton(props) {
+    const {
+        geneAtIDToGeneMap,
+        highlightedGeneChangedSinceLastSave,
+        saveHighlightedGene,
+        hasEditPermission,
+        selectedGeneID,
+        cls = ""
+    } = props;
+
+    return (
+        <div data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item.": null }>
+            <Button variant="primary" className={"btn-block " + cls} onClick={() => saveHighlightedGene(geneAtIDToGeneMap[selectedGeneID])}
+                disabled={!hasEditPermission || !highlightedGeneChangedSinceLastSave}>
+                { !hasEditPermission ? "Need Edit Permission": "Save Highlighted Gene" }
+            </Button>
+        </div>
+    );
+}
+
 /**
  * Displays and handles different CTAs for various stages in the Note Submission Process
  */
@@ -856,7 +1397,7 @@ function GenericInterpretationSubmitButton(props) {
         noteTextPresent,            // Is there text in the note space?
         noteChangedSinceLastSave,   // Has the text in the note space changed since last save?
         saveAsDraft,                // Fx -- save as Draft
-        cls,                        // Classes to apply to the button
+        cls = "",                   // Classes to apply to the button
         hasEditPermission,          // Derived from actions
         noteType,                   // "note_interpretation", "note_discovery", etc.
         isFallback                  // Determined on render in VariantSampleOverview - is this using embed api "newContext" or context as fallback
@@ -872,7 +1413,7 @@ function GenericInterpretationSubmitButton(props) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
             <div data-tip={dataTip}>
-                <Button variant="primary btn-block" disabled className={cls}>
+                <Button variant="primary" disabled className={"btn-block " + cls}>
                     { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
                 </Button>
             </div>
@@ -880,7 +1421,7 @@ function GenericInterpretationSubmitButton(props) {
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
             <div data-tip={dataTip}>
-                <Button variant="primary btn-block" onClick={saveAsDraft} data-tip={dataTip}
+                <Button variant="primary" className={"btn-block " + cls} onClick={saveAsDraft} data-tip={dataTip}
                     disabled={allButtonsDropsDisabled}>
                     { isDraft ? "Re-save as Draft": "Save as Draft" }
                 </Button>

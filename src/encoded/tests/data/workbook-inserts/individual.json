@@ -85,7 +85,38 @@
         "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f92",
         "accession": "GAPID6ZUDPO2",
+        "mother": "GAPID6ZUD00M",
+        "father": "GAPID6ZUD00F",
         "sex": "F",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f93",
+        "mother": "GAPID6ZUD00M",
+        "father": "GAPID6ZUD00F",
+        "sex": "M",
+        "aliases": ["hms-dbmi:individual-455"],
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f94",
+        "accession": "GAPID6ZUD00M",
+        "sex": "F",
+        "is_deceased": false
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f95",
+        "accession": "GAPID6ZUD00F",
+        "sex": "M",
         "is_deceased": false
     },
     {
