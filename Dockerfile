@@ -1,6 +1,7 @@
 # CGAP-Portal (Production) Dockerfile
 # Take latest 3.7.12 Debian variant
-FROM python:3.7.12-slim-buster@sha256:66fbe736b614879d760c5569a775f2d8e6c3d60f9f33c6d39b1048a54f2d4cc0
+# FROM python:3.7.12-slim-buster@sha256:66fbe736b614879d760c5569a775f2d8e6c3d60f9f33c6d39b1048a54f2d4cc0
+FROM python:3.7.12-slim-bullseye
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
@@ -31,7 +32,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Note that the ordering of these operations is intentional to minimize package footprint
 WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
-COPY deploy/docker/production/install_nginx.sh /
+COPY deploy/docker/production/install_nginx_bullseye.sh /
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
