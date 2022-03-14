@@ -383,16 +383,16 @@ class Case(Item):
         """
         Map the SNV vcf file to be digested.
         """
-        vcf_file = {}
+        vcf_file = None
         if not sample_processing:
-            return vcf_file
+            return
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
         if not sp_data:
-            return vcf_file
+            return
         files_processed = sp_data.get('processed_files', [])
         if not files_processed:
-            return vcf_file
-        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
+            return
+        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
             file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
@@ -411,16 +411,16 @@ class Case(Item):
         """
         Map the SV vcf file to be digested.
         """
-        sv_vcf_file = {}
+        sv_vcf_file = None
         if not sample_processing:
-            return sv_vcf_file
+            return
         sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
         if not sp_data:
-            return sv_vcf_file
+            return
         files_processed = sp_data.get('processed_files', [])
         if not files_processed:
-            return sv_vcf_file
-        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
+            return
+        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
             file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type", "")
             file_variant_type = file_data.get("variant_type", "")
@@ -428,6 +428,32 @@ class Case(Item):
                 sv_vcf_file = file_data["@id"]
                 break
         return sv_vcf_file
+
+    @calculated_property(schema={
+        "title": "CNV VCF File",
+        "description": "VCF file that will be used in CNV ingestion",
+        "type": "string",
+        "linkTo": "File"
+    })
+    def cnv_vcf_file(self, request, sample_processing=None):
+        """Map the CNV vcf file to be ingested."""
+        cnv_vcf_file = None
+        if not sample_processing:
+            return
+        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        if not sp_data:
+            return
+        files_processed = sp_data.get('processed_files', [])
+        if not files_processed:
+            return
+        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
+            file_data = get_item_or_none(request, file_processed, 'files-processed')
+            file_type = file_data.get("file_type", "")
+            file_variant_type = file_data.get("variant_type", "")
+            if file_type == "full annotated VCF" and file_variant_type == "CNV":
+                cnv_vcf_file = file_data["@id"]
+                break
+        return cnv_vcf_file
 
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On",
@@ -466,7 +492,7 @@ class Case(Item):
             self, request, sample_processing=None, individual=None
     ):
         """
-        Use SV vcf file and sample accessions to limit structural variants/
+        Use SV and CNV VCF files and sample accessions to limit
         structural variant samples to this case.
         """
         if not individual or not sample_processing:
@@ -474,17 +500,22 @@ class Case(Item):
         sample = self.sample(request, individual, sample_processing)
         if not sample:
             return ''
-        vcf = self.structural_variant_vcf_file(request, sample_processing)
-        if not vcf:
+        sv_vcf = self.structural_variant_vcf_file(request, sample_processing)
+        cnv_vcf = self.cnv_vcf_file(request, sample_processing)
+        if not sv_vcf and not cnv_vcf:
             return ''
         sp_data = get_item_or_none(request, sample, 'sample')
         sample_read_group = sp_data.get('bam_sample_id', '')
         if not sample_read_group:
             return ''
-        vcf_acc = vcf.split('/')[2]
-        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        add_on = "CALL_INFO={}".format(sample_read_group)
+        if sv_vcf:
+            sv_vcf_accession = sv_vcf.split("/")[2]
+            add_on += "&file={}".format(sv_vcf_accession)
+        if cnv_vcf:
+            cnv_vcf_accession = cnv_vcf.split("/")[2]
+            add_on += "&file={}".format(cnv_vcf_accession)
         return add_on
-
 
     @calculated_property(schema={
         "title": "Additional Variant Sample Facets",

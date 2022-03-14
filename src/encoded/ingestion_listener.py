@@ -34,7 +34,11 @@ from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionR
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
 from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
+from .ingestion.variant_utils import (
+    VariantBuilder,
+    StructuralVariantBuilder,
+    CNVBuilder,
+)
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
@@ -605,6 +609,27 @@ class IngestionListener:
                         reader=Reader(formatted_vcf),
                     )
                     variant_builder = StructuralVariantBuilder(
+                        self.vapp,
+                        parser,
+                        file_meta["accession"],
+                        project=file_meta["project"]["@id"],
+                        institution=file_meta["institution"]["@id"],
+                    )
+                elif vcf_type == "CNV":
+                    decoded_content = gunzip_content(raw_content)
+                    debuglog('Got decoded content: %s' % decoded_content[:20])
+                    formatted_vcf = tempfile.NamedTemporaryFile(
+                        mode="w+", encoding="utf-8"
+                    )
+                    formatted_vcf.write(decoded_content)
+                    formatted_vcf.seek(0)
+                    parser = StructuralVariantVCFParser(
+                        None,
+                        STRUCTURAL_VARIANT_SCHEMA,
+                        STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
+                        reader=Reader(formatted_vcf),
+                    )
+                    variant_builder = CNVBuilder(
                         self.vapp,
                         parser,
                         file_meta["accession"],

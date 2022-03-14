@@ -836,6 +836,34 @@ def file_vcf(testapp, institution, project, file_formats):
     return testapp.post_json('/file_processed', item).json['@graph'][0]
 
 
+@pytest.fixture
+def file_vcf_sv(testapp, institution, project, file_formats):
+    item = {
+        "file_format": file_formats.get("vcf_gz").get("@id"),
+        "md5sum": "d41d8cd9f00b204e9800998ecf84212",
+        "institution": institution["@id"],
+        "project": project["@id"],
+        "status": "uploaded",  # avoid s3 upload codepath
+        "file_type": "full annotated VCF",
+        "variant_type": "SV",
+    }
+    return testapp.post_json("/file_processed", item).json["@graph"][0]
+
+
+@pytest.fixture
+def file_vcf_cnv(testapp, institution, project, file_formats):
+    item = {
+        "file_format": file_formats.get("vcf_gz").get("@id"),
+        "md5sum": "d41d8cd9f00b204e9800998ecf84213",
+        "institution": institution["@id"],
+        "project": project["@id"],
+        "status": "uploaded",  # avoid s3 upload codepath
+        "file_type": "full annotated VCF",
+        "variant_type": "CNV",
+    }
+    return testapp.post_json("/file_processed", item).json["@graph"][0]
+
+
 RED_DOT = """data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUA
 AAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO
 9TXL0Y4OHwAAAABJRU5ErkJggg=="""

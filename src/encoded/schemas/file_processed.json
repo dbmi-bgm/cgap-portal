@@ -169,7 +169,8 @@
             "type": "string",
             "enum": [
                 "SNV",
-                "SV"
+                "SV",
+                "CNV"
             ]
         }
     },
