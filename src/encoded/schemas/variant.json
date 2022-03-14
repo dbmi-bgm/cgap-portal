@@ -153,6 +153,7 @@
             "source_name": "CADD",
             "source_version": "v1.6",
             "description": "CADD Phred score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_CADD.html",
             "scope": "variant",
             "schema_title": "CADD Phred score"
         },
@@ -374,6 +375,7 @@
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
             "description": "GERP score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_gerp.html",
             "scope": "variant",
             "schema_title": "Gerp++ score"
         },
@@ -2018,6 +2020,7 @@
             "source_name": "UCSC - VEP",
             "source_version": "hg38",
             "description": "PhastCons 100 way score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_phastCons.html",
             "scope": "variant",
             "schema_title": "PhastCons (100 Vertebrates)"
         },
@@ -2030,6 +2033,7 @@
             "source_name": "UCSC - VEP",
             "source_version": "hg38",
             "description": "PhyloP 100 way score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_phyloP100.html",
             "scope": "variant",
             "schema_title": "PhyloP (100 Vertebrates)",
             "abbreviation": "PhyloP100",
@@ -2057,6 +2061,7 @@
             "source_name": "UCSC - VEP",
             "source_version": "hg38",
             "description": "PhyloP 30 way score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_phyloP30.html",
             "scope": "variant",
             "schema_title": "PhyloP (30 Mammals)"
         },
@@ -2093,6 +2098,7 @@
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
             "description": "PolyPhen 2 score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_PolyPhen2.html",
             "scope": "variant",
             "schema_title": "PolyPhen 2 score"
         },
@@ -2129,6 +2135,7 @@
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
             "description": "PrimateAI score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_PrimateAI.html",
             "scope": "variant",
             "schema_title": "PrimateAI score"
         },
@@ -2153,6 +2160,7 @@
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
             "description": "REVEL score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_REVEL.html",
             "scope": "variant",
             "schema_title": "REVEL score"
         },
@@ -2189,6 +2197,7 @@
             "source_name": "dbNSFP",
             "source_version": "v4.1a",
             "description": "SIFT score",
+            "extended_description": "src/encoded/docs/extended_description_Variant_SIFT.html",
             "scope": "variant",
             "schema_title": "SIFT score"
         },
@@ -2549,6 +2558,7 @@
             "do_import": true,
             "vcf_field": "spliceaiMaxds",
             "description": "maximum delta scores",
+            "extended_description": "src/encoded/docs/extended_description_Variant_SpliceAI.html",
             "scope": "variant",
             "schema_title": "SpliceAI Max Delta",
             "default": 0
