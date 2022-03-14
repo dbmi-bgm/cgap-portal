@@ -78,7 +78,8 @@ RUN poetry install --no-dev && \
 ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
-    rm -rf node_modules/
+    rm -rf node_modules/ && \
+    apt-get remove --purge --auto-remove -y ca-certificates
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
