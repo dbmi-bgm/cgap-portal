@@ -13,7 +13,7 @@ from .base import (
 
 
 def _build_meta_workflow_run_embedded_list():
-    """"""
+    """Create embedded list for MetaWorkflowRuns."""
     return [
         # MetaWorkflow linkTo
         "meta_workflow.title",
