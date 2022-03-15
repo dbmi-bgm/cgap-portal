@@ -3,11 +3,10 @@ import os
 from operator import itemgetter
 import jwt
 import datetime
-from base64 import b64decode
 import structlog
 
 from passlib.context import CryptContext
-from urllib.parse import urlencode, urlparse
+from urllib.parse import urlencode
 from pyramid.authentication import (
     BasicAuthAuthenticationPolicy as _BasicAuthAuthenticationPolicy,
     CallbackAuthenticationPolicy
@@ -19,21 +18,16 @@ from pyramid.path import (
 )
 from pyramid.security import (
     NO_PERMISSION_REQUIRED,
-    remember,
-    forget,
 )
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPUnauthorized,
-    HTTPFound
 )
 from pyramid.view import (
     view_config,
 )
-from pyramid.settings import asbool
 from snovault import (
     ROOT,
-    CONNECTION,
     COLLECTIONS
 )
 from dateutil.parser import isoparse
@@ -44,6 +38,7 @@ from snovault.validators import no_validate_item_content_post
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.schema_utils import validate_request
 from snovault.util import debug_log
+from .ingestion.common import CGAP_CORE_PROJECT
 
 
 log = structlog.getLogger(__name__)
@@ -578,12 +573,16 @@ def generate_password():
 @debug_log
 def create_unauthorized_user(context, request):
     """
-    Endpoint to create an unauthorized user, which will have no institution/project.
+    Endpoint that creates an unauthorized user - so we can distinguish between those added by admins
+    and through this API.
+    For CGAP, an "unauthorized user" has cgap-core project association and nothing else.
     Requires a reCAPTCHA response, which is propogated from the front end
     registration form. This is so the endpoint cannot be abused.
+    TODO: propagate key, secret from GAC
+
     Given a user properties in the request body, will validate those and also
     validate the reCAPTCHA response using the reCAPTCHA server. If all checks
-    are succesful, POST a new user
+    are successful, POST a new user and login
 
     Args:
         request: Request object
@@ -615,6 +614,7 @@ def create_unauthorized_user(context, request):
     del user_props['g-recaptcha-response']
     user_props['was_unauthorized'] = True
     user_props['email'] = user_props_email  # lowercased
+    user_props['project'] = CGAP_CORE_PROJECT  # give core project association
     user_coll = request.registry[COLLECTIONS]['User']
     request.remote_user = 'EMBED'  # permission = restricted_fields
 
@@ -633,9 +633,6 @@ def create_unauthorized_user(context, request):
     data = urlencode(recap_values).encode()
     headers = {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"}
     recap_res = requests.get(recap_url, params=data, headers=headers).json()
-
-    # take a look at this temporarily 
-    log.error(f'Recaptcha response: {recap_res}')
 
     if recap_res['success']:
         sno_res = sno_collection_add(user_coll, request, False)  # POST User
