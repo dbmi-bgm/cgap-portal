@@ -21,7 +21,7 @@ export default class UserRegistrationForm extends React.PureComponent {
     };
 
     static defaultProps = {
-        'captchaSiteKey' : '6Lf6dZYUAAAAAEq46tu1mNp0BTCyl0-_wuJAu3nj', // XXX: this probably needs to change
+        'captchaSiteKey' : '6Ldq_OIeAAAAAFyJU-_A_EuazErJnF8vMRFS4gaA', // XXX: this needs to be resolved another way
         'endpoint' : "/create-unauthorized-user"
     };
 
