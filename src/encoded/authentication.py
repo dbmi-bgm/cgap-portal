@@ -632,7 +632,10 @@ def create_unauthorized_user(context, request):
     }
     data = urlencode(recap_values).encode()
     headers = {"Content-Type": "application/x-www-form-urlencoded; charset=utf-8"}
-    recap_res =  requests.get(recap_url, params=data, headers=headers).json()
+    recap_res = requests.get(recap_url, params=data, headers=headers).json()
+
+    # take a look at this temporarily 
+    log.error(f'Recaptcha response: {recap_res}')
 
     if recap_res['success']:
         sno_res = sno_collection_add(user_coll, request, False)  # POST User
