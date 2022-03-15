@@ -594,6 +594,11 @@ def create_unauthorized_user(context, request):
     Raises:
         LoginDenied, HTTPForbidden, or ValidationFailure
     """
+    # env check
+    env_name = request.registry.settings('env.name')
+    if env_name != 'cgap-training':
+        raise LoginDenied(f'Tried to register on {env_name} when only cgap-training is valid')
+
     recaptcha_resp = request.json.get('g-recaptcha-response')
     if not recaptcha_resp:
         raise LoginDenied()

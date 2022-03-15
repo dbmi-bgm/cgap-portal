@@ -50,6 +50,10 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
                     <a href="#" className="text-500" onClick={onExitLinkClick}>use a different email address</a>{' '}
                     if you have an existing account.
                 </li>
+                <li>
+                    This registration form will only work on the cgap-training environment. If you are not on this
+                    environment please reach out to the CGAP team for help with account creation.
+                </li>
                 { isEmailAGmail?
                     <li>
                         If you prefer, you can use your institutional email address as your account ID by creating a new google account at{' '}
@@ -68,10 +72,8 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
                 <Modal.Title>Registration</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {/* <UserRegistrationForm heading={formHeading} schemas={schemas} unverifiedUserEmail={unverifiedUserEmail}
-                    onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
-                */}
-                <h4 className="text-400">Will be available sometime in the future.</h4>
+                <UserRegistrationForm heading={formHeading} schemas={schemas} unverifiedUserEmail={unverifiedUserEmail}
+                                      onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
             </Modal.Body>
         </Modal>
     );
