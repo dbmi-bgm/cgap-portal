@@ -15,6 +15,7 @@ DOCKER_DEVELOPMENT_INI_FILE = os.path.join(ROOT_DIR, "deploy/docker/local/docker
 DATA_SET_CHOICES = ['prod', 'test', 'local', 'deploy']
 DEFAULT_DATA_SET = 'local'
 
+
 def empty_assignment(line, expanded):
     ignored(line)
     return expanded.strip().endswith(': ""')
@@ -59,7 +60,7 @@ def main():
                         help="if supplied, causes inserts to be loaded (default: not loaded)")
     parser.add_argument("--run-tests", default=False, action="store_true",
                         help="if supplied, causes tests to be run in container (default: not tested)")
-    parser.add_argument('--s3-encrypt-key-id', default="",
+    parser.add_argument('--s3-encrypt-key-id', default=None,
                         help="an encrypt key id (default: the empty string)")
 
     args = parser.parse_args()

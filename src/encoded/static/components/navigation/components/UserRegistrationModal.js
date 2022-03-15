@@ -6,7 +6,7 @@ import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
 
 import { analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-/* import UserRegistrationForm from './../../forms/UserRegistrationForm'; */
+import UserRegistrationForm from './../../forms/UserRegistrationForm';
 
 
 
