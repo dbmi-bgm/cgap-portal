@@ -288,9 +288,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                     <div className="form-group">
                         <label htmlFor="pendingProject">Primary Project <span className="text-300">(Optional)</span></label>
-                        <div>
-                            <LookupProjectField onSelect={this.onSelectProject} currentProjectDetails={value_for_pending_project_details} onClear={this.onClearProject} />
-                        </div>
+                        <div><p>cgap-core</p></div>
                         <small className="form-text text-muted">
                             Project with which you are associated.
                         </small>
@@ -339,7 +337,8 @@ export default class UserRegistrationForm extends React.PureComponent {
 
 }
 
-
+// Use this once we have public projects that can be accessed. For now we should just rely on
+// using cgap-core as the core project - Will March 15 2022
 class LookupProjectField extends React.PureComponent {
 
     static fieldTitleColStyle = {
