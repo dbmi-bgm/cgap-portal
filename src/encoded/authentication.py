@@ -39,7 +39,7 @@ from snovault.validators import no_validate_item_content_post
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.schema_utils import validate_request
 from snovault.util import debug_log
-from .ingestion.common import CGAP_CORE_PROJECT
+from .ingestion.common import CGAP_TRAINING_PROJECT
 
 
 log = structlog.getLogger(__name__)
@@ -622,10 +622,10 @@ def create_unauthorized_user(context, request):
     del user_props['g-recaptcha-response']
     user_props['was_unauthorized'] = True
     user_props['email'] = user_props_email  # lower-cased
-    user_props['project'] = CGAP_CORE_PROJECT  # give core project association
+    user_props['project'] = CGAP_TRAINING_PROJECT  # give training project association
     user_props['project_roles'] = {
         "role": "scientist",
-        "project": CGAP_CORE_PROJECT
+        "project": CGAP_TRAINING_PROJECT
     }
     user_coll = request.registry[COLLECTIONS]['User']
     request.remote_user = 'EMBED'  # permission = restricted_fields
