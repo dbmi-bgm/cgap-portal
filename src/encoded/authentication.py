@@ -32,6 +32,7 @@ from snovault import (
 )
 from dateutil.parser import isoparse
 from dcicutils.misc_utils import remove_element
+from dcicutils.lang_utils import conjoined_list
 from snovault.validation import ValidationFailure
 from snovault.calculated import calculate_properties
 from snovault.validators import no_validate_item_content_post
@@ -66,6 +67,11 @@ JWT_ALL_ALGORITHMS = ['ES512', 'RS384', 'HS512', 'ES256', 'none',
 # we use for encoding. -kmp 19-Jan-2021
 
 JWT_DECODING_ALGORITHMS = [JWT_ENCODING_ALGORITHM] + remove_element(JWT_ENCODING_ALGORITHM, JWT_ALL_ALGORITHMS)
+
+
+# envs where the back-end will accept automated user registration
+# TODO: move to dcicutils
+AUTO_REGISTRATION_ENVS = ['cgap-training']
 
 
 def includeme(config):
@@ -596,11 +602,12 @@ def create_unauthorized_user(context, request):
     # env check
     env_name = request.registry.settings.get('env.name')
     if env_name != 'cgap-training':
-        raise LoginDenied(f'Tried to register on {env_name} when only cgap-training is valid')
+        raise LoginDenied(f'Tried to register on {env_name}. Self-registration is only enabled on '
+                          f'{conjoined_list(AUTO_REGISTRATION_ENVS)}')
 
     recaptcha_resp = request.json.get('g-recaptcha-response')
     if not recaptcha_resp:
-        raise LoginDenied(f'No response from recaptcha detected!')
+        raise LoginDenied(f'Did not receive response from recaptcha!')
 
     email = request._auth0_authenticated  # equal to: jwt_info['email'].lower()
     user_props = request.json
@@ -611,10 +618,15 @@ def create_unauthorized_user(context, request):
             headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
         )
 
+    # set user insert props
     del user_props['g-recaptcha-response']
     user_props['was_unauthorized'] = True
-    user_props['email'] = user_props_email  # lowercased
+    user_props['email'] = user_props_email  # lower-cased
     user_props['project'] = CGAP_CORE_PROJECT  # give core project association
+    user_props['project_roles'] = {
+        "role": "scientist",
+        "project": CGAP_CORE_PROJECT
+    }
     user_coll = request.registry[COLLECTIONS]['User']
     request.remote_user = 'EMBED'  # permission = restricted_fields
 

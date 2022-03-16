@@ -31,12 +31,15 @@ if sys.version_info.major < 3:
     raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
 
 
+# snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022
+CGAP_STATIC_MAX_AGE = 1800
+
+
 def static_resources(config):
     mimetypes.init()
     mimetypes.init([pkg_resources.resource_filename('encoded', 'static/mime.types')])
-    # snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for these - Will March 15 2022
-    config.add_static_view('static', 'static', cache_max_age=1800)
-    config.add_static_view('profiles', 'schemas', cache_max_age=1800)
+    config.add_static_view('static', 'static', cache_max_age=CGAP_STATIC_MAX_AGE)
+    config.add_static_view('profiles', 'schemas', cache_max_age=CGAP_STATIC_MAX_AGE)
 
     # Favicon
     favicon_path = '/static/img/favicon.ico'

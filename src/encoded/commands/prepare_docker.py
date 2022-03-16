@@ -61,7 +61,7 @@ def main():
     parser.add_argument("--run-tests", default=False, action="store_true",
                         help="if supplied, causes tests to be run in container (default: not tested)")
     parser.add_argument('--s3-encrypt-key-id', default=None,
-                        help="an encrypt key id (default: the empty string)")
+                        help="an encrypt key id (default: None)")
 
     args = parser.parse_args()
     logging.basicConfig()
