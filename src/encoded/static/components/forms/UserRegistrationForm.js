@@ -287,23 +287,14 @@ export default class UserRegistrationForm extends React.PureComponent {
                     <hr className="mt-1 mb-2" />
 
                     <div className="form-group">
-                        <label htmlFor="pendingProject">Primary Project <span className="text-300">(Optional)</span></label>
-                        <div><p>cgap-core</p></div>
+                        <label htmlFor="pendingProject">Primary Project <span className="text-300">(Selected for you)</span></label>
+                        <div><p>cgap-training</p></div>
                         <small className="form-text text-muted">
                             Project with which you are associated.
                         </small>
                     </div>
 
                     <JobTitleField {...{ value_for_pending_project, value_for_pending_project_details, schemas }}  />
-
-                    <div className="form-group">
-                        <label htmlFor="contactEmail">Preferred Contact Email <span className="text-300">(Optional)</span></label>
-                        <input name="preferred_email" type="text" onChange={this.onContactEmailChange}
-                            className={"form-control" + (!isContactEmailValid ? " is-invalid" : "")} />
-                        <small className="form-text text-muted">
-                            { isContactEmailValid ? "Preferred contact email, if different from login/primary email." : "Please enter a valid e-mail address." }
-                        </small>
-                    </div>
 
                     <div className="row">
                         <div className="col-12 col-lg-5">
