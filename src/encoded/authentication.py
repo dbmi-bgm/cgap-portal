@@ -623,10 +623,10 @@ def create_unauthorized_user(context, request):
     user_props['was_unauthorized'] = True
     user_props['email'] = user_props_email  # lower-cased
     user_props['project'] = CGAP_TRAINING_PROJECT  # give training project association
-    user_props['project_roles'] = {
+    user_props['project_roles'] = [{
         "role": "scientist",
         "project": CGAP_TRAINING_PROJECT
-    }
+    }]
     user_coll = request.registry[COLLECTIONS]['User']
     request.remote_user = 'EMBED'  # permission = restricted_fields
 
