@@ -31,11 +31,15 @@
             "description": "Location of the main html file",
             "format": "uri"
         },
-        "associated_meta_workflow_run": {
-            "title": "Associated MetaWorkflowRun",
-            "description": "The MetaWorkflowRun that produced this item",
-            "type": "string",
-            "format": "uuid"
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
         }
     },
     "facets": {

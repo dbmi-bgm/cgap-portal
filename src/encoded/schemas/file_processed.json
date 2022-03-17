@@ -187,12 +187,15 @@
                 ]
             }
         },
-        "associated_meta_workflow_run": {
-            "title": "Associated MetaWorkflowRun",
-            "description": "The MetaWorkflowRun that produced this item",
-            "comment": "Property included in meta_workflow_run.common_fields. Any changes here should also be made there.",
-            "type": "string",
-            "format": "uuid"
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
         },
         "vcf_to_be_ingested": {
             "title": "VCF to Ingest",
