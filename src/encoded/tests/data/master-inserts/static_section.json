@@ -204,20 +204,13 @@
         "uuid": "442c8aa0-dc6c-43d7-814a-854af460b051"
     },
     {
-        "name": "help/about/privacy-policy",
+        "name": "help.about.privacy-policy",
         "title": "Privacy Policy",
         "status": "public",
         "aliases": [],
-        "content": [
-            "442c8aa0-dc6c-43d7-814a-854af460b051"
-        ],
         "description": "Privacy policy for usage of the CGAP Portal",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "table-of-contents": {
-            "enabled": false,
-            "header-depth": 4
-        },
         "uuid": "db5ed2fd-b4fb-4f4d-9053-9991d90560b0"
     },
     {
