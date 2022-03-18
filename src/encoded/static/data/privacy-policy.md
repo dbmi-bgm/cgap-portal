@@ -61,4 +61,4 @@ address you have provided us, or by placing a prominent notice on our website.
 
 ## Contact Us
 
-If you have any questions about this Privacy Policy, please contact us via [support@4dnucleome.org](mailto:support@4dnucleome.org).
+If you have any questions about this Privacy Policy, please contact us via [cgap-support@hms-dbmi.atlassian.net](mailto:cgap-support@hms-dbmi.atlassian.net).
