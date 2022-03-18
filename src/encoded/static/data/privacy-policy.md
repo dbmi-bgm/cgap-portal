@@ -1,7 +1,7 @@
 
-Last updated on October 25th, 2018.
+Last updated on March 18th, 2022.
 
-The 4DN DCIC ("us", "we", or "our") operates https://data.4dnucleome.org (the "Portal"). This page informs you of our policies regarding the collection, use and disclosure of
+The CGAP Team ("us", "we", or "our") operates CGAP websites at multiple different URLs ("Portals"). This page informs you of our policies regarding the collection, use and disclosure of
 Personal Information we receive from users of the Portal. We use your Personal Information only for providing and improving the Portal. By using the Portal, you
 agree to the collection and use of information in accordance with this policy.
 
@@ -13,7 +13,7 @@ We may also provide your information to third parties in circumstances where we 
 
 ## Device Information Collected By Us
 
-We may collect non-personal information about the computer, mobile device or other device you use to access the Portal, such as IP address, geolocation information, unique device identifiers, browser type, browser language or other information of this nature. We use this information in an aggregate fashion to track access to the Portal. At no time do we disclose site usage by individual IP addresses. Web server logs are retained on a temporary basis and then deleted from our systems.
+We may collect non-personal information about the computer, mobile device or other device you use to access the Portal, such as IP address, geolocation information, unique device identifiers, browser type, browser language or other information of this nature. We use this information in an aggregate fashion to track access to the Portal. At no time do we disclose site usage by individual IP addresses. Web server logs are retained on a temporary basis and then deleted from our systems. Third-party partners such as Google Analytics may collect additional information about cross-device browsing habits of users who have turned on [Ads Personalization](https://support.google.com/ads/answer/2662856); some of this information may be shared with us and used to understand which devices are used to browse our portal and to improve user experience to cater to usage.
 
 ## Cookies
 
@@ -21,7 +21,7 @@ Cookies are files with small amount of data, which may include an anonymous uniq
 
 ## Third-Party Cookies
 
-Cookies may be set by an organization other than the 4DN DCIC or Harvard. These “third-party cookies” may, for example, originate from websites such as YouTube, Twitter, Facebook, Google Plus or other social media services for which 4DN DCIC has implemented authentication or “plug-ins.” Since the cookie policies of these sites change over time, you should determine their policies by visiting the privacy policy pages of these sites directly.
+Cookies may be set by an organization other than the CGAP or Harvard. These “third-party cookies” may, for example, originate from websites such as YouTube, Twitter, Facebook, Google Plus or other social media services for which CGAP has implemented authentication or “plug-ins.” Since the cookie policies of these sites change over time, you should determine their policies by visiting the privacy policy pages of these sites directly.
 You may disable cookies through your individual browser options. If you would like to learn more about cookies please refer to the following website: [http://www.allaboutcookies.org/](http://www.allaboutcookies.org/).
 
 ## Links to Third-Party Websites
@@ -47,7 +47,7 @@ and controlled entities, including this portal, may collect, use, and share info
 
 ## Changes To This Privacy Policy
 
-This Privacy Policy is effective as of October 25th, 2018 and will remain in effect except with respect to any
+This Privacy Policy is effective as of March 17th, 2022 and will remain in effect except with respect to any
 changes in its provisions in the future, which will be in effect immediately after being posted on this
 page.
 

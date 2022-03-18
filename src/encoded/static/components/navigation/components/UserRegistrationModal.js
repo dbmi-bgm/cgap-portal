@@ -51,8 +51,11 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
                     if you have an existing account.
                 </li>
                 <li>
-                    This registration form will only work on the cgap-training environment. If you are not on this
-                    environment please reach out to the CGAP team for help with account creation.
+                    For information on the CGAP login process, see our documentation <a href="/help/logging-in" target="_blank" rel="noreferrer noopener">here.</a>
+                </li>
+                <li>
+                    This registration form will only work on the <a href="https://cgap-training.hms.harvard.edu" target="_blank" rel="noreferrer noopener">cgap-training</a> environment.
+                    If you are not on this environment, please reach out to the CGAP team for help with account creation.
                 </li>
                 { isEmailAGmail?
                     <li>
