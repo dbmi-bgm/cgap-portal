@@ -47,7 +47,7 @@ and controlled entities, including this portal, may collect, use, and share info
 
 ## Changes To This Privacy Policy
 
-This Privacy Policy is effective as of March 17th, 2022 and will remain in effect except with respect to any
+This Privacy Policy is effective as of March 18th, 2022 and will remain in effect except with respect to any
 changes in its provisions in the future, which will be in effect immediately after being posted on this
 page.
 
