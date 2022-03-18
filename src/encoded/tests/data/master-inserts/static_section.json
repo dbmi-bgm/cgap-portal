@@ -194,7 +194,6 @@
         "uuid": "6f5c7fd0-b7e3-46e6-96f8-8bc22f153d52"
     },
     {
-        "lab": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "file": "/src/encoded/static/data/privacy-policy.md",
         "name": "help.about.privacy-policy.policy-content",
         "status": "public",
