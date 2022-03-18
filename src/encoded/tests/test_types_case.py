@@ -70,9 +70,30 @@ def test_case_second_family(testapp, proband_case, mother_case, fam, second_fam)
 
 
 def test_case_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
-    # add ann_vcf to sample_processing
+    """Test finding SNV VCF on Case.SampleProcessing"""
+    assert not proband_case["vcf_file"]
+    assert not mother_case["vcf_file"]
+
+    # Test VCF by file type
     file_id = file_vcf['@id']
-    testapp.patch_json(sample_proc_fam['@id'], {'processed_files': [file_id]})
+    patch_body = {"processed_files": [file_id]}
+    testapp.patch_json(sample_proc_fam['@id'], patch_body, status=200)
+    proband = testapp.get(proband_case['@id']).json
+    mother = testapp.get(mother_case['@id']).json
+    assert proband['vcf_file']['@id'] == file_id
+    assert mother['vcf_file']['@id'] == file_id
+
+    # Test no VCF without file type and property
+    file_patch_body = {"file_type": "foo"}
+    testapp.patch_json(file_id, file_patch_body, status=200)
+    proband = testapp.get(proband_case['@id']).json
+    mother = testapp.get(mother_case['@id']).json
+    assert not proband["vcf_file"]
+    assert not mother["vcf_file"]
+
+    # Test VCF by property
+    file_patch_body = {"vcf_to_ingest": True}
+    testapp.patch_json(file_id, file_patch_body, status=200)
     proband = testapp.get(proband_case['@id']).json
     mother = testapp.get(mother_case['@id']).json
     assert proband['vcf_file']['@id'] == file_id
@@ -80,8 +101,14 @@ def test_case_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case)
 
 
 def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+    """Test finding SV VCF on Case.SampleProcessing"""
+    assert not proband_case["structural_variant_vcf_file"]
+    assert not mother_case["structural_variant_vcf_file"]
+
     file_id = file_vcf["@id"]
     testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+
+    # Test SV VCF by file type
     testapp.patch_json(
         sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
     )
@@ -89,6 +116,22 @@ def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_ca
     mother = testapp.get(mother_case["@id"]).json
     assert proband["structural_variant_vcf_file"]["@id"] == file_id
     assert mother["structural_variant_vcf_file"]["@id"] == file_id
+
+    # Test no SV VCF without file type and property
+    file_patch_body = {"file_type": "foo"}
+    testapp.patch_json(file_id, file_patch_body, status=200)
+    proband = testapp.get(proband_case['@id']).json
+    mother = testapp.get(mother_case['@id']).json
+    assert not proband["structural_variant_vcf_file"]
+    assert not mother["structural_variant_vcf_file"]
+
+    # Test SV VCF by property
+    file_patch_body = {"vcf_to_ingest": True}
+    testapp.patch_json(file_id, file_patch_body, status=200)
+    proband = testapp.get(proband_case['@id']).json
+    mother = testapp.get(mother_case['@id']).json
+    assert proband['structural_variant_vcf_file']['@id'] == file_id
+    assert mother['structural_variant_vcf_file']['@id'] == file_id
 
 
 def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):

@@ -396,10 +396,10 @@ class Case(Item):
         if not files_processed:
             return vcf_file
         for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
-            # Look for appropriate file_type (old method) or vcf_to_be_ingested
+            # Look for appropriate file_type (old method) or vcf_to_ingest
             file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type")
-            file_vcf_to_ingest = file_data.get("vcf_to_be_ingested", False)
+            file_vcf_to_ingest = file_data.get("vcf_to_ingest", False)
             file_variant_type = file_data.get("variant_type", "SNV")
             if file_variant_type == "SNV":
                 if file_vcf_to_ingest or file_type == "full annotated VCF":
@@ -427,10 +427,10 @@ class Case(Item):
         if not files_processed:
             return sv_vcf_file
         for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
-            # Look for appropriate file_type (old method) or vcf_to_be_ingested
+            # Look for appropriate file_type (old method) or vcf_to_ingest
             file_data = get_item_or_none(request, file_processed, 'files-processed')
             file_type = file_data.get("file_type")
-            file_vcf_to_ingest = file_data.get("vcf_to_be_ingested", False)
+            file_vcf_to_ingest = file_data.get("vcf_to_ingest", False)
             file_variant_type = file_data.get("variant_type")
             if file_variant_type == "SV":
                 if file_vcf_to_ingest or file_type == "full annotated VCF":

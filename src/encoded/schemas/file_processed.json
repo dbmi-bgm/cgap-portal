@@ -197,7 +197,7 @@
                 "format": "uuid"
             }
         },
-        "vcf_to_be_ingested": {
+        "vcf_to_ingest": {
             "title": "VCF to Ingest",
             "description": "Whether file is a VCF with contents to ingest",
             "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
