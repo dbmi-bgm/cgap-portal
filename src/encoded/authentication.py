@@ -601,7 +601,7 @@ def create_unauthorized_user(context, request):
     """
     # env check
     env_name = request.registry.settings.get('env.name')
-    if env_name != 'cgap-training':
+    if env_name not in AUTO_REGISTRATION_ENVS:
         raise LoginDenied(f'Tried to register on {env_name}. Self-registration is only enabled on '
                           f'{conjoined_list(AUTO_REGISTRATION_ENVS)}')
 
