@@ -305,7 +305,7 @@ export default class UserRegistrationForm extends React.PureComponent {
                         </div>
                         <div className="col-12 col-lg-7">
                             <p>
-                                By signing up, you are agreeing to our <a href="/privacy-policy" target="_blank" rel="noreferrer noopener">Privacy Policy</a>.
+                                By signing up, you are agreeing to our <a href="/help/about/privacy-policy" target="_blank" rel="noreferrer noopener">Privacy Policy</a>.
                                 <br/>
                                 We may track your usage of the portal to help improve the quality of user experience and/or security assurance purposes.
                             </p>
