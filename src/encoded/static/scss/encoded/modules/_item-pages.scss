@@ -2528,10 +2528,10 @@ table.report-findings-table {
 .sample-variant-annotation-space-body {
 
 	.sv-snv-annotation { // only used when interpretation space is present to ensure contents don't get pushed off page
-        @media (min-width:992px) {
-            max-width: calc(100% - 375px);
-        }
-    }
+		@media (min-width:992px) {
+			max-width: calc(100% - 375px);
+		}
+	}
 
 	.card .inner-card-section {
 		// TODO: Maybe consider propagating further, overriding btn-outline-secondary or btn-secondary with
