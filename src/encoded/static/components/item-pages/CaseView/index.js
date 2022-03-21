@@ -232,7 +232,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <React.Fragment>
                 <h4 className="text-400 align-middle mt-0">Status Overview</h4>
                 <div className="search-table-wrapper">
-                    <EmbeddedCaseSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
+                    <EmbeddedCaseSearchTable session={session} facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
                 </div>
             </React.Fragment>
         );
@@ -367,7 +367,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
                         </InterpretationTabController>
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
+                    <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
@@ -539,7 +539,7 @@ class DotRouter extends React.PureComponent {
 }
 
 const DotRouterTab = React.memo(function DotRouterTab(props) {
-    const { tabTitle, dotPath, disabled, active, prependDotPath, children, ...passProps } = props;
+    const { tabTitle, dotPath, disabled = false, active, prependDotPath, children, ...passProps } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
@@ -651,18 +651,18 @@ const bioinfoPopoverContent = {
     ),
     filteredSNVIndelVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline-master.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
             remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
-            Briefly, these filters include: (1) removing intergenic variants; (2) whitelisting some variants based on VEP, ClinVar, and SpliceAI
+            Briefly, these filters include: (1) removing intergenic variants; (2) including some variants based on VEP, ClinVar, and SpliceAI
             annotations; (3) Removing variants with only intronic consequences; and (4) removing common variants based on gnomAD population allele
             frequency and a panel of unrelated samples.
         </div>
     ),
     filteredSVVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline-master.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
             remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
-            to fewer than 500. Briefly, these filters include: (1) whitelisting SVs based on VEP annotations; (2) removing SVs with only intronic
+            to fewer than 500. Briefly, these filters include: (1) including SVs based on VEP annotations; (2) removing SVs with only intronic
             or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
             population allele frequency, and a panel of 20 unrelated samples; and (4) removing SVs over a certain size.
         </div>

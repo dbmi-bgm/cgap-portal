@@ -26,7 +26,6 @@ from ..submit import (
     xls_to_json
 )
 
-pytestmark = [pytest.mark.working]
 
 TEST_INGESTION_ID1 = '123456-1243-1234-123456abcdef'
 TEST_INGESTION_ID2 = 'abcdef-1234-1234-abcdef123456'
@@ -59,6 +58,22 @@ def row_dict():
         'specimen type': 'Peripheral_Blood',
         'test requested': 'WGS',
         'test number': '2'
+    }
+
+
+@pytest.fixture
+def row_dict_uncle():
+    return {
+        'individual id': '455',
+        'family id': '333',
+        'sex': 'M',
+        'relation to proband': 'uncle',
+        'analysis id': '999',
+        'report required': 'N',
+        'specimen id': '3464460',
+        'specimen type': 'Peripheral_Blood',
+        'test requested': 'WGS',
+        'test number': '1'
     }
 
 
@@ -272,8 +287,8 @@ def big_family_rows():
 
 
 @pytest.fixture
-def example_rows_obj(example_rows, project, institution):
-    return AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+def example_rows_obj(testapp, example_rows, project, institution):
+    return AccessionMetadata(testapp, example_rows, project, institution, TEST_INGESTION_ID1)
 
 
 @pytest.fixture
@@ -364,14 +379,14 @@ class TestAccessionRow:
         ('test number', '1', 'encode-project:sample-3464467-WGS-1'),
         ('test number', None, 'encode-project:sample-3464467-WGS')
     ])
-    def test_row_sample_aliases(self, row_dict, col, val, sample_alias, project, institution):
+    def test_row_sample_aliases(self, testapp, row_dict, col, val, sample_alias, project, institution):
         if col:
             row_dict[col] = val
-        obj = AccessionRow(row_dict, 1, 'test-proj:fam', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'test-proj:fam', project['name'], institution['name'])
         assert obj.sample_alias == sample_alias
 
-    def test_extract_individual_metadata(self, row_dict, project, institution):
-        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+    def test_extract_individual_metadata(self, testapp, row_dict, project, institution):
+        obj = AccessionRow(testapp, row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.indiv_alias == 'encode-project:individual-456'
         assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
         assert obj.individual.metadata['individual_id'] == row_dict['individual id']
@@ -380,14 +395,14 @@ class TestAccessionRow:
         ('33', '1986', int),
         ('abc', 'def', str)
     ])
-    def test_extract_individual_metadata_nums(self, row_dict, age, birth_year, val_type, project, institution):
+    def test_extract_individual_metadata_nums(self, testapp, row_dict, age, birth_year, val_type, project, institution):
         """
         numerical values for age and birth year are expected
         text values for age and birth year should be passed on without errors to eventually fail validation
         """
         row_dict['age'] = age
         row_dict['birth year'] = birth_year
-        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert isinstance(obj.individual.metadata['age'], val_type)
         assert not obj.errors
 
@@ -395,14 +410,14 @@ class TestAccessionRow:
         ('proband', False),
         ('grandmother', True)
     ])
-    def test_extract_family_metadata_new(self, row_dict, project, institution, relation, error):
+    def test_extract_family_metadata_new(self, testapp, row_dict, project, institution, relation, error):
         """
         Currently without pedigree processing, can only parse proband/mother/father/sibling relationships.
         Other relationships like 'grandmother' should result in an error message, but in the future may
         be permitted with a pedigree file.
         """
         row_dict['relation to proband'] = relation
-        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.family.alias == 'test-proj:fam1'
         assert obj.family.metadata['members'] == ['encode-project:individual-456']
         if relation == 'proband':
@@ -411,7 +426,34 @@ class TestAccessionRow:
         # check for correct error message
         assert ('Row 1 - Invalid relation' in ''.join(obj.errors)) == error
 
-    def test_extract_sample_metadata(self, row_dict, project, institution):
+    def test_extract_family_metadata_extended_fail(self, testapp, row_dict_uncle,
+                                                   project, institution):
+        """
+        Currently without pedigree processing, can only parse proband/mother/father/sibling
+        relationships without pedigree file (but may pass if pedigree file has already been
+        uploaded with the relevant individual). This tests that a relationship like "uncle"
+        fails if pedigree hasn't been submitted first.
+        """
+        obj = AccessionRow(testapp, row_dict_uncle, 1, 'test-proj:fam1', project['name'], institution['name'])
+        assert obj.family.alias == 'test-proj:fam1'
+        assert obj.family.metadata['members'] == ['encode-project:individual-455']
+        assert len(obj.errors) > 0  # check presence of errors
+        # check for correct error message
+        assert 'Row 1 - Invalid relation' in ''.join(obj.errors)
+        assert 'please submit family history first' in ''.join(obj.errors)
+
+    def test_extract_family_metadata_extended_pass(self, workbook, es_testapp, row_dict_uncle):
+        """
+        Currently without pedigree processing, can only parse proband/mother/father/sibling
+        relationships without pedigree file (but may pass if pedigree file has already been
+        uploaded with the relevant individual). This tests that a relationship like "uncle"
+        passes if pedigree has been submitted first.
+        """
+        obj = AccessionRow(es_testapp, row_dict_uncle, 1, 'hms-dbmi:family-456', 'hms-dbmi', 'hms-dbmi')
+        assert obj.family.metadata['members'] == ['hms-dbmi:individual-455']
+        assert not obj.errors
+
+    def test_extract_sample_metadata(self, testapp, row_dict, project, institution):
         """
         Some fields are formatted differently in spreadsheets vs in DB -
         ex.
@@ -420,7 +462,7 @@ class TestAccessionRow:
         """
         row_dict['req accepted y/n'] = 'Yes'
         row_dict['specimen accepted by ref lab'] = "n"
-        obj = AccessionRow(row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'test-proj:fam1', project['name'], institution['name'])
         assert obj.sample.metadata['specimen_accession'] == row_dict['specimen id']
         assert obj.sample.metadata['specimen_accepted'] == 'No'
         assert obj.sample.metadata['specimen_type'] == 'peripheral blood'
@@ -428,11 +470,11 @@ class TestAccessionRow:
         assert obj.analysis.metadata['samples'] == [obj.sample.alias]
         assert obj.individual.metadata['samples'] == [obj.sample.alias]
 
-    def test_extract_file_metadata_valid(self, row_dict, project, institution):
+    def test_extract_file_metadata_valid(self, testapp, row_dict, project, institution):
         """expected file extensions in spreadsheet"""
         row_dict['files'] = 'f1.fastq.gz, f2.cram, f3.vcf.gz'
         files = [f.strip() for f in row_dict['files'].split(',')]
-        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'fam1', project['name'], institution['name'])
         assert files[0] in obj.files_fastq[0].alias
         assert obj.files_fastq[0].metadata['file_format'] == '/file-formats/fastq/'
         assert obj.files_fastq[0].metadata['file_type'] == 'reads'
@@ -440,21 +482,21 @@ class TestAccessionRow:
         assert files[2] in obj.files_processed[1].alias
         assert not obj.errors
 
-    def test_extract_file_metadata_uncompressed(self, row_dict, project, institution):
+    def test_extract_file_metadata_uncompressed(self, testapp, row_dict, project, institution):
         """filenames indicating uncompressed fastqs/vcfs should lead to errors"""
         row_dict['files'] = 'f1.fastq, f2.cram, f3.vcf'
         files = [f.strip() for f in row_dict['files'].split(',')]
-        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'fam1', project['name'], institution['name'])
         assert not obj.files_fastq
         assert obj.files_processed[0].alias == 'encode-project:f2.cram'
         assert files[2] not in ''.join([f.alias for f in obj.files_processed])
         assert all('File must be compressed' in error for error in obj.errors)
 
-    def test_extract_file_metadata_invalid(self, row_dict, project, institution):
+    def test_extract_file_metadata_invalid(self, testapp, row_dict, project, institution):
         """# file extensions other than fastq.gz,.cram, .vcf.gz should generate an error"""
         row_dict['files'] = 'f3.gvcf.gz'
         files = [f.strip() for f in row_dict['files'].split(',')]
-        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'fam1', project['name'], institution['name'])
         assert not obj.files_processed
         assert 'File extension on f3.gvcf.gz not supported - ' in ''.join(obj.errors)
 
@@ -469,10 +511,10 @@ class TestAccessionRow:
         ('specimen type', False),
         ('alsdkjfdk', False)
     ])
-    def test_found_missing_values(self, row_dict, project, institution, field, error):
+    def test_found_missing_values(self, testapp, row_dict, project, institution, field, error):
         """some columns are required for spreadsheet submission, others are optional."""
         row_dict[field] = None
-        obj = AccessionRow(row_dict, 1, 'fam1', project['name'], institution['name'])
+        obj = AccessionRow(testapp, row_dict, 1, 'fam1', project['name'], institution['name'])
         assert (len(obj.errors) > 0) == error
         assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
                 ''.format(field) in obj.errors) == error
@@ -493,18 +535,18 @@ class TestAccessionMetadata:
         assert fams['2222'] == proj_name + 'family-456'
         assert fams['3333'] == proj_name + 'family-555'
 
-    def test_get_analysis_types(self, example_rows_obj, example_rows, project, institution):
+    def test_get_analysis_types(self, testapp, example_rows_obj, example_rows, project, institution):
         """analysis type should be none if workup types in samples don't match"""
         a_types = example_rows_obj.analysis_types
         assert a_types['1111'] == 'WGS-Trio'
         assert a_types['2222'] == 'WGS'
         assert a_types['3333'] == 'WES-Group'
         example_rows[1]['test requested'] = 'WES'
-        new_obj = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        new_obj = AccessionMetadata(testapp, example_rows, project, institution, TEST_INGESTION_ID1)
         new_a_types = new_obj.analysis_types
         assert new_a_types['1111'] is None
 
-    def test_add_metadata_single_item(self, example_rows, project, institution):
+    def test_add_metadata_single_item(self, testapp, example_rows, project, institution):
         """
         if json for an item was already created in a previous row, any new fields for that
         item in the current row should be added to the existing json.
@@ -519,12 +561,12 @@ class TestAccessionMetadata:
                 {k: v for k, v in example_rows[1].items()}
             ]
             data[rowidx]['specimen accepted by ref lab'] = 'Y'
-        submission = AccessionMetadata(data, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, data, project, institution, TEST_INGESTION_ID1)
         assert len(submission.individuals) == 2
         assert len(submission.samples) == 2
         assert 'specimen_accepted' in list(submission.samples.values())[1]
 
-    def test_add_metadata_single_item_fastq(self, example_rows, project, institution):
+    def test_add_metadata_single_item_fastq(self, testapp, example_rows, project, institution):
         """
         if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
         duplicated if it is consistent.
@@ -532,7 +574,7 @@ class TestAccessionMetadata:
         # for rowidx in (1, 2):
         example_rows[0]['files'] = 'f1.fastq.gz, f2.fastq.gz'
         example_rows[1]['files'] = 'f1.fastq.gz, f2.fastq.gz'
-        submission = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, example_rows, project, institution, TEST_INGESTION_ID1)
         fastqs = list(submission.files_fastq.values())
         assert len(fastqs[1]['related_files']) == 1
 
@@ -540,7 +582,7 @@ class TestAccessionMetadata:
         ('f1.fastq.gz, f2.fastq.gz', 'f1.fastq.gz, f3.fastq.gz'),  # inconsistent pairing on first
         ('f1.fastq.gz, f2.fastq.gz', 'f4.fastq.gz, f2.fastq.gz')  # inconsistent pairing on second
     ])
-    def test_add_metadata_single_item_fastq_inconsistent(self, example_rows, files1, files2,
+    def test_add_metadata_single_item_fastq_inconsistent(self, testapp, example_rows, files1, files2,
                                                          project, institution):
         """
         if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
@@ -549,18 +591,18 @@ class TestAccessionMetadata:
         # for rowidx in (1, 2):
         example_rows[0]['files'] = files1
         example_rows[1]['files'] = files2
-        submission = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, example_rows, project, institution, TEST_INGESTION_ID1)
         assert 'Please ensure fastq is paired with correct file in all rows' in ''.join(submission.errors)
         # fastqs = list(submission.files_fastq.values())
         # assert len(fastqs[1]['related_files']) == 1
 
-    def test_add_metadata_single_item_same_sample_accession(self, example_rows_with_test_number,
+    def test_add_metadata_single_item_same_sample_accession(self, testapp, example_rows_with_test_number,
                                                             project, institution):
         """
         if samples have the same specimen_accession but different test number, the bam_sample_id
         should be unique but the specimen_accession should stay the same.
         """
-        submission = AccessionMetadata(example_rows_with_test_number,
+        submission = AccessionMetadata(testapp, example_rows_with_test_number,
                                         project, institution, TEST_INGESTION_ID1)
         accession1 = [item for item in submission.samples.values() if item['specimen_accession'] == '1']
         assert accession1[0]['specimen_accession'] == accession1[1]['specimen_accession']
@@ -571,23 +613,23 @@ class TestAccessionMetadata:
         ('mother', True),  # error if two members of family have same parental relation
         ('sister', False)  # two siblings can have same relation
     ])
-    def test_add_family_metadata(self, big_family_rows, project, institution, last_relation, error):
+    def test_add_family_metadata(self, testapp, big_family_rows, project, institution, last_relation, error):
         """
         tests handling of duplicate relations for parents vs siblings.
         before modification, fixture contains proband, mother, father, sister.
         """
         big_family_rows[4]['relation to proband'] = last_relation
-        submission = AccessionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, big_family_rows, project, institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
         assert len(fam['members']) == 5
         assert (len(submission.errors) > 0) == error
         assert ('Multiple values for relation' in ''.join(submission.errors)) == error
 
-    def test_add_sample_processing(self, example_rows, project, institution):
+    def test_add_sample_processing(self, testapp, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
         example_rows[6]['test requested'] = 'WGS'  # analysis 3333 will have mismatched workup type values
-        submission = AccessionMetadata(example_rows, project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, example_rows, project, institution, TEST_INGESTION_ID1)
         sps = submission.sample_processings
         assert sps['encode-project:analysis-1111']['analysis_type'] == 'WGS-Trio'
         assert sps['encode-project:analysis-2222']['analysis_type'] == 'WGS'
@@ -599,12 +641,12 @@ class TestAccessionMetadata:
         assert '3333 contain mis-matched or invalid workup type values' in ''.join(submission.errors)
 
     @pytest.mark.parametrize('case_id, report', [(None, True), ('Case123', True), ('Case123', False)])
-    def test_create_case_metadata(self, row_dict, case_id, report, project, institution):
+    def test_create_case_metadata(self, testapp, row_dict, case_id, report, project, institution):
         """tests case and report item creation after all rows processed"""
         if not report:
             row_dict['report required'] = 'N'
         row_dict['unique analysis id'] = case_id
-        submission = AccessionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, [row_dict], project, institution, TEST_INGESTION_ID1)
         case = list(submission.cases.values())[0]
         assert row_dict['individual id'] in case['individual']
         assert case['ingestion_ids'] == [TEST_INGESTION_ID1]
@@ -619,19 +661,19 @@ class TestAccessionMetadata:
             assert case['report']
 
     @pytest.mark.parametrize('case_id', [(None), ('Case123')])
-    def test_add_case_info(self, row_dict, case_id, project, institution):
+    def test_add_case_info(self, testapp, row_dict, case_id, project, institution):
         """tests that case ID from row gets added to proper dictionary attribute"""
         row_dict['unique analysis id'] = case_id
-        submission = AccessionMetadata([row_dict], project, institution, TEST_INGESTION_ID1)
+        submission = AccessionMetadata(testapp, [row_dict], project, institution, TEST_INGESTION_ID1)
         key = '{}-{}'.format(row_dict['analysis id'], row_dict['specimen id'])
         assert submission.case_info.get(key)['case id'] == case_id
 
-    def test_add_individual_relations(self, big_family_rows, project, institution):
+    def test_add_individual_relations(self, testapp, big_family_rows, project, institution):
         """
         tests that correct proband mother and father get added to individual item metadata
         after all rows are processed
         """
-        obj = AccessionMetadata(big_family_rows, project, institution, TEST_INGESTION_ID1)
+        obj = AccessionMetadata(testapp, big_family_rows, project, institution, TEST_INGESTION_ID1)
         proband = obj.individuals['encode-project:individual-456']
         sister = obj.individuals['encode-project:individual-546']
         brother = obj.individuals['encode-project:individual-555']
@@ -771,25 +813,25 @@ class TestPedigreeMetadata:
         assert len(fam['members']) == len(example_rows_pedigree)
 
     def test_add_family_metadata_db_single(self, workbook, es_testapp, example_rows_pedigree,
-                                           project, institution):
+                                           wb_project, wb_institution):
         """Tests that if a family ID is already in the database, the atid is used as an identifier instead
         of the new alias. Additionally, if the proband designation is missing from the family history rows,
         the PedigreeMetadata object still gets created without error messages when the family is in the DB already.
         """
         example_rows_pedigree[0]['proband'] == 'N'
-        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, wb_project, wb_institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 1
         fam = list(submission.families.values())[0]
         assert list(submission.families.keys())[0] == WORKBOOK_FAMILY_ID1
         assert len(fam['members']) == len(example_rows_pedigree)
         assert len(submission.errors) == 0
 
-    def test_add_family_metadata_db_multi(self, workbook, es_testapp, example_rows_pedigree, project, institution):
+    def test_add_family_metadata_db_multi(self, workbook, es_testapp, example_rows_pedigree, wb_project, wb_institution):
         """Tests that if 2 items are in the DB with same familyID, that both of these are reflected in the
         PedigreeMetadata object. Checks that both items have all members and proband of each isn't changed."""
         for row in example_rows_pedigree:
             row['family id'] = '0102'
-        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+        submission = PedigreeMetadata(es_testapp, example_rows_pedigree, wb_project, wb_institution, TEST_INGESTION_ID1)
         assert len(submission.families) == 2
         assert sorted(list(submission.families.keys())) == sorted([WORKBOOK_FAMILY_ID2, WORKBOOK_FAMILY_ID3])
         for fam in submission.families.values():
