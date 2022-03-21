@@ -251,6 +251,36 @@
             "type": "object",
             "additionalProperties": true
         },
+        "lifecycle_status": {
+            "title": "Lifecycle Status",
+            "description": "Lifecycle status for this MetaWorkflowRun",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "last_checked": {
+                    "title": "Last checked",
+                    "description": "Date when this MetaWorkflowRun was last checked",
+                    "type": "string",
+                    "anyOf": [
+                        {
+                            "format": "date-time"
+                        },
+                        {
+                            "format": "date"
+                        }
+                    ]
+                },
+                "status": {
+                    "title": "Status",
+                    "description": "Overall lifecycle status of this MetaworkflowRun",
+                    "type": "string",
+                    "enum": [
+                        "pending",
+                        "complete"
+                    ]
+                }
+            }
+        },
         "overall_qcs": {
             "title": "Overall QCs",
             "description": "QC tests for a given pipeline",
