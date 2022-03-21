@@ -11,6 +11,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { layout, ajax, console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas } from './../../util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import QuickPopover from '../components/QuickPopover';
 
 /**
  * Shared components between VariantSample and StructuralVariantSample item pages
@@ -340,14 +341,32 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
             <thead className="bg-transparent">
                 <tr>
                     <th className="text-left">Constraint</th>
-                    <th>Synonymous</th>
-                    <th>Missense</th>
-                    <th>LoF</th>
+                    <th>
+                        Synonymous
+                        <span data-tip="Score as applied to synonymous variants only. A dot (•) indicates the score is not applicable to synonymous variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
+                    </th>
+                    <th>
+                        Missense
+                        <span data-tip="Score as applied to missense variants only. A dot (•) indicates the score is not applicable to missense variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
+                    </th>
+                    <th>
+                        LoF
+                        <span data-tip="Score as applied to loss-of-function variants only. A dot (•) indicates the score is not applicable to LoF variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">Expected</td>
+                    <td className="text-600 text-left">
+                        Expected
+                        <QuickPopover popID="gene_exp" className="p-0 icon-sm ml-02">{genePopoverContents.expected}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("exp_syn")}>{ falsyZeroCheck(exp_syn, fallbackNotPresent)}</span>
                     </td>
@@ -359,7 +378,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Observed</td>
+                    <td className="text-600 text-left">
+                        Observed
+                        <QuickPopover popID="gene_obs" className="p-0 icon-sm ml-02">{genePopoverContents.observed}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("obs_syn")}>{ falsyZeroCheck(obs_syn, fallbackNotPresent)}</span>
                     </td>
@@ -371,7 +393,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">O/E (range)</td>
+                    <td className="text-600 text-left">
+                        O/E (range)
+                        <QuickPopover popID="gene_oerange" className="p-0 icon-sm ml-02">{genePopoverContents.oerange}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("oe_syn")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_syn), fallbackNotPresent)}</span>
                         { oe_syn_lower !== null && oe_syn_upper !== null ? ` (${oe_syn_lower} - ${oe_syn_upper})` : null }
@@ -386,7 +411,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Z-score</td>
+                    <td className="text-600 text-left">
+                        Z-score
+                        <QuickPopover popID="gene_zscore" className="p-0 icon-sm ml-02">{genePopoverContents.zscore}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("syn_z")}>{ falsyZeroCheck(shortenToSignificantDigits(syn_z), fallbackNotPresent)}</span>
                     </td>
@@ -398,7 +426,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">LOEUF</td>
+                    <td className="text-600 text-left">
+                        LOEUF
+                        <QuickPopover popID="gene_loeuf" className="p-0 icon-sm ml-02">{genePopoverContents.loeuf}</QuickPopover>
+                    </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
@@ -406,7 +437,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">S-Het</td>
+                    <td className="text-600 text-left">
+                        S-Het
+                        <QuickPopover popID="gene_shet" className="p-0 icon-sm ml-02">{genePopoverContents.shet}</QuickPopover>
+                    </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
@@ -414,7 +448,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">RVIS (ExAC)</td>
+                    <td className="text-600 text-left">
+                        RVIS (ExAC)
+                        <QuickPopover popID="gene_rvis" className="p-0 icon-sm ml-02">{genePopoverContents.rvis}</QuickPopover>
+                    </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
                         <span data-tip={getTipForField("rvis_exac")}>{ falsyZeroCheck(shortenToSignificantDigits(rvis_exac), fallbackNotPresent)}</span>
@@ -653,3 +690,46 @@ export function getInitialTranscriptIndex(transcript) {
     }
     return parseInt(initialIndex);
 }
+
+const linksToGnomad = <span>More information available <a href="https://gnomad.broadinstitute.org/help/constraint" target="_blank" rel="noreferrer">from gnomAD</a> and in the <a href="https://doi.org/10.1038/s41586-020-2308-7" target="_blank" rel="noreferrer">gnomAD flagship paper</a>.</span>;
+
+const genePopoverContents = {
+    expected: (
+        <p>
+            Expected variant counts (from gnomAD) for each mutation class. {linksToGnomad}
+        </p>
+    ),
+    observed: (
+        <p>
+            Observed variant counts (from gnomAD) for each mutation class. {linksToGnomad}
+        </p>
+    ),
+    oerange: (
+        <p>
+            Quotient of observed variant counts over expected variant counts (from gnomAD) for each variant class. {linksToGnomad}
+        </p>
+    ),
+    zscore: (
+        <p>
+            Z-score for observed vs expected variant counts (from gnomAD) for each variant class. {linksToGnomad}
+        </p>
+    ),
+    loeuf: (
+        <p>
+            Loss-of-function observed/expected upper bound fraction; a metric that is developed by the gnomAD team and supersedes pLI. Applicable to LoF variants only. {linksToGnomad}
+        </p>
+    ),
+    shet: (
+        <p>
+            S-het is a score representing an estimate of the genome-wide distribution of selective effects for heterozygous protein truncating variants. Applicable to LoF variants only.
+            For more information, see <a href="https://doi.org/10.1038/s41586-020-2308-7" target="_blank" rel="noreferrer">the publication</a>.
+        </p>
+    ),
+    rvis: (
+        <p>
+            Residual Variation Intolerance Score, a gene-based score formulated based on allele frequency data in the ExAC cohort. Applicable to missense variants only.&nbsp;
+            A positive score indicates more common functional variation in the gene compared to genome-wide expectation; a negative score indicates less functional variation or intolerance to variation.&nbsp;
+            More information available at <a href="http://genic-intolerance.org/about" target="_blank" rel="noreferrer">http://genic-intolerance.org/about</a>.
+        </p>
+    )
+};

@@ -13,19 +13,30 @@ import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
+import { CNVInterpretationSpace } from '../VariantSampleView/InterpretationSpaceController';
+import { LoadingInterpretationSpacePlaceHolder, convertQueryStringTypes } from '../VariantSampleView/VariantSampleOverview';
+import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 //import { OverviewTabTitle as VSOverviewTabTitle } from './../VariantSampleView/VariantSampleOverview';
 import QuickPopover from './../components/QuickPopover';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
-        const { context = null, schemas, href } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading } = this.props;
         const passProps = { context, schemas, href };
+
+        console.log("setissubmittingavailable", setIsSubmitting, isSubmitting, isSubmittingModalOpen);
+        const { query = {} } = memoizedUrlParse(href);
+        const { showInterpretation, annotationTab, interpretationTab, caseSource } = convertQueryStringTypes(query);
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <StructuralVariantSampleInfoHeader {...passProps} />
-                <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={1} />
+                <SelectedItemsController isMultiSelect={false} currentAction="selection">
+                    <SvInterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
+                        <StructuralVariantSampleInfoHeader {...passProps} />
+                        <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={1} />
+                    </SvInterpretationController>
+                </SelectedItemsController>
             </div>
         );
     }
@@ -47,7 +58,7 @@ function StructuralVariantSampleInfoHeader(props){
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
 
-                    { caseID ?
+                    {/* { caseID ?
                         <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4 className="text-truncate">Case ID</h4>
@@ -56,9 +67,9 @@ function StructuralVariantSampleInfoHeader(props){
                                 <h4 className="text-400 text-center w-100">{ caseID }</h4>
                             </div>
                         </div>
-                        : null }
+                        : null } */}
 
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-12 col-xl-7 pb-2">
                         <div className="info-header-title">
                             <h4>Variant Info</h4>
                         </div>
@@ -68,7 +79,7 @@ function StructuralVariantSampleInfoHeader(props){
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col-lg-3 pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-12 col-xl-5 pb-2">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
@@ -291,7 +302,8 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading,
+            selectedGenes, onSelectGene, onResetSelectedGenes } = this.props;
 
         const annotationTab = this.annotationTab();
 
@@ -307,7 +319,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
                 const commonBodyProps = { context, schemas, index, "active": index === annotationTab, "key": index };
                 switch (index) {
                     case 0: // Gene
-                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading, selectedGenes, onSelectGene, onResetSelectedGenes }} />);
                         this.openPersistentTabs[0] = true; // Persist open after first appearance.
                         break;
                     case 1: // Variant
@@ -355,6 +367,86 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
+
+class SvInterpretationController extends React.PureComponent {
+    // ACMG selection will be handled here, as well as any other selections that need to occur globally
+
+    componentDidUpdate(pastProps, pastState) {
+        const { newVSLoading: pastVSLoading, newContext: pastNewContext = null } = pastProps;
+        const { isMultiSelect, newVSLoading, newContext, onSelectItem: onSelectGene } = this.props;
+
+        // Finished loading new VS, now initialize highlighted gene selections.
+        if ((pastVSLoading && !newVSLoading) && (newContext && !pastNewContext)) {
+            const { highlighted_genes: [ highlightedGene = null ] = [] } = newContext;
+            if (highlightedGene) {
+                onSelectGene(highlightedGene, isMultiSelect);
+            }
+        }
+    }
+
+    render() {
+        const {
+            newVSLoading,
+            newContext = null,
+            context,
+            schemas,
+            children,
+            showInterpretation,
+            interpretationTab,
+            href,
+            caseSource,
+            setIsSubmitting,
+            isSubmitting,
+            isSubmittingModalOpen,
+            selectedItems: selectedGenes,
+            onSelectItem: onSelectGene,
+            onResetSelectedItems: onResetSelectedGenes
+        } = this.props;
+
+        console.log("selectedItemscontroller props?", this.props);
+        const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, selectedGenes, onSelectGene, onResetSelectedGenes };
+
+        // Pulling actions and checking for note errors with newcontext; use context if not present
+        const {
+            actions = [],
+            acmg_rules_invoked = [], // todo
+            interpretation: { error: interpError = null } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+            discovery_interpretation: { error: discoveryError = null } = {}
+        } = newContext || context || {};
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
+
+        const showInterpretationSpace = showInterpretation && !anyNotePermErrors && newContext && !newVSLoading;
+
+        const childrenWithSelectionProps = React.Children.map(children, function(child){
+            if (!React.isValidElement(child)){
+                throw new Error('SvInterpretationController expects props.children to be a valid React component instance(s).');
+            }
+            return React.cloneElement(child, passProps);
+        });
+
+        return (
+            <React.Fragment>
+                {/** ACMG Invoker will go here once new ACMG rules for SVs are determined; might be able to re-use components
+                 * from VariantSampleOverview and just use a new class for handling auto-classification. But also possibility that will need entirely new rules. */}
+                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                    <div className={`${showInterpretation || showInterpretationSpace ? "sv-snv-annotation": ""} col`} >
+                        {/* Annotation Space passed as child */}
+                        { childrenWithSelectionProps }
+                    </div>
+                    { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder headerTitle="SV / CNV Interpretation Space" /> : null }
+                    { showInterpretationSpace ?
+                        <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
+                            <CNVInterpretationSpace {...{ actions }} context={newContext}
+                                {...passProps} defaultTab={interpretationTab} />
+                        </div> : null }
+                </div>
+            </React.Fragment>
+        );
+    }
+}
 
 // This content is also in src/encoded/docs as an html file; if needed for facets, may use that
 const hg19PopoverTitle = "The hg19 coordinates for structural variants are calculated.";
