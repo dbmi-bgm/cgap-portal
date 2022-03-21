@@ -23,7 +23,7 @@ export function navigateChildWindow(targetHref, windowName = null, postMessage =
         childWindowByName[childWindowName] = window.open(
             targetHref,
             "cw-" + childWindowName,
-            "width=1200,height=900"
+            // "width=1200,height=900"
         );
     }
 }
@@ -39,5 +39,27 @@ export function onClickLinkNavigateChildWindow(e){
         return false;
     }
     navigateChildWindow(targetHref, childWindowName, childWindowPostMessage);
+    return false;
+}
+
+
+let newWindowCounter = 0;
+
+export function openNewChildWindow (targetHref, postMessage){
+    const currentCount = newWindowCounter++;
+    console.log("Openining window", currentCount);
+    return navigateChildWindow(targetHref, "nw" + currentCount, postMessage);
+}
+
+export function onClickOpenChildWindow(e) {
+    e.stopPropagation();
+    e.preventDefault();
+    const useEvtTarget = e.currentTarget || e.target;
+    const childWindowPostMessage = !(useEvtTarget.getAttribute("data-child-window-message") === "false");
+    const targetHref = useEvtTarget.href;
+    if (!targetHref || typeof targetHref !== "string" || targetHref === "#") {
+        return false;
+    }
+    openNewChildWindow(targetHref, childWindowPostMessage);
     return false;
 }
