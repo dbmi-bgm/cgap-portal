@@ -232,7 +232,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <React.Fragment>
                 <h4 className="text-400 align-middle mt-0">Status Overview</h4>
                 <div className="search-table-wrapper">
-                    <EmbeddedCaseSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
+                    <EmbeddedCaseSearchTable session={session} facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
                 </div>
             </React.Fragment>
         );
@@ -367,7 +367,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
                         </InterpretationTabController>
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
+                    <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
@@ -539,7 +539,7 @@ class DotRouter extends React.PureComponent {
 }
 
 const DotRouterTab = React.memo(function DotRouterTab(props) {
-    const { tabTitle, dotPath, disabled, active, prependDotPath, children, ...passProps } = props;
+    const { tabTitle, dotPath, disabled = false, active, prependDotPath, children, ...passProps } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
