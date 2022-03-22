@@ -112,6 +112,144 @@
             "type": "string",
             "lookup": 80,
             "linkTo": "User"
+        },
+        "lifecycle_policy": {
+            "title": "Lifecycle policy",
+            "description": "Contains rules how different categories of files are managed during their lifetime.",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "result": {
+                    "title": "Result files",
+                    "description": "Rules for result file (e.g. BAM files)",
+                    "type": "object",
+                    "required": [
+                        "expire_after"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "move_to_infrequent_access_after": {
+                            "title": "Move to Infrequent Access after",
+                            "description": "Time (in months) after which files are moved to Infrequent Access",
+                            "type": "integer"
+                        },
+                        "move_to_deep_archive_after": {
+                            "title": "Move to Deep Archive after",
+                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
+                            "type": "integer"
+                        },
+                        "expire_after": {
+                            "title": "Expire after",
+                            "description": "Time (in months) after which files are deleted",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "persistent_result": {
+                    "title": "Result files (long term availability)",
+                    "description": "Rules for result files that need to be accessible long term (e.g. Bamsnaps)",
+                    "type": "object",
+                    "required": [
+                        "expire_after"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "move_to_infrequent_access_after": {
+                            "title": "Move to Infrequent Access after",
+                            "description": "Time (in months) after which files are moved to Infrequent Access",
+                            "type": "integer"
+                        },
+                        "move_to_deep_archive_after": {
+                            "title": "Move to Deep Archive after",
+                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
+                            "type": "integer"
+                        },
+                        "expire_after": {
+                            "title": "Expire after",
+                            "description": "Time (in months) after which files are deleted",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "reads": {
+                    "title": "Read files",
+                    "description": "Input read files in fastq or cram format",
+                    "type": "object",
+                    "required": [
+                        "expire_after"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "move_to_infrequent_access_after": {
+                            "title": "Move to Infrequent Access after",
+                            "description": "Time (in months) after which files are moved to Infrequent Access",
+                            "type": "integer"
+                        },
+                        "move_to_deep_archive_after": {
+                            "title": "Move to Deep Archive after",
+                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
+                            "type": "integer"
+                        },
+                        "expire_after": {
+                            "title": "Expire after",
+                            "description": "Time (in months) after which files are deleted",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "intermediate_output": {
+                    "title": "Intermediate output files",
+                    "description": "Intermediate output files (e.g. intermediate BAM files)",
+                    "type": "object",
+                    "required": [
+                        "expire_after"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "move_to_infrequent_access_after": {
+                            "title": "Move to Infrequent Access after",
+                            "description": "Time (in months) after which files are moved to Infrequent Access",
+                            "type": "integer"
+                        },
+                        "move_to_deep_archive_after": {
+                            "title": "Move to Deep Archive after",
+                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
+                            "type": "integer"
+                        },
+                        "expire_after": {
+                            "title": "Expire after",
+                            "description": "Time (in months) after which files are deleted",
+                            "type": "integer"
+                        }
+                    }
+                },
+                "intermediate_result": {
+                    "title": "Intermediate result files",
+                    "description": "Intermediate result files (e.g. gvcf, rck.tar files)",
+                    "type": "object",
+                    "required": [
+                        "expire_after"
+                    ],
+                    "additionalProperties": false,
+                    "properties": {
+                        "move_to_infrequent_access_after": {
+                            "title": "Move to Infrequent Access after",
+                            "description": "Time (in months) after which files are moved to Infrequent Access",
+                            "type": "integer"
+                        },
+                        "move_to_deep_archive_after": {
+                            "title": "Move to Deep Archive after",
+                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
+                            "type": "integer"
+                        },
+                        "expire_after": {
+                            "title": "Expire after",
+                            "description": "Time (in months) after which files are deleted",
+                            "type": "integer"
+                        }
+                    }
+                }
+            }
         }
     }
 }
