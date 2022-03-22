@@ -6,7 +6,7 @@ import _ from 'underscore';
 import Modal from 'react-bootstrap/esm/Modal';
 
 import { analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-/* import UserRegistrationForm from './../../forms/UserRegistrationForm'; */
+import UserRegistrationForm from './../../forms/UserRegistrationForm';
 
 
 
@@ -50,6 +50,13 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
                     <a href="#" className="text-500" onClick={onExitLinkClick}>use a different email address</a>{' '}
                     if you have an existing account.
                 </li>
+                <li>
+                    For information on the CGAP login process, see our documentation <a href="/help/logging-in" target="_blank" rel="noreferrer noopener">here.</a>
+                </li>
+                <li>
+                    This registration form will only work on the <a href="https://cgap-training.hms.harvard.edu" target="_blank" rel="noreferrer noopener">cgap-training</a> environment.
+                    If you are not on this environment, please reach out to the CGAP team for help with account creation.
+                </li>
                 { isEmailAGmail?
                     <li>
                         If you prefer, you can use your institutional email address as your account ID by creating a new google account at{' '}
@@ -68,10 +75,8 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
                 <Modal.Title>Registration</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                {/* <UserRegistrationForm heading={formHeading} schemas={schemas} unverifiedUserEmail={unverifiedUserEmail}
-                    onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
-                */}
-                <h4 className="text-400">Will be available sometime in the future.</h4>
+                <UserRegistrationForm heading={formHeading} schemas={schemas} unverifiedUserEmail={unverifiedUserEmail}
+                                      onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
             </Modal.Body>
         </Modal>
     );

@@ -6,7 +6,7 @@
 
 import os
 import logging
-from dcicutils.qa_utils import override_environ
+from dcicutils.misc_utils import override_environ
 from dcicutils.deployment_utils import BasicOrchestratedCGAPIniFileManager
 from dcicutils.secrets_utils import assume_identity
 

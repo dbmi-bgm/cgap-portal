@@ -12,6 +12,10 @@ export function SvGeneTabBody (props){
 
     const {
         columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        selectedGenes,
+        onSelectGene,
+        savedVariantSampleIDMap = {},
+        isLoadingVariantSampleListItem,
         active = false,
         context,
         ...passProps
@@ -23,36 +27,14 @@ export function SvGeneTabBody (props){
         return {
             ...originalColExtMap,
             "display_title": {
-                render: function(result, props) {
-                    const { "@id" : atID = null, display_title, ensgid: thisGene } = result;
-                    const { link = null, align = "left", href, context, rowNumber, detailOpen, toggleDetailOpen } = props;
-
-                    const rows = [
-                        <span key="gene" className="d-block text-truncate">{ display_title } </span>
-                    ];
-
-                    // Filter out transcripts that are not for the current gene
-                    const filteredTranscripts = transcript.filter((t) => {
-                        const {
-                            csq_gene: { ensgid = "" } = {},
-                        } = t;
-                        return ensgid === thisGene;
-                    });
-
-                    // Displaying the canonical transcript; and if no canon available, the first transcript/same displayed under worst consequence
-                    if (filteredTranscripts.length > 0) {
-                        const transcriptIndex = getInitialTranscriptIndex(filteredTranscripts);
-                        const { csq_mane = null, csq_feature = null } = filteredTranscripts[transcriptIndex || 0];
-                        const transcriptDisplay = csq_mane || csq_feature;
-                        rows.push(<span key="transcript" className="font-italic d-block text-small">{ transcriptDisplay } </span>);
-                    }
-
+                "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
+                "render": function(result, props) {
+                    const { href, context, rowNumber, detailOpen, toggleDetailOpen } = props;
                     return (
-                        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
-                            <a href={link || atID || "#"} className="text-truncate">
-                                <StackedRowColumn className={"text-" + align} {...{ rows }} />
-                            </a>
-                        </DisplayTitleColumnWrapper>
+                        <SVGeneDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                            selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
+                            <SVGeneDisplayTitleColumn {...{ transcript }} />
+                        </SVGeneDisplayTitleColumnWrapper>
                     );
                 }
             },
@@ -105,14 +87,81 @@ export function SvGeneTabBody (props){
                         <h4>Gene List</h4>
                     </div>
                     <div className="info-body">
-                        <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref, columnExtensionMap }} columns={geneTableColumns}
-                            renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
+                        <EmbeddedItemSearchTable {...passProps} facets={null} {...{ searchHref, columnExtensionMap }} columns={geneTableColumns} selectedItems={selectedGenes} isMultiSelect={false} currentAction="selection"
+                            maxHeight={1400} renderDetailPane={(result, rowNumber, containerWidth, propsFromTable) => <SvGeneDetailPane {...{ result, rowNumber, containerWidth, context }} {...propsFromTable} />}/>
                     </div>
                 </div>
             </div>
         </div>
     );
 }
+
+function SVGeneDisplayTitleColumnWrapper(props) {
+    const {
+        result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+        selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem,
+        children
+    } = props;
+
+    let highlightedSelector = null;
+    if (selectedGenes && onSelectGene) { //savedVariantSampleIDMap
+        highlightedSelector = <HighlightedGeneSelector {...{ selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />;
+    }
+
+    return (
+        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen }}>
+            { highlightedSelector } { children }
+        </DisplayTitleColumnWrapper>
+    );
+}
+
+const SVGeneDisplayTitleColumn = React.memo(function SVGeneDispalyTitleColumn(props) {
+    const { transcript, result = null, link = null, align = "left", href, context, rowNumber, detailOpen, toggleDetailOpen } = props;
+    const { "@id" : atID = null, display_title, ensgid: thisGene } = result || {};
+
+    const rows = [
+        <span key="gene" className="d-block text-truncate">{ display_title } </span>
+    ];
+
+    // Filter out transcripts that are not for the current gene
+    const filteredTranscripts = transcript.filter((t) => {
+        const {
+            csq_gene: { ensgid = "" } = {},
+        } = t;
+        return ensgid === thisGene;
+    });
+
+    // Displaying the canonical transcript; and if no canon available, the first transcript/same displayed under worst consequence
+    if (filteredTranscripts.length > 0) {
+        const transcriptIndex = getInitialTranscriptIndex(filteredTranscripts);
+        const { csq_mane = null, csq_feature = null } = filteredTranscripts[transcriptIndex || 0];
+        const transcriptDisplay = csq_mane || csq_feature;
+        rows.push(<span key="transcript" className="font-italic d-block text-small">{ transcriptDisplay } </span>);
+    }
+
+    return (
+        <a href={link || atID || "#"} className="text-truncate">
+            <StackedRowColumn className={"text-" + align} {...{ rows }} />
+        </a>
+    );
+});
+
+export const HighlightedGeneSelector = React.memo(function HighlightedGeneSelector(props){
+    const { selectedGenes, result, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem = false } = props;
+    const { "@id": resultID } = result;
+    const isPrevSaved = savedVariantSampleIDMap[resultID];
+    const isSelected = selectedGenes.has(resultID);
+    const isChecked = isPrevSaved || isSelected;
+    console.log("isPrevSaved, isSelected", isPrevSaved, isSelected);
+
+    const onChange = useCallback(function(e){
+        console.log("clicking onSelectGene, ", result);
+        return onSelectGene(result, false, false);
+    }, [ onSelectGene, result ]);
+
+    // return <input type="checkbox" cls="m-0 mr-2" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
+    return <StarCheckboxInput cls="m-0 mr-2" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
+});
 
 const geneTableColumns = {
     "display_title": {
@@ -148,4 +197,30 @@ const geneTableColumns = {
         "title": "o/e (LoF)",
         "order": 4
     }
+};
+
+export const StarCheckboxInput = function(props) {
+    const { disabled, checked, onChange, cls } = props;
+    const checkedJSX = <i className="icon icon-star fas text-primary" />;
+    const uncheckedJSX = <i className="icon icon-star far text-secondary" />;
+    const disabledJSX = <i className="icon icon-star fas text-muted unclickable" />;
+    const uncheckedDisabledJSX = <i className="icon icon-star far text-muted unclickable" />;
+    return <CustomCheckboxInput {...{ disabled, checked, onChange, checkedJSX, uncheckedJSX, disabledJSX, uncheckedDisabledJSX, cls }} />;
+};
+
+
+export const CustomCheckboxInput = function(props) {
+    const { disabled, checked, onChange, checkedJSX, uncheckedJSX, disabledJSX, uncheckedDisabledJSX, cls } = props;
+
+    return (
+        <label className={"custom-checkbox-input inline-block " + cls}>
+            <input className="d-none" type="checkbox" {...{ checked, disabled, onChange }} />
+            <span>
+                { (!checked && !disabled) && <span className="custom-check-unchecked">{ uncheckedJSX }</span>}
+                { (checked && !disabled) && <span className="custom-check-checked">{ checkedJSX }</span>}
+                { (checked && disabled) && <span className="custom-check-checked-disabled">{ disabledJSX }</span>}
+                { (!checked && disabled) && <span className="custom-check-unchecked-disabled">{ uncheckedDisabledJSX }</span>}
+            </span>
+        </label>
+    );
 };

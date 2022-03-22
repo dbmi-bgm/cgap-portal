@@ -12,7 +12,7 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 import { buildSchemaFacetDictionary } from './../../util/Schemas';
-import { onClickLinkNavigateChildWindow } from './../components/child-window-reuser';
+import { onClickLinkNavigateChildWindow, onClickOpenChildWindow } from './../components/child-window-reuser';
 
 import {
     structuralVariantSampleColumnExtensionMap,
@@ -396,7 +396,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             { (variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle) || "Gene, Transcript" }
                         </label>
                         <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
-                            onClick={onClickLinkNavigateChildWindow}>
+                            onClick={onClickOpenChildWindow}>
                             { variantIsSNV ?
                                 <GenesMostSevereDisplayTitle result={variantSample} align="left" />
                                 :
@@ -527,7 +527,7 @@ function InterpretationTabVariantSampleTitle(props){
             <React.Fragment>
                 <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
-                <a href={targetHref} onClick={onClickLinkNavigateChildWindow}>
+                <a href={targetHref} onClick={onClickOpenChildWindow}>
                     { variantDisplayTitle }
                 </a>
             </React.Fragment>

@@ -18,6 +18,42 @@
         "uuid": "f99fbe38-962d-4370-9107-a703544f15ad"
     },
     {
+        "file": "/docs/public/help/tutorials_1.html",
+        "name": "help.tutorials.1",
+        "title": "Analyzing Cases in CGAP",
+        "status": "public",
+        "aliases": [
+            "cgap-core:tutorials-1"
+        ],
+        "options": {
+            "filetype": "html",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "e11fbe38-863d-4370-9107-b703556f15fd"
+    },
+    {
+        "file": "/docs/public/help/tutorials_2.html",
+        "name": "help.tutorials.2",
+        "title": "Submitting Files to CGAP",
+        "status": "public",
+        "aliases": [
+            "cgap-core:tutorials-2"
+        ],
+        "options": {
+            "filetype": "html",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "e22fbe49-863d-1156-9107-b703556f15ba"
+    },
+    {
         "file": "/docs/public/help/annotation_browser.md",
         "name": "help.annotation_browser.content",
         "status": "public",
@@ -156,6 +192,16 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "section_type": "Page Section",
         "uuid": "6f5c7fd0-b7e3-46e6-96f8-8bc22f153d52"
+    },
+    {
+        "file": "/src/encoded/static/data/privacy-policy.md",
+        "name": "help.about.privacy-policy.policy-content",
+        "status": "public",
+        "aliases": [],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "442c8aa0-dc6c-43d7-814a-854af460b051"
     },
     {
         "file": "/docs/public/help/developer_facing_docs.md",
