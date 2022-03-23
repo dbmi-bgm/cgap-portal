@@ -37,6 +37,16 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
                     <div className="info-header-title">
+                        <h4>BIC-seq2 - Caller Properties</h4>
+                    </div>
+                    <div className="info-body">
+                        <SvBicSeqTable {...{ context, getTipForField }} />
+                    </div>
+                </div>
+            </div>
+            <div className="row flex-column flex-lg-row">
+                <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
+                    <div className="info-header-title">
                         <h4>Genotype</h4>
                     </div>
                     <div className="info-body">
@@ -89,6 +99,56 @@ function SvMantaTable(props) {
                         <td className="text-600 text-left">Confidence interval around right breakpoint</td>
                         <td className="text-left">{endExists ? confidence_interval_end.join(", "): fallbackElem}</td>
                         <td className="text-left">{ getTipForField("confidence_interval_end", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
+}
+
+function SvBicSeqTable(props) {
+    const {
+        context: {
+            bicseq2_observed_reads = "",
+            bicseq2_expected_reads,
+            bicseq2_log2_copy_ratio,
+            bicseq2_pvalue
+        } = {},
+        getTipForField
+    } = props;
+    
+    const fallbackElem = <em> - </em>;
+
+    return (
+        <div className="table-responsive">
+            <table className="w-100">
+                <thead>
+                    <tr>
+                        <th className="text-left" style={{ width: "325px" }}>Quality</th>
+                        <th className="text-left">Value</th>
+                        <th className="text-left">Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="text-600 text-left">Number of Observed Reads</td>
+                        <td className="text-left">{bicseq2_observed_reads || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_observed_reads")}</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of Expected Reads</td>
+                        <td className="text-left">{bicseq2_expected_reads || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_expected_reads")}</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Copy Ratio [log2]</td>
+                        <td className="text-left">{bicseq2_log2_copy_ratio || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_log2_copy_ratio")}</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">P-value</td>
+                        <td className="text-left">{bicseq2_pvalue || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_pvalue")}</td>
                     </tr>
                 </tbody>
             </table>
