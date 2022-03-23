@@ -27,10 +27,10 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>Breakpoint Confidence Intervals</h4>
+                        <h4>Manta - Caller Properties</h4>
                     </div>
                     <div className="info-body">
-                        <SvQualityTable {...{ context, getTipForField }} />
+                        <SvMantaTable {...{ context, getTipForField }} />
                     </div>
                 </div>
             </div>
@@ -49,7 +49,7 @@ export const SvSampleTabBody = (props) => {
 };
 
 
-function SvQualityTable(props) {
+function SvMantaTable(props) {
     const {
         context: {
             confidence_interval_start = [],
