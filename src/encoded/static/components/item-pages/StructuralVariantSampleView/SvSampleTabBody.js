@@ -62,6 +62,7 @@ export const SvSampleTabBody = (props) => {
 function SvMantaTable(props) {
     const {
         context: {
+            callers = [],
             confidence_interval_start = [],
             confidence_interval_end = [],
             imprecise = null
@@ -69,6 +70,10 @@ function SvMantaTable(props) {
         getTipForField
     } = props;
     const fallbackElem = <em> - </em>;
+
+    if (!callers.length || !callers.includes("Manta")) {
+        return <div class="font-italic text-larger text-center py-4">Variant not detected by Manta</div>;
+    }
 
     const startExists = confidence_interval_start.length > 0;
     const endExists = confidence_interval_end.length > 0;
@@ -109,6 +114,7 @@ function SvMantaTable(props) {
 function SvBicSeqTable(props) {
     const {
         context: {
+            callers = [],
             bicseq2_observed_reads = "",
             bicseq2_expected_reads,
             bicseq2_log2_copy_ratio,
@@ -116,6 +122,10 @@ function SvBicSeqTable(props) {
         } = {},
         getTipForField
     } = props;
+
+    if (!callers.length || !callers.includes("BIC-seq2")) {
+        return <div class="font-italic text-larger text-center py-4">Variant not detected by BIC-seq2</div>;
+    }
     
     const fallbackElem = <em> - </em>;
 
