@@ -18,7 +18,7 @@ import { VariantSampleSelectionList } from './VariantSampleSelection';
 export class InterpretationTabController extends React.Component {
 
     static propTypes = {
-        "variantSampleListItem": PropTypes.object.isRequired,
+        "variantSampleListItem": PropTypes.object,
         "children": PropTypes.element
     };
 

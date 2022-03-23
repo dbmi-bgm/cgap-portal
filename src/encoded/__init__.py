@@ -18,7 +18,7 @@ from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
 from .local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
-from snovault.app import STATIC_MAX_AGE, session, json_from_path, configure_dbsession, changelogs, json_asset
+from snovault.app import session, json_from_path, configure_dbsession, changelogs, json_asset
 from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
@@ -31,11 +31,15 @@ if sys.version_info.major < 3:
     raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
 
 
+# snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022
+CGAP_STATIC_MAX_AGE = 1800
+
+
 def static_resources(config):
     mimetypes.init()
     mimetypes.init([pkg_resources.resource_filename('encoded', 'static/mime.types')])
-    config.add_static_view('static', 'static', cache_max_age=STATIC_MAX_AGE)
-    config.add_static_view('profiles', 'schemas', cache_max_age=STATIC_MAX_AGE)
+    config.add_static_view('static', 'static', cache_max_age=CGAP_STATIC_MAX_AGE)
+    config.add_static_view('profiles', 'schemas', cache_max_age=CGAP_STATIC_MAX_AGE)
 
     # Favicon
     favicon_path = '/static/img/favicon.ico'

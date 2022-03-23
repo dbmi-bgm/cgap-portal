@@ -1,6 +1,8 @@
 # CGAP-Portal (Production) Dockerfile
 # Take latest 3.7.12 Debian variant
 FROM python:3.7.12-slim-buster
+# bullseye seems to perform worse
+#FROM python:3.7.12-slim-bullseye
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
@@ -20,7 +22,7 @@ ENV NGINX_USER=nginx \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     NVM_VERSION=v0.39.1 \
-    NODE_VERSION=12.22.9
+    NODE_VERSION=16.14.0
 
 # Configure Python3.7 venv
 ENV VIRTUAL_ENV=/opt/venv
@@ -31,7 +33,7 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 # Note that the ordering of these operations is intentional to minimize package footprint
 WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
-COPY deploy/docker/production/install_nginx.sh /
+COPY deploy/docker/production/install_nginx.sh /install_nginx.sh
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
@@ -78,7 +80,8 @@ RUN poetry install --no-dev && \
 ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
-    rm -rf node_modules/
+    rm -rf node_modules/ && \
+    apt-get remove --purge --auto-remove -y ca-certificates
 
 # Copy config files in (down here for quick debugging)
 # Remove default configuration from Nginx
