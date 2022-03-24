@@ -480,7 +480,7 @@ function falsyZeroCheck(value, fallback) {
  *   We have `valueTransforms.roundLargeNumber(num, decimalPlaces = 2)` function already which can just be re-used if we paramaterize its `numberLevels`.
  *       (currently: `['', 'k', 'm', ' billion', ' trillion', ' quadrillion', ' quintillion']`)
  */
-function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
+export function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
 
     if (!numberToShorten) {
         // Pass through falsy values such as "0" (doesnt need shortening) or null, false, undefined.
