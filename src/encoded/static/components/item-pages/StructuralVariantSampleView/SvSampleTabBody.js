@@ -3,6 +3,7 @@
 import React from 'react';
 import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { shortenToSignificantDigits } from '../VariantSampleView/AnnotationSections';
 
 
 export const SvSampleTabBody = (props) => {
@@ -134,7 +135,7 @@ function SvBicSeqTable(props) {
             <table className="w-100">
                 <thead>
                     <tr>
-                        <th className="text-left" style={{ width: "325px" }}>Quality</th>
+                        <th className="text-left" style={{ width: "200px" }}>Quality</th>
                         <th className="text-left">Value</th>
                         <th className="text-left">Definition</th>
                     </tr>
@@ -166,7 +167,7 @@ function SvBicSeqTable(props) {
                     </tr>
                     <tr>
                         <td className="text-600 text-left">P-value</td>
-                        <td className="text-left">{bicseq2_pvalue || fallbackElem}</td>
+                        <td className="text-left">{shortenToSignificantDigits(bicseq2_pvalue, 2) || fallbackElem}</td>
                         <td className="text-left">{getTipForField("bicseq2_pvalue")}</td>
                     </tr>
                 </tbody>
