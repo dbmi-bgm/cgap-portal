@@ -135,7 +135,7 @@ function SvBicSeqTable(props) {
             <table className="w-100">
                 <thead>
                     <tr>
-                        <th className="text-left" style={{ width: "320px" }}>Quality</th>
+                        <th className="text-left" style={{ width: "200px" }}>Quality</th>
                         <th className="text-left">Value</th>
                         <th className="text-left">Definition</th>
                     </tr>
@@ -154,7 +154,7 @@ function SvBicSeqTable(props) {
                     <tr>
                         <td className="text-600 text-left">Copy Ratio [log2]</td>
                         <td className="text-left">
-                            <div className="text-nowrap">
+                            <div className="text-nowrap mr-1">
                                 {bicseq2_log2_copy_ratio || fallbackElem}
                                 <i className="ml-02 font-xs icon icon-info-circle fas" data-html 
                                     data-tip={`

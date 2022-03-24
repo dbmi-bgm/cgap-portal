@@ -206,7 +206,7 @@ function GeneInfoSection({ context }) {
         structural_variant: { gene_summary: { contained = fallbackElem, at_breakpoint = fallbackElem, omim_genes = fallbackElem } = {} } = {}
     } = context;
     return (
-        <div className="col-12">
+        <div className="col-auto" style={{ maxWidth: "400px"}}>
             <div className="row pb-1 pb-md-03">
                 <div className="col-12 col-md-8">
                     <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
