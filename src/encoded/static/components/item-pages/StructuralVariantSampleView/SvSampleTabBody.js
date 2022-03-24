@@ -135,7 +135,7 @@ function SvBicSeqTable(props) {
             <table className="w-100">
                 <thead>
                     <tr>
-                        <th className="text-left" style={{ width: "200px" }}>Quality</th>
+                        <th className="text-left" style={{ width: "320px" }}>Quality</th>
                         <th className="text-left">Value</th>
                         <th className="text-left">Definition</th>
                     </tr>
@@ -154,14 +154,16 @@ function SvBicSeqTable(props) {
                     <tr>
                         <td className="text-600 text-left">Copy Ratio [log2]</td>
                         <td className="text-left">
-                            {bicseq2_log2_copy_ratio || fallbackElem}
-                            <i className="ml-02 font-xs icon icon-info-circle fas" data-html 
-                                data-tip={`
-                                <div class="mb-05"><u>Positive Value</u>: Indicates an excess of reads,</br>
-                                suggesting a possible duplication.</div>
-                                <div><u>Negative Value</u>: Indicates a depletion of reads,</br>
-                                suggesting a possible deletion.</div>`}
-                            />
+                            <div className="text-nowrap">
+                                {bicseq2_log2_copy_ratio || fallbackElem}
+                                <i className="ml-02 font-xs icon icon-info-circle fas" data-html 
+                                    data-tip={`
+                                    <div class="mb-05"><u>Positive Value</u>: Indicates an excess of reads,</br>
+                                    suggesting a possible duplication.</div>
+                                    <div><u>Negative Value</u>: Indicates a depletion of reads,</br>
+                                    suggesting a possible deletion.</div>`}
+                                />
+                            </div>
                         </td>
                         <td className="text-left">{getTipForField("bicseq2_log2_copy_ratio")}</td>
                     </tr>
