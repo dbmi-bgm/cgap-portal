@@ -16,7 +16,7 @@
 // Import commands.js using ES2015 syntax:
 import './commands';
 // Tools for loading up database with for-Cypress inserts.
-import './post-inserts';
+// import './post-inserts';
 
 // Alternatively you can use CommonJS syntax:
 // require('./commands')
