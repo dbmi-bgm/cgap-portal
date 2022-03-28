@@ -2,7 +2,6 @@
 
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
-import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import memoize from "memoize-one";
 
