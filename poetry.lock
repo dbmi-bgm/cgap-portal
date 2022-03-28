@@ -1974,11 +1974,11 @@ testing = ["pytest", "coverage", "pytest-cov"]
 
 [[package]]
 name = "waitress"
-version = "2.1.1"
+version = "2.0.0"
 description = "Waitress WSGI server"
 category = "main"
 optional = false
-python-versions = ">=3.7.0"
+python-versions = ">=3.6.0"
 
 [package.extras]
 docs = ["Sphinx (>=1.8.1)", "docutils", "pylons-sphinx-themes (>=1.0.9)"]
@@ -2149,7 +2149,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.8"
-content-hash = "a9a58e99fac4388ef7085fc0d9f6494dc0603e772a63e3ef47ec48a755336235"
+content-hash = "646a6f85b1d3312a55603315b0074c9502c3a35ee219d35e9a1a60d61a4bfe46"
 
 [metadata.files]
 apipkg = [
@@ -3310,8 +3310,8 @@ venusian = [
     {file = "venusian-1.2.0.tar.gz", hash = "sha256:64ec8285b80b110d0ae5db4280e90e31848a59db98db1aba4d7d46f48ce91e3e"},
 ]
 waitress = [
-    {file = "waitress-2.1.1-py3-none-any.whl", hash = "sha256:c549f5b2b4afd44d9d97d7cec79f3ef581e25d832827f415dc175327af674aa8"},
-    {file = "waitress-2.1.1.tar.gz", hash = "sha256:e2e60576cf14a1539da79f7b7ee1e79a71e64f366a0b47db54a15e971f57bb16"},
+    {file = "waitress-2.0.0-py3-none-any.whl", hash = "sha256:29af5a53e9fb4e158f525367678b50053808ca6c21ba585754c77d790008c746"},
+    {file = "waitress-2.0.0.tar.gz", hash = "sha256:69e1f242c7f80273490d3403c3976f3ac3b26e289856936d1f620ed48f321897"},
 ]
 watchtower = [
     {file = "watchtower-1.0.6-py3-none-any.whl", hash = "sha256:2859275df4ad71b005b983613dd64cabbda61f9fdd3db7600753fc465090119d"},
