@@ -2,8 +2,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
-import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
 
 
