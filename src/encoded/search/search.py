@@ -63,6 +63,9 @@ class SearchBuilder:
     CARDINALITY_RANGE = '-3.4028E38-*'
     PAGINATION_SIZE = 10  # for ECS, 10 is much better than 25, and may even do better when lowered
     MISSING = object()
+    SEARCH_INFO_HEADER_TYPES = [
+        'Workflow'  # TODO: add types here as needed
+    ]
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -339,9 +342,10 @@ class SearchBuilder:
         Note: Because we rely on 'source', if the static_section hasn't been indexed
         into Elasticsearch it will not be loaded
 
-        TODO: refactor, GET call slowing down searches
+        Only check for these if the item type is declared to have 
         """
-        if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
+        if (len(self.doc_types) == 1 and 'Item' not in self.doc_types and
+                self.doc_types[0] in self.SEARCH_INFO_HEADER_TYPES):
             search_term = 'search-info-header.' + self.doc_types[0]
             # XXX: this could be cached application side as well
             try:
