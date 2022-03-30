@@ -1129,8 +1129,9 @@ class SearchBuilder:
         if self.size not in (None, 'all') and self.size < self.response['total']:
             params = [(k, v) for k, v in self.request.normalized_params.items() if k != 'limit']
             params.append(('limit', 'all'))
-            if self.context:
-                self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
+            # do not check presence of this field, as it triggers an ES len call! - Will 30 March 2022
+            # if self.context:
+            #     self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
         # `graph` below is a generator.
         # `es_results['hits']['hits']` will contain a generator instead of list
