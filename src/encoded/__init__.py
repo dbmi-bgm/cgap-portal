@@ -13,6 +13,8 @@ from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
+from dcicutils.ecs_utils import CGAP_ECS_REGION
+from codeguru_profiler_agent import Profiler
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
@@ -101,6 +103,11 @@ def init_sentry(dsn):
         sentry_sdk.init(dsn,
                         traces_sample_rate=.5,
                         integrations=[PyramidIntegration(), SqlalchemyIntegration()])
+
+
+def init_code_guru(*, group_name, region=CGAP_ECS_REGION):
+    """ Starts AWS CodeGuru process for profiling the app remotely. """
+    Profiler(profiling_group_name=group_name, region_name=region).start()
 
 
 def main(global_config, **local_config):
@@ -199,14 +206,10 @@ def main(global_config, **local_config):
     # initialize sentry reporting
     init_sentry(settings.get('sentry_dsn', None))
 
+    # initialize CodeGuru profiling, if set
+    # note that this is intentionally an env variable (so it is a TASK level setting)
+    if 'ENCODED_PROFILING_GROUP' in os.environ:
+        init_code_guru(group_name=os.environ['ENCODED_PROFILING_GROUP'])
+
     app = config.make_wsgi_app()
-
-    workbook_filename = settings.get('load_workbook', '')
-    load_test_only = asbool(settings.get('load_test_only', False))
-    docsdir = settings.get('load_docsdir', None)
-    if docsdir is not None:
-        docsdir = [path.strip() for path in docsdir.strip().split('\n')]
-    if workbook_filename:
-        load_workbook(app, workbook_filename, docsdir)
-
     return app
