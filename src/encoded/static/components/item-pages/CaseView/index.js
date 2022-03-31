@@ -141,8 +141,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
+        updateVariantSampleListSort,
         savedVariantSampleIDMap = {},
         fetchVariantSampleListItem,
+        vslSortType,
         // Passed in from CurrentFamilyController
         canonicalFamily,
         currPedigreeFamily,
@@ -364,14 +366,14 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
-                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
-                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
                                 </NoteSubSelectionStateController>
                             </CaseReviewSelectedNotesStore>
                         </CaseReviewController>

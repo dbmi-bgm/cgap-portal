@@ -147,6 +147,8 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         resetVariantSampleSelectionDeletionsAndOrdering,
         snvDeletionsLen,
         cnvDeletionsLen,
+        updateVariantSampleListSort,
+        vslSortType,
     } = props;
 
     console.log("InterpretationTab props", props);
@@ -174,7 +176,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
             <div>
                 <VariantSampleSelectionList {...{ variantSampleListItem, isLoadingVariantSampleListItem,
                     deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, anyUnsavedChanges, schemas, context,
-                    toggleVariantSampleSelectionDeletion, toggleStructuralVariantSampleSelectionDeletion }} />
+                    toggleVariantSampleSelectionDeletion, toggleStructuralVariantSampleSelectionDeletion, vslSortType }} />
             </div>
         </React.Fragment>
     );
