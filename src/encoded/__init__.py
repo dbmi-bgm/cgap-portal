@@ -101,7 +101,7 @@ def init_sentry(dsn):
     """ Helper function that initializes sentry SDK if a dsn is specified. """
     if dsn:
         sentry_sdk.init(dsn,
-                        traces_sample_rate=.5,
+                        traces_sample_rate=.1,
                         integrations=[PyramidIntegration(), SqlalchemyIntegration()])
 
 
