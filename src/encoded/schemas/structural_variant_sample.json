@@ -96,6 +96,73 @@
             "type": "string",
             "uniqueKey": true
         },
+        "bicseq2_expected_reads": {
+            "title": "Number of Expected Reads",
+            "field_name": "bicseq2_expected_reads",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "BICseq2_expected_reads",
+            "source_name": "VCF",
+            "description": "Total expected reads within variant calculated with BIC-seq2",
+            "scope": "sample_variant",
+            "schema_title": "Number of Expected Reads"
+        },
+        "bicseq2_log2_copy_ratio": {
+            "title": "Copy Ratio [log2]",
+            "field_name": "bicseq2_log2_copy_ratio",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "BICseq2_log2_copyRatio",
+            "source_name": "VCF",
+            "description": "log2(Observed Reads/Expected Reads) within variant calculated with BIC-seq2",
+            "scope": "sample_variant",
+            "schema_title": "Copy Ratio [log2]"
+        },
+        "bicseq2_observed_reads": {
+            "title": "Number of Observed Reads",
+            "field_name": "bicseq2_observed_reads",
+            "type": "integer",
+            "do_import": true,
+            "vcf_field": "BICseq2_observed_reads",
+            "source_name": "VCF",
+            "description": "Total observed reads within variant calculated with BIC-seq2",
+            "scope": "sample_variant",
+            "schema_title": "Number of Observed Reads"
+        },
+        "bicseq2_pvalue": {
+            "title": "P-value",
+            "field_name": "bicseq2_pvalue",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "BICseq2_pvalue",
+            "source_name": "VCF",
+            "description": "p-value significance of the call made by BIC-seq2",
+            "scope": "sample_variant",
+            "schema_title": "P-value"
+        },
+        "caller_types": {
+            "title": "Caller Types",
+            "description": "The types of callers that called this variant",
+            "type": "array",
+            "items": {
+                "title": "Caller Type",
+                "type": "string",
+                "enum": [
+                    "SV",
+                    "CNV"
+                ]
+            }
+        },
+        "callers": {
+            "title": "Callers",
+            "description": "The callers that called this variant",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "title": "Caller",
+                "type": "string"
+            }
+        },
         "confidence_interval_end": {
             "title": "End Position Confidence Interval",
             "type": "array",
@@ -293,6 +360,10 @@
             "title": "Cytoband",
             "order": 10
         },
+        "callers": {
+            "title": "Caller",
+            "order": 15
+        },
         "structural_variant.SV_TYPE": {
             "title": "Type",
             "order": 20
@@ -379,6 +450,16 @@
         "structural_variant.SV_TYPE": {
             "title": "Variant Type",
             "order": 10
+        },
+        "caller_types": {
+            "title": "Caller Type",
+            "grouping": "Caller Info",
+            "order": 15
+        },
+        "callers": {
+            "title": "Caller Name",
+            "grouping": "Caller Info",
+            "order": 16
         },
         "structural_variant.size": {
             "title": "Size",

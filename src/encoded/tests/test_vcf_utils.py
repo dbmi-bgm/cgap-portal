@@ -18,6 +18,7 @@ EXPECTED_ANNOTATION_FIELDS = ['comHet', 'CSQ']
 VARIANT_SCHEMA = resolve_file_path("schemas/variant.json")
 VARIANT_SAMPLE_SCHEMA = resolve_file_path("schemas/variant_sample.json")
 TEST_SV_VCF = resolve_file_path("annotations/GAPFIQHD6QAN_v0.0.4.vcf.subset")
+TEST_CNV_VCF = resolve_file_path("annotations/GAPFIXRDPDK5_v0.0.5.vcf.subset")
 SV_SCHEMA = resolve_file_path("schemas/structural_variant.json")
 SV_SAMPLE_SCHEMA = resolve_file_path("schemas/structural_variant_sample.json")
 VEP_IDENTIFIER = 'transcript'
@@ -225,6 +226,12 @@ def test_sv_vcf():
     return parser
 
 
+@pytest.fixture
+def test_cnv_vcf():
+    parser = StructuralVariantVCFParser(TEST_CNV_VCF, SV_SCHEMA, SV_SAMPLE_SCHEMA)
+    return parser
+
+
 class TestIngestStructuralVariantVCF():
 
     def test_build_variants(self, test_sv_vcf):
@@ -284,7 +291,7 @@ class TestIngestStructuralVariantVCF():
         # record 3 - Additional Transcript fields
         record = test_sv_vcf.read_next_record()
         result = test_sv_vcf.create_variant_from_record(record)
-        
+
         assert get_transcript_field(result, 0, "csq_cds_position") == "3594-4583"
         assert get_transcript_field(
             result, 0, "csq_protein_position"
@@ -304,7 +311,7 @@ class TestIngestStructuralVariantVCF():
         # record 1 - Basics + Samplegeno fields
         record = test_sv_vcf.read_next_record()
         result = test_sv_vcf.create_sample_variant_from_record(record)
-        
+
         assert len(result) == 1
         assert get_top_level_field(result[0], "GT") == "0/1"
         assert get_top_level_field(result[0], "CALL_INFO") == "NA12878_sample"
@@ -330,7 +337,7 @@ class TestIngestStructuralVariantVCF():
         assert sample_geno[1]["samplegeno_quality"] == 48
         assert sample_geno[2]["samplegeno_numgt"] == "0/1"
         assert sample_geno[2]["samplegeno_likelihood"] == "209,0,12"
-        
+
         # record 4 - Confidence intervals and Imprecise
         record = test_sv_vcf.read_next_record()
         record = test_sv_vcf.read_next_record()
@@ -344,3 +351,18 @@ class TestIngestStructuralVariantVCF():
             assert get_top_level_field(
                 result[idx], "confidence_interval_end"
             ) == [-136, 136]
+
+    def test_build_variant_samples_cnv(self, test_cnv_vcf):
+        """Test accurate processing of CNV-specific fields."""
+
+        # record 1 - BIC-seq2 fields
+        record = test_cnv_vcf.read_next_record()
+        result = test_cnv_vcf.create_sample_variant_from_record(record)
+
+        assert len(result) == 1
+        assert get_top_level_field(result[0], "bicseq2_expected_reads") == 1379.98
+        assert get_top_level_field(result[0], "bicseq2_observed_reads") == 738
+        assert get_top_level_field(
+            result[0], "bicseq2_log2_copy_ratio"
+        ) == -0.907696594124564
+        assert get_top_level_field(result[0], "bicseq2_pvalue") == 6.08641e-48

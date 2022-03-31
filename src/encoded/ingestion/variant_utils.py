@@ -326,6 +326,7 @@ class StructuralVariantBuilder(VariantBuilder):
                 variant["SV_TYPE"], variant["CHROM"], variant["START"], variant["END"],
             )
             sample["file"] = self.file
+            self._add_caller_and_variant_type(sample)
             self.parser.format_variant_sub_embedded_objects(sample, sample=True)
 
             # add familial relations to samplegeno field
@@ -343,3 +344,29 @@ class StructuralVariantBuilder(VariantBuilder):
             sample.update(inheritance_modes)
             add_last_modified(sample, userid=LOADXL_USER_UUID)
         return variant_samples
+
+    def _add_caller_and_variant_type(self, sample):
+        """Force caller and variant type properties on sample for now.
+
+        NOTE: Delete this method once properties are available within
+        VCF.
+        """
+        sample["callers"] = ["Manta"]
+        sample["caller_types"] = ["SV"]
+
+
+class CNVBuilder(StructuralVariantBuilder):
+    """Class for CNV ingestion while CNVs (temporarily) exist within a
+    separate VCF.
+
+    NOTE: Delete class once common VCF available for CNVs/SVs.
+    """
+
+    def _add_caller_and_variant_type(self, sample):
+        """Force caller and variant type properties on sample for now.
+
+        NOTE: Delete this method once properties are available within
+        VCF.
+        """
+        sample["callers"] = ["BIC-seq2"]
+        sample["caller_types"] = ["CNV"]

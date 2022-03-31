@@ -1064,7 +1064,6 @@ class StructuralVariantVCFParser(VCFParser):
         result = self.parse_record_for_schema_vcf_fields(self.variant_vcf_props, record)
         return dict(self.variant_defaults, **result)  # copy defaults, merge in result
 
-
     def create_sample_variant_from_record(self, record):
         """
         Process record for variant sample fields, creating variant

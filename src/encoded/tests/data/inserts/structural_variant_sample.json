@@ -5,7 +5,9 @@
         "uuid": "54ad2be8-228f-4690-9805-97f9d7d57f5f",
         "structural_variant": "4609fd8e-067b-48a0-aef3-0268d4073b56",
         "CALL_INFO": "test001_sample",
-        "file": "GAPFIFYGNO4A"
+        "file": "GAPFIFYGNO4A",
+        "callers": ["Manta"],
+        "caller_types": ["SV"]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -13,6 +15,12 @@
         "uuid": "f4d64303-cbd9-4759-b27a-3840c6b8d63c",
         "structural_variant": "4609fd8e-067b-48a0-aef3-0268d4073b57",
         "CALL_INFO": "test001_sample",
-        "file": "GAPFIFYGNO4A"
+        "file": "GAPFIFYGNO4A",
+        "callers": ["BIC-seq2"],
+        "caller_types": ["CNV"],
+        "bicseq2_expected_reads": 6310.3,
+        "bicseq2_log2_copy_ratio": -1.02878685487,
+        "bicseq2_observed_reads": 3103,
+        "bicseq2_pvalue": 1.82888e-60
     }
 ]
