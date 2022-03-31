@@ -176,7 +176,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
             <div>
                 <VariantSampleSelectionList {...{ variantSampleListItem, isLoadingVariantSampleListItem,
                     deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, anyUnsavedChanges, schemas, context,
-                    toggleVariantSampleSelectionDeletion, toggleStructuralVariantSampleSelectionDeletion, vslSortType }} />
+                    toggleVariantSampleSelectionDeletion, toggleStructuralVariantSampleSelectionDeletion, vslSortType, updateVariantSampleListSort }} />
             </div>
         </React.Fragment>
     );

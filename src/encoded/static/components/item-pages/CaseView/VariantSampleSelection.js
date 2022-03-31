@@ -54,11 +54,15 @@ export const parentTabTypes = {
  */
 export const VariantSampleSelectionList = React.memo(function VariantSampleSelectionList (props) {
     const {
-        variantSampleListItem,
         schemas,
         context,
-        isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
+
+        // From VariantSampleListController
+        variantSampleListItem,
+        isLoadingVariantSampleListItem = false,
+        updateVariantSampleListSort,
+        vslSortType,
 
         // From InterpretationTab:
         toggleVariantSampleSelectionDeletion,
@@ -171,6 +175,9 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
 
     return (
         <div className="row">
+            <div className="col-12 align-center justify-center">
+                <VariantSampleListSortSelectDrop {...{ updateVariantSampleListSort, vslSortType }} />
+            </div>
             { !!vsSelections.length &&
                 <div className="col-12">
                     <h2 className="mb-05 text-600">SNV / Indel - {vsSelections.length} Variant(s)</h2>
@@ -187,6 +194,28 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
     );
 
 });
+
+function VariantSampleListSortSelectDrop (props) {
+    const { updateVariantSampleListSort, vslSortType } = props;
+
+    return (
+        <>
+            <label className="mr-1">
+            Sort By:
+            </label>
+            <DropdownButton
+                variant="outline-secondary"
+                size="sm"
+                className="text-600"
+                title={vslSortType || "Variant"}
+                id="vsl-sort-type"
+                onSelect={updateVariantSampleListSort}>
+                <DropdownItem eventKey="Variant">Variant</DropdownItem>,
+                <DropdownItem eventKey="Gene">Gene</DropdownItem>
+            </DropdownButton>
+        </>
+    )
+}
 
 /** @todo Consider making this the calculated display_title property for SVs? */
 function transformSVDisplayTitle(svs){

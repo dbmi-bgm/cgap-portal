@@ -56,7 +56,7 @@ export class VariantSampleListController extends React.PureComponent {
             "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
             "refreshCount": 0,
-            "sortType": "variant"
+            "sortType": "Variant"
         };
 
         this.memoized = {
@@ -170,7 +170,7 @@ export class VariantSampleListController extends React.PureComponent {
         this.setState({ "variantSampleListID": vslID }, callback);
     }
 
-    /** For the short term: enum will consist of ["variant", "gene"] */
+    /** For the short term: enum will consist of ["Variant", "Gene"] */
     updateVariantSampleListSort(newSort) {
         this.setState({ sortType: newSort });
     }

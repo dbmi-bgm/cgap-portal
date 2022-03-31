@@ -172,7 +172,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                     </div>
 
-                    <VariantSampleSelectionList {...commonSelectionsProps} {...{ changedClassificationsByVS, updateClassificationForVS, vslSortType }}
+                    <VariantSampleSelectionList {...commonSelectionsProps} {...{ changedClassificationsByVS, updateClassificationForVS, vslSortType, updateVariantSampleListSort }}
                         parentTabType={parentTabTypes.CASEREVIEW} />
 
                 </div>
