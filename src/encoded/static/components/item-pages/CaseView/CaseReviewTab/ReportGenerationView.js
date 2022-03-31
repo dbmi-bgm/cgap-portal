@@ -128,7 +128,7 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
                 break;
             default:
                 warnings.push(
-                    <React.Fragment>
+                    <React.Fragment key={sectionKey}>
                         Section { title ? <> &lsquo;{ title }&rsquo; (<code>{ sectionKey }</code>)</> : <code>{ sectionKey }</code> } not supported.
                     </React.Fragment>
                 );
@@ -317,7 +317,7 @@ const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
 
         if (samplesForTagLen === 0) {
             return (
-                <div className="mb-24">
+                <div className="mb-24" key={idx}>
                     <ReportFindingsTableNoSamplesFallback {...{ header, visible, id }}
                         defaultValue={savedTagNoteText || none_tagged_fallback_text} />
                 </div>
