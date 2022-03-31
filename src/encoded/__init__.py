@@ -35,6 +35,9 @@ if sys.version_info.major < 3:
 
 # snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022
 CGAP_STATIC_MAX_AGE = 1800
+# default trace_rate for sentry
+# tune this to get more data points when analyzing performance
+SENTRY_TRACE_RATE = .1
 
 
 def static_resources(config):
@@ -101,7 +104,7 @@ def init_sentry(dsn):
     """ Helper function that initializes sentry SDK if a dsn is specified. """
     if dsn:
         sentry_sdk.init(dsn,
-                        traces_sample_rate=.1,
+                        traces_sample_rate=SENTRY_TRACE_RATE,
                         integrations=[PyramidIntegration(), SqlalchemyIntegration()])
 
 

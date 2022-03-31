@@ -342,7 +342,8 @@ class SearchBuilder:
         Note: Because we rely on 'source', if the static_section hasn't been indexed
         into Elasticsearch it will not be loaded
 
-        Only check for these if the item type is declared to have
+        Only check for this if the item type is declared to have one in
+        the class constant SEARCH_INFO_HEADER_TYPES
         """
         if (len(self.doc_types) == 1 and 'Item' not in self.doc_types and
                 self.doc_types[0] in self.SEARCH_INFO_HEADER_TYPES):
