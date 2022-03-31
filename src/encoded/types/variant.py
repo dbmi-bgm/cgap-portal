@@ -23,7 +23,7 @@ from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
-from snovault.util import simple_path_ids, debug_log
+from snovault.util import simple_path_ids, debug_log, IndexSettings
 from snovault.embed import make_subrequest
 
 from ..batch_download_utils import (
@@ -481,6 +481,15 @@ class VariantSample(Item):
         'daughter_genotype_label', 'daughter_II_genotype_label', 'son_genotype_label',
         'son_II_genotype_label'
     ]
+
+    class Collection(Item.Collection):
+        @staticmethod
+        def index_settings():
+            """ Type specific settings for variant_sample """
+            return IndexSettings(
+                shard_count=5,  # split the variant sample index into 5 shards
+                refresh_interval='5s'  # force update every 5 seconds
+            )
 
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):

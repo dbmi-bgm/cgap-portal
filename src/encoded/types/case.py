@@ -4,6 +4,7 @@ from snovault import (
     load_schema,
     # display_title_schema
 )
+from snovault.util import IndexSettings
 from .base import (
     Item,
     get_item_or_none
@@ -313,6 +314,16 @@ class Case(Item):
     name_key = 'accession'
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = _build_case_embedded_list()
+
+    class Collection(Item.Collection):
+        @staticmethod
+        def index_settings():
+            """ Type specific settings for case """
+            return IndexSettings(
+                replica_count=2,  # hold 2 copies of this index
+                shard_count=2,  # split the index into two shards
+                refresh_interval='3s'  # force update every 3 seconds
+            )
 
     @calculated_property(schema={
         "title": "Display Title",
