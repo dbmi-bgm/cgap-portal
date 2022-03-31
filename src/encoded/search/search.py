@@ -342,7 +342,7 @@ class SearchBuilder:
         Note: Because we rely on 'source', if the static_section hasn't been indexed
         into Elasticsearch it will not be loaded
 
-        Only check for these if the item type is declared to have 
+        Only check for these if the item type is declared to have
         """
         if (len(self.doc_types) == 1 and 'Item' not in self.doc_types and
                 self.doc_types[0] in self.SEARCH_INFO_HEADER_TYPES):
@@ -1251,6 +1251,7 @@ class SearchBuilder:
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
     """ Search view connects to ElasticSearch and returns the results """
     search_builder = SearchBuilder(context, request, search_type, return_generator, forced_type, custom_aggregations)
+    import pdb; pdb.set_trace()
     return search_builder._search()
 
 
