@@ -132,9 +132,6 @@ RUN chmod +x entrypoint_deployment.sh
 RUN chmod +x entrypoint_indexer.sh
 RUN chmod +x entrypoint_ingester.sh
 RUN chmod +x assume_identity.py
-
-# disable pipe limitations for users
-#RUN echo 0 > /proc/sys/fs/pipe-user-pages-soft
 EXPOSE 8000
 
 # Container does not run as root
