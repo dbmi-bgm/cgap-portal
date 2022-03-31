@@ -1251,7 +1251,6 @@ class SearchBuilder:
 def search(context, request, search_type=None, return_generator=False, forced_type='Search', custom_aggregations=None):
     """ Search view connects to ElasticSearch and returns the results """
     search_builder = SearchBuilder(context, request, search_type, return_generator, forced_type, custom_aggregations)
-    import pdb; pdb.set_trace()
     return search_builder._search()
 
 
