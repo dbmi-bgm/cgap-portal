@@ -1,5 +1,5 @@
 {
-    "baseUrl" : "https://cgap.hms.harvard.edu",
+    "baseUrl" : "https://cgap-mgb.hms.harvard.edu/",
     "projectId": "9hf9k3",
     "defaultCommandTimeout" : 60000,
     "pageLoadTimeout" : 120000,
