@@ -33,9 +33,10 @@ import { projectReportSettings } from './../ReportView/project-settings-draft';
  * This file contains the VariantSampleSelection item, which is shared between InterpretationTab and Finalize Case tab.
  *
  * @todo
- * We will need to load in Project Item to get table tags and potentially other settings from such
- * as default sorting of VSes. We probably should do this at the CaseView/index.js level so it is accessible
+ * We will need to load in Project Item to get table tags. We probably should do this at the CaseView/index.js level so it is accessible
  * to all elements? It could be lazy-loaded and we just render classification dropdowns once it's loaded.
+ * 
+ * Default sorting of VSes is currently stored as local state in the VSL controller; and will eventually be saved to VSL itself.
  */
 
 
