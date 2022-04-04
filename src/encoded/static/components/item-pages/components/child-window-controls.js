@@ -1,7 +1,15 @@
 'use strict';
-
+import _ from 'underscore';
 
 const childWindowByName = {};
+
+const cleanupChildWindowsDebounced = _.debounce(function(){
+    Object.keys(childWindowByName).forEach(function(k){
+        if (childWindowByName[k].closed) {
+            delete childWindowByName[k];
+        }
+    });
+}, 5000, false);
 
 /**
  * Reusable function that will navigate a child window if one exists already,
@@ -26,6 +34,10 @@ export function navigateChildWindow(targetHref, windowName = null, postMessage =
             // "width=1200,height=900"
         );
     }
+
+    // Cleanup references in background when possible.
+    // 'childWindowByName' is a global-scope variable/store and itself never re-instantiated.
+    cleanupChildWindowsDebounced();
 }
 
 
@@ -42,7 +54,6 @@ function onClickCommonHandler (e) {
     }
     return { childWindowName, childWindowPostMessage, targetHref };
 }
-
 
 export function onClickLinkNavigateChildWindow(e){
     const { childWindowName, childWindowPostMessage, targetHref } = onClickCommonHandler(e);
