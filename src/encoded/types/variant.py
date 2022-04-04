@@ -508,11 +508,11 @@ class VariantSample(Item):
     })
     def display_title(self, request, CALL_INFO, variant=None):
         variant = get_item_or_none(request, variant, 'Variant', frame='raw')
-        variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
-                                                            variant['REF'], variant['ALT'])
         if variant:
-            return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
-        return CALL_INFO
+            variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
+                variant['REF'], variant['ALT'])
+            return variant_display_title + " (" + CALL_INFO + ")" # chr1:504A>T (HG002)
+        return "Sample for " + CALL_INFO
 
     @calculated_property(schema={
         "title": "Variant Sample List",

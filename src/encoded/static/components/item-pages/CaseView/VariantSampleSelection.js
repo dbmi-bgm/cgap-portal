@@ -355,8 +355,8 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             <div className="card-header pr-12">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
-                    <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
-                        <h4 className="text-truncate text-600 my-0 selected-vsl-title">
+                    <div className="flex-auto mb-08 mb-lg-0">
+                        <h4 className="text-600 my-0 selected-vsl-title d-flex align-items-center">
                             { parentTabType === parentTabTypes.CASEREVIEW ?
                                 <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType }} />
                                 : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, vsUUID, caseAccession, variantDisplayTitle, searchType }} />
@@ -445,7 +445,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
             <div className="card-body border-top attribution-section py-2">
                 <div className="row align-items-center">
-                    <div className="col d-flex-align-items-center">
+                    <div className="col d-flex align-items-center">
                         <FilterBlocksUsedPopovers {...{ selection, facetDict }} />
                     </div>
                     <div className="col-auto text-small"
@@ -530,7 +530,7 @@ function InterpretationTabVariantSampleTitle(props){
                 <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
                 <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
-                    data-child-window={vsUUID} className="btn btn-link p-0 text-larger text-600">
+                    data-child-window={vsUUID} className="btn btn-link p-0 text-larger text-600 text-truncate">
                     { variantDisplayTitle }
                 </button>
             </React.Fragment>
