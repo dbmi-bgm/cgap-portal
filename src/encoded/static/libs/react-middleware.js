@@ -9,9 +9,14 @@ import { JWT, object } from '@hms-dbmi-bgm/shared-portal-components/es/component
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import App from './../components';
 
-
-const cssFileStats = fs.statSync(__dirname + '/../css/style.css');
-const lastCSSBuildTime = Date.parse(cssFileStats.mtime.toUTCString());
+// For production, we only check CSS, since assume was built along w. JS.
+const jsFileStats = fs.statSync(__dirname + '/../build/bundle.js');
+let lastBuildTime = Date.parse(jsFileStats.mtime.toUTCString());
+if (process.env.NODE_ENV !== "production") {
+    const cssFileStats = fs.statSync(__dirname + '/../css/style.css');
+    const lastCSSBuildTime = Date.parse(cssFileStats.mtime.toUTCString());
+    lastBuildTime = lastCSSBuildTime > lastBuildTime ? lastCSSBuildTime : lastBuildTime;
+}
 
 export function appRenderFxn(body, res) {
 
@@ -21,7 +26,7 @@ export function appRenderFxn(body, res) {
     const disp_dict = {
         'context'           : context,
         'href'              : res.getHeader('X-Request-URL') || object.itemUtil.atId(context),
-        'lastCSSBuildTime'  : lastCSSBuildTime,
+        'lastBuildTime'     : lastBuildTime,
         'alerts'            : [] // Always have fresh alerts per request, else subprocess will re-use leftover global vars/vals.
     };
 

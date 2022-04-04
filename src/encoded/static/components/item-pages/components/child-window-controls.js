@@ -28,38 +28,43 @@ export function navigateChildWindow(targetHref, windowName = null, postMessage =
     }
 }
 
-export function onClickLinkNavigateChildWindow(e){
+
+
+function onClickCommonHandler (e) {
     e.stopPropagation();
     e.preventDefault();
     const useEvtTarget = e.currentTarget || e.target;
     const childWindowName = useEvtTarget.getAttribute("data-child-window") || null;
     const childWindowPostMessage = !(useEvtTarget.getAttribute("data-child-window-message") === "false");
-    const targetHref = useEvtTarget.href;
+    const targetHref = useEvtTarget.getAttribute("href") || useEvtTarget.getAttribute("data-href") || null;
     if (!targetHref || typeof targetHref !== "string" || targetHref === "#") {
-        return false;
+        throw new Error("Expected a target href");
     }
+    return { childWindowName, childWindowPostMessage, targetHref };
+}
+
+
+export function onClickLinkNavigateChildWindow(e){
+    const { childWindowName, childWindowPostMessage, targetHref } = onClickCommonHandler(e);
     navigateChildWindow(targetHref, childWindowName, childWindowPostMessage);
     return false;
 }
 
 
+
 let newWindowCounter = 0;
 
+/**
+ * Always opens a new child window, rather than re-using existing one.
+ */
 export function openNewChildWindow (targetHref, postMessage){
     const currentCount = newWindowCounter++;
     console.log("Openining window", currentCount);
-    return navigateChildWindow(targetHref, "nw" + currentCount, postMessage);
+    return navigateChildWindow(targetHref, "nw-" + currentCount, postMessage);
 }
 
-export function onClickOpenChildWindow(e) {
-    e.stopPropagation();
-    e.preventDefault();
-    const useEvtTarget = e.currentTarget || e.target;
-    const childWindowPostMessage = !(useEvtTarget.getAttribute("data-child-window-message") === "false");
-    const targetHref = useEvtTarget.href;
-    if (!targetHref || typeof targetHref !== "string" || targetHref === "#") {
-        return false;
-    }
+export function onClickOpenNewChildWindow(e) {
+    const { childWindowPostMessage, targetHref } = onClickCommonHandler(e);
     openNewChildWindow(targetHref, childWindowPostMessage);
     return false;
 }

@@ -64,7 +64,7 @@ export default class App extends React.PureComponent {
      * @constant
      * @type {number}
      */
-    static SLOW_REQUEST_TIME = 750
+    static SLOW_REQUEST_TIME = 750;
 
     /**
      * Immediately scrolls browser viewport to current window hash or to top of page.
@@ -1084,7 +1084,7 @@ export default class App extends React.PureComponent {
 
     /** Renders the entire HTML of the application. */
     render() {
-        const { context, lastCSSBuildTime, href, contextRequest } = this.props;
+        const { context, lastBuildTime, href, contextRequest } = this.props;
         const { mounted = false } = this.state;
         const hrefParts = memoizedUrlParse(href);
         const routeList = hrefParts.pathname.split("/");
@@ -1149,10 +1149,10 @@ export default class App extends React.PureComponent {
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com",
             "worker-src 'self' blob:",
-            "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org https://eutils.ncbi.nlm.nih.gov"
+            "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org https://eutils.ncbi.nlm.nih.gov https://cgap-higlass.s3.amazonaws.com"
         ].join("; ");
 
-        // `lastCSSBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
+        // `lastBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
 
         return (
             <html lang="en">
@@ -1167,13 +1167,13 @@ export default class App extends React.PureComponent {
                     <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
-                    <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
-                    <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
-                    <DeferMount><link rel="stylesheet" media="print" href={'/static/css/print.css?build=' + (lastCSSBuildTime || 0)} /></DeferMount>
+                    <script data-prop-name="lastBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastBuildTime }}/>
+                    <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastBuildTime || 0)} />
+                    <DeferMount><link rel="stylesheet" media="print" href={'/static/css/print.css?build=' + (lastBuildTime || 0)} /></DeferMount>
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />
-                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastCSSBuildTime || 0)} charSet="utf-8" />
+                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastBuildTime || 0)} charSet="utf-8" />
                     <link rel="canonical" href={canonical} />
                     {/* <script data-prop-name="inline" type="application/javascript" charSet="utf-8" dangerouslySetInnerHTML={{__html: this.props.inline}}/> <-- SAVED FOR REFERENCE */}
                 </head>

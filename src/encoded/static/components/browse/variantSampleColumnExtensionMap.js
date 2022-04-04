@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { getInitialTranscriptIndex, getMostSevereConsequence } from '../item-pages/VariantSampleView/AnnotationSections';
-import { onClickLinkNavigateChildWindow } from './../item-pages/components/child-window-reuser';
+import { onClickLinkNavigateChildWindow } from '../item-pages/components/child-window-controls';
 
 /**
  * This gets merged into the columnExtensionMap.js.
@@ -50,14 +50,18 @@ export const variantSampleColumnExtensionMap = {
         widthMap: { 'lg' : 155, 'md' : 140, 'sm' : 130 },
         render: function(result, props) {
             const { link = null, align } = props;
-            const { "@id": atID = null, variant: { genes = [] } = {} } = result || {};
+            const { "@id": atID = null, uuid: resultUUID, variant: { genes = [] } = {} } = result || {};
             if (genes.length === 0) {
                 return null;
             }
+
+            const targetHref = link ? link : (atID ? atID + '?annotationTab=0' : "#");
+
             return (
-                <a href={link ? link : atID ? atID + '?annotationTab=0' : "#"} className="d-block mx-auto" onClick={onClickLinkNavigateChildWindow}>
+                <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
+                    data-child-window={resultUUID} className="text-truncate btn btn-link p-0 w-100">
                     <GenesMostSevereDisplayTitle {...{ result, align }} />
-                </a>
+                </button>
             );
         }
     },
@@ -68,17 +72,20 @@ export const variantSampleColumnExtensionMap = {
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
             const { link = null, align } = props;
-            const { "@id" : atID = null, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
+            const { "@id" : atID = null, uuid: resultUUID, variant : { genes : [ firstGene = null ] = [] } = {} } = result;
             const { genes_most_severe_hgvsc = null, genes_most_severe_hgvsp = null } = firstGene || {};
 
             if (!genes_most_severe_hgvsc && !genes_most_severe_hgvsp) {
                 return null;
             }
 
+            const targetHref = link ? link : (atID ? atID + '?annotationTab=1' : "#");
+
             return (
-                <a href={link ? link : (atID ? atID + '?annotationTab=1' : "#")} onClick={onClickLinkNavigateChildWindow}>
+                <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
+                    data-child-window={resultUUID} className="text-truncate btn btn-link p-0 w-100">
                     <GenesMostSevereHGVSCColumn gene={firstGene} align={align} />
-                </a>
+                </button>
             );
         }
     },
@@ -189,14 +196,17 @@ export const structuralVariantSampleColumnExtensionMap = {
     // Gene, Transcript col
     "structural_variant.transcript": {
         render: (result, props) => {
-            const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
+            const { "@id": atID, uuid: resultUUID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
             const { align = "left", link } = props;
             if (transcripts.length === 0) return null;
 
+            const targetHref = link ? link : (atID ? atID + '?annotationTab=0' : "#");
+
             return (
-                <a href={link ? link : (atID ? atID + '?annotationTab=0' : "#")} onClick={onClickLinkNavigateChildWindow}>
+                <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
+                    data-child-window={resultUUID} className="text-truncate text-left btn btn-link p-0">
                     <StructuralVariantTranscriptColumn {...{ result, align }} />
-                </a>
+                </button>
             );
         }
     }
@@ -219,24 +229,31 @@ export function StackedRowColumn(props) {
 /** An edited version of SPC's DisplayTitleColumnDefault */
 export const VariantSampleDisplayTitleColumn = React.memo(function VariantSampleDisplayTitleColumn(props) {
     const { result = null, link, onClick, className = null } = props;
-    const { variant = null } = result || {};
-    const { display_title = null, ID = null } = variant || {};
+    const {
+        "@id": atID,
+        uuid: resultUUID,
+        variant: {
+            display_title: variantTitle = null,
+            ID: variantID = null
+        } = {}
+    } = result || {};
 
     const cls = ("title-block" + (className ? " " + className : ""));
     const rows = [
         <span key={0} className="d-block text-600 text-truncate">
-            { display_title }
+            { variantTitle }
         </span>
     ];
 
-    if (ID) {
-        rows.push(<span key={1} className="font-italic">{ ID }</span>);
+    if (variantID) {
+        rows.push(<span key={1} className="font-italic">{ variantID }</span>);
     }
 
     return (
-        <a key="title" href={link || '#'} onClick={onClick} className="d-block text-truncate">
+        <button type="button" onClick={onClick} data-href={link || atID}
+            data-child-window={resultUUID} className="text-truncate text-left btn btn-link p-0">
             <StackedRowColumn className={cls} {...{ rows }}  />
-        </a>
+        </button>
     );
 });
 
@@ -245,6 +262,7 @@ export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSamp
     const { result = null, link, onClick, className = null } = props;
     const {
         "@id": atID,
+        uuid: resultUUID,
         structural_variant: {
             display_title = "",
             annotation_id = ""
@@ -264,9 +282,10 @@ export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSamp
     // (defined in SPC's basicColumnExtensionMap>DisplayTitleColumnWrapper) handle target="_blank".
 
     return (
-        <a key="title" href={link || atID} onClick={onClick} className="d-block text-truncate">
+        <button type="button" onClick={onClick} data-href={link || atID}
+            data-child-window={resultUUID} className="text-truncate text-left btn btn-link p-0">
             <StackedRowColumn className={cls} {...{ rows }}  />
-        </a>
+        </button>
     );
 });
 
@@ -437,11 +456,11 @@ export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLab
 });
 
 export const BAMSnapshotColumn = React.memo(function BAMSnapshotColumn({ result }) {
-    const { "@id": resultAtID = null } = result;
+    const { "@id": resultAtID = null, uuid: resultUUID } = result;
     return (
         <div className="mx-auto text-truncate">
             <a className="btn btn-outline-dark btn-sm" onClick={onClickLinkNavigateChildWindow}
-                href={resultAtID + "@@download/"} data-child-window="bam" data-child-window-message="false"
+                href={resultAtID + "@@download/"} data-child-window={"bam-" + resultUUID} data-child-window-message="false"
                 data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
                 <i className="icon icon-fw icon-image fas" />
             </a>
