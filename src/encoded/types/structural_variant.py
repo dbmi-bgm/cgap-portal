@@ -399,17 +399,19 @@ class StructuralVariantSample(Item):
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"
         )
-        start = convert_integer_to_comma_string(structural_variant["START"])
-        end = convert_integer_to_comma_string(structural_variant["END"])
-        structural_variant_display_title = build_structural_variant_display_title(
-            structural_variant["SV_TYPE"],
-            structural_variant["CHROM"],
-            start,
-            end,
-        )
+
         if structural_variant:
-            return CALL_INFO + ":" + structural_variant_display_title
-        return CALL_INFO
+            start = convert_integer_to_comma_string(structural_variant["START"])
+            end = convert_integer_to_comma_string(structural_variant["END"])
+            structural_variant_display_title = build_structural_variant_display_title(
+                structural_variant["SV_TYPE"],
+                structural_variant["CHROM"],
+                start,
+                end,
+            )
+            return structural_variant_display_title + " (" + CALL_INFO + ")" # chr1:504A>T (HG002)
+
+        return "Sample for " + CALL_INFO
 
     @calculated_property(
         schema={
