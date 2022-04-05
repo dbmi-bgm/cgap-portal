@@ -9,7 +9,7 @@ import { JWT, object } from '@hms-dbmi-bgm/shared-portal-components/es/component
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import App from './../components';
 
-// For production, we only check CSS, since assume was built along w. JS.
+// For production, we only check JS, since assume CSS was built along w. JS.
 const jsFileStats = fs.statSync(__dirname + '/../build/bundle.js');
 let lastBuildTime = Date.parse(jsFileStats.mtime.toUTCString());
 if (process.env.NODE_ENV !== "production") {
