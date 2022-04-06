@@ -212,6 +212,7 @@ function commonVSEmbeds(prefix){
         prefix + ".selected_by.@id",
         prefix + ".selected_by.display_title",
         prefix + ".variant_sample_item.@id",
+        prefix + ".variant_sample_item.@type",
         prefix + ".variant_sample_item.uuid",
         prefix + ".variant_sample_item.display_title",
         prefix + ".variant_sample_item.finding_table_tag",

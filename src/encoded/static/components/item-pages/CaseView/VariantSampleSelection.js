@@ -46,6 +46,66 @@ export const parentTabTypes = {
     CASEREVIEW: 2
 };
 
+function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
+    const allSelections = vsSelections.concat(cnvSelections);
+    
+    var variantToUUIDMap = {};
+    var geneToVariantMap = {};
+    var geneToDisplayTitleMap = {};
+
+    allSelections.forEach((selection) => {
+        const {
+            variant_sample_item: {
+                "@id": vsAtID, uuid: vsUUID,
+                variant: {
+                    genes: {
+                        0: {
+                            genes_most_severe_gene: {
+                                "@id": geneAtID,
+                                display_title: geneTitle
+                            } = {}
+                        } = {}
+                    } = []
+                } = {},
+                highlighted_genes: {
+                    0: { 
+                        '@id': highlightedGeneAtID,
+                        display_title: highlightedGene
+                    } = {}
+                } = []
+            } = {}
+        } = selection;
+
+        if (geneAtID && geneToVariantMap[geneAtID]) {
+            geneToVariantMap[geneAtID].push(selection);
+        } else if (geneAtID) {
+            geneToVariantMap[geneAtID] = [selection];
+            geneToDisplayTitleMap[geneAtID] = geneTitle;
+        } else if (highlightedGeneAtID && geneToVariantMap[highlightedGeneAtID]) {
+            geneToVariantMap[highlightedGeneAtID].push(selection);
+        } else if (highlightedGeneAtID) {
+            geneToVariantMap[highlightedGeneAtID] = [selection];
+            geneToDisplayTitleMap[highlightedGeneAtID] = highlightedGene; 
+        } else { // 
+            console.log("lol", highlightedGeneAtID);
+            if (geneToVariantMap["No Gene"]) {
+                geneToVariantMap["No Gene"].push(selection);
+            } else {
+                geneToVariantMap["No Gene"] = [selection];
+                geneToDisplayTitleMap["No Gene"] = "No Genes";
+            }
+        }
+
+        variantToUUIDMap[vsAtID] = vsUUID;
+    });
+
+    geneToVariantMap.displayTitleMap = geneToDisplayTitleMap;
+    geneToVariantMap.variantToUUIDMap = variantToUUIDMap
+    console.log(geneToVariantMap);
+    return geneToVariantMap;
+}
+
+
 
 /**
  * Shows list of variant sample selections, or loading icon, depending on props.
@@ -138,8 +198,8 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         anyUnsavedChanges
     };
 
-    const snvOptions = vsSelections.map(function(selection, index){
-        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
+    function renderSelectionAsJSX(selection, index) {
+        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID, "@type": { 0: vsType = null } = [] } } = selection;
         if (!vsAtID) {
             // Handle lack of permissions, show some 'no permissions' view, idk..
             return (
@@ -148,37 +208,46 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                 </div>
             );
         }
+    
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
-        const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
+    
+        let isDeleted;
+        let facetDict;
+        console.log("vsType", vsType);
+        if (vsType === "VariantSample") {
+            isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
+            facetDict = snvFacetDict;
+            console.log("all stuff", selection, facetDict, isDeleted, vsType, unsavedClassification, index);
+        } else if (vsType === "StructuralVariantSample") {
+            isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
+            facetDict = cnvFacetDict;
+        }   
         return (
-            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="VariantSample"
-                {...{ selection, index, unsavedClassification, isDeleted }} facetDict={snvFacetDict}  />
+            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType={vsType}
+                {...{ selection, index, unsavedClassification, isDeleted, facetDict }}  />
         );
-    });
-
-    const cnvOptions = cnvSelections.map(function(selection, index) {
-        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID, display_title } = {} } = selection;
-        if (!vsAtID) {
-            // Handle lack of permissions, show some 'no permissions' view, idk..
-            return (
-                <div className="text-center p-3">
-                    <em>Item with no view permissions</em>
-                </div>
-            );
-        }
-        const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
-        const isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
-        return (
-            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="StructuralVariantSample"
-                {...{ selection, index, unsavedClassification, isDeleted }} facetDict={cnvFacetDict}   />
-        );
-    });
+    }
 
     return (
         <div className="row">
             <div className="col-12 align-center justify-center">
                 <VariantSampleListSortSelectDrop {...{ updateVariantSampleListSort, vslSortType }} />
             </div>
+            { vslSortType === "Variant" ?
+                <VSLSortedByVariantType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} />:
+                <VSLSortedByGeneType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} /> }
+        </div>
+    );
+});
+
+function VSLSortedByVariantType(props) {
+    const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
+
+    const snvOptions = vsSelections.map(renderSelectionAsJSX);
+    const cnvOptions = cnvSelections.map(renderSelectionAsJSX);
+
+    return (
+        <>
             { !!vsSelections.length &&
                 <div className="col-12">
                     <h2 className="mb-05 text-600">SNV / Indel - {vsSelections.length} Variant(s)</h2>
@@ -191,16 +260,41 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                     <hr className="mb-2 mt-0" />
                     {cnvOptions}
                 </div> }
-        </div>
+        </>
     );
+}
 
-});
+function VSLSortedByGeneType(props) {
+    const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
+
+    const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+
+    const geneToVariantMap = { ...groupedByGene };
+    const genes = Object.keys(geneToVariantMap);
+
+    return (
+        <>
+        {
+            genes.map((geneAtID) => {
+                const geneSelections = geneToVariantMap[geneAtID];
+                console.log("geneSelections", geneSelections);
+                return (
+                    <div className="col-12">
+                        <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
+                        <hr className="mb-2 mt-0" />
+                        { geneSelections.map(renderSelectionAsJSX) }
+                    </div>);
+            })
+        }
+        </>
+    );
+}
 
 function VariantSampleListSortSelectDrop (props) {
     const { updateVariantSampleListSort, vslSortType } = props;
 
     return (
-        <>
+        <div className="d-flex mb-2">
             <label className="mr-1">
             Sort By:
             </label>
@@ -211,10 +305,10 @@ function VariantSampleListSortSelectDrop (props) {
                 title={vslSortType || "Variant"}
                 id="vsl-sort-type"
                 onSelect={updateVariantSampleListSort}>
-                <DropdownItem eventKey="Variant">Variant</DropdownItem>,
+                <DropdownItem eventKey="Variant">Variant</DropdownItem>
                 <DropdownItem eventKey="Gene">Gene</DropdownItem>
             </DropdownButton>
-        </>
+        </div>
     )
 }
 
@@ -570,7 +664,7 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 
     let savedNotesTip;
     if (searchType === "StructuralVariantSample") {
-        savedNotesTip = "No notes saved for this Structural Variant Sample; SV Interpretation UI coming soon...";
+        savedNotesTip = "SV Case Review UI coming soon...";
     } else if (noSavedNotes) {
         savedNotesTip = "No notes saved for this Variant Sample, annotate it under the Interpretation tab.";
     } else {
@@ -698,7 +792,7 @@ function ClassificationDropdown(props){
 
     let tooltip;
     if (searchType === "StructuralVariantSample") {
-        tooltip = "SV Interpretation UI coming soon...";
+        tooltip = "SV Case Review UI coming soon...";
     } else {
         tooltip = !viewClassification? "Select a finding..." : null;
     }
