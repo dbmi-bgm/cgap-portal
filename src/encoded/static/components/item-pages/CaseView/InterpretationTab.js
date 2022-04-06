@@ -11,9 +11,7 @@ import { VariantSampleSelectionList } from './VariantSampleSelection';
 
 
 /**
- * State & update methods for `deletedVariantSampleSelections` & `changedOrdering`.
- * Transforms `props.variantSampleListItem` to have reordered variant_samples, according
- * to `state.changedOrdering` (subject to change).
+ * State & update methods for `deletedVariantSampleSelections`.
  */
 export class InterpretationTabController extends React.Component {
 
@@ -22,32 +20,33 @@ export class InterpretationTabController extends React.Component {
         "children": PropTypes.element
     };
 
-    static reorderedVariantSampleListItem(variantSampleListItem, changedOrdering){
+    // save and see about re-using
+    // static reorderedVariantSampleListItem(variantSampleListItem, changedOrdering){
 
-        function reorderSelectionList(vsSelections){
-            const vsIDDict = {};
-            vsSelections.forEach(function(vsSelection){
-                const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
-                vsIDDict[vsAtID] = vsSelection;
-            });
-            return changedOrdering.map(function(vsAtID){
-                return vsIDDict[vsAtID];
-            });
-        }
+    //     function reorderSelectionList(vsSelections){
+    //         const vsIDDict = {};
+    //         vsSelections.forEach(function(vsSelection){
+    //             const { variant_sample_item: { "@id": vsAtID } } = vsSelection;
+    //             vsIDDict[vsAtID] = vsSelection;
+    //         });
+    //         return changedOrdering.map(function(vsAtID){
+    //             return vsIDDict[vsAtID];
+    //         });
+    //     }
 
-        let useVSItem = variantSampleListItem;
+    //     let useVSItem = variantSampleListItem;
 
-        if (changedOrdering) {
-            const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
-            useVSItem = {
-                ...variantSampleListItem,
-                "variant_samples": reorderSelectionList(vsSelections),
-                "structural_variant_samples": reorderSelectionList(cnvSelections)
-            };
-        }
+    //     if (changedOrdering) {
+    //         const { variant_samples: vsSelections, structural_variant_samples: cnvSelections } = variantSampleListItem;
+    //         useVSItem = {
+    //             ...variantSampleListItem,
+    //             "variant_samples": reorderSelectionList(vsSelections),
+    //             "structural_variant_samples": reorderSelectionList(cnvSelections)
+    //         };
+    //     }
 
-        return useVSItem;
-    }
+    //     return useVSItem;
+    // }
 
     constructor(props){
         super(props);
@@ -56,12 +55,9 @@ export class InterpretationTabController extends React.Component {
         this.resetVariantSampleSelectionDeletionsAndOrdering = this.resetVariantSampleSelectionDeletionsAndOrdering.bind(this);
         this.state = {
             "deletedVariantSampleSelections": {},
-            "deletedStructuralVariantSampleSelections": {},
-            // Not yet implemented fully:
-            "changedOrdering": null
+            "deletedStructuralVariantSampleSelections": {}
         };
         this.memoized = {
-            reorderedVariantSampleListItem: memoize(InterpretationTabController.reorderedVariantSampleListItem),
             deletionsLen: memoize(function(deletedVariantSampleSelections){ return Object.keys(deletedVariantSampleSelections).length; })
         };
     }
@@ -91,23 +87,21 @@ export class InterpretationTabController extends React.Component {
     }
 
     resetVariantSampleSelectionDeletionsAndOrdering(){
-        this.setState({ "deletedVariantSampleSelections": {}, "deletedStructuralVariantSampleSelections": {}, "changedOrdering": null });
+        this.setState({ "deletedVariantSampleSelections": {}, "deletedStructuralVariantSampleSelections": {} });
     }
 
     render(){
-        const { children, variantSampleListItem: propVariantSampleListItem, ...passProps } = this.props;
-        const { deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, changedOrdering } = this.state;
+        const { children, variantSampleListItem, ...passProps } = this.props;
+        const { deletedVariantSampleSelections, deletedStructuralVariantSampleSelections } = this.state;
 
         const snvDeletionsLen = this.memoized.deletionsLen(deletedVariantSampleSelections);
         const cnvDeletionsLen = this.memoized.deletionsLen(deletedStructuralVariantSampleSelections);
-        const variantSampleListItem = this.memoized.reorderedVariantSampleListItem(propVariantSampleListItem, changedOrdering);
 
         const childProps = {
             ...passProps,
             variantSampleListItem, // <- reordered. Might make sense to do reordering elsewhere..
             deletedVariantSampleSelections,
             deletedStructuralVariantSampleSelections,
-            changedOrdering,
             snvDeletionsLen,
             cnvDeletionsLen,
             "toggleVariantSampleSelectionDeletion": this.toggleVariantSampleSelectionDeletion,
@@ -141,7 +135,6 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
         fetchVariantSampleListItem,
         deletedStructuralVariantSampleSelections,
         deletedVariantSampleSelections,
-        changedOrdering,
         toggleVariantSampleSelectionDeletion,
         toggleStructuralVariantSampleSelectionDeletion,
         resetVariantSampleSelectionDeletionsAndOrdering,
@@ -154,7 +147,7 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
     console.log("InterpretationTab props", props);
 
 
-    const anyUnsavedChanges = changedOrdering !== null || snvDeletionsLen > 0 || cnvDeletionsLen > 0;
+    const anyUnsavedChanges = snvDeletionsLen > 0 || cnvDeletionsLen > 0;
 
     if (!isActiveDotRouterTab) {
         return null;
@@ -162,14 +155,14 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
 
     return (
         <React.Fragment>
-            <div className="d-flex align-items-center justify-content-between mb-36">
+            <div className="d-flex align-items-center justify-content-between mb-2">
                 <h1 className="text-300 mb-0">
                     Interpretation
                     { isLoadingVariantSampleListItem ? <i className="icon icon-circle-notch icon-spin fas text-muted ml-12"/> : null }
                 </h1>
                 <div className="d-block d-md-flex">
                     <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="mr-08" />
-                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, changedOrdering,
+                    <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections,
                         resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, snvDeletionsLen, cnvDeletionsLen, fetchVariantSampleListItem }} />
                 </div>
             </div>
@@ -189,7 +182,6 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         variantSampleListItem,
         deletedVariantSampleSelections,
         deletedStructuralVariantSampleSelections,
-        changedOrdering,
         resetVariantSampleSelectionDeletionsAndOrdering,
         anyUnsavedChanges,
         snvDeletionsLen,
@@ -221,7 +213,7 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
             }
 
             fetchVariantSampleListItem(function(){
-                // Reset `deletedVariantSampleSelections`, `changedOrdering`, & `isPatching`
+                // Reset `deletedVariantSampleSelections` & `isPatching`
                 resetVariantSampleSelectionDeletionsAndOrdering(); // resets BOTH SNV and SV selections
                 setIsPatching(false);
             });
@@ -270,9 +262,6 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
     }, [ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections ]);
 
     const titleParts = [];
-    if (changedOrdering) {
-        titleParts.push("Ordering");
-    }
     if (deletionsPresent) {
         titleParts.push("Deletions");
     }
