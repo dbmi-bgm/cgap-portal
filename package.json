@@ -103,7 +103,7 @@
     "higlass-general-vcf": "0.1.1",
     "higlass-cohort": "0.1.1",
     "higlass-bigwig-datafetcher": "0.1.2",
-    "higlass-sv": "0.1.6",
+    "higlass-sv": "1.0.2",
     "markdown-to-jsx": "^6.11.4",
     "memoize-one": "^5.1.1",
     "prop-types": "^15.8.1",

@@ -502,10 +502,11 @@ def make_s3_client():
         s3_client_extra_args['region_name'] = CGAP_ECS_REGION
         log.warning(f"make_s3_client using S3 entity ID {key_id[:10]} arguments in `boto3 client creation call.")
         if 'ENCODED_S3_ENCRYPT_KEY_ID' in identity:
+            # This setting is required when testing locally and encrypted buckets need to be accessed.
             s3_client_extra_args['config'] = Config(signature_version='s3v4')
     else:
         log.warning(f'make_s3_client called with no identity')
-
+    #s3_client_extra_args['config'] = Config(signature_version='s3v4')
     s3_client = boto3.client('s3', **s3_client_extra_args)
     return s3_client
 
