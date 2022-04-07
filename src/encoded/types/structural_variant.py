@@ -409,9 +409,9 @@ class StructuralVariantSample(Item):
                 start,
                 end,
             )
-            return structural_variant_display_title + " (" + CALL_INFO + ")" # chr1:504A>T (HG002)
+            return CALL_INFO + ":" + structural_variant_display_title # HG002:chr1:504A>T
 
-        return "Sample for " + CALL_INFO
+        return CALL_INFO
 
     @calculated_property(
         schema={
