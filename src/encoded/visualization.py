@@ -149,7 +149,7 @@ def get_higlass_viewconf(context, request):
 
     # THIS NEEDS TO BE REPLACED WHEN TESTING LOCALLY
     s3_bucket = request.registry.settings.get('file_wfout_bucket')
-    s3_bucket = "cgap-mgb-main-application-cgap-mgb-wfoutput"
+    #s3_bucket = "cgap-mgb-main-application-cgap-mgb-wfoutput"
 
     if requesting_tab == "bam":
 
@@ -321,7 +321,8 @@ def get_higlass_viewconf(context, request):
                     top_tracks.append(cgap_sv_track_sample)
 
                 # HARCODED FOR DEMO. NEEDS TO BE CHANGED!
-                if bam_sample_id == "NA12879_sample":
+                #if bam_sample_id == "NA12879_sample":
+                if bam_sample_id == "NA24385_sample":
                     text_track_sample = deepcopy(describing_text_track)
                     text_track_sample["uid"] = "cnv_vcf_text" + accession
                     text_track_sample["options"]["text"] = "Copy Number Variants called by BIC-seq2"

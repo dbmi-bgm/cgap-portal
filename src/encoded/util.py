@@ -506,7 +506,7 @@ def make_s3_client():
             s3_client_extra_args['config'] = Config(signature_version='s3v4')
     else:
         log.warning(f'make_s3_client called with no identity')
-    #s3_client_extra_args['config'] = Config(signature_version='s3v4')
+
     s3_client = boto3.client('s3', **s3_client_extra_args)
     return s3_client
 
