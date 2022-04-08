@@ -309,13 +309,12 @@ function VariantSampleListSortSelectDrop (props) {
     const { updateVariantSampleListSort, vslSortType } = props;
 
     return (
-        <div className="d-flex mb-2">
-            <label className="mr-1">
+        <div className="d-flex my-2">
+            <label htmlFor="vsl-sort-type" className="mr-1 mt-06">
             Sort By:
             </label>
             <DropdownButton
                 variant="outline-secondary"
-                size="sm"
                 className="text-600"
                 title={vslSortType === "Gene" ? vslSortType : "Variant Type (SNV/SV)"}
                 id="vsl-sort-type"
