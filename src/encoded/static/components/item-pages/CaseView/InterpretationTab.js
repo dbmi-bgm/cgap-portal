@@ -20,7 +20,7 @@ export class InterpretationTabController extends React.Component {
         "children": PropTypes.element
     };
 
-    // save and see about re-using
+    // save and see about re-using for custom ordering later on
     // static reorderedVariantSampleListItem(variantSampleListItem, changedOrdering){
 
     //     function reorderSelectionList(vsSelections){

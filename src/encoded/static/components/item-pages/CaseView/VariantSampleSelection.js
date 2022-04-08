@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
@@ -86,13 +86,13 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
         } else if (highlightedGeneAtID) {
             geneToVariantMap[highlightedGeneAtID] = [selection];
             geneToDisplayTitleMap[highlightedGeneAtID] = highlightedGene; 
-        } else { // 
-            console.log("lol", highlightedGeneAtID);
+        } else {
+            // handle case for variants with no highlighted gene selected
             if (geneToVariantMap["No Gene"]) {
                 geneToVariantMap["No Gene"].push(selection);
             } else {
                 geneToVariantMap["No Gene"] = [selection];
-                geneToDisplayTitleMap["No Gene"] = "No Genes";
+                geneToDisplayTitleMap["No Gene"] = "No Highlighted Gene Selected";
             }
         }
 
@@ -101,7 +101,6 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
 
     geneToVariantMap.displayTitleMap = geneToDisplayTitleMap;
     geneToVariantMap.variantToUUIDMap = variantToUUIDMap
-    console.log(geneToVariantMap);
     return geneToVariantMap;
 }
 
@@ -213,11 +212,11 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
     
         let isDeleted;
         let facetDict;
-        console.log("vsType", vsType);
+
         if (vsType === "VariantSample") {
             isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
             facetDict = snvFacetDict;
-            console.log("all stuff", selection, facetDict, isDeleted, vsType, unsavedClassification, index);
+
         } else if (vsType === "StructuralVariantSample") {
             isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
             facetDict = cnvFacetDict;
@@ -267,27 +266,43 @@ function VSLSortedByVariantType(props) {
 function VSLSortedByGeneType(props) {
     const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
 
-    const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+    function renderSorted() {
+        const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
 
-    const geneToVariantMap = { ...groupedByGene };
-    const genes = Object.keys(geneToVariantMap);
+        const geneToVariantMap = { ...groupedByGene };
+        const genes = Object.keys(geneToVariantMap).sort(
+            (geneAtID, nextGeneAtID) =>  {
+                // make sure unsorted genes appear last
+                if (geneAtID == "No Gene") return 1;
+                if (nextGeneAtID == "No Gene") return -1;
+                // otherwise sort alphabetically by gene title
+                return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
+            }
+        ); 
 
-    return (
-        <>
-        {
-            genes.map((geneAtID) => {
-                const geneSelections = geneToVariantMap[geneAtID];
-                console.log("geneSelections", geneSelections);
-                return (
-                    <div className="col-12">
-                        <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
-                        <hr className="mb-2 mt-0" />
-                        { geneSelections.map(renderSelectionAsJSX) }
-                    </div>);
-            })
-        }
-        </>
-    );
+        return (
+            <>
+            {
+                genes.map((geneAtID) => {
+                    const geneSelections = geneToVariantMap[geneAtID];
+                    return (
+                        <div className="col-12">
+                            <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
+                            <hr className="mb-2 mt-0" />
+                            { geneSelections.map(renderSelectionAsJSX) }
+                        </div>);
+                })
+            }
+            </>
+        );
+    }
+
+    // update gene sort whenever selections change
+    useEffect(() => {
+        return renderSorted();
+    }, [cnvSelections, vsSelections]);
+    
+    return renderSorted();
 }
 
 function VariantSampleListSortSelectDrop (props) {
@@ -302,10 +317,10 @@ function VariantSampleListSortSelectDrop (props) {
                 variant="outline-secondary"
                 size="sm"
                 className="text-600"
-                title={vslSortType || "Variant"}
+                title={vslSortType === "Gene" ? vslSortType : "Variant Type (SNV/SV)"}
                 id="vsl-sort-type"
                 onSelect={updateVariantSampleListSort}>
-                <DropdownItem eventKey="Variant">Variant</DropdownItem>
+                <DropdownItem eventKey="Variant">Variant Type (SNV/SV)</DropdownItem>
                 <DropdownItem eventKey="Gene">Gene</DropdownItem>
             </DropdownButton>
         </div>
