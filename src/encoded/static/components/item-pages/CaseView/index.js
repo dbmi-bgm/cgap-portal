@@ -1,9 +1,10 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
+import ReactTooltip from 'react-tooltip';
 
 import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
@@ -298,6 +299,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         updateVariantSampleListID, savedVariantSampleIDMap,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem
     };
+
+    useEffect(() => {
+        ReactTooltip.rebuild();
+    }, [vslSortType]);
 
     return (
         <React.Fragment>
