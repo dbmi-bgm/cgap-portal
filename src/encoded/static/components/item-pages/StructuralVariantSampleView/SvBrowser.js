@@ -82,7 +82,7 @@ export class SvBrowser extends React.PureComponent {
         };
 
         ajax.load(
-            "/search/?type=Case&sample.bam_sample_id=" + bamSampleId + "&structural_variant_vcf_file.accession=" + file,
+            "/search/?type=Case&sample.bam_sample_id=" + bamSampleId,
             (resp) => {
                 const { "@graph": [ caseItem = null ] = [] } = resp;
                 const { sample_processing: sampleProcessingItem = null } = caseItem || {};
