@@ -12,7 +12,7 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 import { buildSchemaFacetDictionary } from './../../util/Schemas';
-import { onClickLinkNavigateChildWindow, onClickOpenChildWindow } from './../components/child-window-reuser';
+import { onClickLinkNavigateChildWindow } from '../components/child-window-controls';
 
 import {
     structuralVariantSampleColumnExtensionMap,
@@ -410,6 +410,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const {
         "@id": vsID,
+        uuid: vsUUID,
         variant: { display_title: snvVariantDisplayTitle, genes: [ firstGene = null ] = [] } = {},
         structural_variant: { display_title: svVariantDisplayTitle } = {},
         interpretation: clinicalInterpretationNote = null,
@@ -478,11 +479,11 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             <div className="card-header pr-12">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
-                    <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
-                        <h4 className="text-truncate text-600 my-0 selected-vsl-title">
+                    <div className="flex-auto mb-08 mb-lg-0">
+                        <h4 className="text-600 my-0 selected-vsl-title d-flex align-items-center">
                             { parentTabType === parentTabTypes.CASEREVIEW ?
                                 <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType }} />
-                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, caseAccession, variantDisplayTitle, searchType }} />
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, vsUUID, caseAccession, variantDisplayTitle, searchType }} />
                             }
                         </h4>
                     </div>
@@ -519,24 +520,26 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         <label className="mb-04 text-small d-block" data-tip={variantIsSNV ? snvGeneTranscriptColDescription : svGeneTranscriptColDescription}>
                             { (variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle) || "Gene, Transcript" }
                         </label>
-                        <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
-                            onClick={onClickOpenChildWindow}>
+                        <button type="button" onClick={onClickLinkNavigateChildWindow}
+                            data-href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
+                            data-child-window={vsUUID} className="btn btn-link p-0">
                             { variantIsSNV ?
                                 <GenesMostSevereDisplayTitle result={variantSample} align="left" />
                                 :
                                 <StructuralVariantTranscriptColumn result={variantSample} align="left" />
                             }
-                        </a>
+                        </button>
                     </div>
                     { variantIsSNV ?
                         <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small" data-tip={snvVariantColDescription}>
+                            <label className="mb-04 text-small d-block" data-tip={snvVariantColDescription}>
                                 { snvVariantColTitle || "Variant" }
                             </label>
-                            <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
-                                onClick={onClickLinkNavigateChildWindow}>
+                            <button type="button" onClick={onClickLinkNavigateChildWindow}
+                                data-href={vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
+                                data-child-window={vsUUID} className="btn btn-link p-0">
                                 <GenesMostSevereHGVSCColumn gene={firstGene} align="left" />
-                            </a>
+                            </button>
                         </div>
                         : null }
                     { !variantIsSNV ?
@@ -566,7 +569,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
             <div className="card-body border-top attribution-section py-2">
                 <div className="row align-items-center">
-                    <div className="col d-flex-align-items-center">
+                    <div className="col d-flex align-items-center">
                         <FilterBlocksUsedPopovers {...{ selection, facetDict }} />
                     </div>
                     <div className="col-auto text-small"
@@ -635,9 +638,7 @@ export const DiscoveryCandidacyColumn = React.memo(function DiscoveryCandidacyCo
 
 
 function InterpretationTabVariantSampleTitle(props){
-    const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
-
-    const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
+    const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, vsUUID, variantDisplayTitle, caseAccession } = props;
 
     if (anyUnsavedChanges) {
         return (
@@ -647,13 +648,15 @@ function InterpretationTabVariantSampleTitle(props){
             </React.Fragment>
         );
     } else {
+        const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
         return (
             <React.Fragment>
                 <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
-                <a href={targetHref} onClick={onClickOpenChildWindow}>
+                <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
+                    data-child-window={vsUUID} className="btn btn-link p-0 text-larger text-600 text-truncate">
                     { variantDisplayTitle }
-                </a>
+                </button>
             </React.Fragment>
         );
     }
