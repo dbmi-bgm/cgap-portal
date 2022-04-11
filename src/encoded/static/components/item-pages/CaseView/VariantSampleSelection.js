@@ -263,7 +263,7 @@ function VSLSortedByVariantType(props) {
     );
 }
 
-function VSLSortedByGeneType(props) {
+const VSLSortedByGeneType = React.memo(function(props) {
     const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
 
     function renderSorted() {
@@ -303,7 +303,7 @@ function VSLSortedByGeneType(props) {
     }, [cnvSelections, vsSelections]);
     
     return renderSorted();
-}
+});
 
 function VariantSampleListSortSelectDrop (props) {
     const { updateVariantSampleListSort, vslSortType } = props;
