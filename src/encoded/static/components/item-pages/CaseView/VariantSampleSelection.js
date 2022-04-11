@@ -266,18 +266,20 @@ function VSLSortedByVariantType(props) {
 const VSLSortedByGeneType = React.memo(function VSLSortedByGeneType(props) {
     const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
 
-    const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
-
-    const geneToVariantMap = { ...groupedByGene };
-    const genes = Object.keys(geneToVariantMap).sort(
-        (geneAtID, nextGeneAtID) =>  {
-            // make sure unsorted genes appear last
-            if (geneAtID == "No Gene") return 1;
-            if (nextGeneAtID == "No Gene") return -1;
-            // otherwise sort alphabetically by gene title
-            return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
-        }
-    ); 
+    const { genes, displayTitleMap, geneToVariantMap } = useMemo(function(){
+         const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+        const geneToVariantMap = { ...groupedByGene };
+        const genes = Object.keys(geneToVariantMap).sort(
+            (geneAtID, nextGeneAtID) =>  {
+                // make sure unsorted genes appear last
+                if (geneAtID == "No Gene") return 1;
+                if (nextGeneAtID == "No Gene") return -1;
+                // otherwise sort alphabetically by gene title
+                return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
+            }
+        );
+        return { genes, displayTitleMap, geneToVariantMap };
+    }, [ vsSelections, cnvSelections ]);
 
     return genes.map(function(geneAtID, i){
         const geneSelections = geneToVariantMap[geneAtID];
