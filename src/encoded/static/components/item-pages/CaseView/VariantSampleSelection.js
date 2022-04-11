@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
@@ -12,7 +12,7 @@ import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/f
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 import { buildSchemaFacetDictionary } from './../../util/Schemas';
-import { onClickLinkNavigateChildWindow, onClickOpenChildWindow } from './../components/child-window-reuser';
+import { onClickLinkNavigateChildWindow } from '../components/child-window-controls';
 
 import {
     structuralVariantSampleColumnExtensionMap,
@@ -33,9 +33,10 @@ import { projectReportSettings } from './../ReportView/project-settings-draft';
  * This file contains the VariantSampleSelection item, which is shared between InterpretationTab and Finalize Case tab.
  *
  * @todo
- * We will need to load in Project Item to get table tags and potentially other settings from such
- * as default sorting of VSes. We probably should do this at the CaseView/index.js level so it is accessible
+ * We will need to load in Project Item to get table tags. We probably should do this at the CaseView/index.js level so it is accessible
  * to all elements? It could be lazy-loaded and we just render classification dropdowns once it's loaded.
+ * 
+ * Default sorting of VSes is currently stored as local state in the VSL controller; and will eventually be saved to VSL itself.
  */
 
 
@@ -44,6 +45,65 @@ export const parentTabTypes = {
     INTERPRETATION: 1,
     CASEREVIEW: 2
 };
+
+function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
+    const allSelections = vsSelections.concat(cnvSelections);
+    
+    var variantToUUIDMap = {};
+    var geneToVariantMap = {};
+    var geneToDisplayTitleMap = {};
+
+    allSelections.forEach((selection) => {
+        const {
+            variant_sample_item: {
+                "@id": vsAtID, uuid: vsUUID,
+                variant: {
+                    genes: {
+                        0: {
+                            genes_most_severe_gene: {
+                                "@id": geneAtID,
+                                display_title: geneTitle
+                            } = {}
+                        } = {}
+                    } = []
+                } = {},
+                highlighted_genes: {
+                    0: { 
+                        '@id': highlightedGeneAtID,
+                        display_title: highlightedGene
+                    } = {}
+                } = []
+            } = {}
+        } = selection;
+
+        if (geneAtID && geneToVariantMap[geneAtID]) {
+            geneToVariantMap[geneAtID].push(selection);
+        } else if (geneAtID) {
+            geneToVariantMap[geneAtID] = [selection];
+            geneToDisplayTitleMap[geneAtID] = geneTitle;
+        } else if (highlightedGeneAtID && geneToVariantMap[highlightedGeneAtID]) {
+            geneToVariantMap[highlightedGeneAtID].push(selection);
+        } else if (highlightedGeneAtID) {
+            geneToVariantMap[highlightedGeneAtID] = [selection];
+            geneToDisplayTitleMap[highlightedGeneAtID] = highlightedGene; 
+        } else {
+            // handle case for variants with no highlighted gene selected
+            if (geneToVariantMap["No Gene"]) {
+                geneToVariantMap["No Gene"].push(selection);
+            } else {
+                geneToVariantMap["No Gene"] = [selection];
+                geneToDisplayTitleMap["No Gene"] = "No Highlighted Gene Selected";
+            }
+        }
+
+        variantToUUIDMap[vsAtID] = vsUUID;
+    });
+
+    geneToVariantMap.displayTitleMap = geneToDisplayTitleMap;
+    geneToVariantMap.variantToUUIDMap = variantToUUIDMap
+    return geneToVariantMap;
+}
+
 
 
 /**
@@ -54,11 +114,15 @@ export const parentTabTypes = {
  */
 export const VariantSampleSelectionList = React.memo(function VariantSampleSelectionList (props) {
     const {
-        variantSampleListItem,
         schemas,
         context,
-        isLoadingVariantSampleListItem = false,
         parentTabType = parentTabTypes.INTERPRETATION,
+
+        // From VariantSampleListController
+        variantSampleListItem,
+        isLoadingVariantSampleListItem = false,
+        updateVariantSampleListSort,
+        vslSortType,
 
         // From InterpretationTab:
         toggleVariantSampleSelectionDeletion,
@@ -133,8 +197,8 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         anyUnsavedChanges
     };
 
-    const snvOptions = vsSelections.map(function(selection, index){
-        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID } = {} } = selection;
+    function renderSelectionAsJSX(selection, index) {
+        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID, "@type": { 0: vsType = null } = [] } } = selection;
         if (!vsAtID) {
             // Handle lack of permissions, show some 'no permissions' view, idk..
             return (
@@ -143,34 +207,46 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                 </div>
             );
         }
+    
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
-        const isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
-        return (
-            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="VariantSample"
-                {...{ selection, index, unsavedClassification, isDeleted }} facetDict={snvFacetDict}  />
-        );
-    });
+    
+        let isDeleted;
+        let facetDict;
 
-    const cnvOptions = cnvSelections.map(function(selection, index) {
-        const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID, display_title } = {} } = selection;
-        if (!vsAtID) {
-            // Handle lack of permissions, show some 'no permissions' view, idk..
-            return (
-                <div className="text-center p-3">
-                    <em>Item with no view permissions</em>
-                </div>
-            );
-        }
-        const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
-        const isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
+        if (vsType === "VariantSample") {
+            isDeleted = deletedVariantSampleSelections ? (deletedVariantSampleSelections[vsUUID] || false) : undefined;
+            facetDict = snvFacetDict;
+
+        } else if (vsType === "StructuralVariantSample") {
+            isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
+            facetDict = cnvFacetDict;
+        }   
         return (
-            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType="StructuralVariantSample"
-                {...{ selection, index, unsavedClassification, isDeleted }} facetDict={cnvFacetDict}   />
+            <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType={vsType}
+                {...{ selection, index, unsavedClassification, isDeleted, facetDict }}  />
         );
-    });
+    }
 
     return (
         <div className="row">
+            <div className="col-12 align-center justify-center">
+                <VariantSampleListSortSelectDrop {...{ updateVariantSampleListSort, vslSortType }} />
+            </div>
+            { vslSortType === "Variant" ?
+                <VSLSortedByVariantType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} />:
+                <VSLSortedByGeneType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} /> }
+        </div>
+    );
+});
+
+function VSLSortedByVariantType(props) {
+    const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
+
+    const snvOptions = vsSelections.map(renderSelectionAsJSX);
+    const cnvOptions = cnvSelections.map(renderSelectionAsJSX);
+
+    return (
+        <>
             { !!vsSelections.length &&
                 <div className="col-12">
                     <h2 className="mb-05 text-600">SNV / Indel - {vsSelections.length} Variant(s)</h2>
@@ -183,10 +259,61 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                     <hr className="mb-2 mt-0" />
                     {cnvOptions}
                 </div> }
-        </div>
+        </>
     );
+}
+
+const VSLSortedByGeneType = React.memo(function VSLSortedByGeneType(props) {
+    const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
+
+    const { genes, displayTitleMap, geneToVariantMap } = useMemo(function(){
+         const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+        const geneToVariantMap = { ...groupedByGene };
+        const genes = Object.keys(geneToVariantMap).sort(
+            (geneAtID, nextGeneAtID) =>  {
+                // make sure unsorted genes appear last
+                if (geneAtID == "No Gene") return 1;
+                if (nextGeneAtID == "No Gene") return -1;
+                // otherwise sort alphabetically by gene title
+                return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
+            }
+        );
+        return { genes, displayTitleMap, geneToVariantMap };
+    }, [ vsSelections, cnvSelections ]);
+
+    return genes.map(function(geneAtID, i){
+        const geneSelections = geneToVariantMap[geneAtID];
+        return (
+            <div className="col-12" key={i}>
+                <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
+                <hr className="mb-2 mt-0" />
+                { geneSelections.map(renderSelectionAsJSX) }
+            </div>
+        );
+    });
 
 });
+
+function VariantSampleListSortSelectDrop (props) {
+    const { updateVariantSampleListSort, vslSortType } = props;
+
+    return (
+        <div className="d-flex mt-2 mb-3">
+            <label htmlFor="vsl-sort-type" className="mr-1 mt-06">
+            Sort By:
+            </label>
+            <DropdownButton
+                variant="outline-secondary"
+                className="text-600"
+                title={vslSortType === "Gene" ? vslSortType : "Variant Type (SNV/SV)"}
+                id="vsl-sort-type"
+                onSelect={updateVariantSampleListSort}>
+                <DropdownItem eventKey="Variant">Variant Type (SNV/SV)</DropdownItem>
+                <DropdownItem eventKey="Gene">Gene</DropdownItem>
+            </DropdownButton>
+        </div>
+    )
+}
 
 /** @todo Consider making this the calculated display_title property for SVs? */
 function transformSVDisplayTitle(svs){
@@ -286,6 +413,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     const {
         "@id": vsID,
+        uuid: vsUUID,
         variant: { display_title: snvVariantDisplayTitle, genes: [ firstGene = null ] = [] } = {},
         structural_variant: { display_title: svVariantDisplayTitle } = {},
         interpretation: clinicalInterpretationNote = null,
@@ -354,11 +482,11 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
             <div className="card-header pr-12">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
-                    <div className="flex-auto mb-08 mb-lg-0 overflow-hidden">
-                        <h4 className="text-truncate text-600 my-0 selected-vsl-title">
+                    <div className="flex-auto mb-08 mb-lg-0">
+                        <h4 className="text-600 my-0 selected-vsl-title d-flex align-items-center">
                             { parentTabType === parentTabTypes.CASEREVIEW ?
                                 <CaseReviewTabVariantSampleTitle {...{ noSavedNotes, countNotes, countNotesInReport, countNotesInKnowledgeBase, variantDisplayTitle, searchType }} />
-                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, caseAccession, variantDisplayTitle, searchType }} />
+                                : <InterpretationTabVariantSampleTitle {...{ noSavedNotes, anyUnsavedChanges, isDeleted, vsID, vsUUID, caseAccession, variantDisplayTitle, searchType }} />
                             }
                         </h4>
                     </div>
@@ -395,24 +523,26 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                         <label className="mb-04 text-small d-block" data-tip={variantIsSNV ? snvGeneTranscriptColDescription : svGeneTranscriptColDescription}>
                             { (variantIsSNV ? snvGeneTranscriptColTitle : svGeneTranscriptColTitle) || "Gene, Transcript" }
                         </label>
-                        <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
-                            onClick={onClickOpenChildWindow}>
+                        <button type="button" onClick={onClickLinkNavigateChildWindow}
+                            data-href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=0' + (caseAccession ? '&caseSource=' + caseAccession : '')}
+                            data-child-window={vsUUID} className="btn btn-link p-0">
                             { variantIsSNV ?
                                 <GenesMostSevereDisplayTitle result={variantSample} align="left" />
                                 :
                                 <StructuralVariantTranscriptColumn result={variantSample} align="left" />
                             }
-                        </a>
+                        </button>
                     </div>
                     { variantIsSNV ?
                         <div className="col col-sm-4 col-lg-2 py-2">
-                            <label className="mb-04 text-small" data-tip={snvVariantColDescription}>
+                            <label className="mb-04 text-small d-block" data-tip={snvVariantColDescription}>
                                 { snvVariantColTitle || "Variant" }
                             </label>
-                            <a href={vsID + '?showInterpretation=True&annotationTab=0&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
-                                onClick={onClickLinkNavigateChildWindow}>
+                            <button type="button" onClick={onClickLinkNavigateChildWindow}
+                                data-href={vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
+                                data-child-window={vsUUID} className="btn btn-link p-0">
                                 <GenesMostSevereHGVSCColumn gene={firstGene} align="left" />
-                            </a>
+                            </button>
                         </div>
                         : null }
                     { !variantIsSNV ?
@@ -442,7 +572,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
             <div className="card-body border-top attribution-section py-2">
                 <div className="row align-items-center">
-                    <div className="col d-flex-align-items-center">
+                    <div className="col d-flex align-items-center">
                         <FilterBlocksUsedPopovers {...{ selection, facetDict }} />
                     </div>
                     <div className="col-auto text-small"
@@ -511,9 +641,7 @@ export const DiscoveryCandidacyColumn = React.memo(function DiscoveryCandidacyCo
 
 
 function InterpretationTabVariantSampleTitle(props){
-    const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, variantDisplayTitle, caseAccession } = props;
-
-    const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
+    const { noSavedNotes, anyUnsavedChanges, isDeleted, vsID, vsUUID, variantDisplayTitle, caseAccession } = props;
 
     if (anyUnsavedChanges) {
         return (
@@ -523,13 +651,15 @@ function InterpretationTabVariantSampleTitle(props){
             </React.Fragment>
         );
     } else {
+        const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
         return (
             <React.Fragment>
                 <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
-                <a href={targetHref} onClick={onClickOpenChildWindow}>
+                <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
+                    data-child-window={vsUUID} className="btn btn-link p-0 text-larger text-600 text-truncate">
                     { variantDisplayTitle }
-                </a>
+                </button>
             </React.Fragment>
         );
     }
@@ -540,7 +670,7 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
 
     let savedNotesTip;
     if (searchType === "StructuralVariantSample") {
-        savedNotesTip = "No notes saved for this Structural Variant Sample; SV Interpretation UI coming soon...";
+        savedNotesTip = "SV Case Review UI coming soon...";
     } else if (noSavedNotes) {
         savedNotesTip = "No notes saved for this Variant Sample, annotate it under the Interpretation tab.";
     } else {
@@ -668,7 +798,7 @@ function ClassificationDropdown(props){
 
     let tooltip;
     if (searchType === "StructuralVariantSample") {
-        tooltip = "SV Interpretation UI coming soon...";
+        tooltip = "SV Case Review UI coming soon...";
     } else {
         tooltip = !viewClassification? "Select a finding..." : null;
     }
