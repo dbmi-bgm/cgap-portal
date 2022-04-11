@@ -263,46 +263,33 @@ function VSLSortedByVariantType(props) {
     );
 }
 
-const VSLSortedByGeneType = React.memo(function(props) {
+const VSLSortedByGeneType = React.memo(function VSLSortedByGeneType(props) {
     const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
 
-    function renderSorted() {
-        const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+    const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
 
-        const geneToVariantMap = { ...groupedByGene };
-        const genes = Object.keys(geneToVariantMap).sort(
-            (geneAtID, nextGeneAtID) =>  {
-                // make sure unsorted genes appear last
-                if (geneAtID == "No Gene") return 1;
-                if (nextGeneAtID == "No Gene") return -1;
-                // otherwise sort alphabetically by gene title
-                return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
-            }
-        ); 
+    const geneToVariantMap = { ...groupedByGene };
+    const genes = Object.keys(geneToVariantMap).sort(
+        (geneAtID, nextGeneAtID) =>  {
+            // make sure unsorted genes appear last
+            if (geneAtID == "No Gene") return 1;
+            if (nextGeneAtID == "No Gene") return -1;
+            // otherwise sort alphabetically by gene title
+            return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
+        }
+    ); 
 
+    return genes.map(function(geneAtID, i){
+        const geneSelections = geneToVariantMap[geneAtID];
         return (
-            <>
-            {
-                genes.map((geneAtID) => {
-                    const geneSelections = geneToVariantMap[geneAtID];
-                    return (
-                        <div className="col-12">
-                            <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
-                            <hr className="mb-2 mt-0" />
-                            { geneSelections.map(renderSelectionAsJSX) }
-                        </div>);
-                })
-            }
-            </>
+            <div className="col-12" key={i}>
+                <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
+                <hr className="mb-2 mt-0" />
+                { geneSelections.map(renderSelectionAsJSX) }
+            </div>
         );
-    }
+    });
 
-    // update gene sort whenever selections change
-    useEffect(() => {
-        return renderSorted();
-    }, [cnvSelections, vsSelections]);
-    
-    return renderSorted();
 });
 
 function VariantSampleListSortSelectDrop (props) {
