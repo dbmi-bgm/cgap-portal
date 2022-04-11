@@ -3,14 +3,13 @@ import datetime
 import pytest
 import pytz
 import requests  # XXX: C4-211
-import webtest
 from dateutil.parser import isoparse
 
-from ..ingestion.common import CGAP_CORE_PROJECT
 from ..types.variant import build_variant_sample_annotation_id
 from .variant_fixtures import VARIANT_SAMPLE_URL
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
+
 
 @pytest.fixture
 def bgm_test_variant_sample2(bgm_test_variant_sample):
@@ -30,13 +29,13 @@ def bgm_note_for_patch_process(institution, bgm_project):
         'institution': institution['@id']
     }
 
+
 @pytest.fixture
 def bgm_note_for_patch_process2(bgm_note_for_patch_process):
     # IS NOT pre-POSTed into DB.
     bgm_note_for_patch_process_copy = bgm_note_for_patch_process.copy()
     bgm_note_for_patch_process_copy['note_text'] = 'dummy text 2'
     return bgm_note_for_patch_process_copy
-
 
 
 @pytest.fixture
@@ -58,6 +57,7 @@ def y_variant(bgm_user_testapp, bgm_project, institution):
         "CHROM": "Y"
     }
     return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
+
 
 @pytest.fixture
 def bgm_y_variant_sample(y_variant, institution, bgm_project):
@@ -87,18 +87,18 @@ def test_variant_sample_proband_inheritance(bgm_user_testapp, bgm_y_variant_samp
     ])
 
 
-@pytest.mark.integrated  # uses s3
-def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
-    """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
-    test_variant_sample['file'] += '2'
-    res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=[201, 409]).json
-    uuid = res['@graph'][0]['uuid']
-    bam_snapshot_location = res['@graph'][0]['bam_snapshot']
-    assert bam_snapshot_location == test_variant_sample['file'] + '/bamsnap/chr1_12125898.png'
-    download = es_testapp.get('/' + uuid + '/@@download').location
-    # download location is https://test-wfout-bucket.s3.amazonaws.com/dummy-file-name2/bamsnap/chr1_12125898.png
-    resp = requests.get(download)
-    assert 'hello world' in resp.content.decode('utf-8')
+# @pytest.mark.integrated  # uses s3
+# def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
+#     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
+#     test_variant_sample['file'] += '2'
+#     res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=[201, 409]).json
+#     uuid = res['@graph'][0]['uuid']
+#     bam_snapshot_location = res['@graph'][0]['bam_snapshot']
+#     assert bam_snapshot_location == test_variant_sample['file'] + '/bamsnap/chr1_12125898.png'
+#     download = es_testapp.get('/' + uuid + '/@@download').location
+#     # download location is https://test-wfout-bucket.s3.amazonaws.com/dummy-file-name2/bamsnap/chr1_12125898.png
+#     resp = requests.get(download)
+#     assert 'hello world' in resp.content.decode('utf-8')
 
 
 def test_bam_snapshot_presence(
@@ -401,3 +401,59 @@ def test_case_specific_variant_sample_genelist(
     testapp.patch_json(genelist["@id"], genelist_patch, status=200)
     vs_patch = testapp.patch_json(vs_post["@id"], {}, status=200).json["@graph"][0]
     assert genelist_title in vs_patch["associated_genelists"]
+
+
+@pytest.mark.parametrize(
+    "genes_properties,mitochondrial,expected",
+    [
+        ([], False, "chr1:12345A>C (some_sample)"),
+        (["genes_most_severe_gene"], False, "APC:g.12345A>C (some_sample)"),
+        (["genes_most_severe_gene"], True, "APC:m.12345A>C (some_sample)"),
+        (
+            ["genes_most_severe_gene", "genes_most_severe_hgvsc"],
+            False,
+            "APC:c.1234A>C (some_sample)",
+        ),
+        (
+            ["genes_most_severe_gene", "genes_most_severe_hgvsp"],
+            False,
+            "APC:p.Val= (some_sample)",
+        ),
+        (
+            [
+                "genes_most_severe_gene",
+                "genes_most_severe_hgvsp",
+                "genes_most_severe_hgvsc"
+            ],
+            False,
+            "APC:p.Val= (some_sample)",
+        ),
+    ]
+)
+def test_display_title(
+    testapp, variant_sample, variant, gene, genes_properties, mitochondrial, expected
+):
+    """Test display title creation."""
+    transcript = "ENST000000001:"
+    hgvsp = transcript + "p.Val="
+    hgvsc = transcript + "c.1234A>C"
+    gene_atid = gene["@id"]
+    variant_atid = variant["@id"]
+    genes_patch = {}
+    genes_properties_to_patch = {
+        "genes_most_severe_gene": gene_atid,
+        "genes_most_severe_hgvsp": hgvsp,
+        "genes_most_severe_hgvsc": hgvsc,
+    }
+    for genes_property in genes_properties:
+        patch_value = genes_properties_to_patch.get(genes_property)
+        if patch_value:
+            genes_patch[genes_property] = patch_value
+    patch_body = {"genes": [genes_patch] if genes_patch else []}
+    if mitochondrial is True:
+        patch_body.update({"CHROM": "M"})
+    testapp.patch_json(variant_atid, patch_body, status=200)
+    variant_sample_post = testapp.post_json(
+        "/variant-samples", variant_sample, status=201
+    ).json["@graph"][0]
+    assert variant_sample_post["display_title"] == expected
