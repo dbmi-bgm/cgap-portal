@@ -503,14 +503,25 @@ class VariantSample(Item):
         return super().create(registry, uuid, properties, sheets)
 
     @staticmethod
-    def split_genes_field(property_value):
-        """"""
+    def remove_reference_transcript(hgvs_formatted_string):
+        """Remove reference transcript from HGVS-formatted variant name.
+
+        Typically, these HGVS-formatted variants come from VEP.
+
+        NOTE: HGVS nomenclature can use colons after the reference
+        transcript, but none of those situations should arise within
+        VariantSamples (SNVs and small indels). For more info, see
+        https://varnomen.hgvs.org/recommendations/general/
+        """
         result = None
         transcript_separator = ":"
-        if transcript_separator in property_value:
-            split_value = property_value.split(":")
-            if len(split_value) == 2:
-                result = split_value[1]
+        if (
+            isinstance(hgvs_formatted_string, str)
+            and transcript_separator in hgvs_formatted_string
+        ):
+            split_value = hgvs_formatted_string.split(transcript_separator)
+            if len(split_value) > 1:
+                result = "".join(split_value[1:])
         return result
 
     @calculated_property(schema={
@@ -522,17 +533,27 @@ class VariantSample(Item):
         """Build display title.
 
         This title is displayed in new tabs/windows.
+
+        In order, display hierarchy is:
+            - gene symbol with protein change + sample info
+            - gene symbol with cDNA change + sample info
+            - gene symbol with DNA change + sample info
+            - chromosome with DNA change + sample info
+            - sample info (shouldn't be reached, but just in case)
         """
-        gene_display = None
-        hgvsp_display = None
-        hgvsc_display = None
         result = CALL_INFO
         variant = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant:
+            gene_display = None
+            hgvsp_display = None
+            hgvsc_display = None
             chromosome = variant.get("CHROM")
             position = variant.get("POS")
             reference = variant.get("REF")
             alternate = variant.get("ALT")
+            dna_separator = ":g."
+            if chromosome == "M":
+                dna_separator = ":m."
             genes = variant.get("genes", [])
             if genes:
                 gene_properties = genes[0]  # Currently max 1 via reformatter, but can be more
@@ -543,27 +564,23 @@ class VariantSample(Item):
                         gene_display = gene_item.get("gene_symbol")
                 hgvsp = gene_properties.get("genes_most_severe_hgvsp")
                 if hgvsp:
-                    hgvsp_display = self.split_genes_field(hgvsp)
+                    hgvsp_display = self.remove_reference_transcript(hgvsp)
                 hgvsc = gene_properties.get("genes_most_severe_hgvsc")
                 if hgvsc:
-                    hgvsc_display = self.split_genes_field(hgvsc)
-        if gene_display:
-            if hgvsp_display:
-                result = gene_display + ":" + hgvsp_display
-            elif hgvsc_display:
-                result = gene_display + ":" + hgvsc_display
-            elif position and reference and alternate:
-                if chromosome == "M":
-                    separator = ":m."
-                else:
-                    separator = ":g."
-                result = (
-                    gene_display + separator + str(position) + reference + ">" + alternate
+                    hgvsc_display = self.remove_reference_transcript(hgvsc)
+            if gene_display:
+                if hgvsp_display:
+                    result = gene_display + ":" + hgvsp_display
+                elif hgvsc_display:
+                    result = gene_display + ":" + hgvsc_display
+                elif position and reference and alternate:
+                    result = "%s%s%s%s>%s" % (
+                        gene_display, dna_separator, position, reference, alternate
+                    )
+            elif chromosome and position and reference and alternate:
+                result = build_variant_display_title(
+                    chromosome, position, reference, alternate
                 )
-        elif chromosome and position and reference and alternate:
-            result = build_variant_display_title(
-                chromosome, position, reference, alternate
-            )
         if CALL_INFO not in result:
             result += " (" + CALL_INFO + ")"
         return result

@@ -6,6 +6,7 @@ import requests  # XXX: C4-211
 from dateutil.parser import isoparse
 
 from ..types.variant import build_variant_sample_annotation_id
+from ..types.variant import VariantSample
 from .variant_fixtures import VARIANT_SAMPLE_URL
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.workbook]
@@ -404,9 +405,29 @@ def test_case_specific_variant_sample_genelist(
 
 
 @pytest.mark.parametrize(
+    "hgvs_input,expected",
+    [
+        (None, None),
+        ([], None),
+        ("", None),
+        ("ENST00001c.123T>C", None),
+        ("ENST00001:p.Ile=", "p.Ile="),
+        ("ENST00001:p.Ile=:Val", "p.Ile=Val"),
+    ]
+)
+def test_remove_reference_transcript(hgvs_input, expected):
+    """Test removal of reference transcript from HGVS-formatted variant
+    name.
+    """
+    result = VariantSample.remove_reference_transcript(hgvs_input)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
     "genes_properties,mitochondrial,expected",
     [
         ([], False, "chr1:12345A>C (some_sample)"),
+        ([], True, "chrM:12345A>C (some_sample)"),
         (["genes_most_severe_gene"], False, "APC:g.12345A>C (some_sample)"),
         (["genes_most_severe_gene"], True, "APC:m.12345A>C (some_sample)"),
         (
