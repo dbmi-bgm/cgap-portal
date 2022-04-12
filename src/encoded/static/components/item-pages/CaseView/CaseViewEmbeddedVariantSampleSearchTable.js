@@ -26,6 +26,8 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
         currFilterSet,
+        unsavedTechnicalReview,
+        setTechnicalReviewForVSAtID,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -48,8 +50,11 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     );
                 }
             },
+            /**
+             * Depends on props.currFilterSet, which only available in CaseViewEmbeddedVarriantSampleSearchTable[SV]
+             * Is only shown when multiple filter blocks requested.
+             */
             "__matching_filter_block_names": {
-                // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
@@ -59,6 +64,33 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                         return null;
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
+                }
+            },
+            /** Depends on temporary/unsaved state ... */
+            "technical_review.call": {
+                "colTitle": "Technical Review",
+                "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
+                "order": 120,
+                "sort_fields": [
+                    {
+                        "field": "technical_review.call",
+                        "title": "Technical Review Call"
+                    },
+                    {
+                        "field": "technical_review.classification",
+                        "title": "Technical Review Classification"
+                    }
+                ],
+                "render": function(result, props){
+                    const { technical_review: { call, classification } = {} } = result;
+
+                    return (
+                        <div className="w-100 d-flex align-items-center justify-content-around text-truncate">
+                            <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
+                            <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
+                            <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
+                        </div>
+                    );
                 }
             }
         };
@@ -105,8 +137,11 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     );
                 }
             },
+            /**
+             * Depends on props.currFilterSet, which only available in CaseViewEmbeddedVarriantSampleSearchTable[SV]
+             * Is only shown when multiple filter blocks requested.
+             */
             "__matching_filter_block_names": {
-                // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
@@ -118,7 +153,9 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
                 }
             },
-            // TODO: Move these to variantSampleColumnExtensionMap so we don't create new functions every render (or change to isLoadingVariantSample, ...)
+            //
+            // TODO: Move following 3 funcs to variantSampleColumnExtensionMap, maybe put some logic into memoized component(s) (?)
+            //
             "structural_variant.transcript.csq_gene.display_title": {
                 "noSort": true, // not currently a useful or informative sort.
                 "render": function(result, props) {
@@ -250,3 +287,4 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
         </div>
     );
 });
+

@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useMemo, useCallback, useState, useRef } from 'react';
+import _ from 'underscore';
 import queryString from 'query-string';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -69,17 +70,67 @@ export function FilteringTab(props) {
                 </div>
             </div>
             <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
-                <SelectedItemsController isMultiselect>
-                    <SNVFilteringTabBody {...commonProps} />
-                </SelectedItemsController>
+                <TechnicalReviewController>
+                    <SelectedItemsController isMultiselect>
+                        <SNVFilteringTabBody {...commonProps} />
+                    </SelectedItemsController>
+                </TechnicalReviewController>
             </div>
             <div id="cnvsv-filtering" className={"mt-36" + (currViewIdx === 1 ? "" : " d-none")}>
-                <SelectedItemsController isMultiselect>
-                    <CNVFilteringTabBody {...commonProps} />
-                </SelectedItemsController>
+                <TechnicalReviewController>
+                    <SelectedItemsController isMultiselect>
+                        <CNVFilteringTabBody {...commonProps} />
+                    </SelectedItemsController>
+                </TechnicalReviewController>
             </div>
         </React.Fragment>
     );
+}
+
+class TechnicalReviewController extends React.PureComponent {
+
+    constructor(props) {
+        super(props);
+        this.setTechnicalReviewForVSAtID = this.setTechnicalReviewForVSAtID.bind(this);
+        this.resetUnsavedTechnicalReview = this.resetUnsavedTechnicalReview.bind(this);
+        this.state = {
+            "unsavedTechnicalReview": {}
+        };
+    }
+
+    setTechnicalReviewForVSAtID(vsAtID, technicalReview) {
+        this.setState(function({ unsavedTechnicalReview: existingTechReview }){
+            if (technicalReview === null) {
+                if (typeof existingTechReview[vsAtID] !== "undefined") {
+                    return { "unsavedTechnicalReview": _.omit(existingTechReview, vsAtID) };
+                }
+                return null;
+            }
+            return { "unsavedTechnicalReview": { ...existingTechReview, [vsAtID]: technicalReview } };
+        });
+    }
+
+    resetUnsavedTechnicalReview() {
+        this.setState({ "unsavedTechnicalReview": {} });
+    }
+
+    render(){
+        const { children, ...passProps } = this.props;
+        const { unsavedTechnicalReview } = this.state;
+        const childProps = {
+            ...passProps,
+            unsavedTechnicalReview,
+            "setTechnicalReviewForVSAtID": this.setTechnicalReviewForVSAtID,
+            "resetUnsavedTechnicalReview": this.resetUnsavedTechnicalReview
+        };
+        return React.Children.map(children, function(child){
+            if (!React.isValidElement(child) || typeof child.type === "string") {
+                return child;
+            }
+            return React.cloneElement(child, childProps);
+        });
+    }
+
 }
 
 const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(props) {
@@ -263,6 +314,9 @@ function FilteringTabBody(props) {
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
+        unsavedTechnicalReview,         // passed in from TechnicalReviewController
+        setTechnicalReviewForVSAtID,    // passed in from TechnicalReviewController
+        resetUnsavedTechnicalReview,    // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
@@ -334,7 +388,9 @@ function FilteringTabBody(props) {
     };
 
     const fsControllerProps = {
-        searchHrefBase, onResetSelectedVariantSamples, searchType,
+        searchHrefBase, searchType,
+        onResetSelectedVariantSamples,
+        resetUnsavedTechnicalReview,
         "excludeFacets": hideFacets,
         "ref": filterSetControllerRef
     };
@@ -396,6 +452,8 @@ function FilteringTabBody(props) {
         savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
         currFilterSet, // <- Used for Matching Filter Block Indices column
+        unsavedTechnicalReview, // <- Used for Technical Review Column
+        setTechnicalReviewForVSAtID, // <- Used for Technical Review Column
         "key": searchTableKey
     };
 

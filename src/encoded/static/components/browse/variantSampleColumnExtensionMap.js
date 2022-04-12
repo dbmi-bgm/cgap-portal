@@ -138,10 +138,10 @@ export const variantSampleColumnExtensionMap = {
             return <StackedRowColumn className="text-center" rows={rows} />;
         }
     },
-    'bam_snapshot': {
+    "bam_snapshot": {
         "noSort": true,
         "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-        "colTitle": <i className="icon icon-fw icon-image fas" />,
+        "colTitle": "BAM",
         "render": function(result, props) {
             const { bam_snapshot = null } = result;
             if (!bam_snapshot) {
