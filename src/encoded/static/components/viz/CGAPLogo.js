@@ -64,7 +64,8 @@ export class CGAPLogo extends React.PureComponent {
 
     static defaultProps = {
         'id' : "logo_svg",
-        'hoverDelayUntilTransform' : 10
+        'hoverDelayUntilTransform' : 10,
+        "maxHeight": 80
     };
 
     constructor(props){
@@ -81,13 +82,13 @@ export class CGAPLogo extends React.PureComponent {
     }
 
     setHoverStateOnDoTiming(e){
-        const { hoverDelayUntilTransform } = this.props;
+        const { hoverDelayUntilTransform, id } = this.props;
 
         // CSS styles controlled via stylesheets
         setTimeout(()=>{
 
-            const pathsG1 = d3SelectAll("#logo_svg g path.path-g-1");
-            const pathsG2 = d3SelectAll("#logo_svg g path.path-g-2");
+            const pathsG1 = d3SelectAll(`#${id} g path.path-g-1`);
+            const pathsG2 = d3SelectAll(`#${id} g path.path-g-2`);
 
             if (!this.state.hover) return; // No longer hovering. Cancel.
 
@@ -128,10 +129,10 @@ export class CGAPLogo extends React.PureComponent {
     }
 
     setHoverStateOff(e){
-
+        const { id } = this.props;
         this.setState({ 'hover' : false }, ()=>{
-            const pathsG1 = d3SelectAll("#logo_svg g path.path-g-1");
-            const pathsG2 = d3SelectAll("#logo_svg g path.path-g-2");
+            const pathsG1 = d3SelectAll(`#${id} g path.path-g-1`);
+            const pathsG2 = d3SelectAll(`#${id} g path.path-g-2`);
 
             pathsG1.interrupt().transition()
                 .ease(easeQuadOut)
@@ -147,16 +148,22 @@ export class CGAPLogo extends React.PureComponent {
     }
 
     render(){
-        const { id, onClick } = this.props;
+        const {
+            id,
+            onClick,
+            maxHeight,
+            className,
+            title = <span className="navbar-title">CGAP</span>
+        } = this.props;
         const { hover } = this.state;
 
-        const outerStyle = hover ? svgElemStyleHover : svgElemStyle;
+        const outerStyle = { ...(hover ? svgElemStyleHover : svgElemStyle), maxHeight, width: maxHeight };
         const style1 = hover ? commonStyle1Hover : commonStyle1;
         const style2 = hover ? commonStyle1Hover : commonStyle2;
         // const transform1 = hover ? commonTransform1Hover : commonTransform1;
         // const transform2 = hover ? commonTransform2Hover : commonTransform2;
 
-        const containerCls = "img-container" + (hover ? " hover" : "");
+        const containerCls = "cgap-logo-wrapper img-container" + (hover ? " hover" : "") + (className ? " " + className : "");
 
         const groupTransformRotate = "rotate(135,41,31.25)";
         const groupTransform = groupTransformRotate; //= hover ? groupTransformRotate + " scale(1.125, 1.125) translate(-12,-8)" : groupTransformRotate;
@@ -177,10 +184,7 @@ export class CGAPLogo extends React.PureComponent {
                         <path d="m 70.921875,1 7.746094,15.25 H 97.109375 L 89.423828,1 Z" style={style2} className="path-g-2" />
                     </g>
                 </svg>
-                <span className="navbar-title">
-                    CGAP
-                    {/* <i className="icon icon-fw icon-angle-right fas"/> */}
-                </span>
+                { title }
             </div>
         );
     }

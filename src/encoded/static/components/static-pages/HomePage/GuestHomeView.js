@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { NotLoggedInAlert, onAlertLoginClick } from './../../navigation/components/LoginNavItem';
+import { CGAPLogo } from './../../viz/CGAPLogo';
 
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
@@ -21,10 +22,15 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
     return (
         <React.Fragment>
 
-            <div className="px-4 homepage-contents d-flex flex-column flex-lg-row align-items-lg-stretch">
+            <div className="homepage-contents d-flex flex-column flex-lg-row align-items-lg-stretch">
 
                 <div className="py-5 col col-lg-8 d-flex flex-column justify-content-around">
-                    <div className="mx-3">
+                    <div className="w-75 mx-auto">
+                        {/*
+                        <div>
+                            <CGAPLogo title={null} id="clone_logo" maxHeight={240} />
+                        </div>
+                        */}
                         <h2 className="homepage-section-title text-white mt-0">
                             <span className="text-400">Clinical Genome Analysis Platform </span>
                         </h2>
@@ -38,8 +44,8 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     </div>
                 </div>
 
-                <div className="py-4 col-auto col-lg-4 d-flex flex-column justify-content-end">
-                    <div className="mx-3">
+                <div className="py-4 col-auto col-lg-4 d-flex flex-column justify-content-around" style={{ backgroundColor: "#20445f52" }}>
+                    <div className="mx-4 pb-36">
                         <h4 className="homepage-section-title text-white mt-0">
                             Useful Links
                         </h4>

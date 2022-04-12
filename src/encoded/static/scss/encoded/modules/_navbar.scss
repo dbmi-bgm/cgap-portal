@@ -112,6 +112,37 @@ div.navbar-container {
     }
 }
 
+.cgap-logo-wrapper {
+    display: flex;
+    align-items: center;
+    transition:
+        background-color $navbar-transition-length,
+        padding-left $navbar-transition-length;
+
+    > svg {
+        margin-right: 0px;
+        vertical-align: top;
+        display: inline-block;
+        height: 100%;
+        transition:
+            padding $navbar-transition-length,
+            transform $navbar-transition-length,
+            margin-right $navbar-transition-length;
+
+        > g {
+            > path {
+                transition:
+                    fill-opacity .3s .15s ease-out,
+                    fill .3s .15s ease-out,
+                    stroke-opacity .3s .15s ease-out,
+                    stroke .3s .15s ease-out,
+                    stroke-width .3s .15s ease-out;
+            }
+        }
+
+    }
+}
+
 div#top-nav.navbar-fixed-top {
     position: relative;
     top: 0;
@@ -206,45 +237,20 @@ div#top-nav.navbar-fixed-top {
                 line-height: 1;
                 position: relative;
                 height: 100%;
-                display: flex;
-                align-items: center;
                 padding-right: 20px;
                 padding-left: 20px;
                 max-height: inherit;
                 background-color: transparent;
-                transition:
-                    background-color $navbar-transition-length,
-                    padding-left $navbar-transition-length;
 
                 &:hover {
                     background-color: $navbar-link-hover-bg;
                 }
-                
-                //padding-top: 5px;
-                //padding-bottom: 5px;
+
                 > svg#logo_svg {
                     min-width: 80px;
-                    margin-right: 0px;
-                    vertical-align: top;
-                    display: inline-block;
-                    height: 100%;
-                    transition:
-                        padding $navbar-transition-length,
-                        transform $navbar-transition-length,
-                        margin-right $navbar-transition-length;
                     max-height: inherit;
-                    > g {
-                        > path {
-                            transition:
-                                fill-opacity .3s .15s ease-out,
-                                fill .3s .15s ease-out,
-                                stroke-opacity .3s .15s ease-out,
-                                stroke .3s .15s ease-out,
-                                stroke-width .3s .15s ease-out;
-                        }
-                    }
-
                 }
+                
 
                 @include navbar-fixed-position {
                     float: left; // To decrease width
@@ -270,14 +276,6 @@ div#top-nav.navbar-fixed-top {
                     display: inline-block;
                     transform: translate3d(0px,0,0);
                     transition: font-size $navbar-transition-length, transform $navbar-transition-length;
-
-                    > i.icon.icon-angle-right {
-                        margin-left: 12px;
-                        font-size: 1.25rem;
-                        line-height: inherit;
-                        vertical-align: bottom;
-                        color: transparent;
-                    }
         
                     @include navbar-fixed-position {
                         body.scrolled-past-top &,
@@ -295,10 +293,6 @@ div#top-nav.navbar-fixed-top {
                 .navbar-title {
                     color: $navbar-link-hover-color;
                     text-shadow: 0 0 0 $navbar-link-hover-color;
-                    > i.icon.icon-angle-right {
-                        color: #ccc !important;
-                        text-shadow: none;
-                    }
                 }
             }
 
