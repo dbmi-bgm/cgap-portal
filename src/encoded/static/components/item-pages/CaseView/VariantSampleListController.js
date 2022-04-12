@@ -48,13 +48,15 @@ export class VariantSampleListController extends React.PureComponent {
         this.fetchVariantSampleListItem = this.fetchVariantSampleListItem.bind(this);
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
         this.windowMessageEventListener = this.windowMessageEventListener.bind(this);
+        this.updateVariantSampleListSort = this.updateVariantSampleListSort.bind(this);
         const { id: vslID } = props;
         this.state = {
             "fetchedVariantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
             "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
-            "refreshCount": 0
+            "refreshCount": 0,
+            "sortType": "Variant"
         };
 
         this.memoized = {
@@ -168,17 +170,24 @@ export class VariantSampleListController extends React.PureComponent {
         this.setState({ "variantSampleListID": vslID }, callback);
     }
 
+    /** For the short term: enum will consist of ["Variant", "Gene"] */
+    updateVariantSampleListSort(newSort) {
+        this.setState({ sortType: newSort });
+    }
+
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
-        const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
+        const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem, sortType: vslSortType } = this.state;
         const { variant_samples = [], structural_variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
+            vslSortType,
             variantSampleListItem,
             isLoadingVariantSampleListItem,
             "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples, structural_variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID,
-            "fetchVariantSampleListItem": this.fetchVariantSampleListItem
+            "fetchVariantSampleListItem": this.fetchVariantSampleListItem,
+            "updateVariantSampleListSort": this.updateVariantSampleListSort
         };
         return React.Children.map(children, function(child){
             if (!React.isValidElement(child) || typeof child.type === "string") {
@@ -203,6 +212,7 @@ function commonVSEmbeds(prefix){
         prefix + ".selected_by.@id",
         prefix + ".selected_by.display_title",
         prefix + ".variant_sample_item.@id",
+        prefix + ".variant_sample_item.@type",
         prefix + ".variant_sample_item.uuid",
         prefix + ".variant_sample_item.display_title",
         prefix + ".variant_sample_item.finding_table_tag",
