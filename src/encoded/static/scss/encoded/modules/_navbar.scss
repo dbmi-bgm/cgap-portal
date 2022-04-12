@@ -217,7 +217,7 @@ div#top-nav.navbar-fixed-top {
                     padding-left $navbar-transition-length;
 
                 &:hover {
-                    background-color: darken($navbar-background-color, 5%);
+                    background-color: $navbar-link-hover-bg;
                 }
                 
                 //padding-top: 5px;

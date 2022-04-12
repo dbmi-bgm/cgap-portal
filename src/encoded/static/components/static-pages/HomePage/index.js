@@ -2,13 +2,11 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import ReactTooltip from 'react-tooltip';
 import _ from 'underscore';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { pageTitleViews, PageTitleContainer, TitleAndSubtitleUnder, OnlyTitle } from './../../PageTitleSection';
+import { pageTitleViews } from './../../PageTitleSection';
 import { GuestHomeView } from './GuestHomeView';
 import { UserDashboard } from './UserDashboard';
 

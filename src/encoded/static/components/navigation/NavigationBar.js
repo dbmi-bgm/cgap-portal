@@ -25,8 +25,7 @@ export class NavigationBar extends React.PureComponent {
         'session'           : PropTypes.bool,
         'updateAppSessionState' : PropTypes.func.isRequired,
         'context'           : PropTypes.object,
-        'schemas'           : PropTypes.any,
-        'browseBaseState'   : PropTypes.string
+        'schemas'           : PropTypes.any
     };
 
     constructor(props){
@@ -81,7 +80,7 @@ export class NavigationBar extends React.PureComponent {
 
     render() {
         const { mobileDropdownOpen, mounted } = this.state;
-        const { href, context, schemas, browseBaseState, isFullscreen, testWarningPresent, hideTestWarning } = this.props;
+        const { href, context, schemas, isFullscreen, testWarningPresent, hideTestWarning } = this.props;
         const testWarningVisible = testWarningPresent & !isFullscreen; // Hidden on full screen mode.
         //const navClassName = "navbar-container" + (testWarningVisible ? ' test-warning-visible' : '');
 
