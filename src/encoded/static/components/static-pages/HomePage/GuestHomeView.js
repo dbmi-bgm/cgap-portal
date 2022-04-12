@@ -44,7 +44,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     </div>
                 </div>
 
-                <div className="py-4 col-auto col-lg-4 d-flex flex-column justify-content-around" style={{ backgroundColor: "#20445f52" }}>
+                <div className="py-4 col-auto col-lg-4 d-flex flex-column justify-content-around" style={{ backgroundColor: "#3b63818a" }}>
                     <div className="mx-4 pb-36">
                         <h4 className="homepage-section-title text-white mt-0">
                             Useful Links
