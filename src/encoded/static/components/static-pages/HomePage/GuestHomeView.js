@@ -27,7 +27,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                 <div className="py-5 col col-lg-8 d-flex flex-column justify-content-around">
                     <div className="w-75 mx-auto">
                         {/*
-                        <div>
+                        <div className="d-inline-block mb-36">
                             <CGAPLogo title={null} id="clone_logo" maxHeight={240} />
                         </div>
                         */}
