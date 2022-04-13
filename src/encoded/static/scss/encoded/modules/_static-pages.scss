@@ -491,6 +491,16 @@
 		background: -webkit-linear-gradient(120deg, rgba(7,30,34,1) 0%, rgba(24,73,98,1) 34%, rgba(35,83,115,1) 57%, rgba(14,43,62,1) 83%, rgba(8,29,43,1) 100%);
 		background: linear-gradient(120deg, rgba(7,30,34,1) 0%, rgba(24,73,98,1) 34%, rgba(35,83,115,1) 57%, rgba(14,43,62,1) 83%, rgba(8,29,43,1) 100%);
 	
+		#homepage-login-container .auth0-lock-widget {
+			box-shadow: 0 0 25px -7px #000;
+			.auth0-lock-header-welcome {
+				padding-top: 15px;
+				padding-bottom: 12px;
+				// .auth0-lock-header-logo {
+				// 	display: none;
+				// }
+			}
+		}
 	}
 
 

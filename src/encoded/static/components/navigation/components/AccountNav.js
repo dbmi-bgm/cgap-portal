@@ -13,7 +13,7 @@ import { BigDropdownNavItem, BigDropdownIntroductionWrapper } from './BigDropdow
 
 
 /** Specific to CGAP */
-const auth0Options = {
+export const auth0Options = {
     auth: {
         sso: false,
         redirect: false,

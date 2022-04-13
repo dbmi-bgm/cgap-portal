@@ -1,22 +1,30 @@
 'use strict';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { NotLoggedInAlert, onAlertLoginClick } from './../../navigation/components/LoginNavItem';
+import { LoginController } from '@hms-dbmi-bgm/shared-portal-components/es/components/navigation/components/LoginController';
+import { NotLoggedInAlert } from './../../navigation/components/LoginNavItem';
+import { UserRegistrationModal } from './../../navigation/components/UserRegistrationModal';
+import { auth0Options as navAuth0Options } from './../../navigation/components/AccountNav';
 import { CGAPLogo } from './../../viz/CGAPLogo';
 
 
+const auth0Options = {
+    ...navAuth0Options,
+    container: "homepage-login-container",
+    // Reverts to using Auth0's logo:
+    // theme: { ...navAuth0Options.theme, logo: null, icon: null }
+};
+
 export const GuestHomeView = React.memo(function GuestHomeView(props){
-    const [ mounted, setMounted ] = useState(false);
+    const { updateAppSessionState } = props;
 
     // Upon mount, unset alerts from any other pages, to prevent vertical scroll.
     useEffect(function(){
         Alerts.deQueue(Alerts.LoggedOut);
         Alerts.deQueue(NotLoggedInAlert);
-        // JS might not yet be loaded/active until mounted.
-        setMounted(true);
     }, []);
 
     return (
@@ -24,28 +32,30 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
 
             <div className="homepage-contents d-flex flex-column flex-lg-row align-items-lg-stretch">
 
-                <div className="py-5 col col-lg-8 d-flex flex-column justify-content-around">
-                    <div className="w-75 mx-auto">
+                <div className="py-5 col col-lg-6 d-flex flex-column justify-content-around">
+                    <LoginController {...{ updateAppSessionState, auth0Options }}>
+                        <LoginBox />
+                    </LoginController>
+                </div>
+
+                <div className="py-4 col-auto col-lg-6 d-flex flex-column justify-content-center" style={{ backgroundColor: "#3b63818a" }}>
+                    <div className="mx-4">
                         {/*
                         <div className="d-inline-block mb-36">
                             <CGAPLogo title={null} id="clone_logo" maxHeight={240} />
                         </div>
                         */}
+                        {/*
                         <h2 className="homepage-section-title text-white mt-0">
                             <span className="text-400">Clinical Genome Analysis Platform </span>
                         </h2>
                         <hr className="border-white" />
+                        */}
                         <p className="text-white">The <a className="text-white" href="https://cgap.hms.harvard.edu">Clinical Genome Analysis Platform <b>(CGAP)</b></a> is an intuitive, open-source analysis tool designed to support complex research & clinical genomics workflows.</p>
-                        <button type="button" className="btn btn-outline-light btn-lg mt-24 px-5" onClick={onAlertLoginClick} disabled={!mounted}>
-                            <i className="icon icon-user fas mr-12"/>
-                            <span>Sign In</span>
-                            <span className="d-none d-xl-inline"> or Register</span>
-                        </button>
-                    </div>
-                </div>
 
-                <div className="py-4 col-auto col-lg-4 d-flex flex-column justify-content-around" style={{ backgroundColor: "#3b63818a" }}>
-                    <div className="mx-4 pb-36">
+                    </div>
+                    <div className="mx-4 mt-36">
+
                         <h4 className="homepage-section-title text-white mt-0">
                             Useful Links
                         </h4>
@@ -70,7 +80,31 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
     );
 });
 
+const LoginBox = React.memo(function LoginBox (props) {
+    const { showLock, isAuth0LibraryLoaded, unverifiedUserEmail } = props;
 
+    useEffect(function(){
+        // Also show lock again when unverifiedUserEmail is unset, since when registration modal pops up, LoginController will hide lock.
+        if (!isAuth0LibraryLoaded || unverifiedUserEmail) return;
+        showLock();
+    }, [ isAuth0LibraryLoaded, unverifiedUserEmail ]);
+
+    return (
+        <React.Fragment>
+            <LoginBoxContainerElement />
+            { unverifiedUserEmail ? <UserRegistrationModal {...props} /> : null }
+        </React.Fragment>
+    );
+});
+
+/** Memoized with no props, never to be re-rendered since is root of Auth0 widget's own ReactDOM.render. */
+const LoginBoxContainerElement = React.memo(function(){
+    return (
+        <div className="login-container text-center" id="homepage-login-container">
+            <i className="icon icon-circle-notch icon-spin fas text-secondary icon-2x"/>
+        </div>
+    );
+});
 
 // const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
 //     return (
