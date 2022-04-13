@@ -365,6 +365,11 @@
                     }
                 }
             }
+        },
+        "proband_only": {
+            "title": "Proband-only",
+            "description": "Whether the MetaWorkflow is intended for proband-only analysis",
+            "type": "boolean"
         }
     },
     "facets": {
