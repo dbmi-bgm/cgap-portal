@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import _ from 'underscore';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
@@ -173,15 +173,6 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         return { snvFacetDict, cnvFacetDict };
     }, [ schemas ]);
 
-
-    if (vsSelections.length === 0 && cnvSelections.length === 0) {
-        return (
-            <h4 className="text-400 text-center text-secondary py-3">
-                { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
-            </h4>
-        );
-    }
-
     const commonProps = {
         schemas, context, parentTabType,
         toggleSendToProjectStoreItems,
@@ -197,7 +188,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         anyUnsavedChanges
     };
 
-    function renderSelectionAsJSX(selection, index) {
+    const renderSelectionAsJSX = useCallback(function(selection, index){
         const { variant_sample_item: { "@id": vsAtID, uuid: vsUUID, "@type": { 0: vsType = null } = [] } } = selection;
         if (!vsAtID) {
             // Handle lack of permissions, show some 'no permissions' view, idk..
@@ -224,6 +215,14 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         return (
             <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType={vsType}
                 {...{ selection, index, unsavedClassification, isDeleted, facetDict }}  />
+        );
+    }, [commonProps, changedClassificationsByVS, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections, snvFacetDict, cnvFacetDict]);
+
+    if (vsSelections.length === 0 && cnvSelections.length === 0) {
+        return (
+            <h4 className="text-400 text-center text-secondary py-3">
+                { isLoadingVariantSampleListItem ? "Loading, please wait..." : "No selections added yet" }
+            </h4>
         );
     }
 
