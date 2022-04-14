@@ -19,8 +19,8 @@ export const reducers = {
         }
     },
 
-    'lastCSSBuildTime' : function(state='', action) {
-        return (action.type && action.type.lastCSSBuildTime) || state;
+    'lastBuildTime' : function(state='', action) {
+        return (action.type && action.type.lastBuildTime) || state;
     },
 
     'slow' : function(state=false, action) {
