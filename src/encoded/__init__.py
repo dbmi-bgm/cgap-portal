@@ -38,6 +38,7 @@ CGAP_STATIC_MAX_AGE = 1800
 # default trace_rate for sentry
 # tune this to get more data points when analyzing performance
 SENTRY_TRACE_RATE = .1
+DEFAULT_AUTH0_DOMAIN = 'hms-dbmi.auth0.com'
 
 
 def static_resources(config):
@@ -138,8 +139,23 @@ def main(global_config, **local_config):
     # settings['snovault.jsonld.terms_namespace'] = 'https://www.encodeproject.org/terms/'
     settings['snovault.jsonld.terms_prefix'] = 'encode'
     # set auth0 keys
+    settings['auth0.domain'] = settings.get('auth0.domain', os.environ.get('Auth0Domain', DEFAULT_AUTH0_DOMAIN))
     settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
     settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
+    settings['auth0.options'] = {
+        'auth': {
+            'sso': False,
+            'redirect': False,
+            'responseType': 'token',
+            'params': {
+                'scope': 'openid email',
+                'prompt': 'select_account'
+            }
+        },
+        'allowedConnections': [  # TODO: make at least this part configurable
+            'github', 'google-oauth2', 'partners'
+        ]
+    }
     # set google reCAPTCHA keys
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
