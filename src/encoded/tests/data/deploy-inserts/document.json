@@ -2,20 +2,6 @@
     {
         "status": "shared",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "attachment": "gene_lists/familial_cancer.txt",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "uuid": "c3562a3d-b9ab-4cf1-8dca-33da9f1583b7"
-    },
-    {
-        "status": "shared",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "attachment": "gene_lists/breast_cancer.txt",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "uuid": "6e5002e3-b268-4c24-a4bf-1aedf8eb1949"
-    },
-    {
-        "status": "shared",
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "attachment": "gene_lists/acmg73.txt",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "b2379bbc-ad18-4224-b5a4-31b72de93a6c"
