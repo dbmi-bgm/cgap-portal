@@ -48,11 +48,9 @@ export const parentTabTypes = {
 
 function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
     const allSelections = vsSelections.concat(cnvSelections);
-    
-    var variantToUUIDMap = {};
-    var geneToVariantMap = {};
-    var geneToDisplayTitleMap = {};
 
+    var geneUUIDToVariantMap = {};
+    var geneUUIDToDisplayTitleMap = {};
     allSelections.forEach((selection) => {
         const {
             variant_sample_item: {
@@ -61,7 +59,7 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
                     genes: {
                         0: {
                             genes_most_severe_gene: {
-                                "@id": geneAtID,
+                                uuid: geneUUID,
                                 display_title: geneTitle
                             } = {}
                         } = {}
@@ -69,6 +67,7 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
                 } = {},
                 highlighted_genes: {
                     0: { 
+                        uuid: highlightedGeneUUID,
                         '@id': highlightedGeneAtID,
                         display_title: highlightedGene
                     } = {}
@@ -76,32 +75,29 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
             } = {}
         } = selection;
 
-        if (geneAtID && geneToVariantMap[geneAtID]) {
-            geneToVariantMap[geneAtID].push(selection);
-        } else if (geneAtID) {
-            geneToVariantMap[geneAtID] = [selection];
-            geneToDisplayTitleMap[geneAtID] = geneTitle;
-        } else if (highlightedGeneAtID && geneToVariantMap[highlightedGeneAtID]) {
-            geneToVariantMap[highlightedGeneAtID].push(selection);
-        } else if (highlightedGeneAtID) {
-            geneToVariantMap[highlightedGeneAtID] = [selection];
-            geneToDisplayTitleMap[highlightedGeneAtID] = highlightedGene; 
+        if (geneUUID && geneUUIDToVariantMap[geneUUID]) {
+            geneUUIDToVariantMap[geneUUID].push(selection);
+        } else if (geneUUID) {
+            geneUUIDToVariantMap[geneUUID] = [selection];
+            geneUUIDToDisplayTitleMap[geneUUID] = geneTitle;
+        } else if (highlightedGeneUUID && geneUUIDToVariantMap[highlightedGeneUUID]) {
+            geneUUIDToVariantMap[highlightedGeneUUID].push(selection);
+        } else if (highlightedGeneUUID) {
+            geneUUIDToVariantMap[highlightedGeneUUID] = [selection];
+            geneUUIDToDisplayTitleMap[highlightedGeneUUID] = highlightedGene; 
         } else {
             // handle case for variants with no highlighted gene selected
-            if (geneToVariantMap["No Gene"]) {
-                geneToVariantMap["No Gene"].push(selection);
+            if (geneUUIDToVariantMap["No Gene"]) {
+                geneUUIDToVariantMap["No Gene"].push(selection);
             } else {
-                geneToVariantMap["No Gene"] = [selection];
-                geneToDisplayTitleMap["No Gene"] = "No Highlighted Gene Selected";
+                geneUUIDToVariantMap["No Gene"] = [selection];
+                geneUUIDToDisplayTitleMap["No Gene"] = "No Highlighted Gene Selected";
             }
         }
-
-        variantToUUIDMap[vsAtID] = vsUUID;
     });
 
-    geneToVariantMap.displayTitleMap = geneToDisplayTitleMap;
-    geneToVariantMap.variantToUUIDMap = variantToUUIDMap
-    return geneToVariantMap;
+    geneUUIDToVariantMap.displayTitleMap = geneUUIDToDisplayTitleMap; 
+    return geneUUIDToVariantMap;
 }
 
 
@@ -265,26 +261,26 @@ function VSLSortedByVariantType(props) {
 const VSLSortedByGeneType = React.memo(function VSLSortedByGeneType(props) {
     const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
 
-    const { genes, displayTitleMap, geneToVariantMap } = useMemo(function(){
-         const { displayTitleMap, variantToUUIDMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
-        const geneToVariantMap = { ...groupedByGene };
-        const genes = Object.keys(geneToVariantMap).sort(
-            (geneAtID, nextGeneAtID) =>  {
+    const { genes, displayTitleMap, geneUUIDToVariantMap } = useMemo(function(){
+         const { displayTitleMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+        const geneUUIDToVariantMap = { ...groupedByGene };
+        const genes = Object.keys(geneUUIDToVariantMap).sort(
+            (geneUUID, nextGeneUUID) =>  {
                 // make sure unsorted genes appear last
-                if (geneAtID == "No Gene") return 1;
-                if (nextGeneAtID == "No Gene") return -1;
+                if (geneUUID == "No Gene") return 1;
+                if (nextGeneUUID == "No Gene") return -1;
                 // otherwise sort alphabetically by gene title
-                return displayTitleMap[geneAtID] > displayTitleMap[nextGeneAtID];
+                return displayTitleMap[geneUUID] > displayTitleMap[nextGeneUUID];
             }
         );
-        return { genes, displayTitleMap, geneToVariantMap };
+        return { genes, displayTitleMap, geneUUIDToVariantMap };
     }, [ vsSelections, cnvSelections ]);
 
-    return genes.map(function(geneAtID, i){
-        const geneSelections = geneToVariantMap[geneAtID];
+    return genes.map(function(geneUUID, i){
+        const geneSelections = geneUUIDToVariantMap[geneUUID];
         return (
             <div className="col-12" key={i}>
-                <h2 className="mb-05 text-600">{displayTitleMap[geneAtID]} - {geneSelections.length} Variant(s)</h2>
+                <h2 className="mb-05 text-600">{displayTitleMap[geneUUID]} - {geneSelections.length} Variant(s)</h2>
                 <hr className="mb-2 mt-0" />
                 { geneSelections.map(renderSelectionAsJSX) }
             </div>
@@ -737,7 +733,7 @@ function ClassificationDropdown(props){
     const { table_tags: { tags = [] } = {} } = projectReportSettings;
 
     const onOptionSelect = useCallback(function(evtKey, evt){
-        console.log("Selected classification", evtKey, "for", vsUUID);
+        // console.log("Selected classification", evtKey, "for", vsUUID);
         updateClassificationForVS(vsUUID, evtKey || null);
     }, [ variantSample, updateClassificationForVS ]);
 
