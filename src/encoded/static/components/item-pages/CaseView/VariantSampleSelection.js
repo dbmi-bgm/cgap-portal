@@ -232,8 +232,8 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                 <VariantSampleListSortSelectDrop {...{ updateVariantSampleListSort, vslSortType }} />
             </div>
             { vslSortType === "Variant" ?
-                <VSLSortedByVariantType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} />:
-                <VSLSortedByGeneType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} /> }
+                <VSLSortedByVariantType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} />
+                :<VSLSortedByGeneType {...{ vsSelections, cnvSelections, renderSelectionAsJSX }} /> }
         </div>
     );
 });
