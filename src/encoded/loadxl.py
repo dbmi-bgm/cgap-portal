@@ -597,4 +597,4 @@ def load_deploy_data(app, overwrite=True, **kwargs):
     Returns:
         None if successful, otherwise Exception encountered
     """
-    return load_data(app, indir="deploy-inserts", overwrite=True)
+    return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)

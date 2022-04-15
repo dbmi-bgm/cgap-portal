@@ -8,7 +8,7 @@ from dcicutils.env_utils import infer_foursight_url_from_env
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
 from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
-from .appdefs import APP_VERSION_REGISTRY_KEY
+from .appdefs import APP_VERSION_REGISTRY_KEY, ITEM_INDEX_ORDER
 from .schema_formats import is_accession
 from .util import SettingsKey
 
@@ -16,6 +16,7 @@ from .util import SettingsKey
 def includeme(config):
     config.include(health_check)
     config.include(item_counts)
+    config.include(type_metadata)
     config.include(submissions_page)
     config.scan(__name__)
 
@@ -55,6 +56,23 @@ def item_counts(config):
         return response_dict
 
     config.add_view(counts_view, route_name='item-counts')
+
+
+def type_metadata(config):
+
+    config.add_route(
+        'type-metadata',
+        '/type-metadata'
+    )
+
+    def type_metadata_view(request):
+
+        return {
+            'index_order': ITEM_INDEX_ORDER
+        }
+
+    config.add_view(type_metadata_view, route_name='type-metadata')
+
 
 
 def uptime_info():
