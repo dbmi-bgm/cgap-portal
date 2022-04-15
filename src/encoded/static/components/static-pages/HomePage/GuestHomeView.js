@@ -33,6 +33,9 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
             <div className="homepage-contents d-flex flex-column flex-lg-row align-items-lg-stretch">
 
                 <div className="py-5 col col-lg-6 d-flex flex-column justify-content-around">
+
+                    <PolygonsBG1/>
+
                     <LoginController {...{ updateAppSessionState, auth0Options }}>
                         <LoginBox />
                     </LoginController>
@@ -105,6 +108,35 @@ const LoginBoxContainerElement = React.memo(function(){
         </div>
     );
 });
+
+function PolygonsBG1 () {
+    const imgWrapperStyle = { position: "absolute", pointerEvents: "none", top: 0, bottom: 0, left: 0, right: 0 };
+    return (
+        <div style={{ width: "100%", height: "100%", position: "absolute" }}>
+            <div style={{ position: "absolute", width: 357, height: 308, right: -87, top: 15 }}>
+                <div className="user-select-none" style={imgWrapperStyle}>
+                    <div style={{ display: "contents" }}>
+                        <img src="https://framerusercontent.com/modules/assets/1pXoFnbTd2pyuWmvvDCu8xpQxE~36iLowNAlGP9erAmDQsiAWojpI531uvGNt6YlCe5X5E.png" className="w-100 h-100" />
+                    </div>
+                </div>
+            </div>
+            <div style={{ position: "absolute", width: 357, height: 308, left: 0, top: "calc(50% - 153.905px)" }}>
+                <div style={imgWrapperStyle}>
+                    <div style={{ display: "contents" }}>
+                        <img src="https://framerusercontent.com/modules/assets/1pXoFnbTd2pyuWmvvDCu8xpQxE~36iLowNAlGP9erAmDQsiAWojpI531uvGNt6YlCe5X5E.png" className="w-100 h-100" />
+                    </div>
+                </div>
+            </div>
+            <div style={{ position: "absolute", width: 357, height: 308, right: -87, bottom: -7 }}>
+                <div style={imgWrapperStyle}>
+                    <div style={{ display: "contents" }}>
+                        <img src="https://framerusercontent.com/modules/assets/1pXoFnbTd2pyuWmvvDCu8xpQxE~36iLowNAlGP9erAmDQsiAWojpI531uvGNt6YlCe5X5E.png" className="w-100 h-100" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+}
 
 // const ExternalLinksColumn = React.memo(function ExternalLinksColumn(props){
 //     return (
