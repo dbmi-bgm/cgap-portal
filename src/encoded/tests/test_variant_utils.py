@@ -119,11 +119,13 @@ class TestStructuralVariantBuilder:
             del structural_variant_sample[key]
         variant_post = builder._post_or_patch_variant(structural_variant)
         variant_uuid = variant_post["@graph"][0]["uuid"]
-        variant_display_title = variant_post["@graph"][0]["display_title"]
         builder._post_or_patch_variant_sample(structural_variant_sample, variant_uuid)
         variant_patch = builder._post_or_patch_variant(structural_variant)
         builder._post_or_patch_variant_sample(structural_variant_sample, variant_uuid)
-        sample_posted = testapp.get("/structural-variant-samples/").json["@graph"][0]
+        sample_atid = testapp.get(
+            "/structural-variant-samples/", status=200
+        ).json["@graph"][0]["@id"]
+        sample = testapp.get(sample_atid + "?frame=raw", status=200).json
         assert variant_post["status"] == "success"
         assert variant_patch["status"] == "success"
-        assert variant_display_title in sample_posted["display_title"]
+        assert sample["structural_variant"] == variant_uuid

@@ -191,6 +191,7 @@ def bgm_user_testapp(bgm_user, app, external_tx, zsa_savepoints):
     '''TODO: maybe bring in more permissions-related fixtures into here'''
     return remote_user_testapp(app, bgm_user['uuid'])
 
+
 @pytest.fixture
 def bgm_variant(bgm_user_testapp, bgm_project, institution):
     '''Same thing as workbook inserts, but different project stuff'''
@@ -205,15 +206,16 @@ def bgm_variant(bgm_user_testapp, bgm_project, institution):
         "POS": 12125898,
         "REF": "TG",
         "hg19": [
-        {
-            "hg19_pos": 12185955,
-            "hg19_chrom": "chr1",
-            "hg19_hgvsg": "NC_000001.11:g.12185956del"
-        }
+            {
+                "hg19_pos": 12185955,
+                "hg19_chrom": "chr1",
+                "hg19_hgvsg": "NC_000001.11:g.12185956del"
+            }
         ],
         "CHROM": "1"
     }
     return bgm_user_testapp.post_json('/variants', item).json['@graph'][0]
+
 
 @pytest.fixture
 def bgm_test_variant_sample(bgm_variant, institution, bgm_project):
@@ -226,6 +228,7 @@ def bgm_test_variant_sample(bgm_variant, institution, bgm_project):
         'project': bgm_project['@id'],
         'institution': institution['@id']
     }
+
 
 @pytest.fixture
 def access_key(testapp, bgm_user):
@@ -244,7 +247,6 @@ def access_key(testapp, bgm_user):
 def bgm_access_key(access_key):
     # An alias for access_key, useful for emphasis to compare to non_bgm_access_key
     return access_key
-
 
 
 @pytest.fixture
