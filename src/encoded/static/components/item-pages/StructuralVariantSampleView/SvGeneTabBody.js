@@ -18,6 +18,7 @@ export function SvGeneTabBody (props){
         isLoadingVariantSampleListItem,
         active = false,
         context,
+        showInterpretation,
         ...passProps
     } = props;
 
@@ -32,7 +33,7 @@ export function SvGeneTabBody (props){
                     const { href, context, rowNumber, detailOpen, toggleDetailOpen } = props;
                     return (
                         <SVGeneDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
-                            selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
+                            selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem, showInterpretation }}>
                             <SVGeneDisplayTitleColumn {...{ transcript }} />
                         </SVGeneDisplayTitleColumnWrapper>
                     );
@@ -100,11 +101,11 @@ function SVGeneDisplayTitleColumnWrapper(props) {
     const {
         result, href, context, rowNumber, detailOpen, toggleDetailOpen,
         selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem,
-        children
+        children, showInterpretation
     } = props;
 
     let highlightedSelector = null;
-    if (selectedGenes && onSelectGene) { //savedVariantSampleIDMap
+    if (selectedGenes && onSelectGene && showInterpretation) { //savedVariantSampleIDMap
         highlightedSelector = <HighlightedGeneSelector {...{ selectedGenes, onSelectGene, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />;
     }
 
