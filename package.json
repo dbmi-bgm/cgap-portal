@@ -111,7 +111,7 @@
     "pixi.js": "^5.2.4",
     "query-string": "^4.3.4",
     "react": "^17.0.2",
-    "react-bootstrap": "1.6.0",
+    "react-bootstrap": "1.6.4",
     "react-dom": "^17.0.2",
     "react-draggable": "^4.4.4",
     "react-jsx-parser": "^1.25.1",
