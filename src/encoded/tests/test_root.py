@@ -8,10 +8,21 @@ from dcicutils import lang_utils
 from dcicutils.lang_utils import conjoined_list
 from dcicutils.misc_utils import ignored
 from unittest import mock
+from ..appdefs import ITEM_INDEX_ORDER
 from ..root import SettingsKey, uptime_info
 from ..util import PROJECT_DIR
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
+def test_type_metadata(anontestapp):
+
+    response = anontestapp.get('/type-metadata')
+    assert response.status_code == 200
+    result = response.json
+    assert isinstance(result, dict)
+    assert set(result.keys()) == {'index_order'}
+    assert result['index_order'] == ITEM_INDEX_ORDER
 
 
 def test_uptime_info():

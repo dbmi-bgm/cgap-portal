@@ -263,6 +263,7 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
 
+
 def perform_patch_as_admin(request, item_atid, patch_payload):
     """
     Patches Items as 'UPGRADER' user/permissions.
@@ -501,18 +502,88 @@ class VariantSample(Item):
         )
         return super().create(registry, uuid, properties, sheets)
 
+    @staticmethod
+    def remove_reference_transcript(hgvs_formatted_string):
+        """Remove reference transcript from HGVS-formatted variant name.
+
+        Typically, these HGVS-formatted variants come from VEP.
+
+        NOTE: HGVS nomenclature can use colons after the reference
+        transcript, but none of those situations should arise within
+        VariantSamples (SNVs and small indels). For more info, see
+        https://varnomen.hgvs.org/recommendations/general/
+        """
+        result = None
+        transcript_separator = ":"
+        if (
+            isinstance(hgvs_formatted_string, str)
+            and transcript_separator in hgvs_formatted_string
+        ):
+            split_value = hgvs_formatted_string.split(transcript_separator)
+            if len(split_value) > 1:
+                result = "".join(split_value[1:])
+        return result
+
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
     def display_title(self, request, CALL_INFO, variant=None):
+        """Build display title.
+
+        This title is displayed in new tabs/windows.
+
+        In order, display hierarchy is:
+            - gene symbol with protein change + sample info
+            - gene symbol with cDNA change + sample info
+            - gene symbol with DNA change + sample info
+            - chromosome with DNA change + sample info
+            - sample info (shouldn't be reached, but just in case)
+        """
+        result = CALL_INFO
         variant = get_item_or_none(request, variant, 'Variant', frame='raw')
-        variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
-                                                            variant['REF'], variant['ALT'])
         if variant:
-            return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
-        return CALL_INFO
+            gene_display = None
+            hgvsp_display = None
+            hgvsc_display = None
+            chromosome = variant.get("CHROM")
+            position = variant.get("POS")
+            reference = variant.get("REF")
+            alternate = variant.get("ALT")
+            dna_separator = ":g."
+            if chromosome == "M":
+                dna_separator = ":m."
+            genes = variant.get("genes", [])
+            if genes:
+                gene_properties = genes[0]  # Currently max 1 via reformatter, but can be more
+                gene_uuid = gene_properties.get("genes_most_severe_gene")
+                if gene_uuid:
+                    gene_item = get_item_or_none(request, gene_uuid, "Gene", frame="raw")
+                    if gene_item:
+                        gene_display = gene_item.get("gene_symbol")
+                hgvsp = gene_properties.get("genes_most_severe_hgvsp")
+                if hgvsp:
+                    hgvsp_display = self.remove_reference_transcript(hgvsp)
+                hgvsc = gene_properties.get("genes_most_severe_hgvsc")
+                if hgvsc:
+                    hgvsc_display = self.remove_reference_transcript(hgvsc)
+            if gene_display:
+                if hgvsp_display:
+                    result = gene_display + ":" + hgvsp_display
+                elif hgvsc_display:
+                    result = gene_display + ":" + hgvsc_display
+                elif position and reference and alternate:
+                    result = "%s%s%s%s>%s" % (
+                        gene_display, dna_separator, position, reference, alternate
+                    )
+            elif chromosome and position and reference and alternate:
+                result = build_variant_display_title(
+                    chromosome, position, reference, alternate
+                )
+        if CALL_INFO not in result:
+            result += " (" + CALL_INFO + ")"
+        return result
 
     @calculated_property(schema={
         "title": "Variant Sample List",
@@ -791,12 +862,6 @@ def download(context, request):
 
     # 307 redirect specifies to keep original method
     raise HTTPTemporaryRedirect(location=location)  # 307
-
-
-
-
-
-
 
 
 @view_config(
@@ -1111,6 +1176,7 @@ def add_selections(context, request):
         "@type": ["result"]
     }
 
+
 @view_config(
     name='order-delete-selections',
     context=VariantSampleList,
@@ -1160,8 +1226,6 @@ def order_delete_selections(context, request):
         "status": "success",
         "@type": ["result"]
     }
-
-
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
@@ -1487,6 +1551,7 @@ def get_spreadsheet_mappings(request = None):
         ("Variant notes (prev)",                    own_project_note_factory("variant.variant_notes", "note_text"),                             "Additional notes on variant written for previous cases"),
         ("Gene notes (prev)",                       own_project_note_factory("variant.genes.genes_most_severe_gene.gene_notes", "note_text"),   "Additional notes on gene written for previous cases"),
     ]
+
 
 def get_fields_to_embed(spreadsheet_mappings):
     fields_to_embed = [

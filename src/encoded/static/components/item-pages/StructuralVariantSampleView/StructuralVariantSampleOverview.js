@@ -113,7 +113,8 @@ function StructuralVariantInfoSection({ context }) {
     const {
         structural_variant = {},
         CALL_INFO = null,
-        genotype_labels = {}
+        genotype_labels = {},
+        callers = []
     } = context;
     const {
         size_display = fallbackElem,
@@ -185,6 +186,14 @@ function StructuralVariantInfoSection({ context }) {
                             <span id="vi_cytoband">{cytoband_display}</span>
                         </div>
                     </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_cytoband" className="mb-0">Callers:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_cytoband">{callers.join(", ") || fallbackElem}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -197,7 +206,7 @@ function GeneInfoSection({ context }) {
         structural_variant: { gene_summary: { contained = fallbackElem, at_breakpoint = fallbackElem, omim_genes = fallbackElem } = {} } = {}
     } = context;
     return (
-        <div className="col-12">
+        <div className="col-auto" style={{ maxWidth: "400px"}}>
             <div className="row pb-1 pb-md-03">
                 <div className="col-12 col-md-8">
                     <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
