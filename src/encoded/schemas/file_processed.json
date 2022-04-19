@@ -172,6 +172,12 @@
                 "SV",
                 "CNV"
             ]
+        },
+        "higlass_file": {
+            "title": "File for HiGlass Display",
+            "description": "Whether file is used for HiGlass",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "boolean"
         }
     },
     "facets": {
