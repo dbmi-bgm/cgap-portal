@@ -1456,6 +1456,8 @@ def structural_variant_sample_2(project, institution, structural_variant_2):
         "structural_variant": structural_variant_2["@id"],
         "CALL_INFO": "some_sample",
         "file": "some_vcf_file",
+        "callers": ["BIC-seq2"],
+        "caller_types": ["CNV"],
     }
     return item
 
