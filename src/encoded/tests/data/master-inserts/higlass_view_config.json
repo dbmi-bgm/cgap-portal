@@ -729,7 +729,7 @@
   },
   {
     "name": "higlass-bam-viewconf",
-    "title": "Default CGAP BAM viewconf",
+    "title": "Default CGAP BAM viewconf MOD",
     "viewconfig": {
       "views": [
         {
