@@ -30,53 +30,21 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
     return (
         <React.Fragment>
 
-            <div className="homepage-contents d-flex flex-column flex-lg-row align-items-lg-stretch">
-
-                <div className="py-5 col col-lg-6 d-flex flex-column justify-content-around">
-
-                    <PolygonsBG1/>
-
-                    <LoginController {...{ updateAppSessionState, auth0Options }}>
-                        <LoginBox />
-                    </LoginController>
+            <div className="homepage-contents d-flex flex-column align-items-center">
+                <PolygonsBG1 />
+                <div className="d-inline-block mb-1 mt-36">
+                    <CGAPLogo title={null} id="clone_logo" maxHeight={100} />
                 </div>
-
-                <div className="py-4 col-auto col-lg-6 d-flex flex-column justify-content-center" style={{ backgroundColor: "#3b63818a" }}>
-                    <div className="mx-4">
-                        {/*
-                        <div className="d-inline-block mb-36">
-                            <CGAPLogo title={null} id="clone_logo" maxHeight={240} />
-                        </div>
-                        */}
-                        {/*
-                        <h2 className="homepage-section-title text-white mt-0">
-                            <span className="text-400">Clinical Genome Analysis Platform </span>
-                        </h2>
-                        <hr className="border-white" />
-                        */}
-                        <p className="text-white">The <a className="text-white" href="https://cgap.hms.harvard.edu">Clinical Genome Analysis Platform <b>(CGAP)</b></a> is an intuitive, open-source analysis tool designed to support complex research & clinical genomics workflows.</p>
-
-                    </div>
-                    <div className="mx-4 mt-36">
-
-                        <h4 className="homepage-section-title text-white mt-0">
-                            Useful Links
-                        </h4>
-                        <hr className="border-white my-2" />
-                        <ul className="text-white">
-                            <li>
-                                <a href="https://cgap.hms.harvard.edu" className="text-white">CGAP Homepage</a>
-                            </li>
-                            <li>
-                                <a href="/help/logging-in" className="text-white">Account Setup Guide</a>
-                            </li>
-                            <li>
-                                <a href="/help/tutorials" className="text-white">Video Tutorials</a>
-                            </li>
-                        </ul>
-                    </div>
+                <div className="cgap-welcome text-600 px-2">Welcome to CGAP</div>
+                <div className="cgap-tagline text-center px-2 text-small pt-1">The <strong>Clinical Genome Analysis Platform (CGAP)</strong> is an intuitive, open-source analysis tool designed to support complex research &amp; clinical genomics workflows.</div>
+                <LoginController {...{ updateAppSessionState, auth0Options }}>
+                    <LoginBox className="mt-25" />
+                </LoginController>
+                <div className="text-small mt-2 mb-5">
+                    <span className="text-600 mr-05"><a href="https://cgap.hms.harvard.edu">CGAP Homepage</a></span>| 
+                    <span className="text-600 ml-05 mr-05"><a href="/help/logging-in">Account Setup Guide</a></span>|
+                    <span className="text-600 ml-05"><a href="/help/tutorials">Video Tutorials</a></span>
                 </div>
-
             </div>
 
         </React.Fragment>
