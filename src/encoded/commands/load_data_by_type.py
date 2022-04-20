@@ -5,6 +5,7 @@ import structlog
 from dcicutils.env_utils import permit_load_data
 from pyramid.paster import get_app
 from pyramid.path import DottedNameResolver
+from .. import configure_dbsession
 
 
 log = structlog.getLogger(__name__)
@@ -45,6 +46,9 @@ def main(simulated_args=None):
 
     # get the pyramids app
     app = get_app(args.config_uri, args.app_name)
+
+    # create db schema
+    configure_dbsession(app)
 
     env = app.registry.settings.get('env.name', '')
 
