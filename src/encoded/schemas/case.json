@@ -74,11 +74,16 @@
             "type": "string",
             "linkTo": "Individual"
         },
-        "sample_processing": {
-            "title": "Sample Processing",
-            "description": "Downstream analysis performed on relevant sample",
-            "type": "string",
-            "linkTo": "SampleProcessing"
+        "analyses": {
+            "title": "Analyses",
+            "description": "Downstream analyses performed on relevant sample(s)",
+            "type": "array",
+            "items": {
+                "title": "Analysis",
+                "description": "SampleProcessing object containing information about the analysis",
+                "type": "string",
+                "linkTo": "SampleProcessing"
+            }
         },
         "report": {
             "title": "Report",

@@ -341,17 +341,25 @@ class Case(Item):
         else:
             return accession
 
+    # TODO: Remove
     @calculated_property(schema={
         "title": "Sample",
         "description": "Primary sample used for this case",
         "type": "string",
         "linkTo": 'Sample'
     })
-    def sample(self, request, individual=None, sample_processing=None):
-        if not individual or not sample_processing:
+    def sample(self, request, individual=None, analyses=None):
+        if not individual or not analyses:
             return {}
         ind_data = get_item_or_none(request, individual, 'individuals')
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
+        sp_data = None
+        for analysis in analyses:
+            sp_result = get_item_or_none(request, analysis, 'sample-processings')
+            if sp_result.get('pipeline_type') == 'germline':
+                sp_data = sp_result
+                break
+        if not sp_data:
+            return {}
         ind_samples = ind_data.get('samples', [])
         sp_samples = sp_data.get('samples', [])
         intersection = [i for i in ind_samples if i in sp_samples]
@@ -445,7 +453,7 @@ class Case(Item):
         "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
         "type": "string"
     })
-    def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):
+    def initial_search_href_filter_addon(self, request, analyses=None, individual=None):
         """
         Use vcf file and sample accessions to limit variant/variantsample to this case
         """
