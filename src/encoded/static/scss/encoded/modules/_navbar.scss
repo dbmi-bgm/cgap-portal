@@ -269,19 +269,18 @@ div#top-nav.navbar-fixed-top {
 
                 > .navbar-title {
                     vertical-align: middle;
-                    font-weight: 300;
-                    color: $navbar-default-brand-color;
-                    margin-left: 15px;
-                    font-size: 1.7rem;
+                    fill: $navbar-default-brand-color;
+                    margin-left: 10px;
+                    width: 98px;
                     display: inline-block;
                     transform: translate3d(0px,0,0);
-                    transition: font-size $navbar-transition-length, transform $navbar-transition-length;
+                    transition: width $navbar-transition-length, transform $navbar-transition-length;
         
                     @include navbar-fixed-position {
                         body.scrolled-past-top &,
                         body.is-full-screen &,
                         body.is-item-view & {
-                            font-size: 1.25rem;
+                            width: 70px;
                             transform: translate3d(-5px,0,0);
                         }
                     }
@@ -291,7 +290,7 @@ div#top-nav.navbar-fixed-top {
             // Hover over title link state
             &:hover {
                 .navbar-title {
-                    color: $navbar-link-hover-color;
+                    fill: $navbar-link-hover-color;
                     text-shadow: 0 0 0 $navbar-link-hover-color;
                 }
             }
