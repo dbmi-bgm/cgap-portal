@@ -32,7 +32,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
             <div className="homepage-contents">
                 <div className="d-flex flex-column align-items-center">
                     <div className="d-inline-block mb-1 mt-36">
-                        <CGAPLogo title={null} id="clone_logo" maxHeight={100} />
+                        <CGAPLogo showTitle={false} id="clone_logo" maxHeight={100} />
                     </div>
                     <div className="cgap-welcome px-2 py-2">
                         <svg id="a" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 395.48 35.77">
