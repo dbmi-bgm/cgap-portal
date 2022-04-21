@@ -508,30 +508,38 @@
 		#homepage-login-container {
 			margin-top: 1.5625rem;
 
-			.auth0-lock-center {
-				padding: 0;
-				margin: 0;
-				.auth0-lock-widget {
-					box-shadow: 0px 10px 20px 3px rgba(33, 33, 33, 0.1);
-					.auth0-lock-header-bg.auth0-lock-blur-support {
-						display: none;
-					}
-				
-					.auth0-lock-header-welcome {
-						display: flex;
-						justify-content: center;
-						padding-top: 15px;
-						.auth0-lock-name {
-							color: $primary-dark;
-							border-bottom: 1px solid #eeeeee;
-							width: 75%;
-							padding-bottom: 5px;
-						}
-						.auth0-lock-header-logo {
+			.auth0-lock {
+				z-index: inherit; /* don't overlap the navbar */
+
+				.auth0-lock-center {
+					padding: 0;
+					margin: 0;
+
+					.auth0-lock-widget {
+						box-shadow: 0px 10px 20px 3px rgba(33, 33, 33, 0.1);
+						
+						.auth0-lock-header-bg.auth0-lock-blur-support {
 							display: none;
 						}
+					
+						.auth0-lock-header-welcome {
+							display: flex;
+							justify-content: center;
+							padding-top: 15px;
+							
+							.auth0-lock-name {
+								color: $primary-dark;
+								border-bottom: 1px solid #eeeeee;
+								width: 75%;
+								padding-bottom: 5px;
+							}
+
+							.auth0-lock-header-logo {
+								display: none;
+							}
+						}
 					}
-				}
+				} 
 			}
 		}
 	}
