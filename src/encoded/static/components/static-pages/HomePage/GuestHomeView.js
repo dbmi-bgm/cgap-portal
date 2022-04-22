@@ -59,10 +59,10 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     <LoginController {...{ updateAppSessionState, auth0Options }}>
                         <LoginBox className="mt-25" />
                     </LoginController>
-                    <div className="text-primary text-small mt-2 mb-5">
-                        <span className="text-600 mr-05"><a href="https://cgap.hms.harvard.edu">CGAP Homepage</a></span>| 
-                        <span className="text-600 ml-05 mr-05"><a href="/help/logging-in">Account Setup Guide</a></span>|
-                        <span className="text-600 ml-05"><a href="/help/tutorials">Video Tutorials</a></span>
+                    <div className="cgap-links text-primary text-small mt-2 mb-5 row">
+                        <div className="text-600 pr-sm-1 col-12 col-sm-auto text-center"><a href="https://cgap.hms.harvard.edu">CGAP Homepage</a></div>
+                        <div className="text-600 pl-sm-1 pr-sm-1 border-primary col-12 col-sm-auto text-center"><a href="/help/logging-in">Account Setup Guide</a></div>
+                        <div className="text-600 pl-sm-1 col-12 col-sm-auto text-center"><a href="/help/tutorials">Video Tutorials</a></div>
                     </div>
                 </div>
             </div>

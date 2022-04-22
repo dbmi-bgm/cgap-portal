@@ -554,6 +554,13 @@
 				} 
 			}
 		}
+
+		.cgap-links>div.border-primary {
+			@include media-breakpoint-up(sm){
+				border-left: 1px solid;
+				border-right: 1px solid;
+			}
+		}
 	}
 
 
