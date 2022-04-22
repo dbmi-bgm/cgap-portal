@@ -275,6 +275,7 @@ div#top-nav.navbar-fixed-top {
                     display: inline-block;
                     transform: translate3d(0px,0,0);
                     transition: width $navbar-transition-length, transform $navbar-transition-length;
+                    shape-rendering: geometricPrecision;
         
                     @include navbar-fixed-position {
                         body.scrolled-past-top &,

@@ -503,6 +503,11 @@
 			max-width: 570px;
 		}
 
+		.cgap-welcome>svg,
+		.cgap-logo-wrapper>#clone_logo {
+			shape-rendering: geometricprecision;
+		}
+
 		.cgap-welcome>svg#a { 
 			max-width: 300px;
 			width: 280px;
