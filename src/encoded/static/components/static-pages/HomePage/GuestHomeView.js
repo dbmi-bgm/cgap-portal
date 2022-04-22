@@ -30,7 +30,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
     return (
         <React.Fragment>
             <div className="homepage-contents">
-                <div className="d-flex flex-column align-items-center">
+                <div className="d-flex flex-column align-items-center justify-content-center">
                     <div className="d-inline-block mb-1 mt-36">
                         <CGAPLogo showTitle={false} id="clone_logo" maxHeight={100} />
                     </div>
