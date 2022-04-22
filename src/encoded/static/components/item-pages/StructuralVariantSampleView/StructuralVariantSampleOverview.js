@@ -34,7 +34,7 @@ export class StructuralVariantSampleOverview extends React.PureComponent {
                 <SelectedItemsController isMultiSelect={false} currentAction="selection">
                     <SvInterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
                         <StructuralVariantSampleInfoHeader {...passProps} />
-                        <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={1} />
+                        <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={1} {...{ showInterpretation }} />
                     </SvInterpretationController>
                 </SelectedItemsController>
             </div>
@@ -303,7 +303,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     render(){
         const { context, schemas, currentGeneItem, currentGeneItemLoading,
-            selectedGenes, onSelectGene, onResetSelectedGenes } = this.props;
+            selectedGenes, onSelectGene, onResetSelectedGenes, showInterpretation } = this.props;
 
         const annotationTab = this.annotationTab();
 
@@ -319,7 +319,7 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
                 const commonBodyProps = { context, schemas, index, "active": index === annotationTab, "key": index };
                 switch (index) {
                     case 0: // Gene
-                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading, selectedGenes, onSelectGene, onResetSelectedGenes }} />);
+                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading, selectedGenes, onSelectGene, onResetSelectedGenes, showInterpretation }} />);
                         this.openPersistentTabs[0] = true; // Persist open after first appearance.
                         break;
                     case 1: // Variant
