@@ -508,10 +508,11 @@
 			shape-rendering: geometricprecision;
 		}
 
-		.cgap-welcome>svg#a { 
+		.cgap-welcome>svg#cgap-welcome-svg {
 			max-width: 300px;
 			width: 280px;
 			min-width: 250px;
+			fill: #1f445f;
 		}
 
 		.cgap-logo-wrapper.img-container {
