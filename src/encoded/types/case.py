@@ -384,6 +384,31 @@ class Case(Item):
         secondary_families = [i for i in individual_families if i != family]
         return secondary_families
 
+    @staticmethod
+    def get_vcf_from_sample_processing(request, sample_processing_atid, variant_type):
+        """Retrieve VCF for ingestion of given variant type.
+
+        For backwards compatibility, assume variant type of SNV if none
+        provided.
+        """
+        vcf_file = None
+        sample_processing = get_item_or_none(
+            request, sample_processing_atid, "sample-processings"
+        )
+        if sample_processing:
+            processed_files = sample_processing.get("processed_files", [])
+            for processed_file in processed_files[::-1]:  # Take last in list (~newest)
+                file_data = get_item_or_none(request, processed_file, 'files-processed')
+                file_type = file_data.get("file_type", "")
+                file_variant_type = file_data.get("variant_type", "SNV")
+                if (
+                    file_type == "full annotated VCF"
+                    and file_variant_type == variant_type
+                ):
+                    vcf_file = file_data["@id"]
+                    break
+        return vcf_file
+
     @calculated_property(schema={
         "title": "SNV VCF File",
         "description": "VCF file that will be used in SNV variant digestion",
@@ -395,21 +420,11 @@ class Case(Item):
         Map the SNV vcf file to be digested.
         """
         vcf_file = None
-        if not sample_processing:
-            return
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        if not sp_data:
-            return
-        files_processed = sp_data.get('processed_files', [])
-        if not files_processed:
-            return
-        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type != "SV":
-                vcf_file = file_data["@id"]
-                break
+        variant_type = "SNV"
+        if sample_processing:
+            vcf_file = self.get_vcf_from_sample_processing(
+                request, sample_processing, variant_type
+            )
         return vcf_file
 
     @calculated_property(schema={
@@ -423,21 +438,11 @@ class Case(Item):
         Map the SV vcf file to be digested.
         """
         sv_vcf_file = None
-        if not sample_processing:
-            return
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        if not sp_data:
-            return
-        files_processed = sp_data.get('processed_files', [])
-        if not files_processed:
-            return
-        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type == "SV":
-                sv_vcf_file = file_data["@id"]
-                break
+        variant_type = "SV"
+        if sample_processing:
+            sv_vcf_file = self.get_vcf_from_sample_processing(
+                request, sample_processing, variant_type
+            )
         return sv_vcf_file
 
     @calculated_property(schema={
@@ -449,21 +454,11 @@ class Case(Item):
     def cnv_vcf_file(self, request, sample_processing=None):
         """Map the CNV vcf file to be ingested."""
         cnv_vcf_file = None
-        if not sample_processing:
-            return
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        if not sp_data:
-            return
-        files_processed = sp_data.get('processed_files', [])
-        if not files_processed:
-            return
-        for file_processed in files_processed[::-1]:  # VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type == "CNV":
-                cnv_vcf_file = file_data["@id"]
-                break
+        variant_type = "CNV"
+        if sample_processing:
+            cnv_vcf_file = self.get_vcf_from_sample_processing(
+                request, sample_processing, variant_type
+            )
         return cnv_vcf_file
 
     @calculated_property(schema={
