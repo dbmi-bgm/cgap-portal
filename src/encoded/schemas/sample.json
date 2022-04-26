@@ -47,6 +47,9 @@
         },
         {
             "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
         }
     ],
     "properties": {
