@@ -76,7 +76,7 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
             </Modal.Header>
             <Modal.Body>
                 <UserRegistrationForm heading={formHeading} schemas={schemas} unverifiedUserEmail={unverifiedUserEmail}
-                                      onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
+                    onComplete={onRegistrationComplete} onCancel={onRegistrationCancel} />
             </Modal.Body>
         </Modal>
     );

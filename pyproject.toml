@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "8.8.0"
+version = "8.8.2"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -187,6 +187,7 @@ import-data = "encoded.commands.import_data:main"
 jsonld-rdf = "encoded.commands.jsonld_rdf:main"
 load-access-keys = "encoded.commands.load_access_keys:main"
 load-data = "encoded.commands.load_data:main"
+load-data-by-type = "encoded.commands.load_data_by_type:main"
 load-items = "encoded.commands.load_items:main"
 make-submission-access-key = "encoded.commands.make_submission_access_key:main"
 migrate-attachments-aws = "encoded.commands.migrate_attachments_aws:main"
