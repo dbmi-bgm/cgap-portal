@@ -504,6 +504,21 @@ class Case(Item):
         add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
 
+    @calculated_property(schema={
+        "title": "Search Query Add-Ons for Somatic SNVs",
+        "description": "Strings to be appended to the initial variant sample search query to limit results to those related to somatic SNVs for each tumor sample in this case.",
+        "type": "array",
+        "items": {
+            "title": "Search Query Add-on for Somatic SNVs",
+            "type": "string"
+        }
+    })
+    def somatic_snv_search_addon(self, request, analyses=None, individual=None):
+        """
+        Use vcf file and sample accessions to limit variant/variantsample to this case
+        """
+        addons = []
+        return addons
 
     @calculated_property(schema={
         "title": "Additional Variant Sample Facets",
