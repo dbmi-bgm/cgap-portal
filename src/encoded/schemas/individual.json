@@ -43,7 +43,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "accession": {
             "accessionType": "ID"
@@ -136,11 +136,42 @@
             "title": "Disorders",
             "type": "array",
             "uniqueItems": true,
-            "lookup": 50,
             "items": {
-                "title": "Disorder",
-                "type": "string",
-                "linkTo": "Disorder"
+                "title": "Disorder Info",
+                "type": "object",
+                "required": [
+                    "disorder"
+                ],
+                "properties": {
+                    "disorder": {
+                        "title": "Disorder",
+                        "type": "string",
+                        "linkTo": "Disorder"
+                    },
+                    "onset_age": {
+                        "title": "Onset Age",
+                        "type": "number"
+                    },
+                    "onset_age_units": {
+                        "title": "Onset Age Units",
+                        "type": "string",
+                        "enum": [
+                            "day",
+                            "week",
+                            "month",
+                            "year"
+                        ]
+                    },
+                    "diagnostic_confidence": {
+                        "title": "Diagnostic Confidence",
+                        "type": "string",
+                        "enum": [
+                            "possible",
+                            "probable",
+                            "definite"
+                        ]
+                    }
+                }
             }
         },
         "clinic_notes": {
