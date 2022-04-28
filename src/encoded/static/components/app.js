@@ -1163,6 +1163,7 @@ export default class App extends React.PureComponent {
                     <meta httpEquiv="X-UA-Compatible" content="IE=edge"/>
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
+                    <meta name="robots" content="noindex"/>
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
@@ -1250,7 +1251,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
+        'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',
@@ -1734,7 +1735,7 @@ class BodyElement extends React.PureComponent {
      */
     render(){
         const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas,
-            browseBaseState, updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
+            updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const overlaysContainer = this.overlaysContainerRef.current;
@@ -1759,7 +1760,7 @@ class BodyElement extends React.PureComponent {
             isFullscreen, toggleFullScreen, overlaysContainer,
             testWarningPresent, hideTestWarning: this.hideTestWarning,
             context, href, currentAction, session, schemas,
-            browseBaseState, updateAppSessionState
+            updateAppSessionState
         };
 
         const propsPassedToAllViews = {
