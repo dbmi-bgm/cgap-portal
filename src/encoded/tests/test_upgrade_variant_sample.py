@@ -85,7 +85,6 @@ def test_upgrade_variant_sample_1_2(inheritance_modes, is_male, app, variant_sam
                 assert existing_value in inheritance_modes
 
 
-
 @pytest.fixture
 def variant_sample_list_2_3():
     """Filter set containing query to upgrade in second filter block."""
@@ -120,6 +119,7 @@ def variant_sample_list_2_3():
         "uuid": "292250e7-5cb7-4543-85b2-80cd318287b2"
     }
 
+
 def test_upgrade_variant_sample_list_2_3(app, variant_sample_list_2_3):
     """Test filter set upgrader to update inheritance mode strings."""
     vsl_to_upgrade = deepcopy(variant_sample_list_2_3)
@@ -133,3 +133,27 @@ def test_upgrade_variant_sample_list_2_3(app, variant_sample_list_2_3):
     assert len(all_selections) == 2
     for selection in all_selections:
         assert "filter_blocks_request_at_time_of_selection" not in selection
+
+
+def test_upgrade_structural_variant_sample_2_3(
+    app, structural_variant_sample, structural_variant_sample_2,
+):
+    """Test setting caller fields for existing SVSamples."""
+    upgrader = app.registry["upgrader"]
+    upgrader.upgrade(
+        "structural_variant_sample",
+        structural_variant_sample,
+        current_version="2",
+        target_version="3",
+    )
+    assert structural_variant_sample["callers"] == ["Manta"]
+    assert structural_variant_sample["caller_types"] == ["SV"]
+
+    upgrader.upgrade(
+        "structural_variant_sample",
+        structural_variant_sample_2,
+        current_version="2",
+        target_version="3",
+    )
+    assert structural_variant_sample_2["callers"] == ["BIC-seq2"]
+    assert structural_variant_sample_2["caller_types"] == ["CNV"]

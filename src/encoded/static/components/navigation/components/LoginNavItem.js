@@ -50,7 +50,7 @@ LoginNavItem.propTypes = {
  * Somewhat 'wrap-around' but arguably likely cleanest way to open Auth0 login dialog modal
  * from Alert and not require to move up and pass down login-related stuff like `showLock()`.
  */
-const onAlertLoginClick = function(e) {
+export const onAlertLoginClick = function(e) {
     e.preventDefault();
     const btnElem = document.getElementById("loginbtn");
     if (btnElem && typeof btnElem.click === "function"){

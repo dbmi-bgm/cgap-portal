@@ -58,3 +58,13 @@ def variant_sample_list_2_3(value, system):
     for selection in all_selections:
         if "filter_blocks_request_at_time_of_selection" in selection:
             del selection["filter_blocks_request_at_time_of_selection"]
+
+
+@upgrade_step("structural_variant_sample", "2", "3")
+def structural_variant_sample_2_3(value, system):
+    """Set new caller fields for all existing SVSamples."""
+    callers = value.get("callers")
+    caller_types = value.get("caller_types")
+    if callers is None and caller_types is None:
+        value["callers"] = ["Manta"]
+        value["caller_types"] = ["SV"]

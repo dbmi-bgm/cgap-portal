@@ -396,22 +396,23 @@ class StructuralVariantSample(Item):
         }
     )
     def display_title(self, request, CALL_INFO, structural_variant):
+        """Build display title.
+
+        This title is displayed in new tabs/windows.
+        """
+        result = CALL_INFO
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"
         )
-
         if structural_variant:
-            start = convert_integer_to_comma_string(structural_variant["START"])
-            end = convert_integer_to_comma_string(structural_variant["END"])
             structural_variant_display_title = build_structural_variant_display_title(
                 structural_variant["SV_TYPE"],
                 structural_variant["CHROM"],
-                start,
-                end,
+                structural_variant["START"],
+                structural_variant["END"],
             )
-            return CALL_INFO + ":" + structural_variant_display_title # HG002:chr1:504A>T
-
-        return CALL_INFO
+            result = structural_variant_display_title + " (" + CALL_INFO + ")"
+        return result
 
     @calculated_property(
         schema={

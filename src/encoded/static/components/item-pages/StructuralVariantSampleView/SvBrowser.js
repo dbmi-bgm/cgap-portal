@@ -60,6 +60,7 @@ export class SvBrowser extends React.PureComponent {
                 maxVariantLength: Number.MAX_SAFE_INTEGER
             },
             'higlassSvVcf': null,
+            'higlassCnvVcf': null,
             'hasError': false
         };
         this.higlassContainer = null;
@@ -82,10 +83,9 @@ export class SvBrowser extends React.PureComponent {
         };
 
         ajax.load(
-            "/search/?type=Case&sample.bam_sample_id=" + bamSampleId,
+            "/search/?type=SampleProcessing&processed_files.accession=" + file,
             (resp) => {
-                const { "@graph": [ caseItem = null ] = [] } = resp;
-                const { sample_processing: sampleProcessingItem = null } = caseItem || {};
+                const { "@graph": [ sampleProcessingItem = null ] = [] } = resp;
 
                 const svBamVisibility = {};
                 const svBamLoadingStatus = {};
@@ -113,12 +113,23 @@ export class SvBrowser extends React.PureComponent {
 
                     });
 
-                    // Get the Higlass SV vcf location
+                    // Get the Higlass SV/CNV vcf location
+                    // If there are multiple files that satisfy the conditions below, 
+                    // the last one in the list will be taken.
                     let higlassSvVcf = null;
-                    processedFiles.forEach(function(file){
-                        if (file["file_type"] === "Higlass SV VCF" || file.higlass_file) {
-                            higlassSvVcf = file["upload_key"];
-                        }
+                    let higlassCnvVcf = null;
+                    processedFiles.forEach(function (file) {
+                      if (
+                        file["file_type"] === "Higlass SV VCF" || // This is checked for backwards compatibilty
+                        (file["higlass_file"] && file["variant_type"] === "SV")
+                      ) {
+                        higlassSvVcf = file["upload_key"];
+                      } else if (
+                        file["file_type"] === "Higlass CNV VCF" || // This is checked for backwards compatibilty
+                        (file["higlass_file"] && file["variant_type"] === "CNV")
+                      ) {
+                        higlassCnvVcf = file["upload_key"];
+                      }
                     });
 
                     this.setState({
@@ -127,11 +138,15 @@ export class SvBrowser extends React.PureComponent {
                         svBamLoadingStatus,
                         svVcfVisibility,
                         svVcfLoadingStatus,
-                        higlassSvVcf
+                        higlassSvVcf,
+                        higlassCnvVcf
                     });
                 }
                 else {
                     console.warn("There are no BAM files for this case.");
+                    this.setState({
+                        hasError: true
+                    });
                 }
             },
             'GET',
@@ -278,7 +293,7 @@ export class SvBrowser extends React.PureComponent {
         const {
             variantStartAbsCoord, variantEndAbsCoord,
             samples, bamSampleId, svBamVisibility, svVcfVisibility,
-            higlassSvVcf
+            higlassSvVcf, higlassCnvVcf
         } = this.state;
 
         const payload = {
@@ -290,7 +305,8 @@ export class SvBrowser extends React.PureComponent {
             'bam_visibilty': svBamVisibility,
             'sv_vcf_visibilty': svVcfVisibility,
             'current_viewconf': currentViewconf,
-            'higlass_sv_vcf': higlassSvVcf
+            'higlass_sv_vcf': higlassSvVcf,
+            'higlass_cnv_vcf': higlassCnvVcf,
         };
 
         ajax.load(
@@ -332,7 +348,15 @@ export class SvBrowser extends React.PureComponent {
         const commonBodyProps = { context, schemas, "active": true };
 
         const {
-            hasError, svViewSettings, samples, svBamVisibility, svVcfVisibility, svBamLoadingStatus, svVcfLoadingStatus, higlassSvVcf
+          hasError,
+          svViewSettings,
+          samples,
+          svBamVisibility,
+          svVcfVisibility,
+          svBamLoadingStatus,
+          svVcfLoadingStatus,
+          higlassSvVcf,
+          higlassCnvVcf,
         } = this.state;
 
         if (hasError) {
@@ -370,70 +394,96 @@ export class SvBrowser extends React.PureComponent {
         );
 
         return (
-            <div className="row flex-column flex-lg-row">
-
-                <div className="inner-card-section col pb-2 pb-lg-0 col-lg-3 col-xl-3 d-flex flex-column sv-browser-settings">
-                    <div className="info-header-title">
-                        <h5 className="text-truncate">Settings</h5>
+          <div className="row flex-column flex-lg-row">
+            <div className="inner-card-section col pb-2 pb-lg-0 col-lg-3 col-xl-3 d-flex flex-column sv-browser-settings">
+              <div className="info-header-title">
+                <h5 className="text-truncate">Settings</h5>
+              </div>
+              <div className="info-body flex-grow-1">
+                <div className="d-block bg-light px-2 mb-1">
+                  <small>STRUCTURAL VARIANTS</small>
+                </div>
+                <div className="d-block mb-2">{vcfCheckboxes}</div>
+                <div className="d-block bg-light px-2 mb-1">
+                  <small>BAM FILES</small>
+                </div>
+                <div className="d-block mb-2">{bamCheckboxes}</div>
+                <div className="d-block bg-light px-2 mb-1">
+                  <small>SV FILTER</small>
+                </div>
+                <div className="d-block mb-2">
+                  <SvSettingsCheckbox
+                    label="Show deletions"
+                    checked={svViewSettings.showDeletions}
+                    onChange={(e) => this.updateSvType(e, "del")}
+                  />
+                  <SvSettingsCheckbox
+                    label="Show duplications"
+                    checked={svViewSettings.showDuplications}
+                    onChange={(e) => this.updateSvType(e, "dup")}
+                  />
+                  <SvSettingsCheckbox
+                    label="Show insertions"
+                    checked={svViewSettings.showInsertions}
+                    onChange={(e) => this.updateSvType(e, "ins")}
+                  />
+                  <SvSettingsCheckbox
+                    label="Show inversions"
+                    checked={svViewSettings.showInversions}
+                    onChange={(e) => this.updateSvType(e, "inv")}
+                  />
+                </div>
+                <div className="d-block mb-2">
+                  <form>
+                    <div className="form-group">
+                      <label className="font-weight-normal">
+                        Minimal SV length (bp):
+                      </label>
+                      <input
+                        type="number"
+                        className="form-control form-control-sm"
+                        onChange={(e) => this.updateSvLength(e, "min")}
+                      />
                     </div>
-                    <div className="info-body flex-grow-1">
-                        <div className="d-block bg-light px-2 mb-1">
-                            <small >STRUCTURAL VARIANTS</small>
-                        </div>
-                        <div className="d-block mb-2">
-                            {vcfCheckboxes}
-                        </div>
-                        <div className="d-block bg-light px-2 mb-1">
-                            <small >BAM FILES</small>
-                        </div>
-                        <div className="d-block mb-2">
-                            {bamCheckboxes}
-                        </div>
-                        <div className="d-block bg-light px-2 mb-1">
-                            <small >SV FILTER</small>
-                        </div>
-                        <div className="d-block mb-2">
-                            <SvSettingsCheckbox label="Show deletions" checked={svViewSettings.showDeletions} onChange={(e) => this.updateSvType(e, "del")} />
-                            <SvSettingsCheckbox label="Show duplications" checked={svViewSettings.showDuplications} onChange={(e) => this.updateSvType(e, "dup")} />
-                            <SvSettingsCheckbox label="Show insertions" checked={svViewSettings.showInsertions} onChange={(e) => this.updateSvType(e, "ins")} />
-                            <SvSettingsCheckbox label="Show inversions" checked={svViewSettings.showInversions} onChange={(e) => this.updateSvType(e, "inv")} />
-                        </div>
-                        <div className="d-block mb-2">
-                            <form>
-                                <div className="form-group">
-                                    <label className="font-weight-normal">Minimal SV length (bp):</label>
-                                    <input type="number" className="form-control form-control-sm" onChange={(e) => this.updateSvLength(e, "min")} />
-                                </div>
-                                <div className="form-group">
-                                    <label className="font-weight-normal">Maximal SV length (bp):</label>
-                                    <input type="number" className="form-control form-control-sm" onChange={(e) => this.updateSvLength(e, "max")} />
-                                </div>
-
-                            </form>
-
-                        </div>
- 
-                        <div className="d-block mb-1">
-                            <button type="button" className="btn btn-primary btn-block" onClick={this.exportDisplay}>
-                                <i className="icon icon-download icon-sm fas mr-1"></i>Export
-                            </button>
-                        </div>
-
+                    <div className="form-group">
+                      <label className="font-weight-normal">
+                        Maximal SV length (bp):
+                      </label>
+                      <input
+                        type="number"
+                        className="form-control form-control-sm"
+                        onChange={(e) => this.updateSvLength(e, "max")}
+                      />
                     </div>
+                  </form>
                 </div>
 
-                <div className="inner-card-section col pb-2 pb-lg-0">
-                    <div className="info-header-title">
-                        <h5>Browser</h5>
-                    </div>
-                    <div className="info-body">
-
-                        <SvBrowserHiglass {...commonBodyProps} {...{ samples, higlassSvVcf }} assignHGC={this.assignHGC} />
-
-                    </div>
+                <div className="d-block mb-1">
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-block"
+                    onClick={this.exportDisplay}
+                  >
+                    <i className="icon icon-download icon-sm fas mr-1"></i>
+                    Export
+                  </button>
                 </div>
+              </div>
             </div>
 
+            <div className="inner-card-section col pb-2 pb-lg-0">
+              <div className="info-header-title">
+                <h5>Browser</h5>
+              </div>
+              <div className="info-body">
+                <SvBrowserHiglass
+                  {...commonBodyProps}
+                  {...{ samples, higlassSvVcf, higlassCnvVcf }}
+                  assignHGC={this.assignHGC}
+                />
+              </div>
+            </div>
+          </div>
         );
 
 

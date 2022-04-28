@@ -30,11 +30,21 @@ export const SvBrowserHiglass = React.memo(function SvBrowserHiglass (props) {
 
     return (
         <div className="row">
-            <div className="col-12">
-                <div className="flex-grow-1 pb-2 pb-xl-1">
-                    <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantStartAbsCoord} variantEndAbsCoord={variantEndAbsCoord} ref={higlassContainerRef} requestingTab="sv" bamSampleId={bamSampleId} samples={props.samples} higlassSvVcf={props.higlassSvVcf} file={file}/>
-                </div>
-            </div>
+        <div className="col-12">
+          <div className="flex-grow-1 pb-2 pb-xl-1">
+            <HiGlassAjaxLoadContainer
+              variantPositionAbsCoord={variantStartAbsCoord}
+              variantEndAbsCoord={variantEndAbsCoord}
+              ref={higlassContainerRef}
+              requestingTab="sv"
+              bamSampleId={bamSampleId}
+              samples={props.samples}
+              higlassSvVcf={props.higlassSvVcf}
+              higlassCnvVcf={props.higlassCnvVcf}
+              file={file}
+            />
+          </div>
         </div>
+      </div>
     );
 });
