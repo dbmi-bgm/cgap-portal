@@ -27,7 +27,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         isLoadingVariantSampleListItem,
         currFilterSet,
         unsavedTechnicalReview,
-        setTechnicalReviewForVSAtID,
+        setTechnicalReviewForVSUUID,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -151,6 +151,33 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                         return null;
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
+                }
+            },
+            /** Depends on temporary/unsaved state ... */
+            "technical_review.call": {
+                "colTitle": "Technical Review",
+                "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
+                "order": 120,
+                "sort_fields": [
+                    {
+                        "field": "technical_review.call",
+                        "title": "Technical Review Call"
+                    },
+                    {
+                        "field": "technical_review.classification",
+                        "title": "Technical Review Classification"
+                    }
+                ],
+                "render": function(result, props){
+                    const { technical_review: { call, classification } = {} } = result;
+
+                    return (
+                        <div className="w-100 d-flex align-items-center justify-content-around text-truncate">
+                            <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
+                            <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
+                            <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
+                        </div>
+                    );
                 }
             },
             //

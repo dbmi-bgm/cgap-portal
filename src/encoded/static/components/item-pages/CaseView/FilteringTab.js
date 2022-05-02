@@ -91,22 +91,22 @@ class TechnicalReviewController extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.setTechnicalReviewForVSAtID = this.setTechnicalReviewForVSAtID.bind(this);
+        this.setTechnicalReviewForVSUUID = this.setTechnicalReviewForVSUUID.bind(this);
         this.resetUnsavedTechnicalReview = this.resetUnsavedTechnicalReview.bind(this);
         this.state = {
             "unsavedTechnicalReview": {}
         };
     }
 
-    setTechnicalReviewForVSAtID(vsAtID, technicalReview) {
+    setTechnicalReviewForVSUUID(vsUUID, technicalReview) {
         this.setState(function({ unsavedTechnicalReview: existingTechReview }){
             if (technicalReview === null) {
-                if (typeof existingTechReview[vsAtID] !== "undefined") {
-                    return { "unsavedTechnicalReview": _.omit(existingTechReview, vsAtID) };
+                if (typeof existingTechReview[vsUUID] !== "undefined") {
+                    return { "unsavedTechnicalReview": _.omit(existingTechReview, vsUUID) };
                 }
                 return null;
             }
-            return { "unsavedTechnicalReview": { ...existingTechReview, [vsAtID]: technicalReview } };
+            return { "unsavedTechnicalReview": { ...existingTechReview, [vsUUID]: technicalReview } };
         });
     }
 
@@ -120,7 +120,7 @@ class TechnicalReviewController extends React.PureComponent {
         const childProps = {
             ...passProps,
             unsavedTechnicalReview,
-            "setTechnicalReviewForVSAtID": this.setTechnicalReviewForVSAtID,
+            "setTechnicalReviewForVSUUID": this.setTechnicalReviewForVSUUID,
             "resetUnsavedTechnicalReview": this.resetUnsavedTechnicalReview
         };
         return React.Children.map(children, function(child){
@@ -315,7 +315,7 @@ function FilteringTabBody(props) {
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
         unsavedTechnicalReview,         // passed in from TechnicalReviewController
-        setTechnicalReviewForVSAtID,    // passed in from TechnicalReviewController
+        setTechnicalReviewForVSUUID,    // passed in from TechnicalReviewController
         resetUnsavedTechnicalReview,    // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
@@ -453,7 +453,7 @@ function FilteringTabBody(props) {
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
         currFilterSet, // <- Used for Matching Filter Block Indices column
         unsavedTechnicalReview, // <- Used for Technical Review Column
-        setTechnicalReviewForVSAtID, // <- Used for Technical Review Column
+        setTechnicalReviewForVSUUID, // <- Used for Technical Review Column
         "key": searchTableKey
     };
 
