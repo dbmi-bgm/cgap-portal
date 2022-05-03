@@ -277,6 +277,15 @@
                                     "title": "File for HiGlass Display",
                                     "description": "Whether file is used for HiGlass",
                                     "type": "boolean"
+                                },
+                                "paired_end": {
+                                    "title": "Paired End Identifier",
+                                    "description": "Which pair the file belongs to (if paired end library)",
+                                    "type": "string",
+                                    "enum": [
+                                        "1",
+                                        "2"
+                                    ]
                                 }
                             }
                         }
@@ -370,6 +379,11 @@
         "proband_only": {
             "title": "Proband-only",
             "description": "Whether the MetaWorkflow is intended for proband-only analysis",
+            "type": "boolean"
+        },
+        "family_structure_expected": {
+            "title": "Family Structure Expected",
+            "description": "Whether the MetaWorkflow expects a family structure for the input samples",
             "type": "boolean"
         }
     },
