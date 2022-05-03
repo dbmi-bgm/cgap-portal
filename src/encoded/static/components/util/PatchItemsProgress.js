@@ -109,7 +109,7 @@ export class PatchItemsProgress extends React.PureComponent {
     }
 
     render(){
-        const { children, ...passProps } = this.props;
+        const { children, modalOnCompleteJSX, ...passProps } = this.props;
         const { isPatching, patchingPercentageComplete, patchErrors } = this.state;
 
         const childProps = {
@@ -134,7 +134,7 @@ export class PatchItemsProgress extends React.PureComponent {
             <React.Fragment>
                 { adjustedChildren }
                 { isPatching ?
-                    <ProgressModal {...{ isPatching, patchingPercentageComplete, patchErrors }} onHide={this.onReset} />
+                    <ProgressModal {...{ isPatching, patchingPercentageComplete, patchErrors, modalOnCompleteJSX }} onHide={this.onReset} />
                     : null }
             </React.Fragment>
         );
@@ -148,7 +148,7 @@ export class PatchItemsProgress extends React.PureComponent {
  * @todo Move to SPC or utils directory along with PatchItemsProgress
  */
 export const ProgressModal = React.memo(function ProgressModal (props) {
-    const { isPatching, patchingPercentageComplete, onHide, patchErrors } = props;
+    const { isPatching, patchingPercentageComplete, onHide, patchErrors, modalOnCompleteJSX } = props;
 
     const percentCompleteFormatted = Math.round(patchingPercentageComplete * 1000) / 10;
     const finished = patchingPercentageComplete === 1;
@@ -174,6 +174,7 @@ export const ProgressModal = React.memo(function ProgressModal (props) {
                     <div className="progress-bar" role="progressbar" style={{ "width": percentCompleteFormatted + "%" }}
                         aria-valuenow={percentCompleteFormatted} aria-valuemin="0" aria-valuemax="100"/>
                 </div>
+                { finished ? modalOnCompleteJSX : null }
                 { finished ?
                     <button type="button" className="mt-24 btn btn-block btn-primary" onClick={onHide}>
                         Close

@@ -503,6 +503,7 @@
         "technical_review": {
             "title": "Technical Review",
             "type": "object",
+            "notes": "We will store technical review notes in a separate field `technical_review_notes` perhaps, to simplify UI logic.",
             "properties": {
                 "call": {
                     "title": "Technical Review Call",
@@ -523,6 +524,25 @@
                         "Mendelian Error",
                         "Other"
                     ]
+                },
+                "date_initial_call_made": {
+                    "title": "Date Call Made",
+                    "exclude_from": ["FFedit-create"],
+                    "type": "string",
+                    "anyOf": [
+                        {"format": "date-time"},
+                        {"format": "date"}
+                    ],
+                    "serverDefault": "now",
+                    "permission": "restricted_fields"
+                },
+                "initial_call_made_by": {
+                    "title": "Call Made By",
+                    "exclude_from": ["FFedit-create"],
+                    "type": "string",
+                    "linkTo": "User",
+                    "serverDefault": "userid",
+                    "permission": "restricted_fields"
                 }
             }
         },
@@ -660,7 +680,21 @@
         },
         "technical_review.call": {
             "title": "Technical Review Call",
-            "order": 120
+            "order": 120,
+            "sort_fields": [
+                {
+                    "field": "technical_review.call",
+                    "title": "Technical Review Call"
+                },
+                {
+                    "field": "technical_review.classification",
+                    "title": "Technical Review Classification"
+                },
+                {
+                    "field": "technical_review.date_initial_call_made",
+                    "title": "Initial Call Made Date"
+                }
+            ]
         },
         "project": {
             "title": "Project",

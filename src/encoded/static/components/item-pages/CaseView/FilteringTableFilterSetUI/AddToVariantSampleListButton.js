@@ -36,9 +36,7 @@ export function AddToVariantSampleListButton(props){
 
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
 
-    const mapSearchTypeToDisplay = { VariantSample: "Variant Sample", StructuralVariantSample: "Structural Variant Sample" };
-
-    const regularTitle = <React.Fragment>Add <strong>{ selectedVariantSamples.size }</strong> selected { mapSearchTypeToDisplay[searchType] } to Interpretation</React.Fragment>;
+    const regularTitle = <React.Fragment>Add <strong>{ selectedVariantSamples.size }</strong> selected samples to Interpretation</React.Fragment>;
 
     /** PATCH or create new VariantSampleList w. additions */
 
@@ -64,7 +62,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" disabled>
                 <span>
-                    No {mapSearchTypeToDisplay[searchType]}s selected
+                    No samples selected
                 </span>
             </button>
         );

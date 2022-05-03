@@ -10,6 +10,7 @@ import ReactTooltip from 'react-tooltip';
 import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { buildSchemaFacetDictionary } from './../../../util/Schemas';
+import { PatchItemsProgress } from './../../../util/PatchItemsProgress';
 import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
 import { SearchBar } from './../../../browse/SearchBar';
 import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
@@ -18,6 +19,8 @@ import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 import { PresetFilterSetSelectionUI } from './PresetFilterSetSelectionUI';
 import { FilterBlock, DummyLoadingFilterBlock } from './FilterBlock';
 import { ExportSearchSpreadsheetButton } from './ExportSearchSpreadsheetButton';
+import { SaveTechnicalReviewButton } from './../TechnicalReviewColumn';
+
 
 
 /**
@@ -177,6 +180,9 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             // From FilteringTab (& higher, e.g. App/redux-store):
             caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab,
 
+            // From TechnicalReviewController (used in FilteringTab)
+            unsavedTechnicalReview, resetUnsavedTechnicalReview,
+
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
 
@@ -268,39 +274,50 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         if (isActiveDotRouterTab) {
             aboveTableControls = (
-                <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
-                    <div className="col-12 col-lg-4 py-2">
-                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
-                            placeholder={!currentFilterBlockName ? "Select a single filter-block above to search..." : "Search..."} />
-                    </div>
-                    <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
-                        { typeof totalCount === "number" ?
-                            <React.Fragment>
-                                <strong>{ totalCount || 0 }</strong>
-                                &nbsp;
-                                matches for { currentFilterBlockName ?
-                                    <em>{ currentFilterBlockName }</em>
-                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                    : (
-                                        <React.Fragment>
-                                            <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
-                                            { ` of ${selectedFilterBlockCount} Filter Blocks` }
-                                        </React.Fragment>
-                                    ) }
-                            </React.Fragment>
-                            : null }
-                    </h5>
-                    <div className="col col-lg-auto pr-06 d-flex">
-                        { selectedVariantSamples instanceof Map ?
-                            <div className="pr-14">
+                <React.Fragment>
+                    <div className="filtering-tab-table-controls py-2 row">
+                        <div className="col-12 col-md-6">
+                            <h5 className="text-600">Interpretation</h5>
+                            { selectedVariantSamples instanceof Map ?
                                 <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
                                     intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
                                     isEditDisabled, haveEditPermission }} />
-                            </div>
                             : null }
-                        { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }
+                        </div>
+                        <div className="col-12 col-md-6 text-md-right">
+                            <h5 className="text-600">Technical Review</h5>
+                            <PatchItemsProgress modalOnCompleteJSX={<h5 className="mt-16 mb-16 text-center text-danger">It will take some minutes for changes to become visible in search after a refresh.</h5>}>
+                                <SaveTechnicalReviewButton {...{ unsavedTechnicalReview, resetUnsavedTechnicalReview, haveEditPermission }} />
+                            </PatchItemsProgress>
+                        </div>
                     </div>
-                </AboveTableControlsBaseCGAP>
+                    <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
+                        <div className="col-12 col-lg-4 py-2">
+                            <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
+                                placeholder={!currentFilterBlockName ? "Select a single filter-block above to search..." : "Search..."} />
+                        </div>
+                        <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
+                            { typeof totalCount === "number" ?
+                                <React.Fragment>
+                                    <strong>{ totalCount || 0 }</strong>
+                                    &nbsp;
+                                    matches for { currentFilterBlockName ?
+                                        <em>{ currentFilterBlockName }</em>
+                                        // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                        : (
+                                            <React.Fragment>
+                                                <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                                { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                            </React.Fragment>
+                                        ) }
+                                </React.Fragment>
+                                : null }
+                        </h5>
+                        <div className="col col-lg-auto pr-06 d-flex">
+                            <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} />
+                        </div>
+                    </AboveTableControlsBaseCGAP>
+                </React.Fragment>
             );
         } else {
             aboveTableControls = null;

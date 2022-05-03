@@ -4,6 +4,7 @@ import React, { useMemo, useCallback, useRef, useState } from 'react';
 import Popover  from 'react-bootstrap/esm/Popover';
 import Overlay from 'react-bootstrap/esm/Overlay';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import ReactTooltip from 'react-tooltip';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper, flattenColumnsDefinitionsSortFields } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
@@ -11,6 +12,7 @@ import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable
 import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
+import { TechnicalReviewColumn } from './TechnicalReviewColumn';
 
 /* Used in FilteringTab */
 
@@ -71,17 +73,6 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
             "technical_review.call": {
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
-                "order": 120,
-                "sort_fields": [
-                    {
-                        "field": "technical_review.call",
-                        "title": "Technical Review Call"
-                    },
-                    {
-                        "field": "technical_review.classification",
-                        "title": "Technical Review Classification"
-                    }
-                ],
                 "render": function(result, props){
                     const {
                         uuid: vsUUID,
@@ -129,12 +120,8 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         ...passProps
     } = props;
 
+    // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
-    const {
-        uuid: openPopoverUUID = null,
-        call: openPopoverCall = null,
-        ref: openPopoverRef = null
-    } = openPopoverData || {};
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -174,21 +161,10 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
             "technical_review.call": {
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
-                "order": 120,
-                "sort_fields": [
-                    {
-                        "field": "technical_review.call",
-                        "title": "Technical Review Call"
-                    },
-                    {
-                        "field": "technical_review.classification",
-                        "title": "Technical Review Classification"
-                    }
-                ],
                 "render": function(result, props){
                     const { uuid: vsUUID } = result;
                     const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
-                    return <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, setOpenPopoverData }} />;
+                    return <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, setOpenPopoverData, setTechnicalReviewForVSUUID }} />;
                 }
             },
             //
@@ -236,7 +212,21 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, unsavedTechnicalReview ]);
+
+    return (
+        <React.Fragment>
+            <TechnicalReviewPopoverOverlay {...{ openPopoverData, setOpenPopoverData }} />
+            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
+        </React.Fragment>
+    );
+}
+
+const TechnicalReviewPopoverOverlay = React.memo(function TechnicalReviewPopoverOverlay ({ openPopoverData, setOpenPopoverData }) {
+    const {
+        ref: openPopoverRef = null,
+        jsx: openPopoverJSX = null
+    } = openPopoverData || {};
 
     const onRootClickHide = useCallback(function(e){
         // If they clicked on another technical review column/row rule, don't close popover after switching info
@@ -249,61 +239,18 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         setOpenPopoverData(null);
     });
 
-    return (
-        <React.Fragment>
-            { openPopoverData ?
-                <Overlay target={openPopoverRef} show={!!openPopoverData} transition placement="bottom"
-                    rootClose rootCloseEvent="click" onHide={onRootClickHide}>
-                    <Popover id="technical-review-popover">
-                        <Popover.Title className="m-0 text-600" as="h5">Technical Review</Popover.Title>
-                        <Popover.Content className="pt-0 pl-0 pr-04">
-                            <ul className="mb-0 mt-08">
-                                <li>Test 123</li>
-                                <li>Test 1234</li>
-                            </ul>
-                        </Popover.Content>
-                    </Popover>
-                </Overlay>
-                : null }
-            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
-        </React.Fragment>
-    );
-}
-
-function TechnicalReviewColumn(props){
-    const { result, setOpenPopoverData, unsavedTechnicalReviewForResult } = props;
-    const {
-        uuid: vsUUID,
-        technical_review: { call, classification } = {}
-    } = result;
-    const callTrueButtonRef = useRef(null);
-    const callFalseButtonRef = useRef(null);
-
-    function handleOpenDropdown(e) {
-        // The native event (rather than React SyntheticEvent) is picked up by
-        // onRootClickHide
-        //e.nativeEvent.stopPropagation();
-        //e.nativeEvent.preventDefault();
-        const callStrValue = e.target.getAttribute("data-call");
-        setOpenPopoverData({
-            uuid: vsUUID,
-            call: callStrValue === "True",
-            ref: callTrueButtonRef
-        });
+    if (!openPopoverData) {
+        return null;
     }
-
+    
     return (
-        <div className="w-100 d-flex align-items-center justify-content-around text-truncate py-1">
-            <button type="button" className="btn btn-link p-0" onClick={handleOpenDropdown} ref={callTrueButtonRef}
-                data-call="True" data-technical-review="true">
-                <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
-            </button>
-            <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
-            <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
-        </div>
+        <Overlay target={openPopoverRef} show={!!openPopoverData} transition placement="bottom"
+            rootClose rootCloseEvent="click" onHide={onRootClickHide}>
+            { openPopoverJSX }
+        </Overlay>
     );
+});
 
-}
 
 /**
  * Open Variant Sample in new window

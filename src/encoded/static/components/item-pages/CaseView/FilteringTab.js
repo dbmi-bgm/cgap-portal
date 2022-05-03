@@ -14,6 +14,7 @@ import { FilterSetController } from './FilteringTableFilterSetUI/FilterSetContro
 import { SaveFilterSetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetButton';
 import { SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable, CaseViewEmbeddedVariantSampleSearchTableSV } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { TechnicalReviewController } from './TechnicalReviewColumn';
 
 
 
@@ -87,51 +88,6 @@ export function FilteringTab(props) {
     );
 }
 
-class TechnicalReviewController extends React.PureComponent {
-
-    constructor(props) {
-        super(props);
-        this.setTechnicalReviewForVSUUID = this.setTechnicalReviewForVSUUID.bind(this);
-        this.resetUnsavedTechnicalReview = this.resetUnsavedTechnicalReview.bind(this);
-        this.state = {
-            "unsavedTechnicalReview": {}
-        };
-    }
-
-    setTechnicalReviewForVSUUID(vsUUID, technicalReview) {
-        this.setState(function({ unsavedTechnicalReview: existingTechReview }){
-            if (technicalReview === null) {
-                if (typeof existingTechReview[vsUUID] !== "undefined") {
-                    return { "unsavedTechnicalReview": _.omit(existingTechReview, vsUUID) };
-                }
-                return null;
-            }
-            return { "unsavedTechnicalReview": { ...existingTechReview, [vsUUID]: technicalReview } };
-        });
-    }
-
-    resetUnsavedTechnicalReview() {
-        this.setState({ "unsavedTechnicalReview": {} });
-    }
-
-    render(){
-        const { children, ...passProps } = this.props;
-        const { unsavedTechnicalReview } = this.state;
-        const childProps = {
-            ...passProps,
-            unsavedTechnicalReview,
-            "setTechnicalReviewForVSUUID": this.setTechnicalReviewForVSUUID,
-            "resetUnsavedTechnicalReview": this.resetUnsavedTechnicalReview
-        };
-        return React.Children.map(children, function(child){
-            if (!React.isValidElement(child) || typeof child.type === "string") {
-                return child;
-            }
-            return React.cloneElement(child, childProps);
-        });
-    }
-
-}
 
 const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(props) {
     const { context, currViewIdx, setCurrViewIdx } = props;
@@ -383,6 +339,7 @@ function FilteringTabBody(props) {
         isLoadingVariantSampleListItem,
         selectedVariantSamples,
         isActiveDotRouterTab,
+        unsavedTechnicalReview,
         // setIsSubmitting,
         // "caseItem": context
     };
