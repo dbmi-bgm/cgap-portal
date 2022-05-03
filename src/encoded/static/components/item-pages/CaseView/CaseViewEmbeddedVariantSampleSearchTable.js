@@ -74,22 +74,9 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
                 "render": function(result, props){
-                    const {
-                        uuid: vsUUID,
-                        technical_review: { call, classification } = {}
-                    } = result;
-
-                    console.log("%R%", unsavedTechnicalReview);
-
-                    return (
-                        <div className="w-100 d-flex align-items-center justify-content-around text-truncate">
-                            <button type="button" className="btn btn-link">
-                                <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
-                            </button>
-                            <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
-                            <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
-                        </div>
-                    );
+                    const { uuid: vsUUID } = result;
+                    const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
+                    return <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, setOpenPopoverData, setTechnicalReviewForVSUUID }} />;
                 }
             }
         };
