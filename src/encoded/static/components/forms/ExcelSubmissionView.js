@@ -765,10 +765,14 @@ function useInterval(callback, delay) {
     }, [delay]);
 }
 
+/**
+ * Note: by default Poller now uses datastore=database calls - this is to avoid bugs related to the late indexing of updated submissions
+ * and should not cause issues since there are limited items embedded onto ingestion submission items.
+ */
 function Poller(props){
     const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts } = props;
     const { uuid } = context || {};
-    const getURL = "/ingestion-submissions/" + uuid;
+    const getURL = "/ingestion-submissions/" + uuid + "?datastore=database";
 
     const timeStarted = new Date(Date.now());
     const [ lastUpdated, setLastUpdated ] = useState(timeStarted.toLocaleTimeString('en-US'));
