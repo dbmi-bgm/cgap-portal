@@ -596,7 +596,8 @@ const ACMGInvoker = React.memo(function ACMGInvoker(props) {
                 <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom"
                     rootClose rootCloseEvent="click" onHide={onRootClickHide}>
                     { acmgStrengthPopoverJSX }
-                </Overlay>: null }
+                </Overlay>
+                : null }
         </div>
     );
 });

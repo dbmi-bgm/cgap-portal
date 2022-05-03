@@ -1,11 +1,12 @@
 'use strict';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useState } from 'react';
 import Popover  from 'react-bootstrap/esm/Popover';
+import Overlay from 'react-bootstrap/esm/Overlay';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { DisplayTitleColumnWrapper, flattenColumnsDefinitionsSortFields } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
 import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
@@ -82,11 +83,18 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     }
                 ],
                 "render": function(result, props){
-                    const { technical_review: { call, classification } = {} } = result;
+                    const {
+                        uuid: vsUUID,
+                        technical_review: { call, classification } = {}
+                    } = result;
+
+                    console.log("%R%", unsavedTechnicalReview);
 
                     return (
                         <div className="w-100 d-flex align-items-center justify-content-around text-truncate">
-                            <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
+                            <button type="button" className="btn btn-link">
+                                <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
+                            </button>
                             <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
                             <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
                         </div>
@@ -115,9 +123,18 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
         currFilterSet,
+        unsavedTechnicalReview,
+        setTechnicalReviewForVSUUID,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
+
+    const [ openPopoverData, setOpenPopoverData ] = useState(null);
+    const {
+        uuid: openPopoverUUID = null,
+        call: openPopoverCall = null,
+        ref: openPopoverRef = null
+    } = openPopoverData || {};
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -169,15 +186,9 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     }
                 ],
                 "render": function(result, props){
-                    const { technical_review: { call, classification } = {} } = result;
-
-                    return (
-                        <div className="w-100 d-flex align-items-center justify-content-around text-truncate">
-                            <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
-                            <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
-                            <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
-                        </div>
-                    );
+                    const { uuid: vsUUID } = result;
+                    const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
+                    return <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, setOpenPopoverData }} />;
                 }
             },
             //
@@ -227,7 +238,71 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
+    const onRootClickHide = useCallback(function(e){
+        // If they clicked on another technical review column/row rule, don't close popover after switching info
+        if (e.target && e.target.getAttribute("data-technical-review") === "true") {
+            return false;
+        }
+        if (e.target && e.target.parentElement && e.target.parentElement.getAttribute("data-technical-review") === "true") {
+            return false;
+        }
+        setOpenPopoverData(null);
+    });
+
+    return (
+        <React.Fragment>
+            { openPopoverData ?
+                <Overlay target={openPopoverRef} show={!!openPopoverData} transition placement="bottom"
+                    rootClose rootCloseEvent="click" onHide={onRootClickHide}>
+                    <Popover id="technical-review-popover">
+                        <Popover.Title className="m-0 text-600" as="h5">Technical Review</Popover.Title>
+                        <Popover.Content className="pt-0 pl-0 pr-04">
+                            <ul className="mb-0 mt-08">
+                                <li>Test 123</li>
+                                <li>Test 1234</li>
+                            </ul>
+                        </Popover.Content>
+                    </Popover>
+                </Overlay>
+                : null }
+            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
+        </React.Fragment>
+    );
+}
+
+function TechnicalReviewColumn(props){
+    const { result, setOpenPopoverData, unsavedTechnicalReviewForResult } = props;
+    const {
+        uuid: vsUUID,
+        technical_review: { call, classification } = {}
+    } = result;
+    const callTrueButtonRef = useRef(null);
+    const callFalseButtonRef = useRef(null);
+
+    function handleOpenDropdown(e) {
+        // The native event (rather than React SyntheticEvent) is picked up by
+        // onRootClickHide
+        //e.nativeEvent.stopPropagation();
+        //e.nativeEvent.preventDefault();
+        const callStrValue = e.target.getAttribute("data-call");
+        setOpenPopoverData({
+            uuid: vsUUID,
+            call: callStrValue === "True",
+            ref: callTrueButtonRef
+        });
+    }
+
+    return (
+        <div className="w-100 d-flex align-items-center justify-content-around text-truncate py-1">
+            <button type="button" className="btn btn-link p-0" onClick={handleOpenDropdown} ref={callTrueButtonRef}
+                data-call="True" data-technical-review="true">
+                <i className={"icon icon-2x icon-fw fas icon-check text-" + (call === true ? "success" : "muted")} />
+            </button>
+            <i className={"icon icon-2x icon-fw fas icon-times text-" + (call === false ? "error" : "muted")} />
+            <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
+        </div>
+    );
+
 }
 
 /**
