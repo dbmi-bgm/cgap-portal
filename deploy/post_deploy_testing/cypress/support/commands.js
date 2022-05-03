@@ -61,7 +61,7 @@ Cypress.Commands.add('scrollToCenterElement', { prevSubject : true }, (subject, 
 /**
  * This emulates login.js. Perhaps we should adjust login.js somewhat to match this better re: navigate.then(...) .
  */
-Cypress.Commands.add('loginCGAP', function(options = { 'useEnvToken' : true, 'email': null }){
+Cypress.Commands.add('loginCGAP', function(options = { 'useEnvToken': false, 'email': null }){
 
     function performLogin(token){
         return cy.window().then((w)=>{
