@@ -282,7 +282,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                 <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
                                     intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
                                     isEditDisabled, haveEditPermission }} />
-                            : null }
+                                : null }
                         </div>
                         <div className="col-12 col-md-6 text-md-right">
                             <h5 className="text-600">Technical Review</h5>

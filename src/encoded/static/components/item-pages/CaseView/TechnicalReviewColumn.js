@@ -23,10 +23,9 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     } = savedTechnicalReview || {};
     const {
         call: unsavedCall,
-        classification: unsavedClassification,
         // TODO (?):
         // notes: unsavedNotes
-    } = unsavedTechnicalReviewForResult || {}; 
+    } = unsavedTechnicalReviewForResult || {};
 
     const callTrueButtonRef = useRef(null);
     const callFalseButtonRef = useRef(null);
@@ -37,57 +36,14 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     const handleOpenDropdownCall = useCallback(function handleOpenDropdownCall(){
 
         const opts = [
-            // TODO: Add... onClick-related stuff/data.
-            ["Present"],
-            ["Low Coverage"],
-            ["Low Allelic Fraction"],
-            ["Low Mapping Quality"],
-            ["Strand Bias"],
-            ["Mendelian Error"],
-            ["Other"]
+            "Present",
+            "Low Coverage",
+            "Low Allelic Fraction",
+            "Low Mapping Quality",
+            "Strand Bias",
+            "Mendelian Error",
+            "Other"
         ];
-
-        function renderDropdownItem([ optionName ], i){
-            function handleClick(e){
-                if (savedCall === true && savedClassification === optionName) {
-                    // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
-                    setTechnicalReviewForVSUUID(vsUUID, typeof unsavedTechnicalReviewForResult === "undefined" ? null : undefined);
-                } else if (unsavedCall === true && unsavedClassification === optionName) { // TODO make sure no unsaved notes that'd be lost
-                    // Unset
-                    setTechnicalReviewForVSUUID(vsUUID, undefined);
-                } else {
-                    setTechnicalReviewForVSUUID(vsUUID, {
-                        // Preserve any saved or unsaved notes, as well (if we use linkTo for notes, will need to re-think this)
-                        ...savedTechnicalReview,
-                        ...unsavedTechnicalReviewForResult,
-                        "call": true,
-                        "classification": optionName
-                    });
-                }
-                setOpenPopoverData(null);
-            }
-
-            const isUnsavedSelected = unsavedCall === true && unsavedClassification === optionName;
-            const isSavedSelected = savedCall === true && savedClassification === optionName;
-            const isSetToRemove = isSavedSelected && (unsavedTechnicalReviewForResult === null || (unsavedClassification && !isUnsavedSelected));
-
-            const btnClass = (
-                "dropdown-item" +
-                (isUnsavedSelected || (isSavedSelected && !isSetToRemove) ? " bg-success text-white" : "") +
-                (isSetToRemove ? " bg-light text-secondary" : "")
-            );
-
-            return (
-                <button type="button" className={btnClass} key={i} onClick={handleClick}>
-                    { optionName }
-                    { isUnsavedSelected ?
-                        <i className="icon icon-asterisk fas ml-08" data-tip="Not Saved" />
-                        : isSetToRemove ?
-                            <i className="icon icon-minus-circle fas ml-08 text-danger" data-tip="Will be unset" />
-                            : null }
-                </button>
-            );
-        }
 
         setOpenPopoverData({
             "uuid": vsUUID,
@@ -97,11 +53,15 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Title>
                     <Popover.Content className="px-0 py-1">
-                        { opts.slice(0,1).map(renderDropdownItem) }
+                        { opts.slice(0,1).map(function(optionName, i){
+                            return <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }} callType={true} key={i} />;
+                        }) }
                     </Popover.Content>
                     <Popover.Title className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Title>
                     <Popover.Content className="px-0 py-1">
-                        { opts.slice(1).map(renderDropdownItem) }
+                        { opts.slice(1).map(function(optionName, i){
+                            return <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }} callType={true} key={i} />;
+                        }) }
                     </Popover.Content>
                 </Popover>
             )
@@ -114,51 +74,14 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     const handleOpenDropdownNoCall = useCallback(function(){
 
         const opts = [
-            // TODO: Add... onClick-related stuff/data.
-            ["Recurrent Artifact"],
-            ["Low Coverage"],
-            ["Low Allelic Fraction"],
-            ["Low Mapping Quality"],
-            ["Strand Bias"],
-            ["Mendelian Error"],
-            ["Other"]
+            "Recurrent Artifact",
+            "Low Coverage",
+            "Low Allelic Fraction",
+            "Low Mapping Quality",
+            "Strand Bias",
+            "Mendelian Error",
+            "Other"
         ];
-
-        function renderDropdownItem([ optionName ], i){
-            function handleClick(e){
-                if (savedCall === false && savedClassification === optionName) {
-                    // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
-                    setTechnicalReviewForVSUUID(vsUUID, typeof unsavedTechnicalReviewForResult === "undefined" ? null : undefined);
-                } else if (unsavedCall === false && unsavedClassification === optionName) {
-                    // Unset
-                    setTechnicalReviewForVSUUID(vsUUID, undefined);
-                } else {
-                    setTechnicalReviewForVSUUID(vsUUID, { "call": false, "classification": optionName });
-                }
-                setOpenPopoverData(null);
-            }
-
-            const isUnsavedSelected = unsavedCall === false && unsavedClassification === optionName;
-            const isSavedSelected = savedCall === false && savedClassification === optionName;
-            const isSetToRemove = isSavedSelected && (unsavedTechnicalReviewForResult === null || (unsavedClassification && !isUnsavedSelected));
-
-            const btnClass = (
-                "dropdown-item" +
-                (isUnsavedSelected || (isSavedSelected && !isSetToRemove) ? " bg-danger text-white" : "") +
-                (isSetToRemove ? " bg-light text-secondary" : "")
-            );
-
-            return (
-                <button type="button" className={btnClass} key={i} onClick={handleClick}>
-                    { optionName }
-                    { isUnsavedSelected ?
-                        <i className="icon icon-asterisk fas ml-08" data-tip="Not Saved" />
-                        : isSetToRemove ?
-                            <i className="icon icon-minus-circle fas ml-08 text-danger" data-tip="Will be unset" />
-                            : null }
-                </button>
-            );
-        }
 
         setOpenPopoverData({
             "uuid": vsUUID,
@@ -168,7 +91,9 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
                     <Popover.Content className="px-0 py-1">
-                        { opts.map(renderDropdownItem) }
+                        { opts.map(function(optionName, i){
+                            return <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }} callType={false} key={i} />;
+                        }) }
                     </Popover.Content>
                 </Popover>
             )
@@ -194,13 +119,15 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                             </div>
                             : null }
                         <h6>Variant Call</h6>
-                        { !savedTechnicalReview ? <em>Nothing saved</em> :
-                            <div className={"d-inline-block px-3 py-1 rounded" + (
-                                savedCall === true ? " bg-success text-white"
-                                    : savedCall === false ? " bg-danger text-white" : "" )}>
-                                { savedCall === true ? "Call - " : savedCall === false ? "No Call - " : "" }
-                                { savedClassification }
-                            </div>
+                        { !savedTechnicalReview ? <em>Nothing saved</em>
+                            : (
+                                <div className={"d-inline-block px-3 py-1 rounded" + (
+                                    savedCall === true ? " bg-success text-white"
+                                        : savedCall === false ? " bg-danger text-white" : "" )}>
+                                    { savedCall === true ? "Call - " : savedCall === false ? "No Call - " : "" }
+                                    { savedClassification }
+                                </div>
+                            )
                         }
                         <h6>Technical Notes</h6>
                         <textarea className="form-control" rows={5} disabled>Coming soon...</textarea>
@@ -210,15 +137,24 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
         });
     }, [ result, unsavedTechnicalReviewForResult ]);
 
+    const callTrueIconCls = (
+        "icon icon-2x icon-fw fas icon-check text-" + (
+            (unsavedCall === true || (savedCall === true && typeof unsavedTechnicalReviewForResult === 'undefined' )) ? "success"
+                : (savedCall === true ? "secondary" : "muted")
+        ));
+
+    const callFalseIconCls = (
+        "icon icon-2x icon-fw fas icon-check text-" + (
+            (unsavedCall === false || (savedCall === false && typeof unsavedTechnicalReviewForResult === 'undefined')) ? "danger"
+                : (savedCall === false ? "secondary" : "muted")
+        ));
+
     return (
         <div className="w-100 d-flex align-items-center justify-content-around text-truncate py-1">
 
             <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={handleOpenDropdownCall} ref={callTrueButtonRef}
                 data-call="true" data-technical-review="true">
-                <i className={"icon icon-2x icon-fw fas icon-check text-" + (
-                    (unsavedCall === true || (savedCall === true && typeof unsavedTechnicalReviewForResult === 'undefined' )) ? "success"
-                        : (savedCall === true ? "secondary" : "muted")
-                    )} />
+                <i className={callTrueIconCls} />
                 { unsavedCall === true || (unsavedTechnicalReviewForResult === null && savedCall === true) ?
                     <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                     : null }
@@ -226,10 +162,7 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
 
             <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={handleOpenDropdownNoCall} ref={callFalseButtonRef}
                 data-call="false" data-technical-review="true">
-                <i className={"icon icon-2x icon-fw fas icon-times text-" + (
-                    (unsavedCall === false || (savedCall === false && typeof unsavedTechnicalReviewForResult === 'undefined')) ? "danger"
-                        : (savedCall === false ? "secondary" : "muted")
-                    )} />
+                <i className={callFalseIconCls} />
                 { unsavedCall === false || (unsavedTechnicalReviewForResult === null && savedCall === false) ?
                     <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                     : null }
@@ -243,6 +176,64 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     );
 
 });
+
+
+function CallClassificationButton (props) {
+    const { optionName, callType, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData } = props;
+
+    const {
+        uuid: vsUUID,
+        technical_review: savedTechnicalReview = null
+    } = result;
+    const {
+        call: savedCall,
+        classification: savedClassification,
+    } = savedTechnicalReview || {};
+
+
+    const {
+        call: unsavedCall,
+        classification: unsavedClassification,
+        // TODO (?):
+        // notes: unsavedNotes
+    } = unsavedTechnicalReviewForResult || {};
+
+    function handleClick(e){
+        if (savedCall === callType && savedClassification === optionName) {
+            // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
+            setTechnicalReviewForVSUUID(vsUUID, typeof unsavedTechnicalReviewForResult === "undefined" ? null : undefined);
+        } else if (unsavedCall === callType && unsavedClassification === optionName) {
+            // Unset
+            setTechnicalReviewForVSUUID(vsUUID, undefined);
+        } else {
+            setTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
+        }
+        setOpenPopoverData(null);
+    }
+
+    const highlightStyle = callType === true ? "success" : callType === false ? "danger" : null;
+
+    const isUnsavedSelected = unsavedCall === callType && unsavedClassification === optionName;
+    const isSavedSelected = savedCall === callType && savedClassification === optionName;
+    const isSetToRemove = isSavedSelected && (unsavedTechnicalReviewForResult === null || (unsavedClassification && !isUnsavedSelected));
+
+    const btnClass = (
+        "dropdown-item" +
+        (isUnsavedSelected || (isSavedSelected && !isSetToRemove) ? ` bg-${highlightStyle} text-white` : "") +
+        (isSetToRemove ? " bg-light text-secondary" : "")
+    );
+
+    return (
+        <button type="button" className={btnClass} onClick={handleClick}>
+            { optionName }
+            { isUnsavedSelected ?
+                <span className="text-white text-700" data-tip="Not Saved"> *</span>
+                : isSetToRemove ?
+                    <i className="icon icon-minus-circle fas ml-08 text-danger" data-tip="Will be unset" />
+                    : null }
+        </button>
+    );
+}
 
 
 export function SaveTechnicalReviewButton(props){
