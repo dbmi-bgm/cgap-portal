@@ -35,7 +35,7 @@ import { projectReportSettings } from './../ReportView/project-settings-draft';
  * @todo
  * We will need to load in Project Item to get table tags. We probably should do this at the CaseView/index.js level so it is accessible
  * to all elements? It could be lazy-loaded and we just render classification dropdowns once it's loaded.
- * 
+ *
  * Default sorting of VSes is currently stored as local state in the VSL controller; and will eventually be saved to VSL itself.
  */
 
@@ -54,7 +54,8 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
     allSelections.forEach((selection) => {
         const {
             variant_sample_item: {
-                "@id": vsAtID, uuid: vsUUID,
+                "@id": vsAtID,
+                uuid: vsUUID,
                 variant: {
                     genes: {
                         0: {
@@ -66,7 +67,7 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
                     } = []
                 } = {},
                 highlighted_genes: {
-                    0: { 
+                    0: {
                         uuid: highlightedGeneUUID,
                         '@id': highlightedGeneAtID,
                         display_title: highlightedGene
@@ -84,7 +85,7 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
             geneUUIDToVariantMap[highlightedGeneUUID].push(selection);
         } else if (highlightedGeneUUID) {
             geneUUIDToVariantMap[highlightedGeneUUID] = [selection];
-            geneUUIDToDisplayTitleMap[highlightedGeneUUID] = highlightedGene; 
+            geneUUIDToDisplayTitleMap[highlightedGeneUUID] = highlightedGene;
         } else {
             // handle case for variants with no highlighted gene selected
             if (geneUUIDToVariantMap["No Gene"]) {
@@ -96,7 +97,7 @@ function getVariantSampleListGroupedByGene(cnvSelections, vsSelections) {
         }
     });
 
-    geneUUIDToVariantMap.displayTitleMap = geneUUIDToDisplayTitleMap; 
+    geneUUIDToVariantMap.displayTitleMap = geneUUIDToDisplayTitleMap;
     return geneUUIDToVariantMap;
 }
 
@@ -194,9 +195,9 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
                 </div>
             );
         }
-    
+
         const unsavedClassification = changedClassificationsByVS ? changedClassificationsByVS[vsUUID] : undefined;
-    
+
         let isDeleted;
         let facetDict;
 
@@ -207,7 +208,7 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         } else if (vsType === "StructuralVariantSample") {
             isDeleted = deletedStructuralVariantSampleSelections ? (deletedStructuralVariantSampleSelections[vsUUID] || false) : undefined;
             facetDict = cnvFacetDict;
-        }   
+        }
         return (
             <VariantSampleSelection {...commonProps} key={vsUUID || index} searchType={vsType}
                 {...{ selection, index, unsavedClassification, isDeleted, facetDict }}  />
@@ -262,7 +263,7 @@ const VSLSortedByGeneType = React.memo(function VSLSortedByGeneType(props) {
     const { vsSelections, cnvSelections, renderSelectionAsJSX } = props;
 
     const { genes, displayTitleMap, geneUUIDToVariantMap } = useMemo(function(){
-         const { displayTitleMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
+        const { displayTitleMap, ...groupedByGene } = getVariantSampleListGroupedByGene(cnvSelections, vsSelections);
         const geneUUIDToVariantMap = { ...groupedByGene };
         const genes = Object.keys(geneUUIDToVariantMap).sort(
             (geneUUID, nextGeneUUID) =>  {
@@ -295,7 +296,7 @@ function VariantSampleListSortSelectDrop (props) {
     return (
         <div className="d-flex mt-2 mb-3">
             <label htmlFor="vsl-sort-type" className="mr-1 mt-06">
-            Sort By:
+                Sort By:
             </label>
             <DropdownButton
                 variant="outline-secondary"
@@ -307,7 +308,7 @@ function VariantSampleListSortSelectDrop (props) {
                 <DropdownItem eventKey="Gene">Gene</DropdownItem>
             </DropdownButton>
         </div>
-    )
+    );
 }
 
 /** @todo Consider making this the calculated display_title property for SVs? */
