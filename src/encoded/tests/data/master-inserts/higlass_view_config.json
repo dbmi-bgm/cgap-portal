@@ -509,6 +509,51 @@
                 "tilesetUid": "chromsizes_hg38"
               },
               {
+                "uid": "reference-seq",
+                "data": {
+                  "type": "fasta",
+                  "faiUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.fa.fai",
+                  "fastaUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.fa",
+                  "chromSizesUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes"
+                },
+                "type": "horizontal-sequence",
+                "width": 768,
+                "height": 25,
+                "options": {
+                  "name": "hg38",
+                  "fontSize": 16,
+                  "barBorder": true,
+                  "fontColor": "white",
+                  "colorScale": [
+                    "#08519c",
+                    "#6baed6",
+                    "#993404",
+                    "#fe9929",
+                    "#808080",
+                    "#DCDCDC"
+                  ],
+                  "fontFamily": "Arial",
+                  "labelColor": "black",
+                  "textOption": {
+                    "fill": 16777215,
+                    "fontSize": "32px",
+                    "fontFamily": "Arial",
+                    "fontWeight": "bold"
+                  },
+                  "valueScaling": "linear",
+                  "labelPosition": "topLeft",
+                  "barBorderColor": "white",
+                  "backgroundColor": "white",
+                  "labelTextOpacity": 0.4,
+                  "notificationText": "Zoom in to see nucleotides...",
+                  "sortLargestOnTop": true,
+                  "trackBorderColor": "white",
+                  "trackBorderWidth": 0,
+                  "extendedPreloading": false,
+                  "colorAggregationMode": "none"
+                }
+              },
+              {
                 "uid": "emptytrack_text_transcripts",
                 "type": "empty",
                 "width": 568,
@@ -635,7 +680,7 @@
                 }
               },
               {
-                "uid": "vcf-cgap",
+                "uid": "vcf-cgap-sv",
                 "data": {
                   "type": "vcf",
                   "tbiUrl": "https://aveit.s3.amazonaws.com/higlass/vcf/variants-sv.vcf.gz.tbi",
@@ -646,7 +691,22 @@
                 "width": 470,
                 "height": 55,
                 "options": {
-                  "dataSource": "cgap"
+                  "dataSource": "cgap-sv"
+                }
+              },
+              {
+                "uid": "vcf-cgap-cnv",
+                "data": {
+                  "type": "vcf",
+                  "vcfUrl": "https://aveit.s3.amazonaws.com/higlass/vcf/AllHandsDemo_GAPFI542YORS.vcf.gz",
+                  "tbiUrl": "https://aveit.s3.amazonaws.com/higlass/vcf/AllHandsDemo_GAPFI542YORS.vcf.gz.tbi",
+                  "chromSizesUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes"
+                },
+                "type": "sv",
+                "width": 470,
+                "height": 150,
+                "options": {
+                  "dataSource": "cgap-cnv"
                 }
               },
               {

@@ -147,7 +147,10 @@ def get_higlass_viewconf(context, request):
     higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
     higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
+    # THIS NEEDS TO BE REPLACED WHEN TESTING LOCALLY
     s3_bucket = request.registry.settings.get('file_wfout_bucket')
+    #s3_bucket = "cgap-mgb-main-application-cgap-mgb-wfoutput"
+    #s3_bucket = "cgap-dbmi-main-application-cgap-dbmi-wfoutput"
 
     if requesting_tab == "bam":
 
@@ -224,12 +227,13 @@ def get_higlass_viewconf(context, request):
         sv_vcf_visibilty = request.json_body.get('sv_vcf_visibilty', None)
 
         top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
-        empty_track_a = deepcopy(top_tracks[5])
-        text_track = deepcopy(top_tracks[6])
-        empty_track_b = deepcopy(top_tracks[7])
-        pileup_track = deepcopy(top_tracks[8])
-        cgap_sv_track = deepcopy(top_tracks[9])
-        gnomad_track = deepcopy(top_tracks[10])
+        empty_track_a = deepcopy(top_tracks[6]) # track height 10
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8]) # track height 5
+        pileup_track = deepcopy(top_tracks[9])
+        cgap_sv_track = deepcopy(top_tracks[10])
+        cgap_cnv_track = deepcopy(top_tracks[11])
+        gnomad_track = deepcopy(top_tracks[12])
 
         current_viewconf = request.json_body.get('current_viewconf', None)
         original_options = {}
@@ -245,7 +249,15 @@ def get_higlass_viewconf(context, request):
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[5:]
+        del top_tracks[6:]
+
+        describing_text_track = deepcopy(text_track)
+        describing_text_track["options"]["fontSize"] = 11
+        describing_text_track["options"]["fontWeight"] = "normal"
+        describing_text_track["options"]["textColor"] = "#777777"
+        describing_text_track["options"]["backgroundColor"] = "#ffffff"
+        describing_text_track["options"]["offsetY"] = 12
+        describing_text_track["height"] = 30
 
         higlass_sv_vcf = request.json_body.get('higlass_sv_vcf', None)
         higlass_sv_vcf_presigned = None
@@ -253,6 +265,13 @@ def get_higlass_viewconf(context, request):
         if higlass_sv_vcf is not None:
             higlass_sv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf)
             higlass_sv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf+".tbi")
+
+        higlass_cnv_vcf = request.json_body.get('higlass_cnv_vcf', None)
+        higlass_cnv_vcf_presigned = None
+        higlass_cnv_tbi_presigned = None
+        if higlass_cnv_vcf is not None:
+            higlass_cnv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_cnv_vcf)
+            higlass_cnv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_cnv_vcf+".tbi")
 
         for sample in samples_pedigree:
             accession = sample["sample_accession"]
@@ -289,23 +308,42 @@ def get_higlass_viewconf(context, request):
                 top_tracks.append(pileup_track_sample)
 
             if sv_vcf_visibilty[accession]:
-                empty_track_sample = deepcopy(empty_track_b)
-                empty_track_sample["uid"] = "empty_above_vcf" + accession
-                top_tracks.append(empty_track_sample)
-
-                cgap_sv_track_sample = deepcopy(cgap_sv_track)
-                cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
-                cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
-
-                cgap_sv_track_sample["uid"] = "vcf" + accession
-                if 'svcgap' in original_options:
-                    cgap_sv_track_sample['options'] = deepcopy(original_options['svcgap'])
-                    cgap_sv_track_sample['options']['dataSource'] = 'cgap'
-
-                cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
+                text_track_sample = deepcopy(describing_text_track)
+                text_track_sample["uid"] = "sv_vcf_text" + accession
+                text_track_sample["options"]["text"] = "Structural Variants called by Manta"
+                top_tracks.append(text_track_sample)
 
                 if higlass_sv_vcf_presigned is not None:
+                    cgap_sv_track_sample = deepcopy(cgap_sv_track)
+                    cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
+                    cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
+
+                    cgap_sv_track_sample["uid"] = "sv-vcf" + accession
+                    if 'cgap-sv' in original_options:
+                        cgap_sv_track_sample['options'] = deepcopy(original_options['cgap-sv'])
+                        cgap_sv_track_sample['options']['dataSource'] = 'cgap-sv'
+
+                    cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
                     top_tracks.append(cgap_sv_track_sample)
+
+                # We are showing the track only for the proband for now, since we are not doing
+                # CNV joint calling yet.
+                if (higlass_cnv_vcf_presigned is not None) and (bam_sample_id == sample["sample_name"]):
+                    text_track_sample = deepcopy(describing_text_track)
+                    text_track_sample["uid"] = "cnv_vcf_text" + accession
+                    text_track_sample["options"]["text"] = "Copy Number Variants called by BIC-seq2"
+                    top_tracks.append(text_track_sample)
+
+                    cgap_cnv_track_sample = deepcopy(cgap_cnv_track)
+                    cgap_cnv_track_sample['data']['vcfUrl'] = higlass_cnv_vcf_presigned
+                    cgap_cnv_track_sample['data']['tbiUrl'] = higlass_cnv_tbi_presigned
+
+                    cgap_cnv_track_sample["uid"] = "cnv-vcf" + accession
+                    if 'cgap-cnv' in original_options:
+                        cgap_cnv_track_sample['options'] = deepcopy(original_options['cgap-cnv'])
+                        cgap_cnv_track_sample['options']['dataSource'] = 'cgap-cnv'
+                    cgap_cnv_track_sample['options']['sampleName'] = sample["sample_name"]
+                    top_tracks.append(cgap_cnv_track_sample)
 
         accession = "gnomad-sv"
         if accession in sv_vcf_visibilty and sv_vcf_visibilty[accession]:

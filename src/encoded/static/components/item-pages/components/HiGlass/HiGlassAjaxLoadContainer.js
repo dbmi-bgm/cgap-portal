@@ -30,6 +30,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
             'bamSampleId' : props.bamSampleId ? props.bamSampleId : null,
             'samples' : props.samples ? props.samples : null,
             'higlassSvVcf': props.higlassSvVcf ? props.higlassSvVcf : null,
+            'higlassCnvVcf': props.higlassCnvVcf ? props.higlassCnvVcf : null,
             'cohortVcfLocation': props.cohortVcfLocation ? props.cohortVcfLocation : null,
             'cohortDensityBwLocation': props.cohortDensityBwLocation ? props.cohortDensityBwLocation : null,
             'file' : props.file ? props.file : null,
@@ -101,6 +102,7 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                         ? variantPositionAbsCoord 
                         : this.state.variantEndAbsCoord;
                 const higlassSvVcf = this.state.higlassSvVcf;
+                const higlassCnvVcf = this.state.higlassCnvVcf;
 
                 // Default settings for initial load - show only the proband bam files
                 const svBamVisibility = {}
@@ -124,7 +126,8 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
                     'bam_sample_id' : bamSampleId,
                     'bam_visibilty': svBamVisibility,
                     'sv_vcf_visibilty': svVcfVisibility,
-                    'higlass_sv_vcf': higlassSvVcf
+                    'higlass_sv_vcf': higlassSvVcf,
+                    'higlass_cnv_vcf': higlassCnvVcf,
                 };
                 this.getViewconf(payload, fallbackCallback);
             }
