@@ -392,7 +392,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
 
     if (genes.length <= 2) { // show comma separated
         rows.push(
-            <div>
+            <div key={0}>
                 <span className="text-muted">List:&nbsp;</span>
                 <span>{genes.join(", ")}</span>
             </div>);
@@ -404,7 +404,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
             tipGenes += (" + " + (genes.length - 10).toString() + " more");
         }
         rows.push(
-            <div>
+            <div key={0}>
                 <span className="text-muted">List:&nbsp;</span>
                 <span data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</span>
             </div>
@@ -414,14 +414,14 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
     // Display highlighted gene or placeholder
     if (highlighted_genes.length === 0) {
         rows.push(
-            <div className="text-muted">
+            <div className="text-muted" key={1}>
                 <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
                 <span>Not Selected</span>
             </div>
         );
     } else { // TODO: styles may need to be adjusted to accomodate more than a few at a time
         rows.push(
-            <div>
+            <div key={1}>
                 <i className="icon icon-star fas text-primary" data-tip="Highlighted gene" />:&nbsp;
                 { highlighted_genes.map((gene) => {
                     const { display_title, "@id": atID } = gene;
