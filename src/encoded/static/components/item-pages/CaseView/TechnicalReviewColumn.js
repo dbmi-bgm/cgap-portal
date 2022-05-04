@@ -180,25 +180,11 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
 
 function CallClassificationButton (props) {
     const { optionName, callType, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData } = props;
+    const { uuid: vsUUID, technical_review: savedTechnicalReview = null } = result;
+    const { call: savedCall, classification: savedClassification } = savedTechnicalReview || {};
+    const { call: unsavedCall, classification: unsavedClassification } = unsavedTechnicalReviewForResult || {};
 
-    const {
-        uuid: vsUUID,
-        technical_review: savedTechnicalReview = null
-    } = result;
-    const {
-        call: savedCall,
-        classification: savedClassification,
-    } = savedTechnicalReview || {};
-
-
-    const {
-        call: unsavedCall,
-        classification: unsavedClassification,
-        // TODO (?):
-        // notes: unsavedNotes
-    } = unsavedTechnicalReviewForResult || {};
-
-    function handleClick(e){
+    const handleClick = useCallback(function handleClick(e){
         if (savedCall === callType && savedClassification === optionName) {
             // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
             setTechnicalReviewForVSUUID(vsUUID, typeof unsavedTechnicalReviewForResult === "undefined" ? null : undefined);
@@ -209,7 +195,7 @@ function CallClassificationButton (props) {
             setTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
         }
         setOpenPopoverData(null);
-    }
+    }, [ result, unsavedTechnicalReviewForResult ]);
 
     const highlightStyle = callType === true ? "success" : callType === false ? "danger" : null;
 
