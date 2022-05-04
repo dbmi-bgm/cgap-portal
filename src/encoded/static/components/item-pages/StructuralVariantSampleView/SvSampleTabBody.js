@@ -3,6 +3,7 @@
 import React from 'react';
 import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { shortenToSignificantDigits } from '../VariantSampleView/AnnotationSections';
 
 
 export const SvSampleTabBody = (props) => {
@@ -27,10 +28,20 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>Breakpoint Confidence Intervals</h4>
+                        <h4>Manta - Caller Properties</h4>
                     </div>
                     <div className="info-body">
-                        <SvQualityTable {...{ context, getTipForField }} />
+                        <SvMantaTable {...{ context, getTipForField }} />
+                    </div>
+                </div>
+            </div>
+            <div className="row flex-column flex-lg-row">
+                <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
+                    <div className="info-header-title">
+                        <h4>BIC-seq2 - Caller Properties</h4>
+                    </div>
+                    <div className="info-body">
+                        <SvBicSeqTable {...{ context, getTipForField }} />
                     </div>
                 </div>
             </div>
@@ -49,9 +60,10 @@ export const SvSampleTabBody = (props) => {
 };
 
 
-function SvQualityTable(props) {
+function SvMantaTable(props) {
     const {
         context: {
+            callers = [],
             confidence_interval_start = [],
             confidence_interval_end = [],
             imprecise = null
@@ -59,6 +71,10 @@ function SvQualityTable(props) {
         getTipForField
     } = props;
     const fallbackElem = <em> - </em>;
+
+    if (!callers.length || !callers.includes("Manta")) {
+        return <div class="font-italic text-larger text-center py-4">Variant not detected by Manta</div>;
+    }
 
     const startExists = confidence_interval_start.length > 0;
     const endExists = confidence_interval_end.length > 0;
@@ -89,6 +105,72 @@ function SvQualityTable(props) {
                         <td className="text-600 text-left">Confidence interval around right breakpoint</td>
                         <td className="text-left">{endExists ? confidence_interval_end.join(", "): fallbackElem}</td>
                         <td className="text-left">{ getTipForField("confidence_interval_end", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    );
+}
+
+function SvBicSeqTable(props) {
+    const {
+        context: {
+            callers = [],
+            bicseq2_observed_reads = "",
+            bicseq2_expected_reads,
+            bicseq2_log2_copy_ratio,
+            bicseq2_pvalue
+        } = {},
+        getTipForField
+    } = props;
+
+    if (!callers.length || !callers.includes("BIC-seq2")) {
+        return <div class="font-italic text-larger text-center py-4">Variant not detected by BIC-seq2</div>;
+    }
+    
+    const fallbackElem = <em> - </em>;
+
+    return (
+        <div className="table-responsive">
+            <table className="w-100">
+                <thead>
+                    <tr>
+                        <th className="text-left" style={{ width: "200px" }}>Quality</th>
+                        <th className="text-left">Value</th>
+                        <th className="text-left">Definition</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="text-600 text-left">Number of Observed Reads</td>
+                        <td className="text-left">{bicseq2_observed_reads || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_observed_reads")}</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of Expected Reads</td>
+                        <td className="text-left">{bicseq2_expected_reads || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_expected_reads")}</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Copy Ratio [log2]</td>
+                        <td className="text-left">
+                            <div className="text-nowrap mr-1">
+                                {shortenToSignificantDigits(bicseq2_log2_copy_ratio) || fallbackElem}
+                                <i className="ml-02 font-xs icon icon-info-circle fas" data-html 
+                                    data-tip={`
+                                    <div class="mb-05"><u>Positive Value</u>: Indicates an excess of reads,</br>
+                                    suggesting a possible duplication.</div>
+                                    <div><u>Negative Value</u>: Indicates a depletion of reads,</br>
+                                    suggesting a possible deletion.</div>`}
+                                />
+                            </div>
+                        </td>
+                        <td className="text-left">{getTipForField("bicseq2_log2_copy_ratio")}</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">P-value</td>
+                        <td className="text-left">{shortenToSignificantDigits(bicseq2_pvalue, 2) || fallbackElem}</td>
+                        <td className="text-left">{getTipForField("bicseq2_pvalue")}</td>
                     </tr>
                 </tbody>
             </table>
