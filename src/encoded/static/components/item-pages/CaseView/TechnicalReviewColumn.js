@@ -21,11 +21,7 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
         date_initial_call_made: savedInitialCallDate,
         initial_call_made_by: { display_title: savedInitialCallAuthorName } = {} // Unlikely to be visible to most people.
     } = savedTechnicalReview || {};
-    const {
-        call: unsavedCall,
-        // TODO (?):
-        // notes: unsavedNotes
-    } = unsavedTechnicalReviewForResult || {};
+    const { call: unsavedCall, classification: unsavedClassification } = unsavedTechnicalReviewForResult || {};
 
     const callTrueButtonRef = useRef(null);
     const callFalseButtonRef = useRef(null);
@@ -54,13 +50,19 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Title>
                     <Popover.Content className="px-0 py-1">
                         { opts.slice(0,1).map(function(optionName, i){
-                            return <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }} callType={true} key={i} />;
+                            return (
+                                <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }}
+                                    callType={true} key={i} />
+                            );
                         }) }
                     </Popover.Content>
                     <Popover.Title className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Title>
                     <Popover.Content className="px-0 py-1">
                         { opts.slice(1).map(function(optionName, i){
-                            return <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }} callType={true} key={i} />;
+                            return (
+                                <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }}
+                                    callType={true} key={i} highlightColorStyle="warning" />
+                            );
                         }) }
                     </Popover.Content>
                 </Popover>
@@ -130,21 +132,25 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                             )
                         }
                         <h6>Technical Notes</h6>
-                        <textarea className="form-control" rows={5} disabled>Coming soon...</textarea>
+                        <textarea className="form-control" rows={5} disabled value="Coming soon..." />
                     </Popover.Content>
                 </Popover>
             )
         });
     }, [ result, unsavedTechnicalReviewForResult ]);
 
+    // Green (success) if first option, else yellow/orange for the 'Present - with concerns' options
     const callTrueIconCls = (
         "icon icon-2x icon-fw fas icon-check text-" + (
-            (unsavedCall === true || (savedCall === true && typeof unsavedTechnicalReviewForResult === 'undefined' )) ? "success"
-                : (savedCall === true ? "secondary" : "muted")
+            (unsavedCall === true || (savedCall === true && typeof unsavedTechnicalReviewForResult === 'undefined' )) ? (
+                unsavedCall === true && unsavedClassification === "Present" ? "success"
+                    : savedCall === true && savedClassification === "Present" ? "success"
+                        : "warning"
+            ) : (savedCall === true ? "secondary" : "muted")
         ));
 
     const callFalseIconCls = (
-        "icon icon-2x icon-fw fas icon-check text-" + (
+        "icon icon-2x icon-fw fas icon-times text-" + (
             (unsavedCall === false || (savedCall === false && typeof unsavedTechnicalReviewForResult === 'undefined')) ? "danger"
                 : (savedCall === false ? "secondary" : "muted")
         ));
@@ -179,7 +185,7 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
 
 
 function CallClassificationButton (props) {
-    const { optionName, callType, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData } = props;
+    const { optionName, callType, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData, highlightColorStyle = null } = props;
     const { uuid: vsUUID, technical_review: savedTechnicalReview = null } = result;
     const { call: savedCall, classification: savedClassification } = savedTechnicalReview || {};
     const { call: unsavedCall, classification: unsavedClassification } = unsavedTechnicalReviewForResult || {};
@@ -197,7 +203,7 @@ function CallClassificationButton (props) {
         setOpenPopoverData(null);
     }, [ result, unsavedTechnicalReviewForResult ]);
 
-    const highlightStyle = callType === true ? "success" : callType === false ? "danger" : null;
+    const highlightStyle = highlightColorStyle || (callType === true ? "success" : callType === false ? "danger" : null);
 
     const isUnsavedSelected = unsavedCall === callType && unsavedClassification === optionName;
     const isSavedSelected = savedCall === callType && savedClassification === optionName;

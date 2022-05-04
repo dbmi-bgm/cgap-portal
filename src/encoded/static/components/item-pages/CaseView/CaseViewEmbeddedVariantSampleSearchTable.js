@@ -187,7 +187,7 @@ const TechnicalReviewPopoverOverlay = React.memo(function TechnicalReviewPopover
     }
 
     return (
-        <Overlay target={openPopoverRef} show={!!openPopoverData} transition placement="bottom"
+        <Overlay target={openPopoverRef} show={!!openPopoverData} transition={false} placement="bottom"
             rootClose rootCloseEvent="click" onHide={onRootClickHide}>
             { openPopoverJSX }
         </Overlay>
