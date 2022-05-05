@@ -772,7 +772,7 @@ function useInterval(callback, delay) {
 function Poller(props){
     const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts } = props;
     const { uuid } = context || {};
-    const getURL = "/ingestion-submissions/" + uuid + "?frame=object&datastore=database";
+    const getURL = "/ingestion-submissions/" + uuid + "/?frame=object&datastore=database";
 
     const timeStarted = new Date(Date.now());
     const [ lastUpdated, setLastUpdated ] = useState(timeStarted.toLocaleTimeString('en-US'));
