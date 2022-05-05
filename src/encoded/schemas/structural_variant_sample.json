@@ -389,6 +389,11 @@
                 }
             }
         },
+        "technical_review_note": {
+            "title": "Technical Review Note",
+            "type": "string",
+            "linkTo": "Note"
+        },
         "structural_variant": {
             "title": "Structural Variant",
             "type": "string",

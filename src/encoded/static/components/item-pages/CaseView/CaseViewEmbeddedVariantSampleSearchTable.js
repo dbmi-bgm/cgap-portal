@@ -30,7 +30,9 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         isLoadingVariantSampleListItem,
         currFilterSet,
         unsavedTechnicalReview,
+        unsavedTechnicalReviewNotes,
         setTechnicalReviewForVSUUID,
+        setTechnicalReviewNoteForVSUUID,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -79,11 +81,15 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 "render": function(result, props){
                     const { uuid: vsUUID } = result;
                     const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
-                    return <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, setOpenPopoverData, setTechnicalReviewForVSUUID }} />;
+                    const unsavedTechnicalReviewNoteForResult = unsavedTechnicalReviewNotes[vsUUID];
+                    return (
+                        <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult,
+                            setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID }} />
+                    );
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, unsavedTechnicalReview ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, unsavedTechnicalReview, unsavedTechnicalReviewNotes ]);
 
     return (
         <React.Fragment>
@@ -110,7 +116,9 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         isLoadingVariantSampleListItem,
         currFilterSet,
         unsavedTechnicalReview,
+        unsavedTechnicalReviewNotes,
         setTechnicalReviewForVSUUID,
+        setTechnicalReviewNoteForVSUUID,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -159,11 +167,15 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 "render": function(result, props){
                     const { uuid: vsUUID } = result;
                     const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
-                    return <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, setOpenPopoverData, setTechnicalReviewForVSUUID }} />;
+                    const unsavedTechnicalReviewNoteForResult = unsavedTechnicalReviewNotes[vsUUID];
+                    return (
+                        <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult,
+                            setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID }} />
+                    );
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, unsavedTechnicalReview ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, unsavedTechnicalReview, unsavedTechnicalReviewNotes ]);
 
     return (
         <React.Fragment>

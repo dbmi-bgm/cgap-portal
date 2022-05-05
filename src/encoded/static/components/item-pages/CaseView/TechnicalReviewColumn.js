@@ -9,10 +9,18 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 
 
 export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(props){
-    const { result, setOpenPopoverData, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID } = props;
+    const {
+        result,
+        setOpenPopoverData,
+        unsavedTechnicalReviewForResult,
+        unsavedTechnicalReviewNoteForResult,
+        setTechnicalReviewForVSUUID,
+        setTechnicalReviewNoteForVSUUID
+    } = props;
     const {
         uuid: vsUUID,
-        technical_review: savedTechnicalReview = null
+        technical_review: savedTechnicalReview = null,
+        technical_review_note: savedTechnicalReviewNote = null
     } = result;
     const {
         call: savedCall,
@@ -22,6 +30,16 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
         initial_call_made_by: { display_title: savedInitialCallAuthorName } = {} // Unlikely to be visible to most people.
     } = savedTechnicalReview || {};
     const { call: unsavedCall, classification: unsavedClassification } = unsavedTechnicalReviewForResult || {};
+    const {
+        note_text: savedNoteText,
+        last_modified: {
+            date_modified: noteDateModified,
+            modified_by: noteModifiedBy
+        } = {},
+        date_approved: noteDateApproved,
+        approved_by: noteApprovedBy
+    } = savedTechnicalReviewNote || {};
+    const { note_text: unsavedNoteText } = unsavedTechnicalReviewNoteForResult || {};
 
     const callTrueButtonRef = useRef(null);
     const callFalseButtonRef = useRef(null);
@@ -104,8 +122,30 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     }, [ result, unsavedTechnicalReviewForResult ]);
 
 
+    console.log("UNSAVED NOTE", unsavedTechnicalReviewNoteForResult);
 
     const handleOpenNotesPopover = useCallback(function(){
+
+        const updateUnsavedNoteText = _.debounce(function(e){
+            const nextNoteText = e.target.value;
+            if (nextNoteText === ""){
+                // Logic subject to change if add more meaningful properties to Note (and make it a subtype) aside from note_text.
+                // Even if we keep just note_text, it's worth keeping it inside of an object for performance (avoids checking text value when comes down through props)
+                if (!savedTechnicalReviewNote) {
+                    setTechnicalReviewNoteForVSUUID(vsUUID, undefined);
+                } else {
+                    setTechnicalReviewNoteForVSUUID(vsUUID, null);
+                }
+            } else {
+                if (savedNoteText && nextNoteText === savedNoteText) {
+                    // Unset from unsaved state if same value as existing
+                    setTechnicalReviewNoteForVSUUID(vsUUID, undefined);
+                } else {
+                    setTechnicalReviewNoteForVSUUID(vsUUID, { ...(unsavedTechnicalReviewNoteForResult || {}), "note_text": nextNoteText });
+                }
+            }
+        }, 500);
+
         setOpenPopoverData({
             "uuid": vsUUID,
             "call": null,
@@ -120,6 +160,18 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                                 { savedInitialCallAuthorName ? (" by " + savedInitialCallAuthorName) : null }
                             </div>
                             : null }
+                        { noteDateModified ?
+                            <div className="small">
+                                Last Modified: <LocalizedTime timestamp={noteDateModified} />
+                                { noteModifiedBy ? (" by " + noteModifiedBy) : null }
+                            </div>
+                            : null }
+                        { noteDateApproved ?
+                            <div className="small">
+                                Approved: <LocalizedTime timestamp={noteDateApproved} />
+                                { noteApprovedBy ? (" by " + noteApprovedBy) : null }
+                            </div>
+                            : null }
                         <h6>Variant Call</h6>
                         { !savedTechnicalReview ? <em>Nothing saved</em>
                             : (
@@ -132,7 +184,8 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                             )
                         }
                         <h6>Technical Notes</h6>
-                        <textarea className="form-control" rows={5} disabled value="Coming soon..." />
+                        {/* <textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
+                        <textarea className="form-control" rows={5} defaultValue={unsavedNoteText || savedNoteText || ""} onChange={updateUnsavedNoteText} />
                     </Popover.Content>
                 </Popover>
             )
@@ -147,13 +200,21 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                 (unsavedCall === true && unsavedClassification === "Present") ? "success"
                     : (savedCall === true && noUnsavedTechnicalReview && savedClassification === "Present") ? "success"
                         : "warning"
-            ) : (savedCall === true ? "secondary" : "muted")
+            ) : "muted" // (savedCall === true ? "secondary" : "muted")
         ));
 
     const callFalseIconCls = (
         "icon icon-2x icon-fw fas icon-times text-" + (
             (unsavedCall === false || (savedCall === false && noUnsavedTechnicalReview)) ? "danger"
-                : (savedCall === false ? "secondary" : "muted")
+                : "muted" // (savedCall === false ? "secondary" : "muted")
+        ));
+
+    const noteToBeDeleted = unsavedTechnicalReviewForResult && savedTechnicalReviewNote; // TODO: && !unsavedTechnicalReviewNote;
+    const notesIconCls = (
+        "icon icon-2x icon-fw icon-sticky-note " + (
+            noteToBeDeleted ? "far text-danger"
+                : (savedTechnicalReviewNote || unsavedTechnicalReviewNoteForResult) ? "fas text-secondary"
+                    : "far text-muted"
         ));
 
     return (
@@ -163,6 +224,7 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                 data-call="true" data-technical-review="true">
                 <i className={callTrueIconCls} />
                 { unsavedCall === true || (unsavedTechnicalReviewForResult === null && savedCall === true) ?
+                    // unsavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
                     <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                     : null }
             </button>
@@ -171,12 +233,16 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                 data-call="false" data-technical-review="true">
                 <i className={callFalseIconCls} />
                 { unsavedCall === false || (unsavedTechnicalReviewForResult === null && savedCall === false) ?
+                    // unsavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
                     <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                     : null }
             </button>
 
             <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={handleOpenNotesPopover} ref={notesButtonRef} data-technical-review="true">
-                <i className={"icon icon-2x icon-fw fas icon-sticky-note text-muted"}  />
+                <i data-tip={noteToBeDeleted ? "This note will be deleted upon save due to new classification. Create new note." : null} className={notesIconCls} />
+                { unsavedTechnicalReviewNoteForResult || (unsavedTechnicalReviewNoteForResult === null && savedTechnicalReviewNote) ?
+                    <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
+                    : null }
             </button>
 
         </div>
@@ -230,7 +296,7 @@ function CallClassificationButton (props) {
 
 
 export function SaveTechnicalReviewButton(props){
-    const { unsavedTechnicalReview, resetUnsavedTechnicalReview, haveEditPermission, patchItems, isPatching } = props;
+    const { unsavedTechnicalReview, resetUnsavedTechnicalReviewAndNotes, haveEditPermission, patchItems, isPatching } = props;
 
     const unsavedTechnicalReviewVSUUIDs = Object.keys(unsavedTechnicalReview);
     const unsavedTechnicalReviewVSUUIDsLen = unsavedTechnicalReviewVSUUIDs.length;
@@ -249,7 +315,7 @@ export function SaveTechnicalReviewButton(props){
         });
         patchItems(payloads, function(countCompleted, patchErrors){
             if (countCompleted === unsavedTechnicalReviewVSUUIDsLen) {
-                resetUnsavedTechnicalReview();
+                resetUnsavedTechnicalReviewAndNotes();
             }
         });
     }, [ unsavedTechnicalReview ]);
@@ -268,38 +334,46 @@ export class TechnicalReviewController extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.setTechnicalReviewForVSUUID = this.setTechnicalReviewForVSUUID.bind(this);
-        this.resetUnsavedTechnicalReview = this.resetUnsavedTechnicalReview.bind(this);
+        this.setTechnicalReviewForVSUUID = this._setStatePropertyForVSUUID.bind(this, "unsavedTechnicalReview");
+        this.setTechnicalReviewNoteForVSUUID = this._setStatePropertyForVSUUID.bind(this, "unsavedTechnicalReviewNotes");
+        this.resetUnsavedTechnicalReviewAndNotes = this.resetUnsavedTechnicalReviewAndNotes.bind(this);
         this.state = {
-            "unsavedTechnicalReview": {}
+            "unsavedTechnicalReview": {},
+            "unsavedTechnicalReviewNotes": {}
         };
     }
 
-    setTechnicalReviewForVSUUID(vsUUID, technicalReview) {
-        this.setState(function({ unsavedTechnicalReview: existingTechReview }){
+    _setStatePropertyForVSUUID(statePropertyName, vsUUID, value) {
+        this.setState(function({ [statePropertyName]: existingStatePropertyObject }){
             // "undefined" means remove from state.unsavedTechnicalReview, "null" means to keep in state to queue for deletion in PATCH.
-            if (typeof technicalReview === "undefined") {
-                if (typeof existingTechReview[vsUUID] !== "undefined") {
-                    return { "unsavedTechnicalReview": _.omit(existingTechReview, vsUUID) };
+            if (typeof value === "undefined") {
+                if (typeof existingStatePropertyObject[vsUUID] !== "undefined") {
+                    return { [statePropertyName] : _.omit(existingStatePropertyObject, vsUUID) };
                 }
                 return null;
             }
-            return { "unsavedTechnicalReview": { ...existingTechReview, [vsUUID]: technicalReview } };
+            // `value` may be null, which means 'queued for deletion' in PATCH.
+            return { [statePropertyName] : { ...existingStatePropertyObject, [vsUUID]: value } };
         });
     }
 
-    resetUnsavedTechnicalReview() {
-        this.setState({ "unsavedTechnicalReview": {} });
+    resetUnsavedTechnicalReviewAndNotes() {
+        this.setState({
+            "unsavedTechnicalReview": {},
+            "unsavedTechnicalReviewNotes": {}
+        });
     }
 
     render(){
         const { children, ...passProps } = this.props;
-        const { unsavedTechnicalReview } = this.state;
+        const { unsavedTechnicalReview, unsavedTechnicalReviewNotes } = this.state;
         const childProps = {
             ...passProps,
             unsavedTechnicalReview,
+            unsavedTechnicalReviewNotes,
             "setTechnicalReviewForVSUUID": this.setTechnicalReviewForVSUUID,
-            "resetUnsavedTechnicalReview": this.resetUnsavedTechnicalReview
+            "setTechnicalReviewNoteForVSUUID": this.setTechnicalReviewNoteForVSUUID,
+            "resetUnsavedTechnicalReviewAndNotes": this.resetUnsavedTechnicalReviewAndNotes
         };
         return React.Children.map(children, function(child){
             if (!React.isValidElement(child) || typeof child.type === "string") {

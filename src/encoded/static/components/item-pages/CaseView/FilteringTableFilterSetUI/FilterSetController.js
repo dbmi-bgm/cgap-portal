@@ -360,7 +360,7 @@ export class FilterSetController extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { initialFilterSetItem, context: searchContext, onResetSelectedVariantSamples, resetUnsavedTechnicalReview } = this.props;
+        const { initialFilterSetItem, context: searchContext, onResetSelectedVariantSamples, resetUnsavedTechnicalReviewAndNotes } = this.props;
         const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
 
         // Just some debugging for dev environments.
@@ -389,9 +389,9 @@ export class FilterSetController extends React.PureComponent {
                 console.info("Resetting selected Variant Sample items.");
                 onResetSelectedVariantSamples();
             }
-            if (resetUnsavedTechnicalReview && searchContext !== pastSearchContext) {
+            if (resetUnsavedTechnicalReviewAndNotes && searchContext !== pastSearchContext) {
                 console.info("Resetting unsaved technical review");
-                resetUnsavedTechnicalReview();
+                resetUnsavedTechnicalReviewAndNotes();
             }
         }
 

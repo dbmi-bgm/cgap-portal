@@ -271,8 +271,10 @@ function FilteringTabBody(props) {
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
         unsavedTechnicalReview,         // passed in from TechnicalReviewController
+        unsavedTechnicalReviewNotes,    // passed in from TechnicalReviewController
         setTechnicalReviewForVSUUID,    // passed in from TechnicalReviewController
-        resetUnsavedTechnicalReview,    // passed in from TechnicalReviewController
+        setTechnicalReviewNoteForVSUUID, // passed in from TechnicalReviewController
+        resetUnsavedTechnicalReviewAndNotes, // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
@@ -340,6 +342,7 @@ function FilteringTabBody(props) {
         selectedVariantSamples,
         isActiveDotRouterTab,
         unsavedTechnicalReview,
+        unsavedTechnicalReviewNotes,
         // setIsSubmitting,
         // "caseItem": context
     };
@@ -347,7 +350,7 @@ function FilteringTabBody(props) {
     const fsControllerProps = {
         searchHrefBase, searchType,
         onResetSelectedVariantSamples,
-        resetUnsavedTechnicalReview,
+        resetUnsavedTechnicalReviewAndNotes,
         "excludeFacets": hideFacets,
         "ref": filterSetControllerRef
     };
@@ -410,7 +413,9 @@ function FilteringTabBody(props) {
         isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
         currFilterSet, // <- Used for Matching Filter Block Indices column
         unsavedTechnicalReview, // <- Used for Technical Review Column
+        unsavedTechnicalReviewNotes, // Used for Technical Review Column
         setTechnicalReviewForVSUUID, // <- Used for Technical Review Column
+        setTechnicalReviewNoteForVSUUID, // <- Used for Technical Review Column
         "key": searchTableKey
     };
 
