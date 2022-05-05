@@ -391,6 +391,6 @@ def embed(context, request):
     invalid_ids += [item for item in results if isinstance(item, str)]
     if invalid_ids:
         raise HTTPBadRequest(
-            "The following IDs were invalid: %s." % ", ".join(invalid_ids)
+            "The following IDs were invalid: %s" % ", ".join(invalid_ids)
         )
     return results

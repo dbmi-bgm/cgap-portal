@@ -35,6 +35,9 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         ...passProps
     } = props;
 
+    // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
+    const [ openPopoverData, setOpenPopoverData ] = useState(null);
+
     const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
@@ -80,9 +83,14 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, unsavedTechnicalReview ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
+    return (
+        <React.Fragment>
+            <TechnicalReviewPopoverOverlay {...{ openPopoverData, setOpenPopoverData }} />
+            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
+        </React.Fragment>
+    );
 }
 
 /**

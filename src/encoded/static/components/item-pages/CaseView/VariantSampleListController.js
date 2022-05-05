@@ -112,15 +112,23 @@ export class VariantSampleListController extends React.PureComponent {
         console.info("Fetching VariantSampleList ...");
         const vslFetchCallback = (resp) => {
             console.info("Fetched VariantSampleList", resp);
+
+            if (!Array.isArray(resp)) {
+                this.setState({ "isLoadingVariantSampleListItem": false }, function(){
+                    setTimeout(ReactTooltip.rebuild, 50);
+                });
+                throw new Error(`Couldn't get VSL - malformed response, check if VSL with ID \`${variantSampleListID}\` exists.`);
+            }
+
             const [ variantSampleListItem ] = resp;
-            const { "@id": vslID } = variantSampleListItem || {}; // Is `null` if no view permissions for it.
+            const { "@id": vslAtID } = variantSampleListItem || {}; // Is `null` if no view permissions for it.
 
             if (scopedRequest !== this.currentRequest) {
                 // Request superseded, cancel it.
                 return false;
             }
 
-            if (!vslID) {
+            if (!vslAtID) {
                 this.setState({ "isLoadingVariantSampleListItem": false }, function(){
                     setTimeout(ReactTooltip.rebuild, 50);
                 });
@@ -136,7 +144,7 @@ export class VariantSampleListController extends React.PureComponent {
                     "isLoadingVariantSampleListItem": false
                 };
                 console.log("new variant sample item, ", variantSampleListItem);
-                if (prevAtID && vslID !== prevAtID) {
+                if (prevAtID && vslAtID !== prevAtID) {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
                 return nextState;

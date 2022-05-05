@@ -140,18 +140,19 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     }, [ result, unsavedTechnicalReviewForResult ]);
 
     // Green (success) if first option, else yellow/orange for the 'Present - with concerns' options
+    const noUnsavedTechnicalReview = typeof unsavedTechnicalReviewForResult === 'undefined';
     const callTrueIconCls = (
         "icon icon-2x icon-fw fas icon-check text-" + (
-            (unsavedCall === true || (savedCall === true && typeof unsavedTechnicalReviewForResult === 'undefined' )) ? (
-                unsavedCall === true && unsavedClassification === "Present" ? "success"
-                    : savedCall === true && savedClassification === "Present" ? "success"
+            (unsavedCall === true || (savedCall === true && noUnsavedTechnicalReview)) ? (
+                (unsavedCall === true && unsavedClassification === "Present") ? "success"
+                    : (savedCall === true && noUnsavedTechnicalReview && savedClassification === "Present") ? "success"
                         : "warning"
             ) : (savedCall === true ? "secondary" : "muted")
         ));
 
     const callFalseIconCls = (
         "icon icon-2x icon-fw fas icon-times text-" + (
-            (unsavedCall === false || (savedCall === false && typeof unsavedTechnicalReviewForResult === 'undefined')) ? "danger"
+            (unsavedCall === false || (savedCall === false && noUnsavedTechnicalReview)) ? "danger"
                 : (savedCall === false ? "secondary" : "muted")
         ));
 
