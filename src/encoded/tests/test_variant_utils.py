@@ -93,6 +93,8 @@ class TestStructuralVariantBuilder:
         assert 0 not in sv_sample["samplegeno"]
         assert "genotype_labels" in sv_sample
         assert "inheritance_modes" in sv_sample
+        assert sv_sample["callers"] == ["Manta"]
+        assert sv_sample["caller_types"] == ["SV"]
 
     def test_post_or_patch(self, testapp, project, institution):
         """

@@ -84,6 +84,8 @@ def _build_sample_processing_embedded_list():
         "processed_files.accession",  # used to locate this file from annotated VCF via search
         "processed_files.variant_type",
         "processed_files.file_type",
+        "processed_files.upload_key", # used by Higlass browsers
+        "processed_files.higlass_file", # used by Higlass browsers
 
         # Sample linkTo
         "samples.completed_processes",
