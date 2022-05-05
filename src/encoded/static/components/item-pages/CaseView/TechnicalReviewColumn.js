@@ -122,8 +122,6 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
     }, [ result, unsavedTechnicalReviewForResult ]);
 
 
-    console.log("UNSAVED NOTE", unsavedTechnicalReviewNoteForResult);
-
     const handleOpenNotesPopover = useCallback(function(){
 
         const updateUnsavedNoteText = _.debounce(function(e){
@@ -184,8 +182,8 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                             )
                         }
                         <h6>Technical Notes</h6>
-                        {/* <textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
-                        <textarea className="form-control" rows={5} defaultValue={unsavedNoteText || savedNoteText || ""} onChange={updateUnsavedNoteText} />
+                        <textarea className="form-control" rows={5} disabled value="Coming soon..." />
+                        {/* In Progress in different branch: <textarea className="form-control" rows={5} defaultValue={unsavedNoteText || savedNoteText || ""} onChange={updateUnsavedNoteText} /> */}
                     </Popover.Content>
                 </Popover>
             )

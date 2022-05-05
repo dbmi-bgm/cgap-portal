@@ -275,8 +275,8 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         if (isActiveDotRouterTab) {
             aboveTableControls = (
                 <React.Fragment>
-                    <div className="filtering-tab-table-controls py-2 row">
-                        <div className="col-12 col-md-6">
+                    <div className="filtering-tab-table-controls pb-08 row justify-content-end">
+                        <div className="col-12 col-md-auto">
                             <h5 className="text-600">Interpretation</h5>
                             { selectedVariantSamples instanceof Map ?
                                 <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
@@ -284,7 +284,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                     isEditDisabled, haveEditPermission }} />
                                 : null }
                         </div>
-                        <div className="col-12 col-md-6 text-md-right">
+                        <div className="col-12 col-md-auto">
                             <h5 className="text-600">Technical Review</h5>
                             <PatchItemsProgress modalOnCompleteJSX={<h5 className="mt-16 mb-16 text-center text-danger">It will take some minutes for changes to become visible in search after a refresh.</h5>}>
                                 <SaveTechnicalReviewButton {...{ unsavedTechnicalReview, unsavedTechnicalReviewNotes, resetUnsavedTechnicalReviewAndNotes, haveEditPermission }} />
