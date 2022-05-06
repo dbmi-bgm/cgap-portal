@@ -284,15 +284,15 @@
                 }
             ]
         },
-        "sample_processing.analysis_type": {
+        "analyses.analysis_type": {
             "title": "Bioinformatics",
             "sort_fields": [
                 {
-                    "field": "sample_processing.analysis_type",
+                    "field": "analyses.analysis_type",
                     "title": "Bioinformatics Analysis Type"
                 },
                 {
-                    "field": "sample_processing.last_modified.date_modified",
+                    "field": "analyses.last_modified.date_modified",
                     "title": "Bioinformatics Last Modified Date"
                 }
             ]
