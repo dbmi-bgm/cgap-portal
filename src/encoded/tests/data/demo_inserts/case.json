@@ -1,7 +1,7 @@
 [
     {
         "status": "shared",
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "analyses": ["8dd51b60-2d65-4e74-ac86-08ff9159be90"],
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83ccc",
         "description": "Benchmarking case for Platinum Trio Husband",
@@ -17,7 +17,7 @@
     },
     {
         "status": "shared",
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "analyses": ["8dd51b60-2d65-4e74-ac86-08ff9159be90"],
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83bbb",
         "description": "Benchmarking case for Platinum Trio Father",
@@ -34,7 +34,7 @@
     },
     {
         "status": "shared",
-        "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
+        "analyses": ["8dd51b60-2d65-4e74-ac86-08ff9159be90"],
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83aaa",
         "description": "Benchmarking case for Platinum Trio Proband",

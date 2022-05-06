@@ -56,6 +56,16 @@
     },
     {
         "status": "shared",
+        "uuid": "7a113e31-d4dd-465a-99b2-16fb0c3928a9",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFZGMP5B",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "file_type": "full annotated VCF",
+        "variant_type": "SNV"
+    },
+    {
+        "status": "shared",
         "uuid": "5593ddd6-13d1-4bf3-b412-bb0a01dfc922",
         "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
         "accession": "GAPFIFYGNO4B",

@@ -24,6 +24,7 @@
         "genome_assembly": "GRCh38",
         "description": "The latest full annotated VCF from WGS pipeline v15 for Platinum NA12879 trio",
         "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "file_type": "full annotated VCF",
         "quality_metric": "dadff7e8-4ae8-4d64-871e-3e8c8dbccc4f",
         "file_classification": "processed file",
         "aliases": [
