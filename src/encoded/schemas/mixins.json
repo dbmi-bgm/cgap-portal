@@ -298,6 +298,7 @@
     "technical_review": {
         "technical_review": {
             "title": "Technical Review",
+            "additionalProperties": false,
             "type": "object",
             "notes": "We will store technical review notes in a separate field `technical_review_note` perhaps, to simplify UI logic.",
             "required": ["call", "classification"],
