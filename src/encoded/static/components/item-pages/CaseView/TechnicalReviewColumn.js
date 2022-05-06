@@ -182,8 +182,8 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                             )
                         }
                         <h6>Technical Notes</h6>
-                        <textarea className="form-control" rows={5} disabled value="Coming soon..." />
-                        {/* In Progress in different branch: <textarea className="form-control" rows={5} defaultValue={unsavedNoteText || savedNoteText || ""} onChange={updateUnsavedNoteText} /> */}
+                        {/*<textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
+                        <textarea className="form-control" rows={5} defaultValue={unsavedNoteText || savedNoteText || ""} onChange={updateUnsavedNoteText} />
                     </Popover.Content>
                 </Popover>
             )
@@ -258,7 +258,11 @@ function CallClassificationButton (props) {
     const handleClick = useCallback(function handleClick(e){
         if (savedCall === callType && savedClassification === optionName) {
             // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
-            setTechnicalReviewForVSUUID(vsUUID, typeof unsavedTechnicalReviewForResult === "undefined" ? null : undefined);
+            if (typeof unsavedTechnicalReviewForResult === "undefined") {
+                setTechnicalReviewForVSUUID(vsUUID, null);
+            } else {
+                setTechnicalReviewForVSUUID(vsUUID, undefined);
+            }
         } else if (unsavedCall === callType && unsavedClassification === optionName) {
             // Unset
             setTechnicalReviewForVSUUID(vsUUID, undefined);
