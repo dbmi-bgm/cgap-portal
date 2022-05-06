@@ -346,7 +346,7 @@
         "technical_review": {
             "title": "Technical Review",
             "type": "object",
-            "notes": "We will store technical review notes in a separate field `technical_review_notes` perhaps, to simplify UI logic.",
+            "notes": "We will store technical review notes in a separate field `technical_review_note` perhaps, to simplify UI logic.",
             "properties": {
                 "call": {
                     "title": "Technical Review Call",
@@ -388,11 +388,6 @@
                     "permission": "restricted_fields"
                 }
             }
-        },
-        "technical_review_note": {
-            "title": "Technical Review Note",
-            "type": "string",
-            "linkTo": "Note"
         },
         "structural_variant": {
             "title": "Structural Variant",
