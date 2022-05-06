@@ -310,7 +310,7 @@
                 },
                 "classification": {
                     "title": "Classification",
-                    "description": "Descriptor for the call or no call",
+                    "description": "Reason for the given call choice",
                     "type": "string",
                     "enum": [
                         "Present",
