@@ -43,6 +43,9 @@
             "$ref": "mixins.json#/notes"
         },
         {
+            "$ref": "mixins.json#/technical_review"
+        },
+        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -342,57 +345,6 @@
         },
         "schema_version": {
             "default": "3"
-        },
-        "technical_review": {
-            "title": "Technical Review",
-            "type": "object",
-            "notes": "We will store technical review notes in a separate field `technical_review_notes` perhaps, to simplify UI logic.",
-            "properties": {
-                "call": {
-                    "title": "Technical Review Call",
-                    "type": "boolean",
-                    "description": "True if call, false if no call, or undefined"
-                },
-                "classification": {
-                    "title": "Classification",
-                    "description": "Descriptor for the call or no call",
-                    "type": "string",
-                    "enum": [
-                        "Present",
-                        "Recurrent Artifact",
-                        "Low Coverage",
-                        "Low Allelic Fraction",
-                        "Low Mapping Quality",
-                        "Strand Bias",
-                        "Mendelian Error",
-                        "Other"
-                    ]
-                },
-                "date_initial_call_made": {
-                    "title": "Date Call Made",
-                    "exclude_from": ["FFedit-create"],
-                    "type": "string",
-                    "anyOf": [
-                        {"format": "date-time"},
-                        {"format": "date"}
-                    ],
-                    "serverDefault": "now",
-                    "permission": "restricted_fields"
-                },
-                "initial_call_made_by": {
-                    "title": "Call Made By",
-                    "exclude_from": ["FFedit-create"],
-                    "type": "string",
-                    "linkTo": "User",
-                    "serverDefault": "userid",
-                    "permission": "restricted_fields"
-                }
-            }
-        },
-        "technical_review_note": {
-            "title": "Technical Review Note",
-            "type": "string",
-            "linkTo": "Note"
         },
         "structural_variant": {
             "title": "Structural Variant",

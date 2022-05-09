@@ -295,6 +295,56 @@
             }
         }
     },
+    "technical_review": {
+        "technical_review": {
+            "title": "Technical Review",
+            "additionalProperties": false,
+            "type": "object",
+            "notes": "We will store technical review notes in a separate field `technical_review_note` perhaps, to simplify UI logic.",
+            "required": ["call", "classification"],
+            "properties": {
+                "call": {
+                    "title": "Technical Review Call",
+                    "type": "boolean",
+                    "description": "True if Call or False if No Call"
+                },
+                "classification": {
+                    "title": "Classification",
+                    "description": "Reason for the given call choice",
+                    "type": "string",
+                    "enum": [
+                        "Present",
+                        "Recurrent Artifact",
+                        "Low Coverage",
+                        "Low Allelic Fraction",
+                        "Low Mapping Quality",
+                        "Strand Bias",
+                        "Mendelian Error",
+                        "Other"
+                    ]
+                },
+                "date_initial_call_made": {
+                    "title": "Date Call Made",
+                    "exclude_from": ["FFedit-create"],
+                    "type": "string",
+                    "anyOf": [
+                        {"format": "date-time"},
+                        {"format": "date"}
+                    ],
+                    "serverDefault": "now",
+                    "permission": "restricted_fields"
+                },
+                "initial_call_made_by": {
+                    "title": "Call Made By",
+                    "exclude_from": ["FFedit-create"],
+                    "type": "string",
+                    "linkTo": "User",
+                    "serverDefault": "userid",
+                    "permission": "restricted_fields"
+                }
+            }
+        }
+    },
     "alternative_ids": {
         "alternative_ids": {
             "title": "Alternative identifiers",

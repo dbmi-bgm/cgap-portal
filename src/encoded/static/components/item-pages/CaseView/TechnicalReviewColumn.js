@@ -184,6 +184,14 @@ export const TechnicalReviewColumn = React.memo(function TechnicalReviewColumn(p
                         <h6>Technical Notes</h6>
                         {/*<textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
                         <textarea className="form-control" rows={5} defaultValue={unsavedNoteText || savedNoteText || ""} onChange={updateUnsavedNoteText} />
+                        <div className="d-flex mt-08">
+                            <button type="button" className="btn btn-primary mr-04 w-100" disabled>
+                                Save
+                            </button>
+                            <button type="button" className="btn btn-primary ml-04 w-100" disabled>
+                                Approve
+                            </button>
+                        </div>
                     </Popover.Content>
                 </Popover>
             )
