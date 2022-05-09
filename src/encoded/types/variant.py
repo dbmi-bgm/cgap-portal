@@ -420,31 +420,6 @@ class Variant(Item):
         if names:
             return names
 
-    @calculated_property(schema={
-        "title": "ClinVar Variant Search",
-        "description": "Search ClinVar for all variants at this variant's location",
-        "type": "string"
-    })
-    def clinvar_search(self, CHROM=None, POS=None):
-        """Creates ClinVar search URL for all variants at the given
-        location.
-        """
-        result = None
-        query = None
-        chromosome = CHROM
-        if chromosome:
-            chromosome = chromosome.lower()
-            if chromosome == "m":
-                chromosome = "mt"
-        clinvar_url = "https://www.ncbi.nlm.nih.gov/clinvar"
-        if chromosome and POS:
-            query = "?term=((%s[Chromosome]) AND %s[Base Position])" % (
-                chromosome, POS
-            )
-        if query:
-            result = clinvar_url + query
-        return result
-
 
 @collection(
     name='variant-samples',

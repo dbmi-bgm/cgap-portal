@@ -507,8 +507,25 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         csq_clinvar_clnsig: clinicalSignificanceFromVariant,
         csq_clinvar_clnsigconf: conflictingClinicalSignificance,
         clinvar_submission = [], // TODO - missing in data rn.
-        csq_clinvar_clnrevstat: reviewStatusFromVariant
+        csq_clinvar_clnrevstat: reviewStatusFromVariant,
+        POS,
+        CHROM
     } = variant || structural_variant;
+
+
+    const clinvarVariantUrl = useMemo(function(){
+        if (!CHROM && !POS) {
+            return null;
+        }
+        let chromosome = CHROM;
+        chromosome = chromosome.toLowerCase();
+        if (chromosome === "m"){
+            chromosome = "mt";
+        }
+        return `https://www.ncbi.nlm.nih.gov/clinvar?term=((${chromosome}[Chromosome]) AND ${POS}[Base Position])`;
+    }, [ variant || structural_variant ]);
+
+
 
     const { result: { [variationID]: clinVarResult } = {} } = currentClinVarResponse || {};
     const {
@@ -528,17 +545,30 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         );
     }
 
+    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
+
     return (
         <React.Fragment>
 
             <div className="mb-12">
-                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
+                <label data-tip={getTipForField("csq_clinvar")} className="mb-0 d-inline">ID: </label>
                 { clinvarExternalHref?
-                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer" data-tip="View this variant in ClinVar">
                         { variationID }
-                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                        { externalLinkIconAppend }
                     </a>
                     : <span>{ variationID }</span> }
+                { clinvarVariantUrl ? (
+                    <React.Fragment>
+                        &nbsp;&nbsp;|&nbsp;&nbsp;
+                        <i className="icon icon-search fas small"/>&nbsp;&nbsp;
+                        <a href={clinvarVariantUrl} target="_blank" rel="noopener noreferrer"
+                            data-tip="Search ClinVar for all variants at this variant's location">
+                            Variants at this location
+                            { externalLinkIconAppend }
+                        </a>
+                    </React.Fragment>
+                ) : null }
             </div>
 
             <div className="row mt-03">
