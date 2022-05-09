@@ -513,7 +513,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
     } = variant || structural_variant;
 
 
-    const clinvarVariantUrl = useMemo(function(){
+    const clinvarVariantSearchUrl = useMemo(function(){
         if (!CHROM && !POS) {
             return null;
         }
@@ -558,11 +558,11 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
                         { externalLinkIconAppend }
                     </a>
                     : <span>{ variationID }</span> }
-                { clinvarVariantUrl ? (
+                { clinvarVariantSearchUrl ? (
                     <React.Fragment>
                         &nbsp;&nbsp;|&nbsp;&nbsp;
                         <i className="icon icon-search fas small"/>&nbsp;&nbsp;
-                        <a href={clinvarVariantUrl} target="_blank" rel="noopener noreferrer"
+                        <a href={clinvarVariantSearchUrl} target="_blank" rel="noopener noreferrer"
                             data-tip="Search ClinVar for all variants at this variant's location">
                             Variants at this location
                             { externalLinkIconAppend }
