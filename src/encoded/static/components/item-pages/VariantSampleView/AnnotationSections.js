@@ -536,16 +536,28 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         } = {}
     } = clinVarResult || {};
 
+    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
+
+    const clinVarSearchLink = clinvarVariantSearchUrl ? (
+        <React.Fragment>
+            <i className="icon icon-search fas small"/>&nbsp;&nbsp;
+            <a href={clinvarVariantSearchUrl} target="_blank" rel="noopener noreferrer"
+                data-tip="Search ClinVar for all variants at this variant's location">
+                Variants at this location
+                { externalLinkIconAppend }
+            </a>
+        </React.Fragment>
+    ) : null;
+
     if (!variationID) {
-        // No ClinVar info available ??
+        // No ClinVar info available. Still include link to search for variant at same location, though.
         return (
-            <div className="d-flex align-items-center justify-content-center text-large h-100">
-                <h4 className="font-italic text-400 my-0 pb-08">No record in ClinVar</h4>
+            <div className="d-flex align-items-center justify-content-center h-100 flex-column">
+                { clinVarSearchLink ? <div className="my-2 flex-grow-1 w-100 text-left">{ clinVarSearchLink }</div> : null }
+                <h4 className="font-italic text-400 my-0 pb-24 flex-grow-1">No record in ClinVar</h4>
             </div>
         );
     }
-
-    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
 
     return (
         <React.Fragment>
@@ -558,17 +570,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
                         { externalLinkIconAppend }
                     </a>
                     : <span>{ variationID }</span> }
-                { clinvarVariantSearchUrl ? (
-                    <React.Fragment>
-                        &nbsp;&nbsp;|&nbsp;&nbsp;
-                        <i className="icon icon-search fas small"/>&nbsp;&nbsp;
-                        <a href={clinvarVariantSearchUrl} target="_blank" rel="noopener noreferrer"
-                            data-tip="Search ClinVar for all variants at this variant's location">
-                            Variants at this location
-                            { externalLinkIconAppend }
-                        </a>
-                    </React.Fragment>
-                ) : null }
+                { clinVarSearchLink ? <>&nbsp;&nbsp;|&nbsp;&nbsp;{ clinVarSearchLink }</> : null }
             </div>
 
             <div className="row mt-03">
