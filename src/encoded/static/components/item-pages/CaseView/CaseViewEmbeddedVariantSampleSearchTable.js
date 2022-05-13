@@ -40,6 +40,8 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
     // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
+    const technicalReviewCommonProps = { setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID };
+
     const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
@@ -78,14 +80,12 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
             "technical_review.call": {
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
-                "render": function(result, props){
+                "render": function(result, propsFromSearchTable){
                     const { uuid: vsUUID } = result;
+                    const { rowNumber } = propsFromSearchTable;
                     const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
                     const unsavedTechnicalReviewNoteForResult = unsavedTechnicalReviewNotes[vsUUID];
-                    return (
-                        <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult,
-                            setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID }} />
-                    );
+                    return <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult, rowNumber }} />;
                 }
             }
         };
@@ -126,6 +126,8 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
     // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
+    const technicalReviewCommonProps = { setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID };
+
     const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
@@ -164,14 +166,12 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
             "technical_review.call": {
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
-                "render": function(result, props){
+                "render": function(result, propsFromSearchTable){
                     const { uuid: vsUUID } = result;
+                    const { rowNumber } = propsFromSearchTable;
                     const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
                     const unsavedTechnicalReviewNoteForResult = unsavedTechnicalReviewNotes[vsUUID];
-                    return (
-                        <TechnicalReviewColumn {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult,
-                            setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID }} />
-                    );
+                    return <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult, rowNumber }} />;
                 }
             }
         };
