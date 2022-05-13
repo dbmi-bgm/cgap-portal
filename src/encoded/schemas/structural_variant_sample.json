@@ -43,9 +43,6 @@
             "$ref": "mixins.json#/notes"
         },
         {
-            "$ref": "mixins.json#/technical_review"
-        },
-        {
             "$ref": "mixins.json#/static_embeds"
         }
     ],
@@ -351,6 +348,11 @@
             "type": "string",
             "linkTo": "StructuralVariant"
         },
+        "technical_review": {
+            "title": "Technical Review",
+            "type": "string",
+            "linkTo": "TechnicalReview"
+        },
         "variant_notes": {
             "title": "Variant Notes",
             "description": "Notes related to the relevant Variant",
@@ -415,21 +417,21 @@
                 }
             ]
         },
-        "technical_review.call": {
+        "technical_review.assessment.call": {
             "title": "Technical Review Call",
             "order": 120,
             "sort_fields": [
                 {
-                    "field": "technical_review.call",
+                    "field": "technical_review.assessment.call",
                     "title": "Technical Review Call"
                 },
                 {
-                    "field": "technical_review.classification",
+                    "field": "technical_review.assessment.classification",
                     "title": "Technical Review Classification"
                 },
                 {
-                    "field": "technical_review.date_initial_call_made",
-                    "title": "Initial Call Made Date"
+                    "field": "technical_review.assessment.date_call_made",
+                    "title": "Call Made Date"
                 }
             ]
         }
