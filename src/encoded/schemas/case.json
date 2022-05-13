@@ -74,11 +74,16 @@
             "type": "string",
             "linkTo": "Individual"
         },
-        "sample_processing": {
-            "title": "Sample Processing",
-            "description": "Downstream analysis performed on relevant sample",
-            "type": "string",
-            "linkTo": "SampleProcessing"
+        "analyses": {
+            "title": "Analyses",
+            "description": "Downstream analyses performed on relevant sample(s)",
+            "type": "array",
+            "items": {
+                "title": "Analysis",
+                "description": "SampleProcessing object containing information about the analysis",
+                "type": "string",
+                "linkTo": "SampleProcessing"
+            }
         },
         "report": {
             "title": "Report",
@@ -279,15 +284,15 @@
                 }
             ]
         },
-        "sample_processing.analysis_type": {
+        "analyses.analysis_type": {
             "title": "Bioinformatics",
             "sort_fields": [
                 {
-                    "field": "sample_processing.analysis_type",
+                    "field": "analyses.analysis_type",
                     "title": "Bioinformatics Analysis Type"
                 },
                 {
-                    "field": "sample_processing.last_modified.date_modified",
+                    "field": "analyses.last_modified.date_modified",
                     "title": "Bioinformatics Last Modified Date"
                 }
             ]

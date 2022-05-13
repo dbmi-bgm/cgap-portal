@@ -52,7 +52,7 @@ def _build_family_embeds(*, base_path):
         "members.case.family.family_id",
         "members.case.individual",
         "members.case.individual.individual_id",
-        "members.case.sample_processing",
+        "members.case.analyses",
         "members.case.sample.accession",
         "members.case.sample.workup_type",
 
@@ -93,7 +93,7 @@ def _build_family_embeds(*, base_path):
         # Case linkTo
         "analysis_groups.cases.family",
         "analysis_groups.cases.individual",
-        "analysis_groups.cases.sample_processing",
+        "analysis_groups.cases.analyses",
         "analysis_groups.cases.case_id",
 
         # Sample linkTo
@@ -230,48 +230,48 @@ def _build_case_embedded_list():
         "sample.processed_files.quality_metric.quality_metric_summary.numberType",
 
         # Sample Processing linkTo
-        "sample_processing.analysis_type",
-        "sample_processing.analysis_version",
-        "sample_processing.last_modified.*",
-        "sample_processing.completed_processes",
-        "sample_processing.samples_pedigree.*",
+        "analyses.analysis_type",
+        "analyses.analysis_version",
+        "analyses.last_modified.*",
+        "analyses.completed_processes",
+        "analyses.samples_pedigree.*",
 
 
         # Sample Processing - Family[] linkTo
-        *_build_family_embeds(base_path='sample_processing.families'),
+        *_build_family_embeds(base_path='analyses.families'),
 
 
         # Sample linkTo
-        "sample_processing.samples.accession",
-        "sample_processing.samples.bam_sample_id",
+        "analyses.samples.accession",
+        "analyses.samples.bam_sample_id",
 
         # File linkTo
-        "sample_processing.samples.processed_files.accession",
-        "sample_processing.samples.processed_files.file_format.file_format",
-        "sample_processing.samples.processed_files.last_modified.*",
+        "analyses.samples.processed_files.accession",
+        "analyses.samples.processed_files.file_format.file_format",
+        "analyses.samples.processed_files.last_modified.*",
 
         # File linkTo
-        "sample_processing.processed_files.file_format.file_format",
-        "sample_processing.processed_files.accession",
-        "sample_processing.processed_files.variant_type",
-        "sample_processing.processed_files.file_type",
-        "sample_processing.processed_files.upload_key",
+        "analyses.processed_files.file_format.file_format",
+        "analyses.processed_files.accession",
+        "analyses.processed_files.variant_type",
+        "analyses.processed_files.file_type",
+        "analyses.processed_files.upload_key",
 
         # File linkTo
-        "sample_processing.sample_processed_files.processed_files.accession",
-        "sample_processing.sample_processed_files.processed_files.file_format.file_format",
-        "sample_processing.sample_processed_files.processed_files.last_modified.*",
+        "analyses.sample_processed_files.processed_files.accession",
+        "analyses.sample_processed_files.processed_files.file_format.file_format",
+        "analyses.sample_processed_files.processed_files.last_modified.*",
 
         # Sample linkTo
-        "sample_processing.sample_processed_files.sample.accession",
+        "analyses.sample_processed_files.sample.accession",
 
         # QC
-        "sample_processing.samples.processed_files.quality_metric.*",
+        "analyses.samples.processed_files.quality_metric.*",
 
         # QC
-        "sample_processing.processed_files.quality_metric.*",
-        "sample_processing.processed_files.quality_metric.qc_list.value.ancestry and sex prediction",
-        "sample_processing.processed_files.quality_metric.qc_list.value.url",
+        "analyses.processed_files.quality_metric.*",
+        "analyses.processed_files.quality_metric.qc_list.value.ancestry and sex prediction",
+        "analyses.processed_files.quality_metric.qc_list.value.url",
 
         # Report linkTo
         "report.last_modified.*",
@@ -334,25 +334,33 @@ class Case(Item):
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
-    def display_title(self, request, accession, individual=None, family=None, sample_processing=None, case_id=None):
-        title = self.case_title(request, individual, family, sample_processing, case_id)
+    def display_title(self, request, accession, individual=None, family=None, analyses=None, case_id=None):
+        title = self.case_title(request, individual, family, analyses, case_id)
         if title:
             return title + ' ({})'.format(accession)
         else:
             return accession
 
+    # TODO: Remove
     @calculated_property(schema={
         "title": "Sample",
         "description": "Primary sample used for this case",
         "type": "string",
         "linkTo": 'Sample'
     })
-    def sample(self, request, individual=None, sample_processing=None):
-        if not individual or not sample_processing:
+    def sample(self, request, individual=None, analyses=None):
+        if not individual or not analyses:
             return {}
         ind_data = get_item_or_none(request, individual, 'individuals')
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        ind_samples = ind_data.get('samples', [])
+        sp_data = None
+        for analysis in analyses:
+            sp_result = get_item_or_none(request, analysis, 'sample-processings')
+            if sp_result and sp_result.get('pipeline_type', 'germline') == 'germline':
+                sp_data = sp_result
+                break
+        if not sp_data:
+            return {}
+        ind_samples = ind_data.get('samples', []) if ind_data else None
         sp_samples = sp_data.get('samples', [])
         intersection = [i for i in ind_samples if i in sp_samples]
         if not intersection:
@@ -385,100 +393,178 @@ class Case(Item):
         return secondary_families
 
     @staticmethod
-    def get_vcf_from_sample_processing(request, sample_processing_atid, variant_type):
+    def get_vcf_from_sample_processing(request, sample_processing_atids, variant_type, pipeline_type='germline'):
         """Retrieve VCF for ingestion of given variant type.
 
         For backwards compatibility, assume variant type of SNV if none
         provided.
         """
         vcf_file = None
-        sample_processing = get_item_or_none(
-            request, sample_processing_atid, "sample-processings"
-        )
-        if sample_processing:
-            processed_files = sample_processing.get("processed_files", [])
-            for processed_file in processed_files[::-1]:  # Take last in list (~newest)
-                file_data = get_item_or_none(request, processed_file, 'files-processed')
-                file_type = file_data.get("file_type", "")
-                file_variant_type = file_data.get("variant_type", "SNV")
-                if (
-                    file_type == "full annotated VCF"
-                    and file_variant_type == variant_type
-                ):
-                    vcf_file = file_data["@id"]
-                    break
+        for atid in sample_processing_atids:
+            sample_processing = get_item_or_none(request, atid, "sample-processings")
+            if sample_processing and pipeline_type == sample_processing.get('pipeline_type'):
+                processed_files = sample_processing.get("processed_files", [])
+                for processed_file in processed_files[::-1]:  # Take last in list (~newest)
+                    file_data = get_item_or_none(request, processed_file, 'files-processed')
+                    if not file_data:
+                        continue
+                    file_type = file_data.get("file_type", "")
+                    file_variant_type = file_data.get("variant_type", "SNV")
+                    if file_type == "full annotated VCF" and file_variant_type == variant_type:
+                        vcf_file = file_data["@id"]
+                        break
         return vcf_file
 
+    @staticmethod
+    def get_germline_sample_processing(request, sample_processing_atids, pipeline_type='germline'):
+        """Retrieve VCF for ingestion of given variant type.
+
+        For backwards compatibility, assume variant type of SNV if none
+        provided.
+        """
+        for atid in sample_processing_atids:
+            sample_processing = get_item_or_none(request, atid, "sample-processings")
+            if sample_processing and pipeline_type == sample_processing.get('pipeline_type'):
+                return sample_processing
+        return {}
+
+    # we may want to deprecate these vcf calc props in favor of final_vcf_files further below,
+    # which is an array of object field that contains all the full annotated vcfs along with
+    # what pipeline they were from and what variant type they are. This would help if more pipelines are
+    # added in the future and would prevent us from having to write new calculated props every time.
+    # Of course the UI changes may be needed accordingly.
     @calculated_property(schema={
         "title": "SNV VCF File",
-        "description": "VCF file that will be used in SNV variant digestion",
+        "description": "VCF file that will be used in germline SNV variant digestion",
         "type": "string",
         "linkTo": "File"
     })
-    def vcf_file(self, request, sample_processing=None):
+    def vcf_file(self, request, analyses=None):
         """
         Map the SNV vcf file to be digested.
         """
         vcf_file = None
         variant_type = "SNV"
-        if sample_processing:
-            vcf_file = self.get_vcf_from_sample_processing(
-                request, sample_processing, variant_type
-            )
+        if analyses:
+            vcf_file = self.get_vcf_from_sample_processing(request, analyses, variant_type)
         return vcf_file
 
+    # suggest deprecating as above
     @calculated_property(schema={
         "title": "SV VCF File",
         "description": "VCF file that will be used in SV variant digestion",
         "type": "string",
         "linkTo": "File"
     })
-    def structural_variant_vcf_file(self, request, sample_processing=None):
+    def structural_variant_vcf_file(self, request, analyses=None):
         """
         Map the SV vcf file to be digested.
         """
         sv_vcf_file = None
         variant_type = "SV"
-        if sample_processing:
-            sv_vcf_file = self.get_vcf_from_sample_processing(
-                request, sample_processing, variant_type
-            )
+        if analyses:
+            sv_vcf_file = self.get_vcf_from_sample_processing(request, analyses, variant_type)
         return sv_vcf_file
 
+    # suggest deprecating as above
     @calculated_property(schema={
         "title": "CNV VCF File",
         "description": "VCF file that will be used in CNV ingestion",
         "type": "string",
         "linkTo": "File"
     })
-    def cnv_vcf_file(self, request, sample_processing=None):
+    def cnv_vcf_file(self, request, analyses=None):
         """Map the CNV vcf file to be ingested."""
         cnv_vcf_file = None
         variant_type = "CNV"
-        if sample_processing:
+        if analyses:
             cnv_vcf_file = self.get_vcf_from_sample_processing(
-                request, sample_processing, variant_type
+                request, analyses, variant_type
             )
         return cnv_vcf_file
 
+    @calculated_property(schema={
+        "title": "Final VCF Files",
+        "description": "VCF files that will be used for ingestion",
+        "type": "array",
+        "items": {
+            "title": "Final VCF File",
+            "type": "object",
+            "properties": {
+                "file": {
+                    "title": "VCF File",
+                    "type": "string",
+                    "linkTo": "File"
+                },
+                "pipeline_type": {
+                    "title": "Pipeline Type",
+                    "type": "string",
+                    "description": "The type of pipeline that generated this VCF"
+                },
+                "variant_type": {
+                    "title": "Variant Type",
+                    "type": "string",
+                    "description": "The type of variants stored in this VCF"
+                },
+                "related_search_addon": {
+                    "title": "Related Search Addon",
+                    "description": "The initial search href filter addon needed to display variants from this vcf",
+                    "type": "string"
+                }
+            }
+        }
+    })
+    def final_vcf_files(self, request, analyses=None, individual=None):
+        """Map the CNV vcf file to be ingested."""
+        vcf_file_info = []
+        if analyses:
+            for analysis in analyses:
+                sample_processing = get_item_or_none(request, analysis, "sample-processings")
+                if sample_processing:
+                    processed_files = sample_processing.get("processed_files", [])
+                    pipeline_type = sample_processing.get('pipeline_type', 'germline')
+                    for processed_file in processed_files[::-1]:  # Take last in list (~newest)
+                        file_info = {}
+                        file_data = get_item_or_none(request, processed_file, 'files-processed')
+                        if not file_data:
+                            continue
+                        if file_data.get("file_type", "") == "full annotated VCF":
+                            file_info['file'] = file_data["@id"]
+                            file_info['variant_type'] = file_data.get("variant_type", "SNV")
+                            file_info['pipeline_type'] = pipeline_type
+                            if pipeline_type == 'germline' and individual:
+                                sample = self.sample(request, individual, analyses)
+                                sp_data = get_item_or_none(request, sample, 'sample')
+                                sample_read_group = sp_data.get('bam_sample_id', '') if sp_data else None
+                                if sample_read_group:
+                                    file_info['related_search_addon'] = (
+                                        f'CALLINFO={sample_read_group}&file={file_data["accession"]}'
+                                    )
+                            # TODO: handle CALLINFO for somatic sample
+                            vcf_file_info.append(file_info)
+        return vcf_file_info
+
+    # suggest deprecating as above vcf file props
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On",
         "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
         "type": "string"
     })
-    def initial_search_href_filter_addon(self, request, sample_processing=None, individual=None):
+    def initial_search_href_filter_addon(self, request, analyses=None, individual=None):
         """
         Use vcf file and sample accessions to limit variant/variantsample to this case
         """
-        if not individual or not sample_processing:
+        if not individual or not analyses:
             return ''
-        sample = self.sample(request, individual, sample_processing)
+        sample = self.sample(request, individual, analyses)
         if not sample:
             return ''
-        vcf = self.vcf_file(request, sample_processing)
+        vcf = self.vcf_file(request, analyses)
         if not vcf:
             return ''
         sp_data = get_item_or_none(request, sample, 'sample')
+        if not sp_data:
+            return ''
         sample_read_group = sp_data.get('bam_sample_id', '')
         if not sample_read_group:
             return ''
@@ -486,6 +572,7 @@ class Case(Item):
         add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
         return add_on
 
+    # suggest deprecating as above
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On For SVs",
         "description": (
@@ -495,22 +582,24 @@ class Case(Item):
         "type": "string"
     })
     def sv_initial_search_href_filter_addon(
-            self, request, sample_processing=None, individual=None
+            self, request, analyses=None, individual=None
     ):
         """
         Use SV and CNV VCF files and sample accessions to limit
         structural variant samples to this case.
         """
-        if not individual or not sample_processing:
+        if not individual or not analyses:
             return ''
-        sample = self.sample(request, individual, sample_processing)
+        sample = self.sample(request, individual, analyses)
         if not sample:
             return ''
-        sv_vcf = self.structural_variant_vcf_file(request, sample_processing)
-        cnv_vcf = self.cnv_vcf_file(request, sample_processing)
+        sv_vcf = self.structural_variant_vcf_file(request, analyses)
+        cnv_vcf = self.cnv_vcf_file(request, analyses)
         if not sv_vcf and not cnv_vcf:
             return ''
         sp_data = get_item_or_none(request, sample, 'sample')
+        if not sp_data:
+            return ''
         sample_read_group = sp_data.get('bam_sample_id', '')
         if not sample_read_group:
             return ''
@@ -532,11 +621,13 @@ class Case(Item):
             "type": "string"
         }
     })
-    def additional_variant_sample_facets(self, request, sample_processing=None, extra_variant_sample_facets=[]):
-        if not sample_processing:
+    def additional_variant_sample_facets(self, request, analyses=None, extra_variant_sample_facets=[]):
+        if not analyses:
             return ''
         fields = [facet for facet in extra_variant_sample_facets]
-        sp_item = get_item_or_none(request, sample_processing, 'sample_processing')
+        sp_item = self.get_germline_sample_processing(request, analyses)
+        if not sp_item:
+            return ''
         analysis_type = sp_item.get('analysis_type')
         if analysis_type:
             if (analysis_type.endswith('-Trio') or analysis_type.endswith('-Group')):
@@ -563,7 +654,7 @@ class Case(Item):
         if not individual or not family:
             return False
         family_info = get_item_or_none(request, family, 'family')
-        proband = family_info.get('proband', {})
+        proband = family_info.get('proband', {}) if family_info else None
         if proband == individual:
             return True
         return False
@@ -573,16 +664,16 @@ class Case(Item):
         "description": "Title of the case",
         "type": "string"
     })
-    def case_title(self, request, individual=None, family=None, sample_processing=None, case_id=None):
+    def case_title(self, request, individual=None, family=None, analyses=None, case_id=None):
         if case_id:
             return case_id
         title = ''
         if not individual or not family:
             return title
-        if not sample_processing:
+        if not analyses:
             return title
         family_info = get_item_or_none(request, family, 'family')
-        proband = family_info.get('proband', {})
+        proband = family_info.get('proband', {}) if family_info else None
         if not proband:
             return title
         proband_case = False
@@ -591,7 +682,7 @@ class Case(Item):
         # individual info to get the id, use instition id, if not use accession
         ind_id = ''
         ind_data = get_item_or_none(request, individual, 'individual')
-        if ind_data.get('individual_id'):
+        if ind_data and ind_data.get('individual_id'):
             ind_id = ind_data['individual_id']
         else:
             ind_id = ind_data['accession']
@@ -599,14 +690,14 @@ class Case(Item):
         pro_id = ''
         if not proband_case:
             pro_data = get_item_or_none(request, proband, 'individual')
-            if pro_data.get('individual_id'):
+            if pro_data and pro_data.get('individual_id'):
                 pro_id = pro_data['individual_id']
             else:
                 pro_id = pro_data['accession']
             # append p for proband
             pro_id += 'p'
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        analysis = sp_data.get('analysis_type', 'missing analysis')
+        sp_data = self.get_germline_sample_processing(request, analyses)
+        analysis = sp_data.get('analysis_type', 'missing analysis') if sp_data else None
         if proband_case:
             title = "{} {}".format(ind_id, analysis)
         else:

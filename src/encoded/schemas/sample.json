@@ -79,6 +79,15 @@
                 "saliva"
             ]
         },
+        "sample_category": {
+            "title": "Sample Category",
+            "description": "Category for Sample (e.g. whether sample is tumor or normal)",
+            "type": "string",
+            "enum": [
+                "tumor",
+                "normal"
+            ]
+        },
         "requisition_type": {
             "title": "Requisition Type",
             "type": "string",
@@ -496,6 +505,12 @@
                 "type": "string",
                 "linkTo": "FileProcessed"
             }
+        },
+        "meta_workflow_run": {
+            "title": "Meta-Workflow Run",
+            "description": "The meta-workflow run that contains information about the upstream pipeline steps",
+            "type": "string",
+            "linkTo": "MetaWorkflowRun"
         },
         "processed_files": {
             "title": "Processed Files",
