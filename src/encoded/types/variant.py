@@ -144,6 +144,15 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "discovery_interpretation.last_modified.date_modified",
     # "discovery_interpretation.last_modified.modified_by.display_title",
     "variant_sample_list.created_for_case",
+    # We need the following data in search result rows, so we embed these here and not thru /embed API.
+    "technical_review.assessment.call",
+    "technical_review.assessment.classification",
+    "technical_review.assessment.date_call_made",
+    "technical_review.assessment.call_made_by.display_title",
+    "technical_review.review.date_reviewed",
+    "technical_review.review.reviewed_by.display_title",
+    "technical_review.note.note_text",
+    "technical_review.note.last_modified.date_modified"
 ]
 
 
