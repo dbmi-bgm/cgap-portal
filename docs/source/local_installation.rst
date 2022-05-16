@@ -29,16 +29,23 @@ virtualenv using one of these versions before proceeding to the following steps.
 
 * Step 2: Install or update dependencies::
 
-   $ brew install libevent libmagic libxml2 libxslt openssl postgresql graphviz nginx python3
+   $ brew install libevent libmagic libxml2 libxslt openssl postgresql graphviz nginx
    $ brew install freetype libjpeg libtiff littlecms webp  # Required by Pillow
-   $ brew cask install homebrew/cask-versions/adoptopenjdk8
-   $ brew tap homebrew/versions
-   $ brew install elasticsearch@6.8 node@10
+   $ brew install openblas
+   $ brew install --cask homebrew/cask-versions/adoptopenjdk8
+   $ brew install elasticsearch@6.8 node@16
 
 
 You may need to link the brew-installed elasticsearch::
 
    $ brew link --force elasticsearch@6.8
+   #
+   # You may want to take note of any output from this that looks like:
+   #     export PATH="/opt/homebrew/opt/elasticsearch@6/bin:$PATH"
+   #     export PATH="/opt/homebrew/opt/node@16/bin:$PATH
+   #     export LDFLAGS="-L/opt/homebrew/opt/node@16/lib"
+   #     export CPPFLAGS="-I/opt/homebrew/opt/node@16/include"
+   # For possible future use, e.g. related to special builds (e.g. bin/macpoetry-install) in cgap-portal/Makefile.
 
 
 If you need to update dependencies::
