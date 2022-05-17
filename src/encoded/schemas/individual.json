@@ -170,6 +170,10 @@
                             "probable",
                             "definite"
                         ]
+                    },
+                    "is_primary_diagnosis": {
+                        "title": "Primary Diagnosis",
+                        "type": "boolean"
                     }
                 }
             }
