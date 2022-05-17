@@ -71,7 +71,7 @@ country (e.g. Denmark) or an ethnicity (e.g. African-American).
 If multiple values need to be specified, they can be done so
  in a comma-separated list (e.g. *African-American, Irish*).
 
-**Primary Diagnosis**: MONDO term for the primary disease of
+**Primary Diagnosis**: MONDO term for the primary disorder of
 interest for the individual (must be singular MONDO term).
 Particularly relevant for individuals within larger cohorts.
 Diagnosis Age of Onset, Diagnosis Age of Onset Units, and
