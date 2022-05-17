@@ -295,6 +295,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     // Filtering props shared among both tables, then SV and SNV specific props
     const filteringTableProps = {
         context, windowHeight, session, schemas,
+        haveCaseEditPermission,
         setIsSubmitting, variantSampleListItem,
         updateVariantSampleListID, savedVariantSampleIDMap,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem
@@ -371,14 +372,14 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
-                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
+                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType, haveCaseEditPermission }} />
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
-                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
+                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType, haveCaseEditPermission }} />
                                 </NoteSubSelectionStateController>
                             </CaseReviewSelectedNotesStore>
                         </CaseReviewController>

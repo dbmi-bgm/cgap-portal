@@ -740,11 +740,11 @@ function ClassificationDropdown(props){
 
     const renderedOptions = [];
 
-    const haveEditPermission = useMemo(function(){
+    const haveVSEditPermission = useMemo(function(){
         return !!(_.findWhere(vsActions, { "name" : "edit" }));
     }, [ variantSample ]);
 
-    if (haveEditPermission) {
+    if (haveVSEditPermission) {
         tags.forEach(function(tagObj, idx){
             const { id: classificationID, title } = tagObj;
             const existingSavedOption = (savedClassification === classificationID);
@@ -804,7 +804,7 @@ function ClassificationDropdown(props){
     return (
         <div className="py-1 py-lg-0 pr-lg-12">
             <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
-                disabled={!haveEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
+                disabled={!haveVSEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
                 data-delay={500} data-tip={tooltip}>
                 { renderedOptions }
             </DropdownButton>

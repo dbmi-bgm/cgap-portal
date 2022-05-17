@@ -22,7 +22,7 @@ export function AddToVariantSampleListButton(props){
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem = false,
         searchType = "VariantSample",
-        haveEditPermission = true,
+        haveCaseEditPermission = false,
         isEditDisabled = false
     } = props;
 
@@ -66,7 +66,7 @@ export function AddToVariantSampleListButton(props){
                 </span>
             </button>
         );
-    } else if (!haveEditPermission) {
+    } else if (!haveCaseEditPermission) {
         // Primary button style; is possible this Case is public
         return (
             <button type="button" className="btn btn-primary" disabled>

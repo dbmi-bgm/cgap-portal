@@ -77,15 +77,18 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 }
             },
             /** Depends on temporary/unsaved state ... */
-            "technical_review.call": {
+            "technical_review.assessment.call": {
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
                 "render": function(result, propsFromSearchTable){
                     const { uuid: vsUUID } = result;
-                    const { rowNumber } = propsFromSearchTable;
+                    const { rowNumber, updateResultAtIndex } = propsFromSearchTable;
                     const unsavedTechnicalReviewForResult = unsavedTechnicalReview[vsUUID];
                     const unsavedTechnicalReviewNoteForResult = unsavedTechnicalReviewNotes[vsUUID];
-                    return <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, unsavedTechnicalReviewForResult, unsavedTechnicalReviewNoteForResult, rowNumber }} />;
+                    return (
+                        <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, unsavedTechnicalReviewForResult,
+                            unsavedTechnicalReviewNoteForResult, rowNumber, updateResultAtIndex }} />
+                    );
                 }
             }
         };
@@ -163,7 +166,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 }
             },
             /** Depends on temporary/unsaved state ... */
-            "technical_review.call": {
+            "technical_review.assessment.call": {
                 "colTitle": "Technical Review",
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
                 "render": function(result, propsFromSearchTable){

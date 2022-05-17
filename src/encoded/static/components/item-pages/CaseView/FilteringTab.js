@@ -37,7 +37,7 @@ const filteringTabViews = {
 export function FilteringTab(props) {
     const {
         context, windowHeight, session, schemas, isActiveDotRouterTab,
-        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        haveCaseEditPermission, setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem,
         savedVariantSampleIDMap
     } = props;
@@ -52,7 +52,7 @@ export function FilteringTab(props) {
 
     const commonProps = {
         context, windowHeight, session, schemas, isActiveDotRouterTab,
-        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        haveCaseEditPermission, setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem,
         savedVariantSampleIDMap
     };
@@ -289,6 +289,7 @@ function FilteringTabBody(props) {
         blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         searchType,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        haveCaseEditPermission = false,         // Passed in from CaseView/CaseInfoTabView
         isActiveDotRouterTab = false            // Passed in from CaseView/DotRouter
     } = props;
 
@@ -343,6 +344,7 @@ function FilteringTabBody(props) {
         isActiveDotRouterTab,
         unsavedTechnicalReview,
         unsavedTechnicalReviewNotes,
+        // haveCaseEditPermission,
         // setIsSubmitting,
         // "caseItem": context
     };
@@ -356,7 +358,7 @@ function FilteringTabBody(props) {
     };
 
     const embeddedTableHeaderBody = (
-        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName }} caseItem={context}>
+        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName, haveCaseEditPermission }} caseItem={context}>
             <SaveFilterSetPresetButtonController>
                 <FilteringTableFilterSetUI {...fsuiProps} {...{ searchType }} />
             </SaveFilterSetPresetButtonController>
