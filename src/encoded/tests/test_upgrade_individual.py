@@ -1,5 +1,7 @@
 def test_individual_1_2(app, disorder, female_individual):
-    """"""
+    """Test upgrading Individual.disorders from array of strings to
+    array of objects.
+    """
     upgrader = app.registry["upgrader"]
     disorder_uuid = disorder["uuid"]
     female_individual["disorders"] = [disorder_uuid]
