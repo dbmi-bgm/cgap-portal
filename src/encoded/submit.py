@@ -1096,16 +1096,13 @@ class PedigreeRow:
             info['age_units'] = 'year'
         if info.get('ancestry'):
             info['ancestry'] = string_to_array(info['ancestry'])
-        if info.get('phenotypic_features'):
-            self.update_phenotypes(info)
-        if info.get('disorders') or info.get("primary_diagnosis"):
-            self.update_disorders(info)
-            disorders = info.get("disorders")
-            if disorders:
-                info["disorders"] = disorders
+        if info.get("life_status") == "U":  # TODO: Make use_abbrev property-specific
+            info["life_status"] = "unknown"
         for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
                 info[col] = int(info[col])
+        self.update_disorders(info)
+        self.update_phenotypes(info)
         return MetadataItem(info, self.row, 'individual')
 
     def is_proband(self):

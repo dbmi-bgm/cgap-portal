@@ -109,8 +109,8 @@ an HPO Term ID (e.g. HP:0001546).
 be in weeks or months, the Age at Death Units column must 
 also be filled.
 
-**Age at Death units**: Only add a value if Age at Death is 
-filled for this row. Possible values are: week, month, year.
+**Age at Death Units**: Only add a value if Age at Death is 
+filled for this row. Possible values are: day, week, month, year.
 Must be singular.
 
 **Pregnancy**: Whether the individual indicated is a 
