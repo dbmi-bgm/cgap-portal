@@ -157,6 +157,7 @@ def main(global_config, **local_config):
         ]
     }
     # set google reCAPTCHA keys
+    # TODO propagate from GAC
     settings['g.recaptcha.key'] = os.environ.get('reCaptchaKey')
     settings['g.recaptcha.secret'] = os.environ.get('reCaptchaSecret')
     # enable invalidation scope
