@@ -1307,13 +1307,18 @@ class SpreadsheetProcessing:
         return False
 
     @classmethod
-    def reformat_column_header(cls, row_entry):
+    def reformat_column_header(cls, cell_entry):
         """Reformat column header from spreadsheet.
 
         Remove parentheses contents/undesired characters to allow more
         customization/commentary in spreadsheets given to users.
+
+        :param cell_entry: Spreadsheet cell content
+        :type cell_entry: str
+        :returns: Reformatted entry content
+        :rtype: str
         """
-        return re.sub(cls.COLUMN_HEADER_REMOVAL_PATTERN, "", row_entry).strip().lower()
+        return re.sub(cls.COLUMN_HEADER_REMOVAL_PATTERN, "", cell_entry).strip().lower()
 
     def create_row_dict(self):
         """
