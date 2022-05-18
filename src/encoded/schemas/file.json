@@ -240,7 +240,7 @@
             ]
         },
         "s3_lifecycle_status": {
-            "title": "S3 Lifecycle Status (current storage class)",
+            "title": "S3 Lifecycle Status",
             "description": "Current S3 storage class of this object. If set to ignore, lifecycle management will have no effect on this file.",
             "internal_comment": "Files in Standard and Infrequent Access are accessible without restriction. Files in Glacier and Deep Archive need to be requested and cannot be downloaded.",
             "type": "string",
