@@ -1,0 +1,74 @@
+#!/bin/bash
+
+projfile=pyproject.toml
+libname=
+do_help=
+do_debug=
+
+while [ $# -gt 0 ]; do
+    if [ "$1" = "--help" ]; then
+        do_help=TRUE
+        shift 1
+    elif [ "$1" = "--debug" ]; then
+        do_debug=TRUE
+        shift 1
+    elif [ $# -eq 1 ]; then
+       libname=$1
+        shift 1
+    else
+        echo "You can only preload one library at a time."
+        break
+    fi
+done
+
+if [ -n "${do_help}" ]; then
+    echo "$0 [ <libname> | --help ]"
+    echo ""
+    echo "  Uses pip to preload the version of <libname> that's specified in ${projfile}."
+    exit 1
+fi
+
+if [ -z "${libname}" ]; then
+    echo "No library name specified."
+    exit 1
+elif [ ! -f "${projfile}" ]; then
+    echo "Could not find a ${projfile} from which to obtain the right version of ${libname}."
+    exit 1
+fi
+
+quotes="'\""
+version_line=`grep "^${libname} =" ${projfile}`
+
+if [ -z "${version_line}" ]; then
+    echo "Can't find a version of ${libname} in ${projfile}."
+    exit 1
+fi
+
+if [ -n "${do_debug}" ]; then
+  echo "version_line=${version_line}"
+fi
+
+version=`echo "${version_line}" | sed -E "s/^[^=]*=[ ]*[${quotes}]([^${quotes}]*)[${quotes}][ ]*([#].*)?$/\\1/g"`
+
+if [ -n "${do_debug}" ]; then
+  echo "version=${version}"
+fi
+
+if [[ $version =~ ^([<>=^~*][^ ]*)?$ ]]; then
+    echo "Cannot preload ${libname} because it is not fully pinned: ${version}"
+    exit 1
+elif [[ $version =~ "=" ]]; then
+    echo "Contents of ${projfile} in unexpected format. Can't parse version of ${libname}."
+    echo " Line: ${version_line}"
+    exit 1
+fi
+
+maybe_simulate=""
+
+if [ -n "${do_debug}" ]; then
+   echo "SIMULATING..."
+    maybe_simulate="echo "
+fi
+
+$maybe_simulate echo "Preloading ${libname} ${version}..."
+$maybe_simulate pip install "${libname}==${version}"
