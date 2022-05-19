@@ -57,12 +57,21 @@ macbuild-poetry:
 	make configure
 	make macpoetry-install
 
+macm1build-poetry:
+	make configure
+	pip install h5py # some reason poetry is not installing this right on Apple M1
+	poetry install
+
 build:  # builds
 	make build-poetry
 	make build-after-poetry
 
 macbuild:  # builds for Catalina
 	make macbuild-poetry
+	make build-after-poetry
+
+macm1build:  # builds for Apple M1
+	make macm1build-poetry
 	make build-after-poetry
 
 rebuild:
