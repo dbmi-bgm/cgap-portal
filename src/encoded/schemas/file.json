@@ -227,7 +227,7 @@
         },
         "s3_lifecycle_category": {
             "title": "S3 Lifecycle Category",
-            "description": "The lifecycle category determines how long a file remains in a certain storage class.",
+            "description": "The lifecycle category determines how long a file remains in a certain storage class.  If set to ignore, lifecycle management will have no effect on this file.",
             "type": "string",
             "enum": [
                 "short_term_access_long_term_archive",
@@ -236,12 +236,13 @@
                 "short_term_access",
                 "long_term_archive",
                 "short_term_archive",
-                "no_storage"
+                "no_storage",
+                "ignore"
             ]
         },
         "s3_lifecycle_status": {
             "title": "S3 Lifecycle Status",
-            "description": "Current S3 storage class of this object. If set to ignore, lifecycle management will have no effect on this file.",
+            "description": "Current S3 storage class of this object.",
             "internal_comment": "Files in Standard and Infrequent Access are accessible without restriction. Files in Glacier and Deep Archive need to be requested and cannot be downloaded.",
             "type": "string",
             "default": "standard",
@@ -250,8 +251,7 @@
                 "infrequent access",
                 "glacier",
                 "deep archive",
-                "deleted",
-                "ignore"
+                "deleted"                
             ]
         },
         "s3_lifecycle_last_checked": {
