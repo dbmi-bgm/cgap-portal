@@ -62,7 +62,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     <Popover.Content className="px-0 py-1">
                         { opts.slice(0,1).map(function(optionName, i){
                             return (
-                                <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} />
+                                <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="success" />
                             );
                         }) }
                     </Popover.Content>
@@ -116,7 +116,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
                     <Popover.Content className="px-0 py-1">
                         { opts.map(function(optionName, i){
-                            return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} />;
+                            return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="danger" />;
                         }) }
                     </Popover.Content>
                 </Popover>
@@ -254,14 +254,15 @@ export class TechnicalReviewColumn extends React.PureComponent {
             call: savedCall,
             classification: savedClassification
         } = savedTechnicalReview || {};
-        const { call: unsavedCall, classification: unsavedClassification } = lastSavedTechnicalReviewForResult || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedTechnicalReviewForResult || {};
+
+        const noLastSavedTechnicalReview = typeof lastSavedTechnicalReviewForResult === 'undefined';
 
         // Green (success) if first option, else yellow/orange for the 'Present - with concerns' options
-        const noLastSavedTechnicalReview = typeof lastSavedTechnicalReviewForResult === 'undefined';
         const callTrueIconCls = (
             "icon icon-2x icon-fw fas icon-check text-" + (
-                (unsavedCall === true || (savedCall === true && noLastSavedTechnicalReview)) ? (
-                    (unsavedCall === true && unsavedClassification === "Present") ? "success"
+                (lastSavedCall === true || (savedCall === true && noLastSavedTechnicalReview)) ? (
+                    (lastSavedCall === true && lastSavedClassification === "Present") ? "success"
                         : (savedCall === true && noLastSavedTechnicalReview && savedClassification === "Present") ? "success"
                             : "warning"
                 ) : "muted" // (savedCall === true ? "secondary" : "muted")
@@ -269,7 +270,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
 
         const callFalseIconCls = (
             "icon icon-2x icon-fw fas icon-times text-" + (
-                (unsavedCall === false || (savedCall === false && noLastSavedTechnicalReview)) ? "danger"
+                (lastSavedCall === false || (savedCall === false && noLastSavedTechnicalReview)) ? "danger"
                     : "muted" // (savedCall === false ? "secondary" : "muted")
             ));
 
@@ -287,25 +288,25 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
                     data-call="true" data-technical-review="true">
                     <i className={callTrueIconCls} />
-                    { unsavedCall === true || (lastSavedTechnicalReviewForResult === null && savedCall === true) ?
+                    { lastSavedCall === true || (lastSavedTechnicalReviewForResult === null && savedCall === true) ?
                         // lastSavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
-                        <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
+                        <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownNoCall} ref={this.callFalseButtonRef}
                     data-call="false" data-technical-review="true">
                     <i className={callFalseIconCls} />
-                    { unsavedCall === false || (lastSavedTechnicalReviewForResult === null && savedCall === false) ?
+                    { lastSavedCall === false || (lastSavedTechnicalReviewForResult === null && savedCall === false) ?
                         // lastSavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
-                        <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
+                        <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenNotesPopover} ref={this.notesButtonRef} data-technical-review="true">
                     <i data-tip={noteToBeDeleted ? "This note will be deleted upon save due to new classification. Create new note." : null} className={notesIconCls} />
                     { lastSavedTechnicalReviewNoteForResult || (lastSavedTechnicalReviewNoteForResult === null && savedTechnicalReviewNote) ?
-                        <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
+                        <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
 
@@ -494,26 +495,27 @@ class CallClassificationButton extends React.PureComponent {
                 } = {}
             } = {}
         } = result;
-        const { call: unsavedCall, classification: unsavedClassification } = lastSavedTechnicalReviewForResult || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedTechnicalReviewForResult || {};
 
-        const highlightStyle = highlightColorStyle || (callType === true ? "success" : callType === false ? "danger" : null);
-
-        const isUnsavedSelected = unsavedCall === callType && unsavedClassification === optionName;
-        const isSavedSelected = savedCall === callType && savedClassification === optionName;
-        const isSetToRemove = isSavedSelected && (lastSavedTechnicalReviewForResult === null || (unsavedClassification && !isUnsavedSelected));
+        // If was recently saved but not yet in search results
+        const isLastSaved = lastSavedCall === callType && lastSavedClassification === optionName;
+        // If in search results
+        const isSaved = savedCall === callType && savedClassification === optionName;
+        // If was recently saved and this existing saved value is now unset (either technical_review.assessment changed or deleted)
+        const isLastSaveDeleted = isSaved && (lastSavedTechnicalReviewForResult === null || (lastSavedClassification && !isLastSaved));
 
         const btnClass = (
-            (isUnsavedSelected || (isSavedSelected && !isSetToRemove) ? ` bg-${highlightStyle} text-white` : "") +
-            (isSetToRemove ? " bg-light text-secondary" : "")
+            (isLastSaved || (isSaved && !isLastSaveDeleted) ? ` bg-${highlightColorStyle} text-white` : "") +
+            (isLastSaveDeleted ? " bg-light text-secondary" : "")
         );
 
         return (
             <button type="button" className={"dropdown-item" + btnClass} onClick={this.handleClick} disabled={disabled}>
                 { optionName }
-                { isUnsavedSelected ?
-                    <span className="text-white text-700" data-tip="Not Saved"> *</span>
-                    : isSetToRemove ?
-                        <i className="icon icon-minus-circle fas ml-08 text-danger" data-tip="Will be unset" />
+                { isLastSaved ?
+                    <span className="text-white text-700" data-tip="You recently saved this value and it may not be yet visible in search results"> *</span>
+                    : isLastSaveDeleted ?
+                        <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
                         : null }
             </button>
         );
@@ -577,7 +579,7 @@ export class TechnicalReviewController extends React.PureComponent {
             ...passProps,
             lastSavedTechnicalReview,
             lastSavedTechnicalReviewNotes,
-            "setTechnicalReviewForVSUUID": this.setTechnicalReviewForVSUUID,
+            "cacheSavedTechnicalReviewForVSUUID": this.cacheSavedTechnicalReviewForVSUUID,
             "setTechnicalReviewNoteForVSUUID": this.setTechnicalReviewNoteForVSUUID,
             "resetLastSavedTechnicalReview": this.resetLastSavedTechnicalReview
         };

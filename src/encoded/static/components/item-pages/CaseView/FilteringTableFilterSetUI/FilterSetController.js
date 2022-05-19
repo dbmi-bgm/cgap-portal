@@ -389,10 +389,10 @@ export class FilterSetController extends React.PureComponent {
                 console.info("Resetting selected Variant Sample items.");
                 onResetSelectedVariantSamples();
             }
-            if (resetLastSavedTechnicalReview && searchContext !== pastSearchContext) {
-                console.info("Resetting unsaved technical review");
-                resetLastSavedTechnicalReview();
-            }
+            // if (resetLastSavedTechnicalReview && searchContext !== pastSearchContext) {
+            //     console.info("Resetting last saved technical review cache");
+            //     resetLastSavedTechnicalReview();
+            // }
         }
 
         // If a new FilterSet gets fetched in; should only occur for initial FS being loaded in (where pastInitialFilterSet is null).
