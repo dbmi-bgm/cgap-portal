@@ -53,6 +53,11 @@
             "uniqueItems": true,
             "type": "string"
         },
+        "description": {
+            "title": "Description",
+            "description": "Description of gene list and source(s)",
+            "type": "string"
+        },
         "genes": {
             "title": "Genes",
             "type": "array",

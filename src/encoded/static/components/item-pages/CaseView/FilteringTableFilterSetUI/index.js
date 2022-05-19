@@ -10,6 +10,7 @@ import ReactTooltip from 'react-tooltip';
 import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { buildSchemaFacetDictionary } from './../../../util/Schemas';
+import { PatchItemsProgress } from './../../../util/PatchItemsProgress';
 import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
 import { SearchBar } from './../../../browse/SearchBar';
 import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
@@ -18,6 +19,7 @@ import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 import { PresetFilterSetSelectionUI } from './PresetFilterSetSelectionUI';
 import { FilterBlock, DummyLoadingFilterBlock } from './FilterBlock';
 import { ExportSearchSpreadsheetButton } from './ExportSearchSpreadsheetButton';
+
 
 
 /**
@@ -175,10 +177,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             navigate: virtualNavigate,
 
             // From FilteringTab (& higher, e.g. App/redux-store):
-            caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab,
+            caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab, haveCaseEditPermission,
+
+            // From TechnicalReviewController (used in FilteringTab)
+            lastSavedTechnicalReview, lastSavedTechnicalReviewNotes, resetLastSavedTechnicalReview,
 
             // From SaveFilterSetButtonController:
-            hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet, haveEditPermission,
+            hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
 
             // From SaveFilterSetPresetButtonController:
             hasFilterSetChangedFromOriginalPreset, hasFilterSetChangedFromLastSavedPreset,
@@ -237,7 +242,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         const headerProps = {
             filterSet, bodyOpen, caseItem,
             haveDuplicateQueries, haveDuplicateNames, allFilterBlockNameQueriesValid,
-            isEditDisabled, haveEditPermission,
+            isEditDisabled, haveCaseEditPermission,
             // setTitleOfFilterSet,
             isFetchingInitialFilterSetItem,
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
@@ -260,7 +265,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 savedToVSLFilterBlockQueries, allFilterBlockNameQueriesValid,
                 // Props for Save btn:
                 saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged,
-                haveEditPermission
+                haveCaseEditPermission
             };
 
             fsuiBlocksBody = <FilterSetUIBody {...bodyProps} />;
@@ -268,39 +273,44 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
 
         if (isActiveDotRouterTab) {
             aboveTableControls = (
-                <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
-                    <div className="col-12 col-lg-4 py-2">
-                        <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
-                            placeholder={!currentFilterBlockName ? "Select a single filter-block above to search..." : "Search..."} />
-                    </div>
-                    <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
-                        { typeof totalCount === "number" ?
-                            <React.Fragment>
-                                <strong>{ totalCount || 0 }</strong>
-                                &nbsp;
-                                matches for { currentFilterBlockName ?
-                                    <em>{ currentFilterBlockName }</em>
-                                    // TODO: Allow to toggle Union vs Intersection in FilterSetController
-                                    : (
-                                        <React.Fragment>
-                                            <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
-                                            { ` of ${selectedFilterBlockCount} Filter Blocks` }
-                                        </React.Fragment>
-                                    ) }
-                            </React.Fragment>
-                            : null }
-                    </h5>
-                    <div className="col col-lg-auto pr-06 d-flex">
-                        { selectedVariantSamples instanceof Map ?
-                            <div className="pr-14">
+                <React.Fragment>
+                    <div className="filtering-tab-table-controls pb-08 row">
+                        <div className="col-12 col-md-auto">
+                            <h5 className="text-600">Interpretation</h5>
+                            { selectedVariantSamples instanceof Map ?
                                 <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
                                     intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
-                                    isEditDisabled, haveEditPermission }} />
-                            </div>
-                            : null }
-                        { (searchType === "VariantSample") && <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} /> }
+                                    isEditDisabled, haveCaseEditPermission }} />
+                                : null }
+                        </div>
                     </div>
-                </AboveTableControlsBaseCGAP>
+                    <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
+                        <div className="col-12 col-lg-4 py-2">
+                            <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
+                                placeholder={!currentFilterBlockName ? "Select a single filter-block above to search..." : "Search..."} />
+                        </div>
+                        <h5 className="col-12 col-lg my-0 py-1 text-400 text-truncate">
+                            { typeof totalCount === "number" ?
+                                <React.Fragment>
+                                    <strong>{ totalCount || 0 }</strong>
+                                    &nbsp;
+                                    matches for { currentFilterBlockName ?
+                                        <em>{ currentFilterBlockName }</em>
+                                        // TODO: Allow to toggle Union vs Intersection in FilterSetController
+                                        : (
+                                            <React.Fragment>
+                                                <span className="text-600">{intersectFilterBlocks ? "Intersection" : "Union" }</span>
+                                                { ` of ${selectedFilterBlockCount} Filter Blocks` }
+                                            </React.Fragment>
+                                        ) }
+                                </React.Fragment>
+                                : null }
+                        </h5>
+                        <div className="col col-lg-auto pr-06 d-flex">
+                            <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} />
+                        </div>
+                    </AboveTableControlsBaseCGAP>
+                </React.Fragment>
             );
         } else {
             aboveTableControls = null;
@@ -346,7 +356,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
         hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
         toggleOpen, bodyOpen,
         isEditDisabled: propIsEditDisabled,
-        haveEditPermission,
+        haveCaseEditPermission,
         haveDuplicateQueries, haveDuplicateNames, allFilterBlockNameQueriesValid,
         isFetchingInitialFilterSetItem = false,
         // From SaveFilterSetPresetButtonController
@@ -455,7 +465,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
             <div className="flex-shrink-0 flex-grow-0 pl-16 overflow-hidden">
                 { warnIcon }
                 <div role="group" className="dropdown btn-group">
-                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission }}
+                    <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveCaseEditPermission }}
                         className="btn btn-sm btn-outline-light align-items-center d-flex text-truncate" />
                     <SaveFilterSetPresetButton {...savePresetDropdownProps} />
                 </div>
@@ -473,7 +483,7 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
         selectFilterBlockIdx, removeFilterBlockAtIdx, setNameOfFilterBlockAtIdx,
         cachedCounts, duplicateQueryIndices, duplicateNameIndices, savedToVSLFilterBlockQueries, allFilterBlockNameQueriesValid,
         isSettingFilterBlockIdx, isFetchingInitialFilterSetItem = false,
-        // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission
+        // Contains: addNewFilterBlock, toggleIntersectFilterBlocks, intersectFilterBlocks, saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveCaseEditPermission
         ...remainingProps
     } = props;
 
@@ -541,7 +551,7 @@ function FilterSetUIBlockBottomUI(props){
         singleSelectedFilterBlockIdx,
         currentSingleBlockQuery,
         saveFilterSet, isSavingFilterSet,
-        isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission,
+        isEditDisabled, hasCurrentFilterSetChanged, haveCaseEditPermission,
         intersectFilterBlocks = false
     } = props;
 
@@ -598,7 +608,7 @@ function FilterSetUIBlockBottomUI(props){
                         <i className="icon icon-fw icon-clone far" />
                     </button>
                 </div>
-                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveEditPermission }}
+                <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveCaseEditPermission }}
                     className="btn btn-primary fixed-height d-inline-flex align-items-center" />
             </div>
         </div>

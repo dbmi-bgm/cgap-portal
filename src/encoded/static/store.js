@@ -35,12 +35,6 @@ export const reducers = {
             return action.type.alerts;
         }
         return state;
-    },
-
-    // Deprecated, from 4DN, keeping later in case helps influence
-    // implementation for different role/view 'states' (idk)
-    'browseBaseState' : function(state='only_4dn', action){
-        return (action.type && action.type.browseBaseState) || state;
     }
 };
 

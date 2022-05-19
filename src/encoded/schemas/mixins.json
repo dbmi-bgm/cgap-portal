@@ -137,17 +137,20 @@
     "attribution": {
         "institution": {
             "title": "Institution",
-             "description": "Institution associated with the submission.",
-             "type": "string",
-             "exclude_from": ["FFedit-create"],
-             "linkTo": "Institution"
+            "description": "Institution associated with the submission.",
+            "type": "string",
+            "exclude_from": ["FFedit-create"],
+            "linkTo": "Institution",
+            "serverDefault": "userinstitution"
+
         },
         "project": {
             "title": "Project",
             "description": "Project associated with the submission.",
             "type": "string",
             "exclude_from": ["FFedit-create"],
-            "linkTo": "Project"
+            "linkTo": "Project",
+            "serverDefault": "userproject"
         }
     },
     "notes": {

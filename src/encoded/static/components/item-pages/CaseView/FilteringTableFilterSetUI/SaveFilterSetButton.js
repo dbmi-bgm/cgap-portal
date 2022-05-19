@@ -64,12 +64,6 @@ export function validateAllFilterSetBlockNames(savedToVSLFilterBlockQueryNameDic
  */
 export class SaveFilterSetButtonController extends React.Component {
 
-    static haveEditPermission(caseActions){
-        const result = !!(_.findWhere(caseActions, { "name" : "edit" }));
-        console.log("SaveFilterSetButtonController - have edit permission?", result);
-        return result;
-    }
-
     /**
      * Re: param `fieldsToCompare` -
      * Eventually can add 'status' to this as well, if UI to edit it added.
@@ -127,9 +121,7 @@ export class SaveFilterSetButtonController extends React.Component {
         this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
 
         this.memoized = {
-            hasFilterSetChanged: memoize(SaveFilterSetButtonController.hasFilterSetChanged),
-            haveEditPermission: memoize(SaveFilterSetButtonController.haveEditPermission)
-
+            hasFilterSetChanged: memoize(SaveFilterSetButtonController.hasFilterSetChanged)
         };
 
         this.state = {
@@ -255,14 +247,12 @@ export class SaveFilterSetButtonController extends React.Component {
         const { isSavingFilterSet, lastSavedFilterSet } = this.state;
         const { actions: caseActions = [] } = caseItem || {};
         const hasCurrentFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
-        const haveEditPermission = this.memoized.haveEditPermission(caseActions);
         const childProps = {
             ...passProps,
             currFilterSet,
             caseItem,
             isSavingFilterSet,
             hasCurrentFilterSetChanged,
-            haveEditPermission,
             saveFilterSet: this.saveFilterSet
         };
         return React.Children.map(children, function(child){
@@ -276,13 +266,13 @@ export class SaveFilterSetButtonController extends React.Component {
 export function SaveFilterSetButton(props){
     const {
         isEditDisabled,
-        haveEditPermission = true,
+        haveCaseEditPermission = true,
         saveFilterSet,
         isSavingFilterSet,
         hasCurrentFilterSetChanged,
         className = "btn btn-primary d-inline-flex align-items-center"
     } = props;
-    const disabled = isEditDisabled || isSavingFilterSet || !haveEditPermission || !hasCurrentFilterSetChanged;
+    const disabled = isEditDisabled || isSavingFilterSet || !haveCaseEditPermission || !hasCurrentFilterSetChanged;
 
     const onSaveBtnClick = useCallback(function(e){
         e.stopPropagation();

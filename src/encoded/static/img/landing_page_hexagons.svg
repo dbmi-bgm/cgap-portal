@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1920" height="1063" viewBox="0 0 1920 1063">
+  <defs>
+    <linearGradient id="linear-gradient" x1="0.5" x2="0.5" y2="1" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#73a5de" stop-opacity="0.224"/>
+      <stop offset="1" stop-color="#4579b4" stop-opacity="0.02"/>
+    </linearGradient>
+    <clipPath id="clip-Landing_Page_Hexagons">
+      <rect width="1920" height="1063"/>
+    </clipPath>
+  </defs>
+  <g id="Landing_Page_Hexagons" data-name="Landing Page_Hexagons" clip-path="url(#clip-Landing_Page_Hexagons)">
+    <path id="Polygon_146" data-name="Polygon 146" d="M375.988,0a10,10,0,0,1,8.651,4.985l121.453,209.5a10,10,0,0,1,0,10.031L384.64,434.015A10,10,0,0,1,375.988,439H133.012a10,10,0,0,1-8.651-4.985L2.908,224.515a10,10,0,0,1,0-10.031L124.36,4.985A10,10,0,0,1,133.012,0Z" transform="translate(1114.589 -102.067)" opacity="0.65" fill="url(#linear-gradient)"/>
+    <path id="Polygon_148" data-name="Polygon 148" d="M375.988,0a10,10,0,0,1,8.651,4.985l121.453,209.5a10,10,0,0,1,0,10.031L384.64,434.015A10,10,0,0,1,375.988,439H133.012a10,10,0,0,1-8.651-4.985L2.908,224.515a10,10,0,0,1,0-10.031L124.36,4.985A10,10,0,0,1,133.012,0Z" transform="translate(1108 370.448)" opacity="0.65" fill="url(#linear-gradient)"/>
+    <path id="Polygon_149" data-name="Polygon 149" d="M375.988,0a10,10,0,0,1,8.651,4.985l121.453,209.5a10,10,0,0,1,0,10.031L384.64,434.015A10,10,0,0,1,375.988,439H133.012a10,10,0,0,1-8.651-4.985L2.908,224.515a10,10,0,0,1,0-10.031L124.36,4.985A10,10,0,0,1,133.012,0Z" transform="translate(1520.161 134.27)" opacity="0.65" fill="url(#linear-gradient)"/>
+    <path id="Polygon_150" data-name="Polygon 150" d="M376.994,0a10,10,0,0,1,8.651,4.985L507.434,215.063a10,10,0,0,1,0,10.031L385.646,435.172a10,10,0,0,1-8.651,4.985H133.347a10,10,0,0,1-8.651-4.985L2.908,225.094a10,10,0,0,1,0-10.031L124.7,4.985A10,10,0,0,1,133.347,0Z" transform="translate(828.975 1258.209) rotate(180)" opacity="0.65" fill="url(#linear-gradient)"/>
+    <path id="Polygon_151" data-name="Polygon 151" d="M376.994,0a10,10,0,0,1,8.651,4.985L507.434,215.063a10,10,0,0,1,0,10.031L385.646,435.172a10,10,0,0,1-8.651,4.985H133.347a10,10,0,0,1-8.651-4.985L2.908,225.094a10,10,0,0,1,0-10.031L124.7,4.985A10,10,0,0,1,133.347,0Z" transform="translate(835.581 784.448) rotate(180)" opacity="0.65" fill="url(#linear-gradient)"/>
+    <path id="Polygon_152" data-name="Polygon 152" d="M376.994,0a10,10,0,0,1,8.651,4.985L507.434,215.063a10,10,0,0,1,0,10.031L385.646,435.172a10,10,0,0,1-8.651,4.985H133.347a10,10,0,0,1-8.651-4.985L2.908,225.094a10,10,0,0,1,0-10.031L124.7,4.985A10,10,0,0,1,133.347,0Z" transform="translate(422.333 1021.249) rotate(180)" opacity="0.65" fill="url(#linear-gradient)"/>
+  </g>
+</svg>

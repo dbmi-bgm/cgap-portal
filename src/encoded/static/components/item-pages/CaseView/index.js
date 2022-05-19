@@ -1,9 +1,10 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
+import ReactTooltip from 'react-tooltip';
 
 import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
@@ -141,8 +142,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
+        updateVariantSampleListSort,
         savedVariantSampleIDMap = {},
         fetchVariantSampleListItem,
+        vslSortType,
         // Passed in from CurrentFamilyController
         canonicalFamily,
         currPedigreeFamily,
@@ -292,10 +295,15 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     // Filtering props shared among both tables, then SV and SNV specific props
     const filteringTableProps = {
         context, windowHeight, session, schemas,
+        haveCaseEditPermission,
         setIsSubmitting, variantSampleListItem,
         updateVariantSampleListID, savedVariantSampleIDMap,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem
     };
+
+    useEffect(() => {
+        ReactTooltip.rebuild();
+    }, [vslSortType]);
 
     return (
         <React.Fragment>
@@ -364,14 +372,14 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
-                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType, haveCaseEditPermission }} />
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
-                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType, haveCaseEditPermission }} />
                                 </NoteSubSelectionStateController>
                             </CaseReviewSelectedNotesStore>
                         </CaseReviewController>

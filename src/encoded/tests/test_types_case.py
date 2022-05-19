@@ -69,19 +69,52 @@ def test_case_second_family(testapp, proband_case, mother_case, fam, second_fam)
     assert mother['secondary_families'][0]['@id'] == fam2_id
 
 
-def test_case_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
-    # add ann_vcf to sample_processing
-    file_id = file_vcf['@id']
-    testapp.patch_json(sample_proc_fam['@id'], {'processed_files': [file_id]})
-    proband = testapp.get(proband_case['@id']).json
-    mother = testapp.get(mother_case['@id']).json
-    assert proband['vcf_file']['@id'] == file_id
-    assert mother['vcf_file']['@id'] == file_id
+def test_case_vcf(
+    testapp,
+    sample_proc_fam,
+    file_vcf,
+    file_vcf_sv,
+    file_vcf_cnv,
+    proband_case,
+    mother_case,
+):
+    """Test retrieval of SNV VCF from SampleProcessing.
 
-
-def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+    Ensure file found when VCFs for other variant types also present.
+    """
     file_id = file_vcf["@id"]
-    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    assert proband["vcf_file"]["@id"] == file_id
+    assert mother["vcf_file"]["@id"] == file_id
+
+    all_vcfs = [file_id, file_vcf_sv["@id"], file_vcf_cnv["@id"]]
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": all_vcfs}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    assert proband["vcf_file"]["@id"] == file_id
+    assert mother["vcf_file"]["@id"] == file_id
+
+
+def test_case_sv_vcf(
+    testapp,
+    sample_proc_fam,
+    file_vcf,
+    file_vcf_sv,
+    file_vcf_cnv,
+    proband_case,
+    mother_case,
+):
+    """Test retrieval of SV VCF from SampleProcessing.
+
+    Ensure file found when VCFs for other variant types also present.
+    """
+    file_id = file_vcf_sv["@id"]
     testapp.patch_json(
         sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
     )
@@ -89,6 +122,47 @@ def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_ca
     mother = testapp.get(mother_case["@id"]).json
     assert proband["structural_variant_vcf_file"]["@id"] == file_id
     assert mother["structural_variant_vcf_file"]["@id"] == file_id
+
+    all_vcfs = [file_id, file_vcf["@id"], file_vcf_cnv["@id"]]
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": all_vcfs}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    assert proband["structural_variant_vcf_file"]["@id"] == file_id
+    assert mother["structural_variant_vcf_file"]["@id"] == file_id
+
+
+def test_case_cnv_vcf(
+    testapp,
+    sample_proc_fam,
+    file_vcf,
+    file_vcf_sv,
+    file_vcf_cnv,
+    proband_case,
+    mother_case,
+):
+    """Test retrieval of CNV VCF from SampleProcessing.
+
+    Ensure file found when VCFs for other variant types also present.
+    """
+    file_id = file_vcf_cnv["@id"]
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    assert proband["cnv_vcf_file"]["@id"] == file_id
+    assert mother["cnv_vcf_file"]["@id"] == file_id
+
+    all_vcfs = [file_id, file_vcf["@id"], file_vcf_sv["@id"]]
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": all_vcfs}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    assert proband["cnv_vcf_file"]["@id"] == file_id
+    assert mother["cnv_vcf_file"]["@id"] == file_id
 
 
 def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
@@ -104,19 +178,27 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
 
 
-def test_case_sv_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
-    file_id = file_vcf["@id"]
-    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+def test_case_sv_flag(
+    testapp, sample_proc_fam, file_vcf_sv, file_vcf_cnv, proband_case, mother_case
+):
+    sv_file_id = file_vcf_sv["@id"]
+    sv_file_accession = file_vcf_sv["accession"]
+    cnv_file_id = file_vcf_cnv["@id"]
+    cnv_file_accession = file_vcf_cnv["accession"]
+    patch_body = {"processed_files": [sv_file_id, cnv_file_id]}
     testapp.patch_json(
-        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+        sample_proc_fam["@id"], patch_body, status=200
     )
     proband = testapp.get(proband_case["@id"]).json
     mother = testapp.get(mother_case["@id"]).json
-    file_acc = file_id.split('/')[2]
     proband_sample_tag = "ext_id_006"
     mother_sample_tag = "ext_id_003"
-    proband_flag = "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
-    mother_flag = "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+    proband_flag = "CALL_INFO={}&file={}&file={}".format(
+        proband_sample_tag, sv_file_accession, cnv_file_accession
+    )
+    mother_flag = "CALL_INFO={}&file={}&file={}".format(
+        mother_sample_tag, sv_file_accession, cnv_file_accession
+    )
     assert proband['sv_initial_search_href_filter_addon'] == proband_flag
     assert mother['sv_initial_search_href_filter_addon'] == mother_flag
 

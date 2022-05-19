@@ -7,6 +7,10 @@ from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_request
 from snovault.schema_utils import server_default
 from string import digits, ascii_uppercase
+from snovault import (
+    ROOT,
+    COLLECTIONS
+)
 
 
 ACCESSION_FACTORY = __name__ + ':accession_factory'
@@ -69,6 +73,29 @@ def accession(instance, subschema):
             continue
         return new_accession
     raise AssertionError("Free accession not found in %d attempts" % ATTEMPTS)
+
+
+@server_default
+def userproject(instance, subschema):
+    request = get_current_request()
+    userid_found = _userid()
+    if userid_found == NO_DEFAULT:
+        return NO_DEFAULT
+    user = request.registry[COLLECTIONS]['user'][userid_found]
+    project_roles = user.properties.get("project_roles", [])
+    if len(project_roles) > 0:
+        return project_roles[0]["project"]
+    return NO_DEFAULT
+
+
+@server_default
+def userinstitution(instance, subschema):
+    request = get_current_request()
+    userid_found = _userid()
+    if userid_found == NO_DEFAULT:
+        return NO_DEFAULT
+    user = request.registry[COLLECTIONS]['user'][userid_found]
+    return user.properties.get("user_institution", NO_DEFAULT)
 
 
 def get_userid():

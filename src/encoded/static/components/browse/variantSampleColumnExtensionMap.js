@@ -138,10 +138,10 @@ export const variantSampleColumnExtensionMap = {
             return <StackedRowColumn className="text-center" rows={rows} />;
         }
     },
-    'bam_snapshot': {
+    "bam_snapshot": {
         "noSort": true,
         "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-        "colTitle": <i className="icon icon-fw icon-image fas" />,
+        "colTitle": "BAM",
         "render": function(result, props) {
             const { bam_snapshot = null } = result;
             if (!bam_snapshot) {
@@ -208,6 +208,32 @@ export const structuralVariantSampleColumnExtensionMap = {
                     <StructuralVariantTranscriptColumn {...{ result, align }} />
                 </button>
             );
+        }
+    },
+    "structural_variant.transcript.csq_gene.display_title": {
+        "noSort": true, // not currently a useful or informative sort.
+        "render": function(result, props) {
+            const { structural_variant: { transcript: transcripts = [] } = {} } = result || {};
+            if (transcripts.length === 0) return null;
+            return <StructuralVariantTranscriptCSQGeneColumn {...{ result }} />;
+        }
+    },
+    "structural_variant.gnomadg_af": {
+        "render": function(result, props) {
+            const { structural_variant: { gnomadg_af = null, unrelated_count = null } = {} } = result || {};
+            const { align = 'left' } = props;
+
+            const rows = [
+                <div className="d-block text-truncate" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>,
+                <div className="d-block text-truncate" key="internal"><span className="text-600">Internal: </span>{unrelated_count !== null ? unrelated_count: "-"}</div>
+            ];
+            return <StackedRowColumn {...{ rows }} className={"text-truncate text-" + align} />;
+        }
+    },
+    "structural_variant.size": {
+        "render": function(result, props) {
+            const { structural_variant: { size_display = null } = {} } = result || {};
+            return size_display;
         }
     }
 };
@@ -366,7 +392,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
 
     if (genes.length <= 2) { // show comma separated
         rows.push(
-            <div>
+            <div key={0}>
                 <span className="text-muted">List:&nbsp;</span>
                 <span>{genes.join(", ")}</span>
             </div>);
@@ -378,7 +404,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
             tipGenes += (" + " + (genes.length - 10).toString() + " more");
         }
         rows.push(
-            <div>
+            <div key={0}>
                 <span className="text-muted">List:&nbsp;</span>
                 <span data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</span>
             </div>
@@ -388,14 +414,14 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
     // Display highlighted gene or placeholder
     if (highlighted_genes.length === 0) {
         rows.push(
-            <div className="text-muted">
+            <div className="text-muted" key={1}>
                 <i className="icon icon-star fas" data-tip="Highlighted gene" />:&nbsp;
                 <span>Not Selected</span>
             </div>
         );
     } else { // TODO: styles may need to be adjusted to accomodate more than a few at a time
         rows.push(
-            <div>
+            <div key={1}>
                 <i className="icon icon-star fas text-primary" data-tip="Highlighted gene" />:&nbsp;
                 { highlighted_genes.map((gene) => {
                     const { display_title, "@id": atID } = gene;
@@ -406,6 +432,27 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
     }
 
     return <StackedRowColumn className={"text-" + align} {...{ rows }} />;
+});
+
+const StructuralVariantTranscriptCSQGeneColumn = React.memo(function({ result }){
+    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
+    const path = atID + "?annotationTab=0";
+
+    const transcriptsDeduped = {};
+    transcripts.forEach((transcript) => {
+        const { csq_gene: { display_title = null } = {} } = transcript;
+        transcriptsDeduped[display_title] = true;
+    });
+    const genes = Object.keys(transcriptsDeduped);
+
+    if (genes.length <= 2) { // show comma separated
+        return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
+    }
+    // show first and last gene separated by "..." with first 10 available on hover
+    const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
+    const tipGenes = genes.slice(0, lastItemIndex).join(", ");
+
+    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
 });
 
 export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLabelColumn(props){

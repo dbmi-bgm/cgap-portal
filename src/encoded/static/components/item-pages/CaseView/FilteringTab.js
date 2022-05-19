@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useMemo, useCallback, useState, useRef } from 'react';
+import _ from 'underscore';
 import queryString from 'query-string';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -13,6 +14,7 @@ import { FilterSetController } from './FilteringTableFilterSetUI/FilterSetContro
 import { SaveFilterSetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetButton';
 import { SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable, CaseViewEmbeddedVariantSampleSearchTableSV } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { TechnicalReviewController } from './TechnicalReviewColumn';
 
 
 
@@ -35,7 +37,7 @@ const filteringTabViews = {
 export function FilteringTab(props) {
     const {
         context, windowHeight, session, schemas, isActiveDotRouterTab,
-        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        haveCaseEditPermission, setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem,
         savedVariantSampleIDMap
     } = props;
@@ -50,7 +52,7 @@ export function FilteringTab(props) {
 
     const commonProps = {
         context, windowHeight, session, schemas, isActiveDotRouterTab,
-        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        haveCaseEditPermission, setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem,
         savedVariantSampleIDMap
     };
@@ -69,18 +71,23 @@ export function FilteringTab(props) {
                 </div>
             </div>
             <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
-                <SelectedItemsController isMultiselect>
-                    <SNVFilteringTabBody {...commonProps} />
-                </SelectedItemsController>
+                <TechnicalReviewController>
+                    <SelectedItemsController isMultiselect>
+                        <SNVFilteringTabBody {...commonProps} />
+                    </SelectedItemsController>
+                </TechnicalReviewController>
             </div>
             <div id="cnvsv-filtering" className={"mt-36" + (currViewIdx === 1 ? "" : " d-none")}>
-                <SelectedItemsController isMultiselect>
-                    <CNVFilteringTabBody {...commonProps} />
-                </SelectedItemsController>
+                <TechnicalReviewController>
+                    <SelectedItemsController isMultiselect>
+                        <CNVFilteringTabBody {...commonProps} />
+                    </SelectedItemsController>
+                </TechnicalReviewController>
             </div>
         </React.Fragment>
     );
 }
+
 
 const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(props) {
     const { context, currViewIdx, setCurrViewIdx } = props;
@@ -263,6 +270,11 @@ function FilteringTabBody(props) {
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
+        lastSavedTechnicalReview,         // passed in from TechnicalReviewController
+        lastSavedTechnicalReviewNotes,    // passed in from TechnicalReviewController
+        cacheSavedTechnicalReviewForVSUUID,    // passed in from TechnicalReviewController
+        setTechnicalReviewNoteForVSUUID, // passed in from TechnicalReviewController
+        resetLastSavedTechnicalReview, // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
@@ -277,6 +289,7 @@ function FilteringTabBody(props) {
         blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         searchType,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        haveCaseEditPermission = false,         // Passed in from CaseView/CaseInfoTabView
         isActiveDotRouterTab = false            // Passed in from CaseView/DotRouter
     } = props;
 
@@ -329,18 +342,23 @@ function FilteringTabBody(props) {
         isLoadingVariantSampleListItem,
         selectedVariantSamples,
         isActiveDotRouterTab,
+        lastSavedTechnicalReview,
+        lastSavedTechnicalReviewNotes,
+        // haveCaseEditPermission,
         // setIsSubmitting,
         // "caseItem": context
     };
 
     const fsControllerProps = {
-        searchHrefBase, onResetSelectedVariantSamples, searchType,
+        searchHrefBase, searchType,
+        onResetSelectedVariantSamples,
+        resetLastSavedTechnicalReview,
         "excludeFacets": hideFacets,
         "ref": filterSetControllerRef
     };
 
     const embeddedTableHeaderBody = (
-        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName }} caseItem={context}>
+        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName, haveCaseEditPermission }} caseItem={context}>
             <SaveFilterSetPresetButtonController>
                 <FilteringTableFilterSetUI {...fsuiProps} {...{ searchType }} />
             </SaveFilterSetPresetButtonController>
@@ -393,9 +411,14 @@ function FilteringTabBody(props) {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
         addToBodyClassList, removeFromBodyClassList,
         selectedVariantSamples, onSelectVariantSample,
-        savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
-        isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
-        currFilterSet, // <- Used for Matching Filter Block Indices column
+        savedVariantSampleIDMap,            // <- Will be used to make selected+disabled checkboxes
+        isLoadingVariantSampleListItem,     // <- Used to disable checkboxes if VSL still loading
+        currFilterSet,                      // <- Used for Matching Filter Block Indices column
+        lastSavedTechnicalReview,             // <- Used for TechnicalReviewColumn
+        lastSavedTechnicalReviewNotes,        // <- Used for TechnicalReviewColumn
+        cacheSavedTechnicalReviewForVSUUID,        // <- Used for TechnicalReviewColumn
+        setTechnicalReviewNoteForVSUUID,    // <- Used for TechnicalReviewColumn
+        haveCaseEditPermission,             // <- Used for TechnicalReviewColumn
         "key": searchTableKey
     };
 

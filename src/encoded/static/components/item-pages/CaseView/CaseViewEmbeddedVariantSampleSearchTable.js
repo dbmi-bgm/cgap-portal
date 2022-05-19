@@ -1,15 +1,19 @@
 'use strict';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useState } from 'react';
+import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
+import Overlay from 'react-bootstrap/esm/Overlay';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import ReactTooltip from 'react-tooltip';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { DisplayTitleColumnWrapper, flattenColumnsDefinitionsSortFields } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
 import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
+import { TechnicalReviewColumn } from './TechnicalReviewColumn';
 
 /* Used in FilteringTab */
 
@@ -26,9 +30,19 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
         currFilterSet,
+        lastSavedTechnicalReview,
+        lastSavedTechnicalReviewNotes,
+        cacheSavedTechnicalReviewForVSUUID,
+        setTechnicalReviewNoteForVSUUID,
+        haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
+
+    // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
+    const [ openPopoverData, setOpenPopoverData ] = useState(null);
+
+    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID, haveCaseEditPermission };
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -48,8 +62,11 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     );
                 }
             },
+            /**
+             * Depends on props.currFilterSet, which only available in CaseViewEmbeddedVarriantSampleSearchTable[SV]
+             * Is only shown when multiple filter blocks requested.
+             */
             "__matching_filter_block_names": {
-                // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
@@ -60,11 +77,31 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
                 }
+            },
+            /** Depends on temporary/unsaved state ... */
+            "technical_review.assessment.call": {
+                "colTitle": "Technical Review",
+                "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
+                "render": function(result, propsFromSearchTable){
+                    const { uuid: vsUUID } = result;
+                    const { rowNumber, updateResultAtIndex } = propsFromSearchTable;
+                    const lastSavedTechnicalReviewForResult = lastSavedTechnicalReview[vsUUID];
+                    const lastSavedTechnicalReviewNoteForResult = lastSavedTechnicalReviewNotes[vsUUID];
+                    return (
+                        <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult,
+                            lastSavedTechnicalReviewNoteForResult, rowNumber, updateResultAtIndex }} />
+                    );
+                }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, lastSavedTechnicalReview, lastSavedTechnicalReviewNotes ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
+    return (
+        <React.Fragment>
+            <TechnicalReviewPopoverOverlay {...{ openPopoverData, setOpenPopoverData }} />
+            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
+        </React.Fragment>
+    );
 }
 
 /**
@@ -83,9 +120,19 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
         currFilterSet,
+        lastSavedTechnicalReview,
+        lastSavedTechnicalReviewNotes,
+        cacheSavedTechnicalReviewForVSUUID,
+        setTechnicalReviewNoteForVSUUID,
+        haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
+
+    // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
+    const [ openPopoverData, setOpenPopoverData ] = useState(null);
+
+    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID, haveCaseEditPermission };
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -105,8 +152,11 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     );
                 }
             },
+            /**
+             * Depends on props.currFilterSet, which only available in CaseViewEmbeddedVarriantSampleSearchTable[SV]
+             * Is only shown when multiple filter blocks requested.
+             */
             "__matching_filter_block_names": {
-                // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
@@ -118,53 +168,58 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
                 }
             },
-            // TODO: Move these to variantSampleColumnExtensionMap so we don't create new functions every render (or change to isLoadingVariantSample, ...)
-            "structural_variant.transcript.csq_gene.display_title": {
-                "noSort": true, // not currently a useful or informative sort.
-                "render": function(result, props) {
-                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
-                    const path = atID + "?annotationTab=0";
-
-                    const transcriptsDeduped = {};
-                    transcripts.forEach((transcript) => {
-                        const { csq_gene: { display_title = null } = {} } = transcript;
-                        transcriptsDeduped[display_title] = true;
-                    });
-                    const genes = Object.keys(transcriptsDeduped);
-
-                    if (genes.length <= 2) { // show comma separated
-                        return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
-                    }
-                    // show first and last gene separated by "..." with first 10 available on hover
-                    const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
-                    const tipGenes = genes.slice(0, lastItemIndex).join(", ");
-
-                    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
-                }
-            },
-            "structural_variant.gnomadg_af": {
-                "render": function(result, props) {
-                    const { structural_variant: { gnomadg_af = null, unrelated_count = null } = {} } = result || {};
-                    const { align = 'left' } = props;
-
-                    const rows = [
-                        <div className="d-block text-truncate" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>,
-                        <div className="d-block text-truncate" key="internal"><span className="text-600">Internal: </span>{unrelated_count !== null ? unrelated_count: "-"}</div>
-                    ];
-                    return <StackedRowColumn {...{ rows }} className={"text-truncate text-" + align} />;
-                }
-            },
-            "structural_variant.size": {
-                "render": function(result, props) {
-                    const { structural_variant: { size_display = null } = {} } = result || {};
-                    return size_display;
+            /** Depends on temporary/unsaved state ... */
+            "technical_review.assessment.call": {
+                "colTitle": "Technical Review",
+                "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
+                "render": function(result, propsFromSearchTable){
+                    const { uuid: vsUUID } = result;
+                    const { rowNumber } = propsFromSearchTable;
+                    const lastSavedTechnicalReviewForResult = lastSavedTechnicalReview[vsUUID];
+                    const lastSavedTechnicalReviewNoteForResult = lastSavedTechnicalReviewNotes[vsUUID];
+                    return <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult, lastSavedTechnicalReviewNoteForResult, rowNumber }} />;
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
+    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, lastSavedTechnicalReview, lastSavedTechnicalReviewNotes ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
+    return (
+        <React.Fragment>
+            <TechnicalReviewPopoverOverlay {...{ openPopoverData, setOpenPopoverData }} />
+            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
+        </React.Fragment>
+    );
 }
+
+const TechnicalReviewPopoverOverlay = React.memo(function TechnicalReviewPopoverOverlay ({ openPopoverData, setOpenPopoverData }) {
+    const {
+        ref: openPopoverRef = null,
+        jsx: openPopoverJSX = null
+    } = openPopoverData || {};
+
+    const onRootClickHide = useCallback(function(e){
+        // If they clicked on another technical review column/row rule, don't close popover after switching info
+        if (e.target && e.target.getAttribute("data-technical-review") === "true") {
+            return false;
+        }
+        if (e.target && e.target.parentElement && e.target.parentElement.getAttribute("data-technical-review") === "true") {
+            return false;
+        }
+        setOpenPopoverData(null);
+    });
+
+    if (!openPopoverData) {
+        return null;
+    }
+
+    return (
+        <Overlay target={openPopoverRef} show={!!openPopoverData} transition={false} placement="bottom"
+            rootClose rootCloseEvent="click" onHide={onRootClickHide}>
+            { openPopoverJSX }
+        </Overlay>
+    );
+});
+
 
 /**
  * Open Variant Sample in new window
@@ -250,3 +305,4 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
         </div>
     );
 });
+
