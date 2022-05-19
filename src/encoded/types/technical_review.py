@@ -30,9 +30,7 @@ class TechnicalReview(Item):
     item_type = 'technical_review'
     schema = load_schema('encoded:schemas/technical_review.json')
     embedded_list = [
-        'last_modified.date_modified',
         'last_modified.modified_by.display_title',
-        'review.date_reviewed',
         'review.reviewed_by.display_title',
         'note.last_modified.date_modified',
         'note.last_modified.modified_by.display_title',
