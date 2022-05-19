@@ -48,16 +48,14 @@ class TechnicalReview(Item):
         "description": "Note's display title",
         "type": "string"
     })
-    def display_title(self, assessment):
-        try:
-            # We might not have a call_info, if removed for example.
-            call = assessment['call']
-            classification = assessment['classification']
+    def display_title(self):
+        assessment = self.properties.get("assessment", {})
+        call = assessment.get("call")
+        classification = assessment.get("classification")
+        if call is not None and classification is not None:
             return "(" + ("" if call == True else "No ") + "Call) " + classification
-        except Exception:
-            # last resort, use uuid
-            properties = self.upgrade_properties()
-            return properties.get('uuid', None)
+        return self.uuid
+
         
 
 

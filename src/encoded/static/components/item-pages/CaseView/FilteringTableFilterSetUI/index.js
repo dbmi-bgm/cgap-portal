@@ -181,7 +181,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab, haveCaseEditPermission,
 
             // From TechnicalReviewController (used in FilteringTab)
-            unsavedTechnicalReview, unsavedTechnicalReviewNotes, resetUnsavedTechnicalReviewAndNotes,
+            lastSavedTechnicalReview, lastSavedTechnicalReviewNotes, resetLastSavedTechnicalReview,
 
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,
@@ -287,7 +287,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                         <div className="col-12 col-md-auto">
                             <h5 className="text-600">Technical Review</h5>
                             <PatchItemsProgress modalOnCompleteJSX={<h5 className="mt-16 mb-16 text-center text-danger">It will take some minutes for changes to become visible in search after a refresh.</h5>}>
-                                <SaveTechnicalReviewButton {...{ unsavedTechnicalReview, unsavedTechnicalReviewNotes, resetUnsavedTechnicalReviewAndNotes, haveCaseEditPermission }} />
+                                <SaveTechnicalReviewButton {...{ lastSavedTechnicalReview, lastSavedTechnicalReviewNotes, resetLastSavedTechnicalReview, haveCaseEditPermission }} />
                             </PatchItemsProgress>
                         </div>
                     </div>

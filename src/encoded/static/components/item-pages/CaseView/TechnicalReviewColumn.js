@@ -29,8 +29,8 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const {
             result,
             setOpenPopoverData,
-            unsavedTechnicalReviewForResult,
-            setTechnicalReviewForVSUUID,
+            lastSavedTechnicalReviewForResult,
+            cacheSavedTechnicalReviewForVSUUID,
             // We can't determine if have edit permission for VariantSample (required) because VSes here are returned from ES and not an ItemView.
             // So are relying on haveCaseEditPermission and assume it is same permission for VariantSample.
             haveCaseEditPermission
@@ -49,7 +49,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         ];
 
         const commonBtnProps = {
-            result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData,
+            result, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData,
             "callType": true,
             "disabled": !haveCaseEditPermission
         };
@@ -84,8 +84,8 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const {
             result,
             setOpenPopoverData,
-            unsavedTechnicalReviewForResult,
-            setTechnicalReviewForVSUUID,
+            lastSavedTechnicalReviewForResult,
+            cacheSavedTechnicalReviewForVSUUID,
             // We can't determine if have edit permission for VariantSample (required) because VSes here are returned from ES and not an ItemView.
             // So are relying on haveCaseEditPermission and assume it is same permission for VariantSample.
             haveCaseEditPermission
@@ -104,7 +104,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         ];
 
         const commonBtnProps = {
-            result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData,
+            result, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData,
             "callType": false,
             "disabled": !haveCaseEditPermission
         };
@@ -129,7 +129,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
     updateUnsavedNoteText(e){
         const {
             result,
-            unsavedTechnicalReviewNoteForResult,
+            lastSavedTechnicalReviewNoteForResult,
             setTechnicalReviewNoteForVSUUID
         } = this.props;
         const {
@@ -151,7 +151,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 // Unset from unsaved state if same value as existing
                 setTechnicalReviewNoteForVSUUID(vsUUID, undefined);
             } else {
-                setTechnicalReviewNoteForVSUUID(vsUUID, { ...(unsavedTechnicalReviewNoteForResult || {}), "note_text": nextNoteText });
+                setTechnicalReviewNoteForVSUUID(vsUUID, { ...(lastSavedTechnicalReviewNoteForResult || {}), "note_text": nextNoteText });
             }
         }
     }
@@ -161,7 +161,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const {
             result,
             setOpenPopoverData,
-            unsavedTechnicalReviewNoteForResult
+            lastSavedTechnicalReviewNoteForResult
         } = this.props;
         const {
             uuid: vsUUID,
@@ -185,7 +185,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             date_approved: noteDateApproved,
             approved_by: noteApprovedBy
         } = savedTechnicalReviewNote || {};
-        const { note_text: unsavedNoteText } = unsavedTechnicalReviewNoteForResult || {};
+        const { note_text: unsavedNoteText } = lastSavedTechnicalReviewNoteForResult || {};
 
         setOpenPopoverData({
             "uuid": vsUUID,
@@ -244,8 +244,8 @@ export class TechnicalReviewColumn extends React.PureComponent {
     render() {
         const {
             result,
-            unsavedTechnicalReviewForResult,
-            unsavedTechnicalReviewNoteForResult
+            lastSavedTechnicalReviewForResult,
+            lastSavedTechnicalReviewNoteForResult
         } = this.props;
 
         const { uuid: vsUUID, technical_review: savedTechnicalReviewItem } = result;
@@ -254,30 +254,30 @@ export class TechnicalReviewColumn extends React.PureComponent {
             call: savedCall,
             classification: savedClassification
         } = savedTechnicalReview || {};
-        const { call: unsavedCall, classification: unsavedClassification } = unsavedTechnicalReviewForResult || {};
+        const { call: unsavedCall, classification: unsavedClassification } = lastSavedTechnicalReviewForResult || {};
 
         // Green (success) if first option, else yellow/orange for the 'Present - with concerns' options
-        const noUnsavedTechnicalReview = typeof unsavedTechnicalReviewForResult === 'undefined';
+        const noLastSavedTechnicalReview = typeof lastSavedTechnicalReviewForResult === 'undefined';
         const callTrueIconCls = (
             "icon icon-2x icon-fw fas icon-check text-" + (
-                (unsavedCall === true || (savedCall === true && noUnsavedTechnicalReview)) ? (
+                (unsavedCall === true || (savedCall === true && noLastSavedTechnicalReview)) ? (
                     (unsavedCall === true && unsavedClassification === "Present") ? "success"
-                        : (savedCall === true && noUnsavedTechnicalReview && savedClassification === "Present") ? "success"
+                        : (savedCall === true && noLastSavedTechnicalReview && savedClassification === "Present") ? "success"
                             : "warning"
                 ) : "muted" // (savedCall === true ? "secondary" : "muted")
             ));
 
         const callFalseIconCls = (
             "icon icon-2x icon-fw fas icon-times text-" + (
-                (unsavedCall === false || (savedCall === false && noUnsavedTechnicalReview)) ? "danger"
+                (unsavedCall === false || (savedCall === false && noLastSavedTechnicalReview)) ? "danger"
                     : "muted" // (savedCall === false ? "secondary" : "muted")
             ));
 
-        const noteToBeDeleted = unsavedTechnicalReviewForResult && savedTechnicalReviewNote; // TODO: && !unsavedTechnicalReviewNote;
+        const noteToBeDeleted = lastSavedTechnicalReviewForResult && savedTechnicalReviewNote; // TODO: && !lastSavedTechnicalReviewNote;
         const notesIconCls = (
             "icon icon-2x icon-fw icon-sticky-note " + (
                 noteToBeDeleted ? "far text-danger"
-                    : (savedTechnicalReviewNote || unsavedTechnicalReviewNoteForResult) ? "fas text-secondary"
+                    : (savedTechnicalReviewNote || lastSavedTechnicalReviewNoteForResult) ? "fas text-secondary"
                         : "far text-muted"
             ));
 
@@ -287,8 +287,8 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
                     data-call="true" data-technical-review="true">
                     <i className={callTrueIconCls} />
-                    { unsavedCall === true || (unsavedTechnicalReviewForResult === null && savedCall === true) ?
-                        // unsavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
+                    { unsavedCall === true || (lastSavedTechnicalReviewForResult === null && savedCall === true) ?
+                        // lastSavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
                         <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                         : null }
                 </button>
@@ -296,15 +296,15 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownNoCall} ref={this.callFalseButtonRef}
                     data-call="false" data-technical-review="true">
                     <i className={callFalseIconCls} />
-                    { unsavedCall === false || (unsavedTechnicalReviewForResult === null && savedCall === false) ?
-                        // unsavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
+                    { unsavedCall === false || (lastSavedTechnicalReviewForResult === null && savedCall === false) ?
+                        // lastSavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
                         <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                         : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenNotesPopover} ref={this.notesButtonRef} data-technical-review="true">
                     <i data-tip={noteToBeDeleted ? "This note will be deleted upon save due to new classification. Create new note." : null} className={notesIconCls} />
-                    { unsavedTechnicalReviewNoteForResult || (unsavedTechnicalReviewNoteForResult === null && savedTechnicalReviewNote) ?
+                    { lastSavedTechnicalReviewNoteForResult || (lastSavedTechnicalReviewNoteForResult === null && savedTechnicalReviewNote) ?
                         <span className="text-danger position-absolute" data-tip="Not Saved">*</span>
                         : null }
                 </button>
@@ -325,9 +325,10 @@ class CallClassificationButton extends React.PureComponent {
 
     /* In progress */
     upsertTechnicalReviewItem(){
-        const { result, optionName, callType, setTechnicalReviewForVSUUID, setOpenPopoverData } = this.props;
-        const { technical_review: savedTechnicalReviewItem, "@id" : variantSampleAtID } = result;
+        const { result, optionName, callType, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData } = this.props;
+        const { technical_review: savedTechnicalReviewItem, "@id" : variantSampleAtID, uuid: vsUUID } = result;
         const { "@id": existingTechnicalReviewItemAtID } = savedTechnicalReviewItem || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedTechnicalReviewForResult || {};
 
         // TODO: Handle lack of edit/view permissions
 
@@ -375,6 +376,8 @@ class CallClassificationButton extends React.PureComponent {
                     if (!vsAtIDRepeated) {
                         throw new Error("No [Structural]VariantSample @ID returned."); // If no error thrown during destructuring ^..
                     }
+                    // EXPERIMENTAL -- imperfect attempt at notifying user of their last-edited things.
+                    cacheSavedTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
                     return { created: true };
                 });
         } else if (existingTechnicalReviewItemAtID) {
@@ -387,12 +390,19 @@ class CallClassificationButton extends React.PureComponent {
             let updatePayload;
             // Deletion of `review` field should be done at backend
             let updateHref = existingTechnicalReviewItemAtID + "?delete_fields=review";
-            if (savedCall === callType && savedClassification === optionName) {
+            if (
+                (lastSavedCall === callType && lastSavedClassification === optionName) ||
+                (savedCall === callType && savedClassification === optionName && lastSavedTechnicalReviewForResult !== null)
+            ) {
                 // Pass. Delete/unset on PATCH/save -- leave as `{} & add `assessment` to delete_fields param.
                 updatePayload = { };
                 updateHref += ",assessment";
+                // EXPERIMENTAL -- imperfect attempt at notifying user of their last-edited things.
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, null);
             } else {
                 updatePayload = { "assessment": { "call": callType, "classification": optionName } };
+                // EXPERIMENTAL -- imperfect attempt at notifying user of their last-edited things.
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
             }
             updatePromise = ajax.promise(updateHref, "PATCH", {}, JSON.stringify(updatePayload))
                 .then(function(techReviewResponse){
@@ -417,7 +427,7 @@ class CallClassificationButton extends React.PureComponent {
             })
             .catch(function(errorMsgOrObj){
                 console.error(errorMsgOrObj);
-                // setUpdateError("Failed to create TechnicalReview Item, check permissions or please report.");
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, undefined);
                 setOpenPopoverData(function({ ref: existingBtnRef }){
                     return {
                         // Re-use existing popover, essentially.
@@ -471,7 +481,7 @@ class CallClassificationButton extends React.PureComponent {
             optionName,
             callType,
             result,
-            unsavedTechnicalReviewForResult,
+            lastSavedTechnicalReviewForResult,
             highlightColorStyle = null,
             disabled = false
         } = this.props;
@@ -484,13 +494,13 @@ class CallClassificationButton extends React.PureComponent {
                 } = {}
             } = {}
         } = result;
-        const { call: unsavedCall, classification: unsavedClassification } = unsavedTechnicalReviewForResult || {};
+        const { call: unsavedCall, classification: unsavedClassification } = lastSavedTechnicalReviewForResult || {};
 
         const highlightStyle = highlightColorStyle || (callType === true ? "success" : callType === false ? "danger" : null);
 
         const isUnsavedSelected = unsavedCall === callType && unsavedClassification === optionName;
         const isSavedSelected = savedCall === callType && savedClassification === optionName;
-        const isSetToRemove = isSavedSelected && (unsavedTechnicalReviewForResult === null || (unsavedClassification && !isUnsavedSelected));
+        const isSetToRemove = isSavedSelected && (lastSavedTechnicalReviewForResult === null || (unsavedClassification && !isUnsavedSelected));
 
         const btnClass = (
             (isUnsavedSelected || (isSavedSelected && !isSetToRemove) ? ` bg-${highlightStyle} text-white` : "") +
@@ -529,7 +539,7 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
 
 /** @deprecated */
 export function SaveTechnicalReviewButton(props){
-    const { unsavedTechnicalReview, resetUnsavedTechnicalReviewAndNotes, haveCaseEditPermission, patchItems, isPatching } = props;
+    const { unsavedTechnicalReview, resetLastSavedTechnicalReview, haveCaseEditPermission, patchItems, isPatching } = props;
 
     const unsavedTechnicalReviewVSUUIDs = Object.keys(unsavedTechnicalReview);
     const unsavedTechnicalReviewVSUUIDsLen = unsavedTechnicalReviewVSUUIDs.length;
@@ -548,7 +558,7 @@ export function SaveTechnicalReviewButton(props){
         });
         patchItems(payloads, function(countCompleted, patchErrors){
             if (countCompleted === unsavedTechnicalReviewVSUUIDsLen) {
-                resetUnsavedTechnicalReviewAndNotes();
+                resetLastSavedTechnicalReview();
             }
         });
     }, [ unsavedTechnicalReview ]);
@@ -567,18 +577,18 @@ export class TechnicalReviewController extends React.PureComponent {
 
     constructor(props) {
         super(props);
-        this.setTechnicalReviewForVSUUID = this._setStatePropertyForVSUUID.bind(this, "unsavedTechnicalReview");
-        this.setTechnicalReviewNoteForVSUUID = this._setStatePropertyForVSUUID.bind(this, "unsavedTechnicalReviewNotes");
-        this.resetUnsavedTechnicalReviewAndNotes = this.resetUnsavedTechnicalReviewAndNotes.bind(this);
+        this.cacheSavedTechnicalReviewForVSUUID = this._setStatePropertyForVSUUID.bind(this, "lastSavedTechnicalReview");
+        this.setTechnicalReviewNoteForVSUUID = this._setStatePropertyForVSUUID.bind(this, "lastSavedTechnicalReviewNotes");
+        this.resetLastSavedTechnicalReview = this.resetLastSavedTechnicalReview.bind(this);
         this.state = {
-            "unsavedTechnicalReview": {},
-            "unsavedTechnicalReviewNotes": {}
+            "lastSavedTechnicalReview": {},
+            "lastSavedTechnicalReviewNotes": {}
         };
     }
 
     _setStatePropertyForVSUUID(statePropertyName, vsUUID, value) {
         this.setState(function({ [statePropertyName]: existingStatePropertyObject }){
-            // "undefined" means remove from state.unsavedTechnicalReview, "null" means to keep in state to queue for deletion in PATCH.
+            // "undefined" means remove from state.lastSavedTechnicalReview, "null" means to keep in state to queue for deletion in PATCH.
             if (typeof value === "undefined") {
                 if (typeof existingStatePropertyObject[vsUUID] !== "undefined") {
                     return { [statePropertyName] : _.omit(existingStatePropertyObject, vsUUID) };
@@ -590,23 +600,23 @@ export class TechnicalReviewController extends React.PureComponent {
         });
     }
 
-    resetUnsavedTechnicalReviewAndNotes() {
+    resetLastSavedTechnicalReview() {
         this.setState({
-            "unsavedTechnicalReview": {},
-            "unsavedTechnicalReviewNotes": {}
+            "lastSavedTechnicalReview": {},
+            "lastSavedTechnicalReviewNotes": {}
         });
     }
 
     render(){
         const { children, ...passProps } = this.props;
-        const { unsavedTechnicalReview, unsavedTechnicalReviewNotes } = this.state;
+        const { lastSavedTechnicalReview, lastSavedTechnicalReviewNotes } = this.state;
         const childProps = {
             ...passProps,
-            unsavedTechnicalReview,
-            unsavedTechnicalReviewNotes,
-            "setTechnicalReviewForVSUUID": this.setTechnicalReviewForVSUUID,
+            lastSavedTechnicalReview,
+            lastSavedTechnicalReviewNotes,
+            "cacheSavedTechnicalReviewForVSUUID": this.cacheSavedTechnicalReviewForVSUUID,
             "setTechnicalReviewNoteForVSUUID": this.setTechnicalReviewNoteForVSUUID,
-            "resetUnsavedTechnicalReviewAndNotes": this.resetUnsavedTechnicalReviewAndNotes
+            "resetLastSavedTechnicalReview": this.resetLastSavedTechnicalReview
         };
         return React.Children.map(children, function(child){
             if (!React.isValidElement(child) || typeof child.type === "string") {

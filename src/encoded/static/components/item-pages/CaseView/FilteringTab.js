@@ -270,11 +270,11 @@ function FilteringTabBody(props) {
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
-        unsavedTechnicalReview,         // passed in from TechnicalReviewController
-        unsavedTechnicalReviewNotes,    // passed in from TechnicalReviewController
-        setTechnicalReviewForVSUUID,    // passed in from TechnicalReviewController
+        lastSavedTechnicalReview,         // passed in from TechnicalReviewController
+        lastSavedTechnicalReviewNotes,    // passed in from TechnicalReviewController
+        cacheSavedTechnicalReviewForVSUUID,    // passed in from TechnicalReviewController
         setTechnicalReviewNoteForVSUUID, // passed in from TechnicalReviewController
-        resetUnsavedTechnicalReviewAndNotes, // passed in from TechnicalReviewController
+        resetLastSavedTechnicalReview, // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
@@ -342,8 +342,8 @@ function FilteringTabBody(props) {
         isLoadingVariantSampleListItem,
         selectedVariantSamples,
         isActiveDotRouterTab,
-        unsavedTechnicalReview,
-        unsavedTechnicalReviewNotes,
+        lastSavedTechnicalReview,
+        lastSavedTechnicalReviewNotes,
         // haveCaseEditPermission,
         // setIsSubmitting,
         // "caseItem": context
@@ -352,7 +352,7 @@ function FilteringTabBody(props) {
     const fsControllerProps = {
         searchHrefBase, searchType,
         onResetSelectedVariantSamples,
-        resetUnsavedTechnicalReviewAndNotes,
+        resetLastSavedTechnicalReview,
         "excludeFacets": hideFacets,
         "ref": filterSetControllerRef
     };
@@ -414,9 +414,9 @@ function FilteringTabBody(props) {
         savedVariantSampleIDMap,            // <- Will be used to make selected+disabled checkboxes
         isLoadingVariantSampleListItem,     // <- Used to disable checkboxes if VSL still loading
         currFilterSet,                      // <- Used for Matching Filter Block Indices column
-        unsavedTechnicalReview,             // <- Used for TechnicalReviewColumn
-        unsavedTechnicalReviewNotes,        // <- Used for TechnicalReviewColumn
-        setTechnicalReviewForVSUUID,        // <- Used for TechnicalReviewColumn
+        lastSavedTechnicalReview,             // <- Used for TechnicalReviewColumn
+        lastSavedTechnicalReviewNotes,        // <- Used for TechnicalReviewColumn
+        cacheSavedTechnicalReviewForVSUUID,        // <- Used for TechnicalReviewColumn
         setTechnicalReviewNoteForVSUUID,    // <- Used for TechnicalReviewColumn
         haveCaseEditPermission,             // <- Used for TechnicalReviewColumn
         "key": searchTableKey
