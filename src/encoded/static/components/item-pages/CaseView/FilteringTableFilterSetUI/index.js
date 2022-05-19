@@ -19,7 +19,6 @@ import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 import { PresetFilterSetSelectionUI } from './PresetFilterSetSelectionUI';
 import { FilterBlock, DummyLoadingFilterBlock } from './FilterBlock';
 import { ExportSearchSpreadsheetButton } from './ExportSearchSpreadsheetButton';
-import { SaveTechnicalReviewButton } from './../TechnicalReviewColumn';
 
 
 
@@ -275,7 +274,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         if (isActiveDotRouterTab) {
             aboveTableControls = (
                 <React.Fragment>
-                    <div className="filtering-tab-table-controls pb-08 row justify-content-end">
+                    <div className="filtering-tab-table-controls pb-08 row">
                         <div className="col-12 col-md-auto">
                             <h5 className="text-600">Interpretation</h5>
                             { selectedVariantSamples instanceof Map ?
@@ -283,12 +282,6 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                     intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
                                     isEditDisabled, haveCaseEditPermission }} />
                                 : null }
-                        </div>
-                        <div className="col-12 col-md-auto">
-                            <h5 className="text-600">Technical Review</h5>
-                            <PatchItemsProgress modalOnCompleteJSX={<h5 className="mt-16 mb-16 text-center text-danger">It will take some minutes for changes to become visible in search after a refresh.</h5>}>
-                                <SaveTechnicalReviewButton {...{ lastSavedTechnicalReview, lastSavedTechnicalReviewNotes, resetLastSavedTechnicalReview, haveCaseEditPermission }} />
-                            </PatchItemsProgress>
                         </div>
                     </div>
                     <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>

@@ -536,43 +536,6 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
 });
 
 
-
-/** @deprecated */
-export function SaveTechnicalReviewButton(props){
-    const { unsavedTechnicalReview, resetLastSavedTechnicalReview, haveCaseEditPermission, patchItems, isPatching } = props;
-
-    const unsavedTechnicalReviewVSUUIDs = Object.keys(unsavedTechnicalReview);
-    const unsavedTechnicalReviewVSUUIDsLen = unsavedTechnicalReviewVSUUIDs.length;
-
-    const saveProcess = useCallback(function(){
-        const payloads = [];
-        unsavedTechnicalReviewVSUUIDs.forEach(function(vsUUID){
-            const unsavedTechnicalReviewForVS = unsavedTechnicalReview[vsUUID];
-            const payload = [ "/" + vsUUID, {} ];
-            if (unsavedTechnicalReviewForVS === null) {
-                payload[0] += "?delete_fields=technical_review";
-            } else {
-                payload[1].technical_review = unsavedTechnicalReviewForVS;
-            }
-            payloads.push(payload);
-        });
-        patchItems(payloads, function(countCompleted, patchErrors){
-            if (countCompleted === unsavedTechnicalReviewVSUUIDsLen) {
-                resetLastSavedTechnicalReview();
-            }
-        });
-    }, [ unsavedTechnicalReview ]);
-
-    const disabled = !haveCaseEditPermission || isPatching || unsavedTechnicalReviewVSUUIDsLen === 0;
-
-    return (
-        <button type="button" className="btn btn-primary" disabled={disabled} onClick={saveProcess}>
-            Update technical review for { unsavedTechnicalReviewVSUUIDsLen } samples
-        </button>
-    );
-
-}
-
 export class TechnicalReviewController extends React.PureComponent {
 
     constructor(props) {
@@ -614,7 +577,7 @@ export class TechnicalReviewController extends React.PureComponent {
             ...passProps,
             lastSavedTechnicalReview,
             lastSavedTechnicalReviewNotes,
-            "cacheSavedTechnicalReviewForVSUUID": this.cacheSavedTechnicalReviewForVSUUID,
+            "setTechnicalReviewForVSUUID": this.setTechnicalReviewForVSUUID,
             "setTechnicalReviewNoteForVSUUID": this.setTechnicalReviewNoteForVSUUID,
             "resetLastSavedTechnicalReview": this.resetLastSavedTechnicalReview
         };
