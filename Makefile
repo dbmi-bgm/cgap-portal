@@ -59,7 +59,13 @@ macbuild-poetry:
 
 macm1build-poetry:
 	make configure
-	pip install h5py # some reason poetry is not installing this right on Apple M1
+	#
+	# For some reason on Apple M1 poetry is not installing
+	# this right; pull version out of pyproject.toml.
+	# TODO
+	# Pull version out of pyproject.toml programatically.
+	#
+	pip install "h5py>=2.10.0"
 	poetry install
 
 build:  # builds
