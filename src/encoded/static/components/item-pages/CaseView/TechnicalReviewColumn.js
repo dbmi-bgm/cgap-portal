@@ -4,7 +4,7 @@ import React, { useMemo, useCallback, useRef, useState } from 'react';
 import _ from 'underscore';
 import Popover  from 'react-bootstrap/esm/Popover';
 import ReactTooltip from 'react-tooltip';
-import { ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/ajax';
+import { ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 
@@ -30,7 +30,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
             result,
             setOpenPopoverData,
             unsavedTechnicalReviewForResult,
-            setTechnicalReviewForVSUUID
+            setTechnicalReviewForVSUUID,
+            // We can't determine if have edit permission for VariantSample (required) because VSes here are returned from ES and not an ItemView.
+            // So are relying on haveCaseEditPermission and assume it is same permission for VariantSample.
+            haveCaseEditPermission
         } = this.props;
 
         const { uuid: vsUUID } = result;
@@ -45,9 +48,13 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "Other"
         ];
 
+        const commonBtnProps = {
+            result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData,
+            "callType": true,
+            "disabled": !haveCaseEditPermission
+        };
+
         setOpenPopoverData({
-            "uuid": vsUUID,
-            "call": true,
             "ref": this.callTrueButtonRef,
             "jsx": (
                 <Popover id="technical-review-popover">
@@ -55,8 +62,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     <Popover.Content className="px-0 py-1">
                         { opts.slice(0,1).map(function(optionName, i){
                             return (
-                                <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }}
-                                    callType={true} key={i} />
+                                <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} />
                             );
                         }) }
                     </Popover.Content>
@@ -64,8 +70,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     <Popover.Content className="px-0 py-1">
                         { opts.slice(1).map(function(optionName, i){
                             return (
-                                <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }}
-                                    callType={true} key={i} highlightColorStyle="warning" />
+                                <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="warning" />
                             );
                         }) }
                     </Popover.Content>
@@ -81,6 +86,9 @@ export class TechnicalReviewColumn extends React.PureComponent {
             setOpenPopoverData,
             unsavedTechnicalReviewForResult,
             setTechnicalReviewForVSUUID,
+            // We can't determine if have edit permission for VariantSample (required) because VSes here are returned from ES and not an ItemView.
+            // So are relying on haveCaseEditPermission and assume it is same permission for VariantSample.
+            haveCaseEditPermission
         } = this.props;
 
         const { uuid: vsUUID } = result;
@@ -95,16 +103,20 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "Other"
         ];
 
+        const commonBtnProps = {
+            result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData,
+            "callType": false,
+            "disabled": !haveCaseEditPermission
+        };
+
         setOpenPopoverData({
-            "uuid": vsUUID,
-            "call": false,
             "ref": this.callFalseButtonRef,
             "jsx": (
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
                     <Popover.Content className="px-0 py-1">
                         { opts.map(function(optionName, i){
-                            return <CallClassificationButton {...{ optionName, result, unsavedTechnicalReviewForResult, setTechnicalReviewForVSUUID, setOpenPopoverData }} callType={false} key={i} />;
+                            return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} />;
                         }) }
                     </Popover.Content>
                 </Popover>
@@ -183,7 +195,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600" as="h5">Technical Review Note</Popover.Title>
                     <Popover.Content className="p-2">
-                        { savedInitialCallDate ?
+                        { savedCallDate ?
                             <div className="small">
                                 Call Made: <LocalizedTime timestamp={savedCallDate} />
                                 { savedCallAuthorName ? (" by " + savedCallAuthorName) : null }
@@ -235,6 +247,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             unsavedTechnicalReviewForResult,
             unsavedTechnicalReviewNoteForResult
         } = this.props;
+
         const { uuid: vsUUID, technical_review: savedTechnicalReviewItem } = result;
         const { assessment: savedTechnicalReview, note: savedTechnicalReviewNote = null } = savedTechnicalReviewItem || {};
         const {
@@ -312,66 +325,145 @@ class CallClassificationButton extends React.PureComponent {
 
     /* In progress */
     upsertTechnicalReviewItem(){
-        const { technical_review: savedTechnicalReviewItem } = result;
+        const { result, optionName, callType, setTechnicalReviewForVSUUID, setOpenPopoverData } = this.props;
+        const { technical_review: savedTechnicalReviewItem, "@id" : variantSampleAtID } = result;
         const { "@id": existingTechnicalReviewItemAtID } = savedTechnicalReviewItem || {};
 
         // TODO: Handle lack of edit/view permissions
 
+        setOpenPopoverData(function({ ref: existingBtnRef }){
+            return {
+                // Re-use existing popover position.
+                ref: existingBtnRef,
+                jsx: (
+                    // Set 'key' prop to re-instantiate and force to reposition.
+                    <Popover id="technical-review-popover-updating" key="update">
+                        <Popover.Title className="m-0 text-600" as="h5">Updating...</Popover.Title>
+                        <Popover.Content className="p-2 text-center">
+                            <i className="icon icon-spin icon-circle-notch icon-2x text-secondary fas py-4"/>
+                            <p>Updating Technical Review</p>
+                        </Popover.Content>
+                    </Popover>
+                )
+            };
+        });
 
-        // If no existing Item
+        let updatePromise = null;
+
+        // If no existing Item -- TODO: Maybe pull this out into sep function in case need to reuse logic later re: Tech Review Notes or smth.
         if (!savedTechnicalReviewItem) {
-            ajax.promise("/technical-reviews/", "POST", {}, { "call": callType, "classification": optionName })
-                .then(function(response){
-                    try {
-                        const { "@graph": [ { uuid: newTechnicalReviewUUID } ] } = response;
-                    } catch (e) {
-                        throw new Error("Failed to create new Technical Review, check permissions.");
+
+            const updatePayload = {
+                "assessment": { "call": callType, "classification": optionName }
+            };
+
+            updatePromise = ajax.promise("/technical-reviews/", "POST", {}, JSON.stringify(updatePayload))
+                .then(function(techReviewResponse){
+                    console.log('response', techReviewResponse);
+                    const { "@graph": [ technicalReviewItemFrameObject ] } = techReviewResponse;
+                    const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
+                    if (!newTechnicalReviewAtID) {
+                        throw new Error("No TechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                     }
-                    console.log('response', response);
+                    // PATCH VariantSample to set linkTo of "technical_review"
+                    return ajax.promise(variantSampleAtID, "PATCH", {}, JSON.stringify({ "technical_review": newTechnicalReviewAtID }));
+                })
+                .then(function(vsResponse){
+                    // PATCH VariantSample with new technical review.
+                    const { "@graph": [ vsItemFrameObject ] } = vsResponse;
+                    const { "@id": vsAtIDRepeated } = vsItemFrameObject;
+                    if (!vsAtIDRepeated) {
+                        throw new Error("No [Structural]VariantSample @ID returned."); // If no error thrown during destructuring ^..
+                    }
+                    return { created: true };
                 });
-        }
-
-
-        if (savedCall === callType && savedClassification === optionName) {
-            // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
-            if (typeof unsavedTechnicalReviewForResult === "undefined") {
-                setTechnicalReviewForVSUUID(vsUUID, null);
+        } else if (existingTechnicalReviewItemAtID) {
+            const {
+                assessment: {
+                    call: savedCall,
+                    classification: savedClassification
+                }
+            } = savedTechnicalReviewItem || {};
+            let updatePayload;
+            // Deletion of `review` field should be done at backend
+            let updateHref = existingTechnicalReviewItemAtID + "?delete_fields=review";
+            if (savedCall === callType && savedClassification === optionName) {
+                // Pass. Delete/unset on PATCH/save -- leave as `{} & add `assessment` to delete_fields param.
+                updatePayload = { };
+                updateHref += ",assessment";
             } else {
-                setTechnicalReviewForVSUUID(vsUUID, undefined);
+                updatePayload = { "assessment": { "call": callType, "classification": optionName } };
             }
+            updatePromise = ajax.promise(updateHref, "PATCH", {}, JSON.stringify(updatePayload))
+                .then(function(techReviewResponse){
+                    console.log('response', techReviewResponse);
+                    const { "@graph": [ technicalReviewItemFrameObject ] } = techReviewResponse;
+                    const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
+                    if (!newTechnicalReviewAtID) {
+                        throw new Error("No @ID returned."); // If no error thrown during destructuring ^..
+                    }
+                    return { created: false };
+                });
         } else {
-            setTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
+            throw new Error("Check view permissions, can't access technical review.");
         }
 
-        setOpenPopoverData(null);
+        updatePromise
+            .then(function(propsForPopover){
+                // Show 'saved' popover.
+                setOpenPopoverData(function({ ref: existingBtnRef }){
+                    return { "ref": existingBtnRef, "jsx": <SavedTechnicalReviewPopover {...propsForPopover} /> };
+                });
+            })
+            .catch(function(errorMsgOrObj){
+                console.error(errorMsgOrObj);
+                // setUpdateError("Failed to create TechnicalReview Item, check permissions or please report.");
+                setOpenPopoverData(function({ ref: existingBtnRef }){
+                    return {
+                        // Re-use existing popover, essentially.
+                        ref: { ...existingBtnRef },
+                        jsx: (
+                            <Popover id="technical-review-popover" key="error">
+                                <Popover.Title className="m-0 text-600" as="h5">Error</Popover.Title>
+                                <Popover.Content className="d-flex align-items-center" style={{ maxWidth: 320 }}>
+                                    <div className="p-2 text-center">
+                                        <i className="icon icon-exclamation-triangle icon-2x text-danger fas"/>
+                                    </div>
+                                    <div className="flex-grow-1 px-2">
+                                        <h5 className="text-600 my-0">Failed to save Technical Review</h5>
+                                        <p className="mt-0">Please check permissions or report to admins/developers.</p>
+                                    </div>
+                                </Popover.Content>
+                            </Popover>
+                        )
+                    };
+                });
+            });
 
 
+        // if (savedCall === callType && savedClassification === optionName) {
+        //     // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
+        //     if (typeof unsavedTechnicalReviewForResult === "undefined") {
+        //         setTechnicalReviewForVSUUID(vsUUID, null);
+        //     } else {
+        //         setTechnicalReviewForVSUUID(vsUUID, undefined);
+        //     }
+        // } else {
+        //     setTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
+        // }
+
+        // setOpenPopoverData(null);
 
     }
 
     handleClick(){
-        const { result, optionName, callType, setTechnicalReviewForVSUUID, setOpenPopoverData } = this.props;
-        const {
-            uuid: vsUUID,
-            technical_review: {
-                assessment: {
-                    call: savedCall,
-                    classification: savedClassification
-                } = {}
-            } = {}
-        } = result;
-        if (savedCall === callType && savedClassification === optionName) {
-            // Delete on PATCH/save, unless unsaved is something else, in which case reset unsaved for this vsUUID.
-            if (typeof unsavedTechnicalReviewForResult === "undefined") {
-                setTechnicalReviewForVSUUID(vsUUID, null);
-            } else {
-                setTechnicalReviewForVSUUID(vsUUID, undefined);
-            }
-        } else {
-            setTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
+        const { disabled } = this.props;
+
+        if (disabled) {
+            return false;
         }
 
-        setOpenPopoverData(null);
+        this.upsertTechnicalReviewItem();
     }
 
     render(){
@@ -380,7 +472,8 @@ class CallClassificationButton extends React.PureComponent {
             callType,
             result,
             unsavedTechnicalReviewForResult,
-            highlightColorStyle = null
+            highlightColorStyle = null,
+            disabled = false
         } = this.props;
         const {
             uuid: vsUUID,
@@ -405,7 +498,7 @@ class CallClassificationButton extends React.PureComponent {
         );
 
         return (
-            <button type="button" className={"dropdown-item" + btnClass} onClick={this.handleClick}>
+            <button type="button" className={"dropdown-item" + btnClass} onClick={this.handleClick} disabled={disabled}>
                 { optionName }
                 { isUnsavedSelected ?
                     <span className="text-white text-700" data-tip="Not Saved"> *</span>
@@ -418,6 +511,23 @@ class CallClassificationButton extends React.PureComponent {
 }
 
 
+const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false, ...passProps }, ref){
+    return (
+        <Popover {...passProps} id="technical-review-popover" key="success-new-review" ref={ref}>
+            <Popover.Title className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Title>
+            <Popover.Content style={{ maxWidth: 320 }}>
+                <h5 className="my-0">NOTE:</h5>
+                <p className="mt-0">
+                    It may take some time for your changes to become available in search results, please refresh or search again in a few minutes.
+                </p>
+            </Popover.Content>
+        </Popover>
+    );
+});
+
+
+
+/** @deprecated */
 export function SaveTechnicalReviewButton(props){
     const { unsavedTechnicalReview, resetUnsavedTechnicalReviewAndNotes, haveCaseEditPermission, patchItems, isPatching } = props;
 

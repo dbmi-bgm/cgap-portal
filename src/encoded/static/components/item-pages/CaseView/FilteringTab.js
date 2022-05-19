@@ -411,13 +411,14 @@ function FilteringTabBody(props) {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
         addToBodyClassList, removeFromBodyClassList,
         selectedVariantSamples, onSelectVariantSample,
-        savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
-        isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
-        currFilterSet, // <- Used for Matching Filter Block Indices column
-        unsavedTechnicalReview, // <- Used for Technical Review Column
-        unsavedTechnicalReviewNotes, // Used for Technical Review Column
-        setTechnicalReviewForVSUUID, // <- Used for Technical Review Column
-        setTechnicalReviewNoteForVSUUID, // <- Used for Technical Review Column
+        savedVariantSampleIDMap,            // <- Will be used to make selected+disabled checkboxes
+        isLoadingVariantSampleListItem,     // <- Used to disable checkboxes if VSL still loading
+        currFilterSet,                      // <- Used for Matching Filter Block Indices column
+        unsavedTechnicalReview,             // <- Used for TechnicalReviewColumn
+        unsavedTechnicalReviewNotes,        // <- Used for TechnicalReviewColumn
+        setTechnicalReviewForVSUUID,        // <- Used for TechnicalReviewColumn
+        setTechnicalReviewNoteForVSUUID,    // <- Used for TechnicalReviewColumn
+        haveCaseEditPermission,             // <- Used for TechnicalReviewColumn
         "key": searchTableKey
     };
 

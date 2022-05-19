@@ -48,11 +48,11 @@ class TechnicalReview(Item):
         "description": "Note's display title",
         "type": "string"
     })
-    def display_title(self, call_info):
+    def display_title(self, assessment):
         try:
             # We might not have a call_info, if removed for example.
-            call = call_info['call']
-            classification = call_info['classification']
+            call = assessment['call']
+            classification = assessment['classification']
             return "(" + ("" if call == True else "No ") + "Call) " + classification
         except Exception:
             # last resort, use uuid

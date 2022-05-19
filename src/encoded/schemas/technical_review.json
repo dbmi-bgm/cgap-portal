@@ -7,10 +7,6 @@
     "identifyingProperties": [
         "uuid"
     ],
-    "required": [
-        "project",
-        "institution"
-    ],
     "additionalProperties": false,
     "mixinProperties": [
         {

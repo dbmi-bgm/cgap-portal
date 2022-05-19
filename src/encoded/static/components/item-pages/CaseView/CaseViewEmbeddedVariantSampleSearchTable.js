@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useMemo, useCallback, useRef, useState } from 'react';
+import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
 import Overlay from 'react-bootstrap/esm/Overlay';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
@@ -33,6 +34,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         unsavedTechnicalReviewNotes,
         setTechnicalReviewForVSUUID,
         setTechnicalReviewNoteForVSUUID,
+        haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -40,7 +42,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
     // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
-    const technicalReviewCommonProps = { setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID };
+    const technicalReviewCommonProps = { setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID, haveCaseEditPermission };
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -122,6 +124,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         unsavedTechnicalReviewNotes,
         setTechnicalReviewForVSUUID,
         setTechnicalReviewNoteForVSUUID,
+        haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
@@ -129,7 +132,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
     // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
-    const technicalReviewCommonProps = { setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID };
+    const technicalReviewCommonProps = { setOpenPopoverData, setTechnicalReviewForVSUUID, setTechnicalReviewNoteForVSUUID, haveCaseEditPermission };
 
     const columnExtensionMap = useMemo(function() {
         return {
