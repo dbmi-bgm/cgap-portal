@@ -1,7 +1,6 @@
 # CGAP-Portal (Production) Dockerfile
 # Take latest 3.7.12 Debian variant
-#FROM python:3.7.12-slim-buster
-FROM python:3.8.13-slim-buster
+FROM python:3.7.12-slim-buster
 # bullseye seems to perform worse
 #FROM python:3.7.12-slim-bullseye
 
@@ -36,7 +35,7 @@ WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
 COPY deploy/docker/production/install_nginx.sh /install_nginx.sh
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
+    apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates build-essential \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
     pip install --upgrade pip && \
     curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
