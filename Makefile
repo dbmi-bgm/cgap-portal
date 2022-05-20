@@ -68,7 +68,8 @@ macm1build-poetry:
 	#
 	# Get the h5py version out of pyproject.toml programatically.
 	#
-	HDF5_DIR=$(brew --prefix hdf5) pip install "h5py>=2.10.0"
+	@$(eval HDF5_DIR=$(shell brew --prefix hdf5))
+	HDF5_DIR=${HDF5_DIR} pip install "h5py>=2.10.0"
 	poetry install
 
 build:  # builds
