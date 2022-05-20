@@ -1,8 +1,7 @@
 # CGAP-Portal (Production) Dockerfile
-# Take latest 3.7.12 Debian variant
-FROM python:3.7.12-slim-buster
-# bullseye seems to perform worse
-#FROM python:3.7.12-slim-bullseye
+# Take latest 3.8.13 Debian variant
+FROM python:3.8.13-slim-buster
+
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
@@ -35,7 +34,7 @@ WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
 COPY deploy/docker/production/install_nginx.sh /install_nginx.sh
 RUN apt-get update && apt-get upgrade -y && \
-    apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates \
+    apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates build-essential \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
     pip install --upgrade pip && \
     curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
@@ -114,24 +113,25 @@ RUN chown nginx:nginx development.ini
 RUN chmod +x entrypoint_local.sh
 
 # Production setup
-RUN touch production.ini
-RUN touch session-secret.b64
-RUN chown nginx:nginx session-secret.b64
-RUN chown nginx:nginx production.ini
-RUN chown nginx:nginx poetry.toml
+RUN touch production.ini && chown nginx:nginx production.ini && \
+    touch session-secret.b64 && chown nginx:nginx session-secret.b64 && chown nginx:nginx poetry.toml && \
+    touch supervisord.log && chown nginx:nginx supervisord.log && \
+    touch supervisord.sock && chown nginx:nginx supervisord.sock && \
+    touch supervisord.pid && chown nginx:nginx supervisord.pid
 COPY deploy/docker/production/$INI_BASE deploy/ini_files/.
 COPY deploy/docker/production/entrypoint.sh .
 COPY deploy/docker/production/entrypoint_portal.sh .
 COPY deploy/docker/production/entrypoint_deployment.sh .
 COPY deploy/docker/production/entrypoint_indexer.sh .
 COPY deploy/docker/production/entrypoint_ingester.sh .
+COPY deploy/docker/production/supervisord.conf .
 COPY deploy/docker/production/assume_identity.py .
-RUN chmod +x entrypoint.sh
-RUN chmod +x entrypoint_deployment.sh
-RUN chmod +x entrypoint_deployment.sh
-RUN chmod +x entrypoint_indexer.sh
-RUN chmod +x entrypoint_ingester.sh
-RUN chmod +x assume_identity.py
+RUN chmod +x entrypoint.sh && \
+    chmod +x entrypoint_deployment.sh && \
+    chmod +x entrypoint_deployment.sh && \
+    chmod +x entrypoint_indexer.sh && \
+    chmod +x entrypoint_ingester.sh && \
+    chmod +x assume_identity.py
 EXPOSE 8000
 
 # Container does not run as root
