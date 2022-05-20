@@ -60,12 +60,15 @@ macbuild-poetry:
 macm1build-poetry:
 	make configure
 	#
-	# For some reason on Apple M1 poetry is not installing
-	# this right; pull version out of pyproject.toml.
-	# TODO
-	# Pull version out of pyproject.toml programatically.
+	# On the Apple M1, poetry (or pip) install of h5py may not work.
+	# Doing a brew install of hdf5 (if not already installed) and
+	# this special pip install should do the trick:
 	#
-	pip install "h5py>=2.10.0"
+	#     HDF5_DIR=$(brew --prefix hdf5) pip install h5py
+	#
+	# Get the h5py version out of pyproject.toml programatically.
+	#
+	HDF5_DIR=$(brew --prefix hdf5) pip install "h5py>=2.10.0"
 	poetry install
 
 build:  # builds
@@ -177,7 +180,7 @@ test-any:
 	poetry run python -m pytest -vv -r w --timeout=200
 
 test-npm:
-	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
+	poetry run python -m pytest -vv -r w --timeout=400 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
 
 test-unit:
 	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"
