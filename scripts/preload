@@ -34,9 +34,15 @@ while [ $# -gt 0 ]; do
 done
 
 if [ -n "${do_help}" ]; then
-    echo "$0 [ <libname> | --help ]"
+    echo "$0 [[ <libname> | --debug | --help | [ --export <var>=<val> ]* ]]"
     echo ""
     echo "  Uses pip to preload the version of <libname> that's specified in ${projfile}."
+    echo "  The --export <var>=<value> can be repeated more than once if needed."
+    echo "    Each defines an export that must be dded to the environment"
+    echo "    when running the pip command."
+    echo "  With --debug, it simulates the execution and shows debugging info."
+    echo "  With --help, it just shows this information and exits."
+    echo ""
     exit 1
 fi
 
@@ -87,5 +93,7 @@ if [ -n "${do_debug}" ]; then
 fi
 
 ${maybe_simulate}echo "Preloading ${libname} ${version}"
-${maybe_simulate}eval $exports
+if [ -n "${exports}" ]; then
+    ${maybe_simulate}$exports
+fi
 ${maybe_simulate}pip install "${libname}==${version}"
