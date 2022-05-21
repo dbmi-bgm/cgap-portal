@@ -94,6 +94,6 @@ fi
 
 ${maybe_simulate}echo "Preloading ${libname} ${version}"
 if [ -n "${exports}" ]; then
-    ${maybe_simulate}$exports
+    ${maybe_simulate}${exports}
 fi
 ${maybe_simulate}pip install "${libname}==${version}"
