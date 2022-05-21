@@ -62,11 +62,12 @@ macm1build-poetry:
 	#
 	# On the Apple M1, poetry (or pip) install of h5py may not work.
 	# Doing a brew install of hdf5 (if not already installed) and
-	# this special pip install should do the trick:
+	# using this special pip install should do the trick:
 	#
 	#     HDF5_DIR=$(brew --prefix hdf5) pip install h5py
 	#
-	# Get the h5py version out of pyproject.toml programatically.
+	# NOTE: Get the h5py version out of pyproject.toml.
+	# TODO: Do this programatically.
 	#
 	@$(eval HDF5_DIR=$(shell brew --prefix hdf5))
 	HDF5_DIR=${HDF5_DIR} pip install "h5py>=2.10.0"
