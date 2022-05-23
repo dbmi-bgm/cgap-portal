@@ -375,11 +375,21 @@
         },
         "structural_variant.SV_TYPE": {
             "title": "Type",
-            "order": 20
+            "order": 20,
+            "widthMap": {
+                "lg": 120,
+                "md": 100,
+                "sm": 100
+            }
         },
         "structural_variant.size": {
             "title": "Size",
-            "order": 30
+            "order": 30,
+            "widthMap": {
+                "lg": 120,
+                "md": 100,
+                "sm": 100
+            }
         },
         "structural_variant.transcript.csq_gene.display_title": {
             "title": "Gene(s)",

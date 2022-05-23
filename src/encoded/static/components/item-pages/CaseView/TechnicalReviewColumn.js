@@ -16,6 +16,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         super(props);
 
         this.updateUnsavedNoteText = _.debounce(this.updateUnsavedNoteText.bind(this), 500);
+        this.unsetLastSavedTechnicalReviewIfUpdated = this.unsetLastSavedTechnicalReviewIfUpdated.bind(this);
         this.handleOpenDropdownCall = this.handleOpenDropdownCall.bind(this);
         this.handleOpenDropdownNoCall = this.handleOpenDropdownNoCall.bind(this);
         this.handleOpenNotesPopover = this.handleOpenNotesPopover.bind(this);
@@ -23,6 +24,33 @@ export class TechnicalReviewColumn extends React.PureComponent {
         this.callTrueButtonRef = React.createRef();
         this.callFalseButtonRef = React.createRef();
         this.notesButtonRef = React.createRef();
+    }
+
+    componentDidMount(){
+        this.unsetLastSavedTechnicalReviewIfUpdated();
+    }
+
+    componentDidUpdate(pastProps){
+        this.unsetLastSavedTechnicalReviewIfUpdated();
+    }
+
+    unsetLastSavedTechnicalReviewIfUpdated(){
+        const { lastSavedTechnicalReviewForResult, result, cacheSavedTechnicalReviewForVSUUID } = this.props;
+
+        // Unset cache if receive item that up-to-date. Maybe do this on mount? idk.
+        if (typeof lastSavedTechnicalReviewForResult === "undefined") {
+            return;
+        }
+
+        const {
+            uuid: vsUUID,
+            technical_review: { assessment: savedTechnicalReview } = {}
+        } = result;
+        const { call: savedCall, classification: savedClassification } = savedTechnicalReview || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedTechnicalReviewForResult || {};
+        if ((lastSavedCall === savedCall && lastSavedClassification === savedClassification) || (!savedTechnicalReview && lastSavedTechnicalReviewForResult === null)) {
+            cacheSavedTechnicalReviewForVSUUID(vsUUID, undefined);
+        }
     }
 
     handleOpenDropdownCall(){

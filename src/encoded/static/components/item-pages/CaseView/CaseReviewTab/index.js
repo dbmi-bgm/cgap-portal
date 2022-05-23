@@ -70,8 +70,10 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
     const onResetForm = useCallback(function(e){
         e.stopPropagation();
-        setResetCounter(resetCounter + 1);
-    }, [ resetCounter, setResetCounter ]);
+        setResetCounter(function(currentResetCounter){
+            return currentResetCounter + 1;
+        });
+    }, [ setResetCounter ]);
 
     // if (!isActiveDotRouterTab) {
     //     return null;

@@ -369,8 +369,10 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
     const [ isExpanded, setIsExpanded ] = useState(false); // Can move this state up if have pagination or infinite scroll or something in future.
     const toggleIsExpanded = useCallback(function(e){
         e.stopPropagation();
-        setIsExpanded(!isExpanded);
-    }, [ isExpanded ]);
+        setIsExpanded(function(currentIsExpanded){
+            return !currentIsExpanded;
+        });
+    });
 
     const {
         "VariantSample": {
