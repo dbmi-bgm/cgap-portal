@@ -145,6 +145,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     # "discovery_interpretation.last_modified.modified_by.display_title",
     "variant_sample_list.created_for_case",
     # We need the following data in search result rows, so we embed these here and not thru /embed API.
+    "technical_review.*", # <- Added as workaround for invalidation scope... needs to be looked into more.
     "technical_review.assessment.call",
     "technical_review.assessment.classification",
     "technical_review.assessment.date_call_made",

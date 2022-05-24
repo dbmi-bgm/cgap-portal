@@ -29,6 +29,7 @@ class TechnicalReview(Item):
 
     item_type = 'technical_review'
     schema = load_schema('encoded:schemas/technical_review.json')
+    # rev = {'variant_sample': ('VariantSample', 'technical_review')}
     embedded_list = [
         'last_modified.modified_by.display_title',
         'review.reviewed_by.display_title',
