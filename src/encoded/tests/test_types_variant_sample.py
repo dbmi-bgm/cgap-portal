@@ -147,7 +147,7 @@ def test_variant_sample_patch_notes_process_success(
     gene_2
 ):
     
-    # Load up some data - these are notes to be added with "/@@process-notes/"
+    # Load up some data - these are notes to be added with "/@@process-items/"
     note1 = bgm_user_testapp.post_json('/notes-standard', bgm_note_for_patch_process, status=201).json['@graph'][0]
     note2 = bgm_user_testapp.post_json('/notes-interpretation', bgm_note_for_patch_process2, status=201).json['@graph'][0]
 
@@ -184,7 +184,7 @@ def test_variant_sample_patch_notes_process_success(
 
     prepatch_datetime = datetime.datetime.now(pytz.utc)
 
-    # Test /@@process-notes/ endpoint
+    # Test /@@process-items/ endpoint
     patch_process_payload = {
         "save_to_project_notes" : {
             "variant_notes": note1["uuid"],
@@ -194,7 +194,7 @@ def test_variant_sample_patch_notes_process_success(
         }
     }
 
-    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-notes/", patch_process_payload, status=200).json
+    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@process-items/", patch_process_payload, status=200).json
 
     assert resp["status"] == "success"
     assert resp["patch_results"]["Variant"] == 1

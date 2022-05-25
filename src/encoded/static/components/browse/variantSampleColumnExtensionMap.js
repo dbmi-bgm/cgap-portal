@@ -235,6 +235,14 @@ export const structuralVariantSampleColumnExtensionMap = {
             const { structural_variant: { size_display = null } = {} } = result || {};
             return size_display;
         }
+    },
+    "sv_browser": {
+        "noSort": true,
+        "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
+        "colTitle": "View",
+        "render": function(result, props) {
+            return <SVBrowserColumn {...{ result }} />;
+        }
     }
 };
 
@@ -509,6 +517,18 @@ export const BAMSnapshotColumn = React.memo(function BAMSnapshotColumn({ result 
             <button type="button" className="btn btn-outline-dark btn-sm" onClick={onClickLinkNavigateChildWindow}
                 href={resultAtID + "@@download/"} data-child-window={"bam-" + resultUUID} data-child-window-message="false"
                 data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
+                <i className="icon icon-fw icon-image fas" />
+            </button>
+        </div>
+    );
+});
+
+export const SVBrowserColumn = React.memo(function SVBrowserColumn({ result }) {
+    const { "@id": resultAtID = null, uuid: resultUUID } = result;
+    return (
+        <div className="mx-auto text-truncate">
+            <button type="button" className="btn btn-outline-dark btn-sm" onClick={onClickLinkNavigateChildWindow}
+                href={resultAtID + '?annotationTab=3'} data-child-window={resultUUID} data-tip="View SV/CNV Browser">
                 <i className="icon icon-fw icon-image fas" />
             </button>
         </div>

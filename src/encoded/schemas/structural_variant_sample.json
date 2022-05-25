@@ -427,6 +427,11 @@
                 }
             ]
         },
+        "sv_browser": {
+            "title": "SV/CNV Browser",
+            "order": 100,
+            "noSort": true
+        },
         "technical_review.assessment.call": {
             "title": "Technical Review Call",
             "order": 120,

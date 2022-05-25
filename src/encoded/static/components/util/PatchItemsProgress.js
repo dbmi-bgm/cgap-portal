@@ -78,7 +78,7 @@ export class PatchItemsProgress extends React.PureComponent {
 
         this.setState({ "isPatching": true, "patchingPercentageComplete": 0 }, () => {
             setTimeout(ReactTooltip.hide, 50); // Hide still-present tooltips, if any (i.e. button that was clicked)
-            console.log("Generated PATCH '../@@process-notes/' payloads - ", patchPayloads);
+            console.log("Generated PATCH '../@@process-items/' payloads - ", patchPayloads);
             this.patchItemsProcess(patchPayloads, ({ countCompleted, patchErrors }) => {
                 console.info("Patching Completed, count Items PATCHed -", countCompleted);
                 this.setState({
