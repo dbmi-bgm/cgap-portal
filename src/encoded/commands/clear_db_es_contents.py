@@ -120,8 +120,10 @@ def main(simulated_args=None):
     parser.add_argument('--only-if-env', '--only-if-envs', dest='only_envs', default=None,
                         help=("A comma-separated list of envs where this action is allowed to run."
                               " If omitted, any env is OK to run."))
-    parser.add_argument("--confirm", action="store_true", dest="confirm", default=None)
-    parser.add_argument("--no-confirm", action="store_false", dest="confirm", default=None)
+    parser.add_argument("--confirm", action="store_true", dest="confirm", default=None,
+                        help="Specify --confirm to require interactive confirmation.")
+    parser.add_argument("--no-confirm", action="store_false", dest="confirm", default=None,
+                        help="Specify --no-confirm to suppress interactive confirmation.")
     parser.add_argument('--skip-es', action='store_true', default=False,
                         help='If set, do not run create_mapping after DB drop')
     args = parser.parse_args(simulated_args)
