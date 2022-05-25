@@ -77,6 +77,21 @@ def local_env_name_registry_setting_for_testing(app, envname):
             app.registry.settings['env.name'] = old_env
 
 
+@contextlib.contextmanager
+def input_mocked(*inputs):
+    input_stack = list(reversed(inputs))
+
+    def mocked_input(*args, **kwargs):
+        assert input_stack, "There is insufficient mocked input available."
+        return input_stack.pop()
+
+    with mock.patch.object(clear_db_es_contents_module, "input") as mock_input:
+        mock_input.side_effect = mocked_input
+        yield mock_input
+        assert not input_stack, "Not all inputs were used."
+        assert mock_input.call_count == len(inputs)
+
+
 @pytest.mark.unit
 def test_run_clear_db_es_unit(app, testapp):
 
@@ -157,9 +172,14 @@ def test_clear_db_es_contents_main():
 
     class FakeApp:
 
+        class Registry:
+            def __init__(self):
+                self.settings = {}
+
         def __init__(self, config_uri, appname):
             self.appname = appname
             self.config_uri = config_uri
+            self.registry = self.Registry()
 
         def __str__(self):
             return f"<FakeApp {self.appname} {self.config_uri} {id(self)}>"
@@ -193,27 +213,53 @@ def test_clear_db_es_contents_main():
                 config_uri = 'production.ini'
                 appname = "app"
 
-                clear_db_es_contents_main([config_uri])
-                mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, None),
-                                                        only_envs=[],
-                                                        skip_es=False)
+                with input_mocked("local"):  # We'll be prompted for the environment name to confirm.
 
-                clear_db_es_contents_main([config_uri, "--app-name", appname])
-                mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
-                                                        only_envs=[],
-                                                        skip_es=False)
+                    clear_db_es_contents_main([config_uri])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, None),
+                                                            only_envs=[],
+                                                            skip_es=False)
 
-                clear_db_es_contents_main([config_uri, "--app-name", appname, '--skip-es'])
-                mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
-                                                        only_envs=[],
-                                                        skip_es=True)
+                with input_mocked():  # No input prompting will occur because --no-confirm was supplied.
 
-                clear_db_es_contents_main([config_uri, "--app-name", appname, "--only-if-env", "cgap-devtest"])
-                mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
-                                                        only_envs=['cgap-devtest'],
-                                                        skip_es=False)
+                    clear_db_es_contents_main([config_uri, "--no-confirm"])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, None),
+                                                            only_envs=[],
+                                                            skip_es=False)
 
-                clear_db_es_contents_main([config_uri, "--app-name", appname, "--only-if-env", "cgap-devtest,cgap-foo"])
-                mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
-                                                        only_envs=['cgap-devtest', 'cgap-foo'],
-                                                        skip_es=False)
+                with input_mocked("local"):  # We'll be prompted for the environment name to confirm.
+
+                    clear_db_es_contents_main([config_uri, "--app-name", appname])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
+                                                            only_envs=[],
+                                                            skip_es=False)
+
+                with input_mocked("local"):  # We'll be prompted for the environment name to confirm.
+
+                    clear_db_es_contents_main([config_uri, "--app-name", appname, '--skip-es'])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
+                                                            only_envs=[],
+                                                            skip_es=True)
+
+
+                with input_mocked():  # No input prompting will occur because --only-if-env was supplied.
+
+                    clear_db_es_contents_main([config_uri, "--app-name", appname, "--only-if-env", "cgap-devtest"])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
+                                                            only_envs=['cgap-devtest'],
+                                                            skip_es=False)
+
+                with input_mocked("local"):  # We'll be prompted for the environment name to confirm.
+
+                    clear_db_es_contents_main([config_uri, "--app-name", appname, "--only-if-env", "cgap-devtest",
+                                               "--confirm"])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
+                                                            only_envs=['cgap-devtest'],
+                                                            skip_es=False)
+
+                with input_mocked():  # No input prompting will occur because --only-if-env was supplied.
+
+                    clear_db_es_contents_main([config_uri, "--app-name", appname, "--only-if-env", "cgap-devtest,cgap-foo"])
+                    mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
+                                                            only_envs=['cgap-devtest', 'cgap-foo'],
+                                                            skip_es=False)
