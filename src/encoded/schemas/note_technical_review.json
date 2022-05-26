@@ -1,7 +1,7 @@
 {
-    "title": "TechnicalReview",
+    "title": "NoteTechnicalReview",
     "description": "Schema for technical review of variants.",
-    "id": "/profiles/tracking_item.json",
+    "id": "/profiles/note_technical_review.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "identifyingProperties": [
@@ -29,6 +29,9 @@
         },
         {
             "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "note.json#/properties"
         }
     ],
     "properties": {
@@ -78,12 +81,6 @@
                     "permission": "restricted_fields"
                 }
             }
-        },
-        "note": {
-            "title": "Note",
-            "description": "Annotation of this technical review decision",
-            "type": "string",
-            "linkTo": "Note"
         },
         "review": {
             "title": "Review",

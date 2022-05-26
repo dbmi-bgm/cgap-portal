@@ -3000,7 +3000,7 @@
             "items": {
                 "title": "Technical Review",
                 "type": "string",
-                "linkTo": "TechnicalReview"
+                "linkTo": "NoteTechnicalReview"
             }
         },
         "variant_notes": {

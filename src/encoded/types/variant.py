@@ -21,7 +21,7 @@ import structlog
 from pyramid.httpexceptions import HTTPTemporaryRedirect
 from pyramid.settings import asbool
 from pyramid.view import view_config
-from snovault import calculated_property, collection, load_schema
+from snovault import calculated_property, collection, load_schema, TYPES
 from snovault.calculated import calculate_properties
 from snovault.util import simple_path_ids, debug_log, IndexSettings
 from snovault.embed import make_subrequest
@@ -152,8 +152,9 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.assessment.call_made_by.display_title",
     "technical_review.review.date_reviewed",
     "technical_review.review.reviewed_by.display_title",
-    "technical_review.note.note_text",
-    "technical_review.note.last_modified.date_modified"
+    "technical_review.note_text",
+    "technical_review.last_text_edited.date_text_edited",
+    "technical_review.last_modified.date_modified"
 ]
 
 
@@ -907,7 +908,7 @@ def process_items(context, request):
     request_body = request.json
     stpi = request_body["save_to_project_items"]
 
-    pluralized = {
+    vs_to_variant_or_gene_field_mappings = {
         "interpretation": "interpretations",
         "discovery_interpretation": "discovery_interpretations",
         "gene_notes": "gene_notes",
@@ -939,7 +940,7 @@ def process_items(context, request):
 
             li[vs_field_name] = loaded_item
 
-    for vs_field_name in pluralized.keys():
+    for vs_field_name in vs_to_variant_or_gene_field_mappings.keys():
         validate_and_load_item(vs_field_name)
 
     if len(li) == 0:
@@ -998,14 +999,14 @@ def process_items(context, request):
             sent_item_patch_payloads[item_at_id]["date_approved"] = timestamp
 
     def add_or_replace_note_for_project_on_variant_or_gene_item(vs_field_name, vg_item, payload):
-        vs_field_name_plural = pluralized[vs_field_name]
+        vg_field_name = vs_to_variant_or_gene_field_mappings[vs_field_name]
         newly_shared_item_at_id = li[vs_field_name]["@id"]
 
-        if not vg_item.get(vs_field_name_plural): # Variant or Gene Item has no existing notes for `vs_field_name_plural` field.
-            payload[vs_field_name_plural] = [ newly_shared_item_at_id ]
+        if not vg_item.get(vg_field_name): # Variant or Gene Item has no existing notes for `vg_field_name` field.
+            payload[vg_field_name] = [ newly_shared_item_at_id ]
             return
 
-        existing_node_ids = [ item["@id"] for item in vg_item[vs_field_name_plural] ]
+        existing_node_ids = [ item["@id"] for item in vg_item[vg_field_name] ]
 
         if newly_shared_item_at_id in existing_node_ids:
             # Already shared/present; cancel out; error maybe?
@@ -1015,27 +1016,27 @@ def process_items(context, request):
         # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
         # Ensure we compare to Note.project and not User.project, in case an admin or similar is making edit.
         existing_item_from_project_idx = None
-        for item_idx, item in enumerate(vg_item[vs_field_name_plural]):
+        for item_idx, item in enumerate(vg_item[vg_field_name]):
             if item["project"] == li[vs_field_name]["project"]:
                 existing_item_from_project_idx = item_idx
                 break # Assumption is we only have 1 note per project in this list, so don't need to search further.
 
-        payload[vs_field_name_plural] = existing_node_ids
+        payload[vg_field_name] = existing_node_ids
 
         if existing_item_from_project_idx != None:
-            # TODO: Determine if note, and then set previous or superseding_note only if True... 
-            # is_note_item = "Note" in li[vs_field_name]["@type"]
-            # Link to existing Note from newly-shared Note
-            existing_item_from_project_at_id = vg_item[vs_field_name_plural][existing_item_from_project_idx]["@id"]
+            existing_item_from_project_at_id = vg_item[vg_field_name][existing_item_from_project_idx]["@id"]
+            # Set existing note's status to "obsolete", and populate previous/superseding field if applicable
+            sent_item_patch_payloads[existing_item_from_project_at_id] = sent_item_patch_payloads.get(existing_item_from_project_at_id, {})
+            sent_item_patch_payloads[existing_item_from_project_at_id]["status"] = "obsolete"
+            # Link to existing Note from newly-shared Note            
             sent_item_patch_payloads[newly_shared_item_at_id]["previous_note"] = existing_item_from_project_at_id
             # Link to newly-shared Note from existing note (adds new PATCH request)
             sent_item_patch_payloads[existing_item_from_project_at_id] = sent_item_patch_payloads.get(existing_item_from_project_at_id, {})
             sent_item_patch_payloads[existing_item_from_project_at_id]["superseding_note"] = newly_shared_item_at_id
-            sent_item_patch_payloads[existing_item_from_project_at_id]["status"] = "obsolete"
             # Remove existing Note from Variant or Gene Notes list
-            del payload[vs_field_name_plural][existing_item_from_project_idx]
+            del payload[vg_field_name][existing_item_from_project_idx]
 
-        payload[vs_field_name_plural].append(newly_shared_item_at_id)
+        payload[vg_field_name].append(newly_shared_item_at_id)
 
 
     if "interpretation" in stpi:
@@ -1079,6 +1080,8 @@ def process_items(context, request):
         technical_review_at_id = li["technical_review"]["@id"]
         if li["technical_review"]["status"] != "current":
             create_item_patch_current_status_payload(technical_review_at_id, False)
+        # Add to Variant.technical_reviews
+        add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload)
         
 
 

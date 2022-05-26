@@ -9,6 +9,7 @@ from snovault import (
 from .base import (
     Item
 )
+from ..server_defaults import add_last_modified
 
 
 @abstract_collection(
@@ -25,6 +26,26 @@ class Note(Item):
     schema = load_schema('encoded:schemas/note.json')
     embedded_list = []
 
+    def _update(self, properties, sheets=None):
+        new_note_text = properties.get("note_text")
+        old_note_text = self.properties.get("note_text")
+        if new_note_text != old_note_text:
+            # Add/update last_text_edited: { text_edited_by, date_text_edited }
+            add_last_modified(properties, field_name_portion="text_edited")
+        super(Note, self)._update(properties, sheets)
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Note's display title",
+        "type": "string"
+    })
+    def display_title(self, date_created):
+        try:
+            type_date = "Note from " + date_created[:10]
+            return type_date
+        # last resort, use uuid
+        except Exception:
+            return self.uuid
 
 
 
@@ -45,19 +66,6 @@ class NoteStandard(Note):
         'last_modified.date_modified',
         'last_modified.modified_by.display_title'
     ]
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "Note's display title",
-        "type": "string"
-    })
-    def display_title(self, date_created):
-        try:
-            type_date = "Note from " + date_created[:10]
-            return type_date
-        # last resort, use uuid
-        except Exception:
-            return self.uuid
 
 
 @collection(
@@ -131,3 +139,44 @@ class NoteDiscovery(Note):
         # last resort, use uuid
         except Exception:
             return self.uuid
+
+
+
+
+
+@collection(
+    name='notes-technical-review',
+    properties={
+        'title': 'Technical Review Note',
+        'description': 'Listing of Technical Reviews',
+    })
+class NoteTechnicalReview(Note):
+    """NoteTechnicalReview class."""
+
+    item_type = 'note_technical_review'
+    schema = load_schema('encoded:schemas/note_technical_review.json')
+    # rev = {'variant_sample': ('VariantSample', 'technical_review')}
+    embedded_list = [
+        'last_modified.modified_by.display_title',
+        'last_text_edited.text_edited_by.display_title',
+        'review.reviewed_by.display_title'
+        # Maybe put within like 'approval' sub-object, to make e.g. note.approval.date_approved
+        # Would allow easier PATCHing from UI (no custom endpoint needed)
+        #'note.approved_by',
+        #'note.date_approved'
+    ]
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Note's display title",
+        "type": "string"
+    })
+    def display_title(self):
+        assessment = self.properties.get("assessment", {})
+        call = assessment.get("call")
+        classification = assessment.get("classification")
+        if call is not None and classification is not None:
+            return "(" + ("" if call == True else "No ") + "Call) " + classification
+        return self.uuid
+
+        

@@ -153,7 +153,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         setTimeout(ReactTooltip.rebuild, 10);
     }
 
-    /** Debounced in constructor. 'Business logic' will likely change/  */
+    /** OUTDATED Debounced in constructor. 'Business logic' will likely change/  */
     updateUnsavedNoteText(e){
         const {
             result,
@@ -162,7 +162,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         } = this.props;
         const {
             uuid: vsUUID,
-            technical_review_note: savedTechnicalReviewNote = null
+            //technical_review_note: savedTechnicalReviewNote = null
         } = result;
         const { note_text: savedNoteText } = savedTechnicalReviewNote || {};
         const nextNoteText = e.target.value;
@@ -383,17 +383,17 @@ class CallClassificationButton extends React.PureComponent {
         // If no existing Item -- TODO: Maybe pull this out into sep function in case need to reuse logic later re: Tech Review Notes or smth.
         if (!savedTechnicalReviewItem) {
 
-            const updatePayload = {
+            const createPayload = {
                 "assessment": { "call": callType, "classification": optionName }
             };
 
-            updatePromise = ajax.promise("/technical-reviews/", "POST", {}, JSON.stringify(updatePayload))
+            updatePromise = ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(createPayload))
                 .then(function(techReviewResponse){
                     console.log('response', techReviewResponse);
                     const { "@graph": [ technicalReviewItemFrameObject ] } = techReviewResponse;
                     const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
                     if (!newTechnicalReviewAtID) {
-                        throw new Error("No TechnicalReview @ID returned."); // If no error thrown during destructuring ^..
+                        throw new Error("No NoteTechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                     }
                     // PATCH VariantSample to set linkTo of "technical_review"
                     return ajax.promise(variantSampleAtID, "PATCH", {}, JSON.stringify({ "technical_review": newTechnicalReviewAtID }));

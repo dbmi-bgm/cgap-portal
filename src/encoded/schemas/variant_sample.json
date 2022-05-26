@@ -503,7 +503,7 @@
         "technical_review": {
             "title": "Technical Review",
             "type": "string",
-            "linkTo": "TechnicalReview"
+            "linkTo": "NoteTechnicalReview"
         },
         "variant": {
             "title": "Variant",

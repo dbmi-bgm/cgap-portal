@@ -63,6 +63,32 @@
             ],
             "permission": "restricted_fields"
         },
+        "last_text_edited": {
+            "title": "Last Text Edited",
+            "exclude_from": ["FFedit-create"],
+            "type": "object",
+            "additionalProperties": false,
+            "lookup": 900,
+            "properties": {
+                "date_text_edited": {
+                    "title": "Date Text Edited",
+                    "description": "Do not submit, value is assigned by the server. The date that note_text field is modified.",
+                    "type": "string",
+                    "anyOf": [
+                        {"format": "date-time"},
+                        {"format": "date"}
+                    ],
+                    "permission": "restricted_fields"
+                },
+                "text_edited_by": {
+                    "title": "Text Edited By",
+                    "description": "Do not submit, value is assigned by the server. The user that modfied note_text field.",
+                    "type": "string",
+                    "linkTo": "User",
+                    "permission": "restricted_fields"
+                }
+            }
+        },
         "associated_items": {
             "title": "Associated Items",
             "description": "Items associated with this Note",
