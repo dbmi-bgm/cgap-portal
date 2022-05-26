@@ -834,13 +834,13 @@ class TestPedigreeRow:
             ({"foo": "bar", "phenotypic_features": "foo, bar"}, {"foo": "bar"}),
             (
                 {"phenotypic_features": "HP:0001111"},
-                {"phenotypic_features": [{"phenotypic_feature": "HP:0001111"}]},
+                {"phenotypic_features": [{"phenotypic_feature": "/phenotypes/HP:0001111/"}]},
             ),
             (
                 {"foo": "bar", "phenotypic_features": "HP:0001111"},
                 {
                     "foo": "bar",
-                    "phenotypic_features": [{"phenotypic_feature": "HP:0001111"}],
+                    "phenotypic_features": [{"phenotypic_feature": "/phenotypes/HP:0001111/"}],
                 },
             ),
         ],
@@ -858,13 +858,13 @@ class TestPedigreeRow:
             ("", False, []),
             ("HP:001", True, []),
             ("Ataxia", False, []),
-            ("HP:0000001", False, [{"phenotypic_feature": "HP:0000001"}]),
+            ("HP:0000001", False, [{"phenotypic_feature": "/phenotypes/HP:0000001/"}]),
             (
                 "HP:1094732, HP:2349843",
                 False,
                 [
-                    {"phenotypic_feature": "HP:1094732"},
-                    {"phenotypic_feature": "HP:2349843"},
+                    {"phenotypic_feature": "/phenotypes/HP:1094732/"},
+                    {"phenotypic_feature": "/phenotypes/HP:2349843/"},
                 ],
             ),
         ],
@@ -889,13 +889,13 @@ class TestPedigreeRow:
                 {"primary_diagnosis": "MONDO:0001111"},
                 {
                     "disorders": [
-                        {"disorder": "MONDO:0001111", "is_primary_diagnosis": True}
+                        {"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}
                     ]
                 },
             ),
             (
                 {"disorders": "MONDO:0001111"},
-                {"disorders": [{"disorder": "MONDO:0001111"}]},
+                {"disorders": [{"disorder": "/disorders/MONDO:0001111/"}]},
             ),
             (
                 {
@@ -904,8 +904,8 @@ class TestPedigreeRow:
                 },
                 {
                     "disorders": [
-                        {"disorder": "MONDO:0001111", "is_primary_diagnosis": True},
-                        {"disorder": "MONDO:0002222"},
+                        {"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True},
+                        {"disorder": "/disorders/MONDO:0002222/"},
                     ],
                 },
             ),
@@ -936,7 +936,7 @@ class TestPedigreeRow:
                 {
                     "disorders": [
                         {
-                            "disorder": "MONDO:0001111",
+                            "disorder": "/disorders/MONDO:0001111/",
                             "onset_age": 10,
                             "onset_age_units": "year",
                             "diagnostic_confidence": "probable",
@@ -968,7 +968,7 @@ class TestPedigreeRow:
                 None,
                 None,
                 False,
-                [{"disorder": "MONDO:0001111", "is_primary_diagnosis": True}],
+                [{"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}],
             ),
             (
                 "MONDO:0001111, MONDO:0001111",
@@ -976,7 +976,7 @@ class TestPedigreeRow:
                 None,
                 None,
                 False,
-                [{"disorder": "MONDO:0001111", "is_primary_diagnosis": True}],
+                [{"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}],
             ),
             ("MONDO:0001111, MONDO:0001112", None, None, None, True, []),
             (
@@ -985,7 +985,7 @@ class TestPedigreeRow:
                 None,
                 None,
                 True,
-                [{"disorder": "MONDO:0001111", "is_primary_diagnosis": True}],
+                [{"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}],
             ),
             (
                 "MONDO:0001111",
@@ -995,7 +995,7 @@ class TestPedigreeRow:
                 False,
                 [
                     {
-                        "disorder": "MONDO:0001111",
+                        "disorder": "/disorders/MONDO:0001111/",
                         "onset_age": 10,
                         "onset_age_units": "year",
                         "is_primary_diagnosis": True,
@@ -1010,7 +1010,7 @@ class TestPedigreeRow:
                 False,
                 [
                     {
-                        "disorder": "MONDO:0001111",
+                        "disorder": "/disorders/MONDO:0001111/",
                         "onset_age": 10,
                         "onset_age_units": "month",
                         "is_primary_diagnosis": True,
@@ -1025,7 +1025,7 @@ class TestPedigreeRow:
                 False,
                 [
                     {
-                        "disorder": "MONDO:0001111",
+                        "disorder": "/disorders/MONDO:0001111/",
                         "diagnostic_confidence": "probable",
                         "is_primary_diagnosis": True,
                     }
@@ -1058,14 +1058,14 @@ class TestPedigreeRow:
         [
             ("", False, []),
             ("MONDO:0001", True, []),
-            ("MONDO:0007947", False, [{"disorder": "MONDO:0007947"}]),
-            ("Foo, MONDO:0007947, MONDO:001", True, [{"disorder": "MONDO:0007947"}]),
+            ("MONDO:0007947", False, [{"disorder": "/disorders/MONDO:0007947/"}]),
+            ("Foo, MONDO:0007947, MONDO:001", True, [{"disorder": "/disorders/MONDO:0007947/"}]),
             (
                 "MONDO:0007947, MONDO:0001111",
                 False,
                 [
-                    {"disorder": "MONDO:0007947"},
-                    {"disorder": "MONDO:0001111"},
+                    {"disorder": "/disorders/MONDO:0007947/"},
+                    {"disorder": "/disorders/MONDO:0001111/"},
                 ],
             ),
         ],

@@ -90,7 +90,7 @@ week, month, and year. If no Primary Diagnosis or Diagnosis
 Age of Onset, value is ignored.
 
 **Diagnostic Confidence**: The confidence with which the
-Primary Diagnosis is reported. Possible values are possible,
+Primary Diagnosis is reported. Possible values are patient reported, possible,
 probable, and definite. If no Primary Diagnosis given, value is
 ignored.
 

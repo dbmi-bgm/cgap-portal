@@ -166,6 +166,7 @@
                         "title": "Diagnostic Confidence",
                         "type": "string",
                         "enum": [
+                            "patient reported",
                             "possible",
                             "probable",
                             "definite"

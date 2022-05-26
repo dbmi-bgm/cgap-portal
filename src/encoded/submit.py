@@ -943,9 +943,20 @@ class PedigreeRow:
             ) % (self.row, self.HPO_TERMS.upper(), ", ".join(invalid_hpo_terms))
             self.errors.append(msg)
         result += [
-            {self.PHENOTYPIC_FEATURE: hpo_term} for hpo_term in valid_hpo_terms
+            {self.PHENOTYPIC_FEATURE: self.format_phenotype_atid(hpo_term)}
+            for hpo_term in valid_hpo_terms
         ]
         return result
+
+    def format_phenotype_atid(self, hpo_term):
+        """Convert HPO term to @id.
+
+        :param hpo_term: Validated HPO identifier
+        :type hpo_term: str
+        :returns: LinkTo (as @id) for phenotype item
+        :rtype: str
+        """
+        return f"/phenotypes/{hpo_term}/"
 
     def update_disorders(self, individual_metadata):
         """Process spreadsheet disorder metadata.
@@ -1031,7 +1042,9 @@ class PedigreeRow:
         elif valid_mondo_terms:
             for mondo_term_id in valid_mondo_terms:
                 primary_disorder_properties = {}
-                primary_disorder_properties[self.DISORDER] = mondo_term_id
+                primary_disorder_properties[self.DISORDER] = self.format_disorder_atid(
+                    mondo_term_id
+                )
                 primary_disorder_properties[self.IS_PRIMARY_DIAGNOSIS] = True
                 if onset_age:
                     if onset_age.isnumeric():
@@ -1049,6 +1062,16 @@ class PedigreeRow:
                     primary_disorder_properties[self.DIAGNOSTIC_CONFIDENCE] = diagnostic_confidence.lower()
                 result.append(primary_disorder_properties)
         return result
+
+    def format_disorder_atid(self, mondo_term):
+        """Convert MONDO term to @id.
+
+        :param mondo_term: Validated MONDO identifier
+        :type mondo_term: str
+        :returns: LinkTo (as @id) for disorder item
+        :rtype: str
+        """
+        return f"/disorders/{mondo_term}/"
 
     def get_secondary_disorders(self, disorders):
         """Validate disorder MONDO term(s) and format sub-embedded
@@ -1073,7 +1096,10 @@ class PedigreeRow:
                 " identifier(s): %s. Please edit and resubmit."
             ) % (self.row, self.MONDO_TERMS.upper(), ", ".join(invalid_mondo_terms))
             self.errors.append(msg)
-        result += [{self.DISORDER: mondo_term} for mondo_term in valid_mondo_terms]
+        result += [
+            {self.DISORDER: self.format_disorder_atid(mondo_term)}
+            for mondo_term in valid_mondo_terms
+        ]
         return result
 
     def extract_individual_metadata(self):
