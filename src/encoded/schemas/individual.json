@@ -597,7 +597,7 @@
             "title": "Birth Year",
             "notes": "Currently will show up as terms; need to change to date range once able to"
         },
-        "disorders": {
+        "disorders.disorder": {
             "title": "Disorders"
         },
         "phenotypic_features": {
