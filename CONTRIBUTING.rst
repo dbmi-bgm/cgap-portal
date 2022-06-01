@@ -38,6 +38,8 @@ for which we have specific guidelines.
 
 But, coming up soon, as we start to move toward a self-serve model, we'll be wanting to
 create a better way to engage the community.  We're working out the details for that now.
+Watch `our "Get Involved" page <https://cgap.hms.harvard.edu/getinvolved>`_ for details.
+
 If you have suggestions, send us email at
 `cgap-support@hms-dbmi.atlassian.net <mailto:cgap-support@hms-dbmi.atlassian.net>`_.
 
