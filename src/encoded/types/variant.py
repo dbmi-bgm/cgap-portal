@@ -893,7 +893,7 @@ def process_items(context, request):
     and save it to the proper field on the Variant and Gene item(s) linked to from this VariantSample.::
 
         {
-            "save_to_project_items" : {
+            "save_to_project_notes" : {
                 "variant_notes": <UUID4>,
                 "gene_notes": <UUID4>,
                 "interpretation": <UUID4>,
@@ -906,7 +906,7 @@ def process_items(context, request):
     """
 
     request_body = request.json
-    stpi = request_body["save_to_project_items"]
+    stpi = request_body["save_to_project_notes"]
 
     vs_to_variant_or_gene_field_mappings = {
         "interpretation": "interpretations",
@@ -929,14 +929,14 @@ def process_items(context, request):
             # Compare UUID submitted vs UUID present on VS Item
             if uuid_to_process != context.properties[vs_field_name]:
                 raise HTTPBadRequest("Not all submitted Item UUIDs are present on VariantSample. " + \
-                    "Check 'save_to_project_items." + vs_field_name + "'.")
+                    "Check 'save_to_project_notes." + vs_field_name + "'.")
 
             # Get @@object view of Item to check permissions, status, etc.
             loaded_item = request.embed("/" + uuid_to_process, "@@object", as_user=True)
             item_resource = find_resource(request.root, loaded_item["@id"])
             if not request.has_permission("edit", item_resource):
                 raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
-                    "Check 'save_to_project_items." + vs_field_name + "'.")
+                    "Check 'save_to_project_notes." + vs_field_name + "'.")
 
             li[vs_field_name] = loaded_item
 
@@ -1010,7 +1010,7 @@ def process_items(context, request):
 
         if newly_shared_item_at_id in existing_node_ids:
             # Already shared/present; cancel out; error maybe?
-            # TODO: _UNSET_ or delete it?
+            # TODO: _UNSET_ or delete it? Or rely on "remove_from_project_items" request property or similar?
             return
 
         # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
