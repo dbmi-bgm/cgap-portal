@@ -79,23 +79,28 @@ export function standardizeObjectsInList(jsonList){
         });
 
         listOfIndividuals.forEach(function(indv){
-            const { id: indvID } = indv;
-            const { parents = [], children = [] } = indv;
-            parents.forEach(function(parentID){
+            // Filter out any parents or children not present in jsonList.
+            indv.parents = indv.parents.filter(function(parentID){
+                return typeof idObjMap[parentID] !== "undefined";
+            });
+            indv.parents.forEach(function(parentID){
                 const parentIndv = idObjMap[parentID];
                 parentIndv.children = (parentIndv.children && parentIndv.children.slice(0)) || [];
-                if (parentIndv.children.indexOf(indvID) > -1){
+                if (parentIndv.children.indexOf(indv.id) > -1){
                     return;
                 }
-                parentIndv.children.push(indvID);
+                parentIndv.children.push(indv.id);
             });
-            children.forEach(function(childID){
+            indv.children = indv.children.filter(function(childID){
+                return typeof idObjMap[childID] !== "undefined";
+            });
+            indv.children.forEach(function(childID){
                 const childIndv = idObjMap[childID];
                 childIndv.parents = (childIndv.parents && childIndv.parents.slice(0)) || [];
-                if (childIndv.parents.indexOf(indvID) > -1){
+                if (childIndv.parents.indexOf(indv.id) > -1){
                     return;
                 }
-                childIndv.parents.push(indvID);
+                childIndv.parents.push(indv.id);
             });
         });
         return listOfIndividuals;
