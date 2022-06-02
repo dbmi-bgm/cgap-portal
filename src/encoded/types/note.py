@@ -27,8 +27,14 @@ class Note(Item):
     embedded_list = []
 
     def _update(self, properties, sheets=None):
-        new_note_text = properties.get("note_text")
-        old_note_text = self.properties.get("note_text")
+        new_note_text = properties.get("note_text", None)
+        old_note_text = None
+        try:
+            # We may not have a self.properties yet if this is a new item (e.g. from POST request)
+            # (getattr(self, properties) doesn't work here, throws exception)
+            old_note_text = self.properties.get("note_text", None)
+        except KeyError as e: # str(e) === "''"; not sure why.
+            pass
         if new_note_text != old_note_text:
             # Add/update last_text_edited: { text_edited_by, date_text_edited }
             add_last_modified(properties, field_name_portion="text_edited")

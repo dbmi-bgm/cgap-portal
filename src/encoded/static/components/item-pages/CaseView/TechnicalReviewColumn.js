@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useMemo, useCallback, useRef, useState } from 'react';
+import React, { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import _ from 'underscore';
 import Popover  from 'react-bootstrap/esm/Popover';
 import ReactTooltip from 'react-tooltip';
@@ -449,10 +449,23 @@ class CallClassificationButton extends React.PureComponent {
 
         updatePromise
             .then(function(propsForPopover){
-                // Show 'saved' popover.
-                setOpenPopoverData(function({ ref: existingBtnRef }){
-                    return { "ref": existingBtnRef, "jsx": <SavedTechnicalReviewPopover {...propsForPopover} /> };
-                });
+                // Show 'saved' popover unless manually set to skip it
+                let skipPopover = false;
+                try { // in case this runs server-side or in a non-standard browser
+                    skipPopover = JSON.parse(window.sessionStorage.getItem("skip_index_wait_warning"));
+                } catch (e) {
+                    // pass
+                }
+                if (skipPopover) {
+                    setOpenPopoverData(null);
+                } else {
+                    setOpenPopoverData(function({ ref: existingBtnRef }){
+                        return {
+                            "ref": existingBtnRef,
+                            "jsx": <SavedTechnicalReviewPopover {...propsForPopover} />
+                        };
+                    });
+                }
             })
             .catch(function(errorMsgOrObj){
                 console.error(errorMsgOrObj);
@@ -550,8 +563,27 @@ class CallClassificationButton extends React.PureComponent {
     }
 }
 
-
+/** If this appears, we can assume sessionStorage.skip_index_wait_warning is not true */
 const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false, ...passProps }, ref){
+    // `checked` should always be false initially, otherwise this popover wouldn't have been shown..
+    const [ checked, setChecked ] = useState(false);
+
+    const onCheck = useCallback(function(){
+        setChecked(function(prevChecked){
+            return !prevChecked;
+        });
+    });
+
+    useEffect(function(){
+        // Use sessionStorage since is 'easier to unset' if we iterate on data structure in future.
+        // Also reminds people next session they use the portal that saved changes won't be immediately visible.
+        if (checked) {
+            window.sessionStorage.setItem("skip_index_wait_warning", "true");
+        } else {
+            window.sessionStorage.removeItem("skip_index_wait_warning");
+        }
+    }, [ checked ]);
+
     return (
         <Popover {...passProps} id="technical-review-popover" key="success-new-review" ref={ref}>
             <Popover.Title className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Title>
@@ -560,6 +592,12 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
                 <p className="mt-0">
                     It may take some time for your changes to become available in search results, please refresh or search again in a few minutes.
                 </p>
+                { typeof window !== "undefined" && window.sessionStorage ?
+                    <label className="text-400 mt-1 mb-0">
+                        <input type="checkbox" value={checked} className="align-middle" onChange={onCheck} />&nbsp;
+                        <span className="align-middle ml-04">Check to stop showing this message</span>
+                    </label>
+                    : null }
             </Popover.Content>
         </Popover>
     );

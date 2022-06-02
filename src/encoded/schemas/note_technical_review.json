@@ -107,6 +107,12 @@
                     "permission": "restricted_fields"
                 }
             }
+        },
+        "previous_note": {
+            "linkTo": "NoteTechnicalReview"
+        },
+        "superseding_note": {
+            "linkTo": "NoteTechnicalReview"
         }
 
     }

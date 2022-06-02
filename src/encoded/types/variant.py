@@ -154,7 +154,12 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.review.reviewed_by.display_title",
     "technical_review.note_text",
     "technical_review.last_text_edited.date_text_edited",
-    "technical_review.last_modified.date_modified"
+    "technical_review.last_text_edited.text_edited_by",
+    #"technical_review.review.date_reviewed",
+    #"technical_review.review.reviewed_by",
+    "technical_review.approved_by.display_title",
+    "technical_review.date_approved",
+    #"technical_review.last_modified.date_modified"
 ]
 
 
