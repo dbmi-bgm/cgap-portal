@@ -254,6 +254,7 @@ class Item(snovault.Item):
         'in review': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'uploaded': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'uploading': ALLOW_PROJECT_MEMBER_EDIT_ACL,
+        'archived': ALLOW_PROJECT_MEMBER_VIEW_ACL,
         'deleted': DELETED_ACL,
         'replaced': ONLY_ADMIN_VIEW_ACL,
         # Everyone can view - restricted to specific items via schemas.
