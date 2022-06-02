@@ -295,7 +295,7 @@ function SaveNotesToProjectButton (props) {
 
             if (Object.keys(payload.save_to_project_notes).length > 0) {
                 payloads.push([
-                    variantSampleAtID + "/@@process-items/",
+                    variantSampleAtID + "@@process-items/",
                     payload
                 ]);
             }

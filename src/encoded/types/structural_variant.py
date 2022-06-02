@@ -1,6 +1,7 @@
 import io
 
 import negspy.coordinates as nc
+from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 
 from ..ingestion.common import CGAP_CORE_PROJECT
@@ -12,7 +13,8 @@ from .variant import (
     SHARED_VARIANT_EMBEDS,
     SHARED_VARIANT_SAMPLE_EMBEDS,
     extend_embedded_list,
-    load_extended_descriptions_in_schemas
+    load_extended_descriptions_in_schemas,
+    process_items_process
 )
 
 
@@ -323,7 +325,10 @@ class StructuralVariant(Item):
     unique_key="structural_variant_sample:annotation_id",
 )
 class StructuralVariantSample(Item):
-    """Class for structural variant samples."""
+    """
+    Class for structural variant samples.
+    Should we have this inherit from VariantSample perhaps? Or maybe make a common base class?
+    """
 
     item_type = "structural_variant_sample"
     schema = load_extended_descriptions_in_schemas(
@@ -615,3 +620,14 @@ class StructuralVariantSample(Item):
                 new_labels[role_key] = " ".join(label)  # just in case
 
         return new_labels
+
+
+@view_config(
+    name='process-items',
+    context=StructuralVariantSample,
+    request_method='PATCH',
+    permission='edit'
+)
+def process_items(context, request):
+    """This endpoint is used to process notes attached to this (in-context) StructuralVariantSample."""
+    return process_items_process(context, request)

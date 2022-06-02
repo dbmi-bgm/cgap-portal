@@ -887,15 +887,21 @@ def download(context, request):
     permission='edit'
 )
 def process_items(context, request):
+    """This endpoint is used to process notes attached to this (in-context) VariantSample."""
+    return process_items_process(context, request)
+
+
+
+
+def process_items_process(context, request):
     """
-    This endpoint is used to process notes attached to this (in-context) VariantSample.
     Currently, "saving to project" is supported, but more functions may be available in future.
 
     ### Usage
 
     The endpoint currently accepts the following as JSON body of a POST request, and will then
     change the status of each note to "shared" upon asserting edit permissions from PATCHer for each note,
-    and save it to the proper field on the Variant and Gene item(s) linked to from this VariantSample.::
+    and save it to the proper field on the Variant and Gene item(s) linked to from this [Structural]VariantSample.::
 
         {
             "save_to_project_notes" : {
@@ -933,7 +939,7 @@ def process_items(context, request):
 
             # Compare UUID submitted vs UUID present on VS Item
             if uuid_to_process != context.properties[vs_field_name]:
-                raise HTTPBadRequest("Not all submitted Item UUIDs are present on VariantSample. " + \
+                raise HTTPBadRequest("Not all submitted Item UUIDs are present on [Structural]VariantSample. " + \
                     "Check 'save_to_project_notes." + vs_field_name + "'.")
 
             # Get @@object view of Item to check permissions, status, etc.

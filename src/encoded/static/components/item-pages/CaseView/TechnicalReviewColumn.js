@@ -2,7 +2,7 @@
 
 import React, { useMemo, useCallback, useRef, useState, useEffect } from 'react';
 import _ from 'underscore';
-import Popover  from 'react-bootstrap/esm/Popover';
+import Popover from 'react-bootstrap/esm/Popover';
 import ReactTooltip from 'react-tooltip';
 import { ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
@@ -379,6 +379,7 @@ class CallClassificationButton extends React.PureComponent {
         });
 
         let updatePromise = null;
+        let techReviewResponse = null;
 
         // If no existing Item -- TODO: Maybe pull this out into sep function in case need to reuse logic later re: Tech Review Notes or smth.
         if (!savedTechnicalReviewItem) {
@@ -388,13 +389,14 @@ class CallClassificationButton extends React.PureComponent {
             };
 
             updatePromise = ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(createPayload))
-                .then(function(techReviewResponse){
-                    console.log('response', techReviewResponse);
-                    const { "@graph": [ technicalReviewItemFrameObject ] } = techReviewResponse;
+                .then(function(res){
+                    console.log('response', res);
+                    const { "@graph": [ technicalReviewItemFrameObject ] } = res;
                     const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
                     if (!newTechnicalReviewAtID) {
                         throw new Error("No NoteTechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                     }
+                    techReviewResponse = res;
                     // PATCH VariantSample to set linkTo of "technical_review"
                     return ajax.promise(variantSampleAtID, "PATCH", {}, JSON.stringify({ "technical_review": newTechnicalReviewAtID }));
                 })
@@ -405,42 +407,42 @@ class CallClassificationButton extends React.PureComponent {
                     if (!vsAtIDRepeated) {
                         throw new Error("No [Structural]VariantSample @ID returned."); // If no error thrown during destructuring ^..
                     }
-                    // EXPERIMENTAL -- imperfect attempt at notifying user of their last-edited things.
                     cacheSavedTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
                     return { created: true };
                 });
         } else if (existingTechnicalReviewItemAtID) {
             const {
+                // We may have a technical review Item but no assessment, e.g. if was unset or if Note was created for text only.
                 assessment: {
-                    call: savedCall,
-                    classification: savedClassification
-                }
+                    call: savedCall = null,
+                    classification: savedClassification = null
+                } = {}
             } = savedTechnicalReviewItem || {};
             let updatePayload;
-            // Deletion of `review` field should be done at backend
-            let updateHref = existingTechnicalReviewItemAtID + "?delete_fields=review";
+            // Deletion of `review` field should be done at backend for security, TODO: move to _update method there perhaps.
+            const updateHref = existingTechnicalReviewItemAtID + "?delete_fields=review";
             if (
                 (lastSavedCall === callType && lastSavedClassification === optionName) ||
                 (savedCall === callType && savedClassification === optionName && lastSavedTechnicalReviewForResult !== null)
             ) {
-                // Pass. Delete/unset on PATCH/save -- leave as `{} & add `assessment` to delete_fields param.
-                updatePayload = { };
-                updateHref += ",assessment";
-                // EXPERIMENTAL -- imperfect attempt at notifying user of their last-edited things.
+                // DEPRECATED: Delete/unset on PATCH/save -- leave as `{} & add `assessment` to delete_fields param.
+                // CURRENT: Will fill values as null or empty, so that the datetime+author for deletion is saved.
+                updatePayload = { "assessment": {} };
+                // updateHref += ",assessment";
                 cacheSavedTechnicalReviewForVSUUID(vsUUID, null);
             } else {
                 updatePayload = { "assessment": { "call": callType, "classification": optionName } };
-                // EXPERIMENTAL -- imperfect attempt at notifying user of their last-edited things.
                 cacheSavedTechnicalReviewForVSUUID(vsUUID, { "call": callType, "classification": optionName });
             }
             updatePromise = ajax.promise(updateHref, "PATCH", {}, JSON.stringify(updatePayload))
-                .then(function(techReviewResponse){
-                    console.log('response', techReviewResponse);
-                    const { "@graph": [ technicalReviewItemFrameObject ] } = techReviewResponse;
+                .then(function(res){
+                    console.log('response', res);
+                    const { "@graph": [ technicalReviewItemFrameObject ] } = res;
                     const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
                     if (!newTechnicalReviewAtID) {
                         throw new Error("No @ID returned."); // If no error thrown during destructuring ^..
                     }
+                    techReviewResponse = res;
                     return { created: false };
                 });
         } else {
@@ -448,6 +450,10 @@ class CallClassificationButton extends React.PureComponent {
         }
 
         updatePromise
+            .then(function(propsForPopover){
+                // TODO: If save to project, do that..
+                return propsForPopover;
+            })
             .then(function(propsForPopover){
                 // Show 'saved' popover unless manually set to skip it
                 let skipPopover = false;
@@ -508,7 +514,22 @@ class CallClassificationButton extends React.PureComponent {
 
     }
 
-    handleClick(){
+    /** @return {Promise} AJAX request to update Variant's technical_reviews */
+    saveToProject(technicalReviewUUID){
+        const { result: variantSampleSearchResult } = this.props;
+        const { "@id": vsAtID } = variantSampleSearchResult;
+        const payload = { "save_to_project_notes": { "technical_review": technicalReviewUUID } };
+        return ajax.promise(vsAtID + "@@process-items/", "PATCH", {}, JSON.stringify(payload))
+            .then(function(processItemsResponse){
+                const { status } = processItemsResponse;
+                if (status !== "success") {
+                    throw new Error("Failed to update Variant with new Technical Review, check permissions.");
+                }
+                return processItemsResponse;
+            });
+    }
+
+    handleClick(e){
         const { disabled } = this.props;
 
         if (disabled) {
@@ -545,21 +566,40 @@ class CallClassificationButton extends React.PureComponent {
         // If was recently saved and this existing saved value is now unset (either technical_review.assessment changed or deleted)
         const isLastSaveDeleted = isSaved && (lastSavedTechnicalReviewForResult === null || (lastSavedClassification && !isLastSaved));
 
+        const isDefaultSaveToProject = callType === false && optionName === "Recurrent Artifact";
+
         const btnClass = (
             (isLastSaved || (isSaved && !isLastSaveDeleted) ? ` bg-${highlightColorStyle} text-white` : "") +
             (isLastSaveDeleted ? " bg-light text-secondary" : "")
         );
 
-        return (
-            <button type="button" className={"dropdown-item" + btnClass} onClick={this.handleClick} disabled={disabled}>
+        const button = (
+            <button type="button" className={"dropdown-item" + btnClass + (isDefaultSaveToProject ? " pr-16" : "")}
+                onClick={this.handleClick} disabled={disabled} data-save-to-project={isDefaultSaveToProject} data-html
+                data-tip={isDefaultSaveToProject ? "This classification will be saved <b>project-wide</b> for this variant" : null}>
                 { optionName }
                 { isLastSaved ?
                     <span className="text-white text-700" data-tip="You recently saved this value and it may not be yet visible in search results"> *</span>
                     : isLastSaveDeleted ?
                         <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
                         : null }
+                { isDefaultSaveToProject ? <i className="icon icon-project-diagram fas small ml-16" /> : null }
             </button>
         );
+
+        if (isDefaultSaveToProject) {
+            return (
+                <div className="d-flex">
+                    { button }
+                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-left" + btnClass} data-save-to-project={false}
+                        data-tip="Save only to this variant sample (and not project-wide for this variant)">
+                        <i className="icon icon-vial fas" />
+                    </button>
+                </div>
+            );
+        }
+
+        return button;
     }
 }
 

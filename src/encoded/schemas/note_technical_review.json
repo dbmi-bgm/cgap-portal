@@ -39,7 +39,6 @@
             "title": "Call Assessment",
             "additionalProperties": false,
             "type": "object",
-            "required": ["call", "classification"],
             "properties": {
                 "call": {
                     "title": "Technical Review Call",
