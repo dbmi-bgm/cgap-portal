@@ -1986,7 +1986,7 @@ testing = ["pytest", "coverage", "pytest-cov"]
 
 [[package]]
 name = "waitress"
-version = "2.1.1"
+version = "2.1.2"
 description = "Waitress WSGI server"
 category = "main"
 optional = false
@@ -2161,7 +2161,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.8"
-content-hash = "3368fb721bf314cce927366565091bbff9013c987bbc373014ad1a8d0ada5033"
+content-hash = "4b2da15a35b61bab9f3e878630c4793819ff4ed9b3e388221252d59aa45c1aa8"
 
 [metadata.files]
 apipkg = [
@@ -3331,8 +3331,8 @@ venusian = [
     {file = "venusian-1.2.0.tar.gz", hash = "sha256:64ec8285b80b110d0ae5db4280e90e31848a59db98db1aba4d7d46f48ce91e3e"},
 ]
 waitress = [
-    {file = "waitress-2.1.1-py3-none-any.whl", hash = "sha256:c549f5b2b4afd44d9d97d7cec79f3ef581e25d832827f415dc175327af674aa8"},
-    {file = "waitress-2.1.1.tar.gz", hash = "sha256:e2e60576cf14a1539da79f7b7ee1e79a71e64f366a0b47db54a15e971f57bb16"},
+    {file = "waitress-2.1.2-py3-none-any.whl", hash = "sha256:7500c9625927c8ec60f54377d590f67b30c8e70ef4b8894214ac6e4cad233d2a"},
+    {file = "waitress-2.1.2.tar.gz", hash = "sha256:780a4082c5fbc0fde6a2fcfe5e26e6efc1e8f425730863c04085769781f51eba"},
 ]
 watchtower = [
     {file = "watchtower-1.0.6-py3-none-any.whl", hash = "sha256:2859275df4ad71b005b983613dd64cabbda61f9fdd3db7600753fc465090119d"},
