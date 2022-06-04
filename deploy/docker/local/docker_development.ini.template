@@ -7,6 +7,8 @@
 [app:app]
 use = config:base.ini#app
 session.secret = %(here)s/session-secret.b64
+# env.bucket = ...
+# env.ecosystem = ...
 env.name = cgap-docker-${USER}-test
 sqlalchemy.url = postgres://postgres:postgres@db:5432/postgres
 elasticsearch.server = search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443

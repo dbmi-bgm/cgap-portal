@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "8.9.5"
+version = "8.9.6"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -44,12 +44,12 @@ chardet = "3.0.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
 dcicsnovault = "^5.4.0"
-dcicutils = "^3.9.0"
+dcicutils = "^3.13.1"
 elasticsearch = "6.8.1"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
-granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
-h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
+granite-suite = "0.1.11b0"  # Needs this exact version until Python 3.6 support is dropped. -kmp 10-Feb-2022
+h5py = "2.10.0"  # Needs this exact version until Python 3.6 support is dropped. -kmp 10-Feb-2022
 # html5lib = "0.9999999"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
