@@ -1,7 +1,6 @@
 'use strict';
 
 import React from 'react';
-import moment from 'moment';
 import _ from 'underscore';
 import memoize from 'memoize-one';
 import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';

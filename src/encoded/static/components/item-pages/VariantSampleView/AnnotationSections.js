@@ -11,6 +11,7 @@ import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/
 import { layout, ajax, console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Schemas } from './../../util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import QuickPopover from '../components/QuickPopover';
 
 /**
  * Shared components between VariantSample and StructuralVariantSample item pages
@@ -57,6 +58,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
             "brainatlas_microarray",
             "biogrid",
             "string",
+            "hgmd_id"
             // "gene_symbol", - duplicate/excluded
             // "refseq_accession", - duplicate/excluded
             // "clingendis.disease_id", // removed for now ('user can find through clingen')
@@ -339,14 +341,32 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
             <thead className="bg-transparent">
                 <tr>
                     <th className="text-left">Constraint</th>
-                    <th>Synonymous</th>
-                    <th>Missense</th>
-                    <th>LoF</th>
+                    <th>
+                        Synonymous
+                        <span data-tip="Score as applied to synonymous variants only. A dot (•) indicates the score is not applicable to synonymous variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
+                    </th>
+                    <th>
+                        Missense
+                        <span data-tip="Score as applied to missense variants only. A dot (•) indicates the score is not applicable to missense variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
+                    </th>
+                    <th>
+                        LoF
+                        <span data-tip="Score as applied to loss-of-function variants only. A dot (•) indicates the score is not applicable to LoF variants.">
+                            <i className="icon icon-info-circle fas ml-03"/>
+                        </span>
+                    </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">Expected</td>
+                    <td className="text-600 text-left">
+                        Expected
+                        <QuickPopover popID="gene_exp" className="p-0 icon-sm ml-02">{genePopoverContents.expected}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("exp_syn")}>{ falsyZeroCheck(exp_syn, fallbackNotPresent)}</span>
                     </td>
@@ -358,7 +378,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Observed</td>
+                    <td className="text-600 text-left">
+                        Observed
+                        <QuickPopover popID="gene_obs" className="p-0 icon-sm ml-02">{genePopoverContents.observed}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("obs_syn")}>{ falsyZeroCheck(obs_syn, fallbackNotPresent)}</span>
                     </td>
@@ -370,7 +393,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">O/E (range)</td>
+                    <td className="text-600 text-left">
+                        O/E (range)
+                        <QuickPopover popID="gene_oerange" className="p-0 icon-sm ml-02">{genePopoverContents.oerange}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("oe_syn")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_syn), fallbackNotPresent)}</span>
                         { oe_syn_lower !== null && oe_syn_upper !== null ? ` (${oe_syn_lower} - ${oe_syn_upper})` : null }
@@ -385,7 +411,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Z-score</td>
+                    <td className="text-600 text-left">
+                        Z-score
+                        <QuickPopover popID="gene_zscore" className="p-0 icon-sm ml-02">{genePopoverContents.zscore}</QuickPopover>
+                    </td>
                     <td>
                         <span data-tip={getTipForField("syn_z")}>{ falsyZeroCheck(shortenToSignificantDigits(syn_z), fallbackNotPresent)}</span>
                     </td>
@@ -397,7 +426,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">LOEUF</td>
+                    <td className="text-600 text-left">
+                        LOEUF
+                        <QuickPopover popID="gene_loeuf" className="p-0 icon-sm ml-02">{genePopoverContents.loeuf}</QuickPopover>
+                    </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
@@ -405,7 +437,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">S-Het</td>
+                    <td className="text-600 text-left">
+                        S-Het
+                        <QuickPopover popID="gene_shet" className="p-0 icon-sm ml-02">{genePopoverContents.shet}</QuickPopover>
+                    </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
@@ -413,7 +448,10 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">RVIS (ExAC)</td>
+                    <td className="text-600 text-left">
+                        RVIS (ExAC)
+                        <QuickPopover popID="gene_rvis" className="p-0 icon-sm ml-02">{genePopoverContents.rvis}</QuickPopover>
+                    </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
                         <span data-tip={getTipForField("rvis_exac")}>{ falsyZeroCheck(shortenToSignificantDigits(rvis_exac), fallbackNotPresent)}</span>
@@ -442,7 +480,7 @@ function falsyZeroCheck(value, fallback) {
  *   We have `valueTransforms.roundLargeNumber(num, decimalPlaces = 2)` function already which can just be re-used if we paramaterize its `numberLevels`.
  *       (currently: `['', 'k', 'm', ' billion', ' trillion', ' quadrillion', ' quintillion']`)
  */
-function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
+export function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
 
     if (!numberToShorten) {
         // Pass through falsy values such as "0" (doesnt need shortening) or null, false, undefined.
@@ -469,8 +507,25 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         csq_clinvar_clnsig: clinicalSignificanceFromVariant,
         csq_clinvar_clnsigconf: conflictingClinicalSignificance,
         clinvar_submission = [], // TODO - missing in data rn.
-        csq_clinvar_clnrevstat: reviewStatusFromVariant
+        csq_clinvar_clnrevstat: reviewStatusFromVariant,
+        POS,
+        CHROM
     } = variant || structural_variant;
+
+
+    const clinvarVariantSearchUrl = useMemo(function(){
+        if (!CHROM && !POS) {
+            return null;
+        }
+        let chromosome = CHROM;
+        chromosome = chromosome.toLowerCase();
+        if (chromosome === "m"){
+            chromosome = "mt";
+        }
+        return `https://www.ncbi.nlm.nih.gov/clinvar?term=((${chromosome}[Chromosome]) AND ${POS}[Base Position])`;
+    }, [ variant || structural_variant ]);
+
+
 
     const { result: { [variationID]: clinVarResult } = {} } = currentClinVarResponse || {};
     const {
@@ -481,11 +536,25 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         } = {}
     } = clinVarResult || {};
 
+    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
+
+    const clinVarSearchLink = clinvarVariantSearchUrl ? (
+        <React.Fragment>
+            <i className="icon icon-search fas small"/>&nbsp;&nbsp;
+            <a href={clinvarVariantSearchUrl} target="_blank" rel="noopener noreferrer"
+                data-tip="Search ClinVar for all variants at this variant's location">
+                Variants at this location
+                { externalLinkIconAppend }
+            </a>
+        </React.Fragment>
+    ) : null;
+
     if (!variationID) {
-        // No ClinVar info available ??
+        // No ClinVar info available. Still include link to search for variant at same location, though.
         return (
-            <div className="d-flex align-items-center justify-content-center text-large h-100">
-                <h4 className="font-italic text-400 my-0 pb-08">No record in ClinVar</h4>
+            <div className="d-flex align-items-center justify-content-center h-100 flex-column">
+                { clinVarSearchLink ? <div className="my-2 flex-grow-1 w-100 text-left">{ clinVarSearchLink }</div> : null }
+                <h4 className="font-italic text-400 my-0 pb-24 flex-grow-1">No record in ClinVar</h4>
             </div>
         );
     }
@@ -494,13 +563,14 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         <React.Fragment>
 
             <div className="mb-12">
-                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
+                <label data-tip={getTipForField("csq_clinvar")} className="mb-0 d-inline">ID: </label>
                 { clinvarExternalHref?
-                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer" data-tip="View this variant in ClinVar">
                         { variationID }
-                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                        { externalLinkIconAppend }
                     </a>
                     : <span>{ variationID }</span> }
+                { clinVarSearchLink ? <>&nbsp;&nbsp;|&nbsp;&nbsp;{ clinVarSearchLink }</> : null }
             </div>
 
             <div className="row mt-03">
@@ -652,3 +722,46 @@ export function getInitialTranscriptIndex(transcript) {
     }
     return parseInt(initialIndex);
 }
+
+const linksToGnomad = <span>More information available <a href="https://gnomad.broadinstitute.org/help/constraint" target="_blank" rel="noreferrer">from gnomAD</a> and in the <a href="https://doi.org/10.1038/s41586-020-2308-7" target="_blank" rel="noreferrer">gnomAD flagship paper</a>.</span>;
+
+const genePopoverContents = {
+    expected: (
+        <p>
+            Expected variant counts (from gnomAD) for each mutation class. {linksToGnomad}
+        </p>
+    ),
+    observed: (
+        <p>
+            Observed variant counts (from gnomAD) for each mutation class. {linksToGnomad}
+        </p>
+    ),
+    oerange: (
+        <p>
+            Quotient of observed variant counts over expected variant counts (from gnomAD) for each variant class. {linksToGnomad}
+        </p>
+    ),
+    zscore: (
+        <p>
+            Z-score for observed vs expected variant counts (from gnomAD) for each variant class. {linksToGnomad}
+        </p>
+    ),
+    loeuf: (
+        <p>
+            Loss-of-function observed/expected upper bound fraction; a metric that is developed by the gnomAD team and supersedes pLI. Applicable to LoF variants only. {linksToGnomad}
+        </p>
+    ),
+    shet: (
+        <p>
+            S-het is a score representing an estimate of the genome-wide distribution of selective effects for heterozygous protein truncating variants. Applicable to LoF variants only.
+            For more information, see <a href="https://doi.org/10.1038/s41586-020-2308-7" target="_blank" rel="noreferrer">the publication</a>.
+        </p>
+    ),
+    rvis: (
+        <p>
+            Residual Variation Intolerance Score, a gene-based score formulated based on allele frequency data in the ExAC cohort. Applicable to missense variants only.&nbsp;
+            A positive score indicates more common functional variation in the gene compared to genome-wide expectation; a negative score indicates less functional variation or intolerance to variation.&nbsp;
+            More information available at <a href="http://genic-intolerance.org/about" target="_blank" rel="noreferrer">http://genic-intolerance.org/about</a>.
+        </p>
+    )
+};

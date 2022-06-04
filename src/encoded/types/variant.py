@@ -23,7 +23,7 @@ from pyramid.settings import asbool
 from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 from snovault.calculated import calculate_properties
-from snovault.util import simple_path_ids, debug_log
+from snovault.util import simple_path_ids, debug_log, IndexSettings
 from snovault.embed import make_subrequest
 
 from ..batch_download_utils import (
@@ -263,6 +263,7 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
 
+
 def perform_patch_as_admin(request, item_atid, patch_payload):
     """
     Patches Items as 'UPGRADER' user/permissions.
@@ -294,7 +295,7 @@ class Variant(Item):
 
     item_type = 'variant'
     name_key = 'annotation_id'
-    schema = load_schema('encoded:schemas/variant.json')
+    schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant.json'))
     embedded_list = build_variant_embedded_list()
 
     @classmethod
@@ -482,6 +483,15 @@ class VariantSample(Item):
         'son_II_genotype_label'
     ]
 
+    class Collection(Item.Collection):
+        @staticmethod
+        def index_settings():
+            """ Type specific settings for variant_sample """
+            return IndexSettings(
+                shard_count=5,  # split the variant sample index into 5 shards
+                refresh_interval='5s'  # force update every 5 seconds
+            )
+
     @classmethod
     def create(cls, registry, uuid, properties, sheets=None):
         """ Sets the annotation_id field on this variant_sample prior to passing on. """
@@ -492,18 +502,88 @@ class VariantSample(Item):
         )
         return super().create(registry, uuid, properties, sheets)
 
+    @staticmethod
+    def remove_reference_transcript(hgvs_formatted_string):
+        """Remove reference transcript from HGVS-formatted variant name.
+
+        Typically, these HGVS-formatted variants come from VEP.
+
+        NOTE: HGVS nomenclature can use colons after the reference
+        transcript, but none of those situations should arise within
+        VariantSamples (SNVs and small indels). For more info, see
+        https://varnomen.hgvs.org/recommendations/general/
+        """
+        result = None
+        transcript_separator = ":"
+        if (
+            isinstance(hgvs_formatted_string, str)
+            and transcript_separator in hgvs_formatted_string
+        ):
+            split_value = hgvs_formatted_string.split(transcript_separator)
+            if len(split_value) > 1:
+                result = "".join(split_value[1:])
+        return result
+
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
         "type": "string"
     })
     def display_title(self, request, CALL_INFO, variant=None):
+        """Build display title.
+
+        This title is displayed in new tabs/windows.
+
+        In order, display hierarchy is:
+            - gene symbol with protein change + sample info
+            - gene symbol with cDNA change + sample info
+            - gene symbol with DNA change + sample info
+            - chromosome with DNA change + sample info
+            - sample info (shouldn't be reached, but just in case)
+        """
+        result = CALL_INFO
         variant = get_item_or_none(request, variant, 'Variant', frame='raw')
-        variant_display_title = build_variant_display_title(variant['CHROM'], variant['POS'],
-                                                            variant['REF'], variant['ALT'])
         if variant:
-            return CALL_INFO + ':' + variant_display_title  # HG002:chr1:504A>T
-        return CALL_INFO
+            gene_display = None
+            hgvsp_display = None
+            hgvsc_display = None
+            chromosome = variant.get("CHROM")
+            position = variant.get("POS")
+            reference = variant.get("REF")
+            alternate = variant.get("ALT")
+            dna_separator = ":g."
+            if chromosome == "M":
+                dna_separator = ":m."
+            genes = variant.get("genes", [])
+            if genes:
+                gene_properties = genes[0]  # Currently max 1 via reformatter, but can be more
+                gene_uuid = gene_properties.get("genes_most_severe_gene")
+                if gene_uuid:
+                    gene_item = get_item_or_none(request, gene_uuid, "Gene", frame="raw")
+                    if gene_item:
+                        gene_display = gene_item.get("gene_symbol")
+                hgvsp = gene_properties.get("genes_most_severe_hgvsp")
+                if hgvsp:
+                    hgvsp_display = self.remove_reference_transcript(hgvsp)
+                hgvsc = gene_properties.get("genes_most_severe_hgvsc")
+                if hgvsc:
+                    hgvsc_display = self.remove_reference_transcript(hgvsc)
+            if gene_display:
+                if hgvsp_display:
+                    result = gene_display + ":" + hgvsp_display
+                elif hgvsc_display:
+                    result = gene_display + ":" + hgvsc_display
+                elif position and reference and alternate:
+                    result = "%s%s%s%s>%s" % (
+                        gene_display, dna_separator, position, reference, alternate
+                    )
+            elif chromosome and position and reference and alternate:
+                result = build_variant_display_title(
+                    chromosome, position, reference, alternate
+                )
+        if CALL_INFO not in result:
+            result += " (" + CALL_INFO + ")"
+        return result
 
     @calculated_property(schema={
         "title": "Variant Sample List",
@@ -784,12 +864,6 @@ def download(context, request):
     raise HTTPTemporaryRedirect(location=location)  # 307
 
 
-
-
-
-
-
-
 @view_config(
     name='process-notes',
     context=VariantSample,
@@ -1041,6 +1115,69 @@ class VariantSampleList(Item):
 
 
 @view_config(
+    name='add-selections',
+    context=VariantSampleList,
+    request_method='PATCH',
+    permission='edit'
+)
+def add_selections(context, request):
+    """
+    Adds selections to VariantSampleList, preserving existing data such as selected_by which may not be
+    visible to current 'adder'.
+    """
+
+    request_body = request.json
+    namespace, userid = request.authenticated_userid.split(".", 1)
+
+    # We expect lists of { variant_sample_item: uuid, filter_blocks_used: { filter_blocks: { name: str, query: str }[] } }.
+    # Value for "date_selected" will be set during PATCH by schema serverDefault.
+    requested_variant_samples = request_body.get("variant_samples")
+    requested_structural_variant_samples = request_body.get("structural_variant_samples")
+
+    existing_variant_samples = context.properties.get("variant_samples", [])
+    existing_structural_variant_samples = context.properties.get("structural_variant_samples", [])
+
+    patch_payload = {}
+
+    # Skip adding duplicate selections (shouldn't occur, but just in case)
+    existing_selections_by_uuid = {}
+    for selection in existing_variant_samples + existing_structural_variant_samples:
+        existing_selections_by_uuid[selection["variant_sample_item"]] = selection
+
+    def make_selection_payload(vs_sel):
+        return {
+            "selected_by": userid,
+            "variant_sample_item": vs_sel["variant_sample_item"],
+            "filter_blocks_used": vs_sel["filter_blocks_used"]
+            # date_selected - will be filled upon PATCH
+        }
+
+    if requested_variant_samples is not None:
+        patch_payload["variant_samples"] = existing_variant_samples.copy()
+        for vs_sel in requested_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            patch_payload["variant_samples"].append(make_selection_payload(vs_sel))
+
+    if requested_structural_variant_samples is not None:
+        patch_payload["structural_variant_samples"] = existing_structural_variant_samples.copy()
+        for vs_sel in requested_structural_variant_samples:
+            if vs_sel["variant_sample_item"] in existing_selections_by_uuid:
+                continue
+            patch_payload["structural_variant_samples"].append(make_selection_payload(vs_sel))
+
+    if not patch_payload:
+        return HTTPNotModified("Nothing submitted")
+
+    patch_result = perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+
+    return {
+        "status": "success",
+        "@type": ["result"]
+    }
+
+
+@view_config(
     name='order-delete-selections',
     context=VariantSampleList,
     request_method='PATCH',
@@ -1089,7 +1226,6 @@ def order_delete_selections(context, request):
         "status": "success",
         "@type": ["result"]
     }
-
 
 
 @view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
@@ -1415,6 +1551,7 @@ def get_spreadsheet_mappings(request = None):
         ("Variant notes (prev)",                    own_project_note_factory("variant.variant_notes", "note_text"),                             "Additional notes on variant written for previous cases"),
         ("Gene notes (prev)",                       own_project_note_factory("variant.genes.genes_most_severe_gene.gene_notes", "note_text"),   "Additional notes on gene written for previous cases"),
     ]
+
 
 def get_fields_to_embed(spreadsheet_mappings):
     fields_to_embed = [

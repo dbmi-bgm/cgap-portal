@@ -130,7 +130,7 @@ export default class ExcelSubmissionView extends React.PureComponent {
                 if (value === "View Family Info") {
                     navigate(familyAtID || "/?type=Family&sort=-date_created");
                 } else if (value === "View Related Cases") {
-                    navigate(`/search/?type=Case&family.ingestion_ids=${uuid}&proband_case=true`);
+                    navigate(`/search/?type=Case&sample_processing.families.ingestion_ids=${uuid}&proband_case=true`);
                 }
                 break;
             default:
@@ -765,10 +765,14 @@ function useInterval(callback, delay) {
     }, [delay]);
 }
 
+/**
+ * Note: by default Poller now uses datastore=database calls - this is to avoid bugs related to the late indexing of updated submissions
+ * and should not cause performance issues since there are limited items embedded onto ingestion submission items.
+ */
 function Poller(props){
     const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts } = props;
     const { uuid } = context || {};
-    const getURL = "/ingestion-submissions/" + uuid;
+    const getURL = "/ingestion-submissions/" + uuid + "/?frame=object&datastore=database";
 
     const timeStarted = new Date(Date.now());
     const [ lastUpdated, setLastUpdated ] = useState(timeStarted.toLocaleTimeString('en-US'));

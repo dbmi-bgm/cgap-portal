@@ -72,7 +72,7 @@ $navbar-background-color: #20445f;
 $navbar-link-color : rgb(210, 218, 223);
 $navbar-link-hover-color : #fff;
 $navbar-link-active-color : #fff;
-$navbar-link-hover-bg: darken($navbar-background-color, 5%);
+$navbar-link-hover-bg: #0005; //darken($navbar-background-color, 5%);
 //$navbar-link-hover-bg: lighten($navbar-background-color, 10%);
 $navbar-link-active-bg: lighten($navbar-background-color, 5%);
 $navbar-default-brand-color: rgb(210, 218, 223);

@@ -1,3 +1,4 @@
+import sys
 import uptime
 
 from collections import OrderedDict
@@ -7,7 +8,7 @@ from dcicutils.env_utils import infer_foursight_url_from_env
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
 from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
-from .appdefs import APP_VERSION_REGISTRY_KEY
+from .appdefs import APP_VERSION_REGISTRY_KEY, ITEM_INDEX_ORDER
 from .schema_formats import is_accession
 from .util import SettingsKey
 
@@ -15,6 +16,7 @@ from .util import SettingsKey
 def includeme(config):
     config.include(health_check)
     config.include(item_counts)
+    config.include(type_metadata)
     config.include(submissions_page)
     config.scan(__name__)
 
@@ -56,6 +58,23 @@ def item_counts(config):
     config.add_view(counts_view, route_name='item-counts')
 
 
+def type_metadata(config):
+
+    config.add_route(
+        'type-metadata',
+        '/type-metadata'
+    )
+
+    def type_metadata_view(request):
+
+        return {
+            'index_order': ITEM_INDEX_ORDER
+        }
+
+    config.add_view(type_metadata_view, route_name='type-metadata')
+
+
+
 def uptime_info():
     try:
         return lang_utils.relative_time_string(uptime.uptime())
@@ -76,6 +95,7 @@ def health_check(config):
 
         class ExtendedHealthPageKey(HealthPageKey):
             # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
+            PYTHON_VERSION = "python_version"
             pass
 
         h = ExtendedHealthPageKey
@@ -119,6 +139,7 @@ def health_check(config):
             h.NAMESPACE: settings.get(s.INDEXER_NAMESPACE),
             h.PROCESSED_FILE_BUCKET: settings.get(s.FILE_WFOUT_BUCKET),
             h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
+            h.PYTHON_VERSION: f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
             h.S3_ENCRYPT_KEY_ID: settings.get(s.S3_ENCRYPT_KEY_ID),
             h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
             h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
@@ -217,7 +238,7 @@ class CGAPRoot(Root):
         return acl
 
     def get(self, name, default=None):
-        resource = super(CGAPRoot, self).get(name, None)
+        resource = super().get(name, None)
         if resource is not None:
             return resource
         resource = self.connection.get_by_unique_key('page:location', name)
@@ -242,7 +263,7 @@ class CGAPRoot(Root):
 
     def jsonld_type(self):
         """Inherits from '@type' calculated property of Root in snovault/resources.py"""
-        return ['HomePage', 'StaticPage'] + super(CGAPRoot, self).jsonld_type()
+        return ['HomePage', 'StaticPage'] + super().jsonld_type()
 
     @calculated_property(schema={
         "title": "Static Page Content",

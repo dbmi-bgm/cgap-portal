@@ -194,7 +194,7 @@ const AffectedBGPieChart = React.memo(function AffectedBGPieChart({
         return diseaseToIndex[disease];
     });
     const diseaseLen = visibleDiseases.length;
-    if (diseaseLen === 0) return;
+    if (diseaseLen === 0) return null;
     const centerX = width / 2;
     const centerY = shape.type === TerminatedPregnancyShape ? height / 4 : height / 2;
     const clipID = "pedigree_clipPath_for_" + (shapeTypeToString(shape.type)) + "_viewID" + vizViewID;

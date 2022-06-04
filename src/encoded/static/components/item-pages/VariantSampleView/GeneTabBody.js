@@ -1,12 +1,13 @@
 'use strict';
 
-import React, { useMemo, useState } from 'react';
+import React, { useMemo, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { console, schemaTransforms, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 
 import { ExternalDatabasesSection, GeneOverview, ConstraintScoresSection } from './AnnotationSections';
+import ReactTooltip from 'react-tooltip';
 
 
 /**
@@ -35,6 +36,11 @@ export function GeneTabBody(props){
             return (schemaProperty || {}).description || null;
         };
     }, [ schemas ]);
+
+    // When gene item is loaded, trigger a quick update of tooltips
+    useEffect(() => {
+        ReactTooltip.rebuild();
+    }, [currentGeneItem]);
 
     if (currentGeneItemLoading) {
         return (
@@ -95,7 +101,7 @@ export function GeneTabBody(props){
                         </div>
                         <div className="info-body">
                             {/* maybe Gene Resources sub-header here */}
-                            <ExternalDatabasesSection {...{ schemas, currentGeneItem }} currentItem={currentGeneItem} />
+                            <ExternalDatabasesSection {...{ schemas }} currentItem={currentGeneItem} />
                         </div>
                     </div>
 

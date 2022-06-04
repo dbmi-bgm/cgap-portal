@@ -4,6 +4,7 @@ from snovault import (
     load_schema,
     # display_title_schema
 )
+from snovault.util import IndexSettings
 from .base import (
     Item,
     get_item_or_none
@@ -25,13 +26,21 @@ def _build_family_embeds(*, base_path):
 
         # Individual linkTo
         "proband.accession",
+        "proband.individual_id",
+
+        # Individual linkTo
+        "mother.accession",
+        "mother.individual_id",
+
+        # Individual linkTo
+        "father.accession",
+        "father.individual_id",
 
         # Array of phenotypes linkTo
         "family_phenotypic_features.phenotype_name",
 
         # Individual linkTo
         "members.*",
-        # We need to have mother and father (or 'parents' maybe eventually) for all members with at least @id.
 
         # Case linkTo
         "members.case.case_title",
@@ -40,7 +49,9 @@ def _build_family_embeds(*, base_path):
         "members.case.report",
         "members.case.report.accession",
         "members.case.family",
+        "members.case.family.family_id",
         "members.case.individual",
+        "members.case.individual.individual_id",
         "members.case.sample_processing",
         "members.case.sample.accession",
         "members.case.sample.workup_type",
@@ -94,7 +105,18 @@ def _build_case_embedded_list():
     """ Helper function intended to be used to create the embedded list for case.
         All types should implement a function like this going forward.
     """
-    return _build_family_embeds(base_path='family') + [
+    return [
+
+        ## Canonical Family, grab UUID and @ID to help ID it within sample_processing.families on UI
+        "family.@id",
+        "family.uuid",
+
+        # Used for search column
+        "family.accession",
+        "family.family_id",
+        "family.title",
+        "family.last_modified.date_modified",
+
         # Individual linkTo
         "individual.accession",
         "individual.date_created",
@@ -214,38 +236,10 @@ def _build_case_embedded_list():
         "sample_processing.completed_processes",
         "sample_processing.samples_pedigree.*",
 
-        # Family linkTo
-        "sample_processing.families.family_id",
-        "sample_processing.families.title",
-        "sample_processing.families.accession",
-        "sample_processing.families.analysis_groups",
 
-        # Individual linkTo
-        "sample_processing.families.proband.accession",
-        "sample_processing.families.proband.individual_id",
+        # Sample Processing - Family[] linkTo
+        *_build_family_embeds(base_path='sample_processing.families'),
 
-        # Individual linkTo
-        "sample_processing.families.mother.accession",
-        "sample_processing.families.mother.individual_id",
-
-        # Individual linkTo
-        "sample_processing.families.father.accession",
-        "sample_processing.families.father.individual_id",
-
-        # Individual linkTo
-        "sample_processing.families.members.accession",
-        "sample_processing.families.members.individual_id",
-
-        # Sample linkTo
-        "sample_processing.families.members.samples.accession",
-
-        # Case linkTo
-        # XXX: should it embed sample processing as well?
-        "sample_processing.families.members.case.case_id",
-        "sample_processing.families.members.case.report.accession",
-        "sample_processing.families.members.case.family.family_id",
-        "sample_processing.families.members.case.individual.individual_id",
-        "sample_processing.families.members.case.sample.accession",
 
         # Sample linkTo
         "sample_processing.samples.accession",
@@ -325,6 +319,16 @@ class Case(Item):
     schema = load_schema('encoded:schemas/case.json')
     embedded_list = _build_case_embedded_list()
 
+    class Collection(Item.Collection):
+        @staticmethod
+        def index_settings():
+            """ Type specific settings for case """
+            return IndexSettings(
+                replica_count=2,  # hold 2 copies of this index
+                shard_count=2,  # split the index into two shards
+                refresh_interval='3s'  # force update every 3 seconds
+            )
+
     @calculated_property(schema={
         "title": "Display Title",
         "description": "A calculated title for every object in 4DN",
@@ -380,6 +384,31 @@ class Case(Item):
         secondary_families = [i for i in individual_families if i != family]
         return secondary_families
 
+    @staticmethod
+    def get_vcf_from_sample_processing(request, sample_processing_atid, variant_type):
+        """Retrieve VCF for ingestion of given variant type.
+
+        For backwards compatibility, assume variant type of SNV if none
+        provided.
+        """
+        vcf_file = None
+        sample_processing = get_item_or_none(
+            request, sample_processing_atid, "sample-processings"
+        )
+        if sample_processing:
+            processed_files = sample_processing.get("processed_files", [])
+            for processed_file in processed_files[::-1]:  # Take last in list (~newest)
+                file_data = get_item_or_none(request, processed_file, 'files-processed')
+                file_type = file_data.get("file_type", "")
+                file_variant_type = file_data.get("variant_type", "SNV")
+                if (
+                    file_type == "full annotated VCF"
+                    and file_variant_type == variant_type
+                ):
+                    vcf_file = file_data["@id"]
+                    break
+        return vcf_file
+
     @calculated_property(schema={
         "title": "SNV VCF File",
         "description": "VCF file that will be used in SNV variant digestion",
@@ -390,22 +419,12 @@ class Case(Item):
         """
         Map the SNV vcf file to be digested.
         """
-        vcf_file = {}
-        if not sample_processing:
-            return vcf_file
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        if not sp_data:
-            return vcf_file
-        files_processed = sp_data.get('processed_files', [])
-        if not files_processed:
-            return vcf_file
-        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type != "SV":
-                vcf_file = file_data["@id"]
-                break
+        vcf_file = None
+        variant_type = "SNV"
+        if sample_processing:
+            vcf_file = self.get_vcf_from_sample_processing(
+                request, sample_processing, variant_type
+            )
         return vcf_file
 
     @calculated_property(schema={
@@ -418,23 +437,29 @@ class Case(Item):
         """
         Map the SV vcf file to be digested.
         """
-        sv_vcf_file = {}
-        if not sample_processing:
-            return sv_vcf_file
-        sp_data = get_item_or_none(request, sample_processing, 'sample-processings')
-        if not sp_data:
-            return sv_vcf_file
-        files_processed = sp_data.get('processed_files', [])
-        if not files_processed:
-            return sv_vcf_file
-        for file_processed in files_processed[::-1]:  #VCFs usually at/near end of list
-            file_data = get_item_or_none(request, file_processed, 'files-processed')
-            file_type = file_data.get("file_type", "")
-            file_variant_type = file_data.get("variant_type", "")
-            if file_type == "full annotated VCF" and file_variant_type == "SV":
-                sv_vcf_file = file_data["@id"]
-                break
+        sv_vcf_file = None
+        variant_type = "SV"
+        if sample_processing:
+            sv_vcf_file = self.get_vcf_from_sample_processing(
+                request, sample_processing, variant_type
+            )
         return sv_vcf_file
+
+    @calculated_property(schema={
+        "title": "CNV VCF File",
+        "description": "VCF file that will be used in CNV ingestion",
+        "type": "string",
+        "linkTo": "File"
+    })
+    def cnv_vcf_file(self, request, sample_processing=None):
+        """Map the CNV vcf file to be ingested."""
+        cnv_vcf_file = None
+        variant_type = "CNV"
+        if sample_processing:
+            cnv_vcf_file = self.get_vcf_from_sample_processing(
+                request, sample_processing, variant_type
+            )
+        return cnv_vcf_file
 
     @calculated_property(schema={
         "title": "Search Query Filter String Add-On",
@@ -473,7 +498,7 @@ class Case(Item):
             self, request, sample_processing=None, individual=None
     ):
         """
-        Use SV vcf file and sample accessions to limit structural variants/
+        Use SV and CNV VCF files and sample accessions to limit
         structural variant samples to this case.
         """
         if not individual or not sample_processing:
@@ -481,17 +506,22 @@ class Case(Item):
         sample = self.sample(request, individual, sample_processing)
         if not sample:
             return ''
-        vcf = self.structural_variant_vcf_file(request, sample_processing)
-        if not vcf:
+        sv_vcf = self.structural_variant_vcf_file(request, sample_processing)
+        cnv_vcf = self.cnv_vcf_file(request, sample_processing)
+        if not sv_vcf and not cnv_vcf:
             return ''
         sp_data = get_item_or_none(request, sample, 'sample')
         sample_read_group = sp_data.get('bam_sample_id', '')
         if not sample_read_group:
             return ''
-        vcf_acc = vcf.split('/')[2]
-        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
+        add_on = "CALL_INFO={}".format(sample_read_group)
+        if sv_vcf:
+            sv_vcf_accession = sv_vcf.split("/")[2]
+            add_on += "&file={}".format(sv_vcf_accession)
+        if cnv_vcf:
+            cnv_vcf_accession = cnv_vcf.split("/")[2]
+            add_on += "&file={}".format(cnv_vcf_accession)
         return add_on
-
 
     @calculated_property(schema={
         "title": "Additional Variant Sample Facets",

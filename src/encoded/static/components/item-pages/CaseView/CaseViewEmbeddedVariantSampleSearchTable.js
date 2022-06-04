@@ -7,7 +7,7 @@ import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
-import { navigateChildWindow } from './../components/child-window-reuser';
+import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 
@@ -39,9 +39,9 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                 "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
                 "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
                 "render": function(result, parentProps){
-                    const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+                    const { context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, context, rowNumber, detailOpen, toggleDetailOpen,
                             selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
                             <VariantSampleDisplayTitleColumn />
                         </VariantSampleDisplayTitleColumnWrapper>
@@ -64,7 +64,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
 }
 
 /**
@@ -96,9 +96,9 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                 "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
                 "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
                 "render": function(result, parentProps){
-                    const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+                    const { context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, context, rowNumber, detailOpen, toggleDetailOpen,
                             selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
                             <VariantSampleDisplayTitleColumnSV />
                         </VariantSampleDisplayTitleColumnWrapper>
@@ -163,10 +163,12 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         };
     }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} />;
+    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
 }
 
-/** Open Variant Sample in new window */
+/**
+ * Open Variant Sample in new window
+ */
 function VariantSampleDisplayTitleColumnWrapper (props) {
     const {
         result, href, context, rowNumber, detailOpen, toggleDetailOpen,
@@ -177,8 +179,8 @@ function VariantSampleDisplayTitleColumnWrapper (props) {
     const onClick = useCallback(function(evt){
         evt.preventDefault();
         evt.stopPropagation(); // Avoid having event bubble up and being caught by App.js onClick.
-        const { "@id": resultAtID } = result;
-        navigateChildWindow(resultAtID);
+        const { "@id": resultAtID, uuid: resultUUID } = result;
+        navigateChildWindow(resultAtID, resultUUID);
         return false;
     }, [ result ]);
 
@@ -188,7 +190,7 @@ function VariantSampleDisplayTitleColumnWrapper (props) {
     }
 
     return (
-        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen, onClick }}>
+        <DisplayTitleColumnWrapper {...{ result, context, rowNumber, detailOpen, toggleDetailOpen, onClick }} link="#">
             { checkbox }{ children }
         </DisplayTitleColumnWrapper>
     );

@@ -33,7 +33,7 @@ We have developed a python package for submission of
  accessioning spreadsheets to the CGAP portal, called
  SubmitCGAP. The current version is still in beta. It can be
  installed by running `pip install submit-cgap`. We recommend
- doing this inside a virtual environment running python 3.6.
+ doing this inside a virtual environment running python 3.7.
  Further instructions for submission with this method can be
  found in the [SubmitCGAP documentation](https://submitcgap.readthedocs.io/en/latest/index.html).
  Briefly, the basic commands are as follows:

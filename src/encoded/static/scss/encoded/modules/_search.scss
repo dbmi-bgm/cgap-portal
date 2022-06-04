@@ -369,7 +369,15 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
 
 	.result-table-detail-container {
 		.result-table-detail {
-			padding-left: 57px;
+	
+			> .close-button-container {
+				/* Becomes width 31px with margin of 7px on both sides (self-margin-left+nth-child(2)margin-left) ==> adds up the 45px width on toggle-detail-button-container */
+				/* And then re-using the 10px gap from .close-button-container margin-right.*/
+				width: 31px;
+			}
+			> *:nth-child(2) {
+				margin-left: 7px;
+			}
 		}
 	}
 

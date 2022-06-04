@@ -7,6 +7,7 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ExternalDatabasesSection, ClinVarSection, standardizeGnomadValue } from './AnnotationSections';
+import QuickPopover from '../components/QuickPopover';
 
 /**
  * Excluding the Gene Area (under position in mockuop https://gyazo.com/81d5b75b167bddef1b4c0a97f1640c51)
@@ -42,7 +43,10 @@ export const VariantTabBody = React.memo(function VariantTabBody (props) {
             ret.getTipForField = function(field, itemType = "Variant"){
                 // Func is scoped within GeneTabBody (uses its 'schemas')
                 const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
-                return (schemaProperty || {}).description || null;
+
+                const { description, extended_description } = schemaProperty || {};
+                if (extended_description) { return extended_description; }
+                return description || null;
             };
             if (variationID) {
                 const clinvarIDSchemaProperty = schemaTransforms.getSchemaProperty("csq_clinvar", schemas, "Variant");
@@ -303,7 +307,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_gerp_rs")}>GERP++</label>
+                                <label className="mb-0">GERP++</label>
+                                <QuickPopover popID="GERP++" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_gerp_rs")} />
                             </td>
                             <td className="text-left">{ csq_gerp_rs }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -311,7 +316,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_cadd_phred")}>CADD</label>
+                                <label className="mb-0">CADD</label>
+                                <QuickPopover popID="CADD" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_cadd_phred")} />
                             </td>
                             <td className="text-left">{ csq_cadd_phred }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -319,7 +325,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phylop30way_mammalian")}>phyloP (30 Mammals)</label>
+                                <label className="mb-0">phyloP (30 Mammals)</label>
+                                <QuickPopover popID="phylop30" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_phylop30way_mammalian")} />
                             </td>
                             <td className="text-left">{ csq_phylop30way_mammalian }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -327,7 +334,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phylop100way_vertebrate")}>phyloP (100 Vertebrates)</label>
+                                <label className="mb-0">phyloP (100 Vertebrates)</label>
+                                <QuickPopover popID="phylop100" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_phylop100way_vertebrate")} />
                             </td>
                             <td className="text-left">{ csq_phylop100way_vertebrate }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -335,7 +343,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_phastcons100way_vertebrate")}>phastCons (100 Vertebrates)</label>
+                                <label className="mb-0">phastCons (100 Vertebrates)</label>
+                                <QuickPopover popID="phastcons" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_phastcons100way_vertebrate")}/>
                             </td>
                             <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -358,7 +367,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_sift_score")}>SIFT</label>
+                                <label className="mb-0">SIFT</label>
+                                <QuickPopover popID="SIFT" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_sift_score")} />
                             </td>
                             <td className="text-left">{ csq_sift_score }</td>
                             <td className="text-left">{ csq_sift_pred }</td>
@@ -366,7 +376,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_polyphen2_hvar_score")}>PolyPhen2</label>
+                                <label className="mb-0">PolyPhen2</label>
+                                <QuickPopover popID="PolyPhen2" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_polyphen2_hvar_score")} />
                             </td>
                             <td className="text-left">{ csq_polyphen2_hvar_score }</td>
                             <td className="text-left">{ csq_polyphen2_hvar_pred }</td>
@@ -374,7 +385,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_primateai_score")}>PrimateAI DL Score</label>
+                                <label className="mb-0">PrimateAI DL Score</label>
+                                <QuickPopover popID="PrimateAI" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_primateai_score")} />
                             </td>
                             <td className="text-left">{ csq_primateai_score }</td>
                             <td className="text-left">{ csq_primateai_pred }</td>
@@ -382,7 +394,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                         </tr>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("csq_revel_score")}>REVEL</label>
+                                <label className="mb-0">REVEL</label>
+                                <QuickPopover popID="REVEL" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_revel_score")} />
                             </td>
                             <td className="text-left">{ csq_revel_score }</td>
                             <td className="text-left">{ fallbackElem }</td>
@@ -410,7 +423,8 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <tbody>
                         <tr>
                             <td className="text-left">
-                                <label className="mb-0" data-tip={getTipForField("spliceaiMaxds")}>SpliceAI</label>
+                                <label className="mb-0">SpliceAI</label>
+                                <QuickPopover popID="SpliceAI" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("spliceaiMaxds")} />
                             </td>
                             <td className="text-left">{ spliceaiMaxds }</td>
                         </tr>
@@ -498,9 +512,25 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
             </div>
         );
     }
+    externalResourcesAppend.push(hgmdSearchLink);
 
     return (
         <ExternalDatabasesSection itemType="Variant" {...{ currentItem, schemas, externalDatabaseFieldnames }} appendItems={externalResourcesAppend} />
     );
 }
 
+const hgmdSearchLink = [
+    <div className="row mb-03" key="POS">
+        <div className="col-12 col-lg">
+            <label className="mb-0 black-label" htmlFor="external_resource_for_hgmdidsearch" data-tip="HGMD Public (Human Gene Mutation Database)">
+                HGMD (Professional)
+            </label>
+        </div>
+        <div className="col-12 col-lg-auto">
+            <a href="https://my.qiagendigitalinsights.com/bbp/view/hgmd/pro/search_mut.php" className="d-block" target="_blank" rel="noopener noreferrer" id="external_resource_for_hgmdidsearch">
+                <span className="align-middle">Search</span>
+                <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+            </a>
+        </div>
+    </div>
+];

@@ -78,12 +78,12 @@ const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, wi
     return (
         <div className="recent-cases-table-section mb-36">
             <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} embeddedTableHeader={<AboveCasesTableOptions />}
-                hideFacets={["project.display_title", "report.uuid", "proband_case"]}/>
+                hideFacets={["project.display_title", "report.uuid", "proband_case"]} stickyFirstColumn />
         </div>
     );
 });
 
-function AboveCasesTableOptions(props){
+const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props){
     const {
         context,
         onFilter, isContextLoading, navigate,
@@ -125,13 +125,13 @@ function AboveCasesTableOptions(props){
                     <DropdownButton variant="primary d-flex align-items-center" id="submit-new" className="px-1"
                         title={<React.Fragment><i className="icon fas icon-plus mr-1"/>Submit New...</React.Fragment>}>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
-                            Case(s)
+                            Case
                         </Dropdown.Item>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Family History">
                             Family History
                         </Dropdown.Item>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
-                            Gene List(s)
+                            Gene List
                         </Dropdown.Item>
                     </DropdownButton>
 
@@ -164,7 +164,7 @@ function AboveCasesTableOptions(props){
             </div>
         </React.Fragment>
     );
-}
+});
 
 
 class ProjectFilterCheckbox extends React.PureComponent {

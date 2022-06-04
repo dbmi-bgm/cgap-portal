@@ -1,0 +1,2266 @@
+[
+    {
+        "GQ": 190,
+        "GT": "0/1",
+        "PL": "240,0,542",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 190,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "240,0,542"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:13:10.911137+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:3d5b7912-6e3f-40a3-b58b-ff52a8bfb839:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:13:10.528603+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "3d5b7912-6e3f-40a3-b58b-ff52a8bfb839",
+        "confidence_interval_end": [
+            -553,
+            554
+        ],
+        "confidence_interval_start": [
+            -541,
+            542
+        ],
+        "uuid": "adb1d631-410a-472d-b60c-fc558f8a2a4b"
+    },
+    {
+        "GQ": 112,
+        "GT": "0/1",
+        "PL": "162,0,541",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 112,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "162,0,541"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:13:10.340292+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:60da76c9-60f2-4add-9f2d-e8b937b519af:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:13:09.037423+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "60da76c9-60f2-4add-9f2d-e8b937b519af",
+        "confidence_interval_end": [
+            -540,
+            540
+        ],
+        "confidence_interval_start": [
+            -302,
+            302
+        ],
+        "uuid": "705d41c3-27d7-4278-9a88-30968eaef23b"
+    },
+    {
+        "GQ": 298,
+        "GT": "0/1",
+        "PL": "352,0,298",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 298,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "352,0,298"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:13:08.435421+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:fdbab898-4cf5-4823-b0ec-9649a9564a59:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:54.969942+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "fdbab898-4cf5-4823-b0ec-9649a9564a59",
+        "confidence_interval_end": [
+            -517,
+            518
+        ],
+        "confidence_interval_start": [
+            -515,
+            515
+        ],
+        "uuid": "eb524878-1dda-4d9f-a77b-8660619a2bfa"
+    },
+    {
+        "GQ": 40,
+        "GT": "0/1",
+        "PL": "90,0,553",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 40,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "90,0,553"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:54.794811+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:822a93b9-c21f-4ef2-b688-17818e037a11:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:52.929933+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "822a93b9-c21f-4ef2-b688-17818e037a11",
+        "confidence_interval_end": [
+            -396,
+            397
+        ],
+        "confidence_interval_start": [
+            -496,
+            496
+        ],
+        "uuid": "6b9cd0fc-b72e-4a9b-b053-23db89e95ad1"
+    },
+    {
+        "GQ": 500,
+        "GT": "0/1",
+        "PL": "551,0,504",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 500,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "551,0,504"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:52.846891+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:381383a1-06b5-42b3-8282-5e5d19d9fa90:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:52.578223+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "381383a1-06b5-42b3-8282-5e5d19d9fa90",
+        "uuid": "48d670c9-2eab-4ff2-8104-9deeea618bfa"
+    },
+    {
+        "GQ": 61,
+        "GT": "1/1",
+        "PL": "999,64,0",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_quality": 61,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "999,64,0"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:52.416884+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:721ea415-00ef-4b42-b5b9-eacc05640c37:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:51.383528+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "721ea415-00ef-4b42-b5b9-eacc05640c37",
+        "confidence_interval_start": [
+            0,
+            27
+        ],
+        "uuid": "da59c5ae-447c-4d69-8492-659d3d817ef3"
+    },
+    {
+        "GQ": 86,
+        "GT": "0/1",
+        "PL": "136,0,820",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 86,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "136,0,820"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:51.243868+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:3f94ce0a-9d69-4490-8101-8d14833c0c95:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:49.557880+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "3f94ce0a-9d69-4490-8101-8d14833c0c95",
+        "confidence_interval_end": [
+            -398,
+            398
+        ],
+        "confidence_interval_start": [
+            -374,
+            375
+        ],
+        "uuid": "15b1821d-eaed-41e8-a536-9f7d3daa1334"
+    },
+    {
+        "GQ": 164,
+        "GT": "0/1",
+        "PL": "214,0,577",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 164,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "214,0,577"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:49.417595+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:488d8ad9-a79e-4a52-b01f-85e3ab8ebe70:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:48.104087+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "488d8ad9-a79e-4a52-b01f-85e3ab8ebe70",
+        "confidence_interval_end": [
+            -356,
+            356
+        ],
+        "confidence_interval_start": [
+            -391,
+            391
+        ],
+        "uuid": "0761d20e-feac-45e2-a397-0a6dff8be66e"
+    },
+    {
+        "GQ": 149,
+        "GT": "0/1",
+        "PL": "199,0,544",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 149,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "199,0,544"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:47.983997+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:4de9804c-174f-4f18-9840-7fd05c59cf87:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:46.795102+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "4de9804c-174f-4f18-9840-7fd05c59cf87",
+        "confidence_interval_end": [
+            -260,
+            260
+        ],
+        "confidence_interval_start": [
+            -341,
+            341
+        ],
+        "uuid": "0b9877e6-12bc-41e3-8ecf-8f25e4ef8592"
+    },
+    {
+        "GQ": 20,
+        "GT": "0/1",
+        "PL": "70,0,348",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 20,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "70,0,348"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:46.657681+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:5890b1ab-383d-4f9d-a7c8-8b16dcb26ac0:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:43.569669+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "5890b1ab-383d-4f9d-a7c8-8b16dcb26ac0",
+        "confidence_interval_end": [
+            -504,
+            505
+        ],
+        "confidence_interval_start": [
+            -324,
+            324
+        ],
+        "uuid": "59cad1c8-0ef4-4051-aae7-c3abd950759b"
+    },
+    {
+        "GQ": 281,
+        "GT": "0/1",
+        "PL": "331,0,381",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 281,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "331,0,381"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:43.380806+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:06781469-6476-44e0-8421-fe0e01097840:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:42.965268+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "06781469-6476-44e0-8421-fe0e01097840",
+        "confidence_interval_end": [
+            -370,
+            370
+        ],
+        "confidence_interval_start": [
+            -439,
+            440
+        ],
+        "uuid": "1634c99f-0db3-4441-bff4-aede32c5758a"
+    },
+    {
+        "GQ": 69,
+        "GT": "0/1",
+        "PL": "119,0,565",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 69,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "119,0,565"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:42.880523+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:d6e75758-15a8-4b24-8662-4cfcbcf91553:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:42.490932+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "d6e75758-15a8-4b24-8662-4cfcbcf91553",
+        "confidence_interval_end": [
+            -272,
+            272
+        ],
+        "confidence_interval_start": [
+            -411,
+            411
+        ],
+        "uuid": "3d3f3bf1-c5d1-4f10-af05-3b356b29f611"
+    },
+    {
+        "GQ": 21,
+        "GT": "1/1",
+        "PL": "341,24,0",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_quality": 21,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "341,24,0"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:42.429710+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:aec9dfc5-27a4-4e73-aad3-92f85575e3d1:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:42.272820+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "aec9dfc5-27a4-4e73-aad3-92f85575e3d1",
+        "confidence_interval_start": [
+            0,
+            84
+        ],
+        "uuid": "3100de99-5046-48f0-a240-39de4c37a2e9"
+    },
+    {
+        "GQ": 723,
+        "GT": "0/1",
+        "PL": "999,0,720",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 723,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "999,0,720"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:42.128411+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:62ebf253-fad1-44cd-b1c0-2fbc953877be:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:38.514614+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "62ebf253-fad1-44cd-b1c0-2fbc953877be",
+        "confidence_interval_end": [
+            0,
+            12
+        ],
+        "confidence_interval_start": [
+            0,
+            12
+        ],
+        "uuid": "4da0e094-783f-4e94-b0ff-709567a3ce67"
+    },
+    {
+        "GQ": 723,
+        "GT": "0/1",
+        "PL": "999,0,720",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 723,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "999,0,720"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:38.273699+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:14677428-677d-44bc-901c-6c9f573ff398:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:34.824612+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "14677428-677d-44bc-901c-6c9f573ff398",
+        "confidence_interval_end": [
+            -468,
+            469
+        ],
+        "confidence_interval_start": [
+            -451,
+            452
+        ],
+        "uuid": "bc2b5800-8e2b-4445-9686-4c3ed30e5088"
+    },
+    {
+        "GQ": 344,
+        "GT": "0/1",
+        "PL": "394,0,999",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 344,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "394,0,999"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:34.735462+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:f39dd792-f8fa-4e6d-a4ba-2a21bd3212b1:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:33.804114+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "f39dd792-f8fa-4e6d-a4ba-2a21bd3212b1",
+        "uuid": "a648e510-2034-463c-97e3-475c7d29fd84"
+    },
+    {
+        "GQ": 21,
+        "GT": "0/1",
+        "PL": "71,0,494",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 21,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "71,0,494"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:33.719548+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:80e3c94e-4653-4e77-913a-ba965f285848:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:32.765413+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "80e3c94e-4653-4e77-913a-ba965f285848",
+        "confidence_interval_end": [
+            -405,
+            405
+        ],
+        "confidence_interval_start": [
+            -285,
+            285
+        ],
+        "uuid": "37089524-d4fe-4ae2-88dc-585a26c50071"
+    },
+    {
+        "GQ": 578,
+        "GT": "0/1",
+        "PL": "628,0,641",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 578,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "628,0,641"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:32.293854+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:763b046f-c2d5-4eee-a1af-6440cdb1f9c1:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:25.728199+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "763b046f-c2d5-4eee-a1af-6440cdb1f9c1",
+        "confidence_interval_end": [
+            0,
+            1
+        ],
+        "confidence_interval_start": [
+            0,
+            1
+        ],
+        "uuid": "5e60bbca-6d6d-4ec3-9c3e-acde50a213e6"
+    },
+    {
+        "GQ": 94,
+        "GT": "0/1",
+        "PL": "144,0,154",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 94,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "144,0,154"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:25.665872+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:906ab95b-cef9-4532-9cf6-27a31298728b:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:12:25.521455+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "906ab95b-cef9-4532-9cf6-27a31298728b",
+        "confidence_interval_end": [
+            -412,
+            413
+        ],
+        "confidence_interval_start": [
+            -245,
+            245
+        ],
+        "uuid": "bffd32b3-a534-4620-a7d2-5e23b646a51c"
+    },
+    {
+        "GQ": 228,
+        "GT": "0/1",
+        "PL": "278,0,622",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 228,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "278,0,622"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:12:24.380594+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:d136d60f-a7ab-4f26-b475-2a3bb6415ab6:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:46.889362+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "d136d60f-a7ab-4f26-b475-2a3bb6415ab6",
+        "confidence_interval_end": [
+            -482,
+            483
+        ],
+        "confidence_interval_start": [
+            -328,
+            329
+        ],
+        "uuid": "ba92fbea-1e58-4a1f-b180-0127f8a4590b"
+    },
+    {
+        "GQ": 26,
+        "GT": "1/1",
+        "PL": "424,29,0",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_quality": 26,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "424,29,0"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:46.759543+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:24c26d80-04c5-43b5-925d-3d7f1ede5f39:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:46.580906+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "24c26d80-04c5-43b5-925d-3d7f1ede5f39",
+        "confidence_interval_start": [
+            0,
+            32
+        ],
+        "uuid": "378e0f7b-9e29-4c71-be5b-1c5c8363c132"
+    },
+    {
+        "GQ": 142,
+        "GT": "0/1",
+        "PL": "192,0,635",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 142,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "192,0,635"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:46.414793+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:de8cb070-6959-4e06-a130-5cd5ecde6345:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:45.248110+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "de8cb070-6959-4e06-a130-5cd5ecde6345",
+        "confidence_interval_end": [
+            -310,
+            311
+        ],
+        "confidence_interval_start": [
+            -555,
+            555
+        ],
+        "uuid": "72bda9cf-2eff-4b55-bb0f-d41c53170431"
+    },
+    {
+        "GQ": 114,
+        "GT": "0/1",
+        "PL": "297,0,111",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 114,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "297,0,111"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:45.121639+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:bdef01ac-2d4a-4a7c-b04e-96f83375770d:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:43.181455+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "bdef01ac-2d4a-4a7c-b04e-96f83375770d",
+        "uuid": "b202811b-86a8-4cb4-98e8-0545dda82625"
+    },
+    {
+        "GQ": 100,
+        "GT": "0/1",
+        "PL": "150,0,681",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 100,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "150,0,681"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:42.868113+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:d4409b61-a8ad-4bbf-8878-ee21bd2d61a4:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:35.218268+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "d4409b61-a8ad-4bbf-8878-ee21bd2d61a4",
+        "confidence_interval_end": [
+            -441,
+            442
+        ],
+        "confidence_interval_start": [
+            -248,
+            248
+        ],
+        "uuid": "3014b9dd-5187-4e63-b9b2-a5b007071a26"
+    },
+    {
+        "GQ": 57,
+        "GT": "0/1",
+        "PL": "107,0,726",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 57,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "107,0,726"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:35.029845+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:cf3669f8-15c0-4aaa-b1f5-088ed6218a19:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:34.816946+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "cf3669f8-15c0-4aaa-b1f5-088ed6218a19",
+        "confidence_interval_end": [
+            -393,
+            394
+        ],
+        "confidence_interval_start": [
+            -322,
+            323
+        ],
+        "uuid": "dea4c03c-7502-40c4-82fb-45ddb81174d8"
+    },
+    {
+        "GQ": 37,
+        "GT": "1/1",
+        "PL": "602,40,0",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_quality": 37,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "602,40,0"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:34.731081+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:2909d090-b148-42b8-8949-05d5a43efd0d:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:34.545351+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "2909d090-b148-42b8-8949-05d5a43efd0d",
+        "confidence_interval_start": [
+            0,
+            31
+        ],
+        "uuid": "9bbd6712-be2c-4baf-8c21-f7378c0fc296"
+    },
+    {
+        "GQ": 116,
+        "GT": "0/1",
+        "PL": "166,0,555",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 116,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "166,0,555"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:34.451250+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:92107e1a-ef9a-468a-b7c4-90ce5fe7f8f1:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:33.836813+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "92107e1a-ef9a-468a-b7c4-90ce5fe7f8f1",
+        "confidence_interval_end": [
+            -466,
+            467
+        ],
+        "confidence_interval_start": [
+            -240,
+            240
+        ],
+        "uuid": "bb8b3256-4e40-4f60-b3b0-990d2cd33887"
+    },
+    {
+        "GQ": 28,
+        "GT": "0/1",
+        "PL": "78,0,460",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 28,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "78,0,460"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:33.764178+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:196ff576-8e3a-46f6-865e-1656c6646f14:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:33.407404+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "196ff576-8e3a-46f6-865e-1656c6646f14",
+        "confidence_interval_end": [
+            -390,
+            391
+        ],
+        "confidence_interval_start": [
+            -228,
+            229
+        ],
+        "uuid": "693080e1-d278-4bb9-8cc1-933f4568916a"
+    },
+    {
+        "GQ": 56,
+        "GT": "0/1",
+        "PL": "106,0,729",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 56,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "106,0,729"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:33.332210+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:4e8d3db8-0494-4b26-ac60-49a68d273adb:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:33.015481+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "4e8d3db8-0494-4b26-ac60-49a68d273adb",
+        "confidence_interval_end": [
+            -412,
+            412
+        ],
+        "confidence_interval_start": [
+            -234,
+            235
+        ],
+        "uuid": "63228db0-696b-484c-b913-a205782af8e1"
+    },
+    {
+        "GQ": 46,
+        "GT": "0/1",
+        "PL": "96,0,314",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 46,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "96,0,314"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:32.804982+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:2ba98f98-eca8-4a18-ae3d-29774c3362b5:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:30.565260+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "2ba98f98-eca8-4a18-ae3d-29774c3362b5",
+        "confidence_interval_end": [
+            0,
+            33
+        ],
+        "confidence_interval_start": [
+            0,
+            33
+        ],
+        "uuid": "56967650-7f38-4fbe-bc83-b669a80fb5a9"
+    },
+    {
+        "GQ": 129,
+        "GT": "0/1",
+        "PL": "179,0,354",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 129,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "179,0,354"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:30.459251+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:d09545df-c9a4-47a3-883b-5bfb51170551:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:28.568282+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "d09545df-c9a4-47a3-883b-5bfb51170551",
+        "confidence_interval_end": [
+            -281,
+            282
+        ],
+        "confidence_interval_start": [
+            -351,
+            352
+        ],
+        "uuid": "f01970b4-68de-4ed5-9227-3e905700eb07"
+    },
+    {
+        "GQ": 32,
+        "GT": "0/1",
+        "PL": "82,0,580",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 32,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "82,0,580"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:28.477647+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:79824593-c310-491c-8261-ff5fd6323901:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:27.964771+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "79824593-c310-491c-8261-ff5fd6323901",
+        "confidence_interval_end": [
+            -462,
+            462
+        ],
+        "confidence_interval_start": [
+            -238,
+            239
+        ],
+        "uuid": "aa449d3a-39b3-4bde-86f8-3b3d01a99cb1"
+    },
+    {
+        "GQ": 390,
+        "GT": "0/1",
+        "PL": "440,0,700",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 390,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "440,0,700"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:27.770311+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:79e614ba-bf0b-4eda-8796-230a60777c88:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:25.745471+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "79e614ba-bf0b-4eda-8796-230a60777c88",
+        "uuid": "31e92c87-80a6-4669-8785-d5310d158943"
+    },
+    {
+        "GQ": 55,
+        "GT": "0/1",
+        "PL": "105,0,568",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 55,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "105,0,568"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:25.622569+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:809d45f3-60d3-42aa-b06f-ee0753d0e0dd:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:23.901389+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "809d45f3-60d3-42aa-b06f-ee0753d0e0dd",
+        "confidence_interval_end": [
+            -275,
+            276
+        ],
+        "confidence_interval_start": [
+            -561,
+            561
+        ],
+        "uuid": "3474fb74-11c0-4282-a752-02b857be8931"
+    },
+    {
+        "GQ": 73,
+        "GT": "0/1",
+        "PL": "189,0,70",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 73,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "189,0,70"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:23.816640+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:30a443c0-bd62-4968-8a9c-d0bb11ec586f:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:23.490477+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "30a443c0-bd62-4968-8a9c-d0bb11ec586f",
+        "confidence_interval_start": [
+            0,
+            29
+        ],
+        "uuid": "433575df-f6e2-4f9f-9fcc-82bf5b0d699b"
+    },
+    {
+        "GQ": 464,
+        "GT": "0/1",
+        "PL": "514,0,962",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 464,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "514,0,962"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:23.327403+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:f80c5b5a-770c-40d8-aa6a-6a4c13a7b705:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:21.686454+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "f80c5b5a-770c-40d8-aa6a-6a4c13a7b705",
+        "confidence_interval_end": [
+            -425,
+            425
+        ],
+        "confidence_interval_start": [
+            -574,
+            574
+        ],
+        "uuid": "1de17fd4-637f-4075-8e0e-fb71ff8794fa"
+    },
+    {
+        "GQ": 464,
+        "GT": "0/1",
+        "PL": "514,0,962",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 464,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "514,0,962"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:21.473529+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:713f1271-dc01-40c0-ab8d-83d85cfb4b57:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:19.674462+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "713f1271-dc01-40c0-ab8d-83d85cfb4b57",
+        "confidence_interval_end": [
+            -375,
+            376
+        ],
+        "confidence_interval_start": [
+            -418,
+            418
+        ],
+        "uuid": "c166c4bf-7dce-4fe9-a424-b65356606626"
+    },
+    {
+        "GQ": 238,
+        "GT": "0/1",
+        "PL": "288,0,999",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 238,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "288,0,999"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:19.492168+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:2c6c420f-ec86-4c20-a9f9-5342c5856294:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:16.988693+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "2c6c420f-ec86-4c20-a9f9-5342c5856294",
+        "confidence_interval_end": [
+            0,
+            6
+        ],
+        "confidence_interval_start": [
+            0,
+            6
+        ],
+        "uuid": "a1b4af62-9f01-4e2c-8186-26a8691cf231"
+    },
+    {
+        "GQ": 111,
+        "GT": "0/1",
+        "PL": "161,0,496",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 111,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "161,0,496"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:16.848741+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:61d320c0-4466-4b41-9532-0d2b6a4d1236:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:15.452034+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "61d320c0-4466-4b41-9532-0d2b6a4d1236",
+        "confidence_interval_end": [
+            -471,
+            471
+        ],
+        "confidence_interval_start": [
+            -441,
+            442
+        ],
+        "uuid": "30803f2c-969c-42e3-8a07-a599bad3a65f"
+    },
+    {
+        "GQ": 162,
+        "GT": "0/1",
+        "PL": "212,0,290",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 162,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "212,0,290"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:14.783557+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:d72b6416-1f3e-44d2-aa98-4f3a34ce7ed3:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:04.944988+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "d72b6416-1f3e-44d2-aa98-4f3a34ce7ed3",
+        "confidence_interval_end": [
+            -484,
+            484
+        ],
+        "confidence_interval_start": [
+            -255,
+            255
+        ],
+        "uuid": "6228f22b-6f42-4140-bc53-ea2f53fc4c62"
+    },
+    {
+        "GQ": 83,
+        "GT": "0/1",
+        "PL": "133,0,450",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 83,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "133,0,450"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:04.765050+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:01637ea8-161b-4044-a74d-9656fa0969c6:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:01.806128+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "01637ea8-161b-4044-a74d-9656fa0969c6",
+        "confidence_interval_end": [
+            -410,
+            411
+        ],
+        "confidence_interval_start": [
+            -222,
+            223
+        ],
+        "uuid": "4ea90fe8-2275-4dd5-8960-ad1950659243"
+    },
+    {
+        "GQ": 289,
+        "GT": "0/1",
+        "PL": "662,0,286",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 289,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "662,0,286"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:01.665644+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:1508d66f-2d6b-499a-95fb-5ab11df9cfb0:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:01.409372+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "1508d66f-2d6b-499a-95fb-5ab11df9cfb0",
+        "confidence_interval_start": [
+            0,
+            6
+        ],
+        "uuid": "024ee950-acd7-4942-b407-6db0e70d788a"
+    },
+    {
+        "GQ": 58,
+        "GT": "0/1",
+        "PL": "113,0,56",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 58,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "113,0,56"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:01.317763+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:9f19f6c7-d459-478d-90ac-5f65ebc489e2:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:11:01.080614+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "9f19f6c7-d459-478d-90ac-5f65ebc489e2",
+        "confidence_interval_start": [
+            0,
+            12
+        ],
+        "uuid": "c7e965a8-7134-4462-8ca1-361464166956"
+    },
+    {
+        "GQ": 613,
+        "GT": "0/1",
+        "PL": "984,0,610",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 613,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "984,0,610"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:11:00.985238+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:73b96521-ec42-4c98-aec9-44cd62728858:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:59.866252+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "73b96521-ec42-4c98-aec9-44cd62728858",
+        "uuid": "180217bf-7868-42dd-84e8-e88abed0aa9c"
+    },
+    {
+        "GQ": 86,
+        "GT": "0/1",
+        "PL": "136,0,498",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 86,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "136,0,498"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:10:59.779066+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:11f91113-547c-4ab0-a211-030b91e992af:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:59.498882+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "11f91113-547c-4ab0-a211-030b91e992af",
+        "confidence_interval_end": [
+            -301,
+            302
+        ],
+        "confidence_interval_start": [
+            -415,
+            416
+        ],
+        "uuid": "5f256e15-c714-4bae-9834-e1884f9e3db6"
+    },
+    {
+        "GQ": 171,
+        "GT": "0/1",
+        "PL": "221,0,413",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 171,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "221,0,413"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:10:59.413227+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:ca5c2235-2099-4873-b5d0-509f58f5a910:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:58.838260+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "ca5c2235-2099-4873-b5d0-509f58f5a910",
+        "confidence_interval_end": [
+            -341,
+            341
+        ],
+        "confidence_interval_start": [
+            -381,
+            381
+        ],
+        "uuid": "85cfc0fd-0986-47e2-bff1-6584198df34a"
+    },
+    {
+        "GQ": 999,
+        "GT": "0/1",
+        "PL": "999,0,999",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 999,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "999,0,999"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:10:58.762599+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:17540797-f0f3-4097-9c5f-13e2b00ab063:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:58.353808+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "17540797-f0f3-4097-9c5f-13e2b00ab063",
+        "confidence_interval_end": [
+            0,
+            11
+        ],
+        "confidence_interval_start": [
+            0,
+            11
+        ],
+        "uuid": "df23279b-999f-41fc-9c10-a724c5a1a0bb"
+    },
+    {
+        "GQ": 98,
+        "GT": "0/1",
+        "PL": "148,0,999",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 98,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "148,0,999"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:10:58.279840+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:f0793174-d270-4d3c-abad-b910f608395f:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:57.946150+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "f0793174-d270-4d3c-abad-b910f608395f",
+        "confidence_interval_end": [
+            0,
+            1
+        ],
+        "confidence_interval_start": [
+            0,
+            1
+        ],
+        "uuid": "a6948a6a-6f1f-4549-8eb9-21631b369f50"
+    },
+    {
+        "GQ": 27,
+        "GT": "0/1",
+        "PL": "77,0,877",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 27,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "77,0,877"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:10:57.017917+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:3f251d07-f966-42db-a620-9e52c1d8bc45:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:45.025694+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "3f251d07-f966-42db-a620-9e52c1d8bc45",
+        "confidence_interval_end": [
+            -618,
+            619
+        ],
+        "confidence_interval_start": [
+            -287,
+            288
+        ],
+        "uuid": "34fb8378-809e-4227-8805-af305e16921c"
+    },
+    {
+        "GQ": 78,
+        "GT": "0/1",
+        "PL": "128,0,606",
+        "file": "GAPFI3VTUYFH",
+        "status": "in review",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "CALL_INFO": "PROCA196-DNA1-WGS-v25",
+        "imprecise": true,
+        "samplegeno": [
+            {
+                "samplegeno_sex": "F",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_quality": 78,
+                "samplegeno_sampleid": "PROCA196-DNA1-WGS-v25",
+                "samplegeno_likelihood": "128,0,606"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "date_created": "2021-09-30T21:10:44.310278+00:00",
+        "annotation_id": "PROCA196-DNA1-WGS-v25:1df2a546-80a5-4b8f-849b-2ec6f88c93a2:GAPFI3VTUYFH",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-09-30T21:10:32.449187+00:00"
+        },
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "PROCA196-DNA1-WGS-v25"
+            }
+        ],
+        "inheritance_modes": [],
+        "structural_variant": "1df2a546-80a5-4b8f-849b-2ec6f88c93a2",
+        "confidence_interval_end": [
+            -471,
+            471
+        ],
+        "confidence_interval_start": [
+            -277,
+            278
+        ],
+        "uuid": "2f095cab-ff8b-43d3-b18b-29d6b61a3810"
+    }
+]

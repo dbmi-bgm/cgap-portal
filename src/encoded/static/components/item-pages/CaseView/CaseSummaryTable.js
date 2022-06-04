@@ -17,16 +17,16 @@ function hasViewPermisison({ '@id' : itemID, display_title }) {
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
 export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
+    const { idToGraphIdentifier = {}, sampleProcessing = [], family } = props;
     const {
+        original_pedigree = null,
         relationships = [],
         members = [],
         proband: { '@id' : probandID } = {},
-        original_pedigree = null,
-        idToGraphIdentifier = {},
-        sampleProcessing = []
-    } = props;
+    } = family || {};
 
     console.log("case summary props", props);
+
     if (members.length === 0){
         return (
             <div className="processing-summary">
@@ -179,9 +179,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 overall_quality_status = "",
                 qc_list = [],
                 "@id": qmId,
-                url: qmUrl = qmId || "",
             } = quality_metric;
 
+            let qmUrl = qmId + '/@@download'; // send to @@download instead of url (deprecated for standalone QCs) - Will Jan 24 2022
             const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
 
             let fileOverallQuality = "PASS";
@@ -191,6 +191,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
             // figure out the file's overall quality status
             if (qc_list.length > 0) {
+                qmUrl = qmId; // if qc_list item, link to that metadata item (instead of @@download)
                 // loop through all of the quality metrics and count the number of failures and warnings for this file
                 qc_list.forEach((qm) => {
                     const { value : { overall_quality_status = null } } = qm;
@@ -698,40 +699,49 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     );
 });
 CaseSummaryTable.propTypes = { // todo: update with required fields
-    clinic_notes : PropTypes.string,
-    family_phenotypic_features : PropTypes.arrayOf(PropTypes.shape({
+    "clinic_notes" : PropTypes.string,
+    "family_phenotypic_features" : PropTypes.arrayOf(PropTypes.shape({
         "@id": PropTypes.string,
         "@type": PropTypes.arrayOf(PropTypes.string),
         "display_title": PropTypes.string,
         "principals_allowed": PropTypes.object,
         "uuid": PropTypes.string
     })),
-    idToGraphIdentifier : PropTypes.object,
-    idx : PropTypes.number,
-    isCurrentFamily : PropTypes.bool,
-    members : PropTypes.arrayOf(PropTypes.shape({
-        "@id" : PropTypes.string,
-        "@type" : PropTypes.arrayOf(PropTypes.string),
-        "accession" : PropTypes.string,
-        "age_at_death_units" : PropTypes.string,
-        "age_units" : PropTypes.string,
-        "display_title" : PropTypes.string,
-        "father" : PropTypes.object,
-        "is_deceased" : PropTypes.bool,
-        "is_infertile" : PropTypes.bool,
-        "is_no_children_by_choice" : PropTypes.bool,
-        "is_pregnancy" : PropTypes.bool,
-        "is_spontaneous_abortion" : PropTypes.bool,
-        "is_still_birth" : PropTypes.bool,
-        "is_termination_of_pregnancy" : PropTypes.bool,
-        "mother" : PropTypes.object,
-        "principals_allowed" : PropTypes.object,
-        "sex" : PropTypes.string,
-        "status" : PropTypes.string,
-        "uuid" : PropTypes.string
-    })),
-    original_pedigree : PropTypes.object,
-    proband : PropTypes.object,
-    sampleProcessing: PropTypes.arrayOf(PropTypes.object),
-    timestamp : PropTypes.string
+    "idToGraphIdentifier" : PropTypes.object,
+    "idx" : PropTypes.number,
+    "isCurrentFamily" : PropTypes.bool,
+    "family": PropTypes.shape({
+        "members" : PropTypes.arrayOf(PropTypes.shape({
+            "@id" : PropTypes.string,
+            "@type" : PropTypes.arrayOf(PropTypes.string),
+            "accession" : PropTypes.string,
+            "age_at_death_units" : PropTypes.string,
+            "age_units" : PropTypes.string,
+            "display_title" : PropTypes.string,
+            "father" : PropTypes.object,
+            "is_deceased" : PropTypes.bool,
+            "is_infertile" : PropTypes.bool,
+            "is_no_children_by_choice" : PropTypes.bool,
+            "is_pregnancy" : PropTypes.bool,
+            "is_spontaneous_abortion" : PropTypes.bool,
+            "is_still_birth" : PropTypes.bool,
+            "is_termination_of_pregnancy" : PropTypes.bool,
+            "mother" : PropTypes.object,
+            "principals_allowed" : PropTypes.object,
+            "sex" : PropTypes.string,
+            "status" : PropTypes.string,
+            "uuid" : PropTypes.string
+        })),
+        "original_pedigree" : PropTypes.object,
+        "proband" : PropTypes.object,
+        "family_phenotypic_features" : PropTypes.arrayOf(PropTypes.shape({
+            "@id": PropTypes.string,
+            "@type": PropTypes.arrayOf(PropTypes.string),
+            "display_title": PropTypes.string,
+            "principals_allowed": PropTypes.object,
+            "uuid": PropTypes.string
+        })),
+    }),
+    "sampleProcessing": PropTypes.arrayOf(PropTypes.object),
+    "timestamp" : PropTypes.string
 };

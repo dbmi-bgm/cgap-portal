@@ -28,10 +28,10 @@ function mapFeaturesToBadges(features = []) {
 
 /** @param {Object} props - Contents of a caseItem */
 export const CaseStats = React.memo(function CaseStats(props){
-    const { caseItem = null, haveCaseEditPermission = false } = props;
-    const { individual = null, family = null, "@id": caseAtID } = caseItem || {};
+    const { caseItem = null, haveCaseEditPermission = false, canonicalFamily = null } = props;
+    const { individual = null, "@id": caseAtID } = caseItem || {};
     const { phenotypic_features = [], "@id": individualAtID = null } = individual || {};
-    const { family_phenotypic_features = [], "@id": familyAtID = null } = family || {};
+    const { family_phenotypic_features = [], "@id": familyAtID = null } = canonicalFamily || {};
 
     const renderedPatientPhenotypicFeatures = useMemo(function(){
         const onlyPhenotypicFeatures = phenotypic_features.map((feature) => {
@@ -86,7 +86,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                             : null }
                     </div>
                     <div className="card-body">
-                        <FamilyInfo {...{ caseItem, haveCaseEditPermission }} />
+                        <FamilyInfo {...{ caseItem, haveCaseEditPermission, canonicalFamily }} />
                     </div>
                     <div className="card-footer">
                         <label className="py-1 mb-0 text-large">Family Phenotypic Features: </label>
@@ -98,7 +98,7 @@ export const CaseStats = React.memo(function CaseStats(props){
     );
 });
 
-export const PatientInfo = React.memo(function PatientInfo({ caseItem = null, haveCaseEditPermission = false }) {
+export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) {
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const { individual = null } = caseItem || {};
     const {
@@ -168,8 +168,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null, ha
 });
 
 
-export const FamilyInfo = React.memo(function FamilyInfo({ caseItem }) {
-    const { family = null } = caseItem;
+export const FamilyInfo = React.memo(function FamilyInfo({ canonicalFamily }) {
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
         "@id": familyAtID,
@@ -177,12 +176,12 @@ export const FamilyInfo = React.memo(function FamilyInfo({ caseItem }) {
         display_title : familyDisplayTitle = null,
         title: familyTitle= null,
         project: { display_title: projectTitle } = {}
-    } = family || {};
+    } = canonicalFamily || {};
     // const { cohort: { display_title: cohortTitle } = {} } = caseItem || {};
 
     // TODO later perhaps make Project value into a hyperlink once have a Project page/view.
 
-    if (!family) {
+    if (!canonicalFamily) {
         return (
             <div className="text-center text-italic">
                 No Family Item linked to this Case

@@ -1,9 +1,10 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
+import ReactTooltip from 'react-tooltip';
 
 import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
@@ -78,9 +79,8 @@ export default class CaseView extends DefaultItemView {
     }
 
     getTabViewContents(controllerProps = {}){
-        const { context = null } = this.props;
-        const { family = null } = context || {};
-        const { members = [] } = family || {};
+        const { currPedigreeFamily } = controllerProps;
+        const { "@id": familyAtID, members = [] } = currPedigreeFamily || {};
 
         const membersLen = members.length;
         const commonTabProps = { ...this.props, ...controllerProps };
@@ -88,7 +88,7 @@ export default class CaseView extends DefaultItemView {
 
         initTabs.push(CaseInfoTabView.getTabObject(commonTabProps));
 
-        if (membersLen > 0) {
+        if (familyAtID && membersLen > 0) {
             // Remove this outer if condition if wanna show disabled '0 Pedigrees'
             initTabs.push(PedigreeTabView.getTabObject(commonTabProps));
         }
@@ -142,14 +142,19 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         variantSampleListItem = null,
         isLoadingVariantSampleListItem = false,
         updateVariantSampleListID,
+        updateVariantSampleListSort,
         savedVariantSampleIDMap = {},
-        fetchVariantSampleListItem
+        fetchVariantSampleListItem,
+        vslSortType,
+        // Passed in from CurrentFamilyController
+        canonicalFamily,
+        currPedigreeFamily,
+        familiesWithViewPermission
     } = props;
+
     const { PedigreeVizView } = PedigreeVizLibrary || {}; // Passed in by PedigreeVizLoader, @see CaseView.getControllers();
 
     const {
-        family: currFamily = null, // Previously selected via CurrentFamilyController.js, now primary from case.
-        secondary_families = null,
         case_phenotypic_features: caseFeatures = { case_phenotypic_features: [] },
         description = null,
         // actions: permissibleActions = [],
@@ -176,11 +181,19 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         return !!(_.findWhere(caseActions, { "name" : "edit" }));
     }, [ context ]);
 
+    const secondaryFamilies = useMemo(function(){
+        return (familiesWithViewPermission || []).filter(function(spFamily){
+            // canonicalFamily would have been selected from this same list, so object references
+            // should be identical and we don't have to compare uuid strings (slower)
+            return spFamily !== canonicalFamily;
+        });
+    }, [ familiesWithViewPermission, canonicalFamily ]);
+
     const {
         countIndividuals: numIndividuals,
         countIndividualsWSamples: numWithSamples
     } = useMemo(function(){
-        const { members = [] } = currFamily || {};
+        const { members = [] } = canonicalFamily || {};
         let countIndividuals = 0;
         let countIndividualsWSamples = 0;
         members.forEach(function({ samples }){
@@ -190,7 +203,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             countIndividuals++;
         });
         return { countIndividuals, countIndividualsWSamples };
-    }, [ currFamily ]);
+    }, [ canonicalFamily ]);
 
     const anyAnnotatedVariantSamples = useMemo(function(){ // checks for notes on SNVs and CNV/SVs
         const allSelections = vsSelections.concat(cnvSelections);
@@ -210,7 +223,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const onViewPedigreeBtnClick = useCallback(function(evt){
         evt.preventDefault();
         evt.stopPropagation();
-        if (!currFamily) return false;
+        if (!currPedigreeFamily) return false;
         // By default, click on link elements would trigger ajax request to get new context.
         // (unless are external links)
         navigate("#pedigree", { skipRequest: true, replace: true });
@@ -222,7 +235,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             <React.Fragment>
                 <h4 className="text-400 align-middle mt-0">Status Overview</h4>
                 <div className="search-table-wrapper">
-                    <EmbeddedCaseSearchTable facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
+                    <EmbeddedCaseSearchTable session={session} facets={null} searchHref={`/search/?type=Case&accession=${caseAccession}`} />
                 </div>
             </React.Fragment>
         );
@@ -237,7 +250,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     const rgs = responsiveGridState(windowWidth);
     let pedWidth;
     let pedBlock = (
-        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
+        <div className="d-none d-lg-block pedigree-placeholder flex-fill" onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
             <div className="text-center h-100">
                 <i className="icon icon-sitemap icon-4x fas" />
             </div>
@@ -287,6 +300,10 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         fetchVariantSampleListItem, isLoadingVariantSampleListItem
     };
 
+    useEffect(() => {
+        ReactTooltip.rebuild();
+    }, [vslSortType]);
+
     return (
         <React.Fragment>
             { !isActiveTab ? null : (
@@ -308,7 +325,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 <div className="card-group case-summary-card-row">
                     { !isActiveTab ? null : (
                         <div className="col-stats mb-2 mb-lg-0">
-                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission }} numFamilies={1} />
+                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission, canonicalFamily }} numFamilies={1} />
                         </div>
                     )}
                     <div id="case-overview-ped-link" className="col-pedigree-viz">
@@ -321,7 +338,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                                     </h4>
                                 </div>
                                 <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
-                                    onClick={onViewPedigreeBtnClick} disabled={!currFamily}>
+                                    onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
                                     View
                                 </button>
                             </div>
@@ -337,13 +354,13 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                 </div>
             </div>
 
-            { currFamily && caseIndividual ?
+            { canonicalFamily && caseIndividual ?
                 <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
-                        <AccessioningTab {...{ context, href, currFamily, secondary_families }} />
+                        <AccessioningTab {...{ context, href, canonicalFamily, secondaryFamilies }} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
-                        <BioinformaticsTab {...{ context, idToGraphIdentifier }} />
+                        <BioinformaticsTab {...{ context, idToGraphIdentifier, canonicalFamily }} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
                         <FilteringTab {...filteringTableProps} />
@@ -354,20 +371,24 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
-                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
                         </InterpretationTabController>
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".review" cache disabled={!anyAnnotatedVariantSamples} tabTitle="Case Review">
+                    <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
-                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem }} />
+                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
                                 </NoteSubSelectionStateController>
                             </CaseReviewSelectedNotesStore>
                         </CaseReviewController>
                     </DotRouterTab>
                 </DotRouter>
-                : null }
+                :
+                <div className="error-placeholder bg-light py-5 px-3 border-top border-bottom">
+                    <h4 className="text-400 text-center">No family or no individual defined for this case.</h4>
+                </div>
+            }
         </React.Fragment>
     );
 });
@@ -525,7 +546,7 @@ class DotRouter extends React.PureComponent {
 }
 
 const DotRouterTab = React.memo(function DotRouterTab(props) {
-    const { tabTitle, dotPath, disabled, active, prependDotPath, children, ...passProps } = props;
+    const { tabTitle, dotPath, disabled = false, active, prependDotPath, children, ...passProps } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
@@ -569,10 +590,10 @@ const DotRouterTab = React.memo(function DotRouterTab(props) {
 });
 
 const AccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context, currFamily, secondary_families = [] } = props;
-    const { display_title: primaryFamilyTitle, '@id' : currFamilyID } = currFamily;
+    const { context, canonicalFamily, secondaryFamilies = [] } = props;
+    const { display_title: primaryFamilyTitle, '@id': canonicalFamilyAtID } = canonicalFamily;
     const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
-    const secondaryFamiliesLen = secondary_families.length;
+    const secondaryFamiliesLen = secondaryFamilies.length;
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
         <div className="pt-2">
@@ -598,17 +619,17 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                 <div className="card-body">
                     <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
                         persistent={[
-                            <div key={currFamilyID} className="primary-family">
+                            <div key={canonicalFamilyAtID} className="primary-family">
                                 <h4 className="mt-0 mb-16 text-400">
                                     <span className="text-300">Primary Cases from </span>
                                     { primaryFamilyTitle }
                                 </h4>
-                                <FamilyAccessionStackedTable family={currFamily} result={context}
+                                <FamilyAccessionStackedTable family={canonicalFamily} result={context}
                                     fadeIn collapseLongLists collapseShow={1} />
                             </div>
                         ]}
-                        collapsible={
-                            secondary_families.map(function(family){
+                        collapsible={!isSecondaryFamiliesOpen ? null :
+                            secondaryFamilies.map(function(family){
                                 const { display_title, '@id' : familyID } = family;
                                 return (
                                     <div className="py-4 secondary-family" key={familyID}>
@@ -637,18 +658,18 @@ const bioinfoPopoverContent = {
     ),
     filteredSNVIndelVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline-master.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
             remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
-            Briefly, these filters include: (1) removing intergenic variants; (2) whitelisting some variants based on VEP, ClinVar, and SpliceAI
+            Briefly, these filters include: (1) removing intergenic variants; (2) including some variants based on VEP, ClinVar, and SpliceAI
             annotations; (3) Removing variants with only intronic consequences; and (4) removing common variants based on gnomAD population allele
             frequency and a panel of unrelated samples.
         </div>
     ),
     filteredSVVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline-master.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
             remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
-            to fewer than 500. Briefly, these filters include: (1) whitelisting SVs based on VEP annotations; (2) removing SVs with only intronic
+            to fewer than 500. Briefly, these filters include: (1) including SVs based on VEP annotations; (2) removing SVs with only intronic
             or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
             population allele frequency, and a panel of 20 unrelated samples; and (4) removing SVs over a certain size.
         </div>
@@ -850,16 +871,16 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     // Predicted Sex and Ancestry found in qclist
                     // TODO: At some point see if URL can be moved to qmsummary - if so, move this into above block
                     qc_list.forEach(function(qc) {
-                        const { value: { "ancestry and sex prediction": predictions = [], url } = {}, qc_type } = qc;
-
+                        const { value: { "@id": qmId, "ancestry and sex prediction": predictions = [] } = {}, qc_type } = qc;
+                        const qmUrl = qmId + '/@@download';
                         if (qc_type === "quality_metric_peddyqc") {
                             predictions.forEach(function(prediction) {
                                 const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
                                 const shortFormPredictedSex = mapLongFormSexToLetter(predictedSex);
 
                                 if (name === caseSampleId) { // double check that it's the prediction for the current case
-                                    msaStats.predictedSex = { value: shortFormPredictedSex, url, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
-                                    msaStats.predictedAncestry = { value: predictedAncestry, url };
+                                    msaStats.predictedSex = { value: shortFormPredictedSex, url: qmUrl, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
+                                    msaStats.predictedAncestry = { value: predictedAncestry, url: qmUrl };
                                 }
                             });
                         }
@@ -877,7 +898,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     const fallbackElem = "-";
 
     return (
-        <>
+        <React.Fragment>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Total Number of Reads">
                     { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
@@ -925,7 +946,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                     { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
-        </>
+        </React.Fragment>
     );
 });
 
@@ -950,11 +971,10 @@ function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
 const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         context,
-        idToGraphIdentifier
+        idToGraphIdentifier,
+        canonicalFamily
     } = props;
     const {
-        display_title: caseDisplayTitle,
-        family = null,
         sample_processing: sampleProcessing = null,
         sample: caseSample = null,
         vcf_file: vcf = null,
@@ -965,7 +985,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     const {
         // original_pedigree: { display_title: pedFileName } = {},
         display_title: familyDisplayTitle
-    } = family;
+    } = canonicalFamily;
 
     const title = (
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
@@ -997,7 +1017,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
-                    <CaseSummaryTable {...family} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                    <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
                 </div>
             </div>
         </React.Fragment>

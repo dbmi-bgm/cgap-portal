@@ -5,18 +5,15 @@ import JsxParser from 'react-jsx-parser';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 
-import { SlideCarousel } from './SlideCarousel';
 import { EmbeddedItemSearchTable, SearchTableTitle } from './../../item-pages/components/EmbeddedItemSearchTable';
 import { EmbeddedCohortBrowser } from './../../item-pages/components/HiGlass/EmbeddedCohortBrowser';
-
-export { SlideCarousel };
 
 
 /**
  * Any placeholder(s) used in a StaticSection _must_ get imported here
  * and be available here.
  */
-const placeholders = { SlideCarousel, EmbeddedItemSearchTable, SearchTableTitle, EmbeddedCohortBrowser };
+const placeholders = { EmbeddedItemSearchTable, SearchTableTitle, EmbeddedCohortBrowser };
 
 export const replaceString = memoize(function(placeholderString, props){
 

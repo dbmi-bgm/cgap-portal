@@ -63,6 +63,9 @@ class SearchBuilder:
     CARDINALITY_RANGE = '-3.4028E38-*'
     PAGINATION_SIZE = 10  # for ECS, 10 is much better than 25, and may even do better when lowered
     MISSING = object()
+    SEARCH_INFO_HEADER_TYPES = [
+        'Workflow'  # TODO: add types here as needed
+    ]
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -338,8 +341,12 @@ class SearchBuilder:
         Get static section (if applicable) when searching a single item type
         Note: Because we rely on 'source', if the static_section hasn't been indexed
         into Elasticsearch it will not be loaded
+
+        Only check for this if the item type is declared to have one in
+        the class constant SEARCH_INFO_HEADER_TYPES
         """
-        if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
+        if (len(self.doc_types) == 1 and 'Item' not in self.doc_types and
+                self.doc_types[0] in self.SEARCH_INFO_HEADER_TYPES):
             search_term = 'search-info-header.' + self.doc_types[0]
             # XXX: this could be cached application side as well
             try:
@@ -1127,8 +1134,9 @@ class SearchBuilder:
         if self.size not in (None, 'all') and self.size < self.response['total']:
             params = [(k, v) for k, v in self.request.normalized_params.items() if k != 'limit']
             params.append(('limit', 'all'))
-            if self.context:
-                self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
+            # do not check presence of this field, as it triggers an ES len call! - Will 30 March 2022
+            # if self.context:
+            #     self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
         # `graph` below is a generator.
         # `es_results['hits']['hits']` will contain a generator instead of list

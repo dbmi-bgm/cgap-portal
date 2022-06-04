@@ -535,7 +535,7 @@ def test_collection_actions_filtered_by_permission(workbook, es_testapp, anon_es
 class ItemTypeChecker:
 
     @staticmethod
-    @Retry.retry_allowed('ItemTypeCheckerf.check_item_type', wait_seconds=1, retries_allowed=5)
+    @Retry.retry_allowed('ItemTypeChecker.check_item_type', wait_seconds=1, retries_allowed=5)
     def check_item_type(client, item_type, deleted=False):
         # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
         #

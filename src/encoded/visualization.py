@@ -1,24 +1,22 @@
-import os
 from copy import (
     copy,
     deepcopy
 )
 from pyramid.view import view_config
 from pyramid.httpexceptions import HTTPBadRequest
+from botocore.exceptions import ClientError
+import uuid
 from snovault import CONNECTION
 from snovault.util import debug_log
-from .types.base import Item
+from .types.base import Item, get_item_or_none
 from .types.workflow import (
     trace_workflows,
     DEFAULT_TRACING_OPTIONS,
     WorkflowRunTracingException,
     item_model_to_object
 )
-import boto3
-from botocore.exceptions import ClientError
-import uuid
+from .util import make_s3_client
 
-from .types.base import get_item_or_none
 
 def includeme(config):
     config.add_route(
@@ -95,7 +93,6 @@ def trace_workflow_runs(context, request):
         raise HTTPBadRequest(detail=e.args[0])
 
 
-
 @view_config(route_name='get_higlass_viewconf', request_method='POST')
 @debug_log
 def get_higlass_viewconf(context, request):
@@ -128,38 +125,39 @@ def get_higlass_viewconf(context, request):
     # If no view config could be found, fail
     if not higlass_viewconfig:
         return {
-            "success" : False,
+            "success": False,
             "errors": "No view config found.",
             "viewconfig": None
         }
 
-    variant_pos = request.json_body.get('variant_pos_abs', None)  
+    variant_pos = request.json_body.get('variant_pos_abs', None)
     variant_pos = variant_pos if variant_pos else 100000
     window_size_small = 20 # window size for the interpretation space
     window_size_large = 5000 # window size for the overview
 
     # Overview
     higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_pos - window_size_large
-    higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large 
+    higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_pos + window_size_large
 
     # Details
     higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_pos - window_size_small
-    higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small 
+    higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_pos + window_size_small
 
     # Vertical rules
     higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
     higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
+    # THIS NEEDS TO BE REPLACED WHEN TESTING LOCALLY
     s3_bucket = request.registry.settings.get('file_wfout_bucket')
-    #s3_bucket = "elasticbeanstalk-fourfront-cgap-wfoutput"
-
+    #s3_bucket = "cgap-mgb-main-application-cgap-mgb-wfoutput"
+    #s3_bucket = "cgap-dbmi-main-application-cgap-dbmi-wfoutput"
 
     if requesting_tab == "bam":
 
         # This is the id of the variant sample that we are currently looking at.
         # This should be the first file in the Higlass viewconf
         bam_sample_id = request.json_body.get('bam_sample_id', None)
-  
+
         samples_pedigree = request.json_body.get('samples_pedigree', None)
         samples_pedigree.sort(key=lambda x: x['sample_name'] == bam_sample_id, reverse=True)
 
@@ -198,21 +196,21 @@ def get_higlass_viewconf(context, request):
 
     elif requesting_tab == "sv":
 
-        variant_start = request.json_body.get('variant_pos_abs', None)  
-        variant_end = request.json_body.get('variant_end_abs', None) 
+        variant_start = request.json_body.get('variant_pos_abs', None)
+        variant_end = request.json_body.get('variant_end_abs', None)
         variant_start = variant_start if variant_start else 100000
         variant_end = variant_end if variant_end else variant_start + 1
 
         window_size_small = round((variant_end - variant_start)/8.0) # window size for the interpretation space
-        window_size_large = 6000 # window size for the overview
+        window_size_large = 6000  # window size for the overview
 
         # Overview
         higlass_viewconfig['views'][0]['initialXDomain'][0] = variant_start - window_size_large
-        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_end + window_size_large 
+        higlass_viewconfig['views'][0]['initialXDomain'][1] = variant_end + window_size_large
 
         # Details
         higlass_viewconfig['views'][1]['initialXDomain'][0] = variant_start - window_size_small
-        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_end + window_size_small 
+        higlass_viewconfig['views'][1]['initialXDomain'][1] = variant_end + window_size_small
 
         # Vertical rules
         higlass_viewconfig['views'][0]['tracks']['whole'][0]['x'] = variant_start
@@ -221,22 +219,23 @@ def get_higlass_viewconf(context, request):
         higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_end
         # This is the id of the variant sample that we are currently looking at.
         # This should be the first file in the Higlass viewconf
-        bam_sample_id = request.json_body.get('bam_sample_id', None)  
+        bam_sample_id = request.json_body.get('bam_sample_id', None)
 
         # The samples already come in sorted
-        samples_pedigree = request.json_body.get('samples_pedigree', None) 
-        bam_visibilty = request.json_body.get('bam_visibilty', None) 
-        sv_vcf_visibilty = request.json_body.get('sv_vcf_visibilty', None) 
+        samples_pedigree = request.json_body.get('samples_pedigree', None)
+        bam_visibilty = request.json_body.get('bam_visibilty', None)
+        sv_vcf_visibilty = request.json_body.get('sv_vcf_visibilty', None)
 
         top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
-        empty_track_a = deepcopy(top_tracks[5])
-        text_track = deepcopy(top_tracks[6])
-        empty_track_b = deepcopy(top_tracks[7])
-        pileup_track = deepcopy(top_tracks[8])
-        cgap_sv_track = deepcopy(top_tracks[9])
-        gnomad_track = deepcopy(top_tracks[10])
+        empty_track_a = deepcopy(top_tracks[6]) # track height 10
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8]) # track height 5
+        pileup_track = deepcopy(top_tracks[9])
+        cgap_sv_track = deepcopy(top_tracks[10])
+        cgap_cnv_track = deepcopy(top_tracks[11])
+        gnomad_track = deepcopy(top_tracks[12])
 
-        current_viewconf = request.json_body.get('current_viewconf', None) 
+        current_viewconf = request.json_body.get('current_viewconf', None)
         original_options = {}
         if current_viewconf is not None:
             higlass_viewconfig = current_viewconf
@@ -250,15 +249,29 @@ def get_higlass_viewconf(context, request):
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[5:] 
+        del top_tracks[6:]
 
-        higlass_sv_vcf = request.json_body.get('higlass_sv_vcf', None) 
+        describing_text_track = deepcopy(text_track)
+        describing_text_track["options"]["fontSize"] = 11
+        describing_text_track["options"]["fontWeight"] = "normal"
+        describing_text_track["options"]["textColor"] = "#777777"
+        describing_text_track["options"]["backgroundColor"] = "#ffffff"
+        describing_text_track["options"]["offsetY"] = 12
+        describing_text_track["height"] = 30
+
+        higlass_sv_vcf = request.json_body.get('higlass_sv_vcf', None)
         higlass_sv_vcf_presigned = None
         higlass_sv_tbi_presigned = None
         if higlass_sv_vcf is not None:
-            #s3_bucket = "elasticbeanstalk-fourfront-cgapwolf-wfoutput"
             higlass_sv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf)
             higlass_sv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf+".tbi")
+
+        higlass_cnv_vcf = request.json_body.get('higlass_cnv_vcf', None)
+        higlass_cnv_vcf_presigned = None
+        higlass_cnv_tbi_presigned = None
+        if higlass_cnv_vcf is not None:
+            higlass_cnv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_cnv_vcf)
+            higlass_cnv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_cnv_vcf+".tbi")
 
         for sample in samples_pedigree:
             accession = sample["sample_accession"]
@@ -267,17 +280,17 @@ def get_higlass_viewconf(context, request):
             if accession not in bam_visibilty or accession not in sv_vcf_visibilty:
                 continue
 
-            if(bam_visibilty[accession] == True or sv_vcf_visibilty[accession] == True):
+            if bam_visibilty[accession] or sv_vcf_visibilty[accession]:
                 empty_track_sample = deepcopy(empty_track_a)
                 empty_track_sample["uid"] = "empty_above_text" + accession
                 top_tracks.append(empty_track_sample)
 
                 text_track_sample = deepcopy(text_track)
                 text_track_sample["uid"] = "text" + accession
-                text_track_sample["options"]["text"] = "%s (%s)" % (sample["relationship"].capitalize(),sample["sample_name"])
+                text_track_sample["options"]["text"] = "%s (%s)" % (sample["relationship"].capitalize(), sample["sample_name"])
                 top_tracks.append(text_track_sample)
 
-            if(bam_visibilty[accession] == True):
+            if bam_visibilty[accession]:
 
                 empty_track_sample = deepcopy(empty_track_b)
                 empty_track_sample["uid"] = "empty_above_pileup" + accession
@@ -294,27 +307,46 @@ def get_higlass_viewconf(context, request):
                     pileup_track_sample['options'] = deepcopy(original_options['pileup'])
                 top_tracks.append(pileup_track_sample)
 
-            if(sv_vcf_visibilty[accession] == True):
-                empty_track_sample = deepcopy(empty_track_b)
-                empty_track_sample["uid"] = "empty_above_vcf" + accession
-                top_tracks.append(empty_track_sample)
-
-                cgap_sv_track_sample = deepcopy(cgap_sv_track)
-                cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
-                cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
-
-                cgap_sv_track_sample["uid"] = "vcf" + accession
-                if 'svcgap' in original_options:
-                    cgap_sv_track_sample['options'] = deepcopy(original_options['svcgap'])
-                    cgap_sv_track_sample['options']['dataSource'] = 'cgap'
-
-                cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
+            if sv_vcf_visibilty[accession]:
+                text_track_sample = deepcopy(describing_text_track)
+                text_track_sample["uid"] = "sv_vcf_text" + accession
+                text_track_sample["options"]["text"] = "Structural Variants called by Manta"
+                top_tracks.append(text_track_sample)
 
                 if higlass_sv_vcf_presigned is not None:
+                    cgap_sv_track_sample = deepcopy(cgap_sv_track)
+                    cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
+                    cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
+
+                    cgap_sv_track_sample["uid"] = "sv-vcf" + accession
+                    if 'cgap-sv' in original_options:
+                        cgap_sv_track_sample['options'] = deepcopy(original_options['cgap-sv'])
+                        cgap_sv_track_sample['options']['dataSource'] = 'cgap-sv'
+
+                    cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
                     top_tracks.append(cgap_sv_track_sample)
 
+                # We are showing the track only for the proband for now, since we are not doing
+                # CNV joint calling yet.
+                if (higlass_cnv_vcf_presigned is not None) and (bam_sample_id == sample["sample_name"]):
+                    text_track_sample = deepcopy(describing_text_track)
+                    text_track_sample["uid"] = "cnv_vcf_text" + accession
+                    text_track_sample["options"]["text"] = "Copy Number Variants called by BIC-seq2"
+                    top_tracks.append(text_track_sample)
+
+                    cgap_cnv_track_sample = deepcopy(cgap_cnv_track)
+                    cgap_cnv_track_sample['data']['vcfUrl'] = higlass_cnv_vcf_presigned
+                    cgap_cnv_track_sample['data']['tbiUrl'] = higlass_cnv_tbi_presigned
+
+                    cgap_cnv_track_sample["uid"] = "cnv-vcf" + accession
+                    if 'cgap-cnv' in original_options:
+                        cgap_cnv_track_sample['options'] = deepcopy(original_options['cgap-cnv'])
+                        cgap_cnv_track_sample['options']['dataSource'] = 'cgap-cnv'
+                    cgap_cnv_track_sample['options']['sampleName'] = sample["sample_name"]
+                    top_tracks.append(cgap_cnv_track_sample)
+
         accession = "gnomad-sv"
-        if(accession in sv_vcf_visibilty and sv_vcf_visibilty[accession] == True):
+        if accession in sv_vcf_visibilty and sv_vcf_visibilty[accession]:
             empty_track_sample = deepcopy(empty_track_a)
             empty_track_sample["uid"] = "empty_above_text" + accession
             top_tracks.append(empty_track_sample)
@@ -334,10 +366,11 @@ def get_higlass_viewconf(context, request):
             top_tracks.append(gnomad_track)
 
     return {
-        "success" : True,
+        "success": True,
         "errors": "",
-        "viewconfig" : higlass_viewconfig
+        "viewconfig": higlass_viewconfig
     }
+
 
 @view_config(route_name='get_higlass_cohort_viewconf', request_method='POST')
 @debug_log
@@ -362,17 +395,17 @@ def get_higlass_cohort_viewconf(context, request):
     # If no view config could be found, fail
     if not higlass_viewconfig:
         return {
-            "success" : False,
+            "success": False,
             "errors": "No view config found.",
             "viewconfig": None
         }
 
-    cohort_vcf_location = request.json_body.get('cohort_vcf_location', None)  
-    cohort_density_bw_location = request.json_body.get('cohort_density_bw_location', None) 
+    cohort_vcf_location = request.json_body.get('cohort_vcf_location', None)
+    cohort_density_bw_location = request.json_body.get('cohort_density_bw_location', None)
 
     if not cohort_vcf_location or not cohort_density_bw_location:
         return {
-            "success" : False,
+            "success": False,
             "errors": "Some data files have not been specified.",
             "viewconfig": None
         }
@@ -391,9 +424,9 @@ def get_higlass_cohort_viewconf(context, request):
                 track['data']['url'] = bw_url
 
     return {
-        "success" : True,
+        "success": True,
         "errors": "",
-        "viewconfig" : higlass_viewconfig
+        "viewconfig": higlass_viewconfig
     }
 
 
@@ -405,9 +438,7 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
     :param expiration: Time in seconds for the presigned URL to remain valid
     :return: Presigned URL as string. If error, returns None.
     """
-
-    # Generate a presigned URL for the S3 object
-    s3_client = boto3.client('s3')
+    s3_client = make_s3_client()
     try:
         params = {'Bucket': bucket_name, 'Key': object_name}
         response = s3_client.generate_presigned_url('get_object', Params=params, ExpiresIn=expiration)
@@ -417,4 +448,3 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
 
     # The response contains the presigned URL
     return response
-

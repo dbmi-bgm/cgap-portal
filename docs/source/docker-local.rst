@@ -20,12 +20,25 @@ Install Docker with (OSX assumed)::
 Configuring CGAP Docker
 ^^^^^^^^^^^^^^^^^^^^^^^
 
+Use the ``prepare-docker`` command to configure ``docker-compose.yml`` and ``docker-development.ini``::
 
-Prior to building the image, navigate to ``deploy/docker/local``, open ``docker_development.ini`` and make the following modifications (at a minimum).
+    poetry run prepare-docker -h
+    usage: prepare-docker [-h] [--data-set {prod,test,local,deploy}]
+                      [--load-inserts] [--run-tests]
+                      [--s3-encrypt-key-id S3_ENCRYPT_KEY_ID]
 
-* Modify ``env.name`` and ``indexer.namespace`` - these values must be globally unique with respect to our infrastructure (feel free to just replace the name)
-* Consider changing load_prod_data to load_local_data if you need to load more inserts
-* Once you have loaded inserts once, comment out L54 in ``docker-compose.yml`` to disable automatic insert reloading
+    Prepare docker files
+
+    optional arguments:
+    -h, --help            show this help message and exit
+    --data-set {prod,test,local,deploy}
+                        the data set to use (default: local)
+    --load-inserts        if supplied, causes inserts to be loaded (default: not
+                        loaded)
+    --run-tests           if supplied, causes tests to be run in container
+                        (default: not tested)
+    --s3-encrypt-key-id S3_ENCRYPT_KEY_ID
+                        an encrypt key id (default: the empty string)
 
 Building CGAP Docker
 ^^^^^^^^^^^^^^^^^^^^

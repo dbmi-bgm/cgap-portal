@@ -3,29 +3,40 @@
 import React, { useMemo, useState, useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import url from 'url';
+import queryString from 'query-string';
 import ReactTooltip from 'react-tooltip';
 import { console, layout, ajax, memoizedUrlParse, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
+import { navigate } from '../../util';
 import { SvBrowserTabBody } from './SvBrowserTabBody';
 import { SvGeneTabBody } from './SvGeneTabBody';
 import { SvVariantTabBody } from './SvVariantTabBody';
 import { SvSampleTabBody } from './SvSampleTabBody';
-import QuickPopover from '../components/QuickPopover';
+import { CNVInterpretationSpace } from '../VariantSampleView/InterpretationSpaceController';
+import { LoadingInterpretationSpacePlaceHolder, convertQueryStringTypes } from '../VariantSampleView/VariantSampleOverview';
+import { SelectedItemsController } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
+//import { OverviewTabTitle as VSOverviewTabTitle } from './../VariantSampleView/VariantSampleOverview';
+import QuickPopover from './../components/QuickPopover';
 
 export class StructuralVariantSampleOverview extends React.PureComponent {
 
     render(){
-        const { context = null, schemas, href } = this.props;
+        const { context = null, schemas, href, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading } = this.props;
         const passProps = { context, schemas, href };
 
-        const { query: {
-            annotationTab = null,           // used only if can be parsed to integer (SvBrowser = 0)
-        } } = memoizedUrlParse(href);
+        console.log("setissubmittingavailable", setIsSubmitting, isSubmitting, isSubmittingModalOpen);
+        const { query = {} } = memoizedUrlParse(href);
+        const { showInterpretation, annotationTab, interpretationTab, caseSource } = convertQueryStringTypes(query);
 
         return (
             <div className="sample-variant-overview sample-variant-annotation-space-body">
-                <StructuralVariantSampleInfoHeader {...passProps} />
-                <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={parseInt(annotationTab) !== isNaN ? parseInt(annotationTab) : null} />
+                <SelectedItemsController isMultiSelect={false} currentAction="selection">
+                    <SvInterpretationController {...passProps} {...{ showInterpretation, interpretationTab, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, newContext, newVSLoading }}>
+                        <StructuralVariantSampleInfoHeader {...passProps} />
+                        <StructuralVariantSampleOverviewTabView {...passProps} defaultTab={1} {...{ showInterpretation }} />
+                    </SvInterpretationController>
+                </SelectedItemsController>
             </div>
         );
     }
@@ -47,7 +58,7 @@ function StructuralVariantSampleInfoHeader(props){
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
 
-                    { caseID ?
+                    {/* { caseID ?
                         <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4 className="text-truncate">Case ID</h4>
@@ -56,9 +67,9 @@ function StructuralVariantSampleInfoHeader(props){
                                 <h4 className="text-400 text-center w-100">{ caseID }</h4>
                             </div>
                         </div>
-                        : null }
+                        : null } */}
 
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-12 col-xl-7 pb-2">
                         <div className="info-header-title">
                             <h4>Variant Info</h4>
                         </div>
@@ -68,7 +79,7 @@ function StructuralVariantSampleInfoHeader(props){
                             </div>
                         </div>
                     </div>
-                    <div className="inner-card-section col-lg-3 pb-2 pb-lg-0">
+                    <div className="inner-card-section col-lg-12 col-xl-5 pb-2">
                         <div className="info-header-title">
                             <h4>Gene Info</h4>
                         </div>
@@ -102,7 +113,8 @@ function StructuralVariantInfoSection({ context }) {
     const {
         structural_variant = {},
         CALL_INFO = null,
-        genotype_labels = {}
+        genotype_labels = {},
+        callers = []
     } = context;
     const {
         size_display = fallbackElem,
@@ -174,6 +186,14 @@ function StructuralVariantInfoSection({ context }) {
                             <span id="vi_cytoband">{cytoband_display}</span>
                         </div>
                     </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_cytoband" className="mb-0">Callers:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_cytoband">{callers.join(", ") || fallbackElem}</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -186,7 +206,7 @@ function GeneInfoSection({ context }) {
         structural_variant: { gene_summary: { contained = fallbackElem, at_breakpoint = fallbackElem, omim_genes = fallbackElem } = {} } = {}
     } = context;
     return (
-        <div className="col-12">
+        <div className="col-auto" style={{ maxWidth: "400px"}}>
             <div className="row pb-1 pb-md-03">
                 <div className="col-12 col-md-8">
                     <label htmlFor="contained-genes" className="mb-0">Contained Genes:</label>
@@ -244,62 +264,71 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        const { defaultTab = null } = props;
+        this.annotationTab = this.annotationTab.bind(this);
         this.handleTabClick = _.throttle(this.handleTabClick.bind(this), 300);
-        const numTabs = StructuralVariantSampleOverviewTabView.tabNames.length;
-
-        this.state = {
-            "currentTab" : defaultTab < numTabs ? defaultTab : 1 // default to Variant unless otherwise specified
-        };
-
         // Setting persistence requires setting index to true for tab in render + using active prop in tabBody component to trigger d-none class when inactive
         this.openPersistentTabs = {}; // N.B. ints are cast to type string when used as keys of object (both insert or lookup)
     }
 
-    componentDidUpdate(pastProps, pastState){
-        const { currentTab: pastTab } = pastState;
-        const { currentTab } = this.state;
-        if (currentTab !== pastTab) {
-            // ReactTooltip.rebuild is called by App upon navigation
-            // to rebuild tooltips from current DOM.
-            // However most tabs' DOM contents not visible until switch to them
-            // so we needa rebuild tooltip upon that.
-            // If DotRouter can be reused/integrated here or similar, we can
-            // remove this useEffect.
-            setTimeout(ReactTooltip.rebuild, 200);
-        }
-    }
-
     componentWillUnmount(){
-        this.openPersistentTabs = [];
+        this.openPersistentTabs = {};
     }
 
+    // TODO: DRY-ify
+    annotationTab(){
+        const { href, defaultTab } = this.props;
+        const { query: parsedQuery = {} } = memoizedUrlParse(href);
+        let { annotationTab = null } = parsedQuery;
+        annotationTab = parseInt(annotationTab);
+        if (isNaN(annotationTab)) {
+            annotationTab = defaultTab;
+        }
+        return annotationTab;
+    }
+
+    // TODO: DRY-ify
     handleTabClick(e){
+        const { href } = this.props;
         // Event delegation cuz why not. Less event listeners is good usually, tho somewhat moot in React
         // since it has SyntheticEvents anyway.
+
         if (e.target && e.target.type === "button") {
-            const tabTitle = parseInt(e.target.getAttribute("data-tab-index"));
-            this.setState({ "currentTab": tabTitle });
+            const nextTabIndex = parseInt(e.target.getAttribute("data-tab-index"));
+            const hrefParts = memoizedUrlParse(href);
+            const { query: parsedQuery = {} } = hrefParts;
+            let { annotationTab } = parsedQuery;
+            annotationTab = parseInt(annotationTab);
+            if (!isNaN(annotationTab) && annotationTab === nextTabIndex) {
+                return;
+            }
+            parsedQuery.annotationTab = nextTabIndex;
+            hrefParts.search = "?" + queryString.stringify(parsedQuery);
+            const nextHref = url.format(hrefParts);
+            // ReactTooltip.rebuild is called by App upon navigation
+            // to rebuild tooltips from current DOM.
+            navigate(nextHref, { "replace": true, "skipRequest": true });
         }
     }
 
     render(){
-        const { context, schemas, currentGeneItem, currentGeneItemLoading } = this.props;
-        const { currentTab } = this.state;
+        const { context, schemas, currentGeneItem, currentGeneItemLoading,
+            selectedGenes, onSelectGene, onResetSelectedGenes, showInterpretation } = this.props;
+
+        const annotationTab = this.annotationTab();
 
         const tabTitleElements = [];
         const tabBodyElements = [];
 
         StructuralVariantSampleOverviewTabView.tabNames.forEach((title, index) => {
-            const tabTitleElemProps = { currentTab, index, title, "key": index };
+            const tabTitleElemProps = { annotationTab, index, title, "key": index };
 
             tabTitleElements.push(<OverviewTabTitle {...tabTitleElemProps} />);
 
-            if (index === currentTab || this.openPersistentTabs[index]) {
-                const commonBodyProps = { context, schemas, index, "active": index === currentTab, "key": index };
+            if (index === annotationTab || this.openPersistentTabs[index]) {
+                const commonBodyProps = { context, schemas, index, "active": index === annotationTab, "key": index };
                 switch (index) {
                     case 0: // Gene
-                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading }} />);
+                        tabBodyElements.push(<SvGeneTabBody {...commonBodyProps} {...{ currentGeneItem, currentGeneItemLoading, selectedGenes, onSelectGene, onResetSelectedGenes, showInterpretation }} />);
                         this.openPersistentTabs[0] = true; // Persist open after first appearance.
                         break;
                     case 1: // Variant
@@ -335,10 +364,10 @@ class StructuralVariantSampleOverviewTabView extends React.PureComponent {
 
 }
 
-
+// TODO: DRY-ify (maybe import OverviewTabTitle from "./../VariantSampleView/VariantSampleOverview")
 const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
-    const { currentTab, title, index, disabled = false, loading = false } = props;
-    const active = (currentTab === index);
+    const { annotationTab, title, index, disabled = false, loading = false } = props;
+    const active = (annotationTab === index);
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
@@ -347,6 +376,86 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
         </button>
     );
 });
+
+class SvInterpretationController extends React.PureComponent {
+    // ACMG selection will be handled here, as well as any other selections that need to occur globally
+
+    componentDidUpdate(pastProps, pastState) {
+        const { newVSLoading: pastVSLoading, newContext: pastNewContext = null } = pastProps;
+        const { isMultiSelect, newVSLoading, newContext, onSelectItem: onSelectGene } = this.props;
+
+        // Finished loading new VS, now initialize highlighted gene selections.
+        if ((pastVSLoading && !newVSLoading) && (newContext && !pastNewContext)) {
+            const { highlighted_genes: [ highlightedGene = null ] = [] } = newContext;
+            if (highlightedGene) {
+                onSelectGene(highlightedGene, isMultiSelect);
+            }
+        }
+    }
+
+    render() {
+        const {
+            newVSLoading,
+            newContext = null,
+            context,
+            schemas,
+            children,
+            showInterpretation,
+            interpretationTab,
+            href,
+            caseSource,
+            setIsSubmitting,
+            isSubmitting,
+            isSubmittingModalOpen,
+            selectedItems: selectedGenes,
+            onSelectItem: onSelectGene,
+            onResetSelectedItems: onResetSelectedGenes
+        } = this.props;
+
+        console.log("selectedItemscontroller props?", this.props);
+        const passProps = { schemas, href, caseSource, setIsSubmitting, isSubmitting, isSubmittingModalOpen, selectedGenes, onSelectGene, onResetSelectedGenes };
+
+        // Pulling actions and checking for note errors with newcontext; use context if not present
+        const {
+            actions = [],
+            acmg_rules_invoked = [], // todo
+            interpretation: { error: interpError = null } = {},
+            variant_notes: { error: varNoteError = null } = {},
+            gene_notes: { error: geneNoteError = null } = {},
+            discovery_interpretation: { error: discoveryError = null } = {}
+        } = newContext || context || {};
+
+        const anyNotePermErrors = interpError || varNoteError || geneNoteError || discoveryError;
+
+        const showInterpretationSpace = showInterpretation && !anyNotePermErrors && newContext && !newVSLoading;
+
+        const childrenWithSelectionProps = React.Children.map(children, function(child){
+            if (!React.isValidElement(child)){
+                throw new Error('SvInterpretationController expects props.children to be a valid React component instance(s).');
+            }
+            return React.cloneElement(child, passProps);
+        });
+
+        return (
+            <React.Fragment>
+                {/** ACMG Invoker will go here once new ACMG rules for SVs are determined; might be able to re-use components
+                 * from VariantSampleOverview and just use a new class for handling auto-classification. But also possibility that will need entirely new rules. */}
+                <div className="row flex-column-reverse flex-lg-row flex-nowrap">
+                    <div className={`${showInterpretation || showInterpretationSpace ? "sv-snv-annotation": ""} col`} >
+                        {/* Annotation Space passed as child */}
+                        { childrenWithSelectionProps }
+                    </div>
+                    { showInterpretation && newVSLoading ? <LoadingInterpretationSpacePlaceHolder headerTitle="SV / CNV Interpretation Space" /> : null }
+                    { showInterpretationSpace ?
+                        <div className="col flex-grow-1 flex-lg-grow-0 interpretation-space-wrapper-column">
+                            <CNVInterpretationSpace {...{ actions }} context={newContext}
+                                {...passProps} defaultTab={interpretationTab} />
+                        </div> : null }
+                </div>
+            </React.Fragment>
+        );
+    }
+}
 
 // This content is also in src/encoded/docs as an html file; if needed for facets, may use that
 const hg19PopoverTitle = "The hg19 coordinates for structural variants are calculated.";

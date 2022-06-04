@@ -23,7 +23,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
         context,
         href, currentAction, session, mounted,
         overlaysContainer, windowWidth, windowHeight,
-        browseBaseState, testWarningVisible,
+        testWarningVisible,
         addToBodyClassList, removeFromBodyClassList,
         schemas, updateAppSessionState
     } = props;
@@ -31,7 +31,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
     const leftNavProps = {
         context,
         windowWidth, windowHeight, href, mounted, overlaysContainer, session,
-        testWarningVisible, browseBaseState//, addToBodyClassList, removeFromBodyClassList
+        testWarningVisible, //, addToBodyClassList, removeFromBodyClassList
     };
 
     const userActionNavProps = {
@@ -107,9 +107,11 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
             </a>
             */}
             <HelpNavItem {...props} />
+            {/*
             <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
                 About
             </a>
+            */}
         </div>
     );
 });

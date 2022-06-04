@@ -9,12 +9,12 @@ import { ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util'
 export function SampleTabBody(props){
     const { context = null, schemas } = props;
     const {
+        "@id": atID,
         GQ : genotypeQuality = null,
         QUAL: variantQuality = null,
         PL: genotypeLikelihood = null,
         FS: strandFisherScore = null,
         novoPP = null,
-        uuid = null,
         cmphet: cmphetArr = [],
         samplegeno = [],
         genotype_labels: genotypeLabels = [],
@@ -49,7 +49,7 @@ export function SampleTabBody(props){
                     </div>
                     <div className="info-body text-center overflow-auto d-flex h-100 d-flex justify-content-center flex-column">
                         <span>View BAM Snapshot</span>
-                        <a href={`/${uuid}/@@download`} className="d-block pt-2 text-center mx-auto">
+                        <a href={atID + "@@download"} className="d-block pt-2 text-center mx-auto" target="_blank" rel="noopener noreferrer">
                             <i className="icon icon-fw icon-2x icon-external-link-alt fas ml-05" />
                         </a>
                     </div>

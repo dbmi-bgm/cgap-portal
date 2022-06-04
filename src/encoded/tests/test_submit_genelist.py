@@ -15,27 +15,6 @@ GENELIST_PATH = "src/encoded/tests/data/documents/gene_lists/"
 VARIANT_UPDATE_PATH = "src/encoded/tests/data/documents/"
 
 
-@pytest.fixture
-def wb_project(es_testapp, workbook):
-    search_string = "/search/?type=Project&title=Test+Project"
-    project = es_testapp.get(search_string).json["@graph"][0]
-    return project
-
-
-@pytest.fixture
-def core_project(es_testapp, workbook):
-    search_string = "/search/?type=Project&title=Core+Project"
-    project = es_testapp.get(search_string).json["@graph"][0]
-    return project
-
-
-@pytest.fixture
-def wb_institution(es_testapp, workbook):
-    search_string = "/search/?type=Institution&title=HMS+DBMI"
-    institution = es_testapp.get(search_string).json["@graph"][0]
-    return institution
-
-
 class TestGeneListSubmission:
     def test_genelist_endpoint(self, testapp, bgm_project, bgm_access_key, institution):
         """

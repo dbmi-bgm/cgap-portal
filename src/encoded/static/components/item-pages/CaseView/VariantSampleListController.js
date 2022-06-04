@@ -2,7 +2,6 @@
 
 import React, { useMemo } from 'react';
 import queryString from 'query-string';
-import moment from 'moment';
 import ReactTooltip from 'react-tooltip';
 import memoize from "memoize-one";
 
@@ -49,13 +48,15 @@ export class VariantSampleListController extends React.PureComponent {
         this.fetchVariantSampleListItem = this.fetchVariantSampleListItem.bind(this);
         this.updateVariantSampleListID = this.updateVariantSampleListID.bind(this);
         this.windowMessageEventListener = this.windowMessageEventListener.bind(this);
+        this.updateVariantSampleListSort = this.updateVariantSampleListSort.bind(this);
         const { id: vslID } = props;
         this.state = {
             "fetchedVariantSampleListItem": null,
             "variantSampleListID": typeof vslID === "string" ? vslID : null,
             "isLoadingVariantSampleListItem": typeof vslID === "string" ? true : false,
             // `refreshCount` not necessary at all, just for potential internal debugging.
-            "refreshCount": 0
+            "refreshCount": 0,
+            "sortType": "Variant"
         };
 
         this.memoized = {
@@ -134,6 +135,7 @@ export class VariantSampleListController extends React.PureComponent {
                     "fetchedVariantSampleListItem": variantSampleListItem,
                     "isLoadingVariantSampleListItem": false
                 };
+                console.log("new variant sample item, ", variantSampleListItem);
                 if (prevAtID && vslID !== prevAtID) {
                     nextState.refreshCount = prevRefreshCount + 1;
                 }
@@ -168,17 +170,24 @@ export class VariantSampleListController extends React.PureComponent {
         this.setState({ "variantSampleListID": vslID }, callback);
     }
 
+    /** For the short term: enum will consist of ["Variant", "Gene"] */
+    updateVariantSampleListSort(newSort) {
+        this.setState({ sortType: newSort });
+    }
+
     render(){
         const { children, id: propVSLID, ...passProps } = this.props;
-        const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem } = this.state;
+        const { fetchedVariantSampleListItem: variantSampleListItem, isLoadingVariantSampleListItem, sortType: vslSortType } = this.state;
         const { variant_samples = [], structural_variant_samples = [] } = variantSampleListItem || {};
         const childProps = {
             ...passProps,
+            vslSortType,
             variantSampleListItem,
             isLoadingVariantSampleListItem,
             "savedVariantSampleIDMap": this.memoized.activeVariantSampleIDMap(variant_samples, structural_variant_samples),
             "updateVariantSampleListID": this.updateVariantSampleListID,
-            "fetchVariantSampleListItem": this.fetchVariantSampleListItem
+            "fetchVariantSampleListItem": this.fetchVariantSampleListItem,
+            "updateVariantSampleListSort": this.updateVariantSampleListSort
         };
         return React.Children.map(children, function(child){
             if (!React.isValidElement(child) || typeof child.type === "string") {
@@ -203,6 +212,7 @@ function commonVSEmbeds(prefix){
         prefix + ".selected_by.@id",
         prefix + ".selected_by.display_title",
         prefix + ".variant_sample_item.@id",
+        prefix + ".variant_sample_item.@type",
         prefix + ".variant_sample_item.uuid",
         prefix + ".variant_sample_item.display_title",
         prefix + ".variant_sample_item.finding_table_tag",
@@ -250,21 +260,35 @@ export const variantSampleListEmbeds = [
     ...commonVSEmbeds("variant_samples"),
     ...commonVSEmbeds("structural_variant_samples"),
 
+    "variant_samples.variant_sample_item.variant.uuid",
     "variant_samples.variant_sample_item.variant.@id",
     "variant_samples.variant_sample_item.variant.display_title",
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.@id",
+    "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.uuid",
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_gene.display_title",
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_transcript",
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsc",
     "variant_samples.variant_sample_item.variant.genes.genes_most_severe_hgvsp",
 
+    "structural_variant_samples.variant_sample_item.highlighted_genes.uuid",
+    "structural_variant_samples.variant_sample_item.highlighted_genes.@id",
+    "structural_variant_samples.variant_sample_item.highlighted_genes.display_title",
+    "structural_variant_samples.variant_sample_item.highlighted_genes.ensgid",
     "structural_variant_samples.variant_sample_item.structural_variant.@id",
+    "structural_variant_samples.variant_sample_item.structural_variant.uuid",
     "structural_variant_samples.variant_sample_item.structural_variant.display_title",
     "structural_variant_samples.variant_sample_item.structural_variant.END",
     "structural_variant_samples.variant_sample_item.structural_variant.START",
     "structural_variant_samples.variant_sample_item.structural_variant.CHROM",
     "structural_variant_samples.variant_sample_item.structural_variant.SV_TYPE",
     "structural_variant_samples.variant_sample_item.structural_variant.size_display",
-    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title"
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.display_title",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_gene.ensgid",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_canonical",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_consequence.display_title",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_most_severe",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_mane",
+    "structural_variant_samples.variant_sample_item.structural_variant.transcript.csq_feature",
+
 ];
 

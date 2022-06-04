@@ -41,7 +41,7 @@ export class FilterSetController extends React.PureComponent {
             }))
         }),
         "searchHrefBase" : PropTypes.string.isRequired,
-        "navigate" : PropTypes.func.isRequired,
+        "navigate" : PropTypes.func,
         "initialSelectedFilterBlockIndices" : PropTypes.arrayOf(PropTypes.number),
         "isFetchingInitialFilterSetItem" : PropTypes.bool,
         "onResetSelectedVariantSamples": PropTypes.func

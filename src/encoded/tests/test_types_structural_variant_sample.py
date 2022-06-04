@@ -170,3 +170,10 @@ def test_case_specific_structural_variant_sample_genelist(
         structural_variant_sample_post["@id"], {}, status=200
     ).json["@graph"][0]
     assert genelist_title in structural_variant_sample_patch["associated_genelists"]
+
+
+def test_display_title(testapp, x_structural_variant_sample):
+    """Test SVSample display title."""
+    at_id = x_structural_variant_sample["@id"]
+    display_title = x_structural_variant_sample["display_title"]
+    assert display_title == "DUP_chrX:1000-2000 (some_sample)"

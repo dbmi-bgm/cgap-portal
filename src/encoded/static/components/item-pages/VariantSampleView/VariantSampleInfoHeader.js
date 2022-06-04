@@ -289,7 +289,7 @@ function GDNAList({ context }){
             <div className="row pb-1 pb-md-03" key="GRCh37">
                 <div className="col-12 col-md-3 font-italic">
                     <em>GRCh37 (hg19)</em>
-                    <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm" tooltip="Click here for more information">
+                    <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm">
                         {hg19PopoverContent}
                     </QuickPopover>
                 </div>

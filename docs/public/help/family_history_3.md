@@ -27,7 +27,7 @@ We have developed a python package for submission of
  SubmitCGAP. The current version is still in beta. It can be
  installed by running `pip install submit-cgap`. We
  recommend doing this inside a virtual environment running
- python 3.6. Further instructions for submission with this
+ python 3.7. Further instructions for submission with this
  method can be found in the [SubmitCGAP documentation](https://submitcgap.readthedocs.io/en/latest/getting_started.html#family-history).
 
 Briefly, the command is the same as for new case/accessioning CLI submission, but

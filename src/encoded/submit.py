@@ -1,4 +1,5 @@
 from copy import deepcopy
+from urllib import parse
 import csv
 import datetime
 import json
@@ -6,8 +7,7 @@ import re
 import openpyxl
 
 from dcicutils.lang_utils import n_of
-from dcicutils.qa_utils import ignored
-from dcicutils.misc_utils import VirtualAppError
+from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
 from .util import s3_local_file, debuglog
 
@@ -278,9 +278,10 @@ class AccessionRow:
     class used to hold metadata parsed from one row of spreadsheet at a time
     """
 
-    def __init__(self, metadata, idx, family_alias, project, institution):
+    def __init__(self, vapp, metadata, idx, family_alias, project, institution):
         self.project = project
         self.institution = institution
+        self.virtualapp = vapp
         self.metadata = metadata
         self.row = idx
         self.errors = []
@@ -360,10 +361,27 @@ class AccessionRow:
                     info[relation] = self.indiv_alias
                 break
         if not relation_found:
+            # check if family is already in db
+            # if family in db and member in family, ok
+            try:
+                family_match = self.virtualapp.get(
+                    f'/search/?type=Family&aliases={parse.quote_plus(self.fam_alias)}&frame=object'
+                ).json['@graph'][0]
+                individual_match = self.virtualapp.get(
+                    f'/search/?type=Individual&aliases={parse.quote_plus(self.indiv_alias)}&frame=object'
+                ).json['@graph'][0]
+            except Exception:  # if family and individual not already in DB
+                pass  # relation_found remains False
+            else:
+                if individual_match.get('@id', '') in family_match.get('members', []):
+                    relation_found = True
+        if not relation_found:
             msg = 'Row {} - Invalid relation "{}" for individual {} - Relation should be one of: {}'.format(
                 self.row, self.metadata.get(SS_RELATION), self.metadata.get(SS_INDIVIDUAL_ID),
                 ', '.join(RELATIONS)
             )
+            msg += ('. To submit extended relations (grandparent, uncle, aunt, cousin, etc.),'
+                    ' please submit family history first.')
             self.errors.append(msg)
         return MetadataItem(info, self.row, 'family')
 
@@ -485,7 +503,8 @@ class AccessionMetadata:
     have metadata that occurs across multiple rows.
     """
 
-    def __init__(self, rows, project, institution, ingestion_id, counter=1):
+    def __init__(self, vapp, rows, project, institution, ingestion_id, counter=1):
+        self.virtualapp = vapp
         self.rows = rows
         self.project = project.get('name')
         self.project_atid = project.get('@id')
@@ -764,7 +783,7 @@ class AccessionMetadata:
                                    ' Row cannot be processed.'.format(i + 1 + self.counter))
                 continue
             try:
-                processed_row = AccessionRow(row, i + 1 + self.counter, fam, self.project, self.institution)
+                processed_row = AccessionRow(self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution)
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
                 simple_add_items.extend(processed_row.files_processed)
@@ -1033,7 +1052,6 @@ class SpreadsheetProcessing:
 
     REQUIRED_COLUMNS = []
     METADATA_CLASS = None
-    SKIP = 0  # handles number of args required to instantiate relevant Metadata class
 
     def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
         self.virtualapp = vapp
@@ -1091,7 +1109,7 @@ class SpreadsheetProcessing:
     def extract_metadata(self):
         current_args = [self.virtualapp, self.rows, self.project,
                         self.institution, self.ingestion_id, self.counter]
-        result = self.METADATA_CLASS(*current_args[self.SKIP:])
+        result = self.METADATA_CLASS(*current_args)
         self.output = result.json_out
         self.errors.extend(result.errors)
         self.passing = True
@@ -1105,7 +1123,6 @@ class AccessionProcessing(SpreadsheetProcessing):
     """
     REQUIRED_COLUMNS = REQUIRED_COLS_FOR_ACCESSIONING
     METADATA_CLASS = AccessionMetadata
-    SKIP = 1  # vapp arg not needed for instantiation of this class (only PedigreeMetadata)
 
 
 class PedigreeProcessing(SpreadsheetProcessing):

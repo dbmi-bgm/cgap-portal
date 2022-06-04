@@ -86,7 +86,7 @@ export class AutoGrowTextArea extends React.Component {
     }
 
     render() {
-        const { className, buffer, minHeight, maxHeight, ...passProps } = this.props;
+        const { className, buffer, minHeight, visible, maxHeight, ...passProps } = this.props;
         const { textAreaHeight, parentHeight } = this.state;
 
         return (
