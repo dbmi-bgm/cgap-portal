@@ -1,0 +1,99 @@
+#!/bin/bash
+
+projfile=pyproject.toml
+libname=
+do_help=
+do_debug=
+exports=
+
+while [ $# -gt 0 ]; do
+    if [ "$1" = "--help" ]; then
+        do_help=TRUE
+        shift 1
+    elif [ "$1" = "--debug" ]; then
+        do_debug=TRUE
+        shift 1
+    elif [ "$1" = "--export" ]; then
+        if [ $# -eq 1 ]; then
+            echo "Missing arg for --export"
+            exit 1
+        fi
+        exports="${exports}export $2; "
+        shift 2
+    elif [ -z "$libname" ]; then
+       libname=$1
+        shift 1
+    else
+       if [ "${1:0:1}" != "-" ]; then
+           echo "There can only be one <libname> argument."
+       else
+           echo "Unknown option: $1"
+       fi
+       exit 1
+    fi
+done
+
+if [ -n "${do_help}" ]; then
+    echo "$0 [[ <libname> | --debug | --help | [ --export <var>=<val> ]* ]]"
+    echo ""
+    echo "  Uses pip to preload the version of <libname> that's specified in ${projfile}."
+    echo "  The --export <var>=<value> can be repeated more than once if needed."
+    echo "    Each defines an export that must be dded to the environment"
+    echo "    when running the pip command."
+    echo "  With --debug, it simulates the execution and shows debugging info."
+    echo "  With --help, it just shows this information and exits."
+    echo ""
+    exit 1
+fi
+
+if [ -z "${libname}" ]; then
+    echo "No library name specified."
+    exit 1
+elif [ ! -f "${projfile}" ]; then
+    echo "Could not find a ${projfile} from which to obtain the right version of ${libname}."
+    exit 1
+fi
+
+quotes="'\""
+version_line=`grep "^${libname} =" ${projfile}`
+
+if [ -z "${version_line}" ]; then
+    echo "Can't find a version of ${libname} in ${projfile}."
+    exit 1
+fi
+
+if [ -n "${do_debug}" ]; then
+  echo "version_line=${version_line}"
+fi
+
+version=`echo "${version_line}" | sed -E "s/^[^=]*=[ ]*[${quotes}]([^${quotes}]*)[${quotes}][ ]*([#].*)?$/\\1/g"`
+
+if [ -n "${do_debug}" ]; then
+  echo "version=${version}"
+fi
+
+if [[ $version =~ ^([<>=^~*][^ ]*)?$ ]]; then
+    echo "Cannot preload ${libname} because it is not fully pinned: ${version}"
+    exit 1
+elif [[ $version =~ "=" ]]; then
+    echo "Contents of ${projfile} in unexpected format. Can't parse version of ${libname}."
+    echo " Line: ${version_line}"
+    exit 1
+fi
+
+if [ -n "${do_debug}" ]; then
+    echo "exports=$exports"
+fi
+
+maybe_simulate=""
+
+if [ -n "${do_debug}" ]; then
+   echo "SIMULATING... "
+    maybe_simulate="echo "
+fi
+
+${maybe_simulate}echo "Preloading ${libname} ${version}"
+if [ -n "${exports}" ]; then
+    ${maybe_simulate}${exports}
+fi
+${maybe_simulate}pip install "${libname}==${version}"

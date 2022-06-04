@@ -59,7 +59,8 @@ export default class HealthView extends React.PureComponent {
             },
             'beanstalk_env' : {
                 title : "Beanstalk Environment",
-                description : "Which Elastic Beanstalk environment this instance running on."
+                description : "Which Elastic Beanstalk environment this instance running on. Deprecated." +
+                    " Please prefer the Environment Name."
             },
             'blob_bucket' : {
                 title : "Blob Bucket",
@@ -75,6 +76,18 @@ export default class HealthView extends React.PureComponent {
             'elasticsearch' : {
                 title : "ElasticSearch Location",
                 description : "URI used to connect to the back-end ES instance."
+            },
+            'env_bucket' : {
+                title : "Environment Bucket",
+                description : "The S3 bucket in which information about environments and ecosystems can be found."
+            },
+            'env_ecosystem' : {
+                title : "Environment Ecosystem",
+                description : "A collection of portal environments that might share policies or resources."
+            },
+            'env_name' : {
+                title : "Environment Name",
+                description : "The portal environment (formerly the 'Beanstalk Environment')."
             },
             'file_upload_bucket' : {
                 title : "File Upload Bucket",
@@ -110,7 +123,8 @@ export default class HealthView extends React.PureComponent {
             },
             'namespace': {
                 title : "Namespace",
-                description : "The ElasticSearch namespace to use. This is often the same as the Beanstalk Environment, but don't rely on that."
+                description : "The ElasticSearch namespace to use." +
+                    " This is often the same as the Environment Name, but don't rely on that."
             },
             'ontology_updated' : {
                 title : 'Ontology Last Updated',

@@ -1,18 +1,43 @@
 import glob
 import io
+import json
 import os
-import pkg_resources
 import pytest
 
 from dcicutils import lang_utils
 from dcicutils.lang_utils import conjoined_list
-from dcicutils.misc_utils import ignored
+from dcicutils.misc_utils import ignored, ignorable, override_dict
+from dcicutils.s3_utils import HealthPageKey
 from unittest import mock
 from ..appdefs import ITEM_INDEX_ORDER
 from ..root import SettingsKey, uptime_info
 from ..util import PROJECT_DIR
 
+
+ignorable(json, HealthPageKey)  # For now these might or might not be used in tests below
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
+def test_health_page_env_settings(anontestapp):
+    """Checks that changes to registry settings reflect in changes to health page results."""
+    my_env_bucket = 'my-env-bucket'
+    my_env_ecosystem = 'my-env-ecosystem'
+    my_env_name = 'my-env-name'
+
+    additional_settings = {
+        'env.bucket': my_env_bucket,
+        'env.ecosystem': my_env_ecosystem,
+        'env.name': my_env_name,
+    }
+
+    with override_dict(anontestapp.app.registry.settings, **additional_settings):
+        health_json = anontestapp.get('/health').json
+        # print(json.dumps(health_json, indent=2))
+        assert health_json['env_bucket'] == my_env_bucket  # HealthPageKey.BEANSTALK_ENV
+        assert health_json['env_ecosystem'] == my_env_ecosystem  # HealthPageKey.ENV_ECOSYSTEM
+        assert health_json['env_name'] == my_env_name  # HealthPageKey.ENV_NAME
 
 
 def test_type_metadata(anontestapp):

@@ -95,6 +95,9 @@ def health_check(config):
 
         class ExtendedHealthPageKey(HealthPageKey):
             # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
+            ENV_BUCKET = "env_bucket"
+            ENV_ECOSYSTEM = "env_ecosystem"
+            ENV_NAME = "env_name"
             PYTHON_VERSION = "python_version"
             pass
 
@@ -111,6 +114,8 @@ def health_check(config):
         if not app_url.endswith('/'):
             app_url = ''.join([app_url, '/'])
 
+        env_bucket = settings.get('env.bucket')
+        env_ecosystem = settings.get('env.ecosystem')
         env_name = settings.get('env.name')
         foursight_url = infer_foursight_url_from_env(request, env_name)
 
@@ -128,6 +133,9 @@ def health_check(config):
             h.DATABASE: settings.get(s.SQLALCHEMY_URL).split('@')[1],  # don't show user /password
             h.DISPLAY_TITLE: "CGAP Status and Foursight Monitoring",
             h.ELASTICSEARCH: settings.get(s.ELASTICSEARCH_SERVER),
+            h.ENV_BUCKET: env_bucket,
+            h.ENV_ECOSYSTEM: env_ecosystem,
+            h.ENV_NAME: env_name,
             h.FILE_UPLOAD_BUCKET: settings.get(s.FILE_UPLOAD_BUCKET),
             h.FOURSIGHT: foursight_url,
             h.FOURSIGHT_BUCKET_PREFIX: settings.get(s.FOURSIGHT_BUCKET_PREFIX),
