@@ -32,4 +32,57 @@ ignore =
     # ==============================================================
     # F541: f-string is missing placeholders
     #       https://flake8.pycqa.org/en/latest/user/error-codes.html
-    F541
+    F541,
+    # ==============================================================
+    # =====  We want these complaints eventually, but not now. =====
+    # ==============================================================
+    # E111 indentation is not a multiple of 4
+    E111,
+    # E116 unexpected indentation (comment)
+    E116,
+    # E122 continuation line missing indentation or outdented
+    E122,
+    # E124 closing bracket does not match visual indentation
+    E124,
+    # E127 continuation line over-indented for visual indent
+    E127,
+    # E128 continuation line under-indented for visual indent
+    E128,
+    # E201 whitespace after '['
+    E201,
+    # E202 whitespace before '}'
+    E202,
+    # E203 whitespace before ':'
+    E203,
+    # E221 multiple spaces before operator
+    E221,
+    # E222 multiple spaces after operator
+    E222,
+    # E231 missing whitespace after ':
+    E231,
+    # E241 multiple spaces after ':'
+    E241,
+    # E251 unexpected spaces around keyword / parameter equals
+    E251,
+    # E261 at least two spaces before inline comment
+    E261,
+    # E262 inline comment should start with '# '
+    E262,
+    # E265 block comment should start with '# '
+    E265,
+    # E266 too many leading '#' for block comment
+    E266,
+    # E272 multiple spaces before keyword
+    E272,
+    # W291 trailing whitespace
+    W291,
+    # W293 blank line contains whitespace
+    W293,
+    # E302 expected 2 blank lines
+    E302,
+    # E303 too many blank lines
+    E303,
+    # W391 blank line at end of file
+    W391,
+    # E501 line too long
+    E501,
