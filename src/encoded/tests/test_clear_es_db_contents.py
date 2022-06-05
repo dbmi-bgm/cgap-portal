@@ -175,6 +175,22 @@ def test_run_clear_db_es_unit(app, testapp):
                     assert mock_clear_db_tables.call_count == expected_db_clears
                     assert mock_run_create_mapping.call_count == expected_es_clears
 
+                    # test if we are only running on specific envs
+                    assert run_clear_db_es(app, only_envs=['fourfront-test-env-1', 'fourfront-test-env-2'],
+                                           skip_es=False) is False
+                    expected_db_clears += 0
+                    expected_es_clears += 0
+                    assert mock_clear_db_tables.call_count == expected_db_clears
+                    assert mock_run_create_mapping.call_count == expected_es_clears
+
+                    # test if we are only running on specific envs
+                    assert run_clear_db_es(app, only_envs=['fourfront-test-env-1', 'fourfront-test-env'],
+                                           skip_es=False) is True
+                    expected_db_clears += 1
+                    expected_es_clears += 1
+                    assert mock_clear_db_tables.call_count == expected_db_clears
+                    assert mock_run_create_mapping.call_count == expected_es_clears
+
 
 @pytest.mark.unit
 def test_clear_db_es_contents_main():
