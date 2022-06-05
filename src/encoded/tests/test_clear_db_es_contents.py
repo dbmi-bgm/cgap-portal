@@ -1,6 +1,7 @@
 import contextlib
 import pytest
 
+from dcicutils.lang_utils import disjoined_list
 from unittest import mock
 from ..commands import clear_db_es_contents as clear_db_es_contents_module
 from ..commands.clear_db_es_contents import (
@@ -11,6 +12,31 @@ from ..commands.clear_db_es_contents import (
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.indexing]
+
+
+class MockLog:
+
+    def __init__(self, *, messages=None, key=None):
+        self.messages = messages or {}
+        self.key = key
+
+    def _addmsg(self, kind, msg):
+        self.messages[kind] = msgs = self.messages.get(kind, [])
+        msgs.append(msg[self.key] if self.key else msg)
+
+    def error(self, msg):
+        self._addmsg('error', msg)
+
+    def info(self, msg):
+        self._addmsg('info', msg)
+
+
+@contextlib.contextmanager
+def logged_messages(**kwargs):
+    mocked_log = MockLog()
+    with mock.patch.object(clear_db_es_contents_module, "log", mocked_log):
+        yield mocked_log
+        assert mocked_log.messages == dict(**kwargs)
 
 
 def test_clear_db_tables(app, testapp):
@@ -49,12 +75,21 @@ def test_run_clear_db_es_integrated(app, testapp):
         # should never run on production envs
         for production_env in _CGAP_PRODUCTION_ENVS:
             with local_env_name_registry_setting_for_testing(app, production_env):
-                assert run_clear_db_es(app, only_envs=None, skip_es=True) is False
+                with logged_messages(error=[
+                            (f'clear_db_es_contents: This action cannot be performed on env {production_env}'
+                             f' because it is a production-class (stg or prd) environment.'
+                             f' Skipping the attempt to clear DB.')
+                        ]):
+                    assert run_clear_db_es(app, only_envs=None, skip_es=True) is False
                 testapp.get(post_res.location, status=200)
 
         # test if we are only running on specific envs
-        app.registry.settings['env.name'] = 'fourfront-test-env'
-        assert run_clear_db_es(app, only_envs=['fourfront-other-env'], skip_es=True) is False
+        allowed_envs = ['fourfront-other-env']
+        test_env = 'fourfront-test-env'
+        app.registry.settings['env.name'] = test_env
+        with logged_messages(error=[(f'clear_db_es_contents: The current environment, {test_env},'
+                                     f' is not {disjoined_list(allowed_envs)}. Skipping the attempt to clear DB.')]):
+            assert run_clear_db_es(app, only_envs=['fourfront-other-env'], skip_es=True) is False
         testapp.get(post_res.location, status=200)
         assert run_clear_db_es(app, only_envs=['fourfront-test-env'], skip_es=True) is True
         testapp.get(post_res.location, status=404)
@@ -63,7 +98,7 @@ def test_run_clear_db_es_integrated(app, testapp):
 
         # reset settings after test
         if prev_env is None:
-            del app.registry.settings['env.name']
+            app.registry.settings.pop('env.name', None)  # Tolerant of it not yet being there.
         else:
             app.registry.settings['env.name'] = prev_env
 
@@ -139,23 +174,36 @@ def test_run_clear_db_es_unit(app, testapp):
                     with local_env_name_registry_setting_for_testing(app, production_env):
                         # should never run on production envs env
                         assert clear_db_es_contents_module.is_stg_or_prd_env(production_env) is True
-                        assert run_clear_db_es(app, only_envs=None, skip_es=True) is False
+                        with logged_messages(error=[
+                            (f'clear_db_es_contents: This action cannot be performed on env {production_env}'
+                             f' because it is a production-class (stg or prd) environment.'
+                             f' Skipping the attempt to clear DB.')]):
+                            assert run_clear_db_es(app, only_envs=None, skip_es=True) is False
                         expected_db_clears += 0
                         expected_es_clears += 0
                         assert mock_clear_db_tables.call_count == expected_db_clears
                         assert mock_run_create_mapping.call_count == expected_es_clears
 
-                with local_env_name_registry_setting_for_testing(app, 'fourfront-test-env'):
+                test_env = 'fourfront-test-env'
+                with local_env_name_registry_setting_for_testing(app, test_env):
+
+                    allowed_envs = ['fourfront-other-env']
 
                     # test if we are only running on specific envs
-                    assert run_clear_db_es(app, only_envs=['fourfront-other-env'], skip_es=True) is False
+                    with logged_messages(error=[(f'clear_db_es_contents: The current environment, {test_env},'
+                                                 f' is not {disjoined_list(allowed_envs)}.'
+                                                 f' Skipping the attempt to clear DB.')]):
+                        assert run_clear_db_es(app, only_envs=allowed_envs, skip_es=True) is False
                     expected_db_clears += 0
                     expected_es_clears += 0
                     assert mock_clear_db_tables.call_count == expected_db_clears
                     assert mock_run_create_mapping.call_count == expected_es_clears
 
-                    # test if we are only running on specific envs
-                    assert run_clear_db_es(app, only_envs=['fourfront-other-env'], skip_es=False) is False
+                    # test again if we are only running on specific envs
+                    with logged_messages(error=[(f'clear_db_es_contents: The current environment, {test_env},'
+                                                 f' is not {disjoined_list(allowed_envs)}.'
+                                                 f' Skipping the attempt to clear DB.')]):
+                        assert run_clear_db_es(app, only_envs=allowed_envs, skip_es=False) is False
                     expected_db_clears += 0
                     expected_es_clears += 0
                     assert mock_clear_db_tables.call_count == expected_db_clears
@@ -168,24 +216,27 @@ def test_run_clear_db_es_unit(app, testapp):
                     assert mock_clear_db_tables.call_count == expected_db_clears
                     assert mock_run_create_mapping.call_count == expected_es_clears
 
-                    # test if we are only running on specific envs
+                    # test again if we are only running on specific envs
                     assert run_clear_db_es(app, only_envs=['fourfront-test-env'], skip_es=False) is True
                     expected_db_clears += 1
                     expected_es_clears += 1
                     assert mock_clear_db_tables.call_count == expected_db_clears
                     assert mock_run_create_mapping.call_count == expected_es_clears
 
+                    allowed_envs = ['fourfront-test-env-decoy-1', 'fourfront-test-env-decoy-2']
                     # test if we are only running on specific envs
-                    assert run_clear_db_es(app, only_envs=['fourfront-test-env-1', 'fourfront-test-env-2'],
-                                           skip_es=False) is False
+                    with logged_messages(error=[(f'clear_db_es_contents: The current environment, {test_env},'
+                                                 f' is not {disjoined_list(allowed_envs)}.'
+                                                 f' Skipping the attempt to clear DB.')]):
+                        assert run_clear_db_es(app, only_envs=allowed_envs, skip_es=False) is False
                     expected_db_clears += 0
                     expected_es_clears += 0
                     assert mock_clear_db_tables.call_count == expected_db_clears
                     assert mock_run_create_mapping.call_count == expected_es_clears
 
+                    allowed_envs = ['fourfront-test-env-decoy-1', test_env]
                     # test if we are only running on specific envs
-                    assert run_clear_db_es(app, only_envs=['fourfront-test-env-1', 'fourfront-test-env'],
-                                           skip_es=False) is True
+                    assert run_clear_db_es(app, only_envs=allowed_envs, skip_es=False) is True
                     expected_db_clears += 1
                     expected_es_clears += 1
                     assert mock_clear_db_tables.call_count == expected_db_clears
