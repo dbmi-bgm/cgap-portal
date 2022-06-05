@@ -296,6 +296,15 @@
                 }
             }
         },
+        "genome_assembly": {
+            "title": "Genome Assembly",
+            "description": "The genome assembly associated with the file",
+            "type": "string",
+            "enum": [
+                "GRCh37",
+                "GRCh38"
+            ]
+        },
         "override_lab_name": {
             "description": "The lab that did the experiment if not the attributed Lab from whence this file",
             "type": "string",
