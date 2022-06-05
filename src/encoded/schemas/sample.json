@@ -57,7 +57,7 @@
             "accessionType": "SA"
         },
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "workup_type": {
             "title": "Workup Type",
