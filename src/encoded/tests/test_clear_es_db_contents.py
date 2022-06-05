@@ -127,14 +127,21 @@ def test_run_clear_db_es_unit(app, testapp):
                 assert mock_clear_db_tables.call_count == expected_db_clears
                 assert mock_run_create_mapping.call_count == expected_es_clears
 
-                with local_env_name_registry_setting_for_testing(app, 'fourfront-cgap'):
-                    # should never run on this env
-                    assert clear_db_es_contents_module.is_stg_or_prd_env('fourfront-cgap') is True
-                    assert run_clear_db_es(app, only_envs=None, skip_es=True) is False
-                    expected_db_clears += 0
-                    expected_es_clears += 0
-                    assert mock_clear_db_tables.call_count == expected_db_clears
-                    assert mock_run_create_mapping.call_count == expected_es_clears
+                # Really we only care about the first of these names, but the rest are names that were at one time
+                # planned to be stg or prd names for cgap, so this tests that it's properly noticing such names
+                # and skipping in that case. -kmp 4-Jun-2022
+                for production_env in ['fourfront-cgap',
+                                       'fourfront-cgap-green', 'cgap-green',
+                                       'fourfront-cgap-blue', 'cgap-blue']:
+
+                    with local_env_name_registry_setting_for_testing(app, production_env):
+                        # should never run on this env
+                        assert clear_db_es_contents_module.is_stg_or_prd_env(production_env) is True
+                        assert run_clear_db_es(app, only_envs=None, skip_es=True) is False
+                        expected_db_clears += 0
+                        expected_es_clears += 0
+                        assert mock_clear_db_tables.call_count == expected_db_clears
+                        assert mock_run_create_mapping.call_count == expected_es_clears
 
                 with local_env_name_registry_setting_for_testing(app, 'fourfront-test-env'):
 
