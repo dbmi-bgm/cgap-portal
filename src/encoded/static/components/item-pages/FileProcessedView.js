@@ -1,7 +1,6 @@
 'use strict';
 
 import React from 'react';
-import moment from 'moment';
 import _ from 'underscore';
 import memoize from 'memoize-one';
 import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -20,9 +19,9 @@ export default class FileProcessedView extends DefaultItemView {
     }
 
     shouldGraphExist(){
-        const { context } = this.props;
+        const { context: { workflow_run_outputs = [] } } = this.props;
         return (
-            (Array.isArray(context.workflow_run_outputs) && context.workflow_run_outputs.length > 0)
+            (workflow_run_outputs.length > 0)
             // We can uncomment below line once do permissions checking on backend for graphing
             //&& _.any(context.workflow_run_outputs, object.itemUtil.atId)
         );

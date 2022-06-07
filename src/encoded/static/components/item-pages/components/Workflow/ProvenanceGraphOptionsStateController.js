@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import _ from 'underscore';
 import memoize from 'memoize-one';
 import { parseAnalysisSteps } from '@hms-dbmi-bgm/react-workflow-viz';

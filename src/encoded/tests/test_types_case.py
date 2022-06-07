@@ -1,5 +1,12 @@
 import pytest
+
+
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+
+
+VCF_FILE_TYPE_PATCH = {"file_type": "full annotated VCF", "vcf_to_ingest": False}
+VCF_PROPERTY_PATCH = {"file_type": "foo bar", "vcf_to_ingest": True}
+VCF_NOT_FOUND_PATCH = {"file_type": "foo bar", "vcf_to_ingest": False}
 
 
 @pytest.fixture
@@ -69,69 +76,121 @@ def test_case_second_family(testapp, proband_case, mother_case, fam, second_fam)
     assert mother['secondary_families'][0]['@id'] == fam2_id
 
 
-def test_case_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
-    """Test finding SNV VCF on Case.SampleProcessing"""
-    assert not proband_case["vcf_file"]
-    assert not mother_case["vcf_file"]
+@pytest.mark.parametrize(
+    "patch_body,expect_vcf",
+    [
+        (VCF_FILE_TYPE_PATCH, True),
+        (VCF_PROPERTY_PATCH, True),
+        (VCF_NOT_FOUND_PATCH, False),
+    ]
+)
+def test_case_vcf(
+    testapp,
+    sample_proc_fam,
+    file_vcf,
+    file_vcf_sv,
+    file_vcf_cnv,
+    proband_case,
+    mother_case,
+    patch_body,
+    expect_vcf,
+):
+    """Test retrieval of SNV VCF from SampleProcessing.
 
-    # Test VCF by file type
-    file_id = file_vcf['@id']
-    patch_body = {"processed_files": [file_id]}
-    testapp.patch_json(sample_proc_fam['@id'], patch_body, status=200)
-    proband = testapp.get(proband_case['@id']).json
-    mother = testapp.get(mother_case['@id']).json
-    assert proband['vcf_file']['@id'] == file_id
-    assert mother['vcf_file']['@id'] == file_id
-
-    # Test no VCF without file type and property
-    file_patch_body = {"file_type": "foo"}
-    testapp.patch_json(file_id, file_patch_body, status=200)
-    proband = testapp.get(proband_case['@id']).json
-    mother = testapp.get(mother_case['@id']).json
-    assert not proband["vcf_file"]
-    assert not mother["vcf_file"]
-
-    # Test VCF by property
-    file_patch_body = {"vcf_to_ingest": True}
-    testapp.patch_json(file_id, file_patch_body, status=200)
-    proband = testapp.get(proband_case['@id']).json
-    mother = testapp.get(mother_case['@id']).json
-    assert proband['vcf_file']['@id'] == file_id
-    assert mother['vcf_file']['@id'] == file_id
-
-
-def test_case_sv_vcf(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
-    """Test finding SV VCF on Case.SampleProcessing"""
-    assert not proband_case["structural_variant_vcf_file"]
-    assert not mother_case["structural_variant_vcf_file"]
-
+    Ensure file found when VCFs for other variant types also present.
+    """
     file_id = file_vcf["@id"]
-    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
-
-    # Test SV VCF by file type
+    testapp.patch_json(file_id, patch_body, status=200)
+    all_vcfs = [file_id, file_vcf_sv["@id"], file_vcf_cnv["@id"]]
     testapp.patch_json(
-        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+        sample_proc_fam["@id"], {"processed_files": all_vcfs}, status=200
     )
     proband = testapp.get(proband_case["@id"]).json
     mother = testapp.get(mother_case["@id"]).json
-    assert proband["structural_variant_vcf_file"]["@id"] == file_id
-    assert mother["structural_variant_vcf_file"]["@id"] == file_id
+    if expect_vcf:
+        assert proband["vcf_file"]["@id"] == file_id
+        assert mother["vcf_file"]["@id"] == file_id
+    else:
+        assert proband.get("vcf_file") is None
+        assert mother.get("vcf_file") is None
 
-    # Test no SV VCF without file type and property
-    file_patch_body = {"file_type": "foo"}
-    testapp.patch_json(file_id, file_patch_body, status=200)
-    proband = testapp.get(proband_case['@id']).json
-    mother = testapp.get(mother_case['@id']).json
-    assert not proband["structural_variant_vcf_file"]
-    assert not mother["structural_variant_vcf_file"]
 
-    # Test SV VCF by property
-    file_patch_body = {"vcf_to_ingest": True}
-    testapp.patch_json(file_id, file_patch_body, status=200)
-    proband = testapp.get(proband_case['@id']).json
-    mother = testapp.get(mother_case['@id']).json
-    assert proband['structural_variant_vcf_file']['@id'] == file_id
-    assert mother['structural_variant_vcf_file']['@id'] == file_id
+@pytest.mark.parametrize(
+    "patch_body,expect_vcf",
+    [
+        (VCF_FILE_TYPE_PATCH, True),
+        (VCF_PROPERTY_PATCH, True),
+        (VCF_NOT_FOUND_PATCH, False),
+    ]
+)
+def test_case_sv_vcf(
+    testapp,
+    sample_proc_fam,
+    file_vcf,
+    file_vcf_sv,
+    file_vcf_cnv,
+    proband_case,
+    mother_case,
+    patch_body,
+    expect_vcf,
+):
+    """Test retrieval of SV VCF from SampleProcessing.
+
+    Ensure file found when VCFs for other variant types also present.
+    """
+    file_id = file_vcf_sv["@id"]
+    testapp.patch_json(file_id, patch_body, status=200)
+    all_vcfs = [file_id, file_vcf["@id"], file_vcf_cnv["@id"]]
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": all_vcfs}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    if expect_vcf:
+        assert proband["structural_variant_vcf_file"]["@id"] == file_id
+        assert mother["structural_variant_vcf_file"]["@id"] == file_id
+    else:
+        assert proband.get("structural_variant_vcf_file") is None
+        assert mother.get("structural_variant_vcf_file") is None
+
+
+@pytest.mark.parametrize(
+    "patch_body,expect_vcf",
+    [
+        (VCF_FILE_TYPE_PATCH, True),
+        (VCF_PROPERTY_PATCH, True),
+        (VCF_NOT_FOUND_PATCH, False),
+    ]
+)
+def test_case_cnv_vcf(
+    testapp,
+    sample_proc_fam,
+    file_vcf,
+    file_vcf_sv,
+    file_vcf_cnv,
+    proband_case,
+    mother_case,
+    patch_body,
+    expect_vcf,
+):
+    """Test retrieval of CNV VCF from SampleProcessing.
+
+    Ensure file found when VCFs for other variant types also present.
+    """
+    file_id = file_vcf_cnv["@id"]
+    testapp.patch_json(file_id, patch_body, status=200)
+    all_vcfs = [file_id, file_vcf["@id"], file_vcf_sv["@id"]]
+    testapp.patch_json(
+        sample_proc_fam["@id"], {"processed_files": all_vcfs}, status=200
+    )
+    proband = testapp.get(proband_case["@id"]).json
+    mother = testapp.get(mother_case["@id"]).json
+    if expect_vcf:
+        assert proband["cnv_vcf_file"]["@id"] == file_id
+        assert mother["cnv_vcf_file"]["@id"] == file_id
+    else:
+        assert proband.get("cnv_vcf_file") is None
+        assert mother.get("cnv_vcf_file") is None
 
 
 def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
@@ -147,19 +206,27 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
     assert mother['initial_search_href_filter_addon'] == "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
 
 
-def test_case_sv_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
-    file_id = file_vcf["@id"]
-    testapp.patch_json(file_id, {"variant_type": "SV"}, status=200)
+def test_case_sv_flag(
+    testapp, sample_proc_fam, file_vcf_sv, file_vcf_cnv, proband_case, mother_case
+):
+    sv_file_id = file_vcf_sv["@id"]
+    sv_file_accession = file_vcf_sv["accession"]
+    cnv_file_id = file_vcf_cnv["@id"]
+    cnv_file_accession = file_vcf_cnv["accession"]
+    patch_body = {"processed_files": [sv_file_id, cnv_file_id]}
     testapp.patch_json(
-        sample_proc_fam["@id"], {"processed_files": [file_id]}, status=200
+        sample_proc_fam["@id"], patch_body, status=200
     )
     proband = testapp.get(proband_case["@id"]).json
     mother = testapp.get(mother_case["@id"]).json
-    file_acc = file_id.split('/')[2]
     proband_sample_tag = "ext_id_006"
     mother_sample_tag = "ext_id_003"
-    proband_flag = "CALL_INFO={}&file={}".format(proband_sample_tag, file_acc)
-    mother_flag = "CALL_INFO={}&file={}".format(mother_sample_tag, file_acc)
+    proband_flag = "CALL_INFO={}&file={}&file={}".format(
+        proband_sample_tag, sv_file_accession, cnv_file_accession
+    )
+    mother_flag = "CALL_INFO={}&file={}&file={}".format(
+        mother_sample_tag, sv_file_accession, cnv_file_accession
+    )
     assert proband['sv_initial_search_href_filter_addon'] == proband_flag
     assert mother['sv_initial_search_href_filter_addon'] == mother_flag
 

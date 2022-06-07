@@ -597,4 +597,34 @@ def load_deploy_data(app, overwrite=True, **kwargs):
     Returns:
         None if successful, otherwise Exception encountered
     """
-    return load_data(app, indir="deploy-inserts", overwrite=True)
+    return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)
+
+
+def load_data_by_type(app, indir='master-inserts', overwrite=True, itype=None):
+    """
+    This function will load inserts of type itype from the indir directory.
+    args:
+        indir (inserts): inserts folder, should be relative to tests/data/
+        itype: item type to load (e.g. "higlass_view_config")
+    """
+
+    if itype is None:
+        print('load_data_by_type: No item type specified. Not loading anything.')
+        return
+
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'TEST',
+    }
+    testapp = webtest.TestApp(app, environ)
+   
+    if not indir.endswith('/'):
+        indir += '/'
+    inserts = resource_filename('encoded', 'tests/data/' + indir)
+
+    res = load_all(testapp, inserts, docsdir=[], overwrite=overwrite, itype=itype)
+    if res:  # None if successful
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_data_by_type: failed to load from %s' % indir, error=res)
+        return res
+    return None  # unnecessary, but makes it more clear that no error was encountered

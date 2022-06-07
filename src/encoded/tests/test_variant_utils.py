@@ -93,6 +93,8 @@ class TestStructuralVariantBuilder:
         assert 0 not in sv_sample["samplegeno"]
         assert "genotype_labels" in sv_sample
         assert "inheritance_modes" in sv_sample
+        assert sv_sample["callers"] == ["Manta"]
+        assert sv_sample["caller_types"] == ["SV"]
 
     def test_post_or_patch(self, testapp, project, institution):
         """
@@ -117,11 +119,13 @@ class TestStructuralVariantBuilder:
             del structural_variant_sample[key]
         variant_post = builder._post_or_patch_variant(structural_variant)
         variant_uuid = variant_post["@graph"][0]["uuid"]
-        variant_display_title = variant_post["@graph"][0]["display_title"]
         builder._post_or_patch_variant_sample(structural_variant_sample, variant_uuid)
         variant_patch = builder._post_or_patch_variant(structural_variant)
         builder._post_or_patch_variant_sample(structural_variant_sample, variant_uuid)
-        sample_posted = testapp.get("/structural-variant-samples/").json["@graph"][0]
+        sample_atid = testapp.get(
+            "/structural-variant-samples/", status=200
+        ).json["@graph"][0]["@id"]
+        sample = testapp.get(sample_atid + "?frame=raw", status=200).json
         assert variant_post["status"] == "success"
         assert variant_patch["status"] == "success"
-        assert variant_display_title in sample_posted["display_title"]
+        assert sample["structural_variant"] == variant_uuid

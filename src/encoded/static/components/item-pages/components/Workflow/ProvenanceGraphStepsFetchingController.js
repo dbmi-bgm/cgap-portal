@@ -2,7 +2,7 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
+import { format as dateFormat } from "date-fns";
 import _ from 'underscore';
 import { console, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
@@ -84,7 +84,7 @@ export class ProvenanceGraphStepsFetchingController extends React.PureComponent 
         };
 
         const uriOpts = {
-            timestamp: moment.utc().unix()
+            timestamp: dateFormat(new Date(), 't')
         };
 
         if (includeAllRunsInSteps){
