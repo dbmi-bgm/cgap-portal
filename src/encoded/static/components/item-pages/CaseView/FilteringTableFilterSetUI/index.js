@@ -180,7 +180,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             caseItem, schemas, session, searchHrefBase, searchType, isActiveDotRouterTab, haveCaseEditPermission,
 
             // From TechnicalReviewController (used in FilteringTab)
-            lastSavedTechnicalReview, lastSavedTechnicalReviewNotes, resetLastSavedTechnicalReview,
+            // lastSavedTechnicalReview, lastSavedTechnicalReviewNotes, resetLastSavedTechnicalReview,
 
             // From SaveFilterSetButtonController:
             hasCurrentFilterSetChanged, isSavingFilterSet, saveFilterSet,

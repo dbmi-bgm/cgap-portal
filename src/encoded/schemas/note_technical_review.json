@@ -55,8 +55,12 @@
                         "Low Coverage",
                         "Low Allelic Fraction",
                         "Low Mapping Quality",
+                        "Repeat Region",
                         "Strand Bias",
                         "Mendelian Error",
+                        "No Depth Change",
+                        "No Split Reads",
+                        "No Spanning Reads",
                         "Other"
                     ]
                 },

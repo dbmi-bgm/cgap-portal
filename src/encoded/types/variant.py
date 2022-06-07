@@ -37,6 +37,7 @@ from ..util import (
     resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
 )
 from ..types.base import Item, get_item_or_none
+from ..search.search import get_iterable_search_results
 
 
 log = structlog.getLogger(__name__)
@@ -159,7 +160,12 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     #"technical_review.review.reviewed_by",
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
-    #"technical_review.last_modified.date_modified"
+    #"technical_review.last_modified.date_modified",
+    # "variant.technical_reviews.uuid",
+    # "variant.technical_reviews.assessment.call",
+    # "variant.technical_reviews.assessment.classification",
+    # "variant.technical_reviews.assessment.date_call_made",
+    # "variant.technical_reviews.note_text"
 ]
 
 
@@ -280,16 +286,18 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 continue
 
 
-def perform_patch_as_admin(request, item_atid, patch_payload):
+
+
+def perform_request_as_admin(request, item_atid, payload=None, request_method="PATCH"):
     """
     Patches Items as 'UPGRADER' user/permissions.
 
     TODO: Seems like this could be re-usable somewhere
     """
-    if len(patch_payload) == 0:
+    if len(payload) == 0 and request_method != "GET":
         log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
         return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
-    subreq = make_subrequest(request, item_atid, method="PATCH", json_body=patch_payload, inherit_user=False)
+    subreq = make_subrequest(request, item_atid, method=request_method, json_body=payload, inherit_user=False)
     subreq.remote_user = "UPGRADE"
     if 'HTTP_COOKIE' in subreq.environ:
         del subreq.environ['HTTP_COOKIE']
@@ -451,6 +459,9 @@ class VariantSample(Item):
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
     rev = {'variant_sample_list': ('VariantSampleList', 'variant_samples.variant_sample_item')}
     embedded_list = build_variant_sample_embedded_list()
+
+    default_diff = ["variant.technicals_reviews"]
+
     FACET_ORDER_OVERRIDE = {
         'inheritance_modes': {
             InheritanceMode.INHMODE_LABEL_DE_NOVO_STRONG: 1,  # de novo (strong)
@@ -611,6 +622,21 @@ class VariantSample(Item):
         result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
+
+    @calculated_property(schema={
+        "title": "Project Technical Review",
+        "description": "The technical review saved to project for this Variant",
+        "type": "string",
+        "linkTo": "NoteTechnicalReview"
+    })
+    def project_technical_review(self, request, variant=None, project=None):
+        variant = get_item_or_none(request, variant, 'Variant', frame='raw')
+        if variant:
+            for tr_id in variant.get("technical_reviews", []):
+                technical_review = get_item_or_none(request, tr_id, 'NoteTechnicalReview', frame='raw')
+                if technical_review.get("project") == project:
+                    return tr_id
+        return None
 
     @calculated_property(schema={
         "title": "AD_REF",
@@ -917,7 +943,8 @@ def process_items_process(context, request):
     """
 
     request_body = request.json
-    stpi = request_body["save_to_project_notes"]
+    stpi = request_body.get("save_to_project_notes")
+    rfpi = request_body.get("remove_from_project_notes")
 
     vs_to_variant_or_gene_field_mappings = {
         "interpretation": "interpretations",
@@ -927,12 +954,17 @@ def process_items_process(context, request):
         "technical_review": "technical_reviews"
     }
 
-    if not stpi:
+    if not stpi and not rfpi:
         raise HTTPBadRequest("No Item UUIDs supplied.")
+    if stpi and rfpi:
+        raise HTTPBadRequest("May only supply 1 request at a time, to remove from OR to save to project.")
 
     li = {} # 'loaded notes'
 
     def validate_and_load_item(vs_field_name):
+
+        uuid_to_process = None
+
         # Initial Validation - ensure each requested UUID is present in own properties and editable
         if vs_field_name in stpi:
             uuid_to_process = stpi[vs_field_name]
@@ -942,12 +974,18 @@ def process_items_process(context, request):
                 raise HTTPBadRequest("Not all submitted Item UUIDs are present on [Structural]VariantSample. " + \
                     "Check 'save_to_project_notes." + vs_field_name + "'.")
 
-            # Get @@object view of Item to check permissions, status, etc.
-            loaded_item = request.embed("/" + uuid_to_process, "@@object", as_user=True)
-            item_resource = find_resource(request.root, loaded_item["@id"])
-            if not request.has_permission("edit", item_resource):
-                raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
-                    "Check 'save_to_project_notes." + vs_field_name + "'.")
+        elif vs_field_name in rfpi:
+            uuid_to_process = rfpi[vs_field_name]
+        
+        if uuid_to_process is None:
+            return # skip
+
+        # Get @@object view of Item to check edit permission
+        loaded_item = request.embed("/" + uuid_to_process, "@@object", as_user=True)
+        item_resource = find_resource(request.root, loaded_item["@id"])
+        if not request.has_permission("edit", item_resource):
+            raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
+                "Check 'save_to_project_notes." + vs_field_name + "'.")
 
             li[vs_field_name] = loaded_item
 
@@ -967,6 +1005,7 @@ def process_items_process(context, request):
     need_gene_patch = "discovery_interpretation" in stpi or "gene_notes" in stpi
 
     variant = None
+    variant_uuid = None
     genes = None # We may have multiple different genes from same variant; at moment we save note to each of them.
 
     if need_variant_patch or need_gene_patch:
@@ -999,7 +1038,7 @@ def process_items_process(context, request):
     timestamp = datetime.datetime.now(pytz.utc).isoformat()
     auth_source, user_id = request.authenticated_userid.split(".", 1)
 
-    def create_item_patch_current_status_payload(item_at_id, approve = True):
+    def create_item_patch_current_status_payload(item_at_id, approve=True):
         # This payload may still get updated further with "previous_note" by `add_or_replace_note_for_project_on_variant_or_gene_item`
         sent_item_patch_payloads[item_at_id] = sent_item_patch_payloads.get(item_at_id, {})
         # All 3 of these fields below have permissions: restricted_fields
@@ -1009,7 +1048,7 @@ def process_items_process(context, request):
             sent_item_patch_payloads[item_at_id]["approved_by"] = user_id
             sent_item_patch_payloads[item_at_id]["date_approved"] = timestamp
 
-    def add_or_replace_note_for_project_on_variant_or_gene_item(vs_field_name, vg_item, payload):
+    def add_or_replace_note_for_project_on_variant_or_gene_item(vs_field_name, vg_item, payload, remove=False):
         vg_field_name = vs_to_variant_or_gene_field_mappings[vs_field_name]
         newly_shared_item_at_id = li[vs_field_name]["@id"]
 
@@ -1017,11 +1056,26 @@ def process_items_process(context, request):
             payload[vg_field_name] = [ newly_shared_item_at_id ]
             return
 
-        existing_node_ids = [ item["@id"] for item in vg_item[vg_field_name] ]
+        # How big will this ultimately get? If few projects per instance should be fine; if used a knowledgebase then will
+        # need to change to having Notes linkTo Variant, perhaps.
 
-        if newly_shared_item_at_id in existing_node_ids:
-            # Already shared/present; cancel out; error maybe?
-            # TODO: _UNSET_ or delete it? Or rely on "remove_from_project_items" request property or similar?
+        item_ids = []
+        removed = False
+        for item in vg_item[vg_field_name]:
+            if newly_shared_item_at_id == item["@id"]:
+                # Already exists
+                if not remove:
+                    # Nothing left to do. Throw error?
+                    return
+                # Else remove it; pass
+                removed = True
+            else:
+                item_ids.append(item["@id"])
+
+        if remove:
+            if not removed:
+                raise HTTPBadRequest("Item to remove from project is not present")
+            payload[vg_field_name] = item_ids
             return
 
         # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
@@ -1032,7 +1086,7 @@ def process_items_process(context, request):
                 existing_item_from_project_idx = item_idx
                 break # Assumption is we only have 1 note per project in this list, so don't need to search further.
 
-        payload[vg_field_name] = existing_node_ids
+        payload[vg_field_name] = item_ids
 
         if existing_item_from_project_idx != None:
             existing_item_from_project_at_id = vg_item[vg_field_name][existing_item_from_project_idx]["@id"]
@@ -1093,7 +1147,17 @@ def process_items_process(context, request):
             create_item_patch_current_status_payload(technical_review_at_id, False)
         # Add to Variant.technical_reviews
         add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload)
-        
+
+
+    if "technical_review" in rfpi:
+        # Update Note status if is not already current.
+        # TODO: Handle technical_review.note as well.
+        technical_review_at_id = li["technical_review"]["@id"]
+        if li["technical_review"]["status"] == "current":
+            sent_item_patch_payloads[technical_review_at_id] = sent_item_patch_payloads.get(technical_review_at_id, {})
+            sent_item_patch_payloads[technical_review_at_id]["status"] = "in review"
+        # Remove from Variant.technical_reviews
+        add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload, remove=True)
 
 
     # Perform the PATCHes!
@@ -1107,18 +1171,31 @@ def process_items_process(context, request):
     gene_patch_count = 0
     if need_gene_patch:
         for gene_atid, gene_payload in genes_patch_payloads.items():
-            perform_patch_as_admin(request, gene_atid, gene_payload)
+            perform_request_as_admin(request, gene_atid, gene_payload, request_method="PATCH")
             gene_patch_count += 1
 
     variant_patch_count = 0
     if need_variant_patch:
-        perform_patch_as_admin(request, variant["@id"], variant_patch_payload)
+        perform_request_as_admin(request, variant["@id"], variant_patch_payload, request_method="PATCH")
         variant_patch_count += 1
 
     sent_item_patch_count = 0
     for note_atid, note_payload in sent_item_patch_payloads.items():
-        perform_patch_as_admin(request, note_atid, note_payload)
+        perform_request_as_admin(request, note_atid, note_payload, request_method="PATCH")
         sent_item_patch_count += 1
+
+
+    # Follow-up - now we need to make sure all affected VariantSamples are re-indexed.
+    # This only matter for NoteTechnicalReview items at the moment, which need to be embedded via calcprop "VariantSample.project_technical_review"
+    if variant_patch_count > 0 and ("technical_review" in stpi or "technical_review" in rfpi):
+        vs_project_uuid = context.properties.get("project")
+        affected_variant_sample_uuids = []
+        for variant_sample in get_iterable_search_results(request, { "type": "VariantSample", "field": "uuid", "variant.uuid": variant_uuid, "project.uuid": vs_project_uuid }, inherit_user=False):
+            print("VS", variant_sample)
+            affected_variant_sample_uuids.append(variant_sample['uuid'])
+        perform_request_as_admin(request, "/queue_indexing", { "uuids": affected_variant_sample_uuids }, request_method="POST")
+        # affected_variant_samples = perform_request_as_admin(request, "/search/?type=VariantSample&field=uuid&limit", request_method="GET")
+
 
     return {
         "status" : "success",
@@ -1217,7 +1294,7 @@ def add_selections(context, request):
     if not patch_payload:
         return HTTPNotModified("Nothing submitted")
 
-    patch_result = perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+    patch_result = perform_request_as_admin(request, context.jsonld_id(request), patch_payload, request_method="PATCH")
 
     return {
         "status": "success",
@@ -1268,7 +1345,7 @@ def order_delete_selections(context, request):
 
     # TODO: Save who+when deleted VariantSample from VariantSampleList
 
-    perform_patch_as_admin(request, context.jsonld_id(request), patch_payload)
+    perform_request_as_admin(request, context.jsonld_id(request), patch_payload, request_method="PATCH")
 
     return {
         "status": "success",
