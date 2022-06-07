@@ -77,20 +77,9 @@ CMPHET_UNPHASED_MED = 'Compound Het (Unphased/medium_pair)'
 CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 
 # Shared embeds for variants and variant samples also used for corresponding SV items
-SHARED_VARIANT_EMBEDS = [
-    "interpretations.@id",
-    "discovery_interpretations.@id",
-    "variant_notes.@id",
-]
+SHARED_VARIANT_EMBEDS = []
 
-SHARED_VARIANT_SAMPLE_EMBEDS = [
-    # The following fields are now requested through /embed API.
-    "variant_notes.@id",
-    "gene_notes.@id",
-    "interpretation.@id",
-    "discovery_interpretation.@id",
-    "variant_sample_list.created_for_case",
-]
+SHARED_VARIANT_SAMPLE_EMBEDS = ["variant_sample_list.created_for_case"]
 
 
 def extend_embedded_list(embedded_list, fd, typ, prefix=None):
@@ -122,9 +111,7 @@ def build_variant_embedded_list():
 
         :returns: list of variant embeds
     """
-    embedded_list = SHARED_VARIANT_EMBEDS + [
-        "genes.genes_most_severe_gene.gene_notes.@id", # `genes` not present on StructuralVariant
-    ]
+    embedded_list = SHARED_VARIANT_EMBEDS
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list

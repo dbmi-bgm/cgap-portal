@@ -3,11 +3,9 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    display_title_schema
 )
 
-from .base import Item, get_item_or_none
+from .base import Item
 from ..util import convert_integer_to_comma_string
 
 
@@ -16,13 +14,7 @@ log = structlog.getLogger(__name__)
 
 def _build_gene_embedded_list():
     """ Helper function intended to be used to create the embedded list for gene """
-    return [
-        'gene_lists.title',
-        'interpretations.classification',
-        'interpretations.acmg_rules_invoked.*',
-        'interpretations.conclusion',
-        'interpretations.note_text'
-    ]
+    return []
 
 
 @collection(
