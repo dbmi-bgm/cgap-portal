@@ -13,4 +13,6 @@ the family history first.
 
 [Blank Family History Template](https://raw.githubusercontent.com/dbmi-bgm/cgap-portal/master/docs/public/help/help_linked_docs/family_history_template.xlsx)
 
+[Blank Family History Template With Dropdown Options](https://raw.githubusercontent.com/dbmi-bgm/cgap-portal/master/docs/public/help/help_linked_docs/family_history_template_with_dropdowns.xlsx)
+
 [Example Family History File](https://raw.githubusercontent.com/dbmi-bgm/cgap-portal/master/docs/public/help/help_linked_docs/family_history_template_with_metadata.xlsx)

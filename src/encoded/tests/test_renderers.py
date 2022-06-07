@@ -40,7 +40,9 @@ def test_mime_variables():
     # It's an accident of history that this next relationship matters, but at this point check for consistency.
     assert MIME_TYPE_DEFAULT == MIME_TYPES_SUPPORTED[0]
     # Now we concern ourselves with the actual values...
-    # TODO: I think it's a bug that JSON is at the head of this list. These next two need to change. -kmp 23-Mar-2021
+    # TODO: I think it's a bug that JSON is at the head of this list (and so the default) in cgap-portal.
+    #       cgap-portal needs to be made to match what Fourfront does to dig it out of a bug I introduced.
+    #       -kmp 29-Jan-2022
     assert MIME_TYPES_SUPPORTED == [MIME_TYPE_JSON, MIME_TYPE_HTML, MIME_TYPE_LD_JSON]
     assert MIME_TYPE_DEFAULT == MIME_TYPE_JSON
 

@@ -383,7 +383,7 @@ CONTENT_TYPE_SPECIAL_CASES = {
         # All other special case values should be added using register_path_content_type.
         '/metadata/',
         '/variant-sample-search-spreadsheet/',
-        r'/variant-sample-lists/[\da-z-]+/@@spreadsheet/'
+        re.compile(r'/variant-sample-lists/[\da-z-]+/@@spreadsheet/'),
     ]
 }
 
@@ -400,6 +400,9 @@ def register_path_content_type(*, path, content_type):
         CONTENT_TYPE_SPECIAL_CASES[content_type] = exceptions = []
     if path not in exceptions:
         exceptions.append(path)
+
+
+compiled_regexp_class = type(re.compile("foo.bar"))  # Hides that it's _sre.SRE_Pattern in 3.6, but re.Pattern in 3.7
 
 
 def content_type_allowed(request):
@@ -420,9 +423,11 @@ def content_type_allowed(request):
             if isinstance(path_condition, str):
                 if path_condition in request.path:
                     return True
-            else:
-                if re.match(path_condition, request.path):
+            elif isinstance(path_condition, compiled_regexp_class):
+                if path_condition.match(request.path):
                     return True
+            else:
+                raise NotImplementedError(f"Unrecognized path_condition: {path_condition}")
 
     return False
 
@@ -469,28 +474,6 @@ def make_vapp_for_ingestion(*, app=None, registry=None, context=None):
 @contextlib.contextmanager
 def vapp_for_ingestion(app=None, registry=None, context=None):
     yield make_vapp_for_ingestion(app=app, registry=registry, context=context)
-
-
-# I didn't need these for persona matching, but might in the future so am going to hold them for a little while.
-# -kmp 2-Apr-2021
-#
-# def name_matcher(name):
-#     """
-#     Given a string name, returns a predicate that returns True if given that name (in any case), and False otherwise.
-#     """
-#     return lambda n: n.lower() == name
-#
-#
-# def any_name_matcher(*names):
-#     """
-#     Given a list of string names, returns a predicate that matches those names. Given no names, it matches any name.
-#     The matcher returned is incase-sensitive.
-#     """
-#     if names:
-#         canonical_names = [name.lower() for name in names]
-#         return lambda name: name.lower() in canonical_names
-#     else:
-#         return constantly(True)
 
 
 def make_s3_client():
