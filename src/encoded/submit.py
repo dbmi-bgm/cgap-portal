@@ -9,7 +9,7 @@ import openpyxl
 from dcicutils.lang_utils import n_of
 from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
-from .util import s3_local_file, debuglog
+from .util import s3_local_file
 
 
 GENERIC_FIELD_MAPPINGS = {  # for spreadsheet column names that are different from schema property names
@@ -24,7 +24,9 @@ GENERIC_FIELD_MAPPINGS = {  # for spreadsheet column names that are different fr
         'pregnancy': 'is_pregnancy',
         'spontaneous abortion': 'is_spontaneous_abortion',
         'infertile': 'is_infertile',
-        'no children by choice': 'is_no_children_by_choice'
+        'no children by choice': 'is_no_children_by_choice',
+        "diagnosis age of onset": "diagnosis_onset_age",
+        "diagnosis age of onset units": "diagnosis_onset_age_units",
     },
     'family': {},
     'sample': {
@@ -77,7 +79,9 @@ SS_REPORT_REQUIRED = 'report required'
 SS_PROBAND = 'proband'
 
 REQUIRED_COLS_FOR_CASE = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
-REQUIRED_COLS_FOR_ACCESSIONING =  REQUIRED_COLS_FOR_CASE + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLS_FOR_ACCESSIONING = REQUIRED_COLS_FOR_CASE + [
+    SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED
+]
 REQUIRED_COLS_FOR_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX, SS_PROBAND]
 
 # half-siblings not currently supported, because pedigree info is needed to know
@@ -105,8 +109,17 @@ HPO_TERM_ID_PATTERN = re.compile(r'^HP:[0-9]{7}$')
 MONDO_TERM_ID_PATTERN = re.compile(r'^MONDO:[0-9]{7}$')
 
 
-def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, submission_type, vapp,  # <- Required keyword arguments
-                           validate_only=False):  # <-- Optional keyword arguments (with defaults)
+def submit_metadata_bundle(
+    *,
+    s3_client,
+    bucket,
+    key,
+    project,
+    institution,
+    submission_type,
+    vapp,
+    validate_only=False
+):
     """
     Handles processing of a submitted workbook.
 
@@ -205,7 +218,7 @@ def get_column_name(row, columns):
 
 
 def digest_xlsx(xlsx_data):
-    book = openpyxl.load_workbook(xlsx_data)
+    book = openpyxl.load_workbook(xlsx_data, data_only=True)
     sheet = book.worksheets[0]
     return row_generator(sheet)
 
@@ -246,7 +259,7 @@ def is_yes_value(str_value):
 
 def string_to_array(str_value):
     """converts cell contents to list, splitting by commas"""
-    return [item.strip() for item in str_value.split(',')]
+    return [item.strip() for item in str_value.split(',') if item.strip()]
 
 
 def format_ontology_term_with_colon(str_value):
@@ -259,6 +272,7 @@ def format_ontology_term_with_colon(str_value):
     if not isinstance(str_value, str):
         raise ValueError('String value expected.')
     return str_value.upper().replace('_', ':')
+
 
 class MetadataItem:
     """
@@ -452,7 +466,6 @@ class AccessionRow:
             '.cram': ('cram', 'alignments'),
             '.vcf.gz': ('vcf_gz', 'raw VCF')
         }
-        files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
         filenames = [f.strip() for f in self.metadata.get('files', '').split(',') if f.strip()]
         paired = True if len(filenames) % 2 == 0 else False
         for i, filename in enumerate(filenames):
@@ -461,8 +474,12 @@ class AccessionRow:
                 if [ext for ext in ['.fastq', '.fq', '.vcf'] if filename.endswith(ext)]:
                     self.errors.append('File must be compressed - please gzip file {}'.format(filename))
                 else:
-                    self.errors.append('File extension on {} not supported - expecting one of: '
-                                  '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
+                    self.errors.append(
+                        (
+                            'File extension on {} not supported - expecting one of: '
+                            '.fastq.gz, .fq.gz, .cram, .vcf.gz'
+                        ).format(filename)
+                    )
                 continue
             file_alias = '{}:{}'.format(self.project, filename.strip().split('/')[-1])
             fmt = valid_extensions[extension[0]][0]
@@ -783,7 +800,9 @@ class AccessionMetadata:
                                    ' Row cannot be processed.'.format(i + 1 + self.counter))
                 continue
             try:
-                processed_row = AccessionRow(self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution)
+                processed_row = AccessionRow(
+                    self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution
+                )
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
                 simple_add_items.extend(processed_row.files_processed)
@@ -817,6 +836,25 @@ class AccessionMetadata:
 
 class PedigreeRow:
 
+    # Schema constants
+    PHENOTYPIC_FEATURES = "phenotypic_features"
+    PHENOTYPIC_FEATURE = "phenotypic_feature"
+    DISORDERS = "disorders"
+    DISORDER = "disorder"
+    ONSET_AGE = "onset_age"
+    ONSET_AGE_UNITS = "onset_age_units"
+    DIAGNOSTIC_CONFIDENCE = "diagnostic_confidence"
+    IS_PRIMARY_DIAGNOSIS = "is_primary_diagnosis"
+    YEAR = "year"
+
+    # Spreadsheet constants
+    PHENOTYPES = "phenotypes"
+    PRIMARY_DIAGNOSIS = "primary_diagnosis"
+    PRIMARY_DIAGNOSIS_ONSET_AGE = "diagnosis_onset_age"
+    PRIMARY_DIAGNOSIS_ONSET_AGE_UNITS = "diagnosis_onset_age_units"
+    HPO_TERMS = "hpo_terms"
+    MONDO_TERMS = "mondo_terms"
+
     def __init__(self, metadata, idx, project, institution):
         self.project = project
         self.institution = institution
@@ -839,30 +877,238 @@ class PedigreeRow:
             )
         return len(self.errors) > 0
 
-    def format_atid(self, term):
-        """turns HPO or MONDO term IDs into the corresponding @id in the database."""
-        term_id = format_ontology_term_with_colon(term) if term else ''
-        if HPO_TERM_ID_PATTERN.match(term_id):
-            return f'/phenotypes/{term_id}/'
-        elif MONDO_TERM_ID_PATTERN.match(term_id):
-            return f'/disorders/{term_id}/'
-        else:
-            msg = (f'Row {self.row} - term {term!r} does not match the format for'
-                   ' an HPO or MONDO ontology term. Please edit and resubmit.')
-            self.errors.append(msg)
-            return term
+    def validate_ontology_terms(self, ontology_term_input, match_pattern):
+        """Identify valid and invalid ontology terms in provided string
+        using given term regex.
 
-    def reformat_phenotypic_features(self, feature_list):
-        if not feature_list:
-            return []
-        return [{'phenotypic_feature': self.format_atid(feature)} for feature in feature_list if feature]
+        :param ontology_term_input: Spreadsheet cell input containing
+            comma-separated ontology terms
+        :type ontology_term_input: str
+        :param match_pattern: Compiled regex pattern to validate
+            ontology identifiers
+        :type match_pattern: object
+        :returns: Valid and invalid ontology terms
+        :rtype: tuple(set, set)
+        """
+        valid_terms = set()
+        invalid_terms = set()
+        ontology_terms = string_to_array(ontology_term_input)
+        formatted_ontology_terms = map(format_ontology_term_with_colon, ontology_terms)
+        for idx, formatted_ontology_term in enumerate(formatted_ontology_terms):
+            if match_pattern.match(formatted_ontology_term):
+                valid_terms.add(formatted_ontology_term)
+            else:
+                invalid_terms.add(ontology_terms[idx])
+        return valid_terms, invalid_terms
+
+    def update_phenotypes(self, individual_metadata):
+        """Process spreadsheet phenotype metadata.
+
+        Reformat validated HPO terms into sub-embedded object and
+        update Individual metadata in place.
+
+        :param individual_metadata: Raw Individual properties as parsed
+            from spreadsheet.
+        :type: dict
+        """
+        phenotypes = []
+        input_phenotypes = individual_metadata.get(self.PHENOTYPIC_FEATURES)
+        if input_phenotypes:
+            phenotypes = self.get_phenotypes(input_phenotypes)
+        if phenotypes:
+            individual_metadata[self.PHENOTYPIC_FEATURES] = phenotypes
+        else:
+            individual_metadata.pop(self.PHENOTYPIC_FEATURES, None)
+
+    def get_phenotypes(self, phenotypes_input):
+        """Validate input HPO identifiers and format to sub-embedded
+        object.
+
+        Add error if any HPO identifiers not validated.
+
+        :param phenotypes_input: Raw, comma-separated HPO terms from
+            spreadsheet
+        :type phenotypes_input: str
+        :returns: Formatted validated phenotypes
+        :rtype: list(dict)
+        """
+        result = []
+        valid_hpo_terms, invalid_hpo_terms = self.validate_ontology_terms(
+            phenotypes_input, HPO_TERM_ID_PATTERN
+        )
+        if invalid_hpo_terms:
+            msg = (
+                "Row %s - column %s contains the following invalid HPO identifier(s):"
+                " %s. Please edit and resubmit."
+            ) % (self.row, self.HPO_TERMS.upper(), ", ".join(invalid_hpo_terms))
+            self.errors.append(msg)
+        result += [
+            {self.PHENOTYPIC_FEATURE: self.format_phenotype_atid(hpo_term)}
+            for hpo_term in valid_hpo_terms
+        ]
+        return result
+
+    def format_phenotype_atid(self, hpo_term):
+        """Convert HPO term to @id.
+
+        :param hpo_term: Validated HPO identifier
+        :type hpo_term: str
+        :returns: LinkTo (as @id) for phenotype item
+        :rtype: str
+        """
+        return f"/phenotypes/{hpo_term}/"
+
+    def update_disorders(self, individual_metadata):
+        """Process spreadsheet disorder metadata.
+
+        Reformat validated MONDO terms into sub-embedded objects and
+        update Individual metadata in place.
+
+        :param individual_metadata: Raw Individual properties as parsed
+            from spreadsheet.
+        :type: dict
+        """
+        disorders = []
+        primary_disorder = individual_metadata.get(self.PRIMARY_DIAGNOSIS)
+        onset_age = individual_metadata.get(self.PRIMARY_DIAGNOSIS_ONSET_AGE)
+        onset_age_units = individual_metadata.get(
+            self.PRIMARY_DIAGNOSIS_ONSET_AGE_UNITS
+        )
+        diagnostic_confidence = individual_metadata.get(self.DIAGNOSTIC_CONFIDENCE)
+        secondary_disorders = individual_metadata.get(self.DISORDERS)
+        if primary_disorder:
+            disorders += self.get_primary_disorder(
+                primary_disorder=primary_disorder,
+                onset_age=onset_age,
+                onset_age_units=onset_age_units,
+                diagnostic_confidence=diagnostic_confidence,
+            )
+        if secondary_disorders:
+            disorders += self.get_secondary_disorders(secondary_disorders)
+        if disorders:
+            individual_metadata[self.DISORDERS] = disorders
+        else:
+            individual_metadata.pop(self.DISORDERS, None)
+        for input_term in [
+            self.PRIMARY_DIAGNOSIS,
+            self.PRIMARY_DIAGNOSIS_ONSET_AGE,
+            self.PRIMARY_DIAGNOSIS_ONSET_AGE_UNITS,
+            self.DIAGNOSTIC_CONFIDENCE,
+        ]:
+            individual_metadata.pop(input_term, None)
+
+    def get_primary_disorder(
+        self,
+        primary_disorder=None,
+        onset_age=None,
+        onset_age_units=None,
+        diagnostic_confidence=None,
+    ):
+        """Validate primary disorder MONDO term and format sub-embedded
+        object, including optional associated data.
+
+        Add error if any MONDO identifiers not validated, more than one
+        MONDO term given, or onset age not formatted correctly.
+
+        :param primary_disorder: MONDO term(s) from spreadsheet
+        :type primary_disorder: str
+        :param onset_age: Onset age from spreadsheet
+        :type onset_age: str
+        :param onset_age_units: Onset age units from spreadsheet
+        :type onset_age_units: str
+        :param diagnostic_confidence: Diagnostic confidence from
+            spreadsheet
+        :type diagnostic_confidence: str
+        :returns: Formatted, validated disorders for Individual item
+        :rtype: list(dict)
+        """
+        result = []
+        valid_mondo_terms, invalid_mondo_terms = self.validate_ontology_terms(
+            primary_disorder, MONDO_TERM_ID_PATTERN
+        )
+        if invalid_mondo_terms:
+            msg = (
+                "Row %s - column %s contains the following invalid MONDO identifier(s): %s."
+                " Note that only one identifier should be provided for a primary"
+                " diagnosis. Please edit and resubmit."
+            ) % (self.row, self.PRIMARY_DIAGNOSIS.upper(), ", ".join(invalid_mondo_terms))
+            self.errors.append(msg)
+        if len(valid_mondo_terms) > 1:  # Only expecting 1 currently 20220512 -drr
+            msg = (
+                "Row %s - column %s contains more than one valid MONDO identifier: %s."
+                " Please edit and resubmit."
+            ) % (self.row, self.PRIMARY_DIAGNOSIS.upper(), ", ".join(valid_mondo_terms))
+            self.errors.append(msg)
+        elif valid_mondo_terms:
+            for mondo_term_id in valid_mondo_terms:
+                primary_disorder_properties = {}
+                primary_disorder_properties[self.DISORDER] = self.format_disorder_atid(
+                    mondo_term_id
+                )
+                primary_disorder_properties[self.IS_PRIMARY_DIAGNOSIS] = True
+                if onset_age:
+                    if onset_age.isnumeric():
+                        primary_disorder_properties[self.ONSET_AGE] = int(onset_age)
+                        if onset_age_units is None:
+                            onset_age_units = self.YEAR
+                        primary_disorder_properties[self.ONSET_AGE_UNITS] = onset_age_units
+                    else:
+                        msg = (
+                            "Row %s - column %s contains a non-integer onset age: %s."
+                            " Please edit and resubmit."
+                        ) % (self.row, self.DIAGNOSIS_ONSET_AGE.upper(), onset_age)
+                        self.errors.append(msg)
+                if diagnostic_confidence:
+                    primary_disorder_properties[self.DIAGNOSTIC_CONFIDENCE] = diagnostic_confidence.lower()
+                result.append(primary_disorder_properties)
+        return result
+
+    def format_disorder_atid(self, mondo_term):
+        """Convert MONDO term to @id.
+
+        :param mondo_term: Validated MONDO identifier
+        :type mondo_term: str
+        :returns: LinkTo (as @id) for disorder item
+        :rtype: str
+        """
+        return f"/disorders/{mondo_term}/"
+
+    def get_secondary_disorders(self, disorders):
+        """Validate disorder MONDO term(s) and format sub-embedded
+        object.
+
+        As opposed to a "primary" disorder, these lack additional
+        associated metadata.
+
+        Add error if any MONDO identifiers not validated.
+
+        :param disorders: Comma-separated MONDO terms from spreadsheet
+        :type disorders: str
+        :returns: Formatted, validated disorders for Individual item
+        """
+        result = []
+        valid_mondo_terms, invalid_mondo_terms = self.validate_ontology_terms(
+            disorders, MONDO_TERM_ID_PATTERN
+        )
+        if invalid_mondo_terms:
+            msg = (
+                "Row %s - column %s contains the following invalid MONDO ontology"
+                " identifier(s): %s. Please edit and resubmit."
+            ) % (self.row, self.MONDO_TERMS.upper(), ", ".join(invalid_mondo_terms))
+            self.errors.append(msg)
+        result += [
+            {self.DISORDER: self.format_disorder_atid(mondo_term)}
+            for mondo_term in valid_mondo_terms
+        ]
+        return result
 
     def extract_individual_metadata(self):
         info = {'aliases': [self.indiv_alias]}
         simple_fields = [
             'family_id', 'individual_id', 'sex', 'age', 'age_units', 'clinic_notes',
             'ancestry', 'quantity', 'life_status', 'cause_of_death', 'age_at_death',
-            'age_at_death_units', 'gestational_age', 'cause_of_infertility'
+            'age_at_death_units', 'gestational_age', 'cause_of_infertility',
+            "primary_diagnosis", "diagnostic_confidence",
         ]
         info = map_fields(self.metadata, info, simple_fields, 'individual')
         for field in info:
@@ -876,21 +1122,17 @@ class PedigreeRow:
             info['age_units'] = 'year'
         if info.get('ancestry'):
             info['ancestry'] = string_to_array(info['ancestry'])
-        if info.get('phenotypic_features'):
-            info['phenotypic_features'] = string_to_array(info['phenotypic_features'])
-        if info.get('disorders'):
-            info['disorders'] = [self.format_atid(item.strip()) for item in info['disorders'].split(',')]
-        info['phenotypic_features'] = self.reformat_phenotypic_features(info.get('phenotypic_features', []))
+        if info.get("life_status") == "U":  # TODO: Make use_abbrev property-specific
+            info["life_status"] = "unknown"
         for col in ['age', 'birth_year', 'age_at_death', 'gestational_age', 'quantity']:
             if info.get(col) and isinstance(info[col], str) and info[col].isnumeric():
                 info[col] = int(info[col])
+        self.update_disorders(info)
+        self.update_phenotypes(info)
         return MetadataItem(info, self.row, 'individual')
 
     def is_proband(self):
         return is_yes_value(self.metadata['proband'])
-        # if self.metadata['proband'].lower().startswith('y'):
-        #     return True
-        # return False
 
 
 class PedigreeMetadata:
@@ -1018,7 +1260,7 @@ class PedigreeMetadata:
                 processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
                 self.errors.extend(processed_row.errors)
                 self.add_individual_metadata(processed_row.individual)
-            except AttributeError as e:
+            except AttributeError:
                 continue
         self.families = self.add_family_metadata()
         self.check_individuals()
@@ -1052,6 +1294,7 @@ class SpreadsheetProcessing:
 
     REQUIRED_COLUMNS = []
     METADATA_CLASS = None
+    COLUMN_HEADER_REMOVAL_PATTERN = re.compile(r"\(.*\)|[:*]")
 
     def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
         self.virtualapp = vapp
@@ -1079,7 +1322,7 @@ class SpreadsheetProcessing:
         while self.input:
             try:
                 keys = next(self.input)
-                self.keys = [key.lower().strip().rstrip('*: ') for key in keys]
+                self.keys = [self.reformat_column_header(entry) for entry in keys]
                 self.counter += 1
                 if 'individual id' in self.keys:
                     return True
@@ -1089,13 +1332,29 @@ class SpreadsheetProcessing:
         self.errors.append(msg)
         return False
 
+    @classmethod
+    def reformat_column_header(cls, cell_entry):
+        """Reformat column header from spreadsheet.
+
+        Remove parentheses contents/undesired characters to allow more
+        customization/commentary in spreadsheets given to users.
+
+        :param cell_entry: Spreadsheet cell content
+        :type cell_entry: str
+        :returns: Reformatted entry content
+        :rtype: str
+        """
+        return re.sub(cls.COLUMN_HEADER_REMOVAL_PATTERN, "", cell_entry).strip().lower()
+
     def create_row_dict(self):
         """
         Turns each row into a dictionary of form {column heading1: row value1, ...}
         """
         missing = [col for col in self.REQUIRED_COLUMNS if col not in self.keys]
         if missing:
-            msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
+            msg = (
+                'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'
+            ).format('", "'.join(missing))
             self.errors.append(msg)
         else:
             for values in self.input:
@@ -1146,8 +1405,10 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
         result = AccessionProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
                                      ingestion_id=ingestion_id, submission_type=submission_type)
     elif submission_type == 'family_history':
-        result = PedigreeProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
-                                     ingestion_id=ingestion_id, submission_type=submission_type)
+        result = PedigreeProcessing(
+            vapp, xls_data=xls_data, project=project, institution=institution,
+            ingestion_id=ingestion_id, submission_type=submission_type
+        )
     else:
         raise ValueError(f'{submission_type} is not a valid submission_type argument,'
                          ' expected values are "accessioning" or "family_history"')
@@ -1239,8 +1500,10 @@ def parse_exception(e, aliases):
                         else:
                             hpo_term = error.split("\'")[1]
                         if error.endswith('not found'):
-                            error = ('HPO terms - HPO term {} not found in database.'
-                                    ' Please check HPO ID and resubmit.'.format(hpo_term))
+                            error = (
+                                'HPO terms - HPO term {} not found in database.'
+                                ' Please check HPO ID and resubmit.'
+                            ).format(hpo_term)
                     keep.append(error)
                 elif 'Additional properties are not allowed' in error:
                     keep.append(error[2:])
