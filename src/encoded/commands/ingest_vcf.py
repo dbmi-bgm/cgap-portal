@@ -4,10 +4,10 @@ import logging
 from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 
-from .ingestion.gene_utils import GeneIngestion
-from .ingestion.variant_utils import StructuralVariantBuilder, VariantBuilder
-from .ingestion.vcf_utils import StructuralVariantVCFParser, VCFParser
-from .util import resolve_file_path
+from encoded.ingestion.gene_utils import GeneIngestion
+from encoded.ingestion.variant_utils import StructuralVariantBuilder, VariantBuilder
+from encoded.ingestion.vcf_utils import StructuralVariantVCFParser, VCFParser
+from encoded.util import resolve_file_path
 
 logger = logging.getLogger(__name__)
 EPILOG = __doc__
