@@ -167,6 +167,23 @@
                 ]
             }
         },
+        "confidence_class": {
+            "title": "Confidence Class",
+            "field_name": "confidence_class",
+            "type": "string",
+            "enum": [
+                "HIGH",
+                "MEDIUM",
+                "LOW",
+                "NA"
+            ],
+            "do_import": true,
+            "vcf_field": "CF",
+            "source_name": "VCF",
+            "description": "Confidence class for the variant call",
+            "scope": "sample_variant",
+            "schema_title": "Confidence Class"
+        },
         "confidence_interval_end": {
             "title": "End Position Confidence Interval",
             "type": "array",
@@ -282,6 +299,33 @@
             "type": "string",
             "linkTo": "NoteInterpretation"
         },
+        "paired_reads": {
+            "title": "Paired Read Support",
+            "type": "array",
+            "field_name": "paired_reads",
+            "items": {
+                "title": "Paired Read Support",
+                "field_name": "paired_reads",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "PR",
+                "source_name": "VCF",
+                "description": "Spanning paired-read support for the reference and alternate alleles",
+                "scope": "sample_variant",
+                "schema_title": "Paired Read Support"
+            }
+        },
+        "quality_score": {
+            "title": "Phred-scaled Quality Score",
+            "field_name": "quality_score",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "QUAL",
+            "source_name": "VCF",
+            "description": "Phred-scaled quality score for the variant call",
+            "scope": "sample_variant",
+            "schema_title": "Phred-scaled Quality Score"
+        },
         "samplegeno": {
             "title": "Sample Genotype",
             "type": "array",
@@ -342,6 +386,22 @@
         },
         "schema_version": {
             "default": "3"
+        },
+        "split_reads": {
+            "title": "Split Read Support",
+            "type": "array",
+            "field_name": "split_reads",
+            "items": {
+                "title": "Split Read Support",
+                "field_name": "split_reads",
+                "type": "integer",
+                "do_import": true,
+                "vcf_field": "SR",
+                "source_name": "VCF",
+                "description": "Split reads for the reference and alternate alleles in the order listed, for reads where P(allele|read)>0.999",
+                "scope": "sample_variant",
+                "schema_title": "Split Read Support"
+            }
         },
         "structural_variant": {
             "title": "Structural Variant",
