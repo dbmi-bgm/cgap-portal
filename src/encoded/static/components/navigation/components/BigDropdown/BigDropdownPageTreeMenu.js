@@ -114,6 +114,7 @@ export function BigDropdownPageTreeMenu(props) {
         <div className={cls}>
             { topLeftMenuCol }
             { childItems }
+            <StaticHelpLinks />
         </div>
     );
 }
@@ -129,4 +130,20 @@ function Level1Title({ childPageItem, active }){
             </a>
         </div>
     );
+}
+
+function StaticHelpLinks() {
+    return (
+        <div className="help-menu-tree level-1 col-12 col-md-6 col-lg-4 has-children">
+            <div className="level-1-title-container">
+                <div className="level-1-title text-medium">
+                    General CGAP Info
+                </div>
+            </div>
+            <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/legal" data-tip="" data-delay-show={500}
+                id="Legal-Link">
+                Legal
+            </a>
+        </div>
+    )
 }
