@@ -84,7 +84,6 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
                     const { uuid: vsUUID } = result;
                     const { rowNumber, updateResultAtIndex } = propsFromSearchTable;
                     const lastSavedTechnicalReviewForResult = lastSavedTechnicalReview[vsUUID];
-                    console.log("TEST", lastSavedTechnicalReview, lastSavedTechnicalReviewForResult);
                     return (
                         <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult,
                             rowNumber, updateResultAtIndex }} />

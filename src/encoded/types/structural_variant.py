@@ -432,6 +432,22 @@ class StructuralVariantSample(Item):
         if result:
             return result[0]  # expected one list per case
 
+    @calculated_property(schema={
+        "title": "Project Technical Review",
+        "description": "The technical review saved to project for this Variant",
+        "type": "string",
+        "linkTo": "NoteTechnicalReview"
+    })
+    def project_technical_review(self, request, structural_variant=None, project=None):
+        structural_variant = get_item_or_none(request, structural_variant, 'StructuralVariant', frame='raw')
+        if structural_variant:
+            for tr_id in structural_variant.get("technical_reviews", []):
+                technical_review = get_item_or_none(request, tr_id, 'NoteTechnicalReview', frame='raw')
+                if technical_review.get("project") == project:
+                    return tr_id
+        return None
+
+
     @calculated_property(
         schema={
             "title": "Associated Gene Lists",

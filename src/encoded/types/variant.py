@@ -160,6 +160,20 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     #"technical_review.review.reviewed_by",
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
+    "technical_review.saved_to_project_variant",
+    "project_technical_review.*", 
+    "project_technical_review.assessment.call",
+    "project_technical_review.assessment.classification",
+    "project_technical_review.assessment.date_call_made",
+    "project_technical_review.assessment.call_made_by.display_title",
+    "project_technical_review.review.date_reviewed",
+    "project_technical_review.review.reviewed_by.display_title",
+    "project_technical_review.note_text",
+    "project_technical_review.last_text_edited.date_text_edited",
+    "project_technical_review.last_text_edited.text_edited_by",
+    "project_technical_review.approved_by.display_title",
+    "project_technical_review.date_approved",
+    "project_technical_review.saved_to_project_variant",
     #"technical_review.last_modified.date_modified",
     # "variant.technical_reviews.uuid",
     # "variant.technical_reviews.assessment.call",
@@ -631,11 +645,13 @@ class VariantSample(Item):
     })
     def project_technical_review(self, request, variant=None, project=None):
         variant = get_item_or_none(request, variant, 'Variant', frame='raw')
-        if variant:
-            for tr_id in variant.get("technical_reviews", []):
-                technical_review = get_item_or_none(request, tr_id, 'NoteTechnicalReview', frame='raw')
+        if variant and project:
+            # project will be in form of @id, we need UUID
+            for tr_uuid in variant.get("technical_reviews", []):
+                # frame=object returns linkTos in form of @id, frame=raw returns them in form of UUID.
+                technical_review = get_item_or_none(request, tr_uuid, 'NoteTechnicalReview', frame='object')
                 if technical_review.get("project") == project:
-                    return tr_id
+                    return tr_uuid
         return None
 
     @calculated_property(schema={
@@ -943,8 +959,8 @@ def process_items_process(context, request):
     """
 
     request_body = request.json
-    stpi = request_body.get("save_to_project_notes")
-    rfpi = request_body.get("remove_from_project_notes")
+    stpi = request_body.get("save_to_project_notes", {})
+    rfpi = request_body.get("remove_from_project_notes", {})
 
     vs_to_variant_or_gene_field_mappings = {
         "interpretation": "interpretations",
@@ -986,14 +1002,14 @@ def process_items_process(context, request):
         if not request.has_permission("edit", item_resource):
             raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
                 "Check 'save_to_project_notes." + vs_field_name + "'.")
-
+        else:
             li[vs_field_name] = loaded_item
 
     for vs_field_name in vs_to_variant_or_gene_field_mappings.keys():
         validate_and_load_item(vs_field_name)
 
     if len(li) == 0:
-        raise HTTPBadRequest("No Item UUIDs supplied.")
+        raise HTTPBadRequest("No Item UUIDs could be loaded, check permissions.")
 
 
     variant_patch_payload = {} # Single item/dict, can be converted to dict of variants if need to PATCH multiple in future
@@ -1001,7 +1017,7 @@ def process_items_process(context, request):
     sent_item_patch_payloads = {} # TODO: Rename to 'other_item_payloads' ?
 
     # PATCHing variant or gene only needed when saving notes to project, not to report.
-    need_variant_patch = "interpretation" in stpi or "discovery_interpretation" in stpi or "variant_notes" in stpi or "technical_review" in stpi
+    need_variant_patch = "interpretation" in stpi or "discovery_interpretation" in stpi or "variant_notes" in stpi or "technical_review" in stpi or "technical_review" in rfpi
     need_gene_patch = "discovery_interpretation" in stpi or "gene_notes" in stpi
 
     variant = None
@@ -1185,15 +1201,16 @@ def process_items_process(context, request):
         sent_item_patch_count += 1
 
 
+    # ONGOING
     # Follow-up - now we need to make sure all affected VariantSamples are re-indexed.
     # This only matter for NoteTechnicalReview items at the moment, which need to be embedded via calcprop "VariantSample.project_technical_review"
     if variant_patch_count > 0 and ("technical_review" in stpi or "technical_review" in rfpi):
         vs_project_uuid = context.properties.get("project")
         affected_variant_sample_uuids = []
-        for variant_sample in get_iterable_search_results(request, { "type": "VariantSample", "field": "uuid", "variant.uuid": variant_uuid, "project.uuid": vs_project_uuid }, inherit_user=False):
+        for variant_sample in get_iterable_search_results(request, param_lists={ "type": "VariantSample", "field": "uuid", "variant.uuid": variant_uuid, "project.uuid": vs_project_uuid }, inherit_user=False):
             print("VS", variant_sample)
             affected_variant_sample_uuids.append(variant_sample['uuid'])
-        perform_request_as_admin(request, "/queue_indexing", { "uuids": affected_variant_sample_uuids }, request_method="POST")
+        # perform_request_as_admin(request, "/queue_indexing", { "uuids": affected_variant_sample_uuids }, request_method="POST")
         # affected_variant_samples = perform_request_as_admin(request, "/search/?type=VariantSample&field=uuid&limit", request_method="GET")
 
 
