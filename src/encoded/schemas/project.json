@@ -115,67 +115,75 @@
         },
         "lifecycle_policy": {
             "title": "Lifecycle policy",
-            "description": "Contains rules how different categories of files are managed during their lifetime.",
+            "description": "Contains rules for how different categories of files are managed during their lifetime",
             "type": "object",
-            "additionalProperties": {
-                "type": "object",
-                "description": "Custom lifecycle policy",
-                "comment": "Ensure custom lifecycle policies have the right structure",
-                "required": [
-                    "expire_after"
-                ],
-                "properties": {
-                    "move_to_infrequent_access_after": {
-                        "title": "Move to Infrequent Access after",
-                        "description": "Time (in months) after which files are moved to Infrequent Access",
-                        "type": "integer"
-                    },
-                    "move_to_glacier_after": {
-                        "title": "Move to Glacier Instant Retrieval after",
-                        "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                        "type": "integer"
-                    },
-                    "move_to_deep_archive_after": {
-                        "title": "Move to Deep Archive after",
-                        "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                        "type": "integer"
-                    },
-                    "expire_after": {
-                        "title": "Expire after",
-                        "description": "Time (in months) after which files are deleted",
-                        "type": "integer"
-                    }
-                }
-            },
-            "properties": {
-                "short_term_access_long_term_archive": {
-                    "title": "short_term_access_long_term_archive",
-                    "description": "Files that require shorter term accessibility and are long term archived after that",
+            "patternProperties": {
+                "^(?!(ignore)$).+$": {
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "description": "Custom lifecycle policy",
+                    "comment": "Ensure custom lifecycle policies have the right structure",
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
                         "move_to_infrequent_access_after": {
                             "title": "Move to Infrequent Access after",
                             "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_glacier_after": {
                             "title": "Move to Glacier Instant Retrieval after",
                             "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_deep_archive_after": {
                             "title": "Move to Deep Archive after",
                             "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
+                        }
+                    }
+                }
+            },
+            "additionalProperties": false,
+            "properties": {
+                "short_term_access_long_term_archive": {
+                    "title": "short_term_access_long_term_archive",
+                    "description": "Files that require shorter term accessibility and are long term archived after that",
+                    "type": "object",
+                    "minProperties": 1,
+                    "additionalProperties": false,
+                    "properties": {
+                        "move_to_infrequent_access_after": {
+                            "title": "Move to Infrequent Access after",
+                            "description": "Time (in months) after which files are moved to Infrequent Access",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "move_to_glacier_after": {
+                            "title": "Move to Glacier Instant Retrieval after",
+                            "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "move_to_deep_archive_after": {
+                            "title": "Move to Deep Archive after",
+                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
+                            "type": "integer",
+                            "minimum": 0
+                        },
+                        "expire_after": {
+                            "title": "Expire after",
+                            "description": "Time (in months) after which files are deleted",
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 },
@@ -183,30 +191,32 @@
                     "title": "long_term_access_long_term_archive",
                     "description": "Files that require longer term accessibility and are long term archived after that",
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
                         "move_to_infrequent_access_after": {
                             "title": "Move to Infrequent Access after",
                             "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_glacier_after": {
                             "title": "Move to Glacier Instant Retrieval after",
                             "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_deep_archive_after": {
                             "title": "Move to Deep Archive after",
                             "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 },
@@ -214,30 +224,32 @@
                     "title": "long_term_access",
                     "description": "Files that require long term accessibility and are deleted after that",
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
                         "move_to_infrequent_access_after": {
                             "title": "Move to Infrequent Access after",
                             "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_glacier_after": {
                             "title": "Move to Glacier Instant Retrieval after",
                             "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_deep_archive_after": {
                             "title": "Move to Deep Archive after",
                             "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 },
@@ -245,30 +257,32 @@
                     "title": "short_term_access",
                     "description": "Files that require short term accessibility and are deleted after that",
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
                         "move_to_infrequent_access_after": {
                             "title": "Move to Infrequent Access after",
                             "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_glacier_after": {
                             "title": "Move to Glacier Instant Retrieval after",
                             "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_deep_archive_after": {
                             "title": "Move to Deep Archive after",
                             "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 },
@@ -276,30 +290,32 @@
                     "title": "long_term_archive",
                     "description": "Files that are immediately archived long term and deleted after that",
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
                         "move_to_infrequent_access_after": {
                             "title": "Move to Infrequent Access after",
                             "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_glacier_after": {
                             "title": "Move to Glacier Instant Retrieval after",
                             "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_deep_archive_after": {
                             "title": "Move to Deep Archive after",
                             "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 },
@@ -307,30 +323,32 @@
                     "title": "short_term_archive",
                     "description": "Files that are immediately archived short term and deleted after that",
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
                         "move_to_infrequent_access_after": {
                             "title": "Move to Infrequent Access after",
                             "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_glacier_after": {
                             "title": "Move to Glacier Instant Retrieval after",
                             "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "move_to_deep_archive_after": {
                             "title": "Move to Deep Archive after",
                             "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 },
@@ -338,30 +356,14 @@
                     "title": "no_storage",
                     "description": "Files that are deleted immediately",
                     "type": "object",
-                    "required": [
-                        "expire_after"
-                    ],
+                    "minProperties": 1,
                     "additionalProperties": false,
                     "properties": {
-                        "move_to_infrequent_access_after": {
-                            "title": "Move to Infrequent Access after",
-                            "description": "Time (in months) after which files are moved to Infrequent Access",
-                            "type": "integer"
-                        },
-                        "move_to_glacier_after": {
-                            "title": "Move to Glacier Instant Retrieval after",
-                            "description": "Time (in months) after which files are moved to Glacier Instant Retrieval",
-                            "type": "integer"
-                        },
-                        "move_to_deep_archive_after": {
-                            "title": "Move to Deep Archive after",
-                            "description": "Time (in months) after which files are moved to Glacier Deep Archive",
-                            "type": "integer"
-                        },
                         "expire_after": {
                             "title": "Expire after",
                             "description": "Time (in months) after which files are deleted",
-                            "type": "integer"
+                            "type": "integer",
+                            "minimum": 0
                         }
                     }
                 }
