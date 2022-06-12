@@ -9,7 +9,8 @@ import openpyxl
 from dcicutils.lang_utils import n_of
 from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
-from .util import s3_local_file, debuglog
+
+from .util import s3_local_file
 
 
 GENERIC_FIELD_MAPPINGS = {  # for spreadsheet column names that are different from schema property names
@@ -77,7 +78,7 @@ SS_REPORT_REQUIRED = 'report required'
 SS_PROBAND = 'proband'
 
 REQUIRED_COLS_FOR_CASE = [SS_ANALYSIS_ID, SS_SPECIMEN_ID]
-REQUIRED_COLS_FOR_ACCESSIONING =  REQUIRED_COLS_FOR_CASE + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
+REQUIRED_COLS_FOR_ACCESSIONING = REQUIRED_COLS_FOR_CASE + [SS_INDIVIDUAL_ID, SS_SEX, SS_RELATION, SS_REPORT_REQUIRED]
 REQUIRED_COLS_FOR_PEDIGREE = [SS_FAMILY_ID, SS_INDIVIDUAL_ID, SS_SEX, SS_PROBAND]
 
 # half-siblings not currently supported, because pedigree info is needed to know
@@ -105,7 +106,7 @@ HPO_TERM_ID_PATTERN = re.compile(r'^HP:[0-9]{7}$')
 MONDO_TERM_ID_PATTERN = re.compile(r'^MONDO:[0-9]{7}$')
 
 
-def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, submission_type, vapp,  # <- Required keyword arguments
+def submit_metadata_bundle(*, s3_client, bucket, key, project, institution, submission_type, vapp,
                            validate_only=False):  # <-- Optional keyword arguments (with defaults)
     """
     Handles processing of a submitted workbook.
@@ -259,6 +260,7 @@ def format_ontology_term_with_colon(str_value):
     if not isinstance(str_value, str):
         raise ValueError('String value expected.')
     return str_value.upper().replace('_', ':')
+
 
 class MetadataItem:
     """
@@ -452,7 +454,6 @@ class AccessionRow:
             '.cram': ('cram', 'alignments'),
             '.vcf.gz': ('vcf_gz', 'raw VCF')
         }
-        files = {'file_fastq': {}, 'file_processed': {}, 'errors': []}
         filenames = [f.strip() for f in self.metadata.get('files', '').split(',') if f.strip()]
         paired = True if len(filenames) % 2 == 0 else False
         for i, filename in enumerate(filenames):
@@ -462,7 +463,7 @@ class AccessionRow:
                     self.errors.append('File must be compressed - please gzip file {}'.format(filename))
                 else:
                     self.errors.append('File extension on {} not supported - expecting one of: '
-                                  '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
+                                       '.fastq.gz, .fq.gz, .cram, .vcf.gz'.format(filename))
                 continue
             file_alias = '{}:{}'.format(self.project, filename.strip().split('/')[-1])
             fmt = valid_extensions[extension[0]][0]
@@ -783,7 +784,9 @@ class AccessionMetadata:
                                    ' Row cannot be processed.'.format(i + 1 + self.counter))
                 continue
             try:
-                processed_row = AccessionRow(self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution)
+                processed_row = AccessionRow(
+                    self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution
+                )
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
                 simple_add_items.extend(processed_row.files_processed)
@@ -971,8 +974,14 @@ class PedigreeMetadata:
                 for match in family_matches.json['@graph']:
                     final_family_dict[match['@id']] = value
                     if value.get('proband'):
-                        phenotypes = list(set([item['phenotypic_feature'] for item in
-                                      self.individuals[value['proband']].get('phenotypic_features', [])]))
+                        phenotypes = list(
+                            set(
+                                [
+                                    item['phenotypic_feature'] for item in
+                                    self.individuals[value['proband']].get('phenotypic_features', [])
+                                ]
+                            )
+                        )
                         # Add other family member phenotypes if proband phenotypes < 4
                         if len(phenotypes) < 4:
                             for member in value['members']:
@@ -1018,7 +1027,7 @@ class PedigreeMetadata:
                 processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
                 self.errors.extend(processed_row.errors)
                 self.add_individual_metadata(processed_row.individual)
-            except AttributeError as e:
+            except AttributeError:
                 continue
         self.families = self.add_family_metadata()
         self.check_individuals()
@@ -1095,7 +1104,9 @@ class SpreadsheetProcessing:
         """
         missing = [col for col in self.REQUIRED_COLUMNS if col not in self.keys]
         if missing:
-            msg = 'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'.format('", "'.join(missing))
+            msg = (
+                'Column(s) "{}" not found in spreadsheet! Spreadsheet cannot be processed.'
+            ).format('", "'.join(missing))
             self.errors.append(msg)
         else:
             for values in self.input:
@@ -1146,8 +1157,10 @@ def xls_to_json(vapp, xls_data, project, institution, ingestion_id, submission_t
         result = AccessionProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
                                      ingestion_id=ingestion_id, submission_type=submission_type)
     elif submission_type == 'family_history':
-        result = PedigreeProcessing(vapp, xls_data=xls_data, project=project, institution=institution,
-                                     ingestion_id=ingestion_id, submission_type=submission_type)
+        result = PedigreeProcessing(
+            vapp, xls_data=xls_data, project=project, institution=institution,
+            ingestion_id=ingestion_id, submission_type=submission_type
+        )
     else:
         raise ValueError(f'{submission_type} is not a valid submission_type argument,'
                          ' expected values are "accessioning" or "family_history"')
@@ -1239,8 +1252,10 @@ def parse_exception(e, aliases):
                         else:
                             hpo_term = error.split("\'")[1]
                         if error.endswith('not found'):
-                            error = ('HPO terms - HPO term {} not found in database.'
-                                    ' Please check HPO ID and resubmit.'.format(hpo_term))
+                            error = (
+                                'HPO terms - HPO term {} not found in database.'
+                                ' Please check HPO ID and resubmit.'
+                            ).format(hpo_term)
                     keep.append(error)
                 elif 'Additional properties are not allowed' in error:
                     keep.append(error[2:])
@@ -1442,9 +1457,11 @@ def post_and_patch_all_items(virtualapp, json_data_final):
                     no_errors = False
         for itype in final_status:
             if final_status[itype]['posted'] > 0 or final_status[itype]['not posted'] > 0:
-                output.append('{}: {} created (with POST); {} failed creation'.format(itype,
-                                      n_of(final_status[itype]['posted'], 'item'),
-                                      n_of(final_status[itype]['not posted'], 'item')))
+                output.append('{}: {} created (with POST); {} failed creation'.format(
+                    itype,
+                    n_of(final_status[itype]['posted'], 'item'),
+                    n_of(final_status[itype]['not posted'], 'item')
+                ))
     for k, v in json_data_final['patch'].items():
         final_status.setdefault(k, {'patched': 0, 'not patched': 0})
         for item_id, patch_data in v.items():
