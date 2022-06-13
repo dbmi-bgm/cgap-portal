@@ -283,6 +283,7 @@ def test_changelogs(testapp, registry):
             assert res.status_int == 200, changelog
             assert res.content_type == 'text/markdown'
 
+
 @pytest.mark.parametrize('schema', SCHEMA_FILES)
 def test_facets_and_columns_orders(schema, testapp):
     '''This tests depends on Python 3.6's ordered dicts'''
@@ -320,4 +321,22 @@ schemas change.
 >    fi
 
         ''' % schema
-        
+
+
+def test_schema_version_present_on_items(app):
+    """Test a valid schema version is present on all non-test item
+    types.
+
+    Expecting positive integer values for non-abstract items, and empty
+    string for all abstract items.
+    """
+    all_types = app.registry.get(TYPES).by_item_type
+    for type_name, item_type in all_types.items():
+        if type_name.startswith("testing"):
+            continue
+        schema_version = item_type.schema_version
+        if item_type.is_abstract is False:
+            assert schema_version
+            assert int(schema_version) >= 1
+        else:
+            assert schema_version == ""

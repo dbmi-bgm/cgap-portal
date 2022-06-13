@@ -1,20 +1,17 @@
 import openpyxl
 import pytest
 
-from copy import deepcopy
-from unittest import mock
-from .. import submit
 from ..submit import (
     HPO_TERM_ID_PATTERN,
     MONDO_TERM_ID_PATTERN,
     compare_fields,
     digest_xlsx,
     format_ontology_term_with_colon,
-    MetadataItem,
     AccessionRow,
     AccessionMetadata,
     PedigreeRow,
     PedigreeMetadata,
+    SpreadsheetProcessing,
     AccessionProcessing,
     PedigreeProcessing,
     map_fields,
@@ -96,7 +93,10 @@ def row_dict_pedigree():
         'pregnancy': 'N',
         'spontaneous abortion': 'N',
         'infertile': 'N',
-        'no children by choice': 'Y'
+        'no children by choice': 'Y',
+        "primary diagnosis": "MONDO:0000111",
+        "diagnosis age of onset": "100",
+        "diagnostic confidence": "Definite",
     }
 
 
@@ -231,6 +231,7 @@ def case_with_ingestion_id1(testapp, project, institution, fam, sample_proc_fam)
     res = testapp.post_json('/case', data).json['@graph'][0]
     return res
 
+
 @pytest.fixture
 def case_with_ingestion_id2(testapp, project, institution, fam, sample_proc_fam):
     return {
@@ -311,9 +312,11 @@ def example_rows_pedigree():
          'pregnancy': 'y', 'gestational age': '25', 'gestational age units': 'week'}
     ]
 
+
 @pytest.fixture
 def example_rows_pedigree_obj(testapp, example_rows_pedigree, project, institution):
     return PedigreeMetadata(testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1)
+
 
 @pytest.fixture
 def first_family():
@@ -322,6 +325,7 @@ def first_family():
         'proband': 'encode-project:individual-456',
         'members': ['encode-project:individual-456']
     }]}
+
 
 @pytest.fixture
 def new_family(child, mother, father):
@@ -334,6 +338,12 @@ def new_family(child, mother, father):
             father['@id']
         ]
     }
+
+
+@pytest.fixture
+def pedigree_row(row_dict_pedigree, project, institution):
+    """A PedigreeRow without errors."""
+    return PedigreeRow(row_dict_pedigree, 1, project["name"], institution["name"])
 
 
 def test_hp_term_id_pattern():
@@ -706,81 +716,368 @@ class TestAccessionMetadata:
                 for val2 in val.values():
                     assert val2['project']
                     assert val2['institution']
-                    assert all(val3  for val3 in val2.values())  # test all None values are removed
+                    assert all(val3 for val3 in val2.values())  # test all None values are removed
 
 
 class TestPedigreeRow:
 
-    def test_extract_individual_metadata(self, row_dict_pedigree, project, institution):
-        """tests that individual metadata gets created properly during pedigree file parsing"""
-        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
-        assert obj.indiv_alias == 'encode-project:individual-456'
-        assert obj.individual.metadata['aliases'] == [obj.indiv_alias]
-        assert obj.individual.metadata['individual_id'] == row_dict_pedigree['individual id']
-        assert all([':individual-' in obj.individual.metadata[item] for item in['mother', 'father']])
-        for item in ['family_id', 'sex', 'phenotypic_features', 'disorders', 'ancestry',
-                     'life_status', 'is_deceased', 'is_termination_of_pregnancy',
-                     'is_still_birth', 'is_pregnancy', 'is_spontaneous_abortion',
-                     'is_infertile', 'is_no_children_by_choice']:
-            assert item in obj.individual.metadata
+    def assert_lists_identical(self, list_1, list_2):
+        """Assert equality for unsorted lists."""
+        assert len(list_1) == len(list_2)
+        for item in list_1:
+            assert item in list_2
 
-    @pytest.mark.parametrize('field, error', [
-        ('individual id', True),
-        ('family id', True),
-        ('sex', True),
-        ('ancestry', False),
-        ('mother id', False),
-        ('father id', False),
-        ('hpo terms', False)
-    ])
-    def test_found_missing_values(self, row_dict_pedigree, project, institution, field, error):
+    def test_extract_individual_metadata(self, pedigree_row, row_dict_pedigree):
+        """tests that individual metadata gets created properly during pedigree file parsing"""
+        assert not pedigree_row.errors
+        assert pedigree_row.indiv_alias == "encode-project:individual-456"
+        assert pedigree_row.individual.metadata["aliases"] == [pedigree_row.indiv_alias]
+        assert (
+            pedigree_row.individual.metadata["individual_id"]
+            == row_dict_pedigree["individual id"]
+        )
+        assert all(
+            [
+                ":individual-" in pedigree_row.individual.metadata[item]
+                for item in ["mother", "father"]
+            ]
+        )
+        for item in [
+            "family_id",
+            "sex",
+            "phenotypic_features",
+            "disorders",
+            "ancestry",
+            "life_status",
+            "is_deceased",
+            "is_termination_of_pregnancy",
+            "is_still_birth",
+            "is_pregnancy",
+            "is_spontaneous_abortion",
+            "is_infertile",
+            "is_no_children_by_choice",
+        ]:
+            assert item in pedigree_row.individual.metadata
+
+    @pytest.mark.parametrize(
+        "field, error",
+        [
+            ("individual id", True),
+            ("family id", True),
+            ("sex", True),
+            ("ancestry", False),
+            ("mother id", False),
+            ("father id", False),
+            ("hpo terms", False),
+        ],
+    )
+    def test_found_missing_values(
+        self, row_dict_pedigree, project, institution, field, error
+    ):
         """some columns are required for spreadsheet submission, others are optional."""
         row_dict_pedigree[field] = None
-        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
+        obj = PedigreeRow(row_dict_pedigree, 1, project["name"], institution["name"])
         assert (len(obj.errors) > 0) == error
-        assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
-                ''.format(field) in obj.errors) == error
+        assert (
+            "Row 1 - missing required field(s) {}. This row cannot be processed."
+            "".format(field) in obj.errors
+        ) == error
 
-    @pytest.mark.parametrize('feat_list, length', [
-        ('', 0),
-        ('HPO:000001', 1),
-        ('HPO:094732, HPO:239843, HPO:000001', 3)
-    ])
-    def test_reformat_phenotypic_features(self, row_dict_pedigree, project, institution, feat_list, length):
-        row_dict_pedigree['hpo terms'] = feat_list
-        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
-        result = obj.individual.metadata['phenotypic_features']
-        assert len(result) == length
-        for item in result:
-            assert isinstance(item, dict)
-            assert list(item.keys()) == ['phenotypic_feature']
-
-    @pytest.mark.parametrize('proband_val, result', [
-        ('Y', True),
-        ('N', False),
-        ('U', False)
-    ])
-    def test_is_proband(self, row_dict_pedigree, project, institution, proband_val, result):
-        row_dict_pedigree['proband'] = proband_val
-        obj = PedigreeRow(row_dict_pedigree, 1, project['name'], institution['name'])
+    @pytest.mark.parametrize(
+        "proband_val, result", [("Y", True), ("N", False), ("U", False)]
+    )
+    def test_is_proband(
+        self, row_dict_pedigree, project, institution, proband_val, result
+    ):
+        row_dict_pedigree["proband"] = proband_val
+        obj = PedigreeRow(row_dict_pedigree, 1, project["name"], institution["name"])
         assert obj.proband == result
 
-    @pytest.mark.parametrize('key, val, is_error', [
-        ('hpo terms', 'HP:123456', True),
-        ('hpo terms', 'HP:0000137', False),
-        ('hpo terms', 'ataxia', True),
-        ('mondo terms', 'mondo:0001230', False),
-        ('mondo terms', 'MONDO:99900', True),
-        ('mondo terms', 'MONDO_0001256', False)
-    ])
-    def test_format_atid(self, row_dict_pedigree, project, institution, key, val, is_error):
-        row_dict_pedigree[key] = val
-        obj = PedigreeRow(row_dict_pedigree, 2, project['name'], institution['name'])
-        assert (obj.errors != []) == is_error
-        if obj.errors:
-            text = f'Row 2 - term {val!r} does not match the format for an HPO or MONDO ontology term.'
-            assert text in ''.join(obj.errors)
+    @pytest.mark.parametrize(
+        "ontology_terms,match_pattern,expected_valid,expected_invalid",
+        [
+            ("", HPO_TERM_ID_PATTERN, [], []),
+            ("HP:0000001", HPO_TERM_ID_PATTERN, ["HP:0000001"], []),
+            ("foo, bar", HPO_TERM_ID_PATTERN, [], ["foo", "bar"]),
+            ("foo, bar, foo", HPO_TERM_ID_PATTERN, [], ["foo", "bar"]),
+            (
+                "foo, HP:0000001, bar",
+                HPO_TERM_ID_PATTERN,
+                ["HP:0000001"],
+                ["foo", "bar"],
+            ),
+        ],
+    )
+    def test_validate_ontology_terms(
+        self,
+        pedigree_row,
+        ontology_terms,
+        match_pattern,
+        expected_valid,
+        expected_invalid,
+    ):
+        """Test identification of valid/invalid ontology terms based on
+        given term regex.
+        """
+        result_valid, result_invalid = pedigree_row.validate_ontology_terms(
+            ontology_terms, match_pattern
+        )
+        assert result_valid == set(expected_valid)
+        assert result_invalid == set(expected_invalid)
 
+    @pytest.mark.parametrize(
+        "individual_metadata,expected",
+        [
+            ({}, {}),
+            ({"foo": "bar"}, {"foo": "bar"}),
+            ({"phenotypic_features": "foo, bar"}, {}),
+            ({"foo": "bar", "phenotypic_features": "foo, bar"}, {"foo": "bar"}),
+            (
+                {"phenotypic_features": "HP:0001111"},
+                {"phenotypic_features": [{"phenotypic_feature": "/phenotypes/HP:0001111/"}]},
+            ),
+            (
+                {"foo": "bar", "phenotypic_features": "HP:0001111"},
+                {
+                    "foo": "bar",
+                    "phenotypic_features": [{"phenotypic_feature": "/phenotypes/HP:0001111/"}],
+                },
+            ),
+        ],
+    )
+    def test_update_phenotypes(self, pedigree_row, individual_metadata, expected):
+        """Test phenotypes from spreadsheet properly reformatted or
+        removed from metadata appropriately.
+        """
+        pedigree_row.update_phenotypes(individual_metadata)
+        assert individual_metadata == expected
+
+    @pytest.mark.parametrize(
+        "phenotypes,error,expected",
+        [
+            ("", False, []),
+            ("HP:001", True, []),
+            ("Ataxia", False, []),
+            ("HP:0000001", False, [{"phenotypic_feature": "/phenotypes/HP:0000001/"}]),
+            (
+                "HP:1094732, HP:2349843",
+                False,
+                [
+                    {"phenotypic_feature": "/phenotypes/HP:1094732/"},
+                    {"phenotypic_feature": "/phenotypes/HP:2349843/"},
+                ],
+            ),
+        ],
+    )
+    def test_get_phenotypes(self, pedigree_row, phenotypes, error, expected):
+        """Test spreadsheet HPO term input properly parsed and
+        validated.
+        """
+        result = pedigree_row.get_phenotypes(phenotypes)
+        self.assert_lists_identical(result, expected)
+        if error:
+            assert pedigree_row.errors
+
+    @pytest.mark.parametrize(
+        "individual_metadata,expected",
+        [
+            ({}, {}),
+            ({"foo": "bar"}, {"foo": "bar"}),
+            ({"primary_diagnosis": "foo, bar"}, {}),
+            ({"disorders": "foo, bar"}, {}),
+            (
+                {"primary_diagnosis": "MONDO:0001111"},
+                {
+                    "disorders": [
+                        {"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}
+                    ]
+                },
+            ),
+            (
+                {"disorders": "MONDO:0001111"},
+                {"disorders": [{"disorder": "/disorders/MONDO:0001111/"}]},
+            ),
+            (
+                {
+                    "primary_diagnosis": "MONDO:0001111",
+                    "disorders": "MONDO:0002222",
+                },
+                {
+                    "disorders": [
+                        {"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True},
+                        {"disorder": "/disorders/MONDO:0002222/"},
+                    ],
+                },
+            ),
+            (
+                {
+                    "primary_diagnosis": "foo, bar",
+                    "diagnosis_onset_age": "10",
+                    "diagnosis_onset_age_units": "year",
+                    "diagnostic_confidence": "probable",
+                },
+                {},
+            ),
+            (
+                {
+                    "diagnosis_onset_age": "10",
+                    "diagnosis_onset_age_units": "year",
+                    "diagnostic_confidence": "probable",
+                },
+                {},
+            ),
+            (
+                {
+                    "primary_diagnosis": "MONDO:0001111",
+                    "diagnosis_onset_age": "10",
+                    "diagnosis_onset_age_units": "year",
+                    "diagnostic_confidence": "probable",
+                },
+                {
+                    "disorders": [
+                        {
+                            "disorder": "/disorders/MONDO:0001111/",
+                            "onset_age": 10,
+                            "onset_age_units": "year",
+                            "diagnostic_confidence": "probable",
+                            "is_primary_diagnosis": True,
+                        },
+                    ]
+                },
+            ),
+        ],
+    )
+    def test_update_disorders(self, pedigree_row, individual_metadata, expected):
+        """Test disorder information from spreadsheet properly
+        processed and reformatted or removed from Individual metadata.
+        """
+        pedigree_row.update_disorders(individual_metadata)
+        assert individual_metadata == expected
+
+    @pytest.mark.parametrize(
+        (
+            "primary_disorder,onset_age,onset_age_units,diagnostic_confidence,error"
+            ",expected"
+        ),
+        [
+            ("", None, None, None, False, []),
+            ("MONDO:foo", None, None, None, True, []),
+            (
+                "MONDO:0001111",
+                None,
+                None,
+                None,
+                False,
+                [{"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}],
+            ),
+            (
+                "MONDO:0001111, MONDO:0001111",
+                None,
+                None,
+                None,
+                False,
+                [{"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}],
+            ),
+            ("MONDO:0001111, MONDO:0001112", None, None, None, True, []),
+            (
+                "MONDO:0001111, MONDO:foo",
+                None,
+                None,
+                None,
+                True,
+                [{"disorder": "/disorders/MONDO:0001111/", "is_primary_diagnosis": True}],
+            ),
+            (
+                "MONDO:0001111",
+                "10",
+                None,
+                None,
+                False,
+                [
+                    {
+                        "disorder": "/disorders/MONDO:0001111/",
+                        "onset_age": 10,
+                        "onset_age_units": "year",
+                        "is_primary_diagnosis": True,
+                    }
+                ],
+            ),
+            (
+                "MONDO:0001111",
+                "10",
+                "month",
+                None,
+                False,
+                [
+                    {
+                        "disorder": "/disorders/MONDO:0001111/",
+                        "onset_age": 10,
+                        "onset_age_units": "month",
+                        "is_primary_diagnosis": True,
+                    }
+                ],
+            ),
+            (
+                "MONDO:0001111",
+                None,
+                None,
+                "probable",
+                False,
+                [
+                    {
+                        "disorder": "/disorders/MONDO:0001111/",
+                        "diagnostic_confidence": "probable",
+                        "is_primary_diagnosis": True,
+                    }
+                ],
+            ),
+        ],
+    )
+    def test_get_primary_disorder(
+        self,
+        pedigree_row,
+        primary_disorder,
+        onset_age,
+        onset_age_units,
+        diagnostic_confidence,
+        error,
+        expected,
+    ):
+        """Test primary disorder MONDO terms and associated columns from
+        spreadsheet interpretated, validated, and formatted.
+        """
+        result = pedigree_row.get_primary_disorder(
+            primary_disorder, onset_age, onset_age_units, diagnostic_confidence
+        )
+        assert result == expected
+        if error:
+            assert pedigree_row.errors
+
+    @pytest.mark.parametrize(
+        "disorders,error,expected",
+        [
+            ("", False, []),
+            ("MONDO:0001", True, []),
+            ("MONDO:0007947", False, [{"disorder": "/disorders/MONDO:0007947/"}]),
+            ("Foo, MONDO:0007947, MONDO:001", True, [{"disorder": "/disorders/MONDO:0007947/"}]),
+            (
+                "MONDO:0007947, MONDO:0001111",
+                False,
+                [
+                    {"disorder": "/disorders/MONDO:0007947/"},
+                    {"disorder": "/disorders/MONDO:0001111/"},
+                ],
+            ),
+        ],
+    )
+    def test_get_secondary_disorders(self, pedigree_row, disorders, error, expected):
+        """Test secondary MONDO terms without additional metadata
+        validated and formatted.
+        """
+        result = pedigree_row.get_secondary_disorders(disorders)
+        self.assert_lists_identical(result, expected)
+        if error:
+            assert pedigree_row.errors
 
 
 class TestPedigreeMetadata:
@@ -935,6 +1232,23 @@ class TestSpreadsheetProcessing:
         if not success_bool:
             assert 'Column(s) "{}" not found in spreadsheet!'.format(col.lower().strip(':')) in ''.join(obj.errors)
 
+    @pytest.mark.parametrize(
+        "entry,expected",
+        [
+            ("", ""),
+            ("FOO", "foo"),
+            (" foo ", "foo"),
+            ("foo (bar)", "foo"),
+            ("foo*", "foo"),
+            ("foo:", "foo"),
+            ("Foo* (BAR) ", "foo"),
+        ]
+    )
+    def test_reformat_column_header(self, entry, expected):
+        """Test column header in spreadsheet reformatted correctly."""
+        result = SpreadsheetProcessing.reformat_column_header(entry)
+        assert result == expected
+
 
 def test_xls_to_json_accessioning(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
@@ -945,6 +1259,7 @@ def test_xls_to_json_accessioning(testapp, project, institution):
     assert 'encode-project:family-456' in json_out['family']
     assert len(json_out['individual']) == 3
     assert all(['encode-project:individual-' + x in json_out['individual'] for x in ['123', '456', '789']])
+
 
 def test_xls_to_json_pedigree(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
@@ -971,8 +1286,10 @@ def test_xls_to_json_pedigree_errors(testapp, project, institution):
     """tests for expected output when spreadsheet is not formatted correctly"""
     rows = digest_xlsx(TEST_PEDIGREE_WITH_ERRORS)
     json_out, success = xls_to_json(testapp, rows, project, institution, TEST_INGESTION_ID1, 'family_history')
-    assert "Row 5 - term 'HP:00000821' does not match the format" in "".join(json_out['errors'])
-    assert "Row 9 - missing required field(s) family id." in "".join(json_out['errors'])
+    joined_errors = "".join(json_out["errors"])
+    assert "Row 5" in joined_errors
+    assert "HP:00000821" in joined_errors
+    assert "Row 9 - missing required field(s) family id." in joined_errors
     assert success
 
 
