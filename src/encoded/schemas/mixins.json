@@ -477,13 +477,13 @@
     "submitted_files": {
         "files": {
             "title": "Submitted Files",
-            "description": "Files submitted to the sample.",
+            "description": "Raw files submitted to the item",
             "type": "array",
             "items": {
                 "title": "File",
                 "description": "File metadata.",
                 "type": "string",
-                "linkTo": "File"
+                "linkTo": "FileRaw"
             }
         }
     }

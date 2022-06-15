@@ -529,9 +529,17 @@ class TestAccessionRow:
         assert ('Row 1 - missing required field(s) {}. This row cannot be processed.'
                 ''.format(field) in obj.errors) == error
 
-    @pytest.mark.parametrize('num, val', [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)])
-    def test_get_paired_end_value(self, num, val):
-        assert AccessionRow.get_paired_end_value(num) == val
+    @pytest.mark.parametrize(
+        "file_name,expected",
+        [
+            ("", None),
+            ("foo bar", None),
+        ]
+    )
+    def test_get_paired_end_from_name(self, simple_accession_row, file_name, expected):
+        """"""
+        result = simple_accession_row.get_paired_end_from_name(file_name)
+        assert result == expected
 
 
 class TestAccessionMetadata:
