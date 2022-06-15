@@ -14,7 +14,9 @@ log = structlog.getLogger(__name__)
 
 def _build_gene_embedded_list():
     """ Helper function intended to be used to create the embedded list for gene """
-    return []
+    return [
+        "gene_lists.title",
+    ]
 
 
 @collection(
