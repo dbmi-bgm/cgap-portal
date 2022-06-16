@@ -2,7 +2,6 @@ import datetime
 import io
 import json
 import os
-import csv
 from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
@@ -11,10 +10,8 @@ from pyramid.httpexceptions import (
     HTTPNotModified
 )
 from pyramid.traversal import find_resource
-from pyramid.request import Request
 from pyramid.response import Response
 
-import boto3
 import negspy.coordinates as nc
 import pytz
 import structlog
@@ -76,8 +73,14 @@ CMPHET_UNPHASED_STRONG = 'Compound Het (Unphased/strong_pair)'
 CMPHET_UNPHASED_MED = 'Compound Het (Unphased/medium_pair)'
 CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 
-# Shared embeds for variants and variant samples also used for corresponding SV items
-SHARED_VARIANT_EMBEDS = []
+# Shared embeds for variants and variant samples also used for
+# StructuralVariant(Sample)s
+SHARED_VARIANT_EMBEDS = [
+    # Notes saved to project
+    "interpretations.@id",
+    "discovery_interpretations.@id",
+    "variant_notes.@id",
+]
 
 SHARED_VARIANT_SAMPLE_EMBEDS = ["variant_sample_list.created_for_case"]
 
@@ -111,7 +114,10 @@ def build_variant_embedded_list():
 
         :returns: list of variant embeds
     """
-    embedded_list = SHARED_VARIANT_EMBEDS
+    embedded_list = SHARED_VARIANT_EMBEDS + [
+        # Notes saved to project
+        "genes.genes_most_severe_gene.gene_notes.@id",  # `genes` not present on StructuralVariant
+    ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
     return embedded_list + Item.embedded_list
