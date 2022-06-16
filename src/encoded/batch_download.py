@@ -4,13 +4,9 @@ import pytz
 import structlog
 from pyramid.httpexceptions import (
     HTTPBadRequest,
-    HTTPMovedPermanently,
-    HTTPServerError,
-    HTTPTemporaryRedirect
 )
 from pyramid.view import view_config
 from pyramid.response import Response
-from pyramid.traversal import find_resource
 from snovault.util import simple_path_ids, debug_log
 from snovault.embed import make_subrequest
 
@@ -25,21 +21,17 @@ from .batch_download_utils import (
 from .search.compound_search import CompoundSearchBuilder
 
 
-
-
 log = structlog.getLogger(__name__)
+
 
 def includeme(config):
     config.add_route('variant_sample_search_spreadsheet', '/variant-sample-search-spreadsheet/')
     config.scan(__name__)
 
 
-
-
 ###########################################################################
 ## Spreadsheet Generation Code Specific to VariantSample Search Requests ##
 ###########################################################################
-
 
 
 @view_config(route_name='variant_sample_search_spreadsheet', request_method=['GET', 'POST'])
@@ -53,13 +45,12 @@ def variant_sample_search_spreadsheet(context, request):
     try:
         # This is what we should be receiving
         request_body = request.POST
-    except:
+    except Exception:
         # TODO: Consider accepting JSON body for unit test purposes only
         pass
 
-
     file_format = request_body.get("file_format", request.GET.get("file_format", "tsv")).lower()
-    if file_format not in { "tsv", "csv" }: # TODO: Add support for xslx.
+    if file_format not in {"tsv", "csv"}:  # TODO: Add support for xslx.
         raise HTTPBadRequest("Expected a valid `file_format` such as TSV or CSV.")
 
     case_accession = request_body.get("case_accession", request.GET.get("case_accession"))
@@ -69,7 +60,6 @@ def variant_sample_search_spreadsheet(context, request):
     suggested_filename = (case_accession or "case") + "-filtering-" + timestamp + "." + file_format
 
     spreadsheet_mappings = get_spreadsheet_mappings(request)
-
 
     # Must not contain `limit`
     filterset_blocks_request = request_body["compound_search_request"]
@@ -98,20 +88,18 @@ def variant_sample_search_spreadsheet(context, request):
             embed_and_merge_note_items_to_variant_sample(request, embedded_representation_variant_sample)
             yield convert_item_to_sheet_dict(embedded_representation_variant_sample, spreadsheet_mappings)
 
-
     header_info_rows = [
         ["#"],
         ["#", "Case Accession:", "", case_accession or "Not Available"],
         ["#", "Case Title:", "", case_title or "Not Available"],
-        ["#", "Filters Selected:", "", human_readable_filter_block_queries(filterset_blocks_request) ],
-        #["#", "Filtering Query Used:", "", json.dumps({ "intersect": intersect, "filter_blocks": [ fb["query"] for fb in filter_set["filter_blocks"] ] })  ],
+        ["#", "Filters Selected:", "", human_readable_filter_block_queries(filterset_blocks_request)],
+        # ["#", "Filtering Query Used:", "", json.dumps({ "intersect": intersect, "filter_blocks": [ fb["query"] for fb in filter_set["filter_blocks"] ] })  ],
         ["#"],
-        ["## -------------------------------------------------------"] # <- Slightly less than horizontal length of most VS @IDs
+        ["## -------------------------------------------------------"]  # <- Slightly less than horizontal length of most VS @IDs
     ]
 
-
     return Response(
-        app_iter = stream_tsv_output(
+        app_iter=stream_tsv_output(
             vs_dicts_generator(),
             spreadsheet_mappings,
             file_format=file_format,
@@ -157,4 +145,3 @@ def embed_and_merge_note_items_to_variant_sample(request, embedded_vs):
             setattr(note_subreq, "_stats", request._stats)
             note_response = request.invoke_subrequest(note_subreq)
             incomplete_note_obj.update(note_response.json)
-
