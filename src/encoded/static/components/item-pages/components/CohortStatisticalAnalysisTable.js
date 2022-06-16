@@ -36,6 +36,55 @@ function StatTestCheckbox({ label, checked, onChange }) {
   );
 }
 
+function TextboxFilter({ label, placeholder, filtertype, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <label className="form-label small fw-bold mb-0">{label}</label>
+      <input
+        className="form-control form-control-sm"
+        data-filtertype={filtertype}
+        placeholder={placeholder}
+        onChange={onChange}
+      />
+    </div>
+  );
+}
+
+function GeneListFilter({ geneLists, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <label className="form-label small fw-bold mb-0">Gene list</label>
+      <select
+        className="form-control form-control-sm d-block"
+        aria-label=".form-select-sm example"
+        onChange={onChange}
+        defaultValue={"NONE"}
+      >
+        <option value="NONE">Non selected</option>
+        {Object.keys(geneLists).map((gl) => (
+          <option value={gl}>{gl}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function ShowMore({ recordDifference, onClick }) {
+  if (typeof onClick !== "function") return null;
+  if (recordDifference > 0) {
+    return (
+      <div className="text-center py-3" onClick={onClick}>
+        <a href="#">Show more ({recordDifference})</a>
+      </div>
+    );
+  }
+  return "";
+}
+
 class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -52,7 +101,6 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       sortedBy: activeTests[0],
       activeTests: activeTests,
       geneLists: {},
-      selectedGenes: [],
       filter: {},
     };
 
@@ -61,10 +109,9 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       "https://aveit.s3.amazonaws.com/msa/cohort_gene_info.vcf.gz";
     this.tbiLocation = this.vcfLocation + ".tbi";
 
-    this.vcfRecords = [];
+    this.vcfRecords = {};
+    this.geneListFilteredVcfRecords = [];
   }
-
-  componentDidUpdate(pastProps, pastState) {}
 
   componentDidMount() {
     this.handleSortIconClick = this.handleSortIconClick.bind(this);
@@ -100,10 +147,13 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
           chrom["length"],
           (line) => {
             const vcfRecord = tbiVCFParser.parseLine(line);
-            //console.log(vcfRecord);
-            this.vcfRecords.push(
-              parseVcfRecord(vcfRecord, this.props.statTests)
+            const parsedVcfRecord = parseVcfRecord(
+              vcfRecord,
+              this.props.statTests
             );
+            const id = parsedVcfRecord["id"];
+            // We are using this indexing strategy for more efficient gene list filtering
+            this.vcfRecords[id] = parsedVcfRecord;
           }
         );
         dataPromises.push(dataPromise);
@@ -111,23 +161,12 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
 
       Promise.all(dataPromises).then((values) => {
         const firstTest = this.state.activeTests[0];
+        this.geneListFilteredVcfRecords = Object.values(this.vcfRecords);
         // Initially order by the first test in the list
-        const vcfRecordsFiltered = this.sortRecordsByTest(
-          this.vcfRecords,
+        this.sortRecordsByTestAndUpdateState(
+          this.geneListFilteredVcfRecords,
           firstTest
         );
-        const vcfRecordsToDisplay = vcfRecordsFiltered.slice(
-          0,
-          this.numRowsOriginal
-        );
-        this.setState((prevState) => ({
-          loading: false,
-          vcfRecordsFiltered: vcfRecordsFiltered,
-          vcfRecordsToDisplay: vcfRecordsToDisplay,
-          numRows: this.numRowsOriginal,
-          sortedBy: firstTest,
-        }));
-        //console.log(this.vcfRecords);
         console.log(this.state.vcfRecordsToDisplay);
       });
     });
@@ -207,11 +246,11 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     if (event.target.value === "") {
       delete filter[filtertype];
     }
-    this.applyFilter(filter, this.state.selectedGenes);
+    this.applyFilter(filter);
   }
 
-  applyFilter(filter, selectedGenes) {
-    let records = this.vcfRecords;
+  applyFilter(filter) {
+    let records = this.geneListFilteredVcfRecords;
 
     if (filter["gene"] !== undefined) {
       records = records.filter((v) =>
@@ -235,12 +274,6 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
         });
       }
     }
-    // Gene list filter
-    if (selectedGenes.length > 0) {
-      records = records.filter((v) => {
-        return selectedGenes.includes(v["id"]);
-      });
-    }
 
     const vcfRecordsFiltered = this.sortRecordsByTest(
       records,
@@ -256,14 +289,29 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       vcfRecordsFiltered: vcfRecordsFiltered,
       vcfRecordsToDisplay: vcfRecordsToDisplay,
       numRows: this.numRowsOriginal,
-      selectedGenes: selectedGenes,
     }));
   }
 
   applyGeneListFilter(event) {
     const val = event.target.value;
-    const selectedGenes = val === "NONE" ? [] : this.state.geneLists[val];
-    this.applyFilter(this.state.filter, selectedGenes);
+
+    if (val === "NONE") {
+      this.geneListFilteredVcfRecords = Object.values(this.vcfRecords);
+    } else {
+      const selectedGenes = this.state.geneLists[val];
+      this.geneListFilteredVcfRecords = [];
+      selectedGenes.forEach((gene) => {
+        const record = this.vcfRecords[gene];
+        if (record) {
+          this.geneListFilteredVcfRecords.push(record);
+        } else {
+          console.warn(
+            "Gene " + gene + " from gene list not found in available genes."
+          );
+        }
+      });
+    }
+    this.applyFilter(this.state.filter);
   }
 
   getTableHeader() {
@@ -287,7 +335,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
         </th>
       );
     });
-    return headerCols;
+    return <tr>{headerCols}</tr>;
   }
 
   getTableBody() {
@@ -309,55 +357,29 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     return (
       <React.Fragment>
         <div className="p-3 bg-light">
-          <div className="mb-1">
-            <label
-              htmlFor="filter-gene"
-              className="form-label small fw-bold mb-0"
-            >
-              Gene name
-            </label>
-            <input
-              className="form-control form-control-sm"
-              id="filter-gene"
-              data-filtertype="gene"
-              placeholder="e.g. TNFRSF8"
-              onChange={this.filterChange}
-            />
-          </div>
-          <div className="mb-1">
-            <label
-              htmlFor="filter-from"
-              className="form-label small fw-bold mb-0"
-            >
-              From
-            </label>
-            <input
-              className="form-control form-control-sm"
-              id="filter-from"
-              placeholder="e.g. chr1:1000000"
-              data-filtertype="from"
-              onChange={this.filterChange}
-            />
-          </div>
-          <div className="mb-1">
-            <label
-              htmlFor="filter-to"
-              className="form-label small fw-bold mb-0"
-            >
-              To
-            </label>
-            <input
-              className="form-control form-control-sm"
-              id="filter-to"
-              placeholder="e.g. chr3:20000000"
-              data-filtertype="to"
-              onChange={this.filterChange}
-            />
-          </div>
-          <div className="mb-1">
-            <label className="form-label small fw-bold mb-0">Gene list</label>
-            {this.getGeneListFilter()}
-          </div>
+          <TextboxFilter
+            label="Gene name"
+            placeholder="e.g. TNFRSF8"
+            filtertype="gene"
+            onChange={this.filterChange}
+          />
+          <TextboxFilter
+            label="From"
+            placeholder="e.g. chr1:1000000"
+            filtertype="from"
+            onChange={this.filterChange}
+          />
+          <TextboxFilter
+            label="To"
+            placeholder="e.g. chr3:20000000"
+            filtertype="to"
+            onChange={this.filterChange}
+          />
+
+          <GeneListFilter
+            geneLists={this.state.geneLists}
+            onChange={this.applyGeneListFilter}
+          />
 
           <div className="mt-2">Statistical tests</div>
           {this.statTests.map((test) => (
@@ -372,41 +394,6 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     );
   }
 
-  getGeneListFilter() {
-    return (
-      <select
-        className="form-control form-control-sm d-block"
-        aria-label=".form-select-sm example"
-        onChange={this.applyGeneListFilter}
-        defaultValue={"NONE"}
-      >
-        <option value="NONE">Non selected</option>
-        {Object.keys(this.state.geneLists).map((gl) => (
-          <option value={gl}>{gl}</option>
-        ))}
-      </select>
-    );
-  }
-
-  getShowMore() {
-    if (
-      this.state.vcfRecordsFiltered.length >
-      this.state.vcfRecordsToDisplay.length
-    ) {
-      return (
-        <div className="text-center py-3" onClick={this.showMore}>
-          <a href="#">
-            Show more (
-            {this.state.vcfRecordsFiltered.length -
-              this.state.vcfRecordsToDisplay.length}
-            )
-          </a>
-        </div>
-      );
-    }
-    return "";
-  }
-
   render() {
     if (this.state.loading) {
       return (
@@ -417,18 +404,23 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       );
     }
 
+    const recordsHidden =
+      this.state.vcfRecordsFiltered.length -
+      this.state.vcfRecordsToDisplay.length;
+
     return (
       <React.Fragment>
         <div className="row">
           <div className="col-md-3 col-xl-2">{this.getFilter()}</div>
           <div className="col-md-9 col-xl-10">
             <table className="table table-sm table-hover">
-              <thead>
-                <tr>{this.getTableHeader()}</tr>
-              </thead>
+              <thead>{this.getTableHeader()}</thead>
               <tbody>{this.getTableBody()}</tbody>
             </table>
-            {this.getShowMore()}
+            <ShowMore
+              recordDifference={recordsHidden}
+              onClick={this.showMore}
+            />
           </div>
         </div>
       </React.Fragment>
