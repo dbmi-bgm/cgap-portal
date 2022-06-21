@@ -63,11 +63,10 @@ export class BigDropdownContainer extends React.PureComponent {
 
         if (target){
             // Allow external links to the marketing site by not allowing event to bubble up to window click handler
-            // in BigDropdownGroupController. May need to make more exceptions in future as more external links added (socials?).
+            // in BigDropdownGroupController.
             const targetHref = target.getAttribute('href') || target.getAttribute('data-href');
             if (
-                targetHref && 
-                targetHref.startsWith("https://cgap.hms.harvard.edu") &&
+                targetHref &&
                 !navigate.sameOrigin(targetHref)
             ) {
                 evt.stopPropagation();
