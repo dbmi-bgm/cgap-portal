@@ -53,7 +53,8 @@ individual's phenotypes. The HPO Term IDs are preferred
 
 **MONDO Terms**: Monarch Disease Ontology (MONDO) Terms for 
 disorders that the individual is diagnosed with. MONDO Term
- IDs are preferred (e.g. MONDO:0004330). 
+ IDs are preferred (e.g. MONDO:0004330). If the individual
+ is part of a cohort, see Primary Diagnosis below.
 
 **Age**: The age of the individual. Must be a number. By 
 default refers to years, but when an age in weeks or months 
@@ -70,6 +71,29 @@ country (e.g. Denmark) or an ethnicity (e.g. African-American).
 If multiple values need to be specified, they can be done so
  in a comma-separated list (e.g. *African-American, Irish*).
 
+**Primary Diagnosis**: MONDO term for the primary disorder of
+interest for the individual (must be singular MONDO term).
+Particularly relevant for individuals within larger cohorts.
+Diagnosis Age of Onset, Diagnosis Age of Onset Units, and
+Diagnostic Confidence below are all additional information
+that can be provided for this primary disease.
+
+**Diagnosis Age of Onset**: The age of onset for the disease
+in Primary Diagnosis. Must be a number. Defaults to years,
+but when an alternative unit is desired, the Diagnosis
+Age of Onset Units column can be filled out. If no Primary
+Diagnosis given, value is ignored.
+
+**Diagnosis Age of Onset Units**: Only fill out if Diagnosis
+Age of Onset present in the row. Possible values are day,
+week, month, and year. If no Primary Diagnosis or Diagnosis
+Age of Onset, value is ignored.
+
+**Diagnostic Confidence**: The confidence with which the
+Primary Diagnosis is reported. Possible values are patient reported, possible,
+probable, and definite. If no Primary Diagnosis given, value is
+ignored.
+
 **Life Status**: Possible values are: alive and well, alive, 
 deceased, or unknown.
 
@@ -85,8 +109,8 @@ an HPO Term ID (e.g. HP:0001546).
 be in weeks or months, the Age at Death Units column must 
 also be filled.
 
-**Age at Death units**: Only add a value if Age at Death is 
-filled for this row. Possible values are: week, month, year.
+**Age at Death Units**: Only add a value if Age at Death is 
+filled for this row. Possible values are: day, week, month, year.
 Must be singular.
 
 **Pregnancy**: Whether the individual indicated is a 
