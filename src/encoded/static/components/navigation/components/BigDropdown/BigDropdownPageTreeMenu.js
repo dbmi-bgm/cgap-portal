@@ -144,6 +144,7 @@ function StaticHelpLinks() {
                 id="menutree-linkto-getinvolved_page" target="_blank" rel="noopener noreferrer">
                 <span>Get Involved</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
             </a>
+            {/* CGAP for Education link coming soon */}
             <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/faq"
                 id="menutree-linkto-faq_page" target="_blank" rel="noopener noreferrer">
                 <span>FAQ</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
