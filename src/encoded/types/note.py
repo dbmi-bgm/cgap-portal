@@ -161,23 +161,23 @@ class NoteTechnicalReview(Note):
 
     item_type = 'note_technical_review'
     schema = load_schema('encoded:schemas/note_technical_review.json')
-    rev = {'saved_to_project_variant': ('Variant', 'technical_reviews')}
+    # rev = {'saved_to_project_variant': ('Variant', 'technical_reviews')}
     embedded_list = [
         'last_modified.modified_by.display_title',
         'last_text_edited.text_edited_by.display_title',
         'review.reviewed_by.display_title'
     ]
 
-    @calculated_property(schema={
-        "title": "Saved to Project Variant",
-        "description": "The variant this technical review is saved to, if any",
-        "type": "string",
-        "linkTo": "Variant"
-    })
-    def saved_to_project_variant(self, request):
-        rs = self.rev_link_atids(request, "saved_to_project_variant")
-        if rs:
-            return rs[0]
+    # @calculated_property(schema={
+    #     "title": "Saved to Project Variant",
+    #     "description": "The variant this technical review is saved to, if any",
+    #     "type": "string",
+    #     "linkTo": "Variant"
+    # })
+    # def saved_to_project_variant(self, request):
+    #     rs = self.rev_link_atids(request, "saved_to_project_variant")
+    #     if rs:
+    #         return rs[0]
 
     @calculated_property(schema={
         "title": "Display Title",

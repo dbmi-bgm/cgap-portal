@@ -147,6 +147,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "variant_sample_list.created_for_case",
     # We need the following data in search result rows, so we embed these here and not thru /embed API.
     "technical_review.*", # <- Added as workaround for invalidation scope... needs to be looked into more.
+    "technical_review.uuid",
     "technical_review.assessment.call",
     "technical_review.assessment.classification",
     "technical_review.assessment.date_call_made",
@@ -160,8 +161,8 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     #"technical_review.review.reviewed_by",
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
-    "technical_review.saved_to_project_variant",
-    "project_technical_review.*", 
+    "technical_review.status", # <- needed to check if current or not (=== this 1 is saved to project)
+    "project_technical_review.*",
     "project_technical_review.assessment.call",
     "project_technical_review.assessment.classification",
     "project_technical_review.assessment.date_call_made",
@@ -173,7 +174,6 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "project_technical_review.last_text_edited.text_edited_by",
     "project_technical_review.approved_by.display_title",
     "project_technical_review.date_approved",
-    "project_technical_review.saved_to_project_variant",
     #"technical_review.last_modified.date_modified",
     # "variant.technical_reviews.uuid",
     # "variant.technical_reviews.assessment.call",
@@ -316,7 +316,8 @@ def perform_request_as_admin(request, item_atid, payload=None, request_method="P
     if 'HTTP_COOKIE' in subreq.environ:
         del subreq.environ['HTTP_COOKIE']
     patch_result = request.invoke_subrequest(subreq).json
-    if patch_result["status"] != "success":
+    # /queue_indexing returns 'notification', while PATCH/POST returns 'status'.
+    if patch_result.get("status") != "success" and patch_result.get("notification") != "Success":
         raise HTTPServerError("Couldn't update Item " + item_atid)
     return patch_result
 
@@ -1017,37 +1018,54 @@ def process_items_process(context, request):
     sent_item_patch_payloads = {} # TODO: Rename to 'other_item_payloads' ?
 
     # PATCHing variant or gene only needed when saving notes to project, not to report.
-    need_variant_patch = "interpretation" in stpi or "discovery_interpretation" in stpi or "variant_notes" in stpi or "technical_review" in stpi or "technical_review" in rfpi
-    need_gene_patch = "discovery_interpretation" in stpi or "gene_notes" in stpi
+
+    variant_fields_needed = []
+    gene_fields_needed = []
+
+    # Embed only the fields we need (for performance)
+    if "interpretation" in stpi or "interpretation" in rfpi:
+        variant_fields_needed.append("interpretations.@id")
+        variant_fields_needed.append("interpretations.project")
+
+    if "discovery_interpretation" in stpi or "discovery_interpretation" in rfpi:
+        variant_fields_needed.append("discovery_interpretations.@id")
+        variant_fields_needed.append("discovery_interpretations.project")
+        gene_fields_needed.append("discovery_interpretations.@id")
+        gene_fields_needed.append("discovery_interpretations.project")
+
+    if "variant_notes" in stpi or "variant_notes" in rfpi:
+        variant_fields_needed.append("variant_notes.@id")
+        variant_fields_needed.append("variant_notes.project")
+
+    if "gene_notes" in stpi or "gene_notes" in rfpi:
+        gene_fields_needed.append("gene_notes.@id")
+        gene_fields_needed.append("gene_notes.project")
+
+    if "technical_review" in stpi or "technical_review" in rfpi:
+        variant_fields_needed.append("technical_reviews.@id")
+        variant_fields_needed.append("technical_reviews.project")
+
+    # need_variant_patch = "interpretation" in stpi or "discovery_interpretation" in stpi or "variant_notes" in stpi or "technical_review" in stpi or "technical_review" in rfpi
+    # need_gene_patch = "discovery_interpretation" in stpi or "gene_notes" in stpi
+
+    context_item_type = context.jsonld_type()
+    is_structural_vs = context_item_type[0] == "StructuralVariantSample"
 
     variant = None
-    variant_uuid = None
+    variant_uuid = context.properties["structural_variant" if is_structural_vs else "variant"]
     genes = None # We may have multiple different genes from same variant; at moment we save note to each of them.
 
-    if need_variant_patch or need_gene_patch:
-        # Load variant and/or gene(s) Items
-        variant_uuid = context.properties["variant"]
-        variant_fields = [
-            "@id",
-            "interpretations.@id",
-            "interpretations.project",
-            "discovery_interpretations.@id",
-            "discovery_interpretations.project",
-            "variant_notes.@id",
-            "variant_notes.project"
-        ]
+    if variant_fields_needed:
+        variant_fields_needed.append("@id")
+    if gene_fields_needed:
+        gene_fields_needed.append("@id")
+        for gf in gene_fields_needed:
+            variant_fields_needed.append("genes.genes_most_severe_gene." + gf)
 
-        if need_gene_patch:
-            variant_fields.append("genes.genes_most_severe_gene.@id")
-            variant_fields.append("genes.genes_most_severe_gene.discovery_interpretations.@id")
-            variant_fields.append("genes.genes_most_severe_gene.discovery_interpretations.project")
-            variant_fields.append("genes.genes_most_severe_gene.gene_notes.@id")
-            variant_fields.append("genes.genes_most_severe_gene.gene_notes.project")
-
-        variant_embed = CustomEmbed(request, variant_uuid, embed_props={ "requested_fields": variant_fields })
+    if variant_fields_needed:
+        variant_embed = CustomEmbed(request, variant_uuid, embed_props={ "requested_fields": variant_fields_needed })
         variant = variant_embed.result
-
-        if need_gene_patch:
+        if gene_fields_needed:
             genes = [ gene_subobject["genes_most_severe_gene"] for gene_subobject in variant["genes"] ]
 
     # Using `.now(pytz.utc)` appends "+00:00" for us (making the datetime timezone-aware), while `.utcnow()` doesn't.
@@ -1092,6 +1110,7 @@ def process_items_process(context, request):
             if not removed:
                 raise HTTPBadRequest("Item to remove from project is not present")
             payload[vg_field_name] = item_ids
+            print("REMOVED", item_ids)
             return
 
         # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
@@ -1183,17 +1202,20 @@ def process_items_process(context, request):
     # This is in part to simplify UI logic where only Note status == "current" is checked to
     # assert if a Note is already saved to Project or not.
 
+    print("PAYLOADS-V", variant_patch_payload)
 
     gene_patch_count = 0
-    if need_gene_patch:
+    if gene_fields_needed:
         for gene_atid, gene_payload in genes_patch_payloads.items():
             perform_request_as_admin(request, gene_atid, gene_payload, request_method="PATCH")
             gene_patch_count += 1
 
     variant_patch_count = 0
-    if need_variant_patch:
+    if variant_fields_needed:
         perform_request_as_admin(request, variant["@id"], variant_patch_payload, request_method="PATCH")
         variant_patch_count += 1
+
+    print("PAYLOADS-N", sent_item_patch_payloads)
 
     sent_item_patch_count = 0
     for note_atid, note_payload in sent_item_patch_payloads.items():
@@ -1201,25 +1223,39 @@ def process_items_process(context, request):
         sent_item_patch_count += 1
 
 
-    # ONGOING
     # Follow-up - now we need to make sure all affected VariantSamples are re-indexed.
-    # This only matter for NoteTechnicalReview items at the moment, which need to be embedded via calcprop "VariantSample.project_technical_review"
+    # This matters for NoteTechnicalReview items at the moment, which need to be embedded via calcprop "VariantSample.project_technical_review"
+    # But will probably need to be propagated to all other notes once we make use of other saved to project notes.
     if variant_patch_count > 0 and ("technical_review" in stpi or "technical_review" in rfpi):
         vs_project_uuid = context.properties.get("project")
         affected_variant_sample_uuids = []
-        for variant_sample in get_iterable_search_results(request, param_lists={ "type": "VariantSample", "field": "uuid", "variant.uuid": variant_uuid, "project.uuid": vs_project_uuid }, inherit_user=False):
-            print("VS", variant_sample)
+        param_lists = {
+            "type": "StructuralVariantSample" if is_structural_vs else "VariantSample",
+            "field": "uuid",
+            "structural_variant.uuid" if is_structural_vs else "variant.uuid": variant_uuid,
+            "project.uuid": vs_project_uuid
+        }
+        for variant_sample in get_iterable_search_results(request, param_lists=param_lists, inherit_user=False):
             affected_variant_sample_uuids.append(variant_sample['uuid'])
-        # perform_request_as_admin(request, "/queue_indexing", { "uuids": affected_variant_sample_uuids }, request_method="POST")
-        # affected_variant_samples = perform_request_as_admin(request, "/search/?type=VariantSample&field=uuid&limit", request_method="GET")
+        if affected_variant_sample_uuids:
+            perform_request_as_admin(request, "/queue_indexing", { "uuids": affected_variant_sample_uuids }, request_method="POST")
 
 
     return {
         "status" : "success",
-        "patch_results": {
-            "Gene": gene_patch_count,
-            "Variant": variant_patch_count,
-            "Other": sent_item_patch_count,
+        "results": {
+            "Gene": { 
+                "patched": genes_patch_payloads
+            },
+            "Variant" if is_structural_vs else "StructuralVariant": {
+                "patched": [ variant_patch_payload ]
+            },
+            "Note": {
+                "patched": sent_item_patch_payloads
+            },
+            "VariantSamples": {
+                "queued_for_indexing": affected_variant_sample_uuids
+            }, 
         }
     }
 

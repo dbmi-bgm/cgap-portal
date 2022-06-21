@@ -21,23 +21,76 @@ export class TechnicalReviewColumn extends React.PureComponent {
     // }
 
     /**
-     * @param {Object} projectTechnicalReview - Should have an `@id`
-     * @param {Object} lastSavedTechnicalReview - Should have either an `@id` or saved_to_project_variant, may be savedTechnicalReview (context field) or lastSavedTechnicalReview (state)
+     * @param {{ "@id": string }?} projectTechnicalReview - VariantSample.project_technical_review
+     * @param {{ "@id": string, "status": string }?} lastSavedTechnicalReview - May be `savedTechnicalReview` (context field) or `lastSavedTechnicalReview` (state)
+     * @returns {{ isTechnicalReviewSavedToProject: boolean, justSavedToProject: boolean, justRemovedFromProject: boolan }}
      */
-    static isTechnicalReviewSavedToProject(projectTechnicalReview, lastSavedTechnicalReview) {
+    static projectTechnicalReviewInformation(projectTechnicalReview, lastSavedTechnicalReview) {
         const { "@id": projectTechnicalReviewAtID } = projectTechnicalReview || {};
-        const { "@id": lastSavedTechnicalReviewItemAtID, saved_to_project_variant: lastSavedToProjectVariant } = lastSavedTechnicalReview || {};
-        if (lastSavedToProjectVariant) {
-            return true;
-        }
-        if (!projectTechnicalReviewAtID) {
-            return false;
-        }
-        if (!lastSavedTechnicalReviewItemAtID) {
-            return false;
-        }
-        return lastSavedTechnicalReviewItemAtID === projectTechnicalReviewAtID;
+        const { "@id": lastSavedTechnicalReviewItemAtID, status: lastSavedStatus } = lastSavedTechnicalReview || {};
+
+        // We could theoretically just check if lastSavedStatus === "current" (should always be true when isTechnicalReviewSavedToProject)
+        // but this gives us some more explicitness - i.e. we can have isTechnicalReviewSavedToProject==true and justSavedToProject==false when just deleted,
+        // or have justSavedToProjec==true and isTechnicalReviewSavedToProject==false when just created.
+        const isTechnicalReviewSavedToProject = (
+            projectTechnicalReviewAtID
+            && lastSavedTechnicalReviewItemAtID
+            && (lastSavedTechnicalReviewItemAtID === projectTechnicalReviewAtID)
+        ) || false;
+        const justSavedToProject = lastSavedStatus === "current"; // Should always be true when isTechnicalReviewSavedToProject is true, unless _just_ removed.
+        const justRemovedFromProject = isTechnicalReviewSavedToProject && !justSavedToProject;
+
+        // Hmm, can rename to: isIndexedToProject, isSavedToProject, isJustRemovedFromProject ?
+        return { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject };
     }
+
+    static classificationOptions = {
+        "snv": {
+            "call": [
+                "Present",
+                "Low Coverage",
+                "Low Allelic Fraction",
+                "Low Mapping Quality",
+                "Strand Bias",
+                "Mendelian Error",
+                "Other"
+            ],
+            "noCall": [
+                "Recurrent Artifact",
+                "Low Coverage",
+                "Low Allelic Fraction",
+                "Low Mapping Quality",
+                "Strand Bias",
+                "Mendelian Error",
+                "Other"
+            ]
+        },
+        "cnv": {
+            "call": [
+                "Present",
+                "Recurrent Artifact",
+                "Low Allelic Fraction",
+                "Low Mapping Quality",
+                "Repeat Region",
+                "Mendelian Error",
+                "No Depth Change",
+                "No Split Reads",
+                "No Spanning Reads",
+                "Other"
+            ],
+            "noCall": [
+                "Recurrent Artifact",
+                "Low Allelic Fraction",
+                "Low Mapping Quality",
+                "Repeat Region",
+                "Mendelian Error",
+                "No Depth Change",
+                "No Split Reads",
+                "No Spanning Reads",
+                "Other"
+            ]
+        }
+    };
 
     constructor(props){
         super(props);
@@ -54,8 +107,17 @@ export class TechnicalReviewColumn extends React.PureComponent {
 
         this.memoized = {
             "compareSavedToCache": memoize(TechnicalReviewController.compareSavedToCache),
-            "isTechnicalReviewSavedToProject": memoize(TechnicalReviewColumn.isTechnicalReviewSavedToProject)
+            "projectTechnicalReviewInformation": memoize(TechnicalReviewColumn.projectTechnicalReviewInformation),
+            "isCNV": memoize(function(vsItem){
+                const { "@type": [ primaryItemType ] } = vsItem;
+                return primaryItemType === "StructuralVariantSample";
+            })
         };
+
+        this.state = {
+            "isUpdating" : false
+        };
+
     }
 
     componentDidMount(){
@@ -86,22 +148,17 @@ export class TechnicalReviewColumn extends React.PureComponent {
             haveCaseEditPermission
         } = this.props;
 
-        const { uuid: vsUUID, technical_review, project_technical_review } = result;
+        const {
+            uuid: vsUUID,
+            technical_review: savedTechnicalReview,
+            project_technical_review: projectTechnicalReview
+        } = result;
 
-        const opts = [
-            "Present",
-            "Low Coverage",
-            "Low Allelic Fraction",
-            "Low Mapping Quality",
-            "Strand Bias",
-            "Mendelian Error",
-            "Other"
-        ];
-
-        const isThisTechnicalReviewSavedToProject = this.memoized.isTechnicalReviewSavedToProject(project_technical_review, lastSavedTechnicalReviewForResult || technical_review);
-
+        const isCNV = this.memoized.isCNV(result);
+        const { [isCNV ? "cnv" : "snv"]: { call: options } } = TechnicalReviewColumn.classificationOptions;
+        const projectTechnicalReviewInformation = this.memoized.projectTechnicalReviewInformation(projectTechnicalReview, lastSavedTechnicalReviewForResult || savedTechnicalReview);
         const commonBtnProps = {
-            result, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData, isThisTechnicalReviewSavedToProject,
+            result, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData, projectTechnicalReviewInformation,
             "callType": true,
             "disabled": !haveCaseEditPermission
         };
@@ -112,7 +169,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Title>
                     <Popover.Content className="px-0 py-1">
-                        { opts.slice(0,1).map(function(optionName, i){
+                        { options.slice(0,1).map(function(optionName, i){
                             return (
                                 <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="success" />
                             );
@@ -120,7 +177,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     </Popover.Content>
                     <Popover.Title className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Title>
                     <Popover.Content className="px-0 py-1">
-                        { opts.slice(1).map(function(optionName, i){
+                        { options.slice(1).map(function(optionName, i){
                             return (
                                 <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="warning" />
                             );
@@ -143,23 +200,17 @@ export class TechnicalReviewColumn extends React.PureComponent {
             haveCaseEditPermission
         } = this.props;
 
-        const { uuid: vsUUID, project_technical_review, technical_review } = result;
+        const {
+            uuid: vsUUID,
+            technical_review: savedTechnicalReview,
+            project_technical_review: projectTechnicalReview
+        } = result;
 
-        const opts = [
-            "Recurrent Artifact",
-            "Low Coverage",
-            "Low Allelic Fraction",
-            "Low Mapping Quality",
-            "Strand Bias",
-            "Mendelian Error",
-            "Other"
-        ];
-
-        console.log("TTT3", project_technical_review, lastSavedTechnicalReviewForResult, technical_review);
-
-        const isThisTechnicalReviewSavedToProject = this.memoized.isTechnicalReviewSavedToProject(project_technical_review, lastSavedTechnicalReviewForResult || technical_review);
+        const isCNV = this.memoized.isCNV(result);
+        const { [isCNV ? "cnv" : "snv"]: { noCall: options } } = TechnicalReviewColumn.classificationOptions;
+        const projectTechnicalReviewInformation = this.memoized.projectTechnicalReviewInformation(projectTechnicalReview, lastSavedTechnicalReviewForResult || savedTechnicalReview);
         const commonBtnProps = {
-            result, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData, isThisTechnicalReviewSavedToProject,
+            result, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData, projectTechnicalReviewInformation,
             "callType": false,
             "disabled": !haveCaseEditPermission
         };
@@ -170,7 +221,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
                     <Popover.Content className="px-0 py-1">
-                        { opts.map(function(optionName, i){
+                        { options.map(function(optionName, i){
                             return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="danger" />;
                         }) }
                     </Popover.Content>
@@ -213,27 +264,72 @@ export class TechnicalReviewColumn extends React.PureComponent {
     handleOpenNotesPopover(){
         const {
             result,
-            setOpenPopoverData
+            setOpenPopoverData,
+            lastSavedTechnicalReviewForResult
         } = this.props;
         const {
             uuid: vsUUID,
-            technical_review: {
-                assessment: savedTechnicalReview,
-                note_text: savedTechnicalReviewNoteText = null,
-                date_approved: savedDateApproved,
-                approved_by: savedApprovedBy,
-                last_modified: {
-                    date_modified: savedDateModified,
-                    modified_by: savedModifiedBy
-                } = {}
-            } = {}
+            technical_review: savedTechnicalReview,
+            project_technical_review: projectTechnicalReview
         } = result;
+        const {
+            assessment: projectAssessment,
+            note_text: projectNoteText
+        } = projectTechnicalReview || {};
+        const {
+            call: projectCall,
+            classification: projectClassification,
+            date_call_made: projectCallDate,
+            call_made_by: { display_title: projectCallMadeByName } = {} // Unlikely to be visible to most people.
+        } = projectAssessment || {};
+        const {
+            assessment: savedAssessment,
+            note_text: savedTechnicalReviewNoteText = null,
+            date_approved: savedDateApproved,
+            approved_by: { display_title: approvedByName } = {},
+            last_modified: {
+                date_modified: savedDateModified,
+                modified_by: { display_title: lastModifiedByName } = {}
+            } = {}
+        } = savedTechnicalReview || {};
         const {
             call: savedCall,
             classification: savedClassification,
             date_call_made: savedCallDate,
-            call_made_by: { display_title: savedCallAuthorName } = {} // Unlikely to be visible to most people.
-        } = savedTechnicalReview || {};
+            call_made_by: { display_title: savedCallMadeByName } = {} // Unlikely to be visible to most people.
+        } = savedAssessment || {};
+
+        const { assessment: lastSavedAssessment } = lastSavedTechnicalReviewForResult || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
+
+        console.log("TTT", lastSavedTechnicalReviewForResult);
+
+        let showCall;
+        let showClassification;
+        let showCallDate;
+        let showCallMadeByName;
+        let isLastSaved = false;
+        if (typeof lastSavedAssessment !== "undefined") {
+            showCall = lastSavedCall;
+            showClassification = lastSavedClassification;
+            isLastSaved = true;
+            showCallDate = null;
+        } else if (typeof savedTechnicalReview !== "undefined") {
+            showCall = savedCall;
+            showClassification = savedClassification;
+            showCallDate = savedCallDate;
+            showCallMadeByName = savedCallMadeByName;
+        } else if (typeof projectTechnicalReview !== "undefined") {
+            showCall = projectCall;
+            showClassification = projectClassification;
+            showCallDate = projectCallDate;
+            showCallMadeByName = projectCallMadeByName;
+        } else {
+            showCall = null;
+            showClassification = null;
+            showCallDate = null;
+            showCallMadeByName = null;
+        }
 
         setOpenPopoverData({
             "uuid": vsUUID,
@@ -243,32 +339,46 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600" as="h5">Technical Review Note</Popover.Title>
                     <Popover.Content className="p-2">
-                        { savedCallDate ?
+                        { lastSavedTechnicalReviewForResult ?
+                            <h4>You have recently updated this technical review, but the change is not yet indexed.</h4>
+                            : null }
+                        { showCallDate ?
                             <div className="small">
-                                Call Made: <LocalizedTime timestamp={savedCallDate} />
-                                { savedCallAuthorName ? (" by " + savedCallAuthorName) : null }
+                                { (isLastSaved ? "Previously " : "") + "Call Made: " }
+                                <LocalizedTime timestamp={showCallDate} />
+                                { showCallMadeByName ? (" by " + showCallMadeByName) : null }
                             </div>
                             : null }
                         { savedDateModified ?
                             <div className="small">
-                                Last Modified: <LocalizedTime timestamp={savedDateModified} />
-                                { savedModifiedBy ? (" by " + savedModifiedBy) : null }
+                                { (isLastSaved ? "Previously " : "") + "Last Modified: " }
+                                <LocalizedTime timestamp={savedDateModified} />
+                                { lastModifiedByName ? (" by " + lastModifiedByName) : null }
                             </div>
                             : null }
                         { savedDateApproved ?
                             <div className="small">
-                                Approved: <LocalizedTime timestamp={savedDateApproved} />
-                                { savedApprovedBy ? (" by " + savedApprovedBy) : null }
+                                { (isLastSaved ? "Previously " : "") + "Approved: " }
+                                <LocalizedTime timestamp={savedDateApproved} />
+                                { approvedByName ? (" by " + approvedByName) : null }
                             </div>
                             : null }
-                        <h6>Variant Call</h6>
-                        { !savedTechnicalReview ? <em>Nothing saved</em>
+                        <h6 className="mb-04">Variant Call</h6>
+                        { showCall === null ? <em>A technical review for this item has yet to be created</em>
                             : (
                                 <div className={"d-inline-block px-3 py-1 rounded" + (
-                                    savedCall === true ? " bg-success text-white"
-                                        : savedCall === false ? " bg-danger text-white" : "" )}>
-                                    { savedCall === true ? "Call - " : savedCall === false ? "No Call - " : "" }
-                                    { savedClassification }
+                                    showCall === true ? " bg-success text-white"
+                                        : showCall === false ? " bg-danger text-white"
+                                            : typeof showCall === "undefined" ? " bg-secondary"
+                                                : null )}>
+                                    { showCall === true ? "Call - "
+                                        : showCall === false ? "No Call - "
+                                            : typeof showCall === "undefined" ? "No Call value set"
+                                                : null }
+                                    { showClassification }
+                                    { isLastSaved ?
+                                        <span className="text-700" data-tip="You recently saved this and it may not be yet visible in search results"> *</span>
+                                        : null }
                                 </div>
                             )
                         }
@@ -299,7 +409,6 @@ export class TechnicalReviewColumn extends React.PureComponent {
             project_technical_review: projectTechnicalReview
         } = result;
         const {
-            "@id": projectTechnicalReviewAtID,
             assessment: {
                 call: projectCall,
                 classification: projectClassification
@@ -307,7 +416,6 @@ export class TechnicalReviewColumn extends React.PureComponent {
             note_text: projectNoteText
         } = projectTechnicalReview || {};
         const {
-            "@id": savedTechnicalReviewItemAtID,
             assessment: savedTechnicalReviewAssessment,
             note_text: savedTechnicalReviewNoteText = null
         } = savedTechnicalReviewItem || {};
@@ -324,24 +432,40 @@ export class TechnicalReviewColumn extends React.PureComponent {
         // linkTo exists but can't see @id - no view perms for entire NoteTechnicalReview
         // const noViewPermissions = savedTechnicalReviewItem && !savedTechnicalReviewItemAtID;
 
+        // TODO: Finish later. We need to implement conditional AJAX request that deletes the VariantSample.technical_review if project_technical_review
+        // exists as well so that project_technical_review takes precedence ... probably.
+        // const savedToProjectButOverriden = (
+        //     projectTechnicalReview && (
+        //         (savedTechnicalReviewItem && (projectCall !== savedCall || projectClassification !== savedClassification))
+        //         || (lastSavedTechnicalReviewForResult && (projectCall !== lastSavedCall || projectClassification !== lastSavedClassification))
+        //     )
+        // );
+
         // Green (success) if first option, else yellow/orange for the 'Present - with concerns' options
-        const callTrueIconCls = (
-            "icon icon-2x icon-fw fas icon-check text-" + (
-                (lastSavedCall === true || (!lastSavedTechnicalReviewForResult && savedCall === true) || (!lastSavedTechnicalReviewForResult && !savedTechnicalReviewItem && projectCall === true)) ? (
+        const callTrueIconColor = (
+            (
+                lastSavedCall === true
+                || (!lastSavedAssessment && savedCall === true)
+                || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true)
+            ) ? (
                     (lastSavedCall === true && lastSavedClassification === "Present") ? "success"
-                        : (!lastSavedTechnicalReviewForResult && savedCall === true && savedClassification === "Present") ? "success"
-                            : (!lastSavedTechnicalReviewForResult && !savedTechnicalReviewItem && projectCall === true && projectClassification === "Present") ? "success"
+                        : (!lastSavedAssessment && savedCall === true && savedClassification === "Present") ? "success"
+                            // Check Project
+                            : (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true && projectClassification === "Present") ? "success"
                                 : "warning"
                 ) : "muted" // (savedCall === true ? "secondary" : "muted")
-            ));
+        );
 
-        const callFalseIconCls = (
-            "icon icon-2x icon-fw fas icon-times text-" + (
-                (lastSavedCall === false || (!lastSavedTechnicalReviewForResult && savedCall === false) || (!lastSavedTechnicalReviewForResult && !savedTechnicalReviewItem && projectCall === false)) ? "danger"
-                    : "muted" // (savedCall === false ? "secondary" : "muted")
-            ));
+        const callFalseIconColor = (
+            (
+                (lastSavedCall === false)
+                || (!lastSavedAssessment && savedCall === false)
+                || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === false)
+            ) ? "danger" : "muted" // (savedCall === false ? "secondary" : "muted")
+        );
 
-        const isNotePotentiallyOutdated = lastSavedTechnicalReviewForResult && savedTechnicalReviewNoteText && !lastSavedNoteText;
+
+        const isNotePotentiallyOutdated = lastSavedAssessment && savedTechnicalReviewNoteText && !lastSavedNoteText;
         const notesIconCls = (
             "icon icon-2x icon-fw icon-sticky-note " + (
                 isNotePotentiallyOutdated ? "far text-danger"
@@ -349,23 +473,22 @@ export class TechnicalReviewColumn extends React.PureComponent {
                         : "far text-muted"
             ));
 
+
         return (
             <div className="w-100 d-flex align-items-center justify-content-around text-truncate py-1">
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
                     data-call="true" data-technical-review="true">
-                    <i className={callTrueIconCls} />
-                    { lastSavedCall === true || (lastSavedTechnicalReviewForResult && typeof lastSavedCall === "undefined" && savedCall === true) ?
-                        // lastSavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
+                    <i className={"icon icon-2x icon-fw fas icon-check text-" + callTrueIconColor} />
+                    { lastSavedCall === true || (lastSavedAssessment && typeof lastSavedCall === "undefined" && savedCall === true) ?
                         <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownNoCall} ref={this.callFalseButtonRef}
                     data-call="false" data-technical-review="true">
-                    <i className={callFalseIconCls} />
-                    { lastSavedCall === false || (lastSavedTechnicalReviewForResult && typeof lastSavedCall === "undefined" && savedCall === false) ?
-                        // lastSavedTechnicalReviewForResult === `null` means deletion, vs `undefined` means not present in unsaved state
+                    <i className={"icon icon-2x icon-fw fas icon-times text-" + callFalseIconColor} />
+                    { lastSavedCall === false || (lastSavedAssessment && typeof lastSavedCall === "undefined" && savedCall === false) ?
                         <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
@@ -396,7 +519,13 @@ class CallClassificationButton extends React.PureComponent {
 
     /* In progress */
     upsertTechnicalReviewItem(shouldSaveToProject = false){
-        const { result, optionName, callType, lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID, setOpenPopoverData } = this.props;
+        const {
+            result,
+            optionName, callType,
+            lastSavedTechnicalReviewForResult, cacheSavedTechnicalReviewForVSUUID,
+            setOpenPopoverData,
+            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justRemovedFromProject, justSavedToProject }
+        } = this.props;
         const {
             technical_review: savedTechnicalReviewItem,
             "@id" : variantSampleAtID,
@@ -404,8 +533,10 @@ class CallClassificationButton extends React.PureComponent {
             project: { "@id": vsProjectAtID },
             institution: { "@id": vsInstitutionAtID }
         } = result;
-        const { "@id": savedTechnicalReviewItemAtID } = savedTechnicalReviewItem || {};
-        const { assessment: { call: lastSavedCall, classification: lastSavedClassification } = {}, "@id": lastSavedAtID } = lastSavedTechnicalReviewForResult || {};
+        const { "@id": savedTechnicalReviewItemAtID, assessment: savedAssessment, uuid: savedTechnicalReviewUUID } = savedTechnicalReviewItem || {};
+        const { call: savedCall = null, classification: savedClassification = null } = savedAssessment || {};
+        const { "@id": lastSavedAtID, uuid: lastSavedUUID, assessment: lastSavedAssessment } = lastSavedTechnicalReviewForResult || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
 
         // TODO: Handle lack of edit/view permissions
 
@@ -427,13 +558,16 @@ class CallClassificationButton extends React.PureComponent {
         });
 
         const associatedTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
+        const isExistingValue = associatedTechnicalReviewAtID && (
+            (lastSavedCall === callType && lastSavedClassification === optionName)
+            // Ensure we don't have an empty assessment: {} in lastSavedTechnicalReviewForResult
+            || (typeof lastSavedAssessment === "undefined" && savedCall === callType && savedClassification === optionName)
+        );
+        const isCurrentlySavedToProject = (justSavedToProject || (isTechnicalReviewSavedToProject && !justRemovedFromProject));
         let updatePromise = null;
         let techReviewResponse = null;
 
-        console.log("TTT2", savedTechnicalReviewItem, lastSavedCall, lastSavedClassification);
-
-        // If no existing Item -- TODO: Maybe pull this out into sep function in case need to reuse logic later re: Tech Review Notes or smth.
-        if (!associatedTechnicalReviewAtID) {
+        function createNotePromise(){
 
             const createPayload = {
                 "assessment": { "call": callType, "classification": optionName },
@@ -442,9 +576,7 @@ class CallClassificationButton extends React.PureComponent {
                 "institution": vsInstitutionAtID
             };
 
-            let technicalReviewAtID;
-
-            updatePromise = ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(createPayload))
+            return ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(createPayload))
                 .then(function(res){
                     console.log('response', res);
                     const { "@graph": [ technicalReviewItemFrameObject ] } = res;
@@ -452,7 +584,6 @@ class CallClassificationButton extends React.PureComponent {
                     if (!newTechnicalReviewAtID) {
                         throw new Error("No NoteTechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                     }
-                    technicalReviewAtID = newTechnicalReviewAtID;
                     techReviewResponse = res;
                     // PATCH VariantSample to set linkTo of "technical_review"
                     return ajax.promise(variantSampleAtID, "PATCH", {}, JSON.stringify({ "technical_review": newTechnicalReviewAtID }));
@@ -464,33 +595,39 @@ class CallClassificationButton extends React.PureComponent {
                     if (!vsAtIDRepeated) {
                         throw new Error("No [Structural]VariantSample @ID returned."); // If no error thrown during destructuring ^..
                     }
-                    // Also save "@id" of new NoteTechnicalReviewItem so we may (re-)PATCH it while savedTechnicalReviewItem & VS hasn't yet indexed
-                    cacheSavedTechnicalReviewForVSUUID(vsUUID, { ..._.omit(createPayload, "project"), "@id": technicalReviewAtID });
+                    // - Grab status from techreview response and save to local state to compare for if saved to project or not.
+                    // - Also save "@id" of new NoteTechnicalReviewItem so we may (re-)PATCH it while savedTechnicalReviewItem & VS hasn't yet indexed
+                    //   and so that can use to determine isTechnicalReviewSavedToProject (by comparing to project_technical_review @id)
+                    const { "@graph": [ { "@id": technicalReviewAtID, uuid, status } ] } = techReviewResponse;
+                    cacheSavedTechnicalReviewForVSUUID(
+                        vsUUID,
+                        {
+                            ..._.omit(createPayload, "project"),
+                            uuid,
+                            status,
+                            "@id": technicalReviewAtID
+                        }
+                    );
                     return { created: true };
                 });
-        } else {
-            const {
-                // We may have a technical review Item but no assessment, e.g. if was unset or if Note was created for text only.
-                assessment: {
-                    call: savedCall = null,
-                    classification: savedClassification = null
-                } = {}
-            } = savedTechnicalReviewItem || {};
+        }
+
+        function updateNotePromise(){
+
             let updatePayload;
-            // Deletion of `review` field should be done at backend for security, TODO: move to _update method there perhaps.
+
+            // Deletion of `review` field should be done at backend for security -- TODO: move to _update method there perhaps.
             const updateHref = associatedTechnicalReviewAtID + "?delete_fields=review";
-            if (
-                (lastSavedCall === callType && lastSavedClassification === optionName) ||
-                (savedCall === callType && savedClassification === optionName && typeof lastSavedCall === "undefined")
-            ) {
-                // DEPRECATED: Delete/unset on PATCH/save -- leave as `{} & add `assessment` to delete_fields param.
-                // CURRENT: Will fill values as null or empty, so that the datetime+author for deletion is saved.
+
+            if (isExistingValue) {
+                // Unset; PATCH w. empty object, so that the datetime+author for deletion is saved via serverDefault.
                 updatePayload = { "assessment": {} };
-                // updateHref += ",assessment";
             } else {
+                // Set
                 updatePayload = { "assessment": { "call": callType, "classification": optionName } };
             }
-            updatePromise = ajax.promise(updateHref, "PATCH", {}, JSON.stringify(updatePayload))
+
+            return ajax.promise(updateHref, "PATCH", {}, JSON.stringify(updatePayload))
                 .then(function(res){
                     console.log('response', res);
                     const { "@graph": [ technicalReviewItemFrameObject ] } = res;
@@ -499,21 +636,59 @@ class CallClassificationButton extends React.PureComponent {
                         throw new Error("No @ID returned."); // If no error thrown during destructuring ^..
                     }
                     techReviewResponse = res;
-                    cacheSavedTechnicalReviewForVSUUID(vsUUID, updatePayload);
+                    const { "@id": technicalReviewAtID, status, uuid } = technicalReviewItemFrameObject; // Grab status from techreview response and save to local state to compare for if saved to project or not.
+                    cacheSavedTechnicalReviewForVSUUID(vsUUID, {
+                        ...updatePayload,
+                        "@id": technicalReviewAtID,
+                        uuid,
+                        status
+                    });
                     return { created: false };
                 });
+        }
+
+        // If no existing Item -- TODO: Maybe pull this out into sep function in case need to reuse logic later re: Tech Review Notes or smth.
+        if (!associatedTechnicalReviewAtID) {
+            updatePromise = createNotePromise();
+        } else {
+            // If values are same and we just want to save existing value to project, then skip the PATCH to Note itself.
+            if (isExistingValue && shouldSaveToProject && !isCurrentlySavedToProject) {
+                console.info("Skipping PATCH for same classification, will only save to project");
+                updatePromise = new Promise(function(resolve, reject){
+                    resolve({ created: false });
+                });
+                updatePromise = Promise.resolve({ created: false });
+            } else {
+                updatePromise = updateNotePromise();
+            }
         }
 
         let propsForPopover;
         updatePromise
             .then((propsFromPromise) => {
                 propsForPopover = propsFromPromise;
-                // TODO: If save to project, do that..
-                const { "@graph": [ technicalReviewItemFrameObject ] } = techReviewResponse;
-                const { uuid: technicalReviewUUID } = technicalReviewItemFrameObject;
-                if (shouldSaveToProject) {
-                    return this.saveTechnicalReviewToProject(technicalReviewUUID);
+
+                // Save to project if clicked on a save-to-project button
+                // OR unset if is already saved to project (assume we saved a new/different value)
+                const shouldRemoveFromProject = (
+                    (!shouldSaveToProject && isCurrentlySavedToProject)                         // Clicked on different value which shouldn't be saved to project
+                    || (shouldSaveToProject && isExistingValue && isCurrentlySavedToProject)    // Clicked on same value which already saved to project -- toggle/remove it.
+                ) || false;
+
+                if (shouldSaveToProject || shouldRemoveFromProject) {
+                    // We may not have techReviewResponse if we skipped PATCH, in which case we should have it from savedTechnicalReview
+                    // or lastSavedTechnicalReviewForResult.
+                    const { "@graph": [ technicalReviewItemFrameObject ] = [] } = techReviewResponse || {};
+                    const { uuid: technicalReviewUUIDFromResponse } = technicalReviewItemFrameObject || {};
+
+                    const technicalReviewUUID = technicalReviewUUIDFromResponse || lastSavedUUID || savedTechnicalReviewUUID;
+                    if (!technicalReviewUUID) {
+                        throw new Error("No technical review UUID available to be able to save to project");
+                    }
+                    console.info(`Will ${shouldRemoveFromProject ? "remove from" : "save to"} project`);
+                    return this.saveTechnicalReviewToProject(technicalReviewUUID, shouldRemoveFromProject);
                 }
+
                 return propsForPopover;
             })
             .then(function(){
@@ -564,17 +739,32 @@ class CallClassificationButton extends React.PureComponent {
 
     }
 
-    /** @return {Promise} AJAX request to update Variant's technical_reviews */
-    saveTechnicalReviewToProject(technicalReviewUUID){
-        const { result: variantSampleSearchResult, cacheSavedTechnicalReviewForVSUUID, isThisTechnicalReviewSavedToProject } = this.props;
+    /**
+     * This mechanism works but many niche/edge cases need to be addressed. So for now we disable much of tangential UX for using it.
+     * For example, when we override a saved-to-project review, and then unset the overriding review,
+     * we need to revert to saved-to-project review --probably--, and add mechanism for that (vs just leaving it "no value").
+     *
+     * @return {Promise} AJAX request to update Variant's technical_reviews
+     */
+    saveTechnicalReviewToProject(technicalReviewUUID, remove=false){
+        const {
+            result: variantSampleSearchResult,
+            cacheSavedTechnicalReviewForVSUUID,
+            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject }
+        } = this.props;
         const { "@id": vsAtID, uuid: vsUUID, "@type": vsTypeList } = variantSampleSearchResult;
         const variantFieldName = vsTypeList[0] === "StructuralVariantSample" ? "structural_variant" : "variant";
         const { [variantFieldName]: { "@id": variantAtID } } = variantSampleSearchResult;
-        const payload = {
-            [isThisTechnicalReviewSavedToProject ? "remove_from_project_notes" : "save_to_project_notes"]: {
-                "technical_review": technicalReviewUUID
-            }
-        };
+        let statusToSetInCache;
+        const payload = {};
+        if (remove) {
+            // Remove from project
+            statusToSetInCache = "in review";
+            payload.remove_from_project_notes = { "technical_review": technicalReviewUUID };
+        } else {
+            statusToSetInCache = "current";
+            payload.save_to_project_notes = { "technical_review": technicalReviewUUID };
+        }
         return ajax.promise(vsAtID + "@@process-items/", "PATCH", {}, JSON.stringify(payload))
             .then(function(processItemsResponse){
                 const { status } = processItemsResponse;
@@ -582,7 +772,7 @@ class CallClassificationButton extends React.PureComponent {
                     throw new Error("Failed to update Variant with new Technical Review, check permissions.");
                 }
                 // We save it to cache/lastSavedTechnicalReview as if was a linkTo item, since for comparison with savedTechnicalReview, we'll get embedded linkTo.
-                cacheSavedTechnicalReviewForVSUUID(vsUUID, { "saved_to_project_variant": { "@id": variantAtID } } );
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, { status: statusToSetInCache } ); // Used for comparison
                 return processItemsResponse;
             });
     }
@@ -606,6 +796,7 @@ class CallClassificationButton extends React.PureComponent {
             lastSavedTechnicalReviewForResult,
             highlightColorStyle = null,
             disabled: propDisabled = false,
+            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject },
             isThisTechnicalReviewSavedToProject = false
         } = this.props;
         const {
@@ -628,57 +819,75 @@ class CallClassificationButton extends React.PureComponent {
                 classification: projectClassification
             } = {}
         } = projectTechnicalReview || {};
-        const {
-            assessment: {
-                call: lastSavedCall,
-                classification: lastSavedClassification
-            } = {}
-        } = lastSavedTechnicalReviewForResult || {};
+        const { assessment: lastSavedAssessment } = lastSavedTechnicalReviewForResult || {};
+        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
 
         // linkTo exists but can't see @id - no view perms for entire NoteTechnicalReview
         const noViewPermissions = savedTechnicalReviewItem && !savedTechnicalReviewItemAtID;
-        const disabled = propDisabled || noViewPermissions;
 
         // If was recently saved but not yet in search results
         const isLastSaved = lastSavedCall === callType && lastSavedClassification === optionName;
 
         // If in search results
         const isSavedToVS = savedCall === callType && savedClassification === optionName;
-        const isAssessmentSavedToProject = projectCall === callType && projectClassification === optionName;
+        const isAssessmentSavedToProject = !justRemovedFromProject && (projectCall === callType && projectClassification === optionName);
 
         // If was recently saved and this existing saved value is now unset (either technical_review.assessment changed or deleted)
-        const isLastSaveDeleted = isSavedToVS && lastSavedTechnicalReviewForResult && !isLastSaved;
+        const isLastSaveUnset = isSavedToVS && lastSavedAssessment && !isLastSaved;
+
+        // isThisTechnicalReviewSavedToProject === false when last unset, but projectTechnicalReview and savedTechnicalReview should be present still.
+        // const isLastSaveProjectUnset = isAssessmentSavedToProject && !isThisTechnicalReviewSavedToProject && (projectTechnicalReviewAtID === savedTechnicalReviewItemAtID);
 
         // Allow more options later?
         const isDefaultSaveToProject = callType === false && optionName === "Recurrent Artifact";
 
+        // For now we don't allow saving if a projectTechnicalReview for this VS exists already.
+        // We will revisit this after understand what the ideal UX should be.
+        const disabled = (
+            propDisabled
+            || noViewPermissions
+            || (projectTechnicalReview && !isTechnicalReviewSavedToProject && !justSavedToProject && !justRemovedFromProject)
+        );
+
+        const isCurrentlySavedToProject = (isTechnicalReviewSavedToProject && !justRemovedFromProject) || justSavedToProject;
+
         const btnClass = (
-            (isLastSaved || (isSavedToVS && !isLastSaveDeleted) ? ` bg-${highlightColorStyle} text-white` : "") +
-            (isLastSaveDeleted ? " bg-light text-secondary" : "")
+            (isLastSaved || (isSavedToVS && !isLastSaveUnset) ? ` bg-${highlightColorStyle} text-white` : "") +
+            (isLastSaveUnset ? " bg-light text-secondary" : "")
         );
 
         const lastSavedIndicator = isLastSaved ?
             <span className="text-white text-700" data-tip="You recently saved this value and it may not be yet visible in search results"> *</span>
-            : isLastSaveDeleted ?
+            : isLastSaveUnset ?
                 <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
                 : null;
 
         if (isDefaultSaveToProject) {
 
-            console.log("TTT", projectTechnicalReview, isThisTechnicalReviewSavedToProject, isAssessmentSavedToProject);
+            console.log("LASTSAVED", lastSavedTechnicalReviewForResult);
 
-            const saveToProjectBtnClass = (projectTechnicalReview || isThisTechnicalReviewSavedToProject) && isAssessmentSavedToProject ? ` bg-${highlightColorStyle} text-white` : "";
-            const saveToProjectBtnTip = `This classification will be ${isThisTechnicalReviewSavedToProject ? "removed" : "saved"} <b>project-wide</b> for this variant`;
+            console.log("isDefaultSaveToProject - project", projectTechnicalReview,  isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject, isAssessmentSavedToProject);
+
+            const saveToProjectBtnClass = (
+                (isAssessmentSavedToProject && !justRemovedFromProject)
+                || (justSavedToProject && (isLastSaved || (!lastSavedAssessment && isSavedToVS)))
+            ) ? ` bg-${highlightColorStyle} text-white` : "";
+            const saveToProjectBtnTip = `This classification will be ${isCurrentlySavedToProject ? "removed" : "saved"} <b>project-wide</b> for this variant`;
             // We don't have a way to unsave from project, so disable button for now if already saved to project.
             return (
                 <div className="d-flex">
                     <button type="button" className={"dropdown-item pr-16" + saveToProjectBtnClass} onClick={this.handleClick} data-save-to-project={true}
-                        disabled={disabled || (isAssessmentSavedToProject && !isThisTechnicalReviewSavedToProject)} data-html data-tip={saveToProjectBtnTip}>
+                        disabled={disabled} data-html data-tip={saveToProjectBtnTip}>
                         { optionName }
                         <i className="icon icon-project-diagram fas small ml-16" />
+                        { justSavedToProject && !isAssessmentSavedToProject ? // Not yet indexed
+                            <span className="text-white text-700" data-tip="You recently saved this to project and it may not be yet visible in search results"> *</span>
+                            : justRemovedFromProject ?
+                                <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
+                                : null}
                     </button>
                     <button type="button" className={"px-3 flex-grow-1 dropdown-item border-left" + btnClass} onClick={this.handleClick}
-                        data-save-to-project={false} data-tip="Save only to this variant sample (and not project-wide for this variant)">
+                        disabled={disabled} data-save-to-project={false} data-tip="Save only to this variant sample (and not project-wide for this variant)">
                         <i className="icon icon-vial fas" />
                         { lastSavedIndicator }
                     </button>
@@ -754,13 +963,13 @@ export class TechnicalReviewController extends React.PureComponent {
             const {
                 assessment: { call, classification } = {},
                 note_text,
-                saved_to_project_variant: { "@id": projectVariantAtID } = {},
+                status
                 // "@id": objAtID
             } = obj;
             return {
                 assessment: { call, classification },
                 note_text,
-                saved_to_project_variant: { "@id": projectVariantAtID }
+                status
             };
         }
         const lastSavedSubset = makeSubset(lastSavedTechnicalReviewForResult);
@@ -776,7 +985,7 @@ export class TechnicalReviewController extends React.PureComponent {
         this.cacheSavedTechnicalReviewForVSUUID = this.cacheSavedTechnicalReviewForVSUUID.bind(this);
         this.resetLastSavedTechnicalReview = this.resetLastSavedTechnicalReview.bind(this);
         this.state = {
-            /** @type {Object.<string,{ assessment: { call: boolean|undefined, classification: string|undefined }|undefined, note_text: string|undefined, saved_to_project_variant: string|undefined, "@id": string|undefined }>} */
+            /** @type {Object.<string,{ assessment: { call: boolean|undefined, classification: string|undefined }|undefined, note_text: string|undefined, status: string, "@id": string|undefined }>} */
             "lastSavedTechnicalReview": {}
         };
     }
