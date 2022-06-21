@@ -140,9 +140,17 @@ function StaticHelpLinks() {
                     General CGAP Info
                 </div>
             </div>
-            <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/legal" data-tip="" data-delay-show={500}
-                id="Legal-Link">
-                Legal
+            <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/getinvolved"
+                id="menutree-linkto-getinvolved_page" target="_blank" rel="noopener noreferrer">
+                <span>Get Involved</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+            </a>
+            <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/faq"
+                id="menutree-linkto-faq_page" target="_blank" rel="noopener noreferrer">
+                <span>FAQ</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+            </a>
+            <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/legal"
+                id="menutree-linkto-legal_page" target="_blank" rel="noopener noreferrer">
+                <span>Legal</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
             </a>
         </div>
     )
