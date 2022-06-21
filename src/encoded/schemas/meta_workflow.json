@@ -286,6 +286,21 @@
                                         "1",
                                         "2"
                                     ]
+                                },
+                                "s3_lifecycle_category": {
+                                    "title": "S3 Lifecycle Category",
+                                    "description": "The lifecycle category determines how long a file remains in a certain storage class.  If set to ignore, lifecycle management will have no effect on this file",
+                                    "type": "string",
+                                    "suggested_enum": [
+                                        "short_term_access_long_term_archive",
+                                        "long_term_access_long_term_archive",
+                                        "long_term_access",
+                                        "short_term_access",
+                                        "long_term_archive",
+                                        "short_term_archive",
+                                        "no_storage",
+                                        "ignore"
+                                    ]
                                 }
                             }
                         }
