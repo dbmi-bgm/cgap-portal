@@ -161,6 +161,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     #"technical_review.review.reviewed_by",
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
+    "technical_review.last_modified.date_modified",
     "technical_review.status", # <- needed to check if current or not (=== this 1 is saved to project)
     "project_technical_review.*",
     "project_technical_review.assessment.call",
@@ -1218,8 +1219,10 @@ def process_items_process(context, request):
     print("PAYLOADS-N", sent_item_patch_payloads)
 
     sent_item_patch_count = 0
+    sent_item_patch_responses = []
     for note_atid, note_payload in sent_item_patch_payloads.items():
-        perform_request_as_admin(request, note_atid, note_payload, request_method="PATCH")
+        patch_result = perform_request_as_admin(request, note_atid, note_payload, request_method="PATCH")
+        sent_item_patch_responses.append(patch_result)
         sent_item_patch_count += 1
 
 
@@ -1245,15 +1248,16 @@ def process_items_process(context, request):
         "status" : "success",
         "results": {
             "Gene": { 
-                "patched": genes_patch_payloads
+                "patched_count": gene_patch_count
             },
             "Variant" if is_structural_vs else "StructuralVariant": {
-                "patched": [ variant_patch_payload ]
+                "patched_count": variant_patch_count
             },
             "Note": {
-                "patched": sent_item_patch_payloads
+                "patched_count": sent_item_patch_count,
+                "responses": sent_item_patch_responses
             },
-            "VariantSamples": {
+            "StructuralVariantSample" if is_structural_vs else "VariantSample": {
                 "queued_for_indexing": affected_variant_sample_uuids
             }, 
         }

@@ -13,13 +13,6 @@ import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 
 export class TechnicalReviewColumn extends React.PureComponent {
 
-    // static findSavedToProjectTechnicalReviewForVariant(result){
-    //     const { variant: { technical_reviews: variantTechReviews = [] } = {} } = result;
-    //     return variantTechReviews.find(function(){
-
-    //     });
-    // }
-
     /**
      * @param {{ "@id": string }?} projectTechnicalReview - VariantSample.project_technical_review
      * @param {{ "@id": string, "status": string }?} lastSavedTechnicalReview - May be `savedTechnicalReview` (context field) or `lastSavedTechnicalReview` (state)
@@ -236,16 +229,13 @@ export class TechnicalReviewColumn extends React.PureComponent {
      * @todo IMPORTANT: Handle project_technical_review.note_text as well, if/when enable overwriting or extending it.
      */
     updateUnsavedNoteText(e){
-        const {
-            result,
-            cacheUnsavedTechnicalReviewNoteTextForVSUUID
-        } = this.props;
+        const { result, cacheUnsavedTechnicalReviewNoteTextForVSUUID, lastSavedTechnicalReviewForResult } = this.props;
         const { uuid: vsUUID, technical_review: savedTechnicalReview = null } = result;
-
+        const { note_text: lastSavedNoteText } = lastSavedTechnicalReviewForResult || {};
         const { note_text: savedNoteText } = savedTechnicalReview || {};
         const nextNoteText = e.target.value;
         if (nextNoteText === ""){
-            if (savedNoteText) {
+            if (lastSavedNoteText || (typeof lastSavedNoteText === "undefined" && savedNoteText)) {
                 // Should be deleted upon PATCH
                 cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, null);
             } else {
@@ -253,7 +243,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, undefined);
             }
         } else {
-            if (savedNoteText && nextNoteText === savedNoteText) {
+            if (
+                (nextNoteText === lastSavedNoteText)
+                || ((typeof lastSavedNoteText === "undefined") && nextNoteText === savedNoteText)
+            ){
                 // Unset from unsaved state if same value as existing
                 cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, undefined);
             } else {
@@ -274,7 +267,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
             result,
             setOpenPopoverData,
             lastSavedTechnicalReviewForResult,
-            unsavedTechnicalReviewNoteTextForResult
+            unsavedTechnicalReviewNoteTextForResult,
+            cacheSavedTechnicalReviewForVSUUID,
+            cacheUnsavedTechnicalReviewNoteTextForVSUUID,
+            haveCaseEditPermission
         } = this.props;
         const {
             uuid: vsUUID,
@@ -298,11 +294,13 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 "ref": this.notesButtonRef,
                 "jsx": (
                     // We could instead forwardRef to NotePopover and render Popover there, but this works more performantly
-                    // since Overlay re-renders its child very frequently for screen positioning and don't need to update the NotePopoverContents.
+                    // since Overlay re-renders its child very frequently for screen positioning and we don't need to re-render the NotePopoverContents
+                    // as often.
                     // (See how SavedTechnicalReviewPopover is activated)
                     <Popover id="technical-review-popover">
-                        <NotePopoverContents {...{ result, lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult,
-                            projectTechnicalReviewInformation }} onTextAreaChange={this.updateUnsavedNoteText} />
+                        <NotePopoverContents onTextAreaChange={this.updateUnsavedNoteText} disabled={!haveCaseEditPermission}
+                            {...{ result, lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult, projectTechnicalReviewInformation,
+                                cacheSavedTechnicalReviewForVSUUID, cacheUnsavedTechnicalReviewNoteTextForVSUUID, setOpenPopoverData }}/>
                     </Popover>
                 )
             };
@@ -430,8 +428,12 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         result,
         lastSavedTechnicalReviewForResult,
         unsavedTechnicalReviewNoteTextForResult,
+        cacheSavedTechnicalReviewForVSUUID,
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID,
         projectTechnicalReviewInformation,
         onTextAreaChange,
+        setOpenPopoverData,
+        disabled: propDisabled,
         // ...propsForPopoverFromOverlay
     } = props;
     const {
@@ -450,6 +452,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         call_made_by: { display_title: projectCallMadeByName } = {} // Unlikely to be visible to most people.
     } = projectAssessment || {};
     const {
+        "@id": savedTechnicalReviewItemAtID,
         assessment: savedAssessment,
         note_text: savedTechnicalReviewNoteText = null,
         date_approved: savedDateApproved,
@@ -466,11 +469,11 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         call_made_by: { display_title: savedCallMadeByName } = {} // Unlikely to be visible to most people.
     } = savedAssessment || {};
 
-    const { assessment: lastSavedAssessment } = lastSavedTechnicalReviewForResult || {};
+    const { "@id": lastSavedAtID, assessment: lastSavedAssessment, note_text: lastSavedNoteText } = lastSavedTechnicalReviewForResult || {};
     const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
     const { isTechnicalReviewSavedToProject, justRemovedFromProject, justSavedToProject } = projectTechnicalReviewInformation || {};
 
-    console.log("TTT", lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult);
+    // console.log("NotePopoverContents Render", lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult);
 
     let showCall;
     let showClassification;
@@ -500,7 +503,38 @@ const NotePopoverContents = React.memo(function NotePopover(props){
     }
 
     // If project technical review exists but was not set on this VariantSample, disable it for time being at least.
-    const textareaDisabled = (projectTechnicalReview && !isTechnicalReviewSavedToProject && !justSavedToProject && !justRemovedFromProject);
+    const textareaDisabled = propDisabled || (projectTechnicalReview && !isTechnicalReviewSavedToProject && !justSavedToProject && !justRemovedFromProject);
+    const saveDisabled = textareaDisabled || typeof unsavedTechnicalReviewNoteTextForResult === "undefined";
+
+
+    function handleSave (e) {
+        // const associatedTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
+        // const isExistingValue = associatedTechnicalReviewAtID && (
+        //     (lastSavedCall === callType && lastSavedClassification === optionName)
+        //     // Ensure we don't have an empty assessment: {} in lastSavedTechnicalReviewForResult
+        //     || (typeof lastSavedAssessment === "undefined" && savedCall === callType && savedClassification === optionName)
+        // );
+
+        const payload = {};
+        const deleteFields = [];
+        if (unsavedTechnicalReviewNoteTextForResult === null) { // Not 'undefined'
+            deleteFields.push("note_text");
+        } else {
+            payload.note_text = unsavedTechnicalReviewNoteTextForResult;
+        }
+
+        commonNoteUpsertProcess({
+            payload,
+            deleteFields,
+            onComplete: function(){ cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, undefined); },
+            result,
+            projectTechnicalReviewInformation,
+            setOpenPopoverData,
+            lastSavedTechnicalReviewForResult,
+            cacheSavedTechnicalReviewForVSUUID
+        });
+    }
+
 
     return (
         <React.Fragment>
@@ -550,10 +584,10 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                     { unsavedTechnicalReviewNoteTextForResult ? <span className="text-danger"> - UNSAVED</span> : null }
                 </h6>
                 {/*<textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
-                <textarea className="form-control" rows={5} onChange={onTextAreaChange} disabled={textareaDisabled}
-                    defaultValue={unsavedTechnicalReviewNoteTextForResult || savedTechnicalReviewNoteText || projectNoteText || ""} />
+                <textarea className="form-control" rows={5} onChange={onTextAreaChange} disabled={textareaDisabled} key={vsUUID}
+                    defaultValue={unsavedTechnicalReviewNoteTextForResult || lastSavedNoteText || savedTechnicalReviewNoteText || projectNoteText || ""} />
                 <div className="d-flex mt-08">
-                    <button type="button" className="btn btn-primary mr-04 w-100" disabled>
+                    <button type="button" className="btn btn-primary mr-04 w-100" disabled={saveDisabled} onClick={handleSave}>
                         Save
                     </button>
                     <button type="button" className="btn btn-primary ml-04 w-100" disabled>
@@ -572,7 +606,7 @@ function NoteClassificationIndicator (props) {
         <div className={"d-inline-block px-3 py-1 rounded" + (
             showCall === true ? " bg-success text-white"
                 : showCall === false ? " bg-danger text-white"
-                    : typeof showCall === "undefined" ? " bg-secondary"
+                    : typeof showCall === "undefined" ? " bg-secondary text-white"
                         : null )}>
             { showCall === true ? "Call - "
                 : showCall === false ? "No Call - "
@@ -590,10 +624,6 @@ function NoteClassificationIndicator (props) {
 
 
 
-
-
-
-
 /**
  * Chain of promises that will create or patch VariantSample.technical_review,
  * and/or release it to project if need be.
@@ -604,7 +634,8 @@ function commonNoteUpsertProcess ({
     payload,
     deleteFields = [],
     shouldSaveToProject = false,
-    isExistingValue = false, // If true, value will be toggled, unless upgrading/saving-to-project
+    isExistingValue = false, // If true and shouldSaveToProject is also true, PATCH will be skipped, and it will only be saved to project.
+    onComplete = null,
     // Props -
     result,
     projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justRemovedFromProject, justSavedToProject } = {},
@@ -683,14 +714,15 @@ function commonNoteUpsertProcess ({
                 // - Grab status from techreview response and save to local state to compare for if saved to project or not.
                 // - Also save "@id" of new NoteTechnicalReviewItem so we may (re-)PATCH it while savedTechnicalReviewItem & VS hasn't yet indexed
                 //   and so that can use to determine isTechnicalReviewSavedToProject (by comparing to project_technical_review @id)
-                const { "@graph": [ { "@id": technicalReviewAtID, uuid, status } ] } = techReviewResponse;
+                const { "@graph": [ { "@id": technicalReviewAtID, uuid, status, last_modified: { date_modified } } ] } = techReviewResponse;
                 cacheSavedTechnicalReviewForVSUUID(
                     vsUUID,
                     {
-                        ..._.omit(createPayload, "project"),
+                        ..._.omit(createPayload, "project", "institution"),
+                        "@id": technicalReviewAtID,
                         uuid,
                         status,
-                        "@id": technicalReviewAtID
+                        last_modified: { date_modified }
                     }
                 );
                 return { created: true };
@@ -711,36 +743,55 @@ function commonNoteUpsertProcess ({
                     throw new Error("No @ID returned."); // If no error thrown during destructuring ^..
                 }
                 techReviewResponse = res;
-                const { "@id": technicalReviewAtID, status, uuid } = technicalReviewItemFrameObject; // Grab status from techreview response and save to local state to compare for if saved to project or not.
+                // Grab status from techreview response and save to local state to compare for if saved to project or not.
+                const { "@id": technicalReviewAtID, status, uuid, last_modified: { date_modified } } = technicalReviewItemFrameObject;
                 cacheSavedTechnicalReviewForVSUUID(vsUUID, {
                     ...payload,
                     "@id": technicalReviewAtID,
                     uuid,
-                    status
+                    status,
+                    last_modified: { date_modified }
                 });
                 return { created: false };
             });
     }
 
+    /**
+     * This mechanism works but many niche/edge cases need to be addressed. So for now we disable much of tangential UX for using it.
+     * For example, when we override a saved-to-project review, and then unset the overriding review,
+     * we need to revert to saved-to-project review --probably--, and add mechanism for that (vs just leaving it "no value").
+     *
+     * @return {Promise} AJAX request to update Variant's technical_reviews
+     */
     function saveTechnicalReviewToProject(technicalReviewUUID, remove=false){
-        let statusToSetInCache;
+        let statusExpected;
         const payload = {};
         if (remove) {
             // Remove from project
-            statusToSetInCache = "in review";
+            statusExpected = "in review";
             payload.remove_from_project_notes = { "technical_review": technicalReviewUUID };
         } else {
-            statusToSetInCache = "current";
+            statusExpected = "current";
             payload.save_to_project_notes = { "technical_review": technicalReviewUUID };
         }
         return ajax.promise(variantSampleAtID + "@@process-items/", "PATCH", {}, JSON.stringify(payload))
             .then(function(processItemsResponse){
-                const { status } = processItemsResponse;
-                if (status !== "success") {
+                const {
+                    status: endpointResponseStatus,
+                    results: { Note: { responses: [ technicalReviewPatchResponseItem ] } }
+                } = processItemsResponse;
+                if (endpointResponseStatus !== "success") {
                     throw new Error("Failed to update Variant with new Technical Review, check permissions.");
                 }
+                const { status: statusFromNotePatch, last_modified: { date_modified } } = technicalReviewPatchResponseItem;
+                if (statusExpected !== statusFromNotePatch) {
+                    throw new Error("We expected Note to have updated its status to " + statusExpected);
+                }
                 // We save it to cache/lastSavedTechnicalReview as if was a linkTo item, since for comparison with savedTechnicalReview, we'll get embedded linkTo.
-                cacheSavedTechnicalReviewForVSUUID(vsUUID, { status: statusToSetInCache } ); // Used for comparison
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, {
+                    status: statusFromNotePatch,        // Used to determine if currently saved to project
+                    last_modified: { date_modified }    // Used to determine if result from search is newer (or equal to) our local cache.
+                } );
                 return processItemsResponse;
             });
     }
@@ -811,12 +862,12 @@ function commonNoteUpsertProcess ({
                     };
                 });
             }
+            if (typeof onComplete === "function") {
+                onComplete();
+            }
         })
         .catch(function(errorMsgOrObj){
             console.error(errorMsgOrObj);
-            // Don't unset here, as 1 part of request chain may have succeeded (save to VariantSample)
-            // but not another (e.g. save to project).
-            // cacheSavedTechnicalReviewForVSUUID(vsUUID, undefined);
             setOpenPopoverData(function({ ref: existingBtnRef }){
                 return {
                     // Re-use existing popover, essentially.
@@ -851,7 +902,6 @@ class CallClassificationButton extends React.PureComponent {
     constructor(props) {
         super(props);
         this.upsertTechnicalReviewItem = this.upsertTechnicalReviewItem.bind(this);
-        this.saveTechnicalReviewToProject = this.saveTechnicalReviewToProject.bind(this);
         this.handleClick = this.handleClick.bind(this);
 
     }
@@ -897,42 +947,6 @@ class CallClassificationButton extends React.PureComponent {
 
     }
 
-    /**
-     * This mechanism works but many niche/edge cases need to be addressed. So for now we disable much of tangential UX for using it.
-     * For example, when we override a saved-to-project review, and then unset the overriding review,
-     * we need to revert to saved-to-project review --probably--, and add mechanism for that (vs just leaving it "no value").
-     *
-     * @return {Promise} AJAX request to update Variant's technical_reviews
-     */
-    saveTechnicalReviewToProject(technicalReviewUUID, remove=false){
-        const {
-            result: variantSampleSearchResult,
-            cacheSavedTechnicalReviewForVSUUID,
-            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject }
-        } = this.props;
-        const { "@id": vsAtID, uuid: vsUUID } = variantSampleSearchResult;
-        let statusToSetInCache;
-        const payload = {};
-        if (remove) {
-            // Remove from project
-            statusToSetInCache = "in review";
-            payload.remove_from_project_notes = { "technical_review": technicalReviewUUID };
-        } else {
-            statusToSetInCache = "current";
-            payload.save_to_project_notes = { "technical_review": technicalReviewUUID };
-        }
-        return ajax.promise(vsAtID + "@@process-items/", "PATCH", {}, JSON.stringify(payload))
-            .then(function(processItemsResponse){
-                const { status } = processItemsResponse;
-                if (status !== "success") {
-                    throw new Error("Failed to update Variant with new Technical Review, check permissions.");
-                }
-                // We save it to cache/lastSavedTechnicalReview as if was a linkTo item, since for comparison with savedTechnicalReview, we'll get embedded linkTo.
-                cacheSavedTechnicalReviewForVSUUID(vsUUID, { status: statusToSetInCache } ); // Used for comparison
-                return processItemsResponse;
-            });
-    }
-
     handleClick(e){
         const { disabled } = this.props;
 
@@ -952,8 +966,7 @@ class CallClassificationButton extends React.PureComponent {
             lastSavedTechnicalReviewForResult,
             highlightColorStyle = null,
             disabled: propDisabled = false,
-            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject },
-            isThisTechnicalReviewSavedToProject = false
+            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject }
         } = this.props;
         const {
             uuid: vsUUID,
@@ -1112,36 +1125,16 @@ export class TechnicalReviewController extends React.PureComponent {
      * date_modified from backend; this would cover such cases theoretically.
      */
     static compareSavedToCache(lastSavedTechnicalReviewForResult, savedTechnicalReview){
+
         if (!lastSavedTechnicalReviewForResult || !savedTechnicalReview) {
             return false;
         }
 
-        /**
-         * Essentially sets "field": undefined for non-present fields and clears `@id` as standardization for comparison.
-         *
-         * We only want to compare against the values explicitly present in lastSavedTechnicalReviewForResult, not anything else.
-         * Might have issues if e.g. lastSavedTechnicalReview has no assessment ({}) but savedTechnicalReview does, so explicitly grab fields
-         * instead of trying to recurse down lastSavedTechnicalReviewForResult properties.
-         */
-        function makeSubset(obj){
-            const {
-                assessment: { call, classification } = {},
-                note_text,
-                status
-                // "@id": objAtID
-            } = obj;
-            return {
-                assessment: { call, classification },
-                note_text,
-                status
-            };
-        }
-        const lastSavedSubset = makeSubset(lastSavedTechnicalReviewForResult);
-        const savedSubset = makeSubset(savedTechnicalReview);
-        // Deep comparison wherein {} !== { someFieldName: undefined }
-        const isEqual = _.isEqual(lastSavedSubset, savedSubset);
-        console.log("COMPARISON TEST", lastSavedSubset, savedSubset, isEqual);
-        return isEqual;
+        const { last_modified: { date_modified: lastSavedDateModified } } = lastSavedTechnicalReviewForResult;
+        const { last_modified: { date_modified: savedDateModified } } = savedTechnicalReview;
+
+        // Our indexed technical review has newer or same last_modified date as locally cached date.
+        return savedDateModified >= lastSavedDateModified;
     }
 
     constructor(props) {
