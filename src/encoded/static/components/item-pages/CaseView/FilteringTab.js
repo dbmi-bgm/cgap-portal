@@ -270,8 +270,10 @@ function FilteringTabBody(props) {
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
-        lastSavedTechnicalReview,         // passed in from TechnicalReviewController
-        cacheSavedTechnicalReviewForVSUUID,    // passed in from TechnicalReviewController
+        lastSavedTechnicalReview,           // passed in from TechnicalReviewController
+        cacheSavedTechnicalReviewForVSUUID, // passed in from TechnicalReviewController
+        unsavedTechnicalReviewNoteTexts,    // passed in from TechnicalReviewController
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID, // passed in from TechnicalReviewController
         resetLastSavedTechnicalReview, // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
@@ -413,6 +415,8 @@ function FilteringTabBody(props) {
         currFilterSet,                      // <- Used for Matching Filter Block Indices column
         lastSavedTechnicalReview,           // <- Used for TechnicalReviewColumn
         cacheSavedTechnicalReviewForVSUUID, // <- Used for TechnicalReviewColumn
+        unsavedTechnicalReviewNoteTexts,    // <- Used for TechnicalReviewColumn
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID, // <- Used for TechnicalReviewColumn
         haveCaseEditPermission,             // <- Used for TechnicalReviewColumn
         "key": searchTableKey
     };

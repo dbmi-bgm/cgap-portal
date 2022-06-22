@@ -135,22 +135,28 @@ export class SaveFilterSetButtonController extends React.Component {
         const { currFilterSet, setIsSubmitting } = this.props;
         const { lastSavedFilterSet } = this.state;
 
+        // LastSavedFilterSet will generally be same age or older than currFilterSet, wherein currFilterSet
+        // is updated anytime that change the FilterSet UI, and lastSavedFilterSet only when is explicitly saved.
+        // This primarily is to allow to control App.isSubmitting.
+
         if (currFilterSet && !pastFilterSet) {
             // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
             if (currFilterSet["@id"]) {
                 this.setState({ "lastSavedFilterSet": currFilterSet });
+                return;
             }
         }
 
-        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
 
-        if (currFilterSet && hasFilterSetChanged) {
-            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
-        } else {
-            // Is OK if called frequently with same value, as App is a PureComponent
-            // and won't update if state/prop value is unchanged.
-            setIsSubmitting(false);
+        if (currFilterSet && currFilterSet !== pastFilterSet) {
+            const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
+            if (hasFilterSetChanged) {
+                setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
+            } else {
+                setIsSubmitting(false);
+            }
         }
+
     }
 
     /**

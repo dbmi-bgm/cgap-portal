@@ -69,6 +69,7 @@ export const variantSampleColumnExtensionMap = {
     "variant.genes.genes_most_severe_hgvsc": {
         // Also renders "variant.genes.genes_most_severe_hgvsp"
         // TODO: Update with onclick to handle google analytics tracking
+        minColumnWidth: 90,
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props) {
             const { link = null, align } = props;
@@ -101,6 +102,7 @@ export const variantSampleColumnExtensionMap = {
         }
     },
     "variant.csq_gnomadg_af": { // Gnomad column
+        minColumnWidth: 100,
         widthMap: { 'lg' : 140, 'md' : 130, 'sm' : 120 },
         render: function(result, props){
             const { variant : { csq_gnomadg_af = null, csq_gnomadg_af_popmax = null } = {} } = result;

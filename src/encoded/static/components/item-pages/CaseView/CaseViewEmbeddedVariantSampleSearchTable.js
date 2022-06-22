@@ -32,6 +32,8 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
         currFilterSet,
         lastSavedTechnicalReview,
         cacheSavedTechnicalReviewForVSUUID,
+        unsavedTechnicalReviewNoteTexts,
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID,
         haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
@@ -40,7 +42,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
     // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
-    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, haveCaseEditPermission };
+    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, cacheUnsavedTechnicalReviewNoteTextForVSUUID, haveCaseEditPermission };
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -79,19 +81,29 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
             /** Depends on temporary/unsaved state ... */
             "technical_review.assessment.call": {
                 "colTitle": "Technical Review",
+                "minColumnWidth": 150,
                 "widthMap": { 'lg' : 170, 'md' : 160, 'sm' : 150 },
                 "render": function(result, propsFromSearchTable){
                     const { uuid: vsUUID } = result;
-                    const { rowNumber, updateResultAtIndex } = propsFromSearchTable;
+                    const { rowNumber } = propsFromSearchTable;
                     const lastSavedTechnicalReviewForResult = lastSavedTechnicalReview[vsUUID];
+                    const unsavedTechnicalReviewNoteTextForResult = unsavedTechnicalReviewNoteTexts[vsUUID];
                     return (
                         <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult,
-                            rowNumber, updateResultAtIndex }} />
+                            unsavedTechnicalReviewNoteTextForResult, rowNumber }} />
                     );
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, lastSavedTechnicalReview ]);
+    }, [
+        originalColExtMap,
+        selectedVariantSamples,
+        savedVariantSampleIDMap,
+        isLoadingVariantSampleListItem,
+        currFilterSet,
+        lastSavedTechnicalReview,
+        unsavedTechnicalReviewNoteTexts
+    ]);
 
     return (
         <React.Fragment>
@@ -119,6 +131,8 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         currFilterSet,
         lastSavedTechnicalReview,
         cacheSavedTechnicalReviewForVSUUID,
+        unsavedTechnicalReviewNoteTexts,
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID,
         haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
@@ -127,7 +141,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
     // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
-    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, haveCaseEditPermission };
+    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, cacheUnsavedTechnicalReviewNoteTextForVSUUID, haveCaseEditPermission };
 
     const columnExtensionMap = useMemo(function() {
         return {
@@ -171,11 +185,23 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     const { uuid: vsUUID } = result;
                     const { rowNumber } = propsFromSearchTable;
                     const lastSavedTechnicalReviewForResult = lastSavedTechnicalReview[vsUUID];
-                    return <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult, rowNumber }} />;
+                    const unsavedTechnicalReviewNoteTextForResult = unsavedTechnicalReviewNoteTexts[vsUUID];
+                    return (
+                        <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult,
+                            unsavedTechnicalReviewNoteTextForResult, rowNumber }} />
+                    );
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet, lastSavedTechnicalReview ]);
+    }, [
+        originalColExtMap,
+        selectedVariantSamples,
+        savedVariantSampleIDMap,
+        isLoadingVariantSampleListItem,
+        currFilterSet,
+        lastSavedTechnicalReview,
+        unsavedTechnicalReviewNoteTexts
+    ]);
 
     return (
         <React.Fragment>
