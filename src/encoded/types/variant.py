@@ -1111,7 +1111,6 @@ def process_items_process(context, request):
             if not removed:
                 raise HTTPBadRequest("Item to remove from project is not present")
             payload[vg_field_name] = item_ids
-            print("REMOVED", item_ids)
             return
 
         # Check if note from same project exists and remove it (link to it from Note.previous_note instd.)
@@ -1203,8 +1202,6 @@ def process_items_process(context, request):
     # This is in part to simplify UI logic where only Note status == "current" is checked to
     # assert if a Note is already saved to Project or not.
 
-    print("PAYLOADS-V", variant_patch_payload)
-
     gene_patch_count = 0
     if gene_fields_needed:
         for gene_atid, gene_payload in genes_patch_payloads.items():
@@ -1213,10 +1210,9 @@ def process_items_process(context, request):
 
     variant_patch_count = 0
     if variant_fields_needed:
-        perform_request_as_admin(request, variant["@id"], variant_patch_payload, request_method="PATCH")
+        variant_response = perform_request_as_admin(request, variant["@id"], variant_patch_payload, request_method="PATCH")
         variant_patch_count += 1
-
-    print("PAYLOADS-N", sent_item_patch_payloads)
+        # print('\n\n\nVARIANT RESPONSE', json.dumps(variant_response, indent=4))
 
     sent_item_patch_count = 0
     sent_item_patch_responses = []
@@ -1250,7 +1246,7 @@ def process_items_process(context, request):
             "Gene": { 
                 "patched_count": gene_patch_count
             },
-            "Variant" if is_structural_vs else "StructuralVariant": {
+            "StructuralVariant" if is_structural_vs else "Variant": {
                 "patched_count": variant_patch_count
             },
             "Note": {

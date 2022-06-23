@@ -5,7 +5,7 @@ import _ from 'underscore';
 import memoize from 'memoize-one';
 import Popover from 'react-bootstrap/esm/Popover';
 import ReactTooltip from 'react-tooltip';
-import { ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, JWT, console } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { PatchItemsProgress } from './../../util/PatchItemsProgress';
 
@@ -375,7 +375,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const isNoteUnsaved = typeof unsavedTechnicalReviewNoteTextForResult !== "undefined";
 
 
-        const isNotePotentiallyOutdated = lastSavedAssessment && savedTechnicalReviewNoteText && !lastSavedNoteText;
+        const isNotePotentiallyOutdated = lastSavedAssessment && savedTechnicalReviewNoteText && typeof lastSavedNoteText === "undefined";
         const notesIconCls = (
             "icon icon-2x icon-fw icon-sticky-note " + (
                 isNotePotentiallyOutdated ? "far text-danger"
@@ -394,7 +394,8 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
                     data-call="true" data-technical-review="true">
                     <i className={"icon icon-2x icon-fw fas icon-check text-" + callTrueIconColor} />
-                    { lastSavedCall === true || (lastSavedAssessment && typeof lastSavedCall === "undefined" && savedCall === true) ?
+                    { lastSavedAssessment && (lastSavedCall === true || (typeof lastSavedCall === "undefined" && savedCall === true)) ?
+                        // If was just saved or if was previously saved but now removed (in which case lastSavedAssessment exists but is equal to {})
                         <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
@@ -402,17 +403,20 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownNoCall} ref={this.callFalseButtonRef}
                     data-call="false" data-technical-review="true">
                     <i className={"icon icon-2x icon-fw fas icon-times text-" + callFalseIconColor} />
-                    { lastSavedCall === false || (lastSavedAssessment && typeof lastSavedCall === "undefined" && savedCall === false) ?
+                    { lastSavedAssessment && (lastSavedCall === false || (typeof lastSavedCall === "undefined" && savedCall === false)) ?
+                        // If was just saved or if was previously saved but now removed (in which case lastSavedAssessment exists but is equal to {})
                         <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenNotesPopover} ref={this.notesButtonRef} data-technical-review="true">
                     <i data-tip={isNotePotentiallyOutdated ? "This note is potentially outdated." : null} className={notesIconCls} />
-                    { lastSavedNoteText || (lastSavedNoteText === null && savedTechnicalReviewNoteText) ?
+                    { typeof lastSavedNoteText !== "undefined" ?
+                        // If was note_text just removed, then would === null.
                         <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
                         : null }
                     { typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ?
+                        // Will be equal to null if saved text exists but unsaved text is blank (== will remove field upon save).
                         <span className="text-danger text-700 position-absolute" data-tip="Note text has not been saved yet.">*</span>
                         : null }
                 </button>
@@ -502,8 +506,10 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         showCallMadeByName = null;
     }
 
+    // Including if any, not just this one. Re-enable maybe later (?).
+    const isSavedToProject = justSavedToProject || (projectTechnicalReview && !justRemovedFromProject);
     // If project technical review exists but was not set on this VariantSample, disable it for time being at least.
-    const textareaDisabled = propDisabled || (projectTechnicalReview && !isTechnicalReviewSavedToProject && !justSavedToProject && !justRemovedFromProject);
+    const textareaDisabled = propDisabled || isSavedToProject;
     const saveDisabled = textareaDisabled || typeof unsavedTechnicalReviewNoteTextForResult === "undefined";
 
 
@@ -515,14 +521,17 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         //     || (typeof lastSavedAssessment === "undefined" && savedCall === callType && savedClassification === optionName)
         // );
 
-        const payload = {};
+        // Include in payload even if null, commonNoteUpsetProcess will clear out any delete_fields, but we need this null value to be cached to
+        // lastSavedTechnicalReviewForResult so that the recent change shows up in UI.
+        const payload = { "note_text": unsavedTechnicalReviewNoteTextForResult };
         const deleteFields = [];
-        if (unsavedTechnicalReviewNoteTextForResult === null) { // Not 'undefined'
+        if (unsavedTechnicalReviewNoteTextForResult === null) { // Not 'undefined' (=== in which case button should be disabled)
             deleteFields.push("note_text");
-        } else {
-            payload.note_text = unsavedTechnicalReviewNoteTextForResult;
         }
 
+        // IMPORTANT: There might be a glitch if try to save note of something already saved to project (i.e. it might unset it from saved to project).
+        // Needs to be investigated a little if going to enable overwriting saved-to-project notes. Probably just need to set shouldSaveToProject=true if
+        // already is saved to project -> shouldSaveToProject: isSavedToProject as the _quickest_ solution, albeit maybe not best one.
         commonNoteUpsertProcess({
             payload,
             deleteFields,
@@ -534,6 +543,14 @@ const NotePopoverContents = React.memo(function NotePopover(props){
             cacheSavedTechnicalReviewForVSUUID
         });
     }
+
+    const textareaDefaultValue = (
+        typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ? unsavedTechnicalReviewNoteTextForResult
+            : typeof lastSavedNoteText !== "undefined" ? lastSavedNoteText
+                : typeof savedTechnicalReviewNoteText !== "undefined" ? savedTechnicalReviewNoteText
+                    : typeof projectNoteText !== "undefined" ? projectNoteText
+                        : ""
+    );
 
 
     return (
@@ -585,7 +602,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                 </h6>
                 {/*<textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
                 <textarea className="form-control" rows={5} onChange={onTextAreaChange} disabled={textareaDisabled} key={vsUUID}
-                    defaultValue={unsavedTechnicalReviewNoteTextForResult || lastSavedNoteText || savedTechnicalReviewNoteText || projectNoteText || ""} />
+                    defaultValue={textareaDefaultValue} />
                 <div className="d-flex mt-08">
                     <button type="button" className="btn btn-primary mr-04 w-100" disabled={saveDisabled} onClick={handleSave}>
                         Save
@@ -692,7 +709,7 @@ function commonNoteUpsertProcess ({
             "institution": vsInstitutionAtID
         };
 
-        return ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(createPayload))
+        return ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(_.omit(createPayload, ...deleteFields)))
             .then(function(res){
                 console.log('response', res);
                 const { "@graph": [ technicalReviewItemFrameObject ] } = res;
@@ -718,7 +735,7 @@ function commonNoteUpsertProcess ({
                 cacheSavedTechnicalReviewForVSUUID(
                     vsUUID,
                     {
-                        ..._.omit(createPayload, "project", "institution"),
+                        ...payload,
                         "@id": technicalReviewAtID,
                         uuid,
                         status,
@@ -734,17 +751,17 @@ function commonNoteUpsertProcess ({
         // Deletion of `review` field should be done at backend for security -- TODO: move to _update method there perhaps.
         const updateHref = associatedTechnicalReviewAtID + "?delete_fields=" + ["review"].concat(deleteFields).join(",");
 
-        return ajax.promise(updateHref, "PATCH", {}, JSON.stringify(payload))
+        return ajax.promise(updateHref, "PATCH", {}, JSON.stringify(_.omit(payload, ...deleteFields)))
             .then(function(res){
                 console.log('response', res);
                 const { "@graph": [ technicalReviewItemFrameObject ] } = res;
-                const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
-                if (!newTechnicalReviewAtID) {
+                const { "@id": technicalReviewAtID } = technicalReviewItemFrameObject;
+                if (!technicalReviewAtID) {
                     throw new Error("No @ID returned."); // If no error thrown during destructuring ^..
                 }
                 techReviewResponse = res;
                 // Grab status from techreview response and save to local state to compare for if saved to project or not.
-                const { "@id": technicalReviewAtID, status, uuid, last_modified: { date_modified } } = technicalReviewItemFrameObject;
+                const { status, uuid, last_modified: { date_modified } } = technicalReviewItemFrameObject;
                 cacheSavedTechnicalReviewForVSUUID(vsUUID, {
                     ...payload,
                     "@id": technicalReviewAtID,
@@ -778,7 +795,11 @@ function commonNoteUpsertProcess ({
             .then(function(processItemsResponse){
                 const {
                     status: endpointResponseStatus,
-                    results: { Note: { responses: [ technicalReviewPatchResponseItem ] } }
+                    results: {
+                        "Note": {
+                            "responses": [ { "@graph": [ technicalReviewPatchResponseItem ] } ]
+                        }
+                    }
                 } = processItemsResponse;
                 if (endpointResponseStatus !== "success") {
                     throw new Error("Failed to update Variant with new Technical Review, check permissions.");
@@ -1033,10 +1054,6 @@ class CallClassificationButton extends React.PureComponent {
 
         if (isDefaultSaveToProject) {
 
-            console.log("LASTSAVED", lastSavedTechnicalReviewForResult);
-
-            console.log("isDefaultSaveToProject - project", projectTechnicalReview,  isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject, isAssessmentSavedToProject);
-
             const saveToProjectBtnClass = (
                 (isAssessmentSavedToProject && !justRemovedFromProject)
                 || (justSavedToProject && (isLastSaved || (!lastSavedAssessment && isSavedToVS)))
@@ -1147,6 +1164,10 @@ export class TechnicalReviewController extends React.PureComponent {
             "lastSavedTechnicalReview": {},
             "unsavedTechnicalReviewNoteTexts": {}
         };
+    }
+
+    componentDidUpdate(){
+        console.log("TechnicalReviewController State", this.state);
     }
 
     cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, value) {
