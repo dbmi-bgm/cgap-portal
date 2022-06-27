@@ -237,7 +237,9 @@ export class TechnicalReviewColumn extends React.PureComponent {
         if (nextNoteText === ""){
             if (lastSavedNoteText || (typeof lastSavedNoteText === "undefined" && savedNoteText)) {
                 // Should be deleted upon PATCH
-                cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, null);
+                // cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, null);
+                // TEMPORARY: Instead of `null` we save empty string to get around invalidation not working for empty PATCH w. delete_fields=note_text
+                cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, "");
             } else {
                 // Unset in clientside state
                 cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, undefined);
@@ -523,6 +525,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
 
         // Include in payload even if null, commonNoteUpsetProcess will clear out any delete_fields, but we need this null value to be cached to
         // lastSavedTechnicalReviewForResult so that the recent change shows up in UI.
+        // TEMPORARY: We patch `note_text: ""` for time being, later will revert to deleting note_text again once backend invalidation is fixed.
         const payload = { "note_text": unsavedTechnicalReviewNoteTextForResult };
         const deleteFields = [];
         if (unsavedTechnicalReviewNoteTextForResult === null) { // Not 'undefined' (=== in which case button should be disabled)
@@ -537,6 +540,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
             deleteFields,
             onComplete: function(){ cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, undefined); },
             result,
+            // shouldSaveToProject: isSavedToProject,
             projectTechnicalReviewInformation,
             setOpenPopoverData,
             lastSavedTechnicalReviewForResult,
