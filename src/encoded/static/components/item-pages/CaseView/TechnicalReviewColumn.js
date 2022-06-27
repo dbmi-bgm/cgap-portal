@@ -355,22 +355,30 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const callTrueIconColor = (
             (
                 lastSavedCall === true
-                || (!lastSavedAssessment && savedCall === true)
-                || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true)
+                || (!lastSavedAssessment && projectCall === true)
+                || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true)
+                // If we want savedAssessment to take precedence over project, then:
+                // || (!lastSavedAssessment && savedCall === true)
+                // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true)
             ) ? (
-                    (lastSavedCall === true && lastSavedClassification === "Present") ? "success"
-                        : (!lastSavedAssessment && savedCall === true && savedClassification === "Present") ? "success"
-                            // Check Project
-                            : (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true && projectClassification === "Present") ? "success"
-                                : "warning"
+                    (lastSavedAssessment && lastSavedClassification === "Present")
+                    || (!lastSavedAssessment && projectCall === true && projectClassification === "Present")
+                    || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true && projectClassification === "Present") ? "success"
+                    // If we want savedAssessment to take precedence over project, then:
+                    // || (!lastSavedAssessment && savedCall === true && savedClassification === "Present")
+                    // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true && projectClassification === "Present") ? "success"
+                        : "warning"
                 ) : "muted" // (savedCall === true ? "secondary" : "muted")
         );
 
         const callFalseIconColor = (
             (
                 (lastSavedCall === false)
-                || (!lastSavedAssessment && savedCall === false)
-                || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === false)
+                || (!lastSavedAssessment && projectCall === false)
+                || (!lastSavedAssessment && !projectTechnicalReview && savedCall === false)
+                // If we want savedAssessment to take precedence over project, then:
+                // || (!lastSavedAssessment && savedCall === false)
+                // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === false)
             ) ? "danger" : "muted" // (savedCall === false ? "secondary" : "muted")
         );
 
@@ -486,21 +494,18 @@ const NotePopoverContents = React.memo(function NotePopover(props){
     let showCallDate;
     let showCallMadeByName;
     const isLastSaved = typeof lastSavedAssessment !== "undefined";
-    /* if (typeof lastSavedAssessment !== "undefined") {
-        showCall = lastSavedCall;
-        showClassification = lastSavedClassification;
-        isLastSaved = true;
-        showCallDate = null;
-    } else */ if (typeof savedTechnicalReview !== "undefined") {
-        showCall = savedCall;
-        showClassification = savedClassification;
-        showCallDate = savedCallDate;
-        showCallMadeByName = savedCallMadeByName;
-    } else if (typeof projectTechnicalReview !== "undefined") {
+
+    // Project technical review takes precedence.
+    if (typeof projectTechnicalReview !== "undefined") {
         showCall = projectCall;
         showClassification = projectClassification;
         showCallDate = projectCallDate;
         showCallMadeByName = projectCallMadeByName;
+    } else if (typeof savedTechnicalReview !== "undefined") {
+        showCall = savedCall;
+        showClassification = savedClassification;
+        showCallDate = savedCallDate;
+        showCallMadeByName = savedCallMadeByName;
     } else {
         showCall = null;
         showClassification = null;
@@ -1015,7 +1020,7 @@ class CallClassificationButton extends React.PureComponent {
         const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
 
         // linkTo exists but can't see @id - no view perms for entire NoteTechnicalReview
-        const noViewPermissions = savedTechnicalReviewItem && !savedTechnicalReviewItemAtID;
+        const noViewPermissions = (savedTechnicalReviewItem && !savedTechnicalReviewItemAtID) || (projectTechnicalReview && !projectTechnicalReviewAtID);
 
         // If was recently saved but not yet in search results
         const isLastSaved = lastSavedCall === callType && lastSavedClassification === optionName;
@@ -1043,11 +1048,6 @@ class CallClassificationButton extends React.PureComponent {
 
         const isCurrentlySavedToProject = (isTechnicalReviewSavedToProject && !justRemovedFromProject) || justSavedToProject;
 
-        const btnClass = (
-            (isLastSaved || (isSavedToVS && !isLastSaveUnset) ? ` bg-${highlightColorStyle} text-white` : "") +
-            (isLastSaveUnset ? " bg-light text-secondary" : "")
-        );
-
         const lastSavedIndicator = isLastSaved ?
             <span className="text-white text-700" data-tip="You recently saved this value and it may not be yet visible in search results"> *</span>
             : isLastSaveUnset ?
@@ -1060,7 +1060,14 @@ class CallClassificationButton extends React.PureComponent {
                 (isAssessmentSavedToProject && !justRemovedFromProject)
                 || (justSavedToProject && (isLastSaved || (!lastSavedAssessment && isSavedToVS)))
             ) ? ` bg-${highlightColorStyle} text-white` : "";
+
             const saveToProjectBtnTip = `This classification will be ${isCurrentlySavedToProject ? "removed" : "saved"} <b>project-wide</b> for this variant`;
+
+            const saveToVSBtnClass = (
+                (isLastSaved || (isSavedToVS && !isLastSaveUnset)) ? ` bg-${highlightColorStyle} text-white`
+                    : isLastSaveUnset ? " bg-light text-secondary" : ""
+            );
+
             // We don't have a way to unsave from project, so disable button for now if already saved to project.
             return (
                 <div className="d-flex">
@@ -1074,21 +1081,29 @@ class CallClassificationButton extends React.PureComponent {
                                 <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
                                 : null}
                     </button>
-                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-left" + btnClass} onClick={this.handleClick}
+                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-left" + saveToVSBtnClass} onClick={this.handleClick}
                         disabled={disabled} data-save-to-project={false} data-tip="Save only to this variant sample (and not project-wide for this variant)">
                         <i className="icon icon-vial fas" />
                         { lastSavedIndicator }
                     </button>
                 </div>
             );
-        }
+        } else {
 
-        return (
-            <button type="button" className={"dropdown-item" + btnClass} onClick={this.handleClick} disabled={disabled}>
-                { optionName }
-                { lastSavedIndicator }
-            </button>
-        );
+            const saveToVSBtnClass = (
+                // If we have a project technical review, then its value takes precedence.
+                // (For now are unable to unset here, if is saved to project, then btn is disabled)
+                isAssessmentSavedToProject || (!projectTechnicalReview && (isLastSaved || (isSavedToVS && !isLastSaveUnset))) ? ` bg-${highlightColorStyle} text-white`
+                    : (isLastSaveUnset ? " bg-light text-secondary" : "")
+            );
+
+            return (
+                <button type="button" className={"dropdown-item" + saveToVSBtnClass} onClick={this.handleClick} disabled={disabled}>
+                    { optionName }
+                    { lastSavedIndicator }
+                </button>
+            );
+        }
     }
 }
 
