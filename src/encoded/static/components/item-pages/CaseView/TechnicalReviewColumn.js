@@ -715,7 +715,6 @@ function commonNoteUpsertProcess ({
 
         return ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(_.omit(createPayload, ...deleteFields)))
             .then(function(res){
-                console.log('response', res);
                 const { "@graph": [ technicalReviewItemFrameObject ] } = res;
                 const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
                 if (!newTechnicalReviewAtID) {
@@ -757,7 +756,6 @@ function commonNoteUpsertProcess ({
 
         return ajax.promise(updateHref, "PATCH", {}, JSON.stringify(_.omit(payload, ...deleteFields)))
             .then(function(res){
-                console.log('response', res);
                 const { "@graph": [ technicalReviewItemFrameObject ] } = res;
                 const { "@id": technicalReviewAtID } = technicalReviewItemFrameObject;
                 if (!technicalReviewAtID) {
