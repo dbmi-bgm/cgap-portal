@@ -43,7 +43,9 @@ def test_patch_project_invalid_name(testapp, project):
 def test_project_lifecycle_policy_properties(
     testapp, project, property_name, expected_error
 ):
-    """"""
+    """Test project.lifecycle_policy accepted property names via its
+    patternProperties.
+    """
     status = 200
     if expected_error:
         status = 422
