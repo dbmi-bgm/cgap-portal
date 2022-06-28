@@ -66,7 +66,7 @@
             "type": "string"
         },
         "workflow_runs": {
-            "title": "workflow runs",
+            "title": "Workflow Runs",
             "description": "The list of workflow runs with their status and output files",
             "type": "array",
             "items": {
@@ -227,7 +227,9 @@
                 "running",
                 "completed",
                 "failed",
-                "inactive"
+                "inactive",
+                "stopped",
+                "quality metric failed"
             ]
         },
         "failed_jobs": {
@@ -248,8 +250,33 @@
         "common_fields": {
             "title": "Common Fields",
             "description": "Common fields that go into all workflow_run, processed_files and qc items",
+            "comment": "The properties here must be valid for all item types in description above to prevent validation errors",
             "type": "object",
-            "additionalProperties": true
+            "additionalProperties": false,
+            "properties": {
+                "institution": {
+                    "title": "Institution",
+                    "description": "Institution associated with the MWFR",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "project": {
+                    "title": "Project",
+                    "description": "Project associated with the MWFR",
+                    "type": "string",
+                    "format": "uuid"
+                },
+                "associated_meta_workflow_runs": {
+                    "title": "Associated MetaWorkflowRuns",
+                    "description": "The MetaWorkflowRuns that produced this item",
+                    "type": "array",
+                    "items": {
+                        "title": "Associated MetaWorkflowRun",
+                        "type": "string",
+                        "format": "uuid"
+                    }
+                }
+            }
         },
         "overall_qcs": {
             "title": "Overall QCs",
@@ -275,6 +302,61 @@
                             "PASS",
                             "FAIL"
                         ]
+                    }
+                }
+            }
+        },
+        "input_samples": {
+            "title": "Input Samples",
+            "description": "Sample UUIDs (ordered per input files)",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "format": "uuid"
+            }
+        },
+        "associated_sample_processing": {
+            "title": "Associated SampleProcessing",
+            "description": "Associated SampleProcessing UUID",
+            "type": "string",
+            "format": "uuid"
+        },
+        "ignore_output_quality_metrics": {
+            "title": "Ignore Output QualityMetrics",
+            "description": "If true, ignore the status of output QualityMetrics",
+            "type": "boolean",
+            "default": false
+        },
+        "output_files_linked_status": {
+            "title": "Status of Output File Links",
+            "description": "The status of links created for all output files",
+            "type": "string",
+            "enum": [
+                "success",
+                "error"
+            ]
+        },
+        "output_files_linked_errors": {
+            "title": "Output File Link Creation Errors",
+            "description": "Output files that could not be linked successfully and their associated errors",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "output_file": {
+                        "title": "Output File",
+                        "description": "Output file with link error",
+                        "type": "string",
+                        "linkTo": "FileProcessed"
+                    },
+                    "errors": {
+                        "title": "Errors",
+                        "description": "Errors that occurred on link creation",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
                     }
                 }
             }
