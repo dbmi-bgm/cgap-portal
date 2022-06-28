@@ -54,7 +54,6 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
 const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, windowWidth }){
     const searchHref = (
         "/search/?type=Case"
-        + "&report.uuid!=No+value"
         + "&proband_case=true"
         + "&status!=inactive"
         + "&sort=-last_modified.date_modified"
