@@ -363,7 +363,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             ) ? (
                     (lastSavedAssessment && lastSavedClassification === "Present")
                     || (!lastSavedAssessment && projectCall === true && projectClassification === "Present")
-                    || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true && projectClassification === "Present") ? "success"
+                    || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true && savedClassification === "Present") ? "success"
                     // If we want savedAssessment to take precedence over project, then:
                     // || (!lastSavedAssessment && savedCall === true && savedClassification === "Present")
                     // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true && projectClassification === "Present") ? "success"
