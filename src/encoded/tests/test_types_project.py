@@ -51,5 +51,4 @@ def test_project_lifecycle_policy_properties(
         status = 422
     lifecycle_policy_properties = {property_name: {"expire_after": 10}}
     patch_body = {"lifecycle_policy": lifecycle_policy_properties}
-    response = testapp.patch_json(project["@id"], patch_body, status=status)
-    assert response
+    testapp.patch_json(project["@id"], patch_body, status=status)
