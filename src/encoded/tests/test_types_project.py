@@ -29,3 +29,26 @@ def test_patch_project_invalid_status(testapp, project):
 def test_patch_project_invalid_name(testapp, project):
     """ Tries to patch project name with integer """
     testapp.patch_json(project['@id'], {'name': 47}, status=422)
+
+
+@pytest.mark.parametrize(
+    "property_name,expected_error",
+    [
+        ("", True),
+        ("something", False),
+        ("ignore", True),
+        ("ignore_something", False),
+    ]
+)
+def test_project_lifecycle_policy_properties(
+    testapp, project, property_name, expected_error
+):
+    """Test project.lifecycle_policy accepted property names via its
+    patternProperties.
+    """
+    status = 200
+    if expected_error:
+        status = 422
+    lifecycle_policy_properties = {property_name: {"expire_after": 10}}
+    patch_body = {"lifecycle_policy": lifecycle_policy_properties}
+    testapp.patch_json(project["@id"], patch_body, status=status)
