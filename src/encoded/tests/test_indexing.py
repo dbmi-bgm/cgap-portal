@@ -412,10 +412,7 @@ class TestInvalidationScopeViewCGAP:
          ),
         ('Project', 'Case',
             DEFAULT_SCOPE + ['name']
-         ),
-        ('VariantSample', 'TechnicalReview',
-            DEFAULT_SCOPE + ['accession', 'filename', 'file_format', 'file_size']
-        )
+         )
     ])
     def test_invalidation_scope_view_parametrized(self, indexer_testapp, source_type, target_type, invalidated):
         """ Just call the route function - test some basic interactions.

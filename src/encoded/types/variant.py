@@ -105,48 +105,18 @@ SHARED_VARIANT_EMBEDS = [
 ]
 
 SHARED_VARIANT_SAMPLE_EMBEDS = [
-    # The following fields are now requested through /embed API.
+    # The following 4 "@id" fields are now requested through /embed API when on the VariantSample ItemView
+    # and available through VariantSampleList item (datastore=database request) for when in Case ItemView's
+    # Interpretation+Review Tabs.
     "variant_notes.@id",
-    # "variant_notes.note_text",
-    # "variant_notes.version",
-    # "variant_notes.project",
-    # "variant_notes.institution",
-    # "variant_notes.status",
-    # "variant_notes.last_modified.date_modified",
-    # "variant_notes.last_modified.modified_by.display_title",
     "gene_notes.@id",
-    # "gene_notes.note_text",
-    # "gene_notes.version",
-    # "gene_notes.project",
-    # "gene_notes.institution",
-    # "gene_notes.status",
-    # "gene_notes.last_modified.date_modified",
-    # "gene_notes.last_modified.modified_by.display_title",
     "interpretation.@id",
-    # "interpretation.classification",
-    # "interpretation.acmg_rules_invoked.*",
-    # "interpretation.acmg_rules_with_modifier",
-    # "interpretation.conclusion",
-    # "interpretation.note_text",
-    # "interpretation.version",
-    # "interpretation.project",
-    # "interpretation.institution",
-    # "interpretation.status",
-    # "interpretation.last_modified.date_modified",
-    # "interpretation.last_modified.modified_by.display_title",
     "discovery_interpretation.@id",
-    # "discovery_interpretation.gene_candidacy",
-    # "discovery_interpretation.variant_candidacy",
-    # "discovery_interpretation.note_text",
-    # "discovery_interpretation.version",
-    # "discovery_interpretation.project",
-    # "discovery_interpretation.institution",
-    # "discovery_interpretation.status",
-    # "discovery_interpretation.last_modified.date_modified",
-    # "discovery_interpretation.last_modified.modified_by.display_title",
+
     "variant_sample_list.created_for_case",
-    # We need the following data in search result rows, so we embed these here and not thru /embed API.
-    "technical_review.*", # <- Added as workaround for invalidation scope... needs to be looked into more.
+
+    # We need Technical Review data in our search result rows, so we must embed these here and not use /embed API.
+    "technical_review.*",                       # <- TEMPORARY - Added as workaround for invalidation scope
     "technical_review.uuid",
     "technical_review.assessment.call",
     "technical_review.assessment.classification",
@@ -157,12 +127,12 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.note_text",
     "technical_review.last_text_edited.date_text_edited",
     "technical_review.last_text_edited.text_edited_by",
-    #"technical_review.review.date_reviewed",
-    #"technical_review.review.reviewed_by",
+    #"technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
+    #"technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
     "technical_review.last_modified.date_modified",
-    "technical_review.status", # <- needed to check if current or not (=== this 1 is saved to project)
+    "technical_review.status",                  # <- needed to check if current or not (=== this 1 is saved to project)
     "project_technical_review.*",
     "project_technical_review.assessment.call",
     "project_technical_review.assessment.classification",
@@ -175,12 +145,6 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "project_technical_review.last_text_edited.text_edited_by",
     "project_technical_review.approved_by.display_title",
     "project_technical_review.date_approved",
-    #"technical_review.last_modified.date_modified",
-    # "variant.technical_reviews.uuid",
-    # "variant.technical_reviews.assessment.call",
-    # "variant.technical_reviews.assessment.classification",
-    # "variant.technical_reviews.assessment.date_call_made",
-    # "variant.technical_reviews.note_text"
 ]
 
 
@@ -299,8 +263,6 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                     and "properties" in field_schema["items"]):
                 load_extended_descriptions_in_schemas(field_schema["items"]["properties"], depth + 1)
                 continue
-
-
 
 
 def perform_request_as_admin(request, item_atid, payload=None, request_method="PATCH"):
@@ -475,8 +437,6 @@ class VariantSample(Item):
     schema = load_extended_descriptions_in_schemas(load_schema('encoded:schemas/variant_sample.json'))
     rev = {'variant_sample_list': ('VariantSampleList', 'variant_samples.variant_sample_item')}
     embedded_list = build_variant_sample_embedded_list()
-
-    default_diff = ["variant.technicals_reviews"]
 
     FACET_ORDER_OVERRIDE = {
         'inheritance_modes': {
@@ -961,8 +921,8 @@ def process_items_process(context, request):
     """
 
     request_body = request.json
-    stpi = request_body.get("save_to_project_notes", {})
-    rfpi = request_body.get("remove_from_project_notes", {})
+    save_to_project_notes = request_body.get("save_to_project_notes", {})
+    remove_from_project_notes = request_body.get("remove_from_project_notes", {})
 
     vs_to_variant_or_gene_field_mappings = {
         "interpretation": "interpretations",
@@ -972,9 +932,9 @@ def process_items_process(context, request):
         "technical_review": "technical_reviews"
     }
 
-    if not stpi and not rfpi:
+    if not save_to_project_notes and not remove_from_project_notes:
         raise HTTPBadRequest("No Item UUIDs supplied.")
-    if stpi and rfpi:
+    if save_to_project_notes and remove_from_project_notes:
         raise HTTPBadRequest("May only supply 1 request at a time, to remove from OR to save to project.")
 
     li = {} # 'loaded notes'
@@ -984,16 +944,16 @@ def process_items_process(context, request):
         uuid_to_process = None
 
         # Initial Validation - ensure each requested UUID is present in own properties and editable
-        if vs_field_name in stpi:
-            uuid_to_process = stpi[vs_field_name]
+        if vs_field_name in save_to_project_notes:
+            uuid_to_process = save_to_project_notes[vs_field_name]
 
             # Compare UUID submitted vs UUID present on VS Item
             if uuid_to_process != context.properties[vs_field_name]:
                 raise HTTPBadRequest("Not all submitted Item UUIDs are present on [Structural]VariantSample. " + \
                     "Check 'save_to_project_notes." + vs_field_name + "'.")
 
-        elif vs_field_name in rfpi:
-            uuid_to_process = rfpi[vs_field_name]
+        elif vs_field_name in remove_from_project_notes:
+            uuid_to_process = remove_from_project_notes[vs_field_name]
         
         if uuid_to_process is None:
             return # skip
@@ -1024,30 +984,27 @@ def process_items_process(context, request):
     gene_fields_needed = []
 
     # Embed only the fields we need (for performance)
-    if "interpretation" in stpi or "interpretation" in rfpi:
+    if "interpretation" in save_to_project_notes or "interpretation" in remove_from_project_notes:
         variant_fields_needed.append("interpretations.@id")
         variant_fields_needed.append("interpretations.project")
 
-    if "discovery_interpretation" in stpi or "discovery_interpretation" in rfpi:
+    if "discovery_interpretation" in save_to_project_notes or "discovery_interpretation" in remove_from_project_notes:
         variant_fields_needed.append("discovery_interpretations.@id")
         variant_fields_needed.append("discovery_interpretations.project")
         gene_fields_needed.append("discovery_interpretations.@id")
         gene_fields_needed.append("discovery_interpretations.project")
 
-    if "variant_notes" in stpi or "variant_notes" in rfpi:
+    if "variant_notes" in save_to_project_notes or "variant_notes" in remove_from_project_notes:
         variant_fields_needed.append("variant_notes.@id")
         variant_fields_needed.append("variant_notes.project")
 
-    if "gene_notes" in stpi or "gene_notes" in rfpi:
+    if "gene_notes" in save_to_project_notes or "gene_notes" in remove_from_project_notes:
         gene_fields_needed.append("gene_notes.@id")
         gene_fields_needed.append("gene_notes.project")
 
-    if "technical_review" in stpi or "technical_review" in rfpi:
+    if "technical_review" in save_to_project_notes or "technical_review" in remove_from_project_notes:
         variant_fields_needed.append("technical_reviews.@id")
         variant_fields_needed.append("technical_reviews.project")
-
-    # need_variant_patch = "interpretation" in stpi or "discovery_interpretation" in stpi or "variant_notes" in stpi or "technical_review" in stpi or "technical_review" in rfpi
-    # need_gene_patch = "discovery_interpretation" in stpi or "gene_notes" in stpi
 
     context_item_type = context.jsonld_type()
     is_structural_vs = context_item_type[0] == "StructuralVariantSample"
@@ -1139,7 +1096,7 @@ def process_items_process(context, request):
         payload[vg_field_name].append(newly_shared_item_at_id)
 
 
-    if "interpretation" in stpi:
+    if "interpretation" in save_to_project_notes:
         # Update Note status if is not already current.
         if li["interpretation"]["status"] != "current":
             create_item_patch_current_status_payload(li["interpretation"]["@id"])
@@ -1147,7 +1104,7 @@ def process_items_process(context, request):
         add_or_replace_note_for_project_on_variant_or_gene_item("interpretation", variant, variant_patch_payload)
 
 
-    if "discovery_interpretation" in stpi:
+    if "discovery_interpretation" in save_to_project_notes:
         # Update Note status if is not already current.
         if li["discovery_interpretation"]["status"] != "current":
             create_item_patch_current_status_payload(li["discovery_interpretation"]["@id"])
@@ -1158,14 +1115,14 @@ def process_items_process(context, request):
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
             add_or_replace_note_for_project_on_variant_or_gene_item("discovery_interpretation", gene, genes_patch_payloads[gene["@id"]])
 
-    if "variant_notes" in stpi:
+    if "variant_notes" in save_to_project_notes:
         # Update Note status if is not already current.
         if li["variant_notes"]["status"] != "current":
             create_item_patch_current_status_payload(li["variant_notes"]["@id"])
         # Add to Variant.variant_notes
         add_or_replace_note_for_project_on_variant_or_gene_item("variant_notes", variant, variant_patch_payload)
 
-    if "gene_notes" in stpi:
+    if "gene_notes" in save_to_project_notes:
         # Update Note status if is not already current.
         if li["gene_notes"]["status"] != "current":
             create_item_patch_current_status_payload(li["gene_notes"]["@id"])
@@ -1174,7 +1131,7 @@ def process_items_process(context, request):
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
             add_or_replace_note_for_project_on_variant_or_gene_item("gene_notes", gene, genes_patch_payloads[gene["@id"]])
 
-    if "technical_review" in stpi:
+    if "technical_review" in save_to_project_notes:
         # Update Note status if is not already current.
         # TODO: Handle technical_review.note as well.
         technical_review_at_id = li["technical_review"]["@id"]
@@ -1184,7 +1141,7 @@ def process_items_process(context, request):
         add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload)
 
 
-    if "technical_review" in rfpi:
+    if "technical_review" in remove_from_project_notes:
         # Update Note status if is not already current.
         # TODO: Handle technical_review.note as well.
         technical_review_at_id = li["technical_review"]["@id"]
@@ -1225,7 +1182,7 @@ def process_items_process(context, request):
     # Follow-up - now we need to make sure all affected VariantSamples are re-indexed.
     # This matters for NoteTechnicalReview items at the moment, which need to be embedded via calcprop "VariantSample.project_technical_review"
     # But will probably need to be propagated to all other notes once we make use of other saved to project notes.
-    if variant_patch_count > 0 and ("technical_review" in stpi or "technical_review" in rfpi):
+    if variant_patch_count > 0 and ("technical_review" in save_to_project_notes or "technical_review" in remove_from_project_notes):
         vs_project_uuid = context.properties.get("project")
         affected_variant_sample_uuids = []
         param_lists = {

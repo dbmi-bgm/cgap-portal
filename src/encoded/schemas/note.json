@@ -64,7 +64,7 @@
             "permission": "restricted_fields"
         },
         "last_text_edited": {
-            "title": "Last Text Edited",
+            "title": "Text Last Edited",
             "exclude_from": ["FFedit-create"],
             "type": "object",
             "additionalProperties": false,

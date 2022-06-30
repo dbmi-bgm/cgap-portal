@@ -77,11 +77,9 @@ def accession(instance, subschema):
 
 @server_default
 def userproject(instance, subschema):
-    request = get_current_request()
-    userid_found = _userid()
-    if userid_found == NO_DEFAULT:
+    user = get_user_resource()
+    if user == NO_DEFAULT:
         return NO_DEFAULT
-    user = request.registry[COLLECTIONS]['user'][userid_found]
     project_roles = user.properties.get("project_roles", [])
     if len(project_roles) > 0:
         return project_roles[0]["project"]
@@ -90,17 +88,22 @@ def userproject(instance, subschema):
 
 @server_default
 def userinstitution(instance, subschema):
-    request = get_current_request()
-    userid_found = _userid()
-    if userid_found == NO_DEFAULT:
+    user = get_user_resource()
+    if user == NO_DEFAULT:
         return NO_DEFAULT
-    user = request.registry[COLLECTIONS]['user'][userid_found]
     return user.properties.get("user_institution", NO_DEFAULT)
 
 
 def get_userid():
     """ Wrapper for the server_default 'userid' above so it is not called through SERVER_DEFAULTS in our code """
     return _userid()
+
+def get_user_resource():
+    request = get_current_request()
+    userid_found = _userid()
+    if userid_found == NO_DEFAULT:
+        return NO_DEFAULT
+    return request.registry[COLLECTIONS]['user'][userid_found]
 
 
 def get_now():
