@@ -798,7 +798,7 @@ function commonNoteUpsertProcess ({
             statusExpected = "current";
             payload.save_to_project_notes = { "technical_review": technicalReviewUUID };
         }
-        return ajax.promise(variantSampleAtID + "@@process-items/", "PATCH", {}, JSON.stringify(payload))
+        return ajax.promise(variantSampleAtID + "@@update-project-notes/", "PATCH", {}, JSON.stringify(payload))
             .then(function(processItemsResponse){
                 const {
                     status: endpointResponseStatus,

@@ -14,7 +14,7 @@ from .variant import (
     SHARED_VARIANT_SAMPLE_EMBEDS,
     extend_embedded_list,
     load_extended_descriptions_in_schemas,
-    process_items_process
+    update_project_notes_process
 )
 
 
@@ -639,11 +639,11 @@ class StructuralVariantSample(Item):
 
 
 @view_config(
-    name='process-items',
+    name='update-project-notes',
     context=StructuralVariantSample,
     request_method='PATCH',
     permission='edit'
 )
-def process_items(context, request):
+def update_project_notes(context, request):
     """This endpoint is used to process notes attached to this (in-context) StructuralVariantSample."""
-    return process_items_process(context, request)
+    return update_project_notes_process(context, request)

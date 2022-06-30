@@ -204,7 +204,7 @@ function countVariantSamplesWithAnySelectionSize(variantSampleListItem, selectio
 }
 
 /**
- * Generates payloads for VariantSampleList /@@process-items/ endpoint
+ * Generates payloads for VariantSampleList /@@update-project-notes/ endpoint
  * and then PATCHes them to there.
  *
  * @todo Check if lack edit permission and make button disabled if so.
@@ -295,7 +295,7 @@ function SaveNotesToProjectButton (props) {
 
             if (Object.keys(payload.save_to_project_notes).length > 0) {
                 payloads.push([
-                    variantSampleAtID + "@@process-items/",
+                    variantSampleAtID + "@@update-project-notes/",
                     payload
                 ]);
             }

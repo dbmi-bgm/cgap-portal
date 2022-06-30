@@ -885,19 +885,19 @@ def download(context, request):
 
 
 @view_config(
-    name='process-items',
+    name='update-project-notes',
     context=VariantSample,
     request_method='PATCH',
     permission='edit'
 )
-def process_items(context, request):
+def update_project_notes(context, request):
     """This endpoint is used to process notes attached to this (in-context) VariantSample."""
-    return process_items_process(context, request)
+    return update_project_notes_process(context, request)
 
 
 
 
-def process_items_process(context, request):
+def update_project_notes_process(context, request):
     """
     Currently, "saving to project" is supported, but more functions may be available in future.
 
