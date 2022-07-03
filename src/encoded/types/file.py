@@ -57,7 +57,6 @@ from .base import (
     collection_add,
     item_edit,
     PROJECT_MEMBER_CREATE_ACL,
-    # lab_award_attribution_embed_list,
 )
 
 
@@ -177,6 +176,24 @@ def property_closure(request, propname, root_uuid):
     return seen
 
 
+def _build_file_embedded_list():
+    """"""
+    return [
+        # FileFormat linkTo
+        "file_format.file_format",
+
+        # File linkTo
+        "related_files.relationship_type",
+        "related_files.file.accession",
+        "related_files.file.file_format.file_format",
+
+        # QC
+        "quality_metric.@type",
+        "quality_metric.qc_list.qc_type",
+        "quality_metric.qc_list.value.uuid"
+    ]
+
+
 @abstract_collection(
     name='files',
     unique_key='accession',
@@ -190,20 +207,7 @@ class File(Item):
     item_type = 'file'
     base_types = ['File'] + Item.base_types
     schema = load_schema('encoded:schemas/file.json')
-    embedded_list = Item.embedded_list + [
-        # FileFormat linkTo
-        'file_format.file_format',
-
-        # File linkTo
-        'related_files.relationship_type',
-        'related_files.file.accession',
-        'related_files.file.file_format.file_format',
-
-        # QC
-        'quality_metric.@type',
-        'quality_metric.qc_list.qc_type',
-        'quality_metric.qc_list.value.uuid'
-    ]
+    embedded_list = _build_file_embedded_list()
     name_key = 'accession'
 
     @calculated_property(schema={
@@ -533,6 +537,61 @@ class FileFastq(File):
         "quality_metric.Sequence length",
         "quality_metric.url"
         ] + file_workflow_run_embeds
+    name_key = 'accession'
+    rev = dict(File.rev, **{
+        'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
+        'workflow_run_outputs': ('WorkflowRun', 'output_files.value'),
+    })
+
+    @calculated_property(schema={
+        "title": "Input of Workflow Runs",
+        "description": "All workflow runs that this file serves as an input to",
+        "type": "array",
+        "items": {
+            "title": "Input of Workflow Run",
+            "type": ["string", "object"],
+            "linkTo": "WorkflowRun"
+        }
+    })
+    def workflow_run_inputs(self, request):
+        return self.rev_link_atids(request, "workflow_run_inputs")
+
+    @calculated_property(schema={
+        "title": "Output of Workflow Runs",
+        "description": "All workflow runs that this file serves as an output from",
+        "type": "array",
+        "items": {
+            "title": "Output of Workflow Run",
+            "type": "string",
+            "linkTo": "WorkflowRun"
+        }
+    })
+    def workflow_run_outputs(self, request):
+        return self.rev_link_atids(request, "workflow_run_outputs")
+
+
+def _build_file_submitted_embedded_list():
+    """"""
+    return _build_file_embedded_list() + file_workflow_run_embeds + [
+        "quality_metric.overall_quality_status",
+        "quality_metric.Total Sequences",
+        "quality_metric.Sequence length",
+        "quality_metric.url",
+    ]
+
+
+@collection(
+    name="files-submitted",
+    unique_key="accession",
+    properties={
+        "title": "Submitted Files",
+        "description": "Listing of Submitted Files",
+    })
+class FileSubmitted(File):
+    """Collection for individual submitted files."""
+    item_type = 'file_submitted'
+    schema = load_schema('encoded:schemas/file_fastq.json')
+    embedded_list = _build_file_submitted_embedded_list()
     name_key = 'accession'
     rev = dict(File.rev, **{
         'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),

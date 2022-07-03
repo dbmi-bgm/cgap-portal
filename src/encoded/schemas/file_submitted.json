@@ -1,7 +1,7 @@
 {
-    "title": "Raw file",
-    "description": "Raw file submitted to CGAP",
-    "id": "/profiles/file_raw.json",
+    "title": "Submitted file",
+    "description": "File submitted to CGAP",
+    "id": "/profiles/file_submitted.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [

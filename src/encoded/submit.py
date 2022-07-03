@@ -5,8 +5,8 @@ import csv
 import datetime
 import json
 import re
-import openpyxl
 
+import openpyxl
 from dcicutils.lang_utils import n_of
 from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
@@ -94,14 +94,14 @@ SIBLINGS = ['sibling', 'brother', 'sister', 'full sibling', 'full brother', 'ful
 RELATIONS = SIBLINGS + ['proband', 'mother', 'father']
 
 POST_ORDER = [
-    'file_fastq', 'file_processed', 'sample', 'individual',
+    'file_submitted', 'sample', 'individual',
     'family', 'sample_processing', 'report', 'case'
 ]
 
 
 LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-round
     'samples', 'members', 'mother', 'father', 'proband', 'report',
-    'individual', 'sample_processing', 'families', 'family', 'files'
+    'individual', 'sample_processing', 'families', 'family', 'files',
 ]
 
 
@@ -295,29 +295,33 @@ class AccessionRow:
     """
     class used to hold metadata parsed from one row of spreadsheet at a time
     """
-
-    FILES = "files"
+    # Schema constants
     ALIASES = "aliases"
     SAMPLES = "samples"
     FAMILIES = "families"
-    RELATED_FILES = "related_files"
-    RELATIONSHIP_TYPE = "relationship_type"
-    PAIRED_WITH = "paired with"
-    FILE = "file"
+    SUBMITTED_FILES = "files"
 
+    # Spreadsheet constants
     GENOME_BUILD = "genome_build"
+    FILES = "files"
     CASE_FILES = "case_files"
 
-    PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
-    PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
-    PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
+    # Class constants
+    ACCEPTED_GENOME_BUILDS = {
+        "GRCh37": ["19", "hg19", "grch37"],
+        "GRCh38": ["38", "hg38", "grch38"],
+    }
+    FILE_SUBMITTED = "file_submitted"
 
-    def __init__(self, vapp, metadata, idx, family_alias, project, institution):
+    def __init__(
+        self, vapp, metadata, idx, family_alias, project, institution, file_parser=None
+    ):
         self.project = project
         self.institution = institution
         self.virtualapp = vapp
         self.metadata = metadata
         self.row = idx
+        self.file_parser = file_parser
         self.errors = []
         if not self.found_missing_values():
             self.files = []
@@ -426,8 +430,7 @@ class AccessionRow:
         fields = [
             'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
             'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id',
-            'bam_sample_id',
-            "files", "case_files"
+            'bam_sample_id', self.FILES, self.CASE_FILES,
         ]
         info = map_fields(self.metadata, info, fields, 'sample')
         # handle enum values
@@ -450,242 +453,69 @@ class AccessionRow:
         info['requisition_acceptance'] = {k: v for k, v in req_info.items() if v}
         if self.individual:
             self.individual.metadata['samples'] = [self.sample_alias]
-        self.update_sample_files(info)
-
-        sample_processing_files = info.pop(self.CASE_FILES)
-        sample_processing = self.make_sample_processing_metadata(sample_processing_files)
+        sample_processing = self.make_sample_processing_metadata()
+        self.process_and_add_file_metadata(info, sample_processing)
         return (
             MetadataItem(info, self.row, 'sample'),
             MetadataItem(sample_processing, self.row, 'sample_processing')
         )
 
-    def update_sample_files(self, sample_info):
-        """"""
-        submitted_files = sample_info.pop(self.FILES)
-        file_items, file_aliases = self.extract_file_metadata(submitted_files)
-        self.files += file_items
-        if file_aliases:
-            sample_info[self.FILES] = file_aliases
-
-    def make_sample_processing_metadata(self, case_files):
+    def make_sample_processing_metadata(self):
         """"""
         properties = {
             self.ALIASES: [self.analysis_alias],
             self.SAMPLES: [self.sample_alias],
             self.FAMILIES: [self.fam_alias],
         }
-        file_items, file_aliases = self.extract_file_metadata(case_files)
-        self.files += file_items
-        if file_aliases:
-            properties[self.SUBMITTED_FILES] = file_aliases
         return properties
 
-    def get_file_aliases(self, file_metadata):
+    def process_and_add_file_metadata(self, sample, sample_processing):
         """"""
-
-    def extract_file_metadata(self, submitted_file_names):
-        """"""
-        file_items = []
-        file_aliases = []
-        fastq_files = {}
-        files_without_file_format = []
-        submitted_file_names = set(string_to_array(submitted_file_names))
-        submitted_genome_build = self.metadata.get(self.GENOME_BUILD)
+        submitted_genome_build = sample.pop(self.GENOME_BUILD, None)
         genome_build = self.validate_genome_build(submitted_genome_build)
-        for submitted_file_name in submitted_file_names:
-            file_path = PurePath(submitted_file_name)
-            file_format, file_type = self.identify_file_format(file_path)
-            if not file_format:
-                files_without_file_format.append(submitted_file_name)
-                continue
-            file_alias = '{}:{}'.format(self.project, file_path.name)
-            file_aliases.append(file_alias)
-            file_properties = {
-                self.ALIASES: [file_alias],
-                self.FILE_FORMAT: file_format,
-                self.FILENAME: submitted_file_name,
-            }
-            if file_type:
-                file_properties[self.FILE_TYPE] = file_type
-            if genome_build:
-                file_properties[self.GENOME_ASSEMBLY] = genome_build
-            file_items.append(file_properties)
-            if file_format == self.FILE_FORMAT_FASTQ:
-                fastq_files[file_path.name.lower()] = file_properties
-        if fastq_files:
-            invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(fastq_files)
-            if invalid_fastq_names:
-                msg = ""
-                self.errors.append(msg)
-            if unpaired_fastqs:
-                msg = ""
-                self.errors.append(msg)
-        if files_without_file_format:
-            msg = ""
-            self.errors.append(msg)
-        return file_items, file_aliases
+        submitted_sample_files = sample.pop(self.FILES, None)
+        submitted_sample_processing_files = sample.pop(self.CASE_FILES, None)
+        if submitted_sample_files:
+            self.update_item_files(sample, submitted_sample_files, genome_build)
+        if submitted_sample_processing_files:
+            self.update_item_files(
+                sample_processing, submitted_sample_processing_files, genome_build
+            )
+
+    def update_item_files(self, item, submitted_files, genome_build):
+        """"""
+        file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
+            submitted_files, genome_build=genome_build
+        )
+        for file_item in file_items:
+            file_metadata_item = MetadataItem(file_item, self.row, self.FILE_SUBMITTED)
+            self.files.append(file_metadata_item)
+        if file_aliases:
+            item[self.SUBMITTED_FILES] = file_aliases
+        self.errors.extend(file_errors)
 
     def validate_genome_build(self, submitted_genome_build):
         """"""
-        result = self.ACCEPTED_GENOME_BUILDS.get(submitted_genome_build.lower())
-        if result is None:
-            msg = ""
-            self.errors.append(msg)
-        return result
-
-    def identify_file_format(self, file_path):
-        """"""
         result = None
-        suffixes = file_path.suffixes
-        number_of_suffixes = len(suffixes)
-        for idx in range(number_of_suffixes):  # Iterate through largest to smallest
-            suffix_for_search = suffixes[idx:number_of_suffixes]
-            search_result = self.search_file_format_for_suffix(suffix_for_search)
-            if not search_result:
-                continue
-            elif len(search_result) == 1:
-                result = search_result[0]
-                break
-            else:
-                msg = ""
-                self.errors.append(msg)
-                break
-        return result
-
-    def search_file_format_for_suffix(self, suffix):
-        """"""
-        result = []
-        base_query = "search/?type=FileFormat&valid_item_types=FileRaw"
-        standard_extension_query = base_query + "&standard_file_extension=" + suffix
-        other_extensions_query = base_query + "&other_allowed_extensions=" + suffix
-        result += self.search_query(standard_extension_query)
-        if not result:
-            result += self.search_query(other_extensions_query)
-        return result
-
-    def search_query(self, query):
-        """"""
-        url_encoded_query = parse.quote_plus(query)
-        try:
-            result = self.vapp.get(url_encoded_query, status=200).json
-        except (VirtualAppError, AppError):
-            result = []
-        return result
-
-    def validate_and_pair_fastqs(self, fastq_files):
-        """"""
-        fastq_paired_end_1 = {}
-        fastq_paired_end_2 = {}
-        fastq_unknown_paired_end = []
-        for file_name, file_item in fastq_files.items():
-            paired_end = self.get_paired_end_from_name(file_name)
-            if paired_end == 1:
-                fastq_paired_end_1[file_name] = file_item
-            elif paired_end == 2:
-                fastq_paired_end_2[file_name] = file_item
-            else:
-                fastq_unknown_paired_end.append(file_name)
-        unpaired_fastqs = self.pair_fastqs_by_name(
-            fastq_paired_end_1, fastq_paired_end_2
-        )
-        return fastq_unknown_paired_end, unpaired_fastqs
-
-    def get_paired_end_from_name(self, file_name):
-        """"""
-        result = None
-        matches = []
-        if self.PAIRED_END_1_REGEX.search(file_name):
-            matches.append(1)
-        if self.PAIRED_END_2_REGEX.search(file_name):
-            matches.append(2)
-        if len(matches) == 1:
-            [result] = matches
-        return result
-
-    def pair_fastqs_by_name(self, fastq_paired_end_1, fastq_paired_end_2):
-        """"""
-        unmatched_fastqs = []
-        matched_paired_end_2 = set()
-        for file_name, file_item in fastq_paired_end_1.items():
-            expected_paired_end_2_name = self.make_expected_paired_end_2_name(file_name)
-            match = fastq_paired_end_2.get(expected_paired_end_2_name)
-            if match is not None:
-                matched_paired_end_2.add(expected_paired_end_2_name)
-                match_alias = match[self.ALIASES][0]
-                file_item[self.RELATED_FILES] = [
-                    {
-                        self.RELATIONSHIP_TYPE: self.PAIRED_WITH,
-                        self.FILE: match_alias,
-                    }
-                ]
-            else:
-                unmatched_fastqs.append(file_name)
-        for file_name in fastq_paired_end_2.keys():
-            if file_name not in matched_paired_end_2:
-                unmatched_fastqs.append(file_name)
-        return unmatched_fastqs
-
-    def make_expected_paired_end_2_name(self, file_name):
-        """"""
-        def r1_to_r2(match):
-            return match.group().replace("1", "2")
-
-        return re.sub(self.PAIRED_END_1_REGEX, r1_to_r2, file_name)
-
-    def extract_file_metadata_old(self):
-        """
-        Extracts 'file' item metadata from each row, generating MetadataItem
-        object(s). Objects are appended to self.files_fastq or self.files_processed,
-        as appropriate, which are initialized as empty lists.
-        """
-        valid_extensions = {
-            '.fastq.gz': ('fastq', 'reads'),
-            '.fq.gz': ('fastq', 'reads'),
-            '.cram': ('cram', 'alignments'),
-            '.vcf.gz': ('vcf_gz', 'raw VCF')
-        }
-        filenames = [f.strip() for f in self.metadata.get('files', '').split(',') if f.strip()]
-        paired = True if len(filenames) % 2 == 0 else False
-        for i, filename in enumerate(filenames):
-            extension = [ext for ext in valid_extensions if filename.endswith(ext)]
-            if not extension:
-                if [ext for ext in ['.fastq', '.fq', '.vcf'] if filename.endswith(ext)]:
-                    self.errors.append('File must be compressed - please gzip file {}'.format(filename))
-                else:
-                    self.errors.append(
-                        (
-                            'File extension on {} not supported - expecting one of: '
-                            '.fastq.gz, .fq.gz, .cram, .vcf.gz'
-                        ).format(filename)
+        if submitted_genome_build:
+            submitted_genome_build_lower = submitted_genome_build.lower()
+            for genome_build, accepted_values in self.ACCEPTED_GENOME_BUILDS.items():
+                accepted_values = map(str.lower, accepted_values)
+                if submitted_genome_build_lower in accepted_values:
+                    result = genome_build
+                    break
+            if result is None:
+                msg = (
+                    "Row %s - Invalid genome build provided: %s. Consider replacing"
+                    " with one of the following: %s."
+                    % (
+                        self.row,
+                        submitted_genome_build,
+                        ", ".join(self.ACCEPTED_GENOME_BUILDS.keys()),
                     )
-                continue
-            file_alias = '{}:{}'.format(self.project, filename.strip().split('/')[-1])
-            fmt = valid_extensions[extension[0]][0]
-            file_info = {
-                'aliases': [file_alias],
-                # 'row': self.row,
-                'file_format': '/file-formats/{}/'.format(fmt),
-                'file_type': valid_extensions[extension[0]][1],
-                'filename': filename.strip()
-            }
-            # file relationships if paired
-            if fmt == 'fastq':
-                self.sample.metadata.setdefault('files', []).append(file_alias)
-                if paired:
-                    paired_end = str(AccessionRow.get_paired_end_value(i))
-                    file_info['paired_end'] = paired_end
-                    if paired_end == '2':
-                        file_info['related_files'] = [
-                            {'relationship_type': 'paired with',
-                             'file': self.files_fastq[-1].alias}
-                        ]
-                self.files_fastq.append(MetadataItem(file_info, self.row, 'file_fastq'))
-            else:
-                if fmt == 'cram':
-                    self.sample.metadata.setdefault('cram_files', []).append(file_alias)
-                else:
-                    self.sample.metadata.setdefault('processed_files', []).append(file_alias)
-                self.files_processed.append(MetadataItem(file_info, self.row, 'file_processed'))
+                )
+                self.errors.append(msg)
+        return result
 
 
 class AccessionMetadata:
@@ -720,8 +550,7 @@ class AccessionMetadata:
         self.sample_processings = {}
         self.reports = {}
         self.cases = {}
-        self.files_fastq = {}
-        self.files_processed = {}
+        self.files = {}
         self.reports_req = []
         self.errors = []
         self.analysis_types = self.get_analysis_types()
@@ -732,8 +561,7 @@ class AccessionMetadata:
             'family': self.families,
             'sample': self.samples,
             'sample_processing': self.sample_processings,
-            'file_fastq': self.files_fastq,
-            'file_processed': self.files_processed,
+            'file_submitted': self.files,
             'case': self.cases,
             'report': self.reports
         }
@@ -815,26 +643,6 @@ class AccessionMetadata:
                             previous[item.alias][key] = unique
                     else:
                         previous[item.alias][key] = list(set(previous[item.alias][key]))
-
-    def check_fastq_paired_info(self):
-        """
-        Makes sure fastq files appearing more than once have consistent paired with
-        information. Specifically, checks that paired end 1 files have consistent
-        pairing info.
-        """
-        paired_info = {}
-        for val in self.files_fastq.values():
-            if 'related_files' in val:
-                for file_dict in val['related_files']:
-                    if file_dict['file'] not in paired_info:
-                        paired_info[file_dict['file']] = val['filename']
-                    elif paired_info[file_dict['file']] != val['filename']:
-                        msg = ('Fastq file {} appears multiple times in sheet'
-                               ' with inconsistent paired file. Please ensure fastq is'
-                               ' paired with correct file in all rows where it appears.'
-                               ''.format(file_dict['file']))
-                        self.errors.append(msg)
-        return
 
     def add_family_metadata(self, idx, family, individual):
         """
@@ -969,6 +777,7 @@ class AccessionMetadata:
         Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
         Case creation and family relations added after all rows have been processed.
         """
+        file_parser = SubmittedFilesParser(self.virtualapp, self.project)
         self.get_analysis_types()
         for i, row in enumerate(self.rows):
             try:
@@ -979,14 +788,18 @@ class AccessionMetadata:
                 continue
             try:
                 processed_row = AccessionRow(
-                    self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution
+                    self.virtualapp,
+                    row,
+                    i + 1 + self.counter,
+                    fam,
+                    self.project,
+                    self.institution,
+                    file_parser=file_parser,
                 )
                 simple_add_items = [processed_row.individual, processed_row.sample]
-                simple_add_items.extend(processed_row.files_fastq)
-                simple_add_items.extend(processed_row.files_processed)
+                simple_add_items.extend(processed_row.files)
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
-                self.check_fastq_paired_info()
                 self.add_family_metadata(processed_row.row, processed_row.family, processed_row.individual)
                 self.add_sample_processing(processed_row.analysis, processed_row.metadata.get('analysis id'))
                 self.add_case_info(processed_row)
@@ -994,6 +807,8 @@ class AccessionMetadata:
             except AttributeError:
                 self.errors.extend(processed_row.errors)
                 continue
+        file_parsing_general_errors = file_parser.check_for_errors()
+        self.errors.extend(file_parsing_general_errors)
         self.add_individual_relations()
         self.create_case_metadata()
 
@@ -1010,6 +825,257 @@ class AccessionMetadata:
                 self.json_out[key][alias] = new_metadata
             # self.json_out[key] = self.itemtype_dict[key]
             self.json_out['errors'] = self.errors
+
+
+class SubmittedFilesParser:
+    """"""
+
+    FILES = "files"
+    ALIASES = "aliases"
+    SAMPLES = "samples"
+    FAMILIES = "families"
+    RELATED_FILES = "related_files"
+    RELATIONSHIP_TYPE = "relationship_type"
+    PAIRED_WITH = "paired with"
+    FILE = "file"
+    FILE_FORMAT = "file_format"
+    FILENAME = "filename"
+    STANDARD_FILE_EXTENSION = "standard_file_extension"
+    OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
+    GENOME_ASSEMBLY = "genome_assembly"
+
+    GENOME_BUILD = "genome_build"
+    CASE_FILES = "case_files"
+    FILE_FORMAT_FASTQ_ATID = "/file-formats/fastq/"
+
+    PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
+    PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
+    PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
+
+    def __init__(self, virtualapp, project_name):
+        """"""
+        self.virtualapp = virtualapp
+        self.project_name = project_name
+        self.errors = []  # Errors across rows that don't need to be repeated
+        self.accepted_file_formats = None
+        self.unidentified_file_format = False
+        self.file_extensions_to_file_formats = {}  # Cache extensions --> file formats
+
+    def check_for_errors(self):
+        """"""
+        self.check_for_multiple_file_formats()
+        return self.errors
+
+    def check_for_multiple_file_formats(self):
+        """"""
+        multiple_file_formats = {}
+        for file_extension, file_formats in self.file_extensions_to_file_formats.items():
+            if len(file_formats) > 1:
+                multiple_file_formats[file_extension] = file_formats
+        if multiple_file_formats:
+            msg = (
+                "Could not identify a unique file format for the following file"
+                " extensions: %s. Please report this error to the CGAP team for"
+                "assistance: %s."
+                % (", ".join(multiple_file_formats.keys()), multiple_file_formats)
+            )
+            self.errors.append(msg)
+
+    def extract_file_metadata(
+        self, submitted_file_names, genome_build=None, row_index=None
+    ):
+        """"""
+        file_items = []
+        file_aliases = []
+        fastq_files = {}
+        files_without_file_format = []
+        errors = []
+        submitted_file_names = self.get_file_names(submitted_file_names)
+        for submitted_file_name in submitted_file_names:
+            file_path = PurePath(submitted_file_name)
+            file_name = file_path.name
+            file_suffixes = file_path.suffixes
+            file_format_atid = self.identify_file_format(file_suffixes)
+            if not file_format_atid:
+                files_without_file_format.append(submitted_file_name)
+                continue
+            file_alias = '{}:{}'.format(self.project_name, file_name)
+            file_aliases.append(file_alias)
+            file_properties = {
+                self.ALIASES: [file_alias],
+                self.FILE_FORMAT: file_format_atid,
+                self.FILENAME: submitted_file_name,
+            }
+            if genome_build:
+                file_properties[self.GENOME_ASSEMBLY] = genome_build
+            file_items.append(file_properties)
+            if file_format_atid == self.FILE_FORMAT_FASTQ_ATID:
+                fastq_files[file_name] = file_properties
+        if fastq_files:
+            invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(fastq_files)
+            if invalid_fastq_names:
+                msg = (
+                    "Row %s - Invalid FASTQ file name(s) found: %s. FASTQ file names"
+                    " must contain read information; see documentation for details."
+                    % (row_index, ", ".join(invalid_fastq_names))
+                )
+                errors.append(msg)
+            if unpaired_fastqs:
+                msg = (
+                    "Row %s - No matched pair-end file found for FASTQ file name(s): %s."
+                    " Matched FASTQ file names must differ only in the read number."
+                    % (row_index, ", ".join(unpaired_fastqs))
+                )
+                errors.append(msg)
+        if files_without_file_format:
+            if self.unidentified_file_format is False:
+                accepted_file_extensions = self.get_accepted_file_extensions()
+                msg = (
+                    "Unable to identify at least 1 file extension on this submission."
+                    " The following extensions are currently accepted: %s."
+                    % ", ".join(accepted_file_extensions)
+                )
+                self.errors.append(msg)
+                self.unidentified_file_format = True
+            msg = (
+                "Row %s - Invalid file extensions provided for the following file"
+                " name(s): %s."
+                % (row_index, ", ".join(files_without_file_format))
+            )
+            errors.append(msg)
+        return file_items, file_aliases, errors
+
+    def get_file_names(self, submitted_file_names):
+        """"""
+        return set(string_to_array(submitted_file_names))
+
+    def get_accepted_file_extensions(self):
+        """"""
+        result = []
+        accepted_file_formats = self.get_accepted_file_formats()
+        for file_format in accepted_file_formats:
+            result.append(file_format.get(self.STANDARD_FILE_EXTENSION))
+            result += file_format.get(self.OTHER_ALLOWED_EXTENSIONS, [])
+        return sorted(list(set(result)))
+
+    def get_accepted_file_formats(self):
+        """
+        NOTE: Assume this is a reasonable number and thus faster to
+        go through list than to make multiple search requests
+        """
+        if self.accepted_file_formats is None:
+            query = (
+                "/search/?type=FileFormat&valid_item_types=FileSubmitted"
+                "&field=@id&field=standard_file_extension"
+                "&field=other_allowed_extensions&field=file_format"
+            )
+            self.accepted_file_formats = self.search_query(query)
+        return self.accepted_file_formats
+
+    def identify_file_format(self, file_suffixes):
+        """"""
+        result = None
+        for idx in range(len(file_suffixes)):  # Iterate through largest to smallest
+            suffix_for_search = "".join(file_suffixes[idx:]).lstrip(".")
+            cached_formats = self.file_extensions_to_file_formats.get(suffix_for_search)
+            if cached_formats is not None:
+                search_result = cached_formats
+            else:
+                search_result = self.search_file_format_for_suffix(suffix_for_search)
+                self.file_extensions_to_file_formats[suffix_for_search] = search_result
+            if not search_result:
+                continue
+            else:
+                if len(search_result) == 1:
+                    result = search_result[0]["@id"]
+                break
+        return result
+
+    def search_file_format_for_suffix(self, suffix):
+        """"""
+        result = []
+        file_formats = self.get_accepted_file_formats()
+        for file_format in file_formats:
+            standard_file_extension = file_format.get("standard_file_extension", "")
+            other_allowed_extensions = file_format.get("other_allowed_extensions", [])
+            if suffix == standard_file_extension or suffix in other_allowed_extensions:
+                result.append(file_format)
+        return result
+
+    def search_query(self, query):
+        """"""
+        try:
+            result = self.make_get_request(query).get("@graph", [])
+        except (VirtualAppError, AppError):
+            result = []
+        return result
+
+    def make_get_request(self, url):
+        """"""
+        response = self.virtualapp.get(url, status=[200, 301])
+        if response.status_code == 301:
+            response = response.follow()
+        return response.json
+
+    def validate_and_pair_fastqs(self, fastq_files):
+        """"""
+        fastq_paired_end_1 = {}
+        fastq_paired_end_2 = {}
+        fastq_unknown_paired_end = []
+        for file_name, file_item in fastq_files.items():
+            paired_end = self.get_paired_end_from_name(file_name)
+            if paired_end == 1:
+                fastq_paired_end_1[file_name] = file_item
+            elif paired_end == 2:
+                fastq_paired_end_2[file_name] = file_item
+            else:
+                fastq_unknown_paired_end.append(file_name)
+        unpaired_fastqs = self.pair_fastqs_by_name(
+            fastq_paired_end_1, fastq_paired_end_2
+        )
+        return fastq_unknown_paired_end, unpaired_fastqs
+
+    def get_paired_end_from_name(self, file_name):
+        """"""
+        result = None
+        matches = []
+        if self.PAIRED_END_1_REGEX.search(file_name):
+            matches.append(1)
+        if self.PAIRED_END_2_REGEX.search(file_name):
+            matches.append(2)
+        if len(matches) == 1:
+            [result] = matches
+        return result
+
+    def pair_fastqs_by_name(self, fastq_paired_end_1, fastq_paired_end_2):
+        """"""
+        unmatched_fastqs = []
+        matched_paired_end_2 = set()
+        for file_name, file_item in fastq_paired_end_1.items():
+            expected_paired_end_2_name = self.make_expected_paired_end_2_name(file_name)
+            match = fastq_paired_end_2.get(expected_paired_end_2_name)
+            if match is not None:
+                matched_paired_end_2.add(expected_paired_end_2_name)
+                match_alias = match[self.ALIASES][0]
+                file_item[self.RELATED_FILES] = [
+                    {
+                        self.RELATIONSHIP_TYPE: self.PAIRED_WITH,
+                        self.FILE: match_alias,
+                    }
+                ]
+            else:
+                unmatched_fastqs.append(file_name)
+        for file_name in fastq_paired_end_2.keys():
+            if file_name not in matched_paired_end_2:
+                unmatched_fastqs.append(file_name)
+        return unmatched_fastqs
+
+    def make_expected_paired_end_2_name(self, file_name):
+        """"""
+        def r1_to_r2(match):
+            return match.group().replace("1", "2")
+
+        return re.sub(self.PAIRED_END_1_REGEX, r1_to_r2, file_name)
 
 
 class PedigreeRow:
