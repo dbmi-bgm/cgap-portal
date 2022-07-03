@@ -114,22 +114,22 @@ export class SvBrowser extends React.PureComponent {
                     });
 
                     // Get the Higlass SV/CNV vcf location
-                    // If there are multiple files that satisfy the conditions below, 
+                    // If there are multiple files that satisfy the conditions below,
                     // the last one in the list will be taken.
                     let higlassSvVcf = null;
                     let higlassCnvVcf = null;
                     processedFiles.forEach(function (file) {
-                      if (
-                        file["file_type"] === "Higlass SV VCF" || // This is checked for backwards compatibilty
-                        (file["higlass_file"] && file["variant_type"] === "SV")
-                      ) {
-                        higlassSvVcf = file["upload_key"];
-                      } else if (
-                        file["file_type"] === "Higlass CNV VCF" || // This is checked for backwards compatibilty
-                        (file["higlass_file"] && file["variant_type"] === "CNV")
-                      ) {
-                        higlassCnvVcf = file["upload_key"];
-                      }
+                        if (
+                            file["file_type"] === "Higlass SV VCF" || // This is checked for backwards compatibilty
+                            (file["higlass_file"] && file["variant_type"] === "SV")
+                        ) {
+                            higlassSvVcf = file["upload_key"];
+                        } else if (
+                            file["file_type"] === "Higlass CNV VCF" || // This is checked for backwards compatibilty
+                            (file["higlass_file"] && file["variant_type"] === "CNV")
+                        ) {
+                            higlassCnvVcf = file["upload_key"];
+                        }
                     });
 
                     this.setState({

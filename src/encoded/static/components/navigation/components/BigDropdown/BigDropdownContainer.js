@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { CSSTransition } from 'react-transition-group';
 import ReactTooltip from 'react-tooltip';
-import { layout, console, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-
+import { layout, console, analytics, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import _ from 'underscore';
 
 export class BigDropdownContainer extends React.PureComponent {
 
@@ -59,7 +59,19 @@ export class BigDropdownContainer extends React.PureComponent {
     onBackgroundClick(evt){
         const targetElem = (evt && evt.target) || null;
 
-        if (layout.elementIsChildOfLink(targetElem)){
+        const target = layout.elementIsChildOfLink(targetElem);
+
+        if (target){
+            // Allow external links to the marketing site by not allowing event to bubble up to window click handler
+            // in BigDropdownGroupController.
+            const targetHref = target.getAttribute('href') || target.getAttribute('data-href');
+            if (
+                targetHref &&
+                !navigate.sameOrigin(targetHref)
+            ) {
+                evt.stopPropagation();
+            }
+
             // Let bubble up - app.js will catch and navigate via handleClick and BigDropdownGroupController will catch and hide menu.
             return false;
         }

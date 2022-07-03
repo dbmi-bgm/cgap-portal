@@ -43,6 +43,9 @@
         },
         {
             "$ref": "mixins.json#/submitted_files"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
         }
     ],
     "properties": {
