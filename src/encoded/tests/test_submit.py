@@ -1143,13 +1143,17 @@ class TestSubmittedFilesParser:
             result_value = get_result.get(key)
             assert result_value == value
 
-        search_query = "/search/?type=Project&uuid=" + wb_project["uuid"]
-        search_result = file_parser_with_search.make_get_request(search_query)
-        assert search_result["@graph"][0] == wb_project
+        url = "/search/?type=Project&uuid=" + wb_project["uuid"]
+        get_result = file_parser_with_search.make_get_request(url)
+        assert get_result["@graph"][0] == wb_project
 
-        search_query = "/search/?type=Project&uuid!=No value"  # 301 follow
-        search_result = file_parser_with_search.make_get_request(search_query)
-        assert search_result["@graph"]
+        url = "/search/?type=Project&uuid!=No value"  # 301 follow
+        get_result = file_parser_with_search.make_get_request(url)
+        assert get_result["@graph"]
+
+        url = "/search/?type=FooBar"
+        get_result = file_parser_with_search.make_get_request(url)
+        assert not get_result
 
     def make_file_dicts_for_names(file_names):
         """"""

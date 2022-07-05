@@ -461,7 +461,11 @@ class AccessionRow:
         )
 
     def make_sample_processing_metadata(self):
-        """"""
+        """Create SampleProcessing properties, except possibly files.
+
+        :returns: SampleProcessing properties
+        :rtype: dict
+        """
         properties = {
             self.ALIASES: [self.analysis_alias],
             self.SAMPLES: [self.sample_alias],
@@ -470,7 +474,14 @@ class AccessionRow:
         return properties
 
     def process_and_add_file_metadata(self, sample, sample_processing):
-        """"""
+        """Parse/validate file information and update Sample or
+        SampleProcessing properties accordingly.
+
+        :param sample: Sample properties
+        :type sample: dict
+        :param sample_processing: SampleProcessing properties
+        :type sample_processing: dict
+        """
         submitted_genome_build = sample.pop(self.GENOME_BUILD, None)
         genome_build = self.validate_genome_build(submitted_genome_build)
         submitted_sample_files = sample.pop(self.FILES, None)
@@ -483,7 +494,20 @@ class AccessionRow:
             )
 
     def update_item_files(self, item, submitted_files, genome_build):
-        """"""
+        """Attempt to build File items and update the given item's
+        properties accordingly.
+
+        Add created File aliases to the item, and add any errors to the
+        class' errors for reporting.
+
+        :param item: The Item to update with created Files
+        :type item: dict
+        :param submitted_files: Comma-separated file names
+        :type submitted_files: str or None
+        :param genome_build: Validated genome assembly to set as
+            property on all created File items
+        :type genome_build: str or None
+        """
         file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
             submitted_files, genome_build=genome_build
         )
@@ -495,7 +519,13 @@ class AccessionRow:
         self.errors.extend(file_errors)
 
     def validate_genome_build(self, submitted_genome_build):
-        """"""
+        """Validate submitted genome build and report any errors.
+
+        :param submitted_genome_build: Submitted genome assembly
+        :type submitted_genome_build: str or None
+        :returns: Validated genome assembly if found
+        :rtype: str or None
+        """
         result = None
         if submitted_genome_build:
             submitted_genome_build_lower = submitted_genome_build.lower()
@@ -828,8 +858,9 @@ class AccessionMetadata:
 
 
 class SubmittedFilesParser:
-    """"""
+    """Class to manage File item creation during submission."""
 
+    # Schema constants
     FILES = "files"
     ALIASES = "aliases"
     SAMPLES = "samples"
@@ -843,17 +874,26 @@ class SubmittedFilesParser:
     STANDARD_FILE_EXTENSION = "standard_file_extension"
     OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
     GENOME_ASSEMBLY = "genome_assembly"
+    AT_ID = "@id"
 
+    # Spreadsheet constants
     GENOME_BUILD = "genome_build"
     CASE_FILES = "case_files"
-    FILE_FORMAT_FASTQ_ATID = "/file-formats/fastq/"
 
+    # Class constants
+    FILE_FORMAT_FASTQ_ATID = "/file-formats/fastq/"
     PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
     PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
     PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
 
     def __init__(self, virtualapp, project_name):
-        """"""
+        """Initialize class and set attributes.
+
+        :param virtualapp: App for requests
+        :type virtualapp: WebTest  # TODO: update
+        :param project_name: Project name for created Files
+        :type project_name: str
+        """
         self.virtualapp = virtualapp
         self.project_name = project_name
         self.errors = []  # Errors across rows that don't need to be repeated
@@ -862,12 +902,24 @@ class SubmittedFilesParser:
         self.file_extensions_to_file_formats = {}  # Cache extensions --> file formats
 
     def check_for_errors(self):
-        """"""
+        """Identify any global errors, i.e. those found across multiple
+        spreadsheet rows that only need to be reported once.
+
+        Method called within AccessionMetadata.process_rows().
+        Intended to call helper functions that will update self.errors
+        prior to returning them for reporting purposes.
+
+        :returns: Global errors found while processing all submitted
+            file information on the spreadsheet
+        :rtype: list
+        """
         self.check_for_multiple_file_formats()
         return self.errors
 
     def check_for_multiple_file_formats(self):
-        """"""
+        """Identify file extensions that matched to multiple FileFormat
+        items and update self.errors for reporting.
+        """
         multiple_file_formats = {}
         for file_extension, file_formats in self.file_extensions_to_file_formats.items():
             if len(file_formats) > 1:
@@ -884,7 +936,24 @@ class SubmittedFilesParser:
     def extract_file_metadata(
         self, submitted_file_names, genome_build=None, row_index=None
     ):
-        """"""
+        """Primary method for validating and creating Files from
+        submitted information.
+
+        Updates self.errors with any errors to report for an individual
+        accession row (see self.check_for_errors() for "global" errors
+        that should only be reported once across all rows.
+
+        :param submitted_file_names: Comma-separated submitted file
+            names
+        :type submitted_file_names: str or None
+        :param genome_build: Validated genome assembly
+        :type genome_build: str or None
+        :param row_index: Row index within spreadsheet
+        :type row_index: int or None
+        :returns: Validated File items, validated File aliases, errors
+            to report for this row
+        :rtype: tuple(dict, list, list)
+        """
         file_items = []
         file_aliases = []
         fastq_files = {}
@@ -946,11 +1015,22 @@ class SubmittedFilesParser:
         return file_items, file_aliases, errors
 
     def get_file_names(self, submitted_file_names):
-        """"""
+        """Parse submitted file names.
+
+        :param submitted_file_names: Comma-separated file names
+        :type submitted_file_names: str
+        :returns: Unique, parsed file names
+        :rtype: set(str)
+        """
         return set(string_to_array(submitted_file_names))
 
     def get_accepted_file_extensions(self):
-        """"""
+        """Grab all accepted extensions for FileFormats that can be
+        used for FileSubmitted items.
+
+        :returns: Unique file extensions in alphabetical order
+        :rtype: set(str)
+        """
         result = []
         accepted_file_formats = self.get_accepted_file_formats()
         for file_format in accepted_file_formats:
@@ -959,9 +1039,12 @@ class SubmittedFilesParser:
         return sorted(list(set(result)))
 
     def get_accepted_file_formats(self):
-        """
-        NOTE: Assume this is a reasonable number and thus faster to
-        go through list than to make multiple search requests
+        """Find all FileFormats acceptable for FileSubmitted items.
+
+        Only make this search request once and store as attribute.
+
+        :returns: Acceptable FileFormats found
+        :rtype: list(dict)
         """
         if self.accepted_file_formats is None:
             query = (
@@ -973,7 +1056,23 @@ class SubmittedFilesParser:
         return self.accepted_file_formats
 
     def identify_file_format(self, file_suffixes):
-        """"""
+        """Find FileFormat(s) that accept the given file extension.
+
+        Attempt to find FileFormats from largest possible extension to
+        smallest to provide flexibility for users to name files with
+        extensions; e.g. foo_bar.updated.fastq.gz should match to a
+        FASTQ file format by not finding a match for the extension
+        updated.fastq.gz and then finding one for fastq.gz.
+
+        Cache all file extension --> matched FileFormats so can be
+        re-used across entire spreadsheet to avoid repeated identical
+        requests.
+
+        :param file_suffixes: Suffixes of submitted file name
+        :type file_suffixes: list(str)
+        :returns: Valid matching FileFormat @id if unique match found
+        :rtype: str or None
+        """
         result = None
         for idx in range(len(file_suffixes)):  # Iterate through largest to smallest
             suffix_for_search = "".join(file_suffixes[idx:]).lstrip(".")
@@ -987,38 +1086,79 @@ class SubmittedFilesParser:
                 continue
             else:
                 if len(search_result) == 1:
-                    result = search_result[0]["@id"]
+                    result = search_result[0][self.AT_ID]
                 break
         return result
 
     def search_file_format_for_suffix(self, suffix):
-        """"""
+        """Find all FileFormats that can be used for the given file
+        extension.
+
+        NOTE: We grab all FileFormats that can be used for FileSubmitted
+        items via self.get_accepted_file_formats() (caches search
+        result) and then iterate through them here. Expecting
+        reasonably small number of accepted FileFormats so iterating
+        through them for every extension rather than making separate
+        search request for all such extensions.
+
+        :param suffix: File extension
+        :type suffix: str
+        :returns: FileFormats accepting the extension
+        :rtype: list
+        """
         result = []
         file_formats = self.get_accepted_file_formats()
         for file_format in file_formats:
-            standard_file_extension = file_format.get("standard_file_extension", "")
-            other_allowed_extensions = file_format.get("other_allowed_extensions", [])
+            standard_file_extension = file_format.get(self.STANDARD_FILE_EXTENSION, "")
+            other_allowed_extensions = file_format.get(self.OTHER_ALLOWED_EXTENSIONS, [])
             if suffix == standard_file_extension or suffix in other_allowed_extensions:
                 result.append(file_format)
         return result
 
     def search_query(self, query):
-        """"""
-        try:
-            result = self.make_get_request(query).get("@graph", [])
-        except (VirtualAppError, AppError):
-            result = []
-        return result
+        """Make GET request for given search query and return items
+        found.
+
+        :param query: Search query
+        :type query: str
+        :returns: Items matching query
+        :rtype: list
+        """
+        return self.make_get_request(query).get("@graph", [])
 
     def make_get_request(self, url):
-        """"""
-        response = self.virtualapp.get(url, status=[200, 301])
-        if response.status_code == 301:
-            response = response.follow()
-        return response.json
+        """Make GET request.
+
+        Follow response if re-directed, and handle response errors.
+
+        :param url: URL to GET
+        :type url: str
+        :returns: GET response
+        :rtype: dict
+        """
+        try:
+            response = self.virtualapp.get(url, status=[200, 301])
+            if response.status_code == 301:
+                response = response.follow()
+            result = response.json
+        except (VirtualAppError, AppError):
+            result = {}
+        return result
 
     def validate_and_pair_fastqs(self, fastq_files):
-        """"""
+        """Enforce increased validation for FASTQ files.
+
+        Require strict name formatting and pairing of FASTQs.
+
+        Updates paired file properties accordingly.
+
+        :param fastq_files: Mapping of file names to corresponding item
+            properties
+        :type fastq_files: dict
+        :returns: File names for which paired-end unknown, file names
+            with paired-end but not paired
+        :rtype: tuple(list, list)
+        """
         fastq_paired_end_1 = {}
         fastq_paired_end_2 = {}
         fastq_unknown_paired_end = []
@@ -1036,7 +1176,13 @@ class SubmittedFilesParser:
         return fastq_unknown_paired_end, unpaired_fastqs
 
     def get_paired_end_from_name(self, file_name):
-        """"""
+        """Identify unique FASTQ paired-end from file name.
+
+        :param file_name: File name
+        :type file_name: str
+        :returns: Paired-end, if found and unique
+        :rtype: str or None
+        """
         result = None
         matches = []
         if self.PAIRED_END_1_REGEX.search(file_name):
@@ -1048,7 +1194,21 @@ class SubmittedFilesParser:
         return result
 
     def pair_fastqs_by_name(self, fastq_paired_end_1, fastq_paired_end_2):
-        """"""
+        """Attempt to pair FASTQ files by name, updating File
+        properties accordingly.
+
+        NOTE: Expecting paired-end 1 and 2 file names to match exactly
+        besides the paired-end info within the name.
+
+        :param fastq_paired_end_1: Mapping of file names --> File
+            properties for paired-end 1 FASTQs
+        :type fastq_paired_end_1: dict
+        :param fastq_paired_end_2: Mapping of file names --> File
+            properties for paired-end 2 FASTQs
+        :type fastq_paired_end_2: dict
+        :returns: File names that could not be paired
+        :rtype: list
+        """
         unmatched_fastqs = []
         matched_paired_end_2 = set()
         for file_name, file_item in fastq_paired_end_1.items():
@@ -1071,7 +1231,14 @@ class SubmittedFilesParser:
         return unmatched_fastqs
 
     def make_expected_paired_end_2_name(self, file_name):
-        """"""
+        """Create expected paired-end 2 file name from a paired-end 1
+        file name.
+
+        :param file_name: Paired-end 1 file name
+        :type file_name: str
+        :returns: Expected paired-end 2 file name
+        :rtype: str
+        """
         def r1_to_r2(match):
             return match.group().replace("1", "2")
 
