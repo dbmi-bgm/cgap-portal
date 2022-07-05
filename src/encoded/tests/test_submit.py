@@ -262,9 +262,49 @@ def post_data(project, institution):
                 'bam_sample_id': 'samp1-WGS',
                 'workup_type': 'WGS',
                 'specimen_accession': 'samp1',
+                "files": [
+                    "test-proj:file_name_R1.fastq.gz",
+                    "test-proj:file_name_R2.fastq.gz",
+                ],
                 'project': project['@id'],
                 'institution': institution['@id']
-            }]
+            }],
+            "sample_processing": [
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:sample-processing-1"],
+                    "samples": ["test-proj:samp1"],
+                    "families": ["test-proj:fam1"],
+                    "files": ["test-proj:file_name.vcf.gz"],
+                },
+            ],
+            "file_submitted": [
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:file_name_R1.fastq.gz"],
+                    "file_format": "fastq",
+                    "related_files": [
+                        {
+                            "file": "test-proj:file_name_R1.fastq.gz",
+                            "relationship_type": "paired with",
+                        },
+                    ],
+                },
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:file_name_R2.fastq.gz"],
+                    "file_format": "fastq",
+                },
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:file_name.vcf.gz"],
+                    "file_format": "vcf_gz",
+                },
+            ]
         },
         'patch': {},
         'aliases': {}
@@ -2076,16 +2116,20 @@ def test_validate_all_items_errors(testapp, mother, empty_items):
     assert mother['aliases'][0] not in errors
 
 
-def test_post_and_patch_all_items(testapp, post_data):
+def test_post_and_patch_all_items(testapp, post_data, file_formats):
     output, success, file_info = post_and_patch_all_items(testapp, post_data)
     assert success
     for itemtype in post_data['post']:
-        assert f'{itemtype}: 1 item created (with POST); 0 items failed creation' in output
+        item_count = len(post_data["post"][itemtype])
+        item_name = "item"
+        if item_count > 1:
+            item_name = "items"
+        assert f'{itemtype}: {item_count} {item_name} created (with POST); 0 items failed creation' in output
         if post_data['patch'].get(itemtype):
             assert f'{itemtype}: attributes of 1 item updated (with PATCH); 0 items failed updating' in output
 
 
-def test_post_and_patch_all_items_error(testapp, post_data):
+def test_post_and_patch_all_items_error(testapp, post_data, file_formats):
     """
     additional property introduced into 'family' item json  -
     designed to test appropriate error message produced in 'output' when item fails to post

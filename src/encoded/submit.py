@@ -101,7 +101,7 @@ POST_ORDER = [
 
 LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-round
     'samples', 'members', 'mother', 'father', 'proband', 'report',
-    'individual', 'sample_processing', 'families', 'family', 'files',
+    'individual', 'sample_processing', 'families', 'family', 'files', "related_files",
 ]
 
 
@@ -509,7 +509,7 @@ class AccessionRow:
         :type genome_build: str or None
         """
         file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
-            submitted_files, genome_build=genome_build
+            submitted_files, genome_build=genome_build, row_index=self.row
         )
         for file_item in file_items:
             file_metadata_item = MetadataItem(file_item, self.row, self.FILE_SUBMITTED)
