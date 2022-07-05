@@ -1,3 +1,4 @@
+import copy
 from unittest import mock
 
 import openpyxl
@@ -104,6 +105,8 @@ FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS = {
 FASTQ_ALIAS_TO_FILE_ITEMS_ERRORS = {
     item["aliases"][0]: item for item in FASTQ_FILE_ITEMS_ERRORS
 }
+VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS = copy.copy(VCF_ALIAS_TO_FILE_ITEM)
+VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS.update(FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS)
 PROBAND_BAM_SAMPLE_ID = "3464467-WGS-2"
 UNCLE_BAM_SAMPLE_ID = "3464460-WGS-1"
 
@@ -130,7 +133,6 @@ def row_dict():
     }
 
 
-
 @pytest.fixture
 def row_dict_uncle():
     return {
@@ -145,7 +147,6 @@ def row_dict_uncle():
         'test requested': 'WGS',
         'test number': '1'
     }
-
 
 
 @pytest.fixture
@@ -424,7 +425,7 @@ def pedigree_row(row_dict_pedigree, project, institution):
 
 @pytest.fixture
 def accession_row(row_dict, testapp, project, institution):
-    """"""
+    """An AccessionRow without errors."""
     result = AccessionRow(
         testapp, row_dict, 1, "test-proj:fam1", project["name"], institution["name"]
     )
@@ -434,7 +435,7 @@ def accession_row(row_dict, testapp, project, institution):
 
 @pytest.fixture
 def file_parser(testapp):
-    """"""
+    """A SubmittedFilesParser without errors and without ES."""
     result = SubmittedFilesParser(testapp, "some_project_name")
     assert not result.errors
     return result
@@ -442,7 +443,7 @@ def file_parser(testapp):
 
 @pytest.fixture
 def file_parser_with_search(es_testapp, wb_project):
-    """"""
+    """A SubmittedFilesParser without errors and with ES."""
     result = SubmittedFilesParser(es_testapp, wb_project["name"])
     assert not result.errors
     return result
@@ -452,7 +453,11 @@ def file_parser_with_search(es_testapp, wb_project):
 def accession_row_with_file_parser_and_search(
     es_testapp, file_parser_with_search, wb_project, wb_institution
 ):
-    """"""
+    """An AccessionRow without errors and with a file parser with
+    search.
+
+    Useful for testing integration of file parsing with row parsing.
+    """
     result = AccessionRow(
         es_testapp, row_dict, 1, "test-proj:fam1", wb_project["name"], wb_institution["name"],
         file_parser=file_parser_with_search
@@ -627,7 +632,9 @@ class TestAccessionRow:
         ]
     )
     def test_process_and_add_file_metadata(self, accession_row, sample, expected_calls):
-        """"""
+        """Test spreadsheet fields removed from Sample and
+        Sample/SampleProcessing updated based on fields present.
+        """
         sample_processing = {}
         expected_dropped_keys = ["genome_build", "files", "case_files"]
         with mock.patch(
@@ -648,7 +655,9 @@ class TestAccessionRow:
     def test_update_item_files(
         self, accession_row, file_items, file_aliases, file_errors
     ):
-        """"""
+        """Test output of file parsing handled appropriately: aliases
+        added to items, errors reported, and files added.
+        """
         item = {}
         with mock.patch.object(accession_row, "file_parser") as mocked_file_parser:
             mocked_file_parser.extract_file_metadata.return_value = (
@@ -682,7 +691,9 @@ class TestAccessionRow:
     def test_validate_genome_build(
         self, accession_row, genome_build, expected_errors, expected
     ):
-        """"""
+        """Test submitted genome build converted to appropriate value
+        if valid.
+        """
         result = accession_row.validate_genome_build(genome_build)
         assert result == expected
         assert len(accession_row.errors) == expected_errors
@@ -856,6 +867,14 @@ class TestAccessionMetadata:
                 FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS, 0),
             (None, VCF_FILE_PATH, None, None, VCF_ALIAS_TO_FILE_ITEM, 0),
             (None, VCF_FILE_PATH, None, VCF_FILE_NAME, VCF_ALIAS_TO_FILE_ITEM, 0),
+            (
+                None,
+                VCF_FILE_PATH,
+                None,
+                FASTQ_FILE_NAMES_NO_ERRORS,
+                VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS,
+                0,
+            ),
         ]
     )
     def test_integrated_with_files(
@@ -872,7 +891,12 @@ class TestAccessionMetadata:
         expected_files,
         expected_errors
     ):
-        """"""
+        """Test integration of SubmittedFilesParser with
+        AccessionMetadata.
+
+        Ensure expected errors reported correctly, files placed on
+        appropriate items, and file properties created.
+        """
         row_dict["files"] = proband_files
         row_dict["case files"] = proband_case_files
         row_dict_uncle["files"] = uncle_files
@@ -909,7 +933,7 @@ class TestAccessionMetadata:
 class TestSubmittedFilesParser:
 
     def assert_lists_equal(self, list_1, list_2):
-        """"""
+        """Simple helper to compare lists of dicts."""
         assert len(list_1) == len(list_2)
         for item in list_1:
             assert item in list_2
@@ -927,7 +951,9 @@ class TestSubmittedFilesParser:
     def test_check_for_multiple_file_formats(
         self, file_parser, extensions_to_formats, expected_errors
     ):
-        """"""
+        """Test multiple file formats for a given extension produce an
+        error that is reported.
+        """
         file_parser.file_extensions_to_file_formats = extensions_to_formats
         file_parser.check_for_multiple_file_formats()
         assert len(file_parser.errors) == expected_errors
@@ -986,7 +1012,12 @@ class TestSubmittedFilesParser:
         expected_aliases,
         expected_row_errors,
     ):
-        """"""
+        """Test submitted file names parsing, File alias/property
+        creation, and error reporting.
+
+        NOTE: Essentially an integrated test of the class, so check
+        helper functions if failing.
+        """
         (
             result_items,
             result_aliases,
@@ -1009,7 +1040,7 @@ class TestSubmittedFilesParser:
         ]
     )
     def test_get_file_names(self, file_parser, submitted_file_names, expected):
-        """"""
+        """Test parsing submitted file names."""
         result = file_parser.get_file_names(submitted_file_names)
         assert result == set(expected)
 
@@ -1032,7 +1063,9 @@ class TestSubmittedFilesParser:
     def test_get_accepted_file_extensions(
         self, file_parser, accepted_file_formats, expected
     ):
-        """"""
+        """Test accumulating acceptable file extensions from mocked
+        search results for FileFormats.
+        """
         with mock.patch(
             "encoded.submit.SubmittedFilesParser.get_accepted_file_formats",
             return_value=accepted_file_formats,
@@ -1043,7 +1076,7 @@ class TestSubmittedFilesParser:
 
     @pytest.mark.workbook
     def test_get_accepted_file_formats(self, file_parser_with_search):
-        """"""
+        """Test retrieval of accepted FileFormats via search."""
         result_file_formats = []
         expected_file_formats = ["fastq", "vcf_gz"]
         result = file_parser_with_search.get_accepted_file_formats()
@@ -1090,7 +1123,9 @@ class TestSubmittedFilesParser:
         expected_calls,
         expected,
     ):
-        """"""
+        """Test iteratively matching file extensions to FileFormats with
+        mocked search results.
+        """
         with mock.patch(
             "encoded.submit.SubmittedFilesParser.search_file_format_for_suffix",
             side_effect=return_values,
@@ -1113,7 +1148,9 @@ class TestSubmittedFilesParser:
     def test_search_file_format_for_suffix(
         self, file_parser_with_search, suffix, expected
     ):
-        """"""
+        """Test matching of file extension to FileFormat(s) via search
+        results.
+        """
         result = file_parser_with_search.search_file_format_for_suffix(suffix)
         assert len(result) == len(expected)
         result_file_formats = [item["file_format"] for item in result]
@@ -1130,14 +1167,18 @@ class TestSubmittedFilesParser:
         ],
     )
     def test_search_query(self, file_parser_with_search, query, expected_length):
-        """"""
+        """Test search results retrieved and returned as list of
+        items found.
+        """
         result = file_parser_with_search.search_query(query)
         assert isinstance(result, list)
         assert len(result) == expected_length
 
     @pytest.mark.workbook
     def test_make_get_request(self, file_parser_with_search, wb_project):
-        """"""
+        """Test GET request made with appropriate response following
+        and error handling.
+        """
         get_result = file_parser_with_search.make_get_request(wb_project["@id"])
         for key, value in wb_project.items():
             result_value = get_result.get(key)
@@ -1156,7 +1197,9 @@ class TestSubmittedFilesParser:
         assert not get_result
 
     def make_file_dicts_for_names(file_names):
-        """"""
+        """Helper function to create simple File item with alias
+        property for all given file names.
+        """
         result = {}
         for file_name in file_names:
             result[file_name] = {SubmittedFilesParser.ALIASES: ["alias-" + file_name]}
@@ -1185,6 +1228,9 @@ class TestSubmittedFilesParser:
     def test_validate_and_pair_fastqs(
         self, file_parser, fastqs, expected_unknown_paired_end, expected_unpaired_fastqs
     ):
+        """Test paired-end identification and subsequent file pairing
+        of FASTQs.
+        """
         (
             result_unknown_paired_end,
             result_unpaired_fastqs,
@@ -1212,7 +1258,7 @@ class TestSubmittedFilesParser:
         ],
     )
     def test_get_paired_end_from_name(self, file_parser, file_name, expected):
-        """"""
+        """Test paired-end identification from FASTQ file name."""
         result = file_parser.get_paired_end_from_name(file_name)
         assert result == expected
 
@@ -1261,7 +1307,9 @@ class TestSubmittedFilesParser:
         expected_matches,
         expected_unmatched,
     ):
-        """"""
+        """Test pairing of FASTQ files by name, with file properties
+        updated and unpaired file names returned.
+        """
         unmatched = file_parser.pair_fastqs_by_name(
             fastq_paired_end_1, fastq_paired_end_2
         )
@@ -1287,7 +1335,9 @@ class TestSubmittedFilesParser:
         ],
     )
     def test_make_expected_paired_end_2_name(self, file_parser, file_name, expected):
-        """"""
+        """Test making paired-end 2 name from paired-end 1 FASTQ file
+        name.
+        """
         result = file_parser.make_expected_paired_end_2_name(file_name)
         assert result == expected
 
