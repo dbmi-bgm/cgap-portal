@@ -175,8 +175,16 @@ class NoteTechnicalReview(Note):
         assessment = self.properties.get("assessment", {})
         call = assessment.get("call")
         classification = assessment.get("classification")
+        title_part_1 = None
         if call is not None and classification is not None:
-            return "(" + ("" if call == True else "No ") + "Call) " + classification
-        return self.uuid
+            title_part_1 = "(" + ("" if call == True else "No ") + "Call) " + classification
+        else:
+            title_part_1 = "No Saved Classification"
+        title_part_2 = None
+        try:
+            title_part_2 = " from" + date_created[:10]
+        except Exception:
+            title_part_2 = " - " + self.uuid
 
+        return title_part_1 + title_part_2
         
