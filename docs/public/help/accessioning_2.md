@@ -5,8 +5,7 @@ are needed. Columns where information is required is marked
 with an asterisk (\*). Below are details about filling out 
 each column. 
 
-**Unique Analysis ID**\*: This may sometimes also be referred to 
-as Case ID, but this is an ID that will be used to track 
+**Unique Analysis ID**\*: This ID will be used to track 
 results of an analysis for one particular specimen. This 
 needs to be unique across all rows.
 
@@ -15,13 +14,13 @@ needs to be unique across all rows.
 to be performed on a proband, mother, and father samples, 
 then all 3 of the corresponding rows must have the same 
 analysis ID. If the proband sample also needs to be analyzed
- on its own, or with the mother's sample only, or with an 
+on its own, or with the mother's sample only, or with an 
 additional sibling, this analysis needs a new analysis ID 
 that distinguishes it from the first trio analysis. Note 
 that in the example spreadsheet, row 2 has almost all the 
 same information as row 5, but the analysis ID and unique 
 analysis ID are different. This indicates that the proband's
- sample needs to be analysis as part of a quad analysis 
+sample needs to be analyzed as part of a quad analysis 
 (analysis ID 1134-1) as well as alone on its own (analysis 
 ID 1134-2).
 
@@ -34,47 +33,51 @@ sample was collected from. Make sure this does not include
 any personal identifying information such as MRN.
 
 **Sex**\*: The sex of the individual the sample was collected 
-from. Valid options include: male, female, unknown, M, F, U.
+from.
+- Valid options include: **male**, **female**, **unknown**,
+ **M**, **F**, **U**.
 
 **Age**: The numerical age of the individual. Units for the age 
 can be provided in the subsequent Age Units column. Must be 
 an integer.
 
-**Age Units**: Should be added whenever age is provided. The units for the age. If age isn't provided, 
-this should be left blank. Valid options include: year, 
-month, day. Do not pluralize the units.
+**Age Units**: Should be provided whenever age is present.
+The units for the age. If age isn't provided, 
+this should be left blank.
+- Valid options include: **year**, **month**, **day**.
+ Do not pluralize the units.
 
 **Birth Year**: The year the individual was born. Must be in 
 format YYYY.
 
 **Relation to Proband**\*: If the individual is the 
 proband/affected for the analysis, enter Proband. Otherwise,
- enter the individual's relation to the proband. Valid 
-options include: proband, mother, father, sibling. If the 
-individual is a sibling, the value can be entered as sibling
- or full sibling, and a numerical identifier can be appended
- if necessary (e.g., 'sibling 1' or 'full sibling 2' are 
-also accepted). Currently half-siblings and other relations
- aren't supported by our submission software; if you need to
- be able to submit these, please contact us directly.
+enter the individual's relation to the proband.
+- Valid options include: **proband**, **mother**, **father**,
+ **sibling**.
+- If the individual is a sibling, a numerical identifier can
+ be appended if necessary (e.g., 'sibling 1'). Currently
+ half-siblings and other relations aren't supported by our
+ submission software; if you need to submit these, please
+ contact us directly.
 
-**Specimen Type**\*: The type of specimen. Expected values 
-include: peripheral blood, cord blood, plasma, saliva. If 
-the specimen type is none of these, a different value can 
-also be accepted.
+**Specimen Type**\*: The type of specimen.
+- Recommended options include: **peripheral blood**, **cord blood**,
+ **plasma**, **saliva**.
 
 **Specimen ID**\*: An ID for the specimen that was collected for
  sequencing.
 
 **Report Required**\*: Whether a report needs to be generated for
- this sample in this analysis after variant interpretation 
+this sample in this analysis after variant interpretation 
 is finalized. Commonly a report is required for the 
 proband/affected only, but reports can also be generated for
- other samples in the analysis if necessary. Accepted values
- include: yes, no, Y, N.
+other samples in the analysis if necessary.
+- Valid options include: **yes**, **Y**, **no**, **N**
 
 **Test Requested**\*: The type of test or sequencing that was 
-ordered for the sample. Accepted values include: WGS, WES.
+ordered for the sample.
+- Valid options include: **WGS**, **WES**.
 
 **Specimen Collection Date**: The date the specimen was 
 collected from the individual. Format should be YYYY-MM-DD.
@@ -82,10 +85,35 @@ collected from the individual. Format should be YYYY-MM-DD.
 **Sequencing Date**: The date the sample from the individual was
  sequenced. Format should be YYYY-MM-DD.
 
-**Files**: The raw fastq files that were produced by the 
-sequencing and need to be analyzed in this analysis, 
-comma-separated. .cram files can also be accepted. For best 
-results, use the full path to the file. 
+**Files**: Comma-separated file names to upload for the *sample*.
+While full file paths are accepted, best practice is to submit
+only the file name and to provide the path during upload if needed.
+If the files are FASTQs, the following requirements apply:
+- FASTQs must be paired-end reads
+- File names must indicate paired-end status. Accepted file
+ names must contain one of the following sub-strings:
+    - *\_R1\_* or *\_R1.* (forward reads)
+        - Examples: samplename_S1_L001*_R1_*001.fastq.gz, samplename*_R1.*fastq.gz
+    - *\_R2\_* or *\_R2.* (reverse reads)
+        - Examples: samplename_S1_L001*_R2_*001.fastq.gz, samplename_*R2.*fastq.gz
+- Paired files must be submitted during the same submission and
+ have identical file names other than the paired-end indicator
+    - Examples: samplename_R1.fastq.gz, samplename_R2.fastq.gz
+
+**Case Files**: Comma-separated file names to upload for the *case*.
+These files should contain data related to all individuals/samples
+included in the analysis, e.g. a joint called VCF.
+As above, file names are recommended over full paths.
+
+**Genome Build**: The genome build applicable to all submitted files
+present under the **Files** and **Case Files** headers for the submission.
+- Valid options include: **GChR37**, **hg19**, **GChR38**, **hg38**.
+- Since the value applies to all submitted files, please submit
+multiple times as required to match the genome build to the
+corresponding file names. For example, if submitting both FASTQ
+and VCF files, fill in the FASTQ file names and submit with
+an empty **Genome Build** header, then remove those names, add
+the VCF file names, provide a genome build, and submit again.
 
 The above columns constitute the metadata required for the 
 CGAP portal to perform the analysis, as well as a few 
