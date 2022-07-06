@@ -174,8 +174,7 @@
             "enum": [
                 "HIGH",
                 "MEDIUM",
-                "LOW",
-                "NA"
+                "LOW"
             ],
             "do_import": true,
             "vcf_field": "CF",
@@ -436,6 +435,10 @@
             "title": "Size",
             "order": 30
         },
+        "confidence_class": {
+            "title": "Confidence",
+            "order": 35
+        },
         "structural_variant.transcript.csq_gene.display_title": {
             "title": "Gene(s)",
             "order": 40
@@ -577,6 +580,10 @@
             "title": "Consequence",
             "order": 50,
             "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_consequence.html"
+        },
+        "confidence_class": {
+            "title": "Call Confidence",
+            "order": 52
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",

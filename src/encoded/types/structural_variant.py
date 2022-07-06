@@ -497,9 +497,7 @@ class StructuralVariantSample(Item):
             "items": {"type": "string"},
         }
     )
-    def proband_only_inheritance_modes(
-        self, request, structural_variant, inheritance_modes=[]
-    ):
+    def proband_only_inheritance_modes(self, request, structural_variant):
         """
         Inheritance modes for proband-only cases.
 
