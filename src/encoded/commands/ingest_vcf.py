@@ -5,7 +5,11 @@ from dcicutils.misc_utils import VirtualApp
 from pyramid.paster import get_app
 
 from encoded.ingestion.gene_utils import GeneIngestion
-from encoded.ingestion.variant_utils import StructuralVariantBuilder, VariantBuilder
+from encoded.ingestion.variant_utils import (
+    StructuralVariantBuilder,
+    CNVBuilder,
+    VariantBuilder,
+)
 from encoded.ingestion.vcf_utils import StructuralVariantVCFParser, VCFParser
 from encoded.util import resolve_file_path
 
@@ -23,6 +27,7 @@ def run_vcf_ingestion(
     post_consequence=False,
     post_genes=False,
     structural_variant=False,
+    copy_number_variant=False,
 ):
     """
     Runs VCF ingestion, posting items as indicated by args.
@@ -36,22 +41,32 @@ def run_vcf_ingestion(
     :param post_consequence: bool to post variant consequences
     :param post_genes: bool to post genes
     :param structural_variant: bool if handling SV VCF
+    :param copy_number_variant: bool if handling CNV VCF
     """
     logging.basicConfig()
     logger.info("Ingesting VCF file: %s." % vcf_path)
-    if structural_variant:
+    if structural_variant or copy_number_variant:
         vcf_parser = StructuralVariantVCFParser(
             vcf_path,
             resolve_file_path("schemas/structural_variant.json"),
             resolve_file_path("schemas/structural_variant_sample.json"),
         )
-        builder = StructuralVariantBuilder(
-            app,
-            vcf_parser,
-            vcf_accession,
-            project=project,
-            institution=institution,
-        )
+        if copy_number_variant:
+            builder = CNVBuilder(
+                app,
+                vcf_parser,
+                vcf_accession,
+                project=project,
+                institution=institution,
+            )
+        else:
+            builder = StructuralVariantBuilder(
+                app,
+                vcf_parser,
+                vcf_accession,
+                project=project,
+                institution=institution,
+            )
     else:
         vcf_parser = VCFParser(
             vcf_path,
@@ -113,7 +128,13 @@ def main():
         "--structural-variant",
         action="store_true",
         default=False,
-        help="Provide if ingestion SV VCF",
+        help="Provide if ingestion of SV VCF",
+    )
+    parser.add_argument(
+        "--copy-number-variant",
+        action="store_true",
+        default=False,
+        help="Provide if ingestion of CNV VCF",
     )
     args = parser.parse_args()
 
@@ -134,6 +155,7 @@ def main():
         post_consequence=args.post_conseq,
         post_genes=args.post_genes,
         structural_variant=args.structural_variant,
+        copy_number_variant=args.copy_number_variant,
     )
 
 
