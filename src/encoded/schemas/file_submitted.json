@@ -47,22 +47,33 @@
             "$ref": "mixins.json#/static_embeds"
         },
         {
-            "$ref": "file_fastq.json#/properties"
+            "$ref": "file.json#/properties"
         }
     ],
     "mixinFacets": [
         {
-            "$ref": "file_fastq.json#/facets"
+            "$ref": "file.json#/facets"
         }
     ],
     "mixinColumns": [
         {
-            "$ref": "file_fastq.json#/columns"
+            "$ref": "file.json#/columns"
         }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "file_classification": {
+            "title": "General Classification",
+            "type": "string",
+            "default": "raw file",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "enum": [
+                "raw file"
+            ]
         }
     }
 }

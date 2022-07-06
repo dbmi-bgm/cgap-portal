@@ -177,7 +177,7 @@ def property_closure(request, propname, root_uuid):
 
 
 def _build_file_embedded_list():
-    """"""
+    """Embedded list for File type."""
     return [
         # FileFormat linkTo
         "file_format.file_format",
@@ -571,7 +571,7 @@ class FileFastq(File):
 
 
 def _build_file_submitted_embedded_list():
-    """"""
+    """Embedded list for FileSubmitted items."""
     return _build_file_embedded_list() + file_workflow_run_embeds + [
         "quality_metric.overall_quality_status",
         "quality_metric.Total Sequences",
@@ -590,7 +590,7 @@ def _build_file_submitted_embedded_list():
 class FileSubmitted(File):
     """Collection for individual submitted files."""
     item_type = 'file_submitted'
-    schema = load_schema('encoded:schemas/file_fastq.json')
+    schema = load_schema('encoded:schemas/file_submitted.json')
     embedded_list = _build_file_submitted_embedded_list()
     name_key = 'accession'
     rev = dict(File.rev, **{

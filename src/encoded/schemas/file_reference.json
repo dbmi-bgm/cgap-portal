@@ -96,9 +96,6 @@
             "enum": [
                 "ancillary file"
             ]
-        },
-        "genome_assembly": {
-            "default": "GRCh38"
         }
     }
 }

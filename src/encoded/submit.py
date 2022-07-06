@@ -430,7 +430,7 @@ class AccessionRow:
         fields = [
             'workup_type', 'specimen_type', 'dna_concentration', 'date_transported', 'indication',
             'specimen_notes', 'research_protocol_name', 'sent_by', 'physician_id',
-            'bam_sample_id', self.FILES, self.CASE_FILES,
+            'bam_sample_id', self.FILES, self.CASE_FILES, self.GENOME_BUILD
         ]
         info = map_fields(self.metadata, info, fields, 'sample')
         # handle enum values

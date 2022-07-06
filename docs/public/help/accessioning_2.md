@@ -5,24 +5,18 @@ are needed. Columns where information is required is marked
 with an asterisk (\*). Below are details about filling out 
 each column. 
 
-**Unique Analysis ID**\*: This ID will be used to track 
-results of an analysis for one particular specimen. This 
-needs to be unique across all rows.
-
 **Analysis ID**\*: This is an ID used to indicate which specimens
- need to be analysed together. If a trio analysis is going 
-to be performed on a proband, mother, and father samples, 
+need to be analyzed together. If a trio analysis is going
+to be performed on proband, mother, and father samples,
 then all 3 of the corresponding rows must have the same 
 analysis ID. If the proband sample also needs to be analyzed
 on its own, or with the mother's sample only, or with an 
 additional sibling, this analysis needs a new analysis ID 
-that distinguishes it from the first trio analysis. Note 
-that in the example spreadsheet, row 2 has almost all the 
-same information as row 5, but the analysis ID and unique 
-analysis ID are different. This indicates that the proband's
-sample needs to be analyzed as part of a quad analysis 
-(analysis ID 1134-1) as well as alone on its own (analysis 
-ID 1134-2).
+that distinguishes it from the first trio analysis.
+
+**Unique Analysis ID**\*: This ID will be used to track
+results of an analysis for one particular specimen. This
+needs to be unique across all rows.
 
 **Family ID**: This is an ID that refers to the family being 
 analyzed. This is not required, but may be useful to track 

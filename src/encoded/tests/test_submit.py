@@ -41,7 +41,7 @@ TEST_WORKBOOK_PEDIGREE = 'src/encoded/tests/data/documents/pedigree_test_example
 TEST_PEDIGREE_WITH_ERRORS = 'src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx'
 
 PROJECT_NAME = "hms-dbmi"  # Project name of wb_project fixture
-GENOME_BUILD = "GChR38"
+GENOME_BUILD = "GRCh38"
 FILE_NAME_NOT_ACCEPTED = "foo_bar.foo.bar"
 VCF_FILE_NAME = "foo_bar.vcf.gz"
 VCF_FILE_PATH = "/path/to/" + VCF_FILE_NAME
@@ -51,9 +51,10 @@ VCF_FILE_ITEM = {
     "file_format": "/file-formats/vcf_gz/",
     "filename": VCF_FILE_PATH,
 }
-VCF_FILE_ITEM_WITH_GENOME_BUILD = {"genome_assembly": GENOME_BUILD}
-VCF_FILE_ITEM_WITH_GENOME_BUILD.update(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_GENOME_BUILD = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_GENOME_BUILD.update({"genome_assembly": GENOME_BUILD})
 VCF_ALIAS_TO_FILE_ITEM = {VCF_FILE_ALIAS: VCF_FILE_ITEM}
+VCF_ALIAS_TO_FILE_ITEM_GENOME_BUILD = {VCF_FILE_ALIAS: VCF_FILE_ITEM_WITH_GENOME_BUILD}
 FASTQ_FILE_NAME_1_R1 = "file_1_R1.fastq.gz"
 FASTQ_FILE_NAME_1_R2 = "file_1_R2.fastq.gz"
 FASTQ_FILE_NAME_UNMATCHED = "file_2_R1.fastq.gz"
@@ -895,23 +896,31 @@ class TestAccessionMetadata:
 
     @pytest.mark.workbook
     @pytest.mark.parametrize(
-        "proband_files,proband_case_files,uncle_files,uncle_case_files,expected_files,expected_errors",
+        (
+            "proband_files,proband_case_files,uncle_files,uncle_case_files,"
+            "genome_build,expected_files,expected_errors"
+        ),
         [
-            (None, None, None, None, {}, 0),
-            ("", "", "", "", {}, 0),
-            (FILE_NAME_NOT_ACCEPTED, None, None, None, {}, 2),
-            (None, FILE_NAME_NOT_ACCEPTED, None, None, {}, 2),
-            (FASTQ_FILE_NAMES_ERRORS, None, None, None,
+            (None, None, None, None, None, {}, 0),
+            ("", "", "", "", None, {}, 0),
+            (FILE_NAME_NOT_ACCEPTED, None, None, None, None, {}, 2),
+            (None, FILE_NAME_NOT_ACCEPTED, None, None, None, {}, 2),
+            (FASTQ_FILE_NAMES_ERRORS, None, None, None, None,
                 FASTQ_ALIAS_TO_FILE_ITEMS_ERRORS, 2),
-            (None, None, FASTQ_FILE_NAMES_NO_ERRORS, None,
+            (None, None, FASTQ_FILE_NAMES_NO_ERRORS, None, None,
                 FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS, 0),
-            (None, VCF_FILE_PATH, None, None, VCF_ALIAS_TO_FILE_ITEM, 0),
-            (None, VCF_FILE_PATH, None, VCF_FILE_NAME, VCF_ALIAS_TO_FILE_ITEM, 0),
+            (None, VCF_FILE_PATH, None, None, None, VCF_ALIAS_TO_FILE_ITEM, 0),
+            (None, VCF_FILE_PATH, None, VCF_FILE_NAME, None, VCF_ALIAS_TO_FILE_ITEM, 0),
+            (None, VCF_FILE_PATH, None, VCF_FILE_NAME, "hg38",
+                VCF_ALIAS_TO_FILE_ITEM_GENOME_BUILD, 0),
+            (None, VCF_FILE_PATH, None, VCF_FILE_NAME, "foo",
+                VCF_ALIAS_TO_FILE_ITEM, 1),
             (
                 None,
                 VCF_FILE_PATH,
                 None,
                 FASTQ_FILE_NAMES_NO_ERRORS,
+                None,
                 VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS,
                 0,
             ),
@@ -928,6 +937,7 @@ class TestAccessionMetadata:
         proband_case_files,
         uncle_files,
         uncle_case_files,
+        genome_build,
         expected_files,
         expected_errors
     ):
@@ -941,6 +951,8 @@ class TestAccessionMetadata:
         row_dict["case files"] = proband_case_files
         row_dict_uncle["files"] = uncle_files
         row_dict_uncle["case files"] = uncle_case_files
+        row_dict["genome build"] = genome_build
+        row_dict_uncle["genome_build"] = genome_build
         rows = [row_dict, row_dict_uncle]
         accession_metadata = AccessionMetadata(
             es_testapp, rows, wb_project, wb_institution, "some_ingestion_id"
