@@ -26,6 +26,7 @@ ITEM_INDEX_ORDER = [
     'FileFastq',
     'FileProcessed',
     'FileReference',
+    'FileSubmitted',
     'Image',
     'NoteInterpretation',
     'NoteDiscovery',

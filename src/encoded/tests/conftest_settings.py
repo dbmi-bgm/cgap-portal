@@ -42,7 +42,7 @@ ORDER = [
     'user', 'project', 'institution', 'filter_set', 'nexus',
     'file_format', 'variant_consequence', 'phenotype',
     'cohort', 'family', 'individual', 'sample', 'workflow',
-    'access_key', 'disorder', 'document', 'file_fastq',
+    'access_key', 'disorder', 'document', 'file_fastq', "file_submitted",
     'file_processed', 'file_reference', 'note_standard', 'note_interpretation',
     'gene', 'gene_list', 'sample_processing', 'case', 'report', 'page',
     'quality_metric_fastqc', 'evidence_dis_pheno', 'quality_metric_bamcheck',
