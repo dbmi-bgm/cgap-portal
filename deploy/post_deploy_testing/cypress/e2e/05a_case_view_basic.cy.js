@@ -25,7 +25,7 @@ describe('Case View - Initial', function () {
             .get(".search-result-row").should('have.length.greaterThan', 0)
             .first().within(function($rowElem){
                 return cy.get(".search-result-column-block[data-field=\"display_title\"] .adv-block-link").should('be.visible').click({
-                    // Using force: true here since sometimes Cypress scrolls a bet too much while getting this element and then thinks its hidden
+                    // Using force: true here since sometimes Cypress scrolls a bit too much while getting this element and then thinks its hidden
                     force: true
                 });
             });
