@@ -160,8 +160,8 @@
                               "uid": "gene_list_track",
                               "data": {
                                 "type": "vcf",
-                                "vcfUrl": "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log.vcf.gz",
-                                "tbiUrl": "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log.vcf.gz.tbi",
+                                "vcfUrl": "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log_2.vcf.gz",
+                                "tbiUrl": "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log_2.vcf.gz.tbi",
                                 "chromSizesUrl": "https://aveit.s3.amazonaws.com/higlass/data/sequence/hg38.mod.chrom.sizes"
                               },
                               "width": 450

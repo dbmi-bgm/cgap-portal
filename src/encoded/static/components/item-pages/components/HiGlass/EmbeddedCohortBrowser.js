@@ -4,16 +4,15 @@ import React, { useRef, useEffect } from "react";
 import _ from "underscore";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 import { HiGlassAjaxLoadContainer } from "./HiGlassAjaxLoadContainer";
-import {
-  getGeneLists,
-} from "../CohortStatisticalAnalysisTableUtils";
+import { getGeneLists } from "../CohortStatisticalAnalysisTableUtils";
+import { Checkbox } from "@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox";
 
 function GeneListFilter({ geneLists, onChange }) {
   if (typeof onChange !== "function") return null;
 
   return (
     <div className="mb-1">
-      <label className="form-label small fw-bold mb-0">Gene list</label>
+      <label className="form-label font-weight-normal mb-0">Gene list</label>
       <select
         className="form-control form-control-sm d-block"
         aria-label=".form-select-sm example"
@@ -29,12 +28,31 @@ function GeneListFilter({ geneLists, onChange }) {
   );
 }
 
+function CohortCheckbox({ label, checked, onChange }) {
+  if (typeof onChange !== "function") return null;
+  if (typeof checked === "undefined") return null;
+
+  return (
+    <Checkbox
+      checked={checked}
+      onChange={onChange}
+      labelClassName="mb-0 font-weight-normal"
+      className="checkbox-container"
+      value={label}
+    >
+      {label}
+    </Checkbox>
+  );
+}
+
 function AssociationTestFilter({ associationTests, onChange }) {
   if (typeof onChange !== "function") return null;
 
   return (
     <div className="mb-1">
-      <label className="form-label small fw-bold mb-0">Selected association test</label>
+      <label className="form-label font-weight-normal mb-0">
+        Selected gene-based test
+      </label>
       <select
         className="form-control form-control-sm d-block"
         aria-label=".form-select-sm example"
@@ -181,7 +199,7 @@ class GeneSearchBar extends React.PureComponent {
 
     return (
       <React.Fragment>
-        {/* <div className="input-group">
+        <div className="input-group">
           <div className="input-group-prepend">
             <span className="input-group-text" id="search-for-gene-addon">
               <i className={icon} />
@@ -195,15 +213,15 @@ class GeneSearchBar extends React.PureComponent {
             aria-label="Search for gene"
             aria-describedby="search-for-gene-addon"
           />
-        </div> */}
-        <input
-            type="text"
-            onChange={(evt) => this.updateCurrentSearchTerm(evt)}
-            className="form-control"
-            placeholder="Search for gene"
-            aria-label="Search for gene"
-            aria-describedby="search-for-gene-addon"
-          />
+        </div>
+        {/* <input
+          type="text"
+          onChange={(evt) => this.updateCurrentSearchTerm(evt)}
+          className="form-control"
+          placeholder="Search for gene"
+          aria-label="Search for gene"
+          aria-describedby="search-for-gene-addon"
+        /> */}
         <GeneSearchResult
           results={results}
           error={error}
@@ -235,15 +253,20 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
   }
 
   const resultsFormatted = results.map((result, i) => {
-    if(i>=6){
+    if (i >= 6) {
       return;
     }
 
     return (
       <div className="mr-1" key={result.geneName}>
-        <small><a href="#" onClick={(evt) => handleResultClick(evt, result.geneName)}>
-          {result.geneName}
-        </a></small>
+        <small>
+          <a
+            href="#"
+            onClick={(evt) => handleResultClick(evt, result.geneName)}
+          >
+            {result.geneName}
+          </a>
+        </small>
       </div>
     );
   });
@@ -255,6 +278,12 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
   );
 });
 
+// VEP consequence levels
+const CL_HIGH = "High";
+const CL_MODERATE = "Moderate";
+const CL_LOW = "Low";
+const CL_MODIFIER = "Modifier";
+
 class EmbeddedCohortBrowserComponent extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -264,17 +293,21 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
       cohortDensityBwLocation,
       higlassContainerCohort,
       higlassContainerAnnotation,
-      availableAssociationTests
+      availableAssociationTests,
     } = props;
     this.cohortVcfLocation = cohortVcfLocation;
     this.cohortDensityBwLocation = cohortDensityBwLocation;
     this.higlassContainerCohort = higlassContainerCohort;
     this.higlassContainerAnnotation = higlassContainerAnnotation;
     // TO REMOVE IN PROD
-    this.availableAssociationTests = availableAssociationTests ? availableAssociationTests : ["CMC", "MB", "VT", "SKATO"];
+    this.availableAssociationTests = availableAssociationTests
+      ? availableAssociationTests
+      : ["CMC", "MB", "VT", "SKATO"];
 
     this.state = {
       activeTab: "cohort",
+      activeConsequenceLevels: [CL_HIGH, CL_MODERATE],
+      showAlleleFrequencies: false,
       geneLists: {},
     };
   }
@@ -282,8 +315,13 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
   componentDidMount() {
     this.handleTabClick = this.handleTabClick.bind(this);
     this.applyGeneListFilter = this.applyGeneListFilter.bind(this);
-    this.applyAssociationTestFilter = this.applyAssociationTestFilter.bind(this);
+    this.applyAssociationTestFilter =
+      this.applyAssociationTestFilter.bind(this);
     this.processLoadedGeneList = this.processLoadedGeneList.bind(this);
+    this.changeActiveConsequenceLevels =
+      this.changeActiveConsequenceLevels.bind(this);
+    this.changeShowAlleleFrequencies = this.changeShowAlleleFrequencies.bind(this);
+    this.exportDisplay = this.exportDisplay.bind(this);
     getGeneLists(this.processLoadedGeneList);
   }
 
@@ -292,6 +330,57 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     this.setState((prevState) => ({
       geneLists: geneLists,
     }));
+  }
+
+  changeActiveConsequenceLevels(event) {
+    const clickedConsequenceLevels = event.target.value;
+    const activeConsequenceLevels = [...this.state.activeConsequenceLevels];
+    const index = activeConsequenceLevels.indexOf(clickedConsequenceLevels);
+    // If found then remove, if not found then add
+    if (index > -1) {
+      activeConsequenceLevels.splice(index, 1);
+    } else {
+      activeConsequenceLevels.push(clickedConsequenceLevels);
+    }
+
+    this.setState(
+      (prevState) => ({
+        activeConsequenceLevels: activeConsequenceLevels,
+      }),
+      () => {
+        const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+        if (hgc) {
+          const viewconfCohort = hgc.api.getViewConfig();
+          viewconfCohort.views[0].tracks.top.forEach((track) => {
+            if (track.type === "cohort") {
+              const acl = this.state.activeConsequenceLevels.map(cl => cl.toUpperCase());
+              track.options["consequenceLevels"] = acl;
+            }
+          });
+          hgc.api.setViewConfig(viewconfCohort);
+        }
+      }
+    );
+  }
+
+  changeShowAlleleFrequencies(event){
+    this.setState(
+      (prevState) => ({
+        showAlleleFrequencies: !prevState.showAlleleFrequencies,
+      }),
+      () => {
+        const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+        if (hgc) {
+          const viewconfCohort = hgc.api.getViewConfig();
+          viewconfCohort.views[0].tracks.top.forEach((track) => {
+            if (track.type === "cohort") {
+              track.options["showAlleleFrequencies"] = this.state.showAlleleFrequencies;
+            }
+          });
+          hgc.api.setViewConfig(viewconfCohort);
+        }
+      }
+    );
   }
 
   applyAssociationTestFilter(event) {
@@ -385,8 +474,24 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     );
   }
 
+  exportDisplay(){
+    const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+    if (!hgc) {
+        console.warn("Higlass component not found.");
+        return;
+    }
+    const svg = hgc.api.exportAsSvg();
+
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+    element.setAttribute('download', "cohort.svg");
+    element.click();
+}
+
   render() {
     const variantPositionAbsCoord = 20000;
+    const consequenceLevels = [CL_HIGH, CL_MODERATE, CL_LOW, CL_MODIFIER];
+
     return (
       <div>
         <ul className="nav nav-tabs" role="tablist">
@@ -446,6 +551,33 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                     associationTests={this.availableAssociationTests}
                     onChange={this.applyAssociationTestFilter}
                   />
+                  <div className="mt-2">Variant consequence levels</div>
+                  {consequenceLevels.map((cl) => (
+                    <CohortCheckbox
+                      key={"cb_" + cl}
+                      label={cl}
+                      checked={this.state.activeConsequenceLevels.includes(cl)}
+                      onChange={this.changeActiveConsequenceLevels}
+                    />
+                  ))}
+                  <div className="mt-1">
+                    <CohortCheckbox
+                      label="Show Allele Frequencies"
+                      checked={this.state.showAlleleFrequencies}
+                      onChange={this.changeShowAlleleFrequencies}
+                    />
+                  </div>
+
+                  <div className="d-block mb-1 mt-2">
+                    <button
+                      type="button"
+                      className="btn btn-primary btn-block"
+                      onClick={this.exportDisplay}
+                    >
+                      <i className="icon icon-download icon-sm fas mr-1"></i>
+                      Export
+                    </button>
+                  </div>
                 </div>
               </div>
               <div className="col-sm-9">
