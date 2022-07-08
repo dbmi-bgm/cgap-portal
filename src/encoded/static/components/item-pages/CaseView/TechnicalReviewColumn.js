@@ -706,10 +706,21 @@ function commonNoteUpsertProcess ({
     const associatedTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
 
     const isCurrentlySavedToProject = (justSavedToProject || (isTechnicalReviewSavedToProject && !justRemovedFromProject));
+
+    // Save to project if clicked on a save-to-project button
+    // OR unset if is already saved to project (assume we saved a new/different value -- might change later if allow to overwrite ...)
+    // or unset if we're toggling existing value off (might change)
+    const shouldRemoveFromProject = (
+        (!shouldSaveToProject && isCurrentlySavedToProject)                         // Clicked on different value which shouldn't be saved to project
+        || (shouldSaveToProject && isExistingValue && isCurrentlySavedToProject)    // Clicked on same value which already saved to project -- toggle/remove it.
+    ) || false;
+
     let updatePromise = null;
     let techReviewResponse = null;
 
     function createNotePromise(){
+
+        console.log("Creating Note");
 
         const createPayload = {
             ...payload,
@@ -726,6 +737,7 @@ function commonNoteUpsertProcess ({
                     throw new Error("No NoteTechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                 }
                 techReviewResponse = res;
+                console.log("TRT1", techReviewResponse);
                 // PATCH VariantSample to set linkTo of "technical_review"
                 return ajax.promise(variantSampleAtID, "PATCH", {}, JSON.stringify({ "technical_review": newTechnicalReviewAtID }));
             })
@@ -755,6 +767,8 @@ function commonNoteUpsertProcess ({
     }
 
     function updateNotePromise(){
+
+        console.log("Updating Note");
 
         // Deletion of `review` field should be done at backend for security -- TODO: move to _update method there perhaps.
         const updateHref = associatedTechnicalReviewAtID + "?delete_fields=" + ["review"].concat(deleteFields).join(",");
@@ -798,6 +812,7 @@ function commonNoteUpsertProcess ({
             isSavedToProjectExpected = true;
             payload.save_to_project_notes = { "technical_review": technicalReviewUUID };
         }
+        console.log((remove ? "Removing from" : "Saving to") + " project");
         return ajax.promise(variantSampleAtID + "@@update-project-notes/", "PATCH", {}, JSON.stringify(payload))
             .then(function(processItemsResponse){
                 const {
@@ -824,24 +839,35 @@ function commonNoteUpsertProcess ({
             });
     }
 
+    console.log('commonNoteUpsertProcess', shouldRemoveFromProject, arguments);
 
-    // If no existing Item -- TODO: Maybe pull this out into sep function in case need to reuse logic later re: Tech Review Notes or smth.
+    if (shouldRemoveFromProject) {
+        // Start with this before updating Note itself, since don't want to end in state where saved to project Note has changed incorrectly.
+        // TODO: Prevent backend from accepting changes to Notes which are saved to project (?).
+        // If we're removing, it's presumed we have existing technical review Item UUID saved.
+        const technicalReviewUUID = lastSavedUUID || savedTechnicalReviewUUID;
+        console.log(`Will remove technical review ${technicalReviewUUID} from project`);
+        updatePromise = saveTechnicalReviewToProject(technicalReviewUUID, true);
+    } else {
+        updatePromise = Promise.resolve();
+    }
+
     if (!associatedTechnicalReviewAtID) {
-        updatePromise = createNotePromise();
+        // We need to re-assign updatePromise here, otherwise the `if (shouldSaveToProject && !shouldRemoveFromProject) {` then-block will exec
+        // before .thens defined in createNotePromise b.c. priority given to higher-level '.then' assignments.
+        updatePromise = updatePromise.then(createNotePromise);
     } else {
         // If values are same and we just want to save existing value to project, then skip the PATCH to Note itself.
         if (isExistingValue && shouldSaveToProject && !isCurrentlySavedToProject) {
             console.info("Skipping PATCH for same classification, will only save to project");
-            updatePromise = new Promise(function(resolve, reject){
-                resolve({ created: false });
-            });
-            updatePromise = Promise.resolve({ created: false });
+            // updatePromise = new Promise(function(resolve, reject){
+            //     resolve({ created: false });
+            // });
+            // updatePromise = Promise.resolve({ created: false });
         } else {
-            updatePromise = updateNotePromise();
+            updatePromise = updatePromise.then(updateNotePromise);
         }
     }
-
-
 
 
     let propsForPopover;
@@ -849,25 +875,19 @@ function commonNoteUpsertProcess ({
         .then((propsFromPromise) => {
             propsForPopover = propsFromPromise;
 
-            // Save to project if clicked on a save-to-project button
-            // OR unset if is already saved to project (assume we saved a new/different value)
-            const shouldRemoveFromProject = (
-                (!shouldSaveToProject && isCurrentlySavedToProject)                         // Clicked on different value which shouldn't be saved to project
-                || (shouldSaveToProject && isExistingValue && isCurrentlySavedToProject)    // Clicked on same value which already saved to project -- toggle/remove it.
-            ) || false;
-
-            if (shouldSaveToProject || shouldRemoveFromProject) {
+            if (shouldSaveToProject && !shouldRemoveFromProject) {
                 // We may not have techReviewResponse if we skipped PATCH, in which case we should have it from savedTechnicalReview
-                // or lastSavedTechnicalReviewForResult.
+                // or lastSavedTechnicalReviewForResult. We depend on technicalReviewUUIDFromResponse if we just created this technical review.
                 const { "@graph": [ technicalReviewItemFrameObject ] = [] } = techReviewResponse || {};
                 const { uuid: technicalReviewUUIDFromResponse } = technicalReviewItemFrameObject || {};
 
                 const technicalReviewUUID = technicalReviewUUIDFromResponse || lastSavedUUID || savedTechnicalReviewUUID;
+                console.log("TRT", techReviewResponse, technicalReviewUUIDFromResponse, lastSavedUUID, savedTechnicalReviewUUID);
                 if (!technicalReviewUUID) {
                     throw new Error("No technical review UUID available to be able to save to project");
                 }
-                console.info(`Will ${shouldRemoveFromProject ? "remove from" : "save to"} project`);
-                return saveTechnicalReviewToProject(technicalReviewUUID, shouldRemoveFromProject);
+                console.log(`Will save technical review ${technicalReviewUUID} to project`);
+                return saveTechnicalReviewToProject(technicalReviewUUID, false);
             }
 
             return propsForPopover;
