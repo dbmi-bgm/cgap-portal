@@ -19,7 +19,7 @@ export const parseVcfRecord = (vcfRecord, statTests) => {
   statTests.forEach((testName) => {
     if (info[testName]) {
       parsedResult[testName] = info[testName][0];
-      parsedResult[testName + "_log10"] = -Math.log10(info[testName][0]);
+      //parsedResult[testName + "_log10"] = -Math.log10(info[testName][0]);
     }
   });
 

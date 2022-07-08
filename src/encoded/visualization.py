@@ -415,13 +415,16 @@ def get_higlass_cohort_viewconf(context, request):
         top_tracks = view['tracks']['top']
         for track in top_tracks:
             if track['uid'] == "cohort_track":
-                vcf_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"])
-                track['data']['vcfUrl'] = vcf_url
-                tbi_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"]+".tbi")
-                track['data']['tbiUrl'] = tbi_url
+                #vcf_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"])
+                #track['data']['vcfUrl'] = vcf_url
+                track['data']['vcfUrl'] = "https://aveit.s3.amazonaws.com/msa/joint_calling_20220629_MSA_higlass.multires.vcf.gz"
+                #tbi_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"]+".tbi")
+                #track['data']['tbiUrl'] = tbi_url
+                track['data']['tbiUrl'] = "https://aveit.s3.amazonaws.com/msa/joint_calling_20220629_MSA_higlass.multires.vcf.gz.tbi"
             elif track['uid'] == "density_track":
-                bw_url = create_presigned_url(cohort_density_bw_location["bucket"], cohort_density_bw_location["key"])
-                track['data']['url'] = bw_url
+                #bw_url = create_presigned_url(cohort_density_bw_location["bucket"], cohort_density_bw_location["key"])
+                #track['data']['url'] = bw_url
+                track['data']['url'] = "https://aveit.s3.amazonaws.com/higlass/vcf/test4.bw"
 
     return {
         "success": True,

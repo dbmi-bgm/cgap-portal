@@ -106,7 +106,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
 
     //this.vcfLocation = vcfLocation // CREATE PRESIGNED URL
     this.vcfLocation =
-      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info.vcf.gz";
+      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log.vcf.gz";
     this.tbiLocation = this.vcfLocation + ".tbi";
 
     this.vcfRecords = {};
@@ -167,13 +167,12 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
           this.geneListFilteredVcfRecords,
           firstTest
         );
-        console.log(this.state.vcfRecordsToDisplay);
       });
     });
   }
 
   sortRecordsByTest(records, testName) {
-    records.sort((a, b) => b[testName + "_log10"] - a[testName + "_log10"]);
+    records.sort((a, b) => b[testName] - a[testName]);
     return records;
   }
 
@@ -345,7 +344,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       const cols = [];
       cols.push(<td key={id + "geneName"}>{record["geneName"]}</td>);
       this.state.activeTests.forEach((test) => {
-        const val = format(".2f")(record[test + "_log10"]);
+        const val = format(".2f")(record[test]);
         cols.push(<td key={id + test}>{val}</td>);
       });
       rows.push(<tr key={id}>{cols}</tr>);

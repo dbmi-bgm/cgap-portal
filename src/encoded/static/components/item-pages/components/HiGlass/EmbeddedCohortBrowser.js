@@ -4,6 +4,50 @@ import React, { useRef, useEffect } from "react";
 import _ from "underscore";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 import { HiGlassAjaxLoadContainer } from "./HiGlassAjaxLoadContainer";
+import {
+  getGeneLists,
+} from "../CohortStatisticalAnalysisTableUtils";
+
+function GeneListFilter({ geneLists, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <label className="form-label small fw-bold mb-0">Gene list</label>
+      <select
+        className="form-control form-control-sm d-block"
+        aria-label=".form-select-sm example"
+        onChange={onChange}
+        defaultValue={"NONE"}
+      >
+        <option value="NONE">Non selected</option>
+        {Object.keys(geneLists).map((gl) => (
+          <option value={gl}>{gl}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function AssociationTestFilter({ associationTests, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <label className="form-label small fw-bold mb-0">Selected association test</label>
+      <select
+        className="form-control form-control-sm d-block"
+        aria-label=".form-select-sm example"
+        onChange={onChange}
+        defaultValue={associationTests[0]}
+      >
+        {associationTests.map((gl) => (
+          <option value={gl}>{gl}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
 
 class GeneSearchBar extends React.PureComponent {
   constructor(props) {
@@ -77,7 +121,8 @@ class GeneSearchBar extends React.PureComponent {
             this.setState({
               loading: false,
               results: [],
-              error: "Could not get a response from server. Check network and try again.",
+              error:
+                "Could not get a response from server. Check network and try again.",
               info: null,
             });
             return;
@@ -107,7 +152,9 @@ class GeneSearchBar extends React.PureComponent {
           this.setState({
             loading: false,
             results,
-            error: error || "Something went wrong while searching for matching genes.",
+            error:
+              error ||
+              "Something went wrong while searching for matching genes.",
             info: null,
           });
         }
@@ -133,8 +180,8 @@ class GeneSearchBar extends React.PureComponent {
       : "icon icon-search fas";
 
     return (
-      <div>
-        <div className="input-group">
+      <React.Fragment>
+        {/* <div className="input-group">
           <div className="input-group-prepend">
             <span className="input-group-text" id="search-for-gene-addon">
               <i className={icon} />
@@ -148,14 +195,22 @@ class GeneSearchBar extends React.PureComponent {
             aria-label="Search for gene"
             aria-describedby="search-for-gene-addon"
           />
-        </div>
+        </div> */}
+        <input
+            type="text"
+            onChange={(evt) => this.updateCurrentSearchTerm(evt)}
+            className="form-control"
+            placeholder="Search for gene"
+            aria-label="Search for gene"
+            aria-describedby="search-for-gene-addon"
+          />
         <GeneSearchResult
           results={results}
           error={error}
           info={info}
           handleResultClick={this.handleResultClick}
         />
-      </div>
+      </React.Fragment>
     );
   }
 }
@@ -180,19 +235,24 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
   }
 
   const resultsFormatted = results.map((result, i) => {
+    if(i>=6){
+      return;
+    }
+
     return (
-      <div className="mr-3" key={result.geneName}>
-        <a
-          href="#"
-          onClick={(evt) => handleResultClick(evt, result.geneName)}
-        >
+      <div className="mr-1" key={result.geneName}>
+        <small><a href="#" onClick={(evt) => handleResultClick(evt, result.geneName)}>
           {result.geneName}
-        </a>
+        </a></small>
       </div>
     );
   });
 
-  return <div className="d-flex flex-row flex-wrap ml-5 bd-highlight">{resultsFormatted}</div>;
+  return (
+    <div className="d-flex flex-row flex-wrap bd-highlight">
+      {resultsFormatted}
+    </div>
+  );
 });
 
 class EmbeddedCohortBrowserComponent extends React.PureComponent {
@@ -204,17 +264,79 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
       cohortDensityBwLocation,
       higlassContainerCohort,
       higlassContainerAnnotation,
+      availableAssociationTests
     } = props;
     this.cohortVcfLocation = cohortVcfLocation;
     this.cohortDensityBwLocation = cohortDensityBwLocation;
     this.higlassContainerCohort = higlassContainerCohort;
     this.higlassContainerAnnotation = higlassContainerAnnotation;
+    // TO REMOVE IN PROD
+    this.availableAssociationTests = availableAssociationTests ? availableAssociationTests : ["CMC", "MB", "VT", "SKATO"];
 
     this.state = {
       activeTab: "cohort",
+      geneLists: {},
     };
+  }
 
+  componentDidMount() {
     this.handleTabClick = this.handleTabClick.bind(this);
+    this.applyGeneListFilter = this.applyGeneListFilter.bind(this);
+    this.applyAssociationTestFilter = this.applyAssociationTestFilter.bind(this);
+    this.processLoadedGeneList = this.processLoadedGeneList.bind(this);
+    getGeneLists(this.processLoadedGeneList);
+  }
+
+  processLoadedGeneList(geneLists) {
+    console.log(geneLists);
+    this.setState((prevState) => ({
+      geneLists: geneLists,
+    }));
+  }
+
+  applyAssociationTestFilter(event) {
+    const selectedTest = event.target.value;
+
+    const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+    if (hgc) {
+      const viewconfCohort = hgc.api.getViewConfig();
+      viewconfCohort.views[0].tracks.top.forEach((track) => {
+        if (track.type === "geneList") {
+          track.options["defaultStatistic"] = selectedTest;
+        }
+      });
+      hgc.api.setViewConfig(viewconfCohort);
+    }
+  }
+
+  applyGeneListFilter(event) {
+    const geneList = event.target.value;
+
+    let selectedGenes = "all";
+    if (geneList !== "NONE") {
+      selectedGenes = this.state.geneLists[geneList];
+    }
+    const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+    if (hgc) {
+      const viewconfCohort = hgc.api.getViewConfig();
+      viewconfCohort.views[0].tracks.top.forEach((track) => {
+        if (track.type === "geneList") {
+          if (selectedGenes === "all") {
+            delete track.options.includedGenes;
+          } else {
+            track.options["includedGenes"] = selectedGenes;
+          }
+        }
+        if (track.uid === "texttrack_genelist") {
+          if (selectedGenes === "all") {
+            track.options["text"] = "Selected genes: all coding genes";
+          } else {
+            track.options["text"] = `Selected genes: ${geneList}`;
+          }
+        }
+      });
+      hgc.api.setViewConfig(viewconfCohort);
+    }
   }
 
   handleTabClick(evt, target) {
@@ -231,7 +353,8 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
             hgc.boundRefreshView();
           }
         } else {
-          const hga = this.higlassContainerAnnotation.current.getHiGlassComponent();
+          const hga =
+            this.higlassContainerAnnotation.current.getHiGlassComponent();
           const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
           if (hga && hgc) {
             // We should be using the hga.api.zoomTo(...) functionality, but for some reason
@@ -283,7 +406,9 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
           <li className="nav-item" key="annotation">
             <a
               className={
-                this.state.activeTab === "annotation" ? "nav-link active" : "nav-link"
+                this.state.activeTab === "annotation"
+                  ? "nav-link active"
+                  : "nav-link"
               }
               onClick={(evt) => this.handleTabClick(evt, "annotation")}
               href="#"
@@ -295,17 +420,35 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
         <div className="tab-content" id="cohortTabContent">
           <div
             className={
-              this.state.activeTab === "cohort" ? "tab-pane fade show active" : "tab-pane fade"
+              this.state.activeTab === "cohort"
+                ? "tab-pane fade show active"
+                : "tab-pane fade"
             }
             role="tabpanel"
           >
             <div className="row mt-3">
-              <div className="col-12">
-                <GeneSearchBar higlassContainer={this.higlassContainerCohort} />
+              <div className="col-sm-3 pt-1">
+                <div className="border p-2">
+                  <div className="d-block bg-light px-2 mb-1">
+                    <small>NAVIGATION</small>
+                  </div>
+                  <GeneSearchBar
+                    higlassContainer={this.higlassContainerCohort}
+                  />
+                  <div className="d-block bg-light px-2 mb-1 mt-2">
+                    <small>SETTINGS</small>
+                  </div>
+                  <GeneListFilter
+                    geneLists={this.state.geneLists}
+                    onChange={this.applyGeneListFilter}
+                  />
+                  <AssociationTestFilter
+                    associationTests={this.availableAssociationTests}
+                    onChange={this.applyAssociationTestFilter}
+                  />
+                </div>
               </div>
-            </div>
-            <div className="row">
-              <div className="col-12">
+              <div className="col-sm-9">
                 <HiGlassAjaxLoadContainer
                   cohortVcfLocation={this.cohortVcfLocation}
                   cohortDensityBwLocation={this.cohortDensityBwLocation}
@@ -317,7 +460,9 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
           </div>
           <div
             className={
-              this.state.activeTab === "annotation" ? "tab-pane fade show active" : "tab-pane fade"
+              this.state.activeTab === "annotation"
+                ? "tab-pane fade show active"
+                : "tab-pane fade"
             }
             role="tabpanel"
           >
