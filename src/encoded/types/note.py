@@ -171,20 +171,22 @@ class NoteTechnicalReview(Note):
         "description": "Note's display title",
         "type": "string"
     })
-    def display_title(self):
+    def display_title(self, date_created):
         assessment = self.properties.get("assessment", {})
         call = assessment.get("call")
         classification = assessment.get("classification")
+
         title_part_1 = None
         if call is not None and classification is not None:
             title_part_1 = "(" + ("" if call == True else "No ") + "Call) " + classification
         else:
             title_part_1 = "No Saved Classification"
+
         title_part_2 = None
         try:
-            title_part_2 = " from" + date_created[:10]
+            title_part_2 = " from " + date_created[:10]
         except Exception:
-            title_part_2 = " - " + self.uuid
+            title_part_2 = " - " + str(self.uuid)
 
         return title_part_1 + title_part_2
         

@@ -222,8 +222,8 @@ export class CaseReviewController extends React.Component {
 export class CaseReviewSelectedNotesStore extends React.PureComponent {
 
     static alreadyInProjectNotes(variantSampleListItem) {
-        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ status: noteStatus }){
-            return (noteStatus === "current");
+        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ is_saved_to_project }){
+            return is_saved_to_project === true;
         });
     }
 
@@ -365,7 +365,7 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
  * Builds dictionary to use to mark certain Notes as disabled and exclude them from selection.
  * From those notes which have already been published to knowledgebase.
  *
- * For now can just check if Note.status === "current" and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
+ * For now can just check if Note.is_saved_to_project === true and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
  */
 export function buildAlreadyStoredNoteUUIDDict(variantSampleListItem, checkFunction){
     const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.

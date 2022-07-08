@@ -20,17 +20,17 @@ export class TechnicalReviewColumn extends React.PureComponent {
      */
     static projectTechnicalReviewInformation(projectTechnicalReview, lastSavedTechnicalReview) {
         const { "@id": projectTechnicalReviewAtID } = projectTechnicalReview || {};
-        const { "@id": lastSavedTechnicalReviewItemAtID, status: lastSavedStatus } = lastSavedTechnicalReview || {};
+        const { "@id": lastSavedTechnicalReviewItemAtID, is_saved_to_project: lastSavedIsSavedToProject } = lastSavedTechnicalReview || {};
 
-        // We could theoretically just check if lastSavedStatus === "current" (should always be true when isTechnicalReviewSavedToProject)
+        // We could theoretically just check if is_saved_to_project === true (should always be true when isTechnicalReviewSavedToProject)
         // but this gives us some more explicitness - i.e. we can have isTechnicalReviewSavedToProject==true and justSavedToProject==false when just deleted,
-        // or have justSavedToProjec==true and isTechnicalReviewSavedToProject==false when just created.
+        // or have justSavedToProjec==true and isTechnicalReviewSavedToProject==false when just created, and then show indicators for those cases.
         const isTechnicalReviewSavedToProject = (
             projectTechnicalReviewAtID
             && lastSavedTechnicalReviewItemAtID
             && (lastSavedTechnicalReviewItemAtID === projectTechnicalReviewAtID)
         ) || false;
-        const justSavedToProject = lastSavedStatus === "current"; // Should always be true when isTechnicalReviewSavedToProject is true, unless _just_ removed.
+        const justSavedToProject = lastSavedIsSavedToProject === true; // Should always be true when isTechnicalReviewSavedToProject is true, unless _just_ removed.
         const justRemovedFromProject = isTechnicalReviewSavedToProject && !justSavedToProject;
 
         // Hmm, can rename to: isIndexedToProject, isSavedToProject, isJustRemovedFromProject ?
@@ -788,14 +788,14 @@ function commonNoteUpsertProcess ({
      * @return {Promise} AJAX request to update Variant's technical_reviews
      */
     function saveTechnicalReviewToProject(technicalReviewUUID, remove=false){
-        let statusExpected;
+        let isSavedToProjectExpected;
         const payload = {};
         if (remove) {
             // Remove from project
-            statusExpected = "in review";
+            isSavedToProjectExpected = false;
             payload.remove_from_project_notes = { "technical_review": technicalReviewUUID };
         } else {
-            statusExpected = "current";
+            isSavedToProjectExpected = true;
             payload.save_to_project_notes = { "technical_review": technicalReviewUUID };
         }
         return ajax.promise(variantSampleAtID + "@@update-project-notes/", "PATCH", {}, JSON.stringify(payload))
@@ -811,13 +811,13 @@ function commonNoteUpsertProcess ({
                 if (endpointResponseStatus !== "success") {
                     throw new Error("Failed to update Variant with new Technical Review, check permissions.");
                 }
-                const { status: statusFromNotePatch, last_modified: { date_modified } } = technicalReviewPatchResponseItem;
-                if (statusExpected !== statusFromNotePatch) {
-                    throw new Error("We expected Note to have updated its status to " + statusExpected);
+                const { last_modified: { date_modified }, is_saved_to_project } = technicalReviewPatchResponseItem;
+                if (is_saved_to_project !== isSavedToProjectExpected) {
+                    throw new Error("We expected Note to have updated its `is_saved_to_project` set to " + isSavedToProjectExpected);
                 }
                 // We save it to cache/lastSavedTechnicalReview as if was a linkTo item, since for comparison with savedTechnicalReview, we'll get embedded linkTo.
                 cacheSavedTechnicalReviewForVSUUID(vsUUID, {
-                    status: statusFromNotePatch,        // Used to determine if currently saved to project
+                    is_saved_to_project,                // Used to determine if currently saved to project
                     last_modified: { date_modified }    // Used to determine if result from search is newer (or equal to) our local cache.
                 } );
                 return processItemsResponse;

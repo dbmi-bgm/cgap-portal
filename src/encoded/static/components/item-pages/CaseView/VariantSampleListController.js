@@ -252,6 +252,7 @@ function commonNoteEmbeds(prefix){
         prefix + ".last_modified.modified_by.@id",
         prefix + ".last_modified.modified_by.display_title",
         prefix + ".status",
+        prefix + ".is_saved_to_project",
         prefix + ".associated_items.item_type",
         prefix + ".associated_items.item_identifier",
         prefix + ".note_text"

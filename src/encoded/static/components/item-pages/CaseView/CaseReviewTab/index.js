@@ -253,42 +253,42 @@ function SaveNotesToProjectButton (props) {
                 "@id": variantSampleAtID,
                 interpretation: {
                     uuid: interpretationUUID,
-                    status: interpretationStatus
+                    is_saved_to_project: isInterpretationSavedToProject
                 } = {},
                 discovery_interpretation: {
                     uuid: discoveryInterpretationUUID,
-                    status: discoveryInterprationStatus
+                    is_saved_to_project: isDiscoveryInterpretationSavedToProject
                 } = {},
                 gene_notes: {
                     uuid: lastGeneNoteUUID,
-                    status: lastGeneNoteStatus
+                    is_saved_to_project: isGeneNoteSavedToProject
                 } = {},
                 variant_notes: {
                     uuid: lastVariantNoteUUID,
-                    status: lastVariantNoteStatus
+                    is_saved_to_project: isVariantNoteSavedToProject
                 } = {}
             } = variantSampleItem;
 
             const payload = { "save_to_project_notes": {} };
 
             if (interpretationUUID && sendToProjectStore[interpretationUUID]) {
-                if (interpretationStatus !== "current") {
+                if (!isInterpretationSavedToProject) {
                     // If condition is potentially redundant as we disable such notes from being selectable in first place.
                     payload.save_to_project_notes.interpretation = interpretationUUID;
                 }
             }
             if (discoveryInterpretationUUID && sendToProjectStore[discoveryInterpretationUUID]) {
-                if (discoveryInterprationStatus !== "current") {
+                if (!isDiscoveryInterpretationSavedToProject) {
                     payload.save_to_project_notes.discovery_interpretation = discoveryInterpretationUUID;
                 }
             }
             if (lastGeneNoteUUID && sendToProjectStore[lastGeneNoteUUID]) {
-                if (lastGeneNoteStatus !== "current") {
+                if (!isGeneNoteSavedToProject) {
                     payload.save_to_project_notes.gene_notes = lastGeneNoteUUID;
                 }
             }
             if (lastVariantNoteUUID && sendToProjectStore[lastVariantNoteUUID]) {
-                if (lastVariantNoteStatus !== "current") {
+                if (!isVariantNoteSavedToProject) {
                     payload.save_to_project_notes.variant_notes = lastVariantNoteUUID;
                 }
             }

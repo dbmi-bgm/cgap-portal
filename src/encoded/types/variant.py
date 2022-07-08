@@ -265,23 +265,24 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                 continue
 
 
-def perform_request_as_admin(request, item_atid, payload=None, request_method="PATCH"):
+def perform_request_as_admin(request, target_path, payload=None, request_method="PATCH"):
     """
     Patches Items as 'UPGRADER' user/permissions.
 
-    TODO: Seems like this could be re-usable somewhere
+    TODO: Seems like this could be re-usable somewhere, maybe move to snovault?
     """
     if len(payload) == 0 and request_method != "GET":
-        log.warning("Skipped PATCHing " + item_atid + " due to empty payload.")
+        log.warning("Skipped PATCHing " + target_path + " due to empty payload.")
         return # skip empty patches (e.g. if duplicate note uuid is submitted that a Gene has already)
-    subreq = make_subrequest(request, item_atid, method=request_method, json_body=payload, inherit_user=False)
+    subreq = make_subrequest(request, target_path, method=request_method, json_body=payload, inherit_user=False)
     subreq.remote_user = "UPGRADE"
     if 'HTTP_COOKIE' in subreq.environ:
         del subreq.environ['HTTP_COOKIE']
     patch_result = request.invoke_subrequest(subreq).json
     # /queue_indexing returns 'notification', while PATCH/POST returns 'status'.
+    # Perhaps should check "response status code begins with 2XX" instead?
     if patch_result.get("status") != "success" and patch_result.get("notification") != "Success":
-        raise HTTPServerError("Couldn't update Item " + item_atid)
+        raise HTTPServerError(request_method + " request to " + target_path + " failed.")
     return patch_result
 
 
@@ -608,11 +609,11 @@ class VariantSample(Item):
     def project_technical_review(self, request, variant=None, project=None):
         variant = get_item_or_none(request, variant, 'Variant', frame='raw')
         if variant and project:
-            # project will be in form of @id, we need UUID
+            # project param will be in form of @id
             for tr_uuid in variant.get("technical_reviews", []):
                 # frame=object returns linkTos in form of @id, frame=raw returns them in form of UUID.
                 technical_review = get_item_or_none(request, tr_uuid, 'NoteTechnicalReview', frame='object')
-                if technical_review.get("project") == project:
+                if technical_review.get("project") == project: # Comparing @IDs
                     return tr_uuid
         return None
 
@@ -937,7 +938,7 @@ def update_project_notes_process(context, request):
     if save_to_project_notes and remove_from_project_notes:
         raise HTTPBadRequest("May only supply 1 request at a time, to remove from OR to save to project.")
 
-    li = {} # 'loaded notes'
+    loaded_notes = {}
 
     def validate_and_load_item(vs_field_name):
 
@@ -965,18 +966,18 @@ def update_project_notes_process(context, request):
             raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
                 "Check 'save_to_project_notes." + vs_field_name + "'.")
         else:
-            li[vs_field_name] = loaded_item
+            loaded_notes[vs_field_name] = loaded_item
 
     for vs_field_name in vs_to_variant_or_gene_field_mappings.keys():
         validate_and_load_item(vs_field_name)
 
-    if len(li) == 0:
+    if len(loaded_notes) == 0:
         raise HTTPBadRequest("No Item UUIDs could be loaded, check permissions.")
 
 
     variant_patch_payload = {} # Single item/dict, can be converted to dict of variants if need to PATCH multiple in future
     genes_patch_payloads = {} # Keyed by @id, along with `note_patch_payloads`
-    sent_item_patch_payloads = {} # TODO: Rename to 'other_item_payloads' ?
+    notes_patch_payloads = {}
 
     # PATCHing variant or gene only needed when saving notes to project, not to report.
 
@@ -1013,7 +1014,7 @@ def update_project_notes_process(context, request):
     variant_uuid = context.properties["structural_variant" if is_structural_vs else "variant"]
     genes = None # We may have multiple different genes from same variant; at moment we save note to each of them.
 
-    if variant_fields_needed:
+    if variant_fields_needed or gene_fields_needed:
         variant_fields_needed.append("@id")
     if gene_fields_needed:
         gene_fields_needed.append("@id")
@@ -1030,19 +1031,31 @@ def update_project_notes_process(context, request):
     timestamp = datetime.datetime.now(pytz.utc).isoformat()
     auth_source, user_id = request.authenticated_userid.split(".", 1)
 
-    def create_item_patch_current_status_payload(item_at_id, approve=True):
+    def create_note_patch_payload(loaded_note, remove=False, approve=True):
+        item_at_id = loaded_note["@id"]
         # This payload may still get updated further with "previous_note" by `add_or_replace_note_for_project_on_variant_or_gene_item`
-        sent_item_patch_payloads[item_at_id] = sent_item_patch_payloads.get(item_at_id, {})
+        notes_patch_payloads[item_at_id] = notes_patch_payloads.get(item_at_id, {})
         # All 3 of these fields below have permissions: restricted_fields
         # and may only be manually editable by an admin.
-        sent_item_patch_payloads[item_at_id]["status"] = "current"
-        if approve:
-            sent_item_patch_payloads[item_at_id]["approved_by"] = user_id
-            sent_item_patch_payloads[item_at_id]["date_approved"] = timestamp
+
+        notes_patch_payloads[item_at_id]["is_saved_to_project"] = False if remove else True
+
+        if not remove and loaded_note["status"] == "in review":
+            # Upgrade to "current" - may change later -- DON'T change if status is something else (shared, etc.)
+            notes_patch_payloads[item_at_id]["status"] = "current"
+
+        if remove and loaded_note["status"] == "current":
+            # Downgrade to "in review" only if status is "current" (don't change if is shared, etc.)
+            # May change later.
+            notes_patch_payloads[item_at_id]["status"] = "in review"
+
+        if not remove and approve:
+            notes_patch_payloads[item_at_id]["approved_by"] = user_id
+            notes_patch_payloads[item_at_id]["date_approved"] = timestamp
 
     def add_or_replace_note_for_project_on_variant_or_gene_item(vs_field_name, vg_item, payload, remove=False):
         vg_field_name = vs_to_variant_or_gene_field_mappings[vs_field_name]
-        newly_shared_item_at_id = li[vs_field_name]["@id"]
+        newly_shared_item_at_id = loaded_notes[vs_field_name]["@id"]
 
         if not vg_item.get(vg_field_name): # Variant or Gene Item has no existing notes for `vg_field_name` field.
             payload[vg_field_name] = [ newly_shared_item_at_id ]
@@ -1074,7 +1087,7 @@ def update_project_notes_process(context, request):
         # Ensure we compare to Note.project and not User.project, in case an admin or similar is making edit.
         existing_item_from_project_idx = None
         for item_idx, item in enumerate(vg_item[vg_field_name]):
-            if item["project"] == li[vs_field_name]["project"]:
+            if item["project"] == loaded_notes[vs_field_name]["project"]:
                 existing_item_from_project_idx = item_idx
                 break # Assumption is we only have 1 note per project in this list, so don't need to search further.
 
@@ -1083,13 +1096,13 @@ def update_project_notes_process(context, request):
         if existing_item_from_project_idx != None:
             existing_item_from_project_at_id = vg_item[vg_field_name][existing_item_from_project_idx]["@id"]
             # Set existing note's status to "obsolete", and populate previous/superseding field if applicable
-            sent_item_patch_payloads[existing_item_from_project_at_id] = sent_item_patch_payloads.get(existing_item_from_project_at_id, {})
-            sent_item_patch_payloads[existing_item_from_project_at_id]["status"] = "obsolete"
+            notes_patch_payloads[existing_item_from_project_at_id] = notes_patch_payloads.get(existing_item_from_project_at_id, {})
+            notes_patch_payloads[existing_item_from_project_at_id]["status"] = "obsolete"
             # Link to existing Note from newly-shared Note            
-            sent_item_patch_payloads[newly_shared_item_at_id]["previous_note"] = existing_item_from_project_at_id
+            notes_patch_payloads[newly_shared_item_at_id]["previous_note"] = existing_item_from_project_at_id
             # Link to newly-shared Note from existing note (adds new PATCH request)
-            sent_item_patch_payloads[existing_item_from_project_at_id] = sent_item_patch_payloads.get(existing_item_from_project_at_id, {})
-            sent_item_patch_payloads[existing_item_from_project_at_id]["superseding_note"] = newly_shared_item_at_id
+            notes_patch_payloads[existing_item_from_project_at_id] = notes_patch_payloads.get(existing_item_from_project_at_id, {})
+            notes_patch_payloads[existing_item_from_project_at_id]["superseding_note"] = newly_shared_item_at_id
             # Remove existing Note from Variant or Gene Notes list
             del payload[vg_field_name][existing_item_from_project_idx]
 
@@ -1098,16 +1111,16 @@ def update_project_notes_process(context, request):
 
     if "interpretation" in save_to_project_notes:
         # Update Note status if is not already current.
-        if li["interpretation"]["status"] != "current":
-            create_item_patch_current_status_payload(li["interpretation"]["@id"])
+        if loaded_notes["interpretation"]["is_saved_to_project"] != True:
+            create_note_patch_payload(loaded_notes["interpretation"])
         # Add to Variant.interpretations
         add_or_replace_note_for_project_on_variant_or_gene_item("interpretation", variant, variant_patch_payload)
 
 
     if "discovery_interpretation" in save_to_project_notes:
         # Update Note status if is not already current.
-        if li["discovery_interpretation"]["status"] != "current":
-            create_item_patch_current_status_payload(li["discovery_interpretation"]["@id"])
+        if loaded_notes["discovery_interpretation"]["is_saved_to_project"] != True:
+            create_note_patch_payload(loaded_notes["discovery_interpretation"])
         # Add to Variant.discovery_interpretations
         add_or_replace_note_for_project_on_variant_or_gene_item("discovery_interpretation", variant, variant_patch_payload)
         # Add to Gene.discovery_interpretations
@@ -1117,15 +1130,15 @@ def update_project_notes_process(context, request):
 
     if "variant_notes" in save_to_project_notes:
         # Update Note status if is not already current.
-        if li["variant_notes"]["status"] != "current":
-            create_item_patch_current_status_payload(li["variant_notes"]["@id"])
+        if loaded_notes["variant_notes"]["is_saved_to_project"] != True:
+            create_note_patch_payload(loaded_notes["variant_notes"])
         # Add to Variant.variant_notes
         add_or_replace_note_for_project_on_variant_or_gene_item("variant_notes", variant, variant_patch_payload)
 
     if "gene_notes" in save_to_project_notes:
         # Update Note status if is not already current.
-        if li["gene_notes"]["status"] != "current":
-            create_item_patch_current_status_payload(li["gene_notes"]["@id"])
+        if loaded_notes["gene_notes"]["is_saved_to_project"] != True:
+            create_note_patch_payload(loaded_notes["gene_notes"])
         # Add to Gene.gene_notes
         for gene in genes:
             genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
@@ -1134,9 +1147,8 @@ def update_project_notes_process(context, request):
     if "technical_review" in save_to_project_notes:
         # Update Note status if is not already current.
         # TODO: Handle technical_review.note as well.
-        technical_review_at_id = li["technical_review"]["@id"]
-        if li["technical_review"]["status"] != "current":
-            create_item_patch_current_status_payload(technical_review_at_id, False)
+        if loaded_notes["technical_review"]["is_saved_to_project"] != True:
+            create_note_patch_payload(loaded_notes["technical_review"], approve=False)
         # Add to Variant.technical_reviews
         add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload)
 
@@ -1144,10 +1156,8 @@ def update_project_notes_process(context, request):
     if "technical_review" in remove_from_project_notes:
         # Update Note status if is not already current.
         # TODO: Handle technical_review.note as well.
-        technical_review_at_id = li["technical_review"]["@id"]
-        if li["technical_review"]["status"] == "current":
-            sent_item_patch_payloads[technical_review_at_id] = sent_item_patch_payloads.get(technical_review_at_id, {})
-            sent_item_patch_payloads[technical_review_at_id]["status"] = "in review"
+        if loaded_notes["technical_review"]["is_saved_to_project"] == True:
+            create_note_patch_payload(loaded_notes["technical_review"], remove=True)
         # Remove from Variant.technical_reviews
         add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload, remove=True)
 
@@ -1155,9 +1165,10 @@ def update_project_notes_process(context, request):
     # Perform the PATCHes!
 
     # TODO: Consider parallelizing.
-    # Currently Gene and Variant patches are performed before Note statuses are updated.
-    # This is in part to simplify UI logic where only Note status == "current" is checked to
-    # assert if a Note is already saved to Project or not.
+    # Currently Gene and Variant patches are performed before Note statuses are updated to ensure
+    # we don't update Note properties until the former patches have succeeded.
+    # In UI logic, only Note.is_saved_to_project is checked to assert if a Note is already saved
+    # to Project or not.
 
     gene_patch_count = 0
     if gene_fields_needed:
@@ -1171,20 +1182,20 @@ def update_project_notes_process(context, request):
         variant_patch_count += 1
         # print('\n\n\nVARIANT RESPONSE', json.dumps(variant_response, indent=4))
 
-    sent_item_patch_count = 0
-    sent_item_patch_responses = []
-    for note_atid, note_payload in sent_item_patch_payloads.items():
+    note_patch_count = 0
+    note_patch_responses = []
+    for note_atid, note_payload in notes_patch_payloads.items():
         patch_result = perform_request_as_admin(request, note_atid, note_payload, request_method="PATCH")
-        sent_item_patch_responses.append(patch_result)
-        sent_item_patch_count += 1
+        note_patch_responses.append(patch_result)
+        note_patch_count += 1
 
 
-    # Follow-up - now we need to make sure all affected VariantSamples are re-indexed.
-    # This matters for NoteTechnicalReview items at the moment, which need to be embedded via calcprop "VariantSample.project_technical_review"
-    # But will probably need to be propagated to all other notes once we make use of other saved to project notes.
+    # Follow-up - now we need to make sure all affected VariantSamples are re-indexed to be up-to-date in ES.
+    # This matters right now for "VariantSample.project_technical_review" (calcprop, linkTo NoteTechnicalReview),
+    # ,ut will probably need to be propagated to all other notes once we make use of other saved to project notes.
+    affected_variant_sample_uuids = []
     if variant_patch_count > 0 and ("technical_review" in save_to_project_notes or "technical_review" in remove_from_project_notes):
         vs_project_uuid = context.properties.get("project")
-        affected_variant_sample_uuids = []
         param_lists = {
             "type": "StructuralVariantSample" if is_structural_vs else "VariantSample",
             "field": "uuid",
@@ -1207,8 +1218,8 @@ def update_project_notes_process(context, request):
                 "patched_count": variant_patch_count
             },
             "Note": {
-                "patched_count": sent_item_patch_count,
-                "responses": sent_item_patch_responses
+                "patched_count": note_patch_count,
+                "responses": note_patch_responses
             },
             "StructuralVariantSample" if is_structural_vs else "VariantSample": {
                 "queued_for_indexing": affected_variant_sample_uuids

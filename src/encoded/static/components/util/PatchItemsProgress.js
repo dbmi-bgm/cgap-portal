@@ -23,7 +23,8 @@ export class PatchItemsProgress extends React.PureComponent {
 
     }
 
-    patchItemsProcess(patchPayloads, onComplete) {
+    patchItemsProcess(patchPayloads, onComplete, opts) {
+        const { parallelize = true } = opts || {};
         const patchQ = [ ...patchPayloads ];
 
         const patchesToComplete = patchQ.length;
@@ -41,8 +42,6 @@ export class PatchItemsProgress extends React.PureComponent {
 
         const patchErrors = [];
 
-        // Browser can't send more than 6 reqs anyway, so limit concurrent reqs.
-
         function performRequest([ patchURL, itemPatchPayload ]) {
             return ajax.promise(patchURL, "PATCH", {}, JSON.stringify(itemPatchPayload))
                 .then(function(response){
@@ -58,8 +57,13 @@ export class PatchItemsProgress extends React.PureComponent {
                     countCompleted++;
                     checkIfCompleted();
                     if (patchQ.length > 0) {
-                        // Kick off another request
-                        performRequest(patchQ.shift());
+                        if (!parallelize && patchErrors.length > 0) {
+                            // If not parellelized, stop on first error.
+                            onComplete({ countCompleted, patchErrors });
+                        } else {
+                            // Kick off another request
+                            performRequest(patchQ.shift());
+                        }
                     }
                 });
         }
@@ -69,12 +73,13 @@ export class PatchItemsProgress extends React.PureComponent {
 
         // Browser can't send more than 6 reqs anyway, so limit concurrent reqs to 5.
         // As each requests ends it'll start another as long as there's more things to PATCH.
-        for (var i = 0; i < Math.min(5, patchesToComplete); i++) {
+        const countConcurrent = Math.min(parallelize ? 5 : 1, patchesToComplete);
+        for (var i = 0; i < countConcurrent; i++) {
             performRequest(patchQ.shift());
         }
     }
 
-    patchItems(patchPayloads, callback){
+    patchItems(patchPayloads, callback = null, opts = {}){
 
         this.setState({ "isPatching": true, "patchingPercentageComplete": 0 }, () => {
             setTimeout(ReactTooltip.hide, 50); // Hide still-present tooltips, if any (i.e. button that was clicked)
@@ -90,7 +95,7 @@ export class PatchItemsProgress extends React.PureComponent {
                         callback(countCompleted, patchErrors);
                     }
                 });
-            });
+            }, opts);
 
         });
     }
@@ -156,7 +161,9 @@ export const ProgressModal = React.memo(function ProgressModal (props) {
 
     let body;
     if (errorsLen > 0){
-        body = "" + errorsLen + " errors";
+        body = (
+            <h5 className="my-0 text-danger">{ errorsLen } errors</h5>
+        );
     } else if (finished) {
         body = "Done";
     } else if (isPatching) {
