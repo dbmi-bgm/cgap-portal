@@ -521,8 +521,8 @@ const NotePopoverContents = React.memo(function NotePopover(props){
 
 
     function handleSave (e) {
-        // const associatedTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
-        // const isExistingValue = associatedTechnicalReviewAtID && (
+        // const existingTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
+        // const isExistingValue = existingTechnicalReviewAtID && (
         //     (lastSavedCall === callType && lastSavedClassification === optionName)
         //     // Ensure we don't have an empty assessment: {} in lastSavedTechnicalReviewForResult
         //     || (typeof lastSavedAssessment === "undefined" && savedCall === callType && savedClassification === optionName)
@@ -703,7 +703,7 @@ function commonNoteUpsertProcess ({
         };
     });
 
-    const associatedTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
+    const existingTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
 
     const isCurrentlySavedToProject = (justSavedToProject || (isTechnicalReviewSavedToProject && !justRemovedFromProject));
 
@@ -718,9 +718,9 @@ function commonNoteUpsertProcess ({
     let updatePromise = null;
     let techReviewResponse = null;
 
-    function createNotePromise(){
+    function postNewNotePromise(){
 
-        console.log("Creating Note");
+        console.log("POSTing new Note and PATCHing [Structural]VariantSample.technical_review");
 
         const createPayload = {
             ...payload,
@@ -737,8 +737,6 @@ function commonNoteUpsertProcess ({
                     throw new Error("No NoteTechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                 }
                 techReviewResponse = res;
-                console.log("TRT1", techReviewResponse);
-                // PATCH VariantSample to set linkTo of "technical_review"
                 return ajax.promise(variantSampleAtID, "PATCH", {}, JSON.stringify({ "technical_review": newTechnicalReviewAtID }));
             })
             .then(function(vsResponse){
@@ -762,16 +760,15 @@ function commonNoteUpsertProcess ({
                         last_modified: { date_modified }
                     }
                 );
-                return { created: true };
             });
     }
 
-    function updateNotePromise(){
+    function patchExistingNotePromise(){
 
-        console.log("Updating Note");
+        console.log("Patching Note");
 
         // Deletion of `review` field should be done at backend for security -- TODO: move to _update method there perhaps.
-        const updateHref = associatedTechnicalReviewAtID + "?delete_fields=" + ["review"].concat(deleteFields).join(",");
+        const updateHref = existingTechnicalReviewAtID + "?delete_fields=" + ["review"].concat(deleteFields).join(",");
 
         return ajax.promise(updateHref, "PATCH", {}, JSON.stringify(_.omit(payload, ...deleteFields)))
             .then(function(res){
@@ -790,7 +787,6 @@ function commonNoteUpsertProcess ({
                     status,
                     last_modified: { date_modified }
                 });
-                return { created: false };
             });
     }
 
@@ -839,8 +835,6 @@ function commonNoteUpsertProcess ({
             });
     }
 
-    console.log('commonNoteUpsertProcess', shouldRemoveFromProject, arguments);
-
     if (shouldRemoveFromProject) {
         // Start with this before updating Note itself, since don't want to end in state where saved to project Note has changed incorrectly.
         // TODO: Prevent backend from accepting changes to Notes which are saved to project (?).
@@ -852,45 +846,34 @@ function commonNoteUpsertProcess ({
         updatePromise = Promise.resolve();
     }
 
-    if (!associatedTechnicalReviewAtID) {
-        // We need to re-assign updatePromise here, otherwise the `if (shouldSaveToProject && !shouldRemoveFromProject) {` then-block will exec
-        // before .thens defined in createNotePromise b.c. priority given to higher-level '.then' assignments.
-        updatePromise = updatePromise.then(createNotePromise);
+    if (!existingTechnicalReviewAtID) {
+        // We re-assign updatePromise here (and below); otherwise the `if (shouldSaveToProject && !shouldRemoveFromProject) {`
+        // '.then' -block below will execute before the .thens defined in createNotePromise (priority given to higher-level '.then' assignments).
+        updatePromise = updatePromise.then(postNewNotePromise);
     } else {
         // If values are same and we just want to save existing value to project, then skip the PATCH to Note itself.
         if (isExistingValue && shouldSaveToProject && !isCurrentlySavedToProject) {
-            console.info("Skipping PATCH for same classification, will only save to project");
-            // updatePromise = new Promise(function(resolve, reject){
-            //     resolve({ created: false });
-            // });
-            // updatePromise = Promise.resolve({ created: false });
+            console.info("Skipping PATCH for same classification value -- will only save to project");
         } else {
-            updatePromise = updatePromise.then(updateNotePromise);
+            updatePromise = updatePromise.then(patchExistingNotePromise);
         }
     }
 
 
-    let propsForPopover;
     updatePromise
-        .then((propsFromPromise) => {
-            propsForPopover = propsFromPromise;
-
+        .then(function(){
             if (shouldSaveToProject && !shouldRemoveFromProject) {
                 // We may not have techReviewResponse if we skipped PATCH, in which case we should have it from savedTechnicalReview
                 // or lastSavedTechnicalReviewForResult. We depend on technicalReviewUUIDFromResponse if we just created this technical review.
                 const { "@graph": [ technicalReviewItemFrameObject ] = [] } = techReviewResponse || {};
                 const { uuid: technicalReviewUUIDFromResponse } = technicalReviewItemFrameObject || {};
-
                 const technicalReviewUUID = technicalReviewUUIDFromResponse || lastSavedUUID || savedTechnicalReviewUUID;
-                console.log("TRT", techReviewResponse, technicalReviewUUIDFromResponse, lastSavedUUID, savedTechnicalReviewUUID);
                 if (!technicalReviewUUID) {
                     throw new Error("No technical review UUID available to be able to save to project");
                 }
                 console.log(`Will save technical review ${technicalReviewUUID} to project`);
                 return saveTechnicalReviewToProject(technicalReviewUUID, false);
             }
-
-            return propsForPopover;
         })
         .then(function(){
             // Show 'saved' popover unless manually set to skip it
@@ -906,7 +889,7 @@ function commonNoteUpsertProcess ({
                 setOpenPopoverData(function({ ref: existingBtnRef }){
                     return {
                         "ref": existingBtnRef,
-                        "jsx": <SavedTechnicalReviewPopover {...propsForPopover} />
+                        "jsx": <SavedTechnicalReviewPopover created={!existingTechnicalReviewAtID} />
                     };
                 });
             }
@@ -969,8 +952,8 @@ class CallClassificationButton extends React.PureComponent {
         const { "@id": lastSavedAtID, assessment: lastSavedAssessment } = lastSavedTechnicalReviewForResult || {};
         const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
 
-        const associatedTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
-        const isExistingValue = associatedTechnicalReviewAtID && (
+        const existingTechnicalReviewAtID = savedTechnicalReviewItemAtID || lastSavedAtID || null;
+        const isExistingValue = existingTechnicalReviewAtID && (
             (lastSavedCall === callType && lastSavedClassification === optionName)
             // Ensure we don't have an empty assessment: {} in lastSavedTechnicalReviewForResult
             || (typeof lastSavedAssessment === "undefined" && savedCall === callType && savedClassification === optionName)
