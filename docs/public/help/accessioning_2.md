@@ -109,6 +109,9 @@ and VCF files, fill in the FASTQ file names and submit with
 an empty **Genome Build** header, then remove those names, add
 the VCF file names, provide a genome build, and submit again.
 
+**BAM Sample ID**: The sample identifier used in the submitted file(s).
+Must be provided if submitting BAM or VCF files; optional otherwise.
+
 The above columns constitute the metadata required for the 
 CGAP portal to perform the analysis, as well as a few 
 additional columns that will show up on the Case View user 
