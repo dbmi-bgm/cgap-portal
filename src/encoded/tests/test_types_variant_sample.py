@@ -266,7 +266,7 @@ def test_variant_sample_patch_notes_process_success(
     techreview_note_reloaded = bgm_user_testapp.get(techreview_note["@id"] + "?datastore=database&frame=object", status=200).json
     assert techreview_note_reloaded["is_saved_to_project"] == False
     variant_reloaded_2 = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
-    assert techreview_note["@id"] not in [ note["@id"] for note in variant_reloaded["technical_reviews"] ]
+    assert techreview_note["@id"] not in [ note["@id"] for note in variant_reloaded_2["technical_reviews"] ]
 
 
 
