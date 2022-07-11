@@ -12,7 +12,7 @@ no,field_name,vcf_field,schema_title,do_import,value_example,scope,source_name,s
 9,PL,PL,"Genotype Likelihoods (0/0, 0/1, 1/1)",Y,"859,0,600",sample_variant,VCF,,"Normalized, Phred-scaled likelihoods for genotypes as defined in the VCF specification",string,,N,,,,,,,,,,,,,,,
 10,paired_reads,PR,Paired Read Support,Y,"6,1",sample_variant,VCF,,Spanning paired-read support for the reference and alternate alleles,integer,,Y,,,,,,,,,,,,,,,
 11,split_reads,SR,Split Read Support,Y,"2,3",sample_variant,VCF,,"Split reads for the reference and alternate alleles in the order listed, for reads where P(allele|read)>0.999",integer,,Y,,,,,,,,,,,,,,,
-12,confidence_class,CF,Confidence Class,Y,MEDIUM,sample_variant,VCF,,Confidence class for the variant call,string,,N,,,,,,,"HIGH,MEDIUM,LOW,NA",,,,,,,,
+12,confidence_class,CF,Confidence Class,Y,MEDIUM,sample_variant,VCF,,Confidence class for the variant call,string,,N,,,,,,,"HIGH,MEDIUM,LOW",,,,,,,,
 13,gnomadg_af,AF,gnomAD-SV Alt Allele Frequency,Y,0.0345,variant,gnomAD,v2.1,Alternate allele frequency in samples,number,,N,,,,,0,1,,,,,,,,,Y
 14,gnomadg_ac,AC,gnomAD-SV Alt Allele Count,Y,210,variant,gnomAD,v2.1,Alternate allele count for samples,integer,,N,,,,,0,,,,,,,,,,Y
 15,gnomadg_an,AN,gnomAD-SV Alt Allele Number,Y,1032,variant,gnomAD,v2.1,Total number of alleles in samples,integer,,N,,,,,0,,,,,,,,,,Y
