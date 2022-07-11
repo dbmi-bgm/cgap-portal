@@ -341,8 +341,8 @@ class TestInvalidationScopeViewCGAP:
                 'target_type': target_type
             }
 
+    # source_type is the item being edited, target_type is the item we are simulating invalidation one
     @pytest.mark.parametrize('source_type, target_type, invalidated', [
-        # Test WorkflowRun (same as fourfront)
         ('FileProcessed', 'WorkflowRunAwsem',
             DEFAULT_SCOPE + ['accession', 'filename', 'file_format', 'file_size']
          ),
@@ -350,10 +350,13 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['name', 'title', 'version', 'source_url']
          ),
         ('Workflow', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['category', 'experiment_types', 'app_name', 'title']
+            DEFAULT_SCOPE + ['title', 'experiment_types', 'category', 'app_name', 'steps.name']
          ),
-        ('WorkflowRunAwsem', 'FileProcessed',  # no link
-            DEFAULT_SCOPE
+        ('Software', 'WorkflowRunAwsem',
+            DEFAULT_SCOPE + ['name', 'version', 'title', 'source_url']
+         ),
+        ('WorkflowRunAwsem', 'FileProcessed',
+            DEFAULT_SCOPE + ['input_files.workflow_argument_name', 'output_files.workflow_argument_name']
          ),
         # Test Case as it has the most links and thus the most ways things can go wrong
         ('VariantSample', 'Case',
@@ -379,11 +382,9 @@ class TestInvalidationScopeViewCGAP:
                              'mother', 'father', 'samples']
          ),
         ('Sample', 'Case',
-            DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type',
-                             'specimen_accession_date', 'specimen_collection_date',
-                             'specimen_accession', 'specimen_notes', 'sequence_id',
-                             'sequencing_date', 'completed_processes', 'bam_sample_id',
-                             'indication']
+            DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type', 'indication', 'specimen_accession_date',
+                             'specimen_collection_date', 'specimen_accession', 'specimen_notes', 'sequence_id',
+                             'sequencing_date', 'files', 'processed_files', 'completed_processes', 'bam_sample_id']
          ),
         ('Family', 'Case',
             DEFAULT_SCOPE + ['institution', 'project', 'tags', 'last_modified.date_modified',
@@ -396,8 +397,7 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']
          ),
         ('FileProcessed', 'Case',
-            DEFAULT_SCOPE + ['accession', 'quality_metric', 'file_ingestion_status',
-                             'file_type', 'variant_type']
+            DEFAULT_SCOPE + ['accession', 'file_type', 'quality_metric', 'file_ingestion_status', 'variant_type']
          ),
         ('Report', 'Case',
             DEFAULT_SCOPE + ['accession']
@@ -423,5 +423,4 @@ class TestInvalidationScopeViewCGAP:
         """
         req = self.MockedRequest(indexer_testapp.app.registry, source_type, target_type)
         scope = compute_invalidation_scope(None, req)
-        print(scope['Invalidated'])
         assert sorted(scope['Invalidated']) == sorted(invalidated)
