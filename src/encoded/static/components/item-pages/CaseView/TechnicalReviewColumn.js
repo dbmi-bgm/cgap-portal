@@ -327,17 +327,24 @@ export class TechnicalReviewColumn extends React.PureComponent {
         } = projectTechnicalReview || {};
         const {
             assessment: savedTechnicalReviewAssessment,
-            note_text: savedTechnicalReviewNoteText
+            note_text: savedTechnicalReviewNoteText,
+            last_text_edited: { date_text_edited: savedDateTextEdited } = {}
         } = savedTechnicalReviewItem || {};
         const {
             call: savedCall,
-            classification: savedClassification
+            classification: savedClassification,
+            date_call_made: savedDateCallMade
         } = savedTechnicalReviewAssessment || {};
         const {
             assessment: lastSavedAssessment,
-            note_text: lastSavedNoteText
+            note_text: lastSavedNoteText,
+            last_text_edited: { date_text_edited: lastSavedDateTextEdited } = {}
         } = lastSavedTechnicalReviewForResult || {};
-        const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
+        const {
+            call: lastSavedCall,
+            classification: lastSavedClassification,
+            date_call_made: lastSavedDateCallMade
+        } = lastSavedAssessment || {};
 
         // linkTo exists but can't see @id - no view perms for entire NoteTechnicalReview
         // const noViewPermissions = savedTechnicalReviewItem && !savedTechnicalReviewItemAtID;
@@ -384,8 +391,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
 
         const isNoteUnsaved = typeof unsavedTechnicalReviewNoteTextForResult !== "undefined";
 
+        const noteTextDateLastEdited = lastSavedDateTextEdited || savedDateTextEdited || null;
+        const callDateLastMade = lastSavedDateCallMade || savedDateCallMade || null;
+        const isNotePotentiallyOutdated = noteTextDateLastEdited && callDateLastMade && noteTextDateLastEdited < callDateLastMade; //lastSavedAssessment && savedTechnicalReviewNoteText && typeof lastSavedNoteText === "undefined";
 
-        const isNotePotentiallyOutdated = lastSavedAssessment && savedTechnicalReviewNoteText && typeof lastSavedNoteText === "undefined";
         const notesIconCls = (
             "icon icon-2x icon-fw icon-sticky-note " + (
                 isNotePotentiallyOutdated ? "far text-danger"
@@ -474,6 +483,10 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         last_modified: {
             date_modified: savedDateModified,
             modified_by: { display_title: lastModifiedByName } = {}
+        } = {},
+        last_text_edited: {
+            date_text_edited: savedDateTextEdited,
+            text_edited_by: { display_title: savedTextEditedByName } = {}
         } = {}
     } = savedTechnicalReview || {};
     const {
@@ -483,12 +496,28 @@ const NotePopoverContents = React.memo(function NotePopover(props){
         call_made_by: { display_title: savedCallMadeByName } = {} // Unlikely to be visible to most people.
     } = savedAssessment || {};
 
-    const { "@id": lastSavedAtID, assessment: lastSavedAssessment, note_text: lastSavedNoteText } = lastSavedTechnicalReviewForResult || {};
-    const { call: lastSavedCall, classification: lastSavedClassification } = lastSavedAssessment || {};
+    const {
+        "@id": lastSavedAtID,
+        assessment: lastSavedAssessment,
+        note_text: lastSavedNoteText,
+        last_text_edited: {
+            date_text_edited: lastSavedDateTextEdited,
+            text_edited_by: { display_title: lastSavedTextEditedByName } = {}
+        } = {}
+    } = lastSavedTechnicalReviewForResult || {};
+    const {
+        call: lastSavedCall,
+        classification: lastSavedClassification,
+        date_call_made: lastSavedCallDate,
+    } = lastSavedAssessment || {};
     const { isTechnicalReviewSavedToProject, justRemovedFromProject, justSavedToProject } = projectTechnicalReviewInformation || {};
 
     // console.log("NotePopoverContents Render", lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult);
 
+    const showLastTextEditDate = lastSavedDateTextEdited || savedDateTextEdited || null;
+    const showLastTextEditAuthorName = lastSavedDateTextEdited ? lastSavedTextEditedByName
+        : savedDateTextEdited ? savedTextEditedByName
+            : null;
     let showCall;
     let showClassification;
     let showCallDate;
@@ -575,21 +604,21 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                 { showCallDate ?
                     <div className="small">
                         { (isLastSaved ? "Previous " : "") + "Call Made: " }
-                        <LocalizedTime timestamp={showCallDate} />
+                        <LocalizedTime timestamp={showCallDate} formatType="date-time-sm" />
                         { showCallMadeByName ? (" by " + showCallMadeByName) : null }
                     </div>
                     : null }
-                { savedDateModified ?
+                {/* savedDateModified ?
                     <div className="small">
                         { (isLastSaved ? "Previous " : "") + "Last Modified: " }
-                        <LocalizedTime timestamp={savedDateModified} />
+                        <LocalizedTime timestamp={savedDateModified} formatType="date-time-sm" />
                         { lastModifiedByName ? (" by " + lastModifiedByName) : null }
                     </div>
-                    : null }
+                : null */}
                 { savedDateApproved ?
                     <div className="small">
                         { (isLastSaved ? "Previously " : "") + "Approved: " }
-                        <LocalizedTime timestamp={savedDateApproved} />
+                        <LocalizedTime timestamp={savedDateApproved} formatType="date-time-sm" />
                         { approvedByName ? (" by " + approvedByName) : null }
                     </div>
                     : null }
@@ -601,6 +630,11 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                     : <NoteClassificationIndicator {...{ showCall, showClassification }} showAsterisk={isLastSaved} /> }
                 { isLastSaved ?
                     <React.Fragment>
+                        <div className="small mt-16">
+                            { "New Call Made: " }
+                            <LocalizedTime timestamp={lastSavedCallDate} formatType="date-time-sm" />
+                            { " by you" }
+                        </div>
                         <h6 className="mb-04 text-600">Newly-Saved Variant Classification</h6>
                         <NoteClassificationIndicator showCall={lastSavedCall} showClassification={lastSavedClassification} />
                     </React.Fragment>
@@ -612,6 +646,13 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                 {/*<textarea className="form-control" rows={5} disabled value="Coming soon..." /> */}
                 <textarea className="form-control" rows={5} onChange={onTextAreaChange} disabled={textareaDisabled} key={vsUUID}
                     defaultValue={textareaDefaultValue} />
+                { showLastTextEditDate ?
+                    <div className="small mt-04">
+                        { "Text Last Saved: " }
+                        <LocalizedTime timestamp={showLastTextEditDate} formatType="date-time-sm" />
+                        { showLastTextEditAuthorName ? (" by " + showLastTextEditAuthorName) : null }
+                    </div>
+                    : null }
                 <div className="d-flex mt-08">
                     <button type="button" className="btn btn-primary mr-04 w-100" disabled={saveDisabled} onClick={handleSave}>
                         Save
@@ -673,7 +714,6 @@ function commonNoteUpsertProcess ({
         technical_review: savedTechnicalReviewItem,
         "@id" : variantSampleAtID,
         uuid: vsUUID,
-        "@type": vsTypeList,
         project: { "@id": vsProjectAtID },
         institution: { "@id": vsInstitutionAtID }
     } = result;
@@ -707,9 +747,11 @@ function commonNoteUpsertProcess ({
 
     const isCurrentlySavedToProject = (justSavedToProject || (isTechnicalReviewSavedToProject && !justRemovedFromProject));
 
+    // LIKELY TO CHANGE:
     // Save to project if clicked on a save-to-project button
     // OR unset if is already saved to project (assume we saved a new/different value -- might change later if allow to overwrite ...)
     // or unset if we're toggling existing value off (might change)
+    // we will likely force users to explictly unset from project before defining new value, so some of this might be moot.
     const shouldRemoveFromProject = (
         (!shouldSaveToProject && isCurrentlySavedToProject)                         // Clicked on different value which shouldn't be saved to project
         || (shouldSaveToProject && isExistingValue && isCurrentlySavedToProject)    // Clicked on same value which already saved to project -- toggle/remove it.
@@ -718,21 +760,55 @@ function commonNoteUpsertProcess ({
     let updatePromise = null;
     let techReviewResponse = null;
 
+    /**
+     * Also save "@id" of new NoteTechnicalReviewItem so we may (re-)PATCH it while savedTechnicalReviewItem & VS hasn't yet indexed
+     * and so that can use to determine isTechnicalReviewSavedToProject (by comparing to project_technical_review @id)
+     */
+    function getNoteDataToCache(originalPayload, noteUpsertResponse){
+        const { "@graph": [ {
+            "@id": technicalReviewAtID,
+            uuid,
+            assessment: { date_call_made } = {},
+            last_text_edited: { date_text_edited } = {},
+            last_modified: { date_modified },
+            is_saved_to_project, // - is set by `saveTechnicalReviewToProject`, but we include here also in case allow to edit already-saved-to-project-notes in future.
+        } ] } = noteUpsertResponse;
+
+        const retObj = {
+            ...originalPayload,
+            "@id": technicalReviewAtID,
+            uuid,
+            is_saved_to_project,
+            last_modified: { date_modified }
+        };
+
+        if (retObj.assessment && date_call_made) {
+            // If assessment was part of originalPayload, add in the date_call_made generated by backend
+            retObj.assessment.date_call_made = date_call_made;
+        }
+
+        if (retObj.note_text && date_text_edited) {
+            // If note_text was part of originalPayload, add in the date_text_edited generated by backend
+            retObj.last_text_edited = { date_text_edited };
+        }
+
+        return retObj;
+    }
+
     function postNewNotePromise(){
 
         console.log("POSTing new Note and PATCHing [Structural]VariantSample.technical_review");
 
+        // Explicitly add project+institution so is same as that of VariantSample and not that of user (potentially admin).
         const createPayload = {
             ...payload,
-            // Explicitly add project+institution so is same as that of VariantSample and not that of user (potentially admin).
             "project": vsProjectAtID,
             "institution": vsInstitutionAtID
         };
 
         return ajax.promise("/notes-technical-review/", "POST", {}, JSON.stringify(_.omit(createPayload, ...deleteFields)))
             .then(function(res){
-                const { "@graph": [ technicalReviewItemFrameObject ] } = res;
-                const { "@id": newTechnicalReviewAtID } = technicalReviewItemFrameObject;
+                const { "@graph": [ { "@id": newTechnicalReviewAtID } ] } = res;
                 if (!newTechnicalReviewAtID) {
                     throw new Error("No NoteTechnicalReview @ID returned."); // If no error thrown during destructuring ^..
                 }
@@ -746,20 +822,7 @@ function commonNoteUpsertProcess ({
                 if (!vsAtIDRepeated) {
                     throw new Error("No [Structural]VariantSample @ID returned."); // If no error thrown during destructuring ^..
                 }
-                // - Grab status from techreview response and save to local state to compare for if saved to project or not.
-                // - Also save "@id" of new NoteTechnicalReviewItem so we may (re-)PATCH it while savedTechnicalReviewItem & VS hasn't yet indexed
-                //   and so that can use to determine isTechnicalReviewSavedToProject (by comparing to project_technical_review @id)
-                const { "@graph": [ { "@id": technicalReviewAtID, uuid, status, last_modified: { date_modified } } ] } = techReviewResponse;
-                cacheSavedTechnicalReviewForVSUUID(
-                    vsUUID,
-                    {
-                        ...payload,
-                        "@id": technicalReviewAtID,
-                        uuid,
-                        status,
-                        last_modified: { date_modified }
-                    }
-                );
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, getNoteDataToCache(payload, techReviewResponse));
             });
     }
 
@@ -772,21 +835,12 @@ function commonNoteUpsertProcess ({
 
         return ajax.promise(updateHref, "PATCH", {}, JSON.stringify(_.omit(payload, ...deleteFields)))
             .then(function(res){
-                const { "@graph": [ technicalReviewItemFrameObject ] } = res;
-                const { "@id": technicalReviewAtID } = technicalReviewItemFrameObject;
+                const { "@graph": [ { "@id": technicalReviewAtID } ] } = res;
                 if (!technicalReviewAtID) {
                     throw new Error("No @ID returned."); // If no error thrown during destructuring ^..
                 }
                 techReviewResponse = res;
-                // Grab status from techreview response and save to local state to compare for if saved to project or not.
-                const { status, uuid, last_modified: { date_modified } } = technicalReviewItemFrameObject;
-                cacheSavedTechnicalReviewForVSUUID(vsUUID, {
-                    ...payload,
-                    "@id": technicalReviewAtID,
-                    uuid,
-                    status,
-                    last_modified: { date_modified }
-                });
+                cacheSavedTechnicalReviewForVSUUID(vsUUID, getNoteDataToCache(payload, techReviewResponse));
             });
     }
 
@@ -848,7 +902,7 @@ function commonNoteUpsertProcess ({
 
     if (!existingTechnicalReviewAtID) {
         // We re-assign updatePromise here (and below); otherwise the `if (shouldSaveToProject && !shouldRemoveFromProject) {`
-        // '.then' -block below will execute before the .thens defined in createNotePromise (priority given to higher-level '.then' assignments).
+        // '.then' -block below will execute before (or same time) as the .thens defined in createNotePromise (parallelized not sequential).
         updatePromise = updatePromise.then(postNewNotePromise);
     } else {
         // If values are same and we just want to save existing value to project, then skip the PATCH to Note itself.

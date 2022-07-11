@@ -3,6 +3,7 @@ import io
 import json
 import os
 import csv
+from itertools import chain
 from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
@@ -925,12 +926,24 @@ def update_project_notes_process(context, request):
     save_to_project_notes = request_body.get("save_to_project_notes", {})
     remove_from_project_notes = request_body.get("remove_from_project_notes", {})
 
-    vs_to_variant_or_gene_field_mappings = {
-        "interpretation": "interpretations",
-        "discovery_interpretation": "discovery_interpretations",
-        "gene_notes": "gene_notes",
-        "variant_notes": "variant_notes",
-        "technical_review": "technical_reviews"
+    vs_to_item_mappings = {
+        # "Variant" can apply to "Variant" or "StructuralVariant" when it appears here.
+        "interpretation": {
+            "Variant": "interpretations"
+        },
+        "discovery_interpretation": {
+            "Variant": "discovery_interpretations",
+            "Gene": "discovery_interpretations"
+        },
+        "variant_notes": {
+            "Variant": "variant_notes"
+        },
+        "gene_notes": {
+            "Gene": "gene_notes"
+        },
+        "technical_review": {
+            "Variant": "technical_reviews"
+        }
     }
 
     if not save_to_project_notes and not remove_from_project_notes:
@@ -968,7 +981,7 @@ def update_project_notes_process(context, request):
         else:
             loaded_notes[vs_field_name] = loaded_item
 
-    for vs_field_name in vs_to_variant_or_gene_field_mappings.keys():
+    for vs_field_name in vs_to_item_mappings.keys():
         validate_and_load_item(vs_field_name)
 
     if len(loaded_notes) == 0:
@@ -984,28 +997,15 @@ def update_project_notes_process(context, request):
     variant_fields_needed = []
     gene_fields_needed = []
 
-    # Embed only the fields we need (for performance)
-    if "interpretation" in save_to_project_notes or "interpretation" in remove_from_project_notes:
-        variant_fields_needed.append("interpretations.@id")
-        variant_fields_needed.append("interpretations.project")
-
-    if "discovery_interpretation" in save_to_project_notes or "discovery_interpretation" in remove_from_project_notes:
-        variant_fields_needed.append("discovery_interpretations.@id")
-        variant_fields_needed.append("discovery_interpretations.project")
-        gene_fields_needed.append("discovery_interpretations.@id")
-        gene_fields_needed.append("discovery_interpretations.project")
-
-    if "variant_notes" in save_to_project_notes or "variant_notes" in remove_from_project_notes:
-        variant_fields_needed.append("variant_notes.@id")
-        variant_fields_needed.append("variant_notes.project")
-
-    if "gene_notes" in save_to_project_notes or "gene_notes" in remove_from_project_notes:
-        gene_fields_needed.append("gene_notes.@id")
-        gene_fields_needed.append("gene_notes.project")
-
-    if "technical_review" in save_to_project_notes or "technical_review" in remove_from_project_notes:
-        variant_fields_needed.append("technical_reviews.@id")
-        variant_fields_needed.append("technical_reviews.project")
+    # Embed only the fields we need (for performance).
+    for note_field in { *save_to_project_notes.keys(), *remove_from_project_notes.keys() }:
+        for item_type in vs_to_item_mappings[note_field].keys():
+            vg_notes_field_name = vs_to_item_mappings[note_field][item_type]
+            vg_notes_fields_required = [ vg_notes_field_name + ".@id", vg_notes_field_name + ".project" ]
+            if item_type == "Variant":
+                variant_fields_needed = variant_fields_needed + vg_notes_fields_required
+            elif item_type == "Gene":
+                gene_fields_needed = gene_fields_needed + vg_notes_fields_required
 
     context_item_type = context.jsonld_type()
     is_structural_vs = context_item_type[0] == "StructuralVariantSample"
@@ -1054,7 +1054,10 @@ def update_project_notes_process(context, request):
             notes_patch_payloads[item_at_id]["date_approved"] = timestamp
 
     def add_or_replace_note_for_project_on_variant_or_gene_item(vs_field_name, vg_item, payload, remove=False):
-        vg_field_name = vs_to_variant_or_gene_field_mappings[vs_field_name]
+        # At the moment, field names on Variant and Gene are the same, so we get via this "OR". Later, we might need
+        # to figure out item type.
+        vg_item_type_mapping = vs_to_item_mappings[vs_field_name]
+        vg_field_name = vg_item_type_mapping.get("Variant") or vg_item_type_mapping.get("Gene")
         newly_shared_item_at_id = loaded_notes[vs_field_name]["@id"]
 
         if not vg_item.get(vg_field_name): # Variant or Gene Item has no existing notes for `vg_field_name` field.
@@ -1109,57 +1112,29 @@ def update_project_notes_process(context, request):
         payload[vg_field_name].append(newly_shared_item_at_id)
 
 
-    if "interpretation" in save_to_project_notes:
-        # Update Note status if is not already current.
-        if loaded_notes["interpretation"]["is_saved_to_project"] != True:
-            create_note_patch_payload(loaded_notes["interpretation"])
-        # Add to Variant.interpretations
-        add_or_replace_note_for_project_on_variant_or_gene_item("interpretation", variant, variant_patch_payload)
+    ## Handle Saves -
+    for note_field in save_to_project_notes:
+        item_field_mapping = vs_to_item_mappings[note_field]
+        if loaded_notes[note_field]["is_saved_to_project"] != True:
+            create_note_patch_payload(loaded_notes[note_field])
+        if "Variant" in item_field_mapping:     # Add to Variant
+            add_or_replace_note_for_project_on_variant_or_gene_item(note_field, variant, variant_patch_payload)
+        if "Gene" in item_field_mapping:        # Add to Genes
+            for gene in genes:
+                genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
+                add_or_replace_note_for_project_on_variant_or_gene_item(note_field, gene, genes_patch_payloads[gene["@id"]])
 
+    ## Handle Removes -
 
-    if "discovery_interpretation" in save_to_project_notes:
-        # Update Note status if is not already current.
-        if loaded_notes["discovery_interpretation"]["is_saved_to_project"] != True:
-            create_note_patch_payload(loaded_notes["discovery_interpretation"])
-        # Add to Variant.discovery_interpretations
-        add_or_replace_note_for_project_on_variant_or_gene_item("discovery_interpretation", variant, variant_patch_payload)
-        # Add to Gene.discovery_interpretations
-        for gene in genes:
-            genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
-            add_or_replace_note_for_project_on_variant_or_gene_item("discovery_interpretation", gene, genes_patch_payloads[gene["@id"]])
+    for note_field in remove_from_project_notes:
+        item_field_mapping = vs_to_item_mappings[note_field]
+        if loaded_notes[note_field]["is_saved_to_project"] == True:
+            create_note_patch_payload(loaded_notes[note_field], remove=True)
+        if "Variant" in item_field_mapping: # Remove from Variant
+            add_or_replace_note_for_project_on_variant_or_gene_item(note_field, variant, variant_patch_payload, remove=True)
+        if "Gene" in item_field_mapping:
+            raise HTTPBadRequest("Removing note from gene not yet implemented")
 
-    if "variant_notes" in save_to_project_notes:
-        # Update Note status if is not already current.
-        if loaded_notes["variant_notes"]["is_saved_to_project"] != True:
-            create_note_patch_payload(loaded_notes["variant_notes"])
-        # Add to Variant.variant_notes
-        add_or_replace_note_for_project_on_variant_or_gene_item("variant_notes", variant, variant_patch_payload)
-
-    if "gene_notes" in save_to_project_notes:
-        # Update Note status if is not already current.
-        if loaded_notes["gene_notes"]["is_saved_to_project"] != True:
-            create_note_patch_payload(loaded_notes["gene_notes"])
-        # Add to Gene.gene_notes
-        for gene in genes:
-            genes_patch_payloads[gene["@id"]] = genes_patch_payloads.get(gene["@id"], {})
-            add_or_replace_note_for_project_on_variant_or_gene_item("gene_notes", gene, genes_patch_payloads[gene["@id"]])
-
-    if "technical_review" in save_to_project_notes:
-        # Update Note status if is not already current.
-        # TODO: Handle technical_review.note as well.
-        if loaded_notes["technical_review"]["is_saved_to_project"] != True:
-            create_note_patch_payload(loaded_notes["technical_review"], approve=False)
-        # Add to Variant.technical_reviews
-        add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload)
-
-
-    if "technical_review" in remove_from_project_notes:
-        # Update Note status if is not already current.
-        # TODO: Handle technical_review.note as well.
-        if loaded_notes["technical_review"]["is_saved_to_project"] == True:
-            create_note_patch_payload(loaded_notes["technical_review"], remove=True)
-        # Remove from Variant.technical_reviews
-        add_or_replace_note_for_project_on_variant_or_gene_item("technical_review", variant, variant_patch_payload, remove=True)
 
 
     # Perform the PATCHes!
