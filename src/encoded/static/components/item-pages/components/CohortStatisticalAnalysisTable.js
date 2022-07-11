@@ -41,7 +41,7 @@ function TextboxFilter({ label, placeholder, filtertype, onChange }) {
 
   return (
     <div className="mb-1">
-      <label className="form-label small fw-bold mb-0">{label}</label>
+      <div className="mb-0">{label}</div>
       <input
         className="form-control form-control-sm"
         data-filtertype={filtertype}
@@ -57,7 +57,7 @@ function GeneListFilter({ geneLists, onChange }) {
 
   return (
     <div className="mb-1">
-      <label className="form-label small fw-bold mb-0">Gene list</label>
+      <div className="mb-0">Gene list</div>
       <select
         className="form-control form-control-sm d-block"
         aria-label=".form-select-sm example"
@@ -106,7 +106,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
 
     //this.vcfLocation = vcfLocation // CREATE PRESIGNED URL
     this.vcfLocation =
-      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log.vcf.gz";
+      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log_2.vcf.gz";
     this.tbiLocation = this.vcfLocation + ".tbi";
 
     this.vcfRecords = {};
@@ -355,7 +355,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
   getFilter() {
     return (
       <React.Fragment>
-        <div className="p-3 bg-light">
+        <div className="p-3 border">
           <TextboxFilter
             label="Gene name"
             placeholder="e.g. TNFRSF8"
