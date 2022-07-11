@@ -440,11 +440,13 @@ class StructuralVariantSample(Item):
     })
     def project_technical_review(self, request, structural_variant=None, project=None):
         structural_variant = get_item_or_none(request, structural_variant, 'StructuralVariant', frame='raw')
-        if structural_variant:
-            for tr_id in structural_variant.get("technical_reviews", []):
-                technical_review = get_item_or_none(request, tr_id, 'NoteTechnicalReview', frame='raw')
-                if technical_review.get("project") == project:
-                    return tr_id
+        if structural_variant and project:
+            # project param will be in form of @id
+            for tr_uuid in structural_variant.get("technical_reviews", []):
+                # frame=object returns linkTos in form of @id, frame=raw returns them in form of UUID.
+                technical_review = get_item_or_none(request, tr_uuid, 'NoteTechnicalReview', frame='object')
+                if technical_review.get("project") == project: # Comparing @IDs
+                    return tr_uuid
         return None
 
 

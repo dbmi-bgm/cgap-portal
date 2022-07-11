@@ -142,7 +142,10 @@ export const VariantSampleSelectionList = React.memo(function VariantSampleSelec
         sendToReportStore
     } = props;
 
-    const { variant_samples: vsSelections = [], structural_variant_samples: cnvSelections = [] } =  variantSampleListItem || {};
+    const {
+        variant_samples: vsSelections = [],
+        structural_variant_samples: cnvSelections = []
+    } =  variantSampleListItem || {};
 
     // Used for faster lookups of current tag title.
     const tableTagsByID = useMemo(function(){

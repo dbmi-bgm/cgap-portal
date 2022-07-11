@@ -368,9 +368,12 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
  * For now can just check if Note.is_saved_to_project === true and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
  */
 export function buildAlreadyStoredNoteUUIDDict(variantSampleListItem, checkFunction){
-    const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
+    const {
+        variant_samples: snvVSObjects = [], //vsObjects = [],
+        structural_variant_samples: cnvVSObjects = []
+    } = variantSampleListItem || {}; // Might not yet be loaded.
     const dict = {};
-    vsObjects.forEach(function({ variant_sample_item }){
+    snvVSObjects.concat(cnvVSObjects).forEach(function({ variant_sample_item }){
         getAllNotesFromVariantSample(variant_sample_item).forEach(function(noteItem){
             const { uuid: noteUUID } = noteItem;
             if (checkFunction(noteItem, variant_sample_item)) {
