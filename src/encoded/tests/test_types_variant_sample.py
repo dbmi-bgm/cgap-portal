@@ -155,10 +155,15 @@ def test_variant_sample_patch_notes_process_success(
     gene, # These 2 Gene are from ENCODED project (not BGM)
     gene_2
 ):
+
+    # Make sure system-generated timestamps are newer than this.
+    prepatch_datetime = datetime.datetime.now(pytz.utc)
     
     # Load up some data - these are notes to be added with "/@@update-project-notes/"
     note1 = bgm_user_testapp.post_json('/notes-standard', bgm_note_for_patch_process, status=201).json['@graph'][0]
     note2 = bgm_user_testapp.post_json('/notes-interpretation', bgm_note_for_patch_process2, status=201).json['@graph'][0]
+    assert isoparse(note1["last_text_edited"]["date_text_edited"]) >= prepatch_datetime
+    assert isoparse(note2["last_text_edited"]["date_text_edited"]) >= prepatch_datetime
 
     note3_json = bgm_note_for_patch_process2.copy()
     note3_json["note_text"] = "gene discovery note text"
@@ -167,7 +172,9 @@ def test_variant_sample_patch_notes_process_success(
     note3 = bgm_user_testapp.post_json('/notes-discovery', note3_json, status=201).json['@graph'][0]
     note4 = bgm_user_testapp.post_json('/notes-standard', note4_json, status=201).json['@graph'][0]
 
+    # Techreview has some additional fields, we test that they're populated correctly.
     techreview_note = bgm_user_testapp.post_json('/notes-technical-review', bgm_techreview_note_for_patch_process, status=201).json['@graph'][0]
+    assert isoparse(techreview_note["assessment"]["date_call_made"]) >= prepatch_datetime
 
     # Create a "pre-existing" variant_note with same Project (BGM).
     bgm_note_for_patch_process_preexisting = bgm_note_for_patch_process2.copy()
@@ -193,8 +200,6 @@ def test_variant_sample_patch_notes_process_success(
         "genes": [ {"genes_most_severe_gene": gene["@id"] }, {"genes_most_severe_gene": gene_2["@id"] } ]
     }
     variant_loaded = testapp.patch_json(variant_sample["variant"], variant_payload_for_initial_state, status=200).json['@graph'][0]
-
-    prepatch_datetime = datetime.datetime.now(pytz.utc)
 
     # Test /@@update-project-notes/ endpoint
     save_patch_process_payload = {
@@ -231,6 +236,7 @@ def test_variant_sample_patch_notes_process_success(
     assert note2["@id"] in [ note["@id"] for note in variant_reloaded["interpretations"] ]
     assert techreview_note["@id"] in [ note["@id"] for note in variant_reloaded["technical_reviews"] ]
 
+
     # Gene notes not embedded by default on variant, we GET Gene first to check on it.
     gene_loaded = bgm_user_testapp.get(variant_reloaded["genes"][0]["genes_most_severe_gene"]["@id"] + "?datastore=database", status=200).json
     gene_2_loaded = bgm_user_testapp.get(variant_reloaded["genes"][1]["genes_most_severe_gene"]["@id"] + "?datastore=database", status=200).json
@@ -247,7 +253,7 @@ def test_variant_sample_patch_notes_process_success(
     note_pre_existing_reloaded = bgm_user_testapp.get(note_pre_existing["@id"] + "?datastore=database&frame=object", status=200).json
     assert note_pre_existing_reloaded["superseding_note"] == note1["@id"]
 
-    ## ---- TODO: Test remove_from_project_notes ----- ##
+    ## Test remove_from_project_notes ##
 
     # Now, attempt to remove note(s). This currently should work for saved-to-project Variant notes but not yet for Gene
     remove_patch_process_payload = {
