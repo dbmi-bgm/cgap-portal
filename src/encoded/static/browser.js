@@ -48,6 +48,11 @@ function updateSessionInfo(){
 // Inside this function, kick-off all initialization, everything up to this
 // point should be definitions.
 if (typeof window !== 'undefined' && window.document && !window.TEST_RUNNER) {
+    
+    window.onload = function(){
+        console.log("Window Loaded");
+        window._onload_event_fired = true;
+    };
 
     updateSessionInfo();
 

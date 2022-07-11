@@ -47,6 +47,9 @@
             "$ref": "mixins.json#/tags"
         },
         {
+            "$ref": "mixins.json#/paired_end"
+        },
+        {
             "$ref": "file.json#/properties"
         }
     ],
@@ -71,6 +74,7 @@
         "file_type": {
             "title": "File Type",
             "description": "The type of file based on the information in the file.",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
             "suggested_enum": [
                 "alignments",
                 "image",
@@ -166,12 +170,42 @@
         "variant_type": {
             "title": "Variant Type",
             "description": "The variant type associated with this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
             "type": "string",
             "enum": [
                 "SNV",
                 "SV",
                 "CNV"
             ]
+        },
+        "linkto_location": {
+            "title": "LinkTo Location",
+            "description": "Location on which to place a linkTo for this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "Sample",
+                    "SampleProcessing"
+                ]
+            }
+        },
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
+        },
+        "vcf_to_ingest": {
+            "title": "VCF to Ingest",
+            "description": "Whether file is a VCF with contents to ingest",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "boolean"
         },
         "higlass_file": {
             "title": "File for HiGlass Display",

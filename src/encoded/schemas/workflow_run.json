@@ -246,6 +246,16 @@
                 "description": "one of the commands that are run for the workflow run",
                 "type": "string"
             }
+        },
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
         }
     },
     "facets": {
