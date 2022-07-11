@@ -38,6 +38,14 @@ def bgm_note_for_patch_process2(bgm_note_for_patch_process):
     bgm_note_for_patch_process_copy['note_text'] = 'dummy text 2'
     return bgm_note_for_patch_process_copy
 
+@pytest.fixture
+def bgm_techreview_note_for_patch_process(bgm_note_for_patch_process):
+    # IS NOT pre-POSTed into DB.
+    bgm_note_for_patch_process_copy = bgm_note_for_patch_process.copy()
+    bgm_note_for_patch_process_copy['note_text'] = 'dummy text 3'
+    bgm_note_for_patch_process_copy['assessment'] = { "call": False, "classification": "Recurrent Artifact" }
+    return bgm_note_for_patch_process_copy
+
 
 @pytest.fixture
 def y_variant(bgm_user_testapp, bgm_project, institution):
@@ -143,6 +151,7 @@ def test_variant_sample_patch_notes_process_success(
     bgm_test_variant_sample2, # This VS is from BGM project and has no "genes" on it initially.
     bgm_note_for_patch_process,
     bgm_note_for_patch_process2,
+    bgm_techreview_note_for_patch_process,
     gene, # These 2 Gene are from ENCODED project (not BGM)
     gene_2
 ):
@@ -158,6 +167,8 @@ def test_variant_sample_patch_notes_process_success(
     note3 = bgm_user_testapp.post_json('/notes-discovery', note3_json, status=201).json['@graph'][0]
     note4 = bgm_user_testapp.post_json('/notes-standard', note4_json, status=201).json['@graph'][0]
 
+    techreview_note = bgm_user_testapp.post_json('/notes-technical-review', bgm_techreview_note_for_patch_process, status=201).json['@graph'][0]
+
     # Create a "pre-existing" variant_note with same Project (BGM).
     bgm_note_for_patch_process_preexisting = bgm_note_for_patch_process2.copy()
     bgm_note_for_patch_process_preexisting['note_text'] = 'dummy text 3'
@@ -172,6 +183,7 @@ def test_variant_sample_patch_notes_process_success(
     bgm_test_variant_sample_copy['interpretation'] = note2['@id']
     bgm_test_variant_sample_copy['discovery_interpretation'] = note3['@id']
     bgm_test_variant_sample_copy['gene_notes'] = note4['@id']
+    bgm_test_variant_sample_copy['technical_review'] = techreview_note['@id']
     variant_sample = bgm_user_testapp.post_json('/variant_sample', bgm_test_variant_sample_copy, status=201).json['@graph'][0]
 
     # Add the pre-existing variant_note by PATCHING VariantSample.variant.variant_notes (as admin)
@@ -185,16 +197,17 @@ def test_variant_sample_patch_notes_process_success(
     prepatch_datetime = datetime.datetime.now(pytz.utc)
 
     # Test /@@update-project-notes/ endpoint
-    patch_process_payload = {
+    save_patch_process_payload = {
         "save_to_project_notes" : {
             "variant_notes": note1["uuid"],
             "interpretation": note2["uuid"],
             "discovery_interpretation": note3["uuid"],
-            "gene_notes": note4["uuid"]
+            "gene_notes": note4["uuid"],
+            "technical_review": techreview_note["uuid"]
         }
     }
 
-    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@update-project-notes/", patch_process_payload, status=200).json
+    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@update-project-notes/", save_patch_process_payload, status=200).json
 
     assert resp["status"] == "success"
     assert resp["patch_results"]["Variant"] == 1
@@ -202,32 +215,54 @@ def test_variant_sample_patch_notes_process_success(
 
     note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
     note3_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
-    assert note1_reloaded["status"] == "current"
-    assert note3_reloaded["status"] == "current"
+    assert note1_reloaded["is_saved_to_project"] == True
+    assert note3_reloaded["is_saved_to_project"] == True
+
+    # NOTE: Approval is auto-set only for interpretation, gene_notes, variant_notes... might be removed later from those also.
     assert note1_reloaded["approved_by"] == bgm_user["@id"] # Ensure this is set for us
     assert note3_reloaded["approved_by"] == bgm_user["@id"]
+
+    # NOTE: Approval is auto-set only for interpretation, gene_notes, variant_notes... might be removed later from those also.
     assert isoparse(note1_reloaded["date_approved"]) >= prepatch_datetime # Datetime of approval is same or after the datetime at which we started PATCH
     assert isoparse(note3_reloaded["date_approved"]) >= prepatch_datetime # Datetime of approval is same or after the datetime at which we started PATCH
 
     variant_reloaded = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
-    assert note1["@id"] in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
-    assert note2["@id"] in [ inp["@id"] for inp in variant_reloaded["interpretations"] ]
+    assert note1["@id"] in [ note["@id"] for note in variant_reloaded["variant_notes"] ]
+    assert note2["@id"] in [ note["@id"] for note in variant_reloaded["interpretations"] ]
+    assert techreview_note["@id"] in [ note["@id"] for note in variant_reloaded["technical_reviews"] ]
 
     # Gene notes not embedded by default on variant, we GET Gene first to check on it.
     gene_loaded = bgm_user_testapp.get(variant_reloaded["genes"][0]["genes_most_severe_gene"]["@id"] + "?datastore=database", status=200).json
     gene_2_loaded = bgm_user_testapp.get(variant_reloaded["genes"][1]["genes_most_severe_gene"]["@id"] + "?datastore=database", status=200).json
-    assert note3["@id"] in [ inp["@id"] for inp in gene_loaded["discovery_interpretations"] ]
-    assert note4["@id"] in [ inp["@id"] for inp in gene_loaded["gene_notes"] ]
-    assert note3["@id"] in [ inp["@id"] for inp in gene_2_loaded["discovery_interpretations"] ]
-    assert note4["@id"] in [ inp["@id"] for inp in gene_2_loaded["gene_notes"] ]
+    assert note3["@id"] in [ note["@id"] for note in gene_loaded["discovery_interpretations"] ]
+    assert note4["@id"] in [ note["@id"] for note in gene_loaded["gene_notes"] ]
+    assert note3["@id"] in [ note["@id"] for note in gene_2_loaded["discovery_interpretations"] ]
+    assert note4["@id"] in [ note["@id"] for note in gene_2_loaded["gene_notes"] ]
 
     # Since note_pre_existing (pre-existing) has same Project (BGM), it should have been removed and instead available via note1.previous_note
-    assert note_pre_existing["@id"] not in [ inp["@id"] for inp in variant_reloaded["variant_notes"] ]
+    assert note_pre_existing["@id"] not in [ note["@id"] for note in variant_reloaded["variant_notes"] ]
     assert note1_reloaded["previous_note"] == note_pre_existing["@id"]
 
     # Make sure it acts like a linked-list, ""
     note_pre_existing_reloaded = bgm_user_testapp.get(note_pre_existing["@id"] + "?datastore=database&frame=object", status=200).json
     assert note_pre_existing_reloaded["superseding_note"] == note1["@id"]
+
+    ## ---- TODO: Test remove_from_project_notes ----- ##
+
+    # Now, attempt to remove note(s). This currently should work for saved-to-project Variant notes but not yet for Gene
+    remove_patch_process_payload = {
+        "remove_from_project" : {
+            "technical_review": techreview_note["uuid"]
+        }
+    }
+
+    resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@update-project-notes/", remove_patch_process_payload, status=200).json
+    techreview_note_reloaded = bgm_user_testapp.get(techreview_note["@id"] + "?datastore=database&frame=object", status=200).json
+    assert techreview_note_reloaded["is_saved_to_project"] == False
+    variant_reloaded_2 = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
+    assert techreview_note["@id"] not in [ note["@id"] for note in variant_reloaded["technical_reviews"] ]
+
+
 
 
 def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_sample_list1, bgm_test_variant_sample, bgm_test_variant_sample2):

@@ -3,7 +3,6 @@ import io
 import json
 import os
 import csv
-from itertools import chain
 from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
