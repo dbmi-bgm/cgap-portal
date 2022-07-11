@@ -329,3 +329,11 @@ class TestCustomEmbed:
                 assert bgm_embed[key] == value
         for variant_sample in bgm_variant_samples:
             assert variant_sample["variant_sample_item"] == FORBIDDEN_MSG
+
+    def test_repeated_field_embed(self, testapp, file_fastq):
+        """Test retrieval of repeated field term from item."""
+        file_fastq_uuid = file_fastq["uuid"]
+        fields = ["file_format.file_format"]
+        json_params = {"ids": [file_fastq_uuid], "fields": fields}
+        admin_embed = embed_with_json_params(testapp, json_params)
+        assert admin_embed["file_format"]["file_format"] == "fastq"

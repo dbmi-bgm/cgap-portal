@@ -220,15 +220,102 @@
                     },
                     "custom_pf_fields": {
                         "title": "Custom PF fields",
-                        "description": "Custom fields to be added to processed file items through Tibanna",
+                        "description": "Custom fields to be added to specified processed file items through Tibanna",
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": {
+                            "type": "object",
+                            "description": "Custom fields to be added to processed file items through Tibanna",
+                            "comment": "Ensure all properties here are same as those located on processed file schema",
+                            "properties": {
+                                "description": {
+                                    "title": "Description",
+                                    "description": "A plain text description of the file.",
+                                    "type": "string"
+                                },
+                                "file_type": {
+                                    "title": "File Type",
+                                    "description": "The type of file based on the information in the file.",
+                                    "suggested_enum": [
+                                        "alignments",
+                                        "image",
+                                        "other",
+                                        "intermediate file",
+                                        "raw VCF",
+                                        "gVCF",
+                                        "Higlass SV VCF",
+                                        "full annotated VCF"
+                                    ]
+                                },
+                                "variant_type": {
+                                    "title": "Variant Type",
+                                    "description": "The variant type associated with this file",
+                                    "type": "string",
+                                    "enum": [
+                                        "SNV",
+                                        "SV",
+                                        "CNV"
+                                    ]
+                                },
+                                "linkto_location": {
+                                    "title": "LinkTo Location",
+                                    "description": "Location on case on which to place a linkTo",
+                                    "type": "array",
+                                    "items": {
+                                        "type": "string",
+                                        "enum": [
+                                            "Sample",
+                                            "SampleProcessing"
+                                        ]
+                                    }
+                                },
+                                "vcf_to_ingest": {
+                                    "title": "VCF to Ingest",
+                                    "description": "Whether file is a VCF with contents to ingest",
+                                    "type": "boolean"
+                                },
+                                "higlass_file": {
+                                    "title": "File for HiGlass Display",
+                                    "description": "Whether file is used for HiGlass",
+                                    "type": "boolean"
+                                },
+                                "paired_end": {
+                                    "title": "Paired End Identifier",
+                                    "description": "Which pair the file belongs to (if paired end library)",
+                                    "type": "string",
+                                    "enum": [
+                                        "1",
+                                        "2"
+                                    ]
+                                },
+                                "s3_lifecycle_category": {
+                                    "title": "S3 Lifecycle Category",
+                                    "description": "The lifecycle category determines how long a file remains in a certain storage class.  If set to ignore, lifecycle management will have no effect on this file",
+                                    "type": "string",
+                                    "suggested_enum": [
+                                        "short_term_access_long_term_archive",
+                                        "long_term_access_long_term_archive",
+                                        "long_term_access",
+                                        "short_term_access",
+                                        "long_term_archive",
+                                        "short_term_archive",
+                                        "no_storage",
+                                        "ignore"
+                                    ]
+                                }
+                            }
+                        }
                     },
                     "custom_qc_fields": {
                         "title": "Custom QC fields",
                         "description": "Custom fields to be added to QC items through Tibanna",
                         "type": "object",
-                        "additionalProperties": true
+                        "additionalProperties": false,
+                        "properties": {
+                            "filtering_condition": {
+                                "title": "Filtering Condition",
+                                "type": "string"
+                            }
+                        }
                     }
                 }
             }
@@ -291,9 +378,23 @@
                                 }
                             }
                         }
+                    },
+                    "dimensionality": {
+                        "title": "Dimensionality",
+                        "description": "The number of dimensions of input files",
+                        "type": "integer",
+                        "enum": [
+                            1,
+                            2
+                        ]
                     }
                 }
             }
+        },
+        "proband_only": {
+            "title": "Proband-only",
+            "description": "Whether the MetaWorkflow is intended for proband-only analysis",
+            "type": "boolean"
         }
     },
     "facets": {

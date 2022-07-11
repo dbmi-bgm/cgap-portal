@@ -299,10 +299,6 @@ def _build_case_embedded_list():
         # File linkTo
         "structural_variant_vcf_file.file_ingestion_status",
         "structural_variant_vcf_file.accession",
-
-        # MetaWorkflowRun linkTo
-        "meta_workflow_run.meta_workflow.name",
-        "meta_workflow_run.meta_workflow.version"
     ]
 
 
@@ -400,9 +396,12 @@ class Case(Item):
             for processed_file in processed_files[::-1]:  # Take last in list (~newest)
                 file_data = get_item_or_none(request, processed_file, 'files-processed')
                 file_type = file_data.get("file_type", "")
+                file_vcf_to_ingest = file_data.get("vcf_to_ingest", False)
                 file_variant_type = file_data.get("variant_type", "SNV")
                 if (
-                    file_type == "full annotated VCF"
+                    (
+                        file_type == "full annotated VCF" or file_vcf_to_ingest is True
+                    )
                     and file_variant_type == variant_type
                 ):
                     vcf_file = file_data["@id"]
