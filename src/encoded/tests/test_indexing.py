@@ -423,6 +423,4 @@ class TestInvalidationScopeViewCGAP:
         """
         req = self.MockedRequest(indexer_testapp.app.registry, source_type, target_type)
         scope = compute_invalidation_scope(None, req)
-        if sorted(scope['Invalidated']) != sorted(invalidated):
-            import pdb; pdb.set_trace()
         assert sorted(scope['Invalidated']) == sorted(invalidated)
