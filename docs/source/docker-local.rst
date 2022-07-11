@@ -6,7 +6,7 @@ dependencies other than Docker. A few important notes on this setup.
 
 * Although the build dependency layer is cached, it still takes around 4 minutes to rebuild the front-end for each image. This limitation is tolerable considering the local deployment now identically matches the execution runtime of production.
 * This setup only works when users have sourced AWS Keys in the main account (to connect to the shared ES cluster).
-* IMPORTANT: Do not upload the local deployment container image to any registry.
+* IMPORTANT: Take care when working with local credentials - be careful not to write them to files that end up in container images that get pushed to a public registry!
 
 
 Installing Docker
@@ -39,6 +39,9 @@ Use the ``prepare-docker`` command to configure ``docker-compose.yml`` and ``doc
                         (default: not tested)
     --s3-encrypt-key-id S3_ENCRYPT_KEY_ID
                         an encrypt key id (default: the empty string)
+
+
+On initial run, you will want to run with the ``--load-inserts`` option so data is loaded. Pass ``--data-set local`` to get local inserts, or ``deploy`` to use the production inserts.
 
 Building CGAP Docker
 ^^^^^^^^^^^^^^^^^^^^
