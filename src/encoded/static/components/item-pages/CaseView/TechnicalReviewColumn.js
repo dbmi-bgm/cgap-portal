@@ -239,7 +239,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                 // Should be deleted upon PATCH
                 // cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, null);
                 // TEMPORARY: Instead of `null` we save empty string to get around invalidation not working for empty PATCH w. delete_fields=note_text
-                cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, "");
+                cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, null);
             } else {
                 // Unset in clientside state
                 cacheUnsavedTechnicalReviewNoteTextForVSUUID(vsUUID, undefined);

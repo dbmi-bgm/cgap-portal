@@ -116,7 +116,7 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "variant_sample_list.created_for_case",
 
     # We need Technical Review data in our search result rows, so we must embed these here and not use /embed API.
-    "technical_review.*",                       # <- TEMPORARY - Added as workaround for invalidation scope
+    # "technical_review.*",                       # <- TEMPORARY - Added as workaround for invalidation scope
     "technical_review.uuid",
     "technical_review.assessment.call",
     "technical_review.assessment.classification",
@@ -132,8 +132,9 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
     "technical_review.last_modified.date_modified",
-    "technical_review.status",                  # <- needed to check if current or not (=== this 1 is saved to project)
-    "project_technical_review.*",
+    "technical_review.is_saved_to_project",
+    "technical_review.status",
+    # "project_technical_review.*",
     "project_technical_review.assessment.call",
     "project_technical_review.assessment.classification",
     "project_technical_review.assessment.date_call_made",
