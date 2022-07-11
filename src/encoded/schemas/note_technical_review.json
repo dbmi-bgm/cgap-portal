@@ -5,7 +5,8 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "identifyingProperties": [
-        "uuid"
+        "uuid",
+        "aliases"
     ],
     "additionalProperties": false,
     "mixinProperties": [
@@ -14,6 +15,9 @@
         },
         {
             "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
         },
         {
             "$ref": "mixins.json#/attribution"
