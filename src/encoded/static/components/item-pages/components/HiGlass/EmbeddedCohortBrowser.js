@@ -320,7 +320,8 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     this.processLoadedGeneList = this.processLoadedGeneList.bind(this);
     this.changeActiveConsequenceLevels =
       this.changeActiveConsequenceLevels.bind(this);
-    this.changeShowAlleleFrequencies = this.changeShowAlleleFrequencies.bind(this);
+    this.changeShowAlleleFrequencies =
+      this.changeShowAlleleFrequencies.bind(this);
     this.exportDisplay = this.exportDisplay.bind(this);
     getGeneLists(this.processLoadedGeneList);
   }
@@ -353,7 +354,9 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
           const viewconfCohort = hgc.api.getViewConfig();
           viewconfCohort.views[0].tracks.top.forEach((track) => {
             if (track.type === "cohort") {
-              const acl = this.state.activeConsequenceLevels.map(cl => cl.toUpperCase());
+              const acl = this.state.activeConsequenceLevels.map((cl) =>
+                cl.toUpperCase()
+              );
               track.options["consequenceLevels"] = acl;
             }
           });
@@ -363,7 +366,7 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     );
   }
 
-  changeShowAlleleFrequencies(event){
+  changeShowAlleleFrequencies(event) {
     this.setState(
       (prevState) => ({
         showAlleleFrequencies: !prevState.showAlleleFrequencies,
@@ -374,7 +377,8 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
           const viewconfCohort = hgc.api.getViewConfig();
           viewconfCohort.views[0].tracks.top.forEach((track) => {
             if (track.type === "cohort") {
-              track.options["showAlleleFrequencies"] = this.state.showAlleleFrequencies;
+              track.options["showAlleleFrequencies"] =
+                this.state.showAlleleFrequencies;
             }
           });
           hgc.api.setViewConfig(viewconfCohort);
@@ -474,19 +478,22 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     );
   }
 
-  exportDisplay(){
+  exportDisplay() {
     const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
     if (!hgc) {
-        console.warn("Higlass component not found.");
-        return;
+      console.warn("Higlass component not found.");
+      return;
     }
     const svg = hgc.api.exportAsSvg();
 
-    var element = document.createElement('a');
-    element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
-    element.setAttribute('download', "cohort.svg");
+    var element = document.createElement("a");
+    element.setAttribute(
+      "href",
+      "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg)
+    );
+    element.setAttribute("download", "cohort.svg");
     element.click();
-}
+  }
 
   render() {
     const variantPositionAbsCoord = 20000;
@@ -535,13 +542,20 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
               <div className="col-sm-3 pt-1">
                 <div className="border p-2">
                   <div className="d-block bg-light px-2 mb-1">
-                    <small>NAVIGATION</small>
+                    <small>NAVIGATION & DISPLAY</small>
                   </div>
                   <GeneSearchBar
                     higlassContainer={this.higlassContainerCohort}
                   />
-                  <div className="d-block bg-light px-2 mb-1 mt-2">
-                    <small>SETTINGS</small>
+                  <div className="mt-2">
+                    <CohortCheckbox
+                      label="Show Allele Frequencies"
+                      checked={this.state.showAlleleFrequencies}
+                      onChange={this.changeShowAlleleFrequencies}
+                    />
+                  </div>
+                  <div className="d-block bg-light px-2 mb-1 mt-1">
+                    <small>GENE LEVEL FILTERING</small>
                   </div>
                   <GeneListFilter
                     geneLists={this.state.geneLists}
@@ -551,21 +565,36 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                     associationTests={this.availableAssociationTests}
                     onChange={this.applyAssociationTestFilter}
                   />
-                  <div className="mt-2">Variant consequence levels</div>
-                  {consequenceLevels.map((cl) => (
-                    <CohortCheckbox
-                      key={"cb_" + cl}
-                      label={cl}
-                      checked={this.state.activeConsequenceLevels.includes(cl)}
-                      onChange={this.changeActiveConsequenceLevels}
-                    />
-                  ))}
-                  <div className="mt-1">
-                    <CohortCheckbox
-                      label="Show Allele Frequencies"
-                      checked={this.state.showAlleleFrequencies}
-                      onChange={this.changeShowAlleleFrequencies}
-                    />
+                  <div className="d-block bg-light px-2 mb-1 mt-2">
+                    <small>VARIANT LEVEL FILTERING</small>
+                  </div>
+                  <div className="mt-1">CADD Score</div>
+                  <div className="row">
+                    <div className="col-sm-6">
+                      <div class="form-group">
+                        <input type="text" class="form-control form-control-sm" placeholder="Min" />
+                      </div>
+                    </div>
+                    <div className="col-sm-6">
+                      <div class="form-group">
+                        <input type="text" class="form-control form-control-sm" placeholder="Max" />
+                      </div>
+                    </div>
+                  </div>
+                  <div className="">Consequence levels (VEP)</div>
+                  <div className="row">
+                    {consequenceLevels.map((cl) => (
+                      <div className="col-sm-6">
+                        <CohortCheckbox
+                          key={"cb_" + cl}
+                          label={cl}
+                          checked={this.state.activeConsequenceLevels.includes(
+                            cl
+                          )}
+                          onChange={this.changeActiveConsequenceLevels}
+                        />
+                      </div>
+                    ))}
                   </div>
 
                   <div className="d-block mb-1 mt-2">
