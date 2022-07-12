@@ -1168,7 +1168,7 @@ def update_project_notes_process(context, request):
 
     # Follow-up - now we need to make sure all affected VariantSamples are re-indexed to be up-to-date in ES.
     # This matters right now for "VariantSample.project_technical_review" (calcprop, linkTo NoteTechnicalReview),
-    # ,ut will probably need to be propagated to all other notes once we make use of other saved to project notes.
+    # but will probably need to be propagated to all other notes once we make use of other saved to project notes.
     affected_variant_sample_uuids = []
     if variant_patch_count > 0 and ("technical_review" in save_to_project_notes or "technical_review" in remove_from_project_notes):
         vs_project_uuid = context.properties.get("project")
