@@ -1,4 +1,5 @@
 import datetime
+import mock
 
 import pytest
 import pytz
@@ -144,6 +145,25 @@ def test_variant_sample_list_post(bgm_user_testapp, variant_sample_list1):
     bgm_user_testapp.post_json('/variant_sample_list', variant_sample_list1, status=201)
 
 
+class MockedSearchBuilder:
+    """
+    Mock to avoid needing ElasticSearch.
+    Always returns no results.
+    Maybe worth putting somewhere reusable.
+    """
+
+    def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
+                 custom_aggregations=None, skip_bootstrap=False):
+        self.return_generator = return_generator or False
+
+    def _search(self, *args, **kwargs):
+        if self.return_generator:
+            return []
+        else:
+            # TODO Add "total": 0 and other properties to response.
+            return { "@graph": [] }
+
+@mock.patch("encoded.search.search.SearchBuilder", new=MockedSearchBuilder)
 def test_variant_sample_patch_notes_process_success(
     testapp,
     bgm_user,
@@ -215,8 +235,8 @@ def test_variant_sample_patch_notes_process_success(
     resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@update-project-notes/", save_patch_process_payload, status=200).json
 
     assert resp["status"] == "success"
-    assert resp["patch_results"]["Variant"] == 1
-    assert resp["patch_results"]["Note"] == 5 # 4 Newly-shared Notes, +1 "superseding_notes" field to existing Note PATCH
+    assert resp["results"]["Variant"]["patched_count"] == 1
+    assert resp["results"]["Note"]["patched_count"] == 6 # 4 Newly-shared Notes, +1 "superseding_notes" field to existing Note PATCH
 
     note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
     note3_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
@@ -257,10 +277,12 @@ def test_variant_sample_patch_notes_process_success(
 
     # Now, attempt to remove note(s). This currently should work for saved-to-project Variant notes but not yet for Gene
     remove_patch_process_payload = {
-        "remove_from_project" : {
+        "remove_from_project_notes" : {
             "technical_review": techreview_note["uuid"]
         }
     }
+
+    print("UUID", remove_patch_process_payload)
 
     resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@update-project-notes/", remove_patch_process_payload, status=200).json
     techreview_note_reloaded = bgm_user_testapp.get(techreview_note["@id"] + "?datastore=database&frame=object", status=200).json
