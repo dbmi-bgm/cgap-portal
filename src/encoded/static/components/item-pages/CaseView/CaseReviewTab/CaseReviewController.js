@@ -148,6 +148,7 @@ export class CaseReviewController extends React.Component {
                      * Updated on adding Notes to Report and setting/unsetting finding_table_tag
                      */
                     "variant_samples.uuid",
+                    "structural_variant_samples.uuid",
                     /** String */
                     "indication",
                     "analysis_performed",
@@ -228,19 +229,25 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
     }
 
     static alreadyInReportNotes(variantSampleListItem, report){
-        const { uuid: reportUUID, variant_samples = [] } = report || {};
+        const {
+            uuid: reportUUID,
+            variant_samples = [],
+            structural_variant_samples = []
+        } = report || {};
         if (!reportUUID) {
             return {};
         }
         return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function(noteItem, vsItem){
             const { associated_items: noteAssociatedItems } = noteItem;
             const { uuid: vsUUID } = vsItem;
-            // Ensure this VariantSample is in `Report.variant_samples`.
-            const foundVSEntryInReport = _.findWhere(variant_samples, { "uuid": vsUUID });
+            // Ensure this VariantSample is in `Report.variant_samples` or `Report.structural_variant_samples`.
+            const foundVSEntryInReport = (
+                _.findWhere(variant_samples, { "uuid": vsUUID }) || _.findWhere(structural_variant_samples, { "uuid": vsUUID })
+            );
             if (!foundVSEntryInReport) {
                 return false;
             }
-            // Ensure this Report is in `Note.associated_items`
+            // Ensure this Report is in `Note.associated_items`.
             const foundReportEntryInNote = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
             if (!foundReportEntryInNote) {
                 return false;
