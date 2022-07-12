@@ -570,12 +570,12 @@ const ACMGInvoker = React.memo(function ACMGInvoker(props) {
     const [ acmgStrengthPopover, setACMGStrengthPopover ] = useState(null);
     const { target: targetIndicatorRef, jsx: acmgStrengthPopoverJSX } = acmgStrengthPopover || {};
 
-    function onRootClickHide(e) {
+    const onRootClickHide = useCallback(function onRootClickHide(e) {
         // If they clicked on another acmg rule, don't close popover after switching popover info
         if (e.target.className !== targetIndicatorRef.current.className) {
             setACMGStrengthPopover(null);
         }
-    }
+    }, [ acmgStrengthPopover ]);
 
     return (
         <div className="card flex-row my-3 mt-0">
@@ -596,7 +596,8 @@ const ACMGInvoker = React.memo(function ACMGInvoker(props) {
                 <Overlay target={targetIndicatorRef} show={!!acmgStrengthPopover} transition={true} placement="bottom"
                     rootClose rootCloseEvent="click" onHide={onRootClickHide}>
                     { acmgStrengthPopoverJSX }
-                </Overlay>: null }
+                </Overlay>
+                : null }
         </div>
     );
 });
@@ -640,7 +641,8 @@ const ACMGInvokableRule = React.memo(function ACMGInvokableRule(props) {
         <div ref={thisRef} className="acmg-invoker clickable ml-02 mr-02 flex-grow-1" key={rule} data-criteria={rule} data-invoked={!!strength}
             onClick={onClick} data-html data-tip={acmgTip(rule, description)}>
             { rule }
-        </div>);
+        </div>
+    );
 });
 
 function acmgTip(criteria, description){
@@ -707,9 +709,11 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
                                 key={strengthOption} className={`list-group-item list-group-item-action py-2 text-600 ${selected ? 'active disabled': ""}`}
                                 data-criteria={rule} data-invoked={selected}>
                                 {rule}{ defaultStr ? null: "_" + (strengthOptionNoSpaces || strengthOption) }
-                            </button>);
+                            </button>)
+                        ;
                     })}
                 </div>
             </Popover.Content>
-        </Popover>);
+        </Popover>
+    );
 }

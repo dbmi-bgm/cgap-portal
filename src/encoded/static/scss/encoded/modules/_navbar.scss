@@ -270,10 +270,11 @@ div#top-nav.navbar-fixed-top {
                 > .navbar-title {
                     vertical-align: middle;
                     fill: $navbar-default-brand-color;
-                    margin-left: 10px;
+                    margin-left: 5px;
                     width: 98px;
                     display: inline-block;
-                    transform: translate3d(0px,0,0);
+                    transform: translate3d(0px, 0, 0) scale3d(0.925, 0.925, 1);
+                    transform-origin: 50%;
                     transition: width $navbar-transition-length, transform $navbar-transition-length;
                     shape-rendering: geometricPrecision;
         
@@ -282,7 +283,7 @@ div#top-nav.navbar-fixed-top {
                         body.is-full-screen &,
                         body.is-item-view & {
                             width: 70px;
-                            transform: translate3d(-5px,0,0);
+                            transform: translate3d(5px,0,0) scale3d(0.925, 0.925, 1);
                         }
                     }
                 }
@@ -293,6 +294,7 @@ div#top-nav.navbar-fixed-top {
                 .navbar-title {
                     fill: $navbar-link-hover-color;
                     text-shadow: 0 0 0 $navbar-link-hover-color;
+                    transform: translate3d(3px, 0, 0) scale3d(0.925, 0.925, 1);
                 }
             }
 

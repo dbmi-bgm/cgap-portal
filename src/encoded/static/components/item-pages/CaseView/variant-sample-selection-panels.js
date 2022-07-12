@@ -25,8 +25,10 @@ export const CaseSpecificSelectionsPanel = React.memo(function CaseSpecificSelec
 
     const toggleExpanded = useCallback(function(e){
         e.stopPropagation();
-        setIsExpanded(!isExpanded);
-    }, [ isExpanded ]);
+        setIsExpanded(function(currentIsExpanded){
+            return !currentIsExpanded;
+        });
+    });
 
     const onSelectPanel = useCallback(function(eventKey, evt){
         evt.stopPropagation();
