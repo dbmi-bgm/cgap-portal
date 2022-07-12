@@ -568,16 +568,16 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                   <div className="d-block bg-light px-2 mb-1 mt-2">
                     <small>VARIANT LEVEL FILTERING</small>
                   </div>
-                  <div className="mt-1">CADD Score</div>
+                  <div className="mt-1 text-muted">CADD Score</div>
                   <div className="row">
                     <div className="col-sm-6">
                       <div class="form-group">
-                        <input type="text" class="form-control form-control-sm" placeholder="Min" />
+                        <input type="text" class="form-control form-control-sm" placeholder="Min" disabled />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div class="form-group">
-                        <input type="text" class="form-control form-control-sm" placeholder="Max" />
+                        <input type="text" class="form-control form-control-sm" placeholder="Max" disabled />
                       </div>
                     </div>
                   </div>
