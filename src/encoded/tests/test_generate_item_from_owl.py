@@ -6,11 +6,11 @@ import pytest
 
 from collections import OrderedDict
 from dcicutils import s3_utils
+from dcicutils.qa_utils import MockFileSystem
 # from rdflib import URIRef
 from unittest import mock
 from ..commands import generate_items_from_owl as gifo
 from ..commands.owltools import Owler
-from dcicutils.qa_utils import MockFileSystem
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]

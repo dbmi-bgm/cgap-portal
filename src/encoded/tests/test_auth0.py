@@ -6,8 +6,7 @@ import pytest
 import requests
 import time
 
-from dcicutils.misc_utils import Retry
-from dcicutils.qa_utils import override_dict
+from dcicutils.misc_utils import Retry, override_dict
 from http import cookies
 from pyramid.testing import DummyRequest
 from ..authentication import get_jwt

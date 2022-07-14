@@ -4,8 +4,8 @@ import pytest
 import re
 import webtest
 
-from dcicutils.misc_utils import ignorable
-from dcicutils.qa_utils import raises_regexp, override_environ
+from dcicutils.misc_utils import ignorable, override_environ
+from dcicutils.qa_utils import raises_regexp
 from ..util import make_vapp_for_email
 from .test_access_key import basic_auth
 from ..util import ENCODED_ROOT_DIR

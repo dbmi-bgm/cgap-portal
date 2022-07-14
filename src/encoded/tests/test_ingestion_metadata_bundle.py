@@ -9,8 +9,8 @@ import pytz
 import webtest
 
 from dcicutils import qa_utils
-from dcicutils.misc_utils import constantly, file_contents
-from dcicutils.qa_utils import ignored, ControlledTime, MockBotoS3Client
+from dcicutils.misc_utils import constantly, file_contents, ignored
+from dcicutils.qa_utils import ControlledTime, MockBotoS3Client
 from unittest import mock
 from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
 from .. import ingestion_listener as ingestion_listener_module

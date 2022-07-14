@@ -6,11 +6,10 @@ import re
 import subprocess
 import typing
 
+from dcicutils.env_utils import data_set_for_env
+from dcicutils.misc_utils import ignored, override_environ
 from io import StringIO
 from unittest import mock
-
-from dcicutils.qa_utils import override_environ
-from dcicutils.env_utils import data_set_for_env
 from ..generate_production_ini import ProductionIniFileManager
 
 
@@ -81,6 +80,7 @@ MOCKED_BUNDLE_VERSION = 'v-12345-bundle-version'
 MOCKED_LOCAL_GIT_VERSION = 'v-67890-git-version'
 MOCKED_PROJECT_VERSION = '11.22.33'
 
+
 def make_mocked_check_output_for_get_version(simulate_git_command=True, simulate_git_repo=True):
     def mocked_check_output(command):
         if simulate_git_command and command[0] == 'git':
@@ -111,15 +111,19 @@ def test_build_ini_file_from_template():
 
         class MockFileStream:
             FILE_SYSTEM = {}
+
             @classmethod
             def reset(cls):
                 cls.FILE_SYSTEM = {}
+
             def __init__(self, filename, mode):
                 assert 'w' in mode
                 self.filename = filename
                 self.output_string_stream = StringIO()
+
             def __enter__(self):
                 return self.output_string_stream
+
             def __exit__(self, type, value, traceback):
                 self.FILE_SYSTEM[self.filename] = self.output_string_stream.getvalue().strip().split('\n')
 
@@ -217,11 +221,14 @@ def test_build_ini_file_from_template():
                     # because we're simulating the absence of Git.
                     return filename in [some_template_file_name]
                 mock_exists.side_effect = mocked_exists
+
                 class MockDateTime:
                     DATETIME = datetime.datetime
+
                     @classmethod
                     def now(cls):
-                        return cls.DATETIME(2001,2,3,4,55,6)
+                        return cls.DATETIME(2001, 2, 3, 4, 55, 6)
+
                 with mock.patch("io.open", side_effect=mocked_open):
                     with mock.patch.object(datetime, "datetime", MockDateTime()):
                         build_ini_file_from_template(some_template_file_name, some_ini_file_name)
@@ -297,6 +304,7 @@ def test_get_eb_bundled_version():
         mock_exists.return_value = False
         with mock.patch("io.open") as mock_open:
             def mocked_open_error(filename, mode='r'):
+                ignored(filename, mode)
                 raise Exception("Simulated file error (file not found or permissions problem).")
             mock_open.side_effect = mocked_open_error
             assert get_eb_bundled_version() is None
@@ -450,4 +458,3 @@ def test_transitional_equivalence():
                     tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
                            es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
                            line_checker=ProdChecker(expect_indexer=None))
-
