@@ -360,7 +360,7 @@ export class FilterSetController extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        const { initialFilterSetItem, context: searchContext, onResetSelectedVariantSamples } = this.props;
+        const { initialFilterSetItem, context: searchContext, onResetSelectedVariantSamples, resetLastSavedTechnicalReview } = this.props;
         const { initialFilterSetItem: pastInitialFilterSet, context: pastSearchContext } = pastProps;
 
         // Just some debugging for dev environments.
@@ -383,9 +383,16 @@ export class FilterSetController extends React.PureComponent {
         //     }
         // }
 
-        if (onResetSelectedVariantSamples && searchContext !== pastSearchContext) {
-            console.info("Resetting selected VS items");
-            onResetSelectedVariantSamples();
+        if (searchContext !== pastSearchContext) {
+            console.info("FilterSetController: Received new search context / response.");
+            if (onResetSelectedVariantSamples) {
+                console.info("Resetting selected Variant Sample items.");
+                onResetSelectedVariantSamples();
+            }
+            // if (resetLastSavedTechnicalReview && searchContext !== pastSearchContext) {
+            //     console.info("Resetting last saved technical review cache");
+            //     resetLastSavedTechnicalReview();
+            // }
         }
 
         // If a new FilterSet gets fetched in; should only occur for initial FS being loaded in (where pastInitialFilterSet is null).
