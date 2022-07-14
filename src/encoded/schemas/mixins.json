@@ -477,7 +477,7 @@
     "submitted_files": {
         "files": {
             "title": "Submitted Files",
-            "description": "Files submitted to the item",
+            "description": "Submitted files associated withthe item",
             "type": "array",
             "items": {
                 "title": "Submitted File",
