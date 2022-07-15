@@ -344,19 +344,20 @@ class TestInvalidationScopeViewCGAP:
     # source_type is the item being edited, target_type is the item we are simulating invalidation one
     @pytest.mark.parametrize('source_type, target_type, invalidated', [
         ('FileProcessed', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['accession', 'filename', 'file_format', 'file_size']
+            DEFAULT_SCOPE + ['accession', 'file_format', 'file_size', 'filename', 'quality_metric']
          ),
         ('Software', 'WorkflowRunAwsem',
             DEFAULT_SCOPE + ['name', 'title', 'version', 'source_url']
          ),
         ('Workflow', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['title', 'experiment_types', 'category', 'app_name', 'steps.name']
+            DEFAULT_SCOPE + ['app_name', 'category', 'experiment_types', 'name', 'steps.name', 'title']
          ),
         ('Software', 'WorkflowRunAwsem',
             DEFAULT_SCOPE + ['name', 'version', 'title', 'source_url']
          ),
         ('WorkflowRunAwsem', 'FileProcessed',
-            DEFAULT_SCOPE + ['input_files.workflow_argument_name', 'output_files.workflow_argument_name']
+            DEFAULT_SCOPE + ['input_files.workflow_argument_name', 'output_files.workflow_argument_name', 'title',
+                             'workflow']
          ),
         # Test Case as it has the most links and thus the most ways things can go wrong
         ('VariantSample', 'Case',
@@ -382,9 +383,11 @@ class TestInvalidationScopeViewCGAP:
                              'mother', 'father', 'samples']
          ),
         ('Sample', 'Case',
-            DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type', 'indication', 'specimen_accession_date',
-                             'specimen_collection_date', 'specimen_accession', 'specimen_notes', 'sequence_id',
-                             'sequencing_date', 'files', 'processed_files', 'completed_processes', 'bam_sample_id']
+            DEFAULT_SCOPE + ['accession', 'bam_sample_id', 'completed_processes', 'files', 'indication',
+                             'last_modified.date_modified', 'last_modified.modified_by', 'other_processed_files.files',
+                             'processed_files', 'sequence_id', 'sequencing_date', 'specimen_accession',
+                             'specimen_accession_date', 'specimen_collection_date', 'specimen_notes',
+                             'specimen_type', 'workup_type']
          ),
         ('Family', 'Case',
             DEFAULT_SCOPE + ['institution', 'project', 'tags', 'last_modified.date_modified',
@@ -397,10 +400,12 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']
          ),
         ('FileProcessed', 'Case',
-            DEFAULT_SCOPE + ['accession', 'file_type', 'quality_metric', 'file_ingestion_status', 'variant_type']
+            DEFAULT_SCOPE + ['accession', 'file_format', 'file_ingestion_status', 'file_type',
+                             'last_modified.date_modified', 'last_modified.modified_by', 'quality_metric',
+                             'variant_type']
          ),
         ('Report', 'Case',
-            DEFAULT_SCOPE + ['accession']
+            DEFAULT_SCOPE + ['accession', 'last_modified.date_modified', 'last_modified.modified_by']
          ),
         ('FilterSet', 'Case',
             DEFAULT_SCOPE + ['notes', 'tags', 'last_modified.date_modified', 'last_modified.modified_by',
