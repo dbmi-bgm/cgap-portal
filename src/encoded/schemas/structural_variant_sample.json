@@ -365,6 +365,31 @@
             "title": "Position",
             "order": 0
         },
+        "technical_review.assessment.call": {
+            "title": "Technical Review Call",
+            "order": 2,
+            "sort_fields": [
+                {
+                    "field": "technical_review.assessment.call",
+                    "title": "Technical Review Call"
+                },
+                {
+                    "field": "technical_review.assessment.classification",
+                    "title": "Technical Review Classification"
+                },
+                {
+                    "field": "technical_review.assessment.date_call_made",
+                    "title": "Call Made Date"
+                }
+            ]
+        },
+        "interpretation_selection": {
+            "title": "Interpretation Selection",
+            "disabled": true,
+            "noSort": true,
+            "notes": "Becomes 'not disabled' only on CaseViewEmbeddedVariantSampleSearchTableBase",
+            "order": 3
+        },
         "structural_variant.cytoband_display": {
             "title": "Cytoband",
             "order": 10
@@ -431,24 +456,6 @@
             "title": "SV/CNV Browser",
             "order": 100,
             "noSort": true
-        },
-        "technical_review.assessment.call": {
-            "title": "Technical Review Call",
-            "order": 120,
-            "sort_fields": [
-                {
-                    "field": "technical_review.assessment.call",
-                    "title": "Technical Review Call"
-                },
-                {
-                    "field": "technical_review.assessment.classification",
-                    "title": "Technical Review Classification"
-                },
-                {
-                    "field": "technical_review.assessment.date_call_made",
-                    "title": "Call Made Date"
-                }
-            ]
         }
     },
     "facets": {

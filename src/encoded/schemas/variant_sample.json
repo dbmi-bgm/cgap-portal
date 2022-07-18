@@ -532,6 +532,31 @@
                 }
             ]
         },
+        "technical_review.assessment.call": {
+            "title": "Technical Review Call",
+            "order": 2,
+            "sort_fields": [
+                {
+                    "field": "technical_review.assessment.call",
+                    "title": "Technical Review Call"
+                },
+                {
+                    "field": "technical_review.assessment.classification",
+                    "title": "Technical Review Classification"
+                },
+                {
+                    "field": "technical_review.assessment.date_call_made",
+                    "title": "Call Made Date"
+                }
+            ]
+        },
+        "interpretation_selection": {
+            "title": "Interpretation Selection",
+            "disabled": true,
+            "notes": "Becomes 'not disabled' only on CaseViewEmbeddedVariantSampleSearchTableBase",
+            "noSort": true,
+            "order": 3
+        },
         "variant.genes.genes_most_severe_gene.display_title": {
             "title": "Gene, Transcript",
             "order": 10,
@@ -636,24 +661,6 @@
         "bam_snapshot": {
             "title": "Genome Snapshot",
             "order": 100
-        },
-        "technical_review.assessment.call": {
-            "title": "Technical Review Call",
-            "order": 120,
-            "sort_fields": [
-                {
-                    "field": "technical_review.assessment.call",
-                    "title": "Technical Review Call"
-                },
-                {
-                    "field": "technical_review.assessment.classification",
-                    "title": "Technical Review Classification"
-                },
-                {
-                    "field": "technical_review.assessment.date_call_made",
-                    "title": "Call Made Date"
-                }
-            ]
         },
         "project": {
             "title": "Project",
