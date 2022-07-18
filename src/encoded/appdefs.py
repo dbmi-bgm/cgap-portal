@@ -27,6 +27,7 @@ ITEM_INDEX_ORDER = [
     'FileProcessed',
     'FileReference',
     'Image',
+    'NoteTechnicalReview',
     'NoteInterpretation',
     'NoteDiscovery',
     'NoteStandard',

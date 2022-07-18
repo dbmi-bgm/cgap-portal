@@ -1265,7 +1265,7 @@ def collection_view(context, request):
     return search(context, request, context.type_info.name, False, forced_type='Search')
 
 
-def get_iterable_search_results(request, search_path='/search/', param_lists=None, **kwargs):
+def get_iterable_search_results(request, search_path='/search/', param_lists=None, inherit_user=True, **kwargs):
     '''
     Loops through search results, returns 100 (or search_results_chunk_row_size) results at a time. Pass it through itertools.chain.from_iterable to get one big iterable of results.
     Potential TODO: Move to search_utils or other file, and have this (or another version of this) handle compound filter_sets.
@@ -1279,7 +1279,12 @@ def get_iterable_search_results(request, search_path='/search/', param_lists=Non
     param_lists['limit'] = ['all']
     param_lists['from'] = [0]
     param_lists['sort'] = param_lists.get('sort', 'uuid')
-    subreq = make_search_subreq(request, '{}?{}'.format(search_path, urlencode(param_lists, True)) )
+    subreq = make_search_subreq(request, '{}?{}'.format(search_path, urlencode(param_lists, True)), inherit_user=inherit_user)
+    if not inherit_user:
+        # Perform request as if an admin.
+        subreq.remote_user = "UPGRADE"
+        if 'HTTP_COOKIE' in subreq.environ:
+            del subreq.environ['HTTP_COOKIE']
     return iter_search_results(None, subreq, **kwargs)
 
 

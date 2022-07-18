@@ -12,7 +12,7 @@ import { basicColumnExtensionMap,
     DisplayTitleColumnUser } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { Schemas, typedefs } from './../util';
 
-import { variantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
+import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
@@ -135,6 +135,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
 export const columnExtensionMap = {
     ...basicColumnExtensionMap,
     ...variantSampleColumnExtensionMap,
+    ...structuralVariantSampleColumnExtensionMap,
     'display_title' : { // TODO: Look into a better way to do this
         'title' : "Title",
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },

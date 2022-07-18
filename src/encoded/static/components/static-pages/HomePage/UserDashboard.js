@@ -277,7 +277,7 @@ function ProjectSelectDropdown(props){
         <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
             title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
             variant="outline-dark" className={className}>
-            <DropdownItem eventKey={0} active={!projectFilterTerm}>
+            <DropdownItem eventKey={null} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
             </DropdownItem>
             { renderedOptions }

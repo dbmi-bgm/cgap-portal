@@ -70,8 +70,10 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
     const onResetForm = useCallback(function(e){
         e.stopPropagation();
-        setResetCounter(resetCounter + 1);
-    }, [ resetCounter, setResetCounter ]);
+        setResetCounter(function(currentResetCounter){
+            return currentResetCounter + 1;
+        });
+    }, [ setResetCounter ]);
 
     // if (!isActiveDotRouterTab) {
     //     return null;
@@ -202,7 +204,7 @@ function countVariantSamplesWithAnySelectionSize(variantSampleListItem, selectio
 }
 
 /**
- * Generates payloads for VariantSampleList /@@process-notes/ endpoint
+ * Generates payloads for VariantSampleList /@@update-project-notes/ endpoint
  * and then PATCHes them to there.
  *
  * @todo Check if lack edit permission and make button disabled if so.
@@ -235,9 +237,12 @@ function SaveNotesToProjectButton (props) {
             return false;
         }
 
-        const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
+        const {
+            variant_samples: snvVSObjects = [],
+            structural_variant_samples: cnvVSObjects = []
+        } = variantSampleListItem || {};
 
-        const variantSampleItems = vsObjects.map(function({ variant_sample_item }){
+        const variantSampleItems = snvVSObjects.concat(cnvVSObjects).map(function({ variant_sample_item }){
             return variant_sample_item;
         }).filter(function({ "@id": vsAtID }){
             // Filters out any VSes without view permissions, if any.
@@ -251,49 +256,49 @@ function SaveNotesToProjectButton (props) {
                 "@id": variantSampleAtID,
                 interpretation: {
                     uuid: interpretationUUID,
-                    status: interpretationStatus
+                    is_saved_to_project: isInterpretationSavedToProject
                 } = {},
                 discovery_interpretation: {
                     uuid: discoveryInterpretationUUID,
-                    status: discoveryInterprationStatus
+                    is_saved_to_project: isDiscoveryInterpretationSavedToProject
                 } = {},
                 gene_notes: {
                     uuid: lastGeneNoteUUID,
-                    status: lastGeneNoteStatus
+                    is_saved_to_project: isGeneNoteSavedToProject
                 } = {},
                 variant_notes: {
                     uuid: lastVariantNoteUUID,
-                    status: lastVariantNoteStatus
+                    is_saved_to_project: isVariantNoteSavedToProject
                 } = {}
             } = variantSampleItem;
 
             const payload = { "save_to_project_notes": {} };
 
             if (interpretationUUID && sendToProjectStore[interpretationUUID]) {
-                if (interpretationStatus !== "current") {
+                if (!isInterpretationSavedToProject) {
                     // If condition is potentially redundant as we disable such notes from being selectable in first place.
                     payload.save_to_project_notes.interpretation = interpretationUUID;
                 }
             }
             if (discoveryInterpretationUUID && sendToProjectStore[discoveryInterpretationUUID]) {
-                if (discoveryInterprationStatus !== "current") {
+                if (!isDiscoveryInterpretationSavedToProject) {
                     payload.save_to_project_notes.discovery_interpretation = discoveryInterpretationUUID;
                 }
             }
             if (lastGeneNoteUUID && sendToProjectStore[lastGeneNoteUUID]) {
-                if (lastGeneNoteStatus !== "current") {
+                if (!isGeneNoteSavedToProject) {
                     payload.save_to_project_notes.gene_notes = lastGeneNoteUUID;
                 }
             }
             if (lastVariantNoteUUID && sendToProjectStore[lastVariantNoteUUID]) {
-                if (lastVariantNoteStatus !== "current") {
+                if (!isVariantNoteSavedToProject) {
                     payload.save_to_project_notes.variant_notes = lastVariantNoteUUID;
                 }
             }
 
             if (Object.keys(payload.save_to_project_notes).length > 0) {
                 payloads.push([
-                    variantSampleAtID + "/@@process-notes/",
+                    variantSampleAtID + "@@update-project-notes/",
                     payload
                 ]);
             }
@@ -322,56 +327,21 @@ function SaveNotesToProjectButton (props) {
     );
 }
 
-function SaveNotesToReportButton (props) {
-    const {
-        fetchedReportItem,
-        fetchReportItem,
-        variantSampleListItem,
-        fetchVariantSampleListItem,
-        isLoadingVariantSampleListItem,
-        sendToReportStore,
-        isPatching,
-        patchItems,
-        className,
-        disabled: propDisabled
-    } = props;
 
-    const {
-        "@id": reportAtID,
-        uuid: reportUUID = null,
-        variant_samples: reportVariantSamples = []
-    } = fetchedReportItem || {};
 
-    const selectionStoreSize = useMemo(function(){
-        return Object.keys(sendToReportStore).length;
-    }, [ sendToReportStore ]);
 
-    const variantSamplesWithAnySelections = useMemo(function(){
-        return countVariantSamplesWithAnySelectionSize(variantSampleListItem, sendToReportStore);
-    }, [ variantSampleListItem, sendToReportStore ]);
+class SaveNotesToReportButton extends React.PureComponent {
 
-    const disabled = propDisabled || isPatching || isLoadingVariantSampleListItem || !reportUUID || selectionStoreSize === 0 || false;
-
-    const onClick = useCallback(function(e){
-        e.stopPropagation();
-        if (disabled) {
-            return false;
-        }
-
-        const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
-
-        const variantSampleItems = vsObjects.map(function({ variant_sample_item }){
-            return variant_sample_item;
-        }).filter(function({ "@id": vsAtID }){
-            // Filters out any VSes without view permissions, if any.
-            // TODO: check actions for edit ability, perhaps.
-            return !!(vsAtID);
-        });
-
-        const payloads = [];                        // [ [path, payload], ... ]
+    static buildPatchPayloads (
+        existingReportVariantSamples,
+        vslVariantSampleItems,
+        reportUUID,
+        sendToReportStore = {}
+    ) {
+        const notePayloads = [];                        // [ [path, payload], ... ]
         const reportPatchVariantSampleUUIDs = {};   // { <uuid> : true }
 
-        reportVariantSamples.forEach(function({ uuid: reportVSUUID }){
+        existingReportVariantSamples.forEach(function({ uuid: reportVSUUID }){
             // Add any existing variant samples first (JS objects ordered in order of insertion)
             reportPatchVariantSampleUUIDs[reportVSUUID] = true;
         });
@@ -379,7 +349,7 @@ function SaveNotesToReportButton (props) {
         // Added into all Note.associated_items[] which are sent to report to identify them as being part of report.
         const newAssociatedItemEntry = { "item_type": "Report", "item_identifier": reportUUID };
 
-        variantSampleItems.forEach(function(variantSampleItem){
+        vslVariantSampleItems.forEach(function(variantSampleItem){
             const {
                 "@id": variantSampleAtID,
                 uuid: variantSampleUUID,
@@ -406,7 +376,7 @@ function SaveNotesToReportButton (props) {
             if (interpretationUUID && sendToReportStore[interpretationUUID]) {
                 const existingEntry = _.findWhere(interpretationAssociatedItems, newAssociatedItemEntry);
                 if (!existingEntry) {
-                    payloads.push([
+                    notePayloads.push([
                         "/" + interpretationUUID,
                         { "associated_items": [ ...interpretationAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
@@ -416,7 +386,7 @@ function SaveNotesToReportButton (props) {
             if (discoveryInterpretationUUID && sendToReportStore[discoveryInterpretationUUID]) {
                 const existingEntry = _.findWhere(discoveryInterpretationAssociatedItems, newAssociatedItemEntry);
                 if (!existingEntry) {
-                    payloads.push([
+                    notePayloads.push([
                         "/" + discoveryInterpretationUUID,
                         { "associated_items": [ ...discoveryInterpretationAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
@@ -426,7 +396,7 @@ function SaveNotesToReportButton (props) {
             if (lastGeneNoteUUID && sendToReportStore[lastGeneNoteUUID]) {
                 const existingEntry = _.findWhere(lastGeneNoteAssociatedItems, newAssociatedItemEntry);
                 if (!existingEntry) {
-                    payloads.push([
+                    notePayloads.push([
                         "/" + lastGeneNoteUUID,
                         { "associated_items": [ ...lastGeneNoteAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
@@ -436,7 +406,7 @@ function SaveNotesToReportButton (props) {
             if (lastVariantNoteUUID && sendToReportStore[lastVariantNoteUUID]) {
                 const existingEntry = _.findWhere(lastVariantNoteAssociatedItems, newAssociatedItemEntry);
                 if (!existingEntry) {
-                    payloads.push([
+                    notePayloads.push([
                         "/" + lastVariantNoteUUID,
                         { "associated_items": [ ...lastVariantNoteAssociatedItems, newAssociatedItemEntry  ] }
                     ]);
@@ -452,20 +422,119 @@ function SaveNotesToReportButton (props) {
 
         // PATCH Report Item with `variant_samples`. TODO: Check for edit permissions first (?)
         const reportVariantSampleUUIDsToPatch = Object.keys(reportPatchVariantSampleUUIDs);
-        const reportVariantSampleUUIDsToPatchLen = reportVariantSampleUUIDsToPatch.length;
-        let performedReportPatch = false;
-        if (reportVariantSampleUUIDsToPatchLen > 0) {
-            if (!_.isEqual(reportVariantSampleUUIDsToPatch, _.pluck(reportVariantSamples, "uuid"))) {
+
+        return { notePayloads, reportVariantSampleUUIDsToPatch };
+    }
+
+    constructor(props){
+        super(props);
+        this.isDisabled = this.isDisabled.bind(this);
+        this.handleClick = this.handleClick.bind(this);
+
+        this.memoized = {
+            selectionStoreSize: memoize(function(sendToReportStore){
+                return Object.keys(sendToReportStore).length;
+            }),
+            variantSamplesWithAnySelections: memoize(function(variantSampleListItem, sendToReportStore){
+                return countVariantSamplesWithAnySelectionSize(variantSampleListItem, sendToReportStore);
+            })
+        };
+    }
+
+    isDisabled() {
+        const {
+            fetchedReportItem,
+            isLoadingVariantSampleListItem,
+            sendToReportStore,
+            isPatching,
+            disabled: propDisabled
+        } = this.props;
+        const { uuid: reportUUID = null } = fetchedReportItem || {};
+        const selectionStoreSize = this.memoized.selectionStoreSize(sendToReportStore);
+        return propDisabled || isPatching || isLoadingVariantSampleListItem || !reportUUID || selectionStoreSize === 0 || false;
+    }
+
+    handleClick(e) {
+        const {
+            fetchedReportItem,
+            fetchReportItem,
+            variantSampleListItem,
+            fetchVariantSampleListItem,
+            sendToReportStore,
+            patchItems
+        } = this.props;
+
+        e.stopPropagation();
+
+        if (this.isDisabled()) {
+            return false;
+        }
+
+        const {
+            "@id": reportAtID,
+            uuid: reportUUID = null,
+            variant_samples: reportVariantSamples = [],
+            structural_variant_samples: reportStructuralVariantSamples = []
+        } = fetchedReportItem || {};
+
+        const {
+            variant_samples: snvVSObjects = [],
+            structural_variant_samples: cnvVSObjects = []
+        } = variantSampleListItem || {};
+
+
+        const snvVSItems = snvVSObjects.map(function({ variant_sample_item }){
+            return variant_sample_item;
+        }).filter(function({ "@id": vsAtID }){
+            // Filters out any VSes without view permissions, if any.
+            // TODO: check actions for edit ability, perhaps.
+            return !!(vsAtID);
+        });
+
+        const cnvVSItems = cnvVSObjects.map(function({ variant_sample_item }){
+            return variant_sample_item;
+        }).filter(function({ "@id": vsAtID }){
+            return !!(vsAtID);
+        });
+
+        const {
+            notePayloads: snvNotePayloads,
+            reportVariantSampleUUIDsToPatch: reportSNVUUIDList
+        } = SaveNotesToReportButton.buildPatchPayloads(reportVariantSamples, snvVSItems, reportUUID, sendToReportStore);
+        const {
+            notePayloads: cnvNotePayloads,
+            reportVariantSampleUUIDsToPatch: reportCNVUUIDList
+        } = SaveNotesToReportButton.buildPatchPayloads(reportStructuralVariantSamples, cnvVSItems, reportUUID, sendToReportStore);
+
+        const allPayloads = snvNotePayloads.concat(cnvNotePayloads);
+        let reportPayload = null;
+
+        const reportSNVUUIDListLen = reportSNVUUIDList.length;
+        const reportCNVUUIDListLen = reportCNVUUIDList.length;
+
+        if (reportSNVUUIDListLen > 0) {
+            if (!_.isEqual(reportSNVUUIDList, _.pluck(reportVariantSamples, "uuid"))) {
                 // Skip if is same value to be patched (maybe this is 2nd saving action as result of some prior network error(s))
-                payloads.unshift([
-                    reportAtID,
-                    { "variant_samples": reportVariantSampleUUIDsToPatch }
-                ]);
-                performedReportPatch = true;
+                reportPayload = reportPayload || {};
+                reportPayload.variant_samples = reportSNVUUIDList;
             }
         }
 
-        patchItems(payloads, (countCompleted, patchErrors) => {
+        if (reportCNVUUIDListLen > 0) {
+            if (!_.isEqual(reportCNVUUIDList, _.pluck(reportStructuralVariantSamples, "uuid"))) {
+                // Skip if is same value to be patched (maybe this is 2nd saving action as result of some prior network error(s))
+                reportPayload = reportPayload || {};
+                reportPayload.structural_variant_samples = reportCNVUUIDList;
+            }
+        }
+
+        if (reportPayload !== null) {
+            allPayloads.unshift([ reportAtID, reportPayload ]);
+        }
+
+        // TODO: Consider doing PATCH to report first, and then only do Note patches once report is successfully PATCHed.
+
+        patchItems(allPayloads, (countCompleted, patchErrors) => {
             if (countCompleted > 0) {
                 if (typeof fetchVariantSampleListItem === "function") {
                     console.log("Refreshing our VariantSampleListItem with updated Note Item statuses.");
@@ -474,7 +543,7 @@ function SaveNotesToReportButton (props) {
                     throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveNotesToReportButton");
                 }
 
-                if (performedReportPatch) {
+                if (reportPayload !== null) {
                     if (typeof fetchReportItem === "function") {
                         console.log("Refreshing our fetchedReportItem.");
                         fetchReportItem();
@@ -486,16 +555,24 @@ function SaveNotesToReportButton (props) {
             // TODO:
             // if (patchErrors.length > 0) {}
         });
-    }, [ disabled, patchItems, variantSampleListItem, sendToReportStore, fetchedReportItem, fetchVariantSampleListItem, fetchReportItem ]);
+    }
 
-    const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
+    render(){
+        const { fetchedReportItem, sendToReportStore, className } = this.props;
+        const { uuid: reportUUID = null } = fetchedReportItem || {};
 
-    return (
-        <button type="button" {...{ disabled, onClick }} className={btnCls}
-            data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelections} Sample Variants`}>
-            Save Note Selections to <span className="text-600">Report</span>
-        </button>
-    );
+        const selectionStoreSize = this.memoized.selectionStoreSize(sendToReportStore);
+        const variantSamplesWithAnySelections = this.memoized.variantSamplesWithAnySelections();
+        const disabled = this.isDisabled();
+        const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
+
+        return (
+            <button type="button" disabled={disabled} onClick={this.handleClick} className={btnCls}
+                data-tip={`${selectionStoreSize} Note selections from ${variantSamplesWithAnySelections} Sample Variants`}>
+                Save Note Selections to <span className="text-600">Report</span>
+            </button>
+        );
+    }
 }
 
 
