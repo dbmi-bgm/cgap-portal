@@ -18,14 +18,16 @@ describe('Case View - Initial', function () {
      */
 
     it('CGAP Core project "GAPCAJQ1L99X" exists; search result clickable', function(){
-
         cy.visit(
             "/search/?proband_case=true&project.display_title=CGAP+Core&type=Case&accession=GAPCAJQ1L99X",
             { headers: cypressVisitHeaders }
         )
             .get(".search-result-row").should('have.length.greaterThan', 0)
             .first().within(function($rowElem){
-                return cy.get(".search-result-column-block[data-field=\"display_title\"] .adv-block-link").click();
+                return cy.get(".search-result-column-block[data-field=\"display_title\"] .adv-block-link").should('be.visible').click({
+                    // Using force: true here since sometimes Cypress scrolls a bit too much while getting this element and then thinks its hidden
+                    force: true
+                });
             });
     });
 

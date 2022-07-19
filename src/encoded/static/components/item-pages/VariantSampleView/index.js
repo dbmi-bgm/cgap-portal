@@ -99,18 +99,20 @@ class OverviewTabView extends React.Component {
                     // Variant and Gene Notes
                     "gene_notes.@id",
                     "gene_notes.status",
-                    "gene_notes.approved_by.display_title",
+                    "gene_notes.is_saved_to_project",
                     "gene_notes.note_text",
                     "gene_notes.approved_date",
+                    "gene_notes.approved_by.display_title",
                     "gene_notes.last_modified.date_modified",
                     "gene_notes.last_modified.modified_by.display_title",
                     "gene_notes.principles_allowed",
 
                     "variant_notes.@id",
                     "variant_notes.status",
-                    "variant_notes.approved_by.display_title",
+                    "variant_notes.is_saved_to_project",
                     "variant_notes.note_text",
                     "variant_notes.approved_date",
+                    "variant_notes.approved_by.display_title",
                     "variant_notes.last_modified.date_modified",
                     "variant_notes.last_modified.modified_by.display_title",
                     "variant_notes.principles_allowed",
@@ -118,6 +120,7 @@ class OverviewTabView extends React.Component {
                     // Interpretation Notes
                     "interpretation.@id",
                     "interpretation.status",
+                    "interpretation.is_saved_to_project",
                     "interpretation.note_text",
                     "interpretation.conclusion",
                     "interpretation.classification",
@@ -131,6 +134,7 @@ class OverviewTabView extends React.Component {
                     // Discovery Notes
                     "discovery_interpretation.@id",
                     "discovery_interpretation.status",
+                    "discovery_interpretation.is_saved_to_project",
                     "discovery_interpretation.note_text",
                     "discovery_interpretation.variant_candidacy",
                     "discovery_interpretation.gene_candidacy",

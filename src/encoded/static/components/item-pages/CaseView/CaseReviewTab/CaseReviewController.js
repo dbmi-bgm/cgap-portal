@@ -148,6 +148,7 @@ export class CaseReviewController extends React.Component {
                      * Updated on adding Notes to Report and setting/unsetting finding_table_tag
                      */
                     "variant_samples.uuid",
+                    "structural_variant_samples.uuid",
                     /** String */
                     "indication",
                     "analysis_performed",
@@ -222,25 +223,31 @@ export class CaseReviewController extends React.Component {
 export class CaseReviewSelectedNotesStore extends React.PureComponent {
 
     static alreadyInProjectNotes(variantSampleListItem) {
-        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ status: noteStatus }){
-            return (noteStatus === "current");
+        return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function({ is_saved_to_project }){
+            return is_saved_to_project === true;
         });
     }
 
     static alreadyInReportNotes(variantSampleListItem, report){
-        const { uuid: reportUUID, variant_samples = [] } = report || {};
+        const {
+            uuid: reportUUID,
+            variant_samples = [],
+            structural_variant_samples = []
+        } = report || {};
         if (!reportUUID) {
             return {};
         }
         return buildAlreadyStoredNoteUUIDDict(variantSampleListItem, function(noteItem, vsItem){
             const { associated_items: noteAssociatedItems } = noteItem;
             const { uuid: vsUUID } = vsItem;
-            // Ensure this VariantSample is in `Report.variant_samples`.
-            const foundVSEntryInReport = _.findWhere(variant_samples, { "uuid": vsUUID });
+            // Ensure this VariantSample is in `Report.variant_samples` or `Report.structural_variant_samples`.
+            const foundVSEntryInReport = (
+                _.findWhere(variant_samples, { "uuid": vsUUID }) || _.findWhere(structural_variant_samples, { "uuid": vsUUID })
+            );
             if (!foundVSEntryInReport) {
                 return false;
             }
-            // Ensure this Report is in `Note.associated_items`
+            // Ensure this Report is in `Note.associated_items`.
             const foundReportEntryInNote = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
             if (!foundReportEntryInNote) {
                 return false;
@@ -365,12 +372,15 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
  * Builds dictionary to use to mark certain Notes as disabled and exclude them from selection.
  * From those notes which have already been published to knowledgebase.
  *
- * For now can just check if Note.status === "current" and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
+ * For now can just check if Note.is_saved_to_project === true and then keep that way if can assert Variant.interpretations etc. will be up-to-date.
  */
 export function buildAlreadyStoredNoteUUIDDict(variantSampleListItem, checkFunction){
-    const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
+    const {
+        variant_samples: snvVSObjects = [], //vsObjects = [],
+        structural_variant_samples: cnvVSObjects = []
+    } = variantSampleListItem || {}; // Might not yet be loaded.
     const dict = {};
-    vsObjects.forEach(function({ variant_sample_item }){
+    snvVSObjects.concat(cnvVSObjects).forEach(function({ variant_sample_item }){
         getAllNotesFromVariantSample(variant_sample_item).forEach(function(noteItem){
             const { uuid: noteUUID } = noteItem;
             if (checkFunction(noteItem, variant_sample_item)) {

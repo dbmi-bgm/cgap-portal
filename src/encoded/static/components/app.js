@@ -195,7 +195,9 @@ export default class App extends React.PureComponent {
             }
             // Avoid popState on load, see: http://stackoverflow.com/q/6421769/199100
             // We don't use WindowEventDelegator here since we intend to `useCapture` to prevent default browser handling from being triggered for this.
-            const registerWindowOnPopState = () => { window.addEventListener("popstate", this.handlePopState, true) };
+            const registerWindowOnPopState = () => {
+                window.addEventListener("popstate", this.handlePopState, true);
+            };
             if (window._onload_event_fired) {
                 registerWindowOnPopState();
             } else {
@@ -1173,6 +1175,10 @@ export default class App extends React.PureComponent {
                     <DeferMount><link rel="stylesheet" media="print" href={'/static/css/print.css?build=' + (lastBuildTime || 0)} /></DeferMount>
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
+                    {/* Can set webpack.config.js browser build's externals "react":"React" and load via CDN but need to then allow cross-origin requests to CDN domain
+                    <script crossOrigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+                    <script crossOrigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+                    */}
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />
                     <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastBuildTime || 0)} charSet="utf-8" />
                     <link rel="canonical" href={canonical} />
