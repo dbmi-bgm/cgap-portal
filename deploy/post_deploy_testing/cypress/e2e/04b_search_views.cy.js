@@ -1,7 +1,7 @@
 import { cypressVisitHeaders } from './../support';
 
 
-describe.skip('Post-Deployment Search View Tests', function () {
+describe('Post-Deployment Search View Tests', function () {
 
     context('/search/?type=Item', function () {
 
@@ -19,14 +19,13 @@ describe.skip('Post-Deployment Search View Tests', function () {
             cy.location('search').should('include', 'type=Item');
 
             cy.searchPageTotalResultCount().then((totalCountExpected)=>{
-                const intervalCount = Math.min(20, parseInt(totalCountExpected / 25));
+                const intervalCount = Math.min(10, parseInt(totalCountExpected / 15));
 
                 for (let interval = 0; interval < intervalCount; interval++){
                     cy.scrollToBottom().then(()=>{
-                        cy.get('.search-results-container .search-result-row[data-row-number="' + (25 * (interval + 1)) + '"]').should('have.length', 1);
+                        cy.get('.search-results-container .search-result-row[data-row-number="' + (15 * (interval + 1)) + '"]').should('have.length', 1);
                     });
                 }
-
             });
 
         });
