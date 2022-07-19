@@ -112,7 +112,7 @@ def health_check(config):
             app_url = ''.join([app_url, '/'])
 
         env_name = settings.get('env.name')
-        foursight_url = infer_foursight_url_from_env(request, env_name)
+        foursight_url = infer_foursight_url_from_env(request=request, envname=env_name)
 
         response_dict = {
 

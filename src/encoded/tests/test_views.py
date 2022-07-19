@@ -74,11 +74,6 @@ def test_get_health_page(app, testapp):
     """
     Tests that we can get the health page and various fields we expect are there
     """
-    res = testapp.get('/health', status=200).json
-    assert 'namespace' in res
-    assert 'blob_bucket' in res
-    assert 'elasticsearch' in res
-    assert res['foursight'] is None
 
     # test some stuff that uses the env.name setting by making a new testapp
     prev_env = app.registry.settings.get('env.name')
@@ -88,9 +83,16 @@ def test_get_health_page(app, testapp):
         'REMOTE_USER': 'TEST',
     }
     new_env_testapp = TestApp(app, environ)
+
+    res = new_env_testapp.get('/health', status=200).json
+    assert 'namespace' in res
+    assert 'blob_bucket' in res
+    assert ['elasticsearch']
+    assert res['foursight']
+
     env_res = new_env_testapp.get('/health', status=200).json
     assert env_res['beanstalk_env'] == 'fourfront-test'
-    assert env_res['foursight'].endswith('/view/test')
+    assert '/view/' in env_res['foursight']
 
     # reset settings after test
     if prev_env is None:
