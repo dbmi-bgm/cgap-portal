@@ -558,11 +558,11 @@ class SaveNotesToReportButton extends React.PureComponent {
     }
 
     render(){
-        const { fetchedReportItem, sendToReportStore, className } = this.props;
+        const { variantSampleListItem, fetchedReportItem, sendToReportStore, className } = this.props;
         const { uuid: reportUUID = null } = fetchedReportItem || {};
 
         const selectionStoreSize = this.memoized.selectionStoreSize(sendToReportStore);
-        const variantSamplesWithAnySelections = this.memoized.variantSamplesWithAnySelections();
+        const variantSamplesWithAnySelections = this.memoized.variantSamplesWithAnySelections(variantSampleListItem, sendToReportStore);
         const disabled = this.isDisabled();
         const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
 
