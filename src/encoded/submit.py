@@ -293,6 +293,28 @@ class AccessionRow:
     """
 
     def __init__(self, vapp, metadata, idx, family_alias, project, institution):
+        """
+        Args:
+            vapp (webtest TestApp object): used for pytesting
+            metadata (dict): dictionary of form {column heading1: row value1, ...}, for the given row
+            idx (int): current row's number within original submitted spreadsheet
+            family_alias (string): analysis ID value for the current row being processed
+            project (string): project name
+            institution (string): institution name
+
+        Class Attributes, additional info:
+            self.errors (list of strings): errors arising from invalid MONDO terms, HPO terms, etc., within row cells
+            self.indiv_alias (string): alias of this row's individual
+            self.sample_alias (string): alias of this sample, including specimen ID and workup type
+            self.analysis_alias (string): alias of the sample analysis, including analysis ID and project name
+            self.case_name (string): the unique analysis ID of this row, if present
+            self.individual (MetadataItem object): single DB-item-worth of json, for current row's individual
+            self.family (MetadataItem object): single DB-item-worth of json, for current row's individual's family info
+            self.sample (MetadataItem object): single DB-item-worth of json, containing info about current sample
+            self.analysis (MetadataItem object): single DB-item-worth of json, containing info about current sample's analysis
+            self.files_fastq (list of MetadataItem objects): list of current fastq files, as single DB-item-worth of jsons
+            self.files_processed (list of MetadataItem objects): same as self.files_fastq, but for processed files
+        """
         self.project = project
         self.institution = institution
         self.virtualapp = vapp
@@ -512,7 +534,7 @@ class AccessionRow:
 
 class AccessionMetadata:
     """
-    class to hold info parsed from one spreadsheet.
+    Class to hold info parsed from one spreadsheet.
 
     One row is parsed at a time and a AccessionRow object is generated; this is then
     compared with previous rows already added to AccessionMetadata object, and compared,
@@ -520,22 +542,52 @@ class AccessionMetadata:
     have metadata that occurs across multiple rows.
     """
 
-    def __init__(self, vapp, rows, project, institution, ingestion_id, counter=1):
+    def __init__(self, vapp, rows, project, institution, ingestion_id):
+        """
+        Args:
+            vapp (webtest TestApp object): used for pytesting
+            rows (list of (dict, int) tuples): populated within class method create_row_tuples() -- the tuples consist
+                of the row dictionary, which contains key-value pairs of header of current column and its cell value within
+                that row; the integer is the row number within the overall spreadsheet
+            project (dict): project identifier (e.g. contains status, date created, project title, @id, etc.)
+            institution (dict): institution identifier
+            ingestion_id (string): ID of current ingestion, determined by the name of the key of the given S3 bucket
+
+        Class Attributes, additional info:
+            self.row_data_dicts (list of dicts): dictionaries of form {column heading1: row value1, ...}, for every row
+            self.proband_rows (list of dict(s)): dictionaries of form {column heading1: row value1, ...}, only for row(s) 
+                corresponding to the proband
+            self.family_dict (dict): keys = analysis ID, values = <project>:family-<individual id> for every proband present
+            self.individuals (dict): dictionary of each individual within the spreadsheet and key-value pairs of individual metadata
+            self.families (dict): dictionary representing the members within each family in the accession spreadsheet
+            self.samples (dict): dictionary of samples
+            self.sample_processings (dict): dictionary of analyses and their corresponding samples, families involved, and analysis type
+            self.reports (dict): dictionary of reports with their corresponding metadata (aliases, descriptions)
+            self.cases (dict): dictionary of cases involved in the given spreadsheet, including individuals, projects, sample processings, etc.
+            self.files_fastq (dict): dictionary of fastq files and corresponding metadata
+            self.files_processed (dict): dictionary of files that have already been processed
+            self.errors (list of strings): errors arising from failure in validation of PedigreeRows
+            self.analysis_types (dict): dictionary of form {analysis id: analysis type} (type includes workup type and grouping)
+            self.case_info (dict): dictionary containing case metadata, after processing samples
+            self.json_out (dict): json file used for subsequent validation function
+            self.itemtype_dict (dict of dicts): a dictionary of all the dictionaries defined prior
+        """
+
         self.virtualapp = vapp
         self.rows = rows
+        self.row_data_dicts = list(map(lambda x: x[0], rows))
         self.project = project.get('name')
         self.project_atid = project.get('@id')
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
         self.ingestion_id = ingestion_id
-        self.counter = counter
-        self.proband_rows = [row for row in rows if row.get(SS_RELATION).lower() == 'proband']
+        self.proband_rows = [row for row in self.row_data_dicts if row.get(SS_RELATION).lower() == 'proband']
         self.family_dict = {
             row.get(SS_ANALYSIS_ID): '{}:family-{}'.format(
                 self.project, row.get(SS_INDIVIDUAL_ID)
             ) for row in self.proband_rows
         }
-        self.metadata = []
+        # self.metadata = []
         self.individuals = {}
         self.families = {}
         self.samples = {}
@@ -544,7 +596,7 @@ class AccessionMetadata:
         self.cases = {}
         self.files_fastq = {}
         self.files_processed = {}
-        self.reports_req = []
+        # self.reports_req = []
         self.errors = []
         self.analysis_types = self.get_analysis_types()
         self.case_info = {}
@@ -579,9 +631,10 @@ class AccessionMetadata:
         The last entry in the dict will get an analysis_type of None because the workup types are mixed which is
         not allowed.
         """
+
         analysis_relations = {}
         analysis_types = {}
-        for row in self.rows:
+        for row in self.row_data_dicts:
             analysis_relations.setdefault(row.get(SS_ANALYSIS_ID), [[], []])
             analysis_relations[row.get(SS_ANALYSIS_ID)][0].append(row.get(SS_RELATION, '').lower())
             workup_col = get_column_name(row, ['test requested', 'workup type'])
@@ -792,16 +845,16 @@ class AccessionMetadata:
         Case creation and family relations added after all rows have been processed.
         """
         self.get_analysis_types()
-        for i, row in enumerate(self.rows):
+        for(row, row_number) in self.rows:
             try:
                 fam = self.family_dict[row.get('analysis id')]
             except KeyError:
                 self.errors.append('Row {} - Family/Analysis does not include a proband.'
-                                   ' Row cannot be processed.'.format(i + 1 + self.counter))
+                                   ' Row cannot be processed.'.format(row_number))
                 continue
             try:
                 processed_row = AccessionRow(
-                    self.virtualapp, row, i + 1 + self.counter, fam, self.project, self.institution
+                    self.virtualapp, row, row_number, fam, self.project, self.institution
                 )
                 simple_add_items = [processed_row.individual, processed_row.sample]
                 simple_add_items.extend(processed_row.files_fastq)
@@ -856,6 +909,19 @@ class PedigreeRow:
     MONDO_TERMS = "mondo_terms"
 
     def __init__(self, metadata, idx, project, institution):
+        """
+        Args:
+            metadata (dict): dictionary of form {column heading1: row value1, ...}, for the given row
+            idx (int): current row's number within original submitted spreadsheet
+            project (string): project name
+            institution (string): institution name
+
+        Class Attributes, additional info:
+            self.errors (list of strings): errors arising from invalid MONDO terms, HPO terms, etc., within row cells
+            self.indiv_alias (string): alias of this row's individual
+            self.individual (MetadataItem object): single DB-item-worth of json, for current row's individual
+            self.proband (bool): True if individual of this current row is this family's proband
+        """
         self.project = project
         self.institution = institution
         self.row = idx
@@ -1137,7 +1203,23 @@ class PedigreeRow:
 
 class PedigreeMetadata:
 
-    def __init__(self, vapp, rows, project, institution, ingestion_id, counter=1):
+    def __init__(self, vapp, rows, project, institution, ingestion_id):
+        """
+        Args:
+            vapp (webtest TestApp object): used for pytesting
+            rows (list of (dict, int) tuples): populated within class method create_row_tuples() -- the tuples consist
+                of the row dictionary, which contains key-value pairs of header of current column and its cell value within
+                that row; the integer is the row number within the overall spreadsheet
+            project (dict): project identifier (e.g. contains status, date created, project title, @id, etc.)
+            institution (dict): institution identifier
+            ingestion_id (string): ID of current ingestion, determined by the name of the key of the given S3 bucket
+
+        Class Attributes, additional info:
+            self.individuals (dict): dictionary of each individual within the spreadsheet and key-value pairs of individual metadata
+            self.families (dict): dictionary representing the proband and corresponding family members
+            self.errors (list of strings): errors arising from failure in validation of PedigreeRows
+            self.json_out (dict): json file used for subsequent validation function
+        """
         self.virtualapp = vapp
         self.rows = rows
         self.project = project.get('name')
@@ -1145,8 +1227,7 @@ class PedigreeMetadata:
         self.institution = institution.get('name')
         self.institution_atid = institution.get('@id')
         self.ingestion_id = ingestion_id
-        self.counter = counter
-        self.metadata = []
+        # self.metadata = []
         self.individuals = {}
         self.families = {}
         self.errors = []
@@ -1254,10 +1335,12 @@ class PedigreeMetadata:
     def process_rows(self):
         """
         Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
+        Spreadsheet rows are saved as tuples -- (dict, int), where the dictionary is of the form 
+        {column heading1: row value1, ...}, and the integer is the row number within the spreadsheet.
         """
-        for i, row in enumerate(self.rows):
+        for (row, row_number) in self.rows:
             try:
-                processed_row = PedigreeRow(row, i + 1 + self.counter, self.project, self.institution)
+                processed_row = PedigreeRow(row, row_number, self.project, self.institution)
                 self.errors.extend(processed_row.errors)
                 self.add_individual_metadata(processed_row.individual)
             except AttributeError:
@@ -1287,7 +1370,7 @@ class PedigreeMetadata:
 
 class SpreadsheetProcessing:
     """
-    class that holds relevant information for processing of a single spreadsheet.
+    Class that holds relevant information for processing of a single spreadsheet.
     After initial processing of header and rows, will create an instance of relevant
     'Metadata' class to hold all metadata extracted from spreadsheet.
     """
@@ -1297,6 +1380,29 @@ class SpreadsheetProcessing:
     COLUMN_HEADER_REMOVAL_PATTERN = re.compile(r"\(.*\)|[:*]")
 
     def __init__(self, vapp, xls_data, project, institution, ingestion_id, submission_type='accessioning'):
+        """
+        Args:
+            vapp (webtest TestApp object): used for pytesting
+            xls_data (generator object): contains row cell values from spreadsheet
+            project (dict): project identifier (e.g. contains status, date created, project title, @id, etc.)
+            institution (dict): institution identifier
+            ingestion_id (string): ID of current ingestion, determined by the name of the key of the given S3 bucket
+            submission_type (string): determines whether submitting 'accessioning' (a case) or 'family_history' (pedigree)
+
+        Class Attributes, additional info:
+            REQUIRED_COLUMNS (list of strings): required column headers within submitted spreadsheet
+            METADATA_CLASS (class): either AccessionMetadata or PedigreeMetadata class, based on submission type,
+                and populated in class method extract_metadata()
+            COLUMN_HEADER_REMOVAL_PATTERN (regex): for parsing through Header row from spreadsheet, in reformat_column_header()
+            self.output (dict): json file used for subsequent validation after population of the respective metadata object
+            self.errors (list of strings): errors arising from failure in validation of header and spreadsheet contents
+            self.keys (list of strings): holds spreadsheet's header values (i.e. column labels)
+            self.preheader_rows_counter (int): number of rows above the header in the spreadsheet
+            self.rows (list of (dict, int) tuples): populated within class method create_row_tuples() -- the tuples consist
+                of the row dictionary, which contains key-value pairs of header of current column and its cell value within
+                that row; the integer is the row number within the overall spreadsheet
+            self.passing (bool): toggled to True once metadata class is populated in method extract_metadata()
+        """
         self.virtualapp = vapp
         self.input = xls_data
         self.project = project
@@ -1306,11 +1412,14 @@ class SpreadsheetProcessing:
         self.output = {}
         self.errors = []
         self.keys = []
-        self.counter = 0
+        self.preheader_rows_counter = 0
         self.rows = []
         self.passing = False
+
+        # Once a satisfactory header is found, create list of tuples for row values
         if self.header_found():
-            self.create_row_dict()
+            self.create_row_tuples()
+        # If row tuples were created, populate the metadata object
         if self.rows:
             self.extract_metadata()
 
@@ -1318,12 +1427,15 @@ class SpreadsheetProcessing:
         """
         The header we are looking for may not always be the first row - some iterations of the
         submission spreadsheet had super-headings to group columns into categories.
+        :returns: True if correct type of header is found ("Individual ID*" present),
+            else, False
+        :rtype: bool
         """
         while self.input:
             try:
                 keys = next(self.input)
                 self.keys = [self.reformat_column_header(entry) for entry in keys]
-                self.counter += 1
+                self.preheader_rows_counter += 1
                 if 'individual id' in self.keys:
                     return True
             except StopIteration:
@@ -1346,9 +1458,13 @@ class SpreadsheetProcessing:
         """
         return re.sub(cls.COLUMN_HEADER_REMOVAL_PATTERN, "", cell_entry).strip().lower()
 
-    def create_row_dict(self):
+    def create_row_tuples(self):
         """
-        Turns each row into a dictionary of form {column heading1: row value1, ...}
+        Turns each row into a tuple consisting of a dictionary of form {column heading1: row value1, ...},
+        and integer representing the row number. Overall tuple: ({column heading1: row value1, ...}, row number)
+
+        :returns: list of formatted rows and row position
+        :rtype: list of tuples (dict, int)
         """
         missing = [col for col in self.REQUIRED_COLUMNS if col not in self.keys]
         if missing:
@@ -1357,17 +1473,25 @@ class SpreadsheetProcessing:
             ).format('", "'.join(missing))
             self.errors.append(msg)
         else:
-            for values in self.input:
-                r = [val for val in values]
-                if 'y/n' in ''.join(r).lower() or ''.join(r) == '':  # skip comments/description/blank row if present
-                    self.counter += 1
-                    continue
-                row_dict = {self.keys[i]: item for i, item in enumerate(r)}
-                self.rows.append(row_dict)
+            # enumerate through generator of input from spreadsheet
+            for i, row in enumerate(self.input):
+                r = [val for val in row]
+                # skip comments/description/blank row if present
+                if 'y/n' in ''.join(r).lower() or ''.join(r) == '':  
+                    continue # then jumps to the beginning of for loop
+
+                # the cell values within this row
+                row_dict = {self.keys[i]: item for i, item in enumerate(r)} 
+                # row number populated, taking into account header and preheader rows
+                self.rows.append((row_dict, i + self.preheader_rows_counter + 1)) 
 
     def extract_metadata(self):
+        """
+        Populates the specified metadata class (either AccessionMetadata or PedigreeMetadata) with the
+        formatted tuples for the rows, defined in create_row_tuples().
+        """
         current_args = [self.virtualapp, self.rows, self.project,
-                        self.institution, self.ingestion_id, self.counter]
+                        self.institution, self.ingestion_id]
         result = self.METADATA_CLASS(*current_args)
         self.output = result.json_out
         self.errors.extend(result.errors)
@@ -1376,9 +1500,9 @@ class SpreadsheetProcessing:
 
 class AccessionProcessing(SpreadsheetProcessing):
     """
-    class that holds relevant information for processing of a single accessioning spreadsheet.
+    Class that holds relevant information for processing of a single accessioning spreadsheet.
     After initial processing of header and rows, will create an instance of AccessionMetadata
-    to hold all metadata extracted from spreadsheet.
+    to hold all metadata extracted from spreadsheet. Refer to parent class SpreadsheetProcessing.
     """
     REQUIRED_COLUMNS = REQUIRED_COLS_FOR_ACCESSIONING
     METADATA_CLASS = AccessionMetadata
@@ -1386,9 +1510,9 @@ class AccessionProcessing(SpreadsheetProcessing):
 
 class PedigreeProcessing(SpreadsheetProcessing):
     """
-    class that holds relevant information for processing of a single pedigree/family history spreadsheet.
+    Class that holds relevant information for processing of a single pedigree/family history spreadsheet.
     After initial processing of header and rows, will create an instance of PedigreeMetadata
-    to hold all metadata extracted from spreadsheet.
+    to hold all metadata extracted from spreadsheet. Refer to parent class SpreadsheetProcessing.
     """
     REQUIRED_COLUMNS = REQUIRED_COLS_FOR_PEDIGREE
     METADATA_CLASS = PedigreeMetadata
