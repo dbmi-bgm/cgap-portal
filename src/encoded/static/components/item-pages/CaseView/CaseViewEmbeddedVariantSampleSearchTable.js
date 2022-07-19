@@ -9,6 +9,8 @@ import ReactTooltip from 'react-tooltip';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DisplayTitleColumnWrapper, flattenColumnsDefinitionsSortFields } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+
+import { IconCheckbox } from '../../forms/IconCheckbox';
 import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
 import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
@@ -34,7 +36,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
             "display_title" : {
                 // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
                 ...originalColExtMap.display_title,
-                "widthMap": { 'lg' : 230, 'md' : 200, 'sm' : 180 },
+                "widthMap": { 'lg' : 200, 'md' : 200, 'sm' : 180 },
                 "render": function(result, parentProps){
                     const { context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
@@ -139,7 +141,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-book-medical fas"/>,
                 "render": function(result, props) {
-                    return <VariantSampleSelectionCheckbox {...interpretationSelectionCommonProps} result={result} className="mx-auto" />;
+                    return <VariantSampleSelectionCheckbox {...interpretationSelectionCommonProps} result={result} />;
                 }
             },
             /**
@@ -237,7 +239,7 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
         onSelectVariantSample,
         savedVariantSampleIDMap,
         isLoadingVariantSampleListItem = false,
-        className = "mr-2"
+        className = "mx-auto d-block my-0 text-larger"
     } = props;
     const { "@id": resultID } = result;
     const isPrevSaved = savedVariantSampleIDMap[resultID];
@@ -254,7 +256,7 @@ export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleS
         return onSelectVariantSample(result, true);
     }, [ onSelectVariantSample, result ]);
 
-    return <input type="checkbox" {...{ checked, onChange, disabled, className }} />;
+    return <IconCheckbox {...{ checked, onChange, disabled, className }} />;
 });
 
 const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilterBlockIndicesPopoverColumn(props){
