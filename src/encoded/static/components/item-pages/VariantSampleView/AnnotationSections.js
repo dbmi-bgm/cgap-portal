@@ -532,9 +532,12 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         clinical_significance: {
             description: clinicalSignificanceFromClinVar,
             review_status: reviewStatusFromClinVar,
-            last_evaluated: lastEvaluatedFromClinVar
+            last_evaluated: lastEvaluatedFromClinVarRaw
         } = {}
     } = clinVarResult || {};
+
+    // Ensure that the date is valid by running through date parser
+    const lastEvaluatedFromClinVar = Date.parse(new Date(lastEvaluatedFromClinVarRaw));
 
     const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
 
@@ -591,7 +594,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
                 </div>
             </div>
 
-            { lastEvaluatedFromClinVar ?
+            { lastEvaluatedFromClinVar && !isNaN(lastEvaluatedFromClinVar) ?
                 <div className="row mt-03">
                     <div className="col-3">
                         <label className="mb-0">Last Evaluated: </label>
