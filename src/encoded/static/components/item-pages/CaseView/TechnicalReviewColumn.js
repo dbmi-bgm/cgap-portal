@@ -396,7 +396,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const isNotePotentiallyOutdated = noteTextDateLastEdited && callDateLastMade && noteTextDateLastEdited < callDateLastMade; //lastSavedAssessment && savedTechnicalReviewNoteText && typeof lastSavedNoteText === "undefined";
 
         const notesIconCls = (
-            "icon icon-2x icon-fw icon-sticky-note " + (
+            "icon text-larger icon-fw icon-sticky-note " + (
                 isNotePotentiallyOutdated ? "far text-danger"
                     : (
                         unsavedTechnicalReviewNoteTextForResult
@@ -407,33 +407,28 @@ export class TechnicalReviewColumn extends React.PureComponent {
             ));
 
 
+        const recentlySavedAsterisk = <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>;
+
         return (
             <div className="w-100 d-flex align-items-center justify-content-around text-truncate py-1">
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
                     data-call="true" data-technical-review="true">
-                    <i className={"icon icon-2x icon-fw fas icon-check text-" + callTrueIconColor} />
-                    { lastSavedAssessment && (lastSavedCall === true || (typeof lastSavedCall === "undefined" && savedCall === true)) ?
-                        // If was just saved or if was previously saved but now removed (in which case lastSavedAssessment exists but is equal to {})
-                        <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
-                        : null }
+                    <i className={"icon text-larger icon-fw fas icon-check text-" + callTrueIconColor} />
+                    {/* If was just saved or if was previously saved but now removed (in which case lastSavedAssessment exists but is equal to {}) */}
+                    { lastSavedAssessment && (lastSavedCall === true || (typeof lastSavedCall === "undefined" && savedCall === true)) ? recentlySavedAsterisk : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownNoCall} ref={this.callFalseButtonRef}
                     data-call="false" data-technical-review="true">
-                    <i className={"icon icon-2x icon-fw fas icon-times text-" + callFalseIconColor} />
-                    { lastSavedAssessment && (lastSavedCall === false || (typeof lastSavedCall === "undefined" && savedCall === false)) ?
-                        // If was just saved or if was previously saved but now removed (in which case lastSavedAssessment exists but is equal to {})
-                        <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
-                        : null }
+                    <i className={"icon text-larger icon-fw fas icon-times text-" + callFalseIconColor} />
+                    { lastSavedAssessment && (lastSavedCall === false || (typeof lastSavedCall === "undefined" && savedCall === false)) ? recentlySavedAsterisk : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenNotesPopover} ref={this.notesButtonRef} data-technical-review="true">
                     <i data-tip={isNotePotentiallyOutdated ? "This note is potentially outdated." : null} className={notesIconCls} />
-                    { typeof lastSavedNoteText !== "undefined" ?
-                        // If was note_text just removed, then would === null.
-                        <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>
-                        : null }
+                    {/* If was note_text just removed, then would === null. */}
+                    { typeof lastSavedNoteText !== "undefined" ? recentlySavedAsterisk : null }
                     { typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ?
                         // Will be equal to null if saved text exists but unsaved text is blank (== will remove field upon save).
                         <span className="text-danger text-700 position-absolute" data-tip="Note text has not been saved yet.">*</span>

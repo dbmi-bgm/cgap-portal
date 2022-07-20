@@ -366,7 +366,7 @@
             "order": 0
         },
         "technical_review.assessment.call": {
-            "title": "Technical Review Call",
+            "title": "Technical Review",
             "order": 2,
             "sort_fields": [
                 {
