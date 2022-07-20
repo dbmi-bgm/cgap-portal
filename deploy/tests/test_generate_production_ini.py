@@ -100,7 +100,8 @@ def test_build_ini_file_from_template():
     some_template_file_name = "mydir/whatever"
     some_ini_file_name = "mydir/production.ini"
     env_vars = dict(RDS_DB_NAME='snow_white', RDS_USERNAME='user', RDS_PASSWORD='my-secret',
-                    RDS_HOSTNAME='unittest', RDS_PORT="6543")
+                    RDS_HOSTNAME='unittest', RDS_PORT="6543", ENCODED_ENV_NAME='cgap-devtest',
+                    ENCODED_IDENTITY='C4DatastoreCgapDevtestApplicationConfiguration')
 
     with override_environ(**env_vars):
 
@@ -310,6 +311,7 @@ def test_get_eb_bundled_version():
             assert get_eb_bundled_version() is None
 
 
+@pytest.mark.skip  # obsolete, all are now generated from cgap_any_alpha.ini
 def test_transitional_equivalence():
     """
     We used to use separate files for each environment. This tests that the new any.ini technology,

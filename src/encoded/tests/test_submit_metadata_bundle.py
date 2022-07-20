@@ -225,7 +225,7 @@ def test_process_ingestion(testapp, posted_personas_etc):
     assert res.json['success'] is True
     assert res.json['message'] == "Uploaded successfully."
     assert res.json['filename'] == sample_bundle_filename
-    assert re.match("elasticbeanstalk-.*-metadata-bundles", res.json['bucket'])
+    assert re.match('cgap-unit-testing-metadata-bundles', res.json['bucket'])
     assert res.json['object_name'] == submission_id + "/datafile.json"
     assert res.json['submission_id'] == submission_id
     assert res.json['authenticated_userid'] == "remoteuser." + email

@@ -77,7 +77,7 @@ def test_get_health_page(app, testapp):
 
     # test some stuff that uses the env.name setting by making a new testapp
     prev_env = app.registry.settings.get('env.name')
-    app.registry.settings['env.name'] = 'fourfront-test'
+    app.registry.settings['env.name'] = 'cgap-devtest'
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -91,7 +91,7 @@ def test_get_health_page(app, testapp):
     assert res['foursight']
 
     env_res = new_env_testapp.get('/health', status=200).json
-    assert env_res['beanstalk_env'] == 'fourfront-test'
+    assert env_res['beanstalk_env'] == 'cgap-devtest'
     assert '/view/' in env_res['foursight']
 
     # reset settings after test

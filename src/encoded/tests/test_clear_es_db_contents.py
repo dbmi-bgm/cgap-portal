@@ -29,8 +29,8 @@ def test_run_clear_db_envs(app, testapp):
     testapp.get(post_res.location, status=200)
 
     # should never run on this env
-    app.registry.settings['env.name'] = 'fourfront-cgap'
-    assert run_clear_db_es(app, None, True) is False
+    app.registry.settings['env.name'] = 'cgap-devtest'
+    assert run_clear_db_es(app, None, True) is False  # still false since cgap-devtest is a "prod" env
     testapp.get(post_res.location, status=200)
 
     # test if we are only running on specific envs
