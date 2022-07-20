@@ -528,7 +528,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
 
     static renderEmptyBlock(columnClass) {
         return (
-            <StackedBlock {...{ columnClass }} subtitleVisible={false}
+            <StackedBlock {...{ columnClass }} subtitleVisible={false} key={"empty-" + columnClass}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
                 <StackedBlockName>
                     <span className="name-title">-</span>
@@ -591,7 +591,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                                 <div className="row justify-content-between" key={id+id_type}>
                                     <div className="col-auto accession-table-title">{id_type}</div>
                                     <div className="col-auto text-truncate">{ id }</div>
-                                </div>);
+                                </div>
+                            );
                         }): null
                     }
                     <div className="row justify-content-between">
@@ -632,7 +633,7 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                 }
 
                 <StackedBlockList className="report" title="Report">
-                    { reportBlocks ? reportBlocks : FamilyAccessionStackedTable.renderEmptyBlock("report") }
+                    { reportBlocks ? reportBlocks : [FamilyAccessionStackedTable.renderEmptyBlock("report")] }
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -771,10 +772,8 @@ export class FamilyAccessionStackedTable extends React.PureComponent {
                     </div>
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Sequencing Libraries">
-                    { indvSamples.map((thisSample) =>
-                    {
+                    { indvSamples.map((thisSample) => {
                         const { '@id' : thisSampleAtId } = thisSample || {};
-
                         const reportBlocks = sampleToCaseReportBlockMap[thisSampleAtId];
                         return this.renderSampleBlock(thisSample, reportBlocks);
                     })}

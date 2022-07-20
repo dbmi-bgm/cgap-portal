@@ -348,8 +348,10 @@ function ReportFindingsTableNoSamplesFallback (props) {
     const { header, id, visible, defaultValue, includeDefaultChecked = true } = props;
     const [ includeChecked, setIncludeChecked ] = useState(includeDefaultChecked);
     const onCheck = useCallback(function(e){
-        setIncludeChecked(!includeChecked);
-    }, [ includeChecked ]);
+        setIncludeChecked(function(currentIncludeChecked){
+            return !currentIncludeChecked;
+        });
+    });
     return (
         <React.Fragment>
             <div className="d-flex align-items-center">

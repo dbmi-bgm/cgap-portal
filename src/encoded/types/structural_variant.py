@@ -1,6 +1,7 @@
 import io
 
 import negspy.coordinates as nc
+from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 
 from ..ingestion.common import CGAP_CORE_PROJECT
@@ -12,7 +13,8 @@ from .variant import (
     SHARED_VARIANT_EMBEDS,
     SHARED_VARIANT_SAMPLE_EMBEDS,
     extend_embedded_list,
-    load_extended_descriptions_in_schemas
+    load_extended_descriptions_in_schemas,
+    update_project_notes_process
 )
 
 
@@ -323,7 +325,10 @@ class StructuralVariant(Item):
     unique_key="structural_variant_sample:annotation_id",
 )
 class StructuralVariantSample(Item):
-    """Class for structural variant samples."""
+    """
+    Class for structural variant samples.
+    Should we have this inherit from VariantSample perhaps? Or maybe make a common base class?
+    """
 
     item_type = "structural_variant_sample"
     schema = load_extended_descriptions_in_schemas(
@@ -426,6 +431,24 @@ class StructuralVariantSample(Item):
         result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
+
+    @calculated_property(schema={
+        "title": "Project Technical Review",
+        "description": "The technical review saved to project for this Variant",
+        "type": "string",
+        "linkTo": "NoteTechnicalReview"
+    })
+    def project_technical_review(self, request, structural_variant=None, project=None):
+        structural_variant = get_item_or_none(request, structural_variant, 'StructuralVariant', frame='raw')
+        if structural_variant and project:
+            # project param will be in form of @id
+            for tr_uuid in structural_variant.get("technical_reviews", []):
+                # frame=object returns linkTos in form of @id, frame=raw returns them in form of UUID.
+                technical_review = get_item_or_none(request, tr_uuid, 'NoteTechnicalReview', frame='object')
+                if technical_review.get("project") == project: # Comparing @IDs
+                    return tr_uuid
+        return None
+
 
     @calculated_property(
         schema={
@@ -613,3 +636,14 @@ class StructuralVariantSample(Item):
                 new_labels[role_key] = " ".join(label)  # just in case
 
         return new_labels
+
+
+@view_config(
+    name='update-project-notes',
+    context=StructuralVariantSample,
+    request_method='PATCH',
+    permission='edit'
+)
+def update_project_notes(context, request):
+    """This endpoint is used to process notes attached to this (in-context) StructuralVariantSample."""
+    return update_project_notes_process(context, request)
