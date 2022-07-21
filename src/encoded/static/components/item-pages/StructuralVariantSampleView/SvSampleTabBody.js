@@ -4,7 +4,7 @@ import React from 'react';
 import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { shortenToSignificantDigits } from '../VariantSampleView/AnnotationSections';
-
+import { falsyZeroCheck } from '../VariantSampleView/AnnotationSections';
 
 export const SvSampleTabBody = (props) => {
     const { context = {}, schemas } = props;
@@ -66,7 +66,10 @@ function SvMantaTable(props) {
             callers = [],
             confidence_interval_start = [],
             confidence_interval_end = [],
-            imprecise = null
+            imprecise = null,
+            quality_score: qualityScore = null,
+            split_reads: splitReads = [],
+            paired_reads: pairedReads = []
         } = {},
         getTipForField
     } = props;
@@ -85,7 +88,7 @@ function SvMantaTable(props) {
             <table className="w-100">
                 <thead>
                     <tr>
-                        <th className="text-left" style={{ width: "325px" }}>Quality</th>
+                        <th className="text-left" style={{ width: "385px" }}>Quality</th>
                         <th className="text-left">Value</th>
                         <th className="text-left">Definition</th>
                     </tr>
@@ -105,6 +108,31 @@ function SvMantaTable(props) {
                         <td className="text-600 text-left">Confidence interval around right breakpoint</td>
                         <td className="text-left">{endExists ? confidence_interval_end.join(", "): fallbackElem}</td>
                         <td className="text-left">{ getTipForField("confidence_interval_end", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of split reads supporting the alternative allele</td>
+                        <td className="text-left">{ falsyZeroCheck(splitReads[1], fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("split_reads", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of split reads supporting the reference allele</td>
+                        <td className="text-left">{ falsyZeroCheck(splitReads[0], fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("split_reads", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of spanning reads supporting the alternative allele</td>
+                        <td className="text-left">{ falsyZeroCheck(pairedReads[1], fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("paired_reads", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of spanning reads supporting the reference allele</td>
+                        <td className="text-left">{ falsyZeroCheck(pairedReads[0], fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("paired_reads", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Manta Quality Score</td>
+                        <td className="text-left">{ falsyZeroCheck(qualityScore, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("quality_score", "StructuralVariantSample") }</td>
                     </tr>
                 </tbody>
             </table>
