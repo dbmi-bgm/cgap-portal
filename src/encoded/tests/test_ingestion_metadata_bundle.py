@@ -73,6 +73,8 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
 
     class ControlledTimeWithFix(ControlledTime):
 
+        # This method has been added in the configurable env_utils branch of dcicutils
+        # and can eventually be removed here.
         def just_utcnow(self):
             return self.just_now().astimezone(pytz.UTC).replace(tzinfo=None)
 

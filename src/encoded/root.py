@@ -1,9 +1,10 @@
+import os
 import sys
 import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
-from dcicutils.s3_utils import HealthPageKey  # , s3Utils
+from dcicutils.s3_utils import HealthPageKey
 from dcicutils.env_utils import infer_foursight_url_from_env
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
@@ -105,11 +106,6 @@ def health_check(config):
         response = request.response
         response.content_type = 'application/json; charset=utf-8'
         settings = request.registry.settings
-
-        # TODO: This computation of app_url is unused. Is that a bug, or should we remove it? -kmp 4-Oct-2021
-        app_url = request.application_url
-        if not app_url.endswith('/'):
-            app_url = ''.join([app_url, '/'])
 
         env_name = settings.get('env.name')
         foursight_url = infer_foursight_url_from_env(request=request, envname=env_name)
