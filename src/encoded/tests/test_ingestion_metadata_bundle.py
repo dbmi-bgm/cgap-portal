@@ -11,6 +11,7 @@ import webtest
 from dcicutils import qa_utils
 from dcicutils.misc_utils import constantly, file_contents, ignored
 from dcicutils.qa_utils import ControlledTime, MockBotoS3Client
+from dcicutils.s3_utils import HealthPageKey
 from unittest import mock
 from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
 from .. import ingestion_listener as ingestion_listener_module
@@ -124,7 +125,8 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
 
         s3_file_system = mocked_s3_client.s3_files.files
 
-        expected_bucket = "elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles"
+        health_json = testapp.get('/health?format=json').json
+        expected_bucket = health_json.get(HealthPageKey.METADATA_BUNDLES_BUCKET)
 
         datafile_short_name = "datafile.xlsx"
         manifest_short_name = "manifest.json"
