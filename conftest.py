@@ -37,8 +37,10 @@ if not my_selected_account or my_selected_account == "643366669028":
 
 my_selected_env = os.environ.get("ENV_NAME")
 # TODO: Maybe make this test programmable in env_utils sometime. -kmp 21-Jul-2022
-if my_selected_env != 'cgap-devtest':
-    PRINT(f"ENV_NAME must be set to cgap-devtest for testing. (It is set to {my_selected_env}.)")
+if not my_selected_account:
+    os.environ['ENV_NAME'] = 'cgap-devtest'
+elif my_selected_env != 'cgap-devtest':
+    PRINT(f"ENV_NAME must be set to cgap-devtest (or left unset) for testing. (It is set to {my_selected_env}.)")
     exit(1)
 
 old_identity = os.environ.get("IDENTITY")
