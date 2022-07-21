@@ -28,7 +28,13 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>Manta - Caller Properties</h4>
+                        <h4>
+                            Structural Variant - Caller Properties (Manta)
+                            <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-1.html#manta" rel="noopener noreferrer" target="_blank"
+                                className="px-1" data-tip="View Manta Documentation">
+                                <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                            </a>
+                        </h4>
                     </div>
                     <div className="info-body">
                         <SvMantaTable {...{ context, getTipForField }} />
@@ -38,7 +44,13 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>BIC-seq2 - Caller Properties</h4>
+                        <h4>
+                            Copy Number Variant - Caller Properties (BicSeq2)
+                            <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/CNV_germline/overview-CNV_germline.html" rel="noopener noreferrer" target="_blank"
+                                className="px-1" data-tip="View BIC-seq2 Documentation">
+                                <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                            </a>
+                        </h4>
                     </div>
                     <div className="info-body">
                         <SvBicSeqTable {...{ context, getTipForField }} />
@@ -48,7 +60,7 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>Genotype</h4>
+                        <h4>Genotype Information</h4>
                     </div>
                     <div className="info-body">
                         <GenotypeQualityTable {...{ context, getTipForField }} />
