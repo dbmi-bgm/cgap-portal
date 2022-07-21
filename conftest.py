@@ -39,7 +39,7 @@ desired_env = 'cgap-devtest'
 
 my_selected_env = os.environ.get("ENV_NAME")
 # TODO: Maybe make this test programmable in env_utils sometime. -kmp 21-Jul-2022
-if not my_selected_account:
+if not my_selected_env:
     print("ENV_NAME was not set. It is being set to ")
     os.environ['ENV_NAME'] = desired_env
 elif my_selected_env != desired_env:
