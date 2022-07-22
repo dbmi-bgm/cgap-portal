@@ -433,8 +433,8 @@
             "noSort": true
         },
         "technical_review.assessment.call": {
-            "title": "Technical Review Call",
-            "order": 120,
+            "title": "Technical Review",
+            "order": 200,
             "sort_fields": [
                 {
                     "field": "technical_review.assessment.call",
@@ -449,6 +449,13 @@
                     "title": "Call Made Date"
                 }
             ]
+        },
+        "interpretation_selection": {
+            "title": "Move to Interpretation",
+            "disabled": true,
+            "noSort": true,
+            "notes": "Becomes 'not disabled' only on CaseViewEmbeddedVariantSampleSearchTableBase",
+            "order": 230
         }
     },
     "facets": {
