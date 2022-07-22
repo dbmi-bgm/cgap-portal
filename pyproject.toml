@@ -168,13 +168,18 @@ wheel = ">=0.29.0"
 # See details at https://pytest.org/en/stable/customize.html
 
 [tool.poetry.scripts]
+# dcicutils commands
+add-image-tag = "dcicutils.ecr_scripts:add_image_tag_main"
+show-global-env-bucket = "dcicutils.env_scripts:show_global_env_bucket_main"
+show-image-manifest = "dcicutils.ecr_scripts:show_image_manifest_main"
+show-image-catalog = "dcicutils.ecr_scripts:show_image_catalog_main"
+unrelease-most-recent-image = "dcicutils.ecr_scripts:unrelease_most_recent_image_main"
 # snovault commands
 batchupgrade = "snovault.batchupgrade:main"
 create-mapping = "snovault.elasticsearch.create_mapping:main"
 wipe-test-indices = "snovault.commands.wipe_test_indices:main"
 # encoded commands
 add-date-created = "encoded.commands.add_date_created:main"
-add-image-tag = "dcicutils.ecr_scripts:add_image_tag_main"
 check-rendering = "encoded.commands.check_rendering:main"
 clear-db-es-contents = "encoded.commands.clear_db_es_contents:main"
 configure-kibana-index = "encoded.commands.configure_kibana_index:main"
@@ -200,24 +205,19 @@ profiler = "encoded.commands.profiler:main"
 prepare-docker = "encoded.commands.prepare_docker:main"
 purge-item-type = "encoded.commands.purge_item_type:main"
 run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"
-show-global-env-bucket = "dcicutils.env_scripts:show_global_env_bucket_main"
-show-image-manifest = "dcicutils.ecr_scripts:show_image_manifest_main"
-show-image-catalog = "dcicutils.ecr_scripts:show_image_catalog_main"
 spreadsheet-to-json = "encoded.commands.spreadsheet_to_json:main"
 submission-test = "encoded.commands.submission_test:main"
 # Use the same-named script in SubmitCGAP instead.
 # submit-metadata-bundle = "encoded.commands.submit_metadata_bundle:main"
-unrelease-most-recent-image = "dcicutils.ecr_scripts:unrelease_most_recent_image_main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
-
-# cgap commands
-variant-table-intake = "encoded.commands.variant_table_intake:main"
-ingest-vcf = "encoded.commands.ingest_vcf:main"
-gene-table-intake = "encoded.commands.gene_table_intake:main"
+# cgap-specific commands
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
+gene-table-intake = "encoded.commands.gene_table_intake:main"
+ingest-vcf = "encoded.commands.ingest_vcf:main"
 ingestion-listener = "encoded.ingestion_listener:main"
 reformat-vcf = "encoded.commands.reformat_vcf:main"
+variant-table-intake = "encoded.commands.variant_table_intake:main"
 
 # container commands
 simulate-environment = "encoded.commands.simulate_environment:main"
