@@ -1,10 +1,10 @@
-from copy import deepcopy
-from pathlib import PurePath
-from urllib import parse
 import csv
 import datetime
 import json
 import re
+from copy import deepcopy
+from pathlib import PurePath
+from urllib import parse
 
 import openpyxl
 from dcicutils.lang_utils import n_of
@@ -881,7 +881,9 @@ class SubmittedFilesParser:
     PAIRED_WITH = "paired with"
     FILE = "file"
     FILE_FORMAT = "file_format"
-    FILENAME = "filename"
+    EXTRA_FILE_FORMATS = "extrafile_formats"
+    FILE_NAME = "filename"
+    EXTRA_FILES = "extra_files"
     STANDARD_FILE_EXTENSION = "standard_file_extension"
     OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
     GENOME_ASSEMBLY = "genome_assembly"
@@ -909,6 +911,8 @@ class SubmittedFilesParser:
         self.project_name = project_name
         self.errors = []  # Errors across rows that don't need to be repeated
         self.accepted_file_formats = None
+        self.extra_file_formats = {}
+        self.primary_to_extra_file_formats = {}
         self.unidentified_file_format = False
         self.file_extensions_to_file_formats = {}  # Cache extensions --> file formats
 
@@ -952,7 +956,7 @@ class SubmittedFilesParser:
 
         Updates self.errors with any errors to report for an individual
         accession row (see self.check_for_errors() for "global" errors
-        that should only be reported once across all rows.
+        that should only be reported once across all rows).
 
         :param submitted_file_names: Comma-separated submitted file
             names
@@ -965,32 +969,43 @@ class SubmittedFilesParser:
             to report for this row
         :rtype: tuple(dict, list, list)
         """
-        file_items = []
+        file_names_to_items = {}
         file_aliases = []
         fastq_files = {}
-        files_without_file_format = []
+        files_without_file_format = {}
+        files_to_check_extra_files = {}
         errors = []
-        submitted_file_names = self.get_file_names(submitted_file_names)
+        submitted_file_names = self.parse_file_names(submitted_file_names)
         for submitted_file_name in submitted_file_names:
             file_path = PurePath(submitted_file_name)
             file_name = file_path.name
             file_suffixes = file_path.suffixes
-            file_format_atid = self.identify_file_format(file_suffixes)
+            (
+                file_format_atid, extra_file_format_atids, suffix_found
+            ) = self.identify_file_format(file_suffixes)
             if not file_format_atid:
-                files_without_file_format.append(submitted_file_name)
+                files_without_file_format[file_name] = submitted_file_name
                 continue
+            if extra_file_format_atids:
+                files_to_check_extra_files[file_name] = (
+                    extra_file_format_atids, suffix_found
+                )
             file_alias = '{}:{}'.format(self.project_name, file_name)
-            file_aliases.append(file_alias)
             file_properties = {
                 self.ALIASES: [file_alias],
                 self.FILE_FORMAT: file_format_atid,
-                self.FILENAME: submitted_file_name,
+                self.FILE_NAME: submitted_file_name,
             }
             if genome_build:
                 file_properties[self.GENOME_ASSEMBLY] = genome_build
-            file_items.append(file_properties)
+            file_names_to_items[file_name] = file_properties
             if file_format_atid == self.FILE_FORMAT_FASTQ_ATID:
                 fastq_files[file_name] = file_properties
+        self.associate_extra_files(
+            files_to_check_extra_files, file_names_to_items, files_without_file_format
+        )
+        file_items = file_names_to_items.values()
+        file_aliases = [item[self.ALIASES][0] for item in file_items]
         if fastq_files:
             invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(fastq_files)
             if invalid_fastq_names:
@@ -1020,12 +1035,101 @@ class SubmittedFilesParser:
             msg = (
                 "Row %s - Invalid file extensions provided for the following file"
                 " name(s): %s."
-                % (row_index, ", ".join(files_without_file_format))
+                % (row_index, ", ".join(files_without_file_format.keys()))
             )
             errors.append(msg)
         return file_items, file_aliases, errors
 
-    def get_file_names(self, submitted_file_names):
+    def associate_extra_files(
+        self, files_to_check_extra_files, file_names_to_items, files_without_file_format
+    ):
+        """"""
+        for (
+            file_name, (extra_file_format_atids, file_suffix)
+        ) in files_to_check_extra_files.items():
+            file_properties = file_names_to_items.get(file_name)
+            if not file_properties:
+                # log
+                continue
+            extra_file_names_and_formats = self.generate_extra_file_names_with_formats(
+                file_name, file_suffix, extra_file_format_atids
+            )
+            for extra_file_names, extra_file_format_atid in extra_file_names_and_formats:
+                for extra_file_name in extra_file_names:
+                    existing_file_item = file_names_to_items.get(extra_file_name)
+                    if existing_file_item:
+                        submitted_file_name = existing_file_item.get(self.FILE_NAME)
+                        self.associate_file_with_extra_file(
+                            file_properties, submitted_file_name, extra_file_format_atid
+                        )
+                        del file_names_to_items[extra_file_name]
+                        break
+                    submitted_file_name = files_without_file_format.get(extra_file_name)
+                    if submitted_file_name:
+                        self.associate_file_with_extra_file(
+                            file_properties, submitted_file_name, extra_file_format_atid
+                        )
+                        del files_without_file_format[extra_file_name]
+                        break
+
+    def generate_extra_file_names_with_formats(
+        self, file_name, file_suffix, extra_file_format_atids
+    ):
+        """"""
+        result = []
+        base_file_name = self.get_file_name_without_suffix(file_name, file_suffix)
+        for extra_file_format_atid in extra_file_format_atids:
+            file_names_for_extra_file_format = []
+            extra_file_format = self.extra_file_formats.get(extra_file_format_atid)
+            if not extra_file_format:
+                # log
+                continue
+            extra_file_format_extension = extra_file_format.get(
+                self.STANDARD_FILE_EXTENSION
+            )
+            if extra_file_format_extension:
+                file_names_for_extra_file_format.append(
+                    self.make_file_name_for_extension(
+                        base_file_name, extra_file_format_extension
+                    )
+                )
+            other_extra_file_extensions = extra_file_format.get(
+                self.OTHER_ALLOWED_EXTENSIONS, []
+            )
+            for extension in other_extra_file_extensions:
+                file_names_for_extra_file_format.append(
+                    self.make_file_name_for_extension(base_file_name, extension)
+                )
+            result.append((file_names_for_extra_file_format, extra_file_format_atid))
+        return result
+
+    def get_file_name_without_suffix(self, file_name, suffix):
+        """"""
+        suffix = suffix.lstrip(".")
+        result = file_name.rstrip(suffix)
+        return result.rstrip(".")
+
+    def make_file_name_for_extension(self, base_file_name, extension):
+        """"""
+        base_file_name = base_file_name.rstrip(".")
+        extension = extension.lstrip(".")
+        return f"{base_file_name}.{extension}"
+
+    def associate_file_with_extra_file(
+        self, file_item, extra_file_name, extra_file_format_atid
+    ):
+        """"""
+        extra_file_properties = {
+            self.FILE_FORMAT: extra_file_format_atid,
+            self.FILE_NAME: extra_file_name,
+        }
+        existing_extra_files = file_item.get(self.EXTRA_FILES)
+        if existing_extra_files:
+            existing_extra_files.append(extra_file_properties)
+        else:
+            file_item[self.EXTRA_FILES] = [extra_file_properties]
+
+    def parse_file_names(self, submitted_file_names):
         """Parse submitted file names.
 
         :param submitted_file_names: Comma-separated file names
@@ -1043,8 +1147,8 @@ class SubmittedFilesParser:
         :rtype: set(str)
         """
         result = []
-        accepted_file_formats = self.get_accepted_file_formats()
-        for file_format in accepted_file_formats:
+        file_format_atids_to_items = self.get_accepted_file_formats()
+        for file_format in file_format_atids_to_items.values():
             result.append(file_format.get(self.STANDARD_FILE_EXTENSION))
             result += file_format.get(self.OTHER_ALLOWED_EXTENSIONS, [])
         return sorted(list(set(result)))
@@ -1058,13 +1162,42 @@ class SubmittedFilesParser:
         :rtype: list(dict)
         """
         if self.accepted_file_formats is None:
-            query = (
-                "/search/?type=FileFormat&valid_item_types=FileSubmitted"
-                "&field=@id&field=standard_file_extension"
-                "&field=other_allowed_extensions&field=file_format"
-            )
-            self.accepted_file_formats = self.search_query(query)
+            query = "/search/?type=FileFormat&valid_item_types=FileSubmitted"
+            search_results = self.search_query(query)
+            file_format_atids_to_items = {}
+            for file_format in search_results:
+                file_format_atid = file_format.get(self.AT_ID)
+                file_format_atids_to_items[file_format_atid] = file_format
+                extra_file_formats = file_format.get(self.EXTRA_FILE_FORMATS)
+                if extra_file_formats:
+                    extra_file_format_atids = [
+                        item.get(self.AT_ID) for item in extra_file_formats
+                    ]
+                    self.update_extra_file_formats(extra_file_format_atids)
+                    self.associate_file_formats(file_format_atid, extra_file_format_atids)
+            self.accepted_file_formats = file_format_atids_to_items
         return self.accepted_file_formats
+
+    def update_extra_file_formats(self, extra_file_format_atids):
+        """"""
+        for file_format_atid in extra_file_format_atids:
+            extra_file_format = self.extra_file_formats.get(file_format_atid)
+            if extra_file_format:
+                continue
+            file_format_properties = self.make_get_request(file_format_atid)
+            self.extra_file_formats[file_format_atid] = file_format_properties
+
+    def associate_file_formats(self, primary_file_format_atid, extra_file_format_atids):
+        """"""
+        existing_values = self.primary_to_extra_file_formats.get(
+            primary_file_format_atid
+        )
+        if existing_values is None:
+            self.primary_to_extra_file_formats[primary_file_format_atid] = set(
+                extra_file_format_atids
+            )
+        else:
+            existing_values.update(extra_file_format_atids)
 
     def identify_file_format(self, file_suffixes):
         """Find FileFormat(s) that accept the given file extension.
@@ -1084,7 +1217,9 @@ class SubmittedFilesParser:
         :returns: Valid matching FileFormat @id if unique match found
         :rtype: str or None
         """
-        result = None
+        file_format_atid = None
+        extra_file_formats = None
+        suffix_found = None
         for idx in range(len(file_suffixes)):  # Iterate through largest to smallest
             suffix_for_search = "".join(file_suffixes[idx:]).lstrip(".")
             cached_formats = self.file_extensions_to_file_formats.get(suffix_for_search)
@@ -1097,9 +1232,14 @@ class SubmittedFilesParser:
                 continue
             else:
                 if len(search_result) == 1:
-                    result = search_result[0][self.AT_ID]
+                    [file_format] = search_result
+                    file_format_atid = file_format.get(self.AT_ID)
+                    extra_file_formats = self.primary_to_extra_file_formats.get(
+                        file_format_atid
+                    )
+                    suffix_found = suffix_for_search
                 break
-        return result
+        return file_format_atid, extra_file_formats, suffix_found
 
     def search_file_format_for_suffix(self, suffix):
         """Find all FileFormats that can be used for the given file
@@ -1118,12 +1258,19 @@ class SubmittedFilesParser:
         :rtype: list
         """
         result = []
-        file_formats = self.get_accepted_file_formats()
-        for file_format in file_formats:
+        file_format_atids_to_items = self.get_accepted_file_formats()
+        for file_format in file_format_atids_to_items.values():
             standard_file_extension = file_format.get(self.STANDARD_FILE_EXTENSION, "")
             other_allowed_extensions = file_format.get(self.OTHER_ALLOWED_EXTENSIONS, [])
-            if suffix == standard_file_extension or suffix in other_allowed_extensions:
+            alternative_suffix = "." + suffix
+            if (
+                suffix == standard_file_extension
+                or suffix in other_allowed_extensions
+                or alternative_suffix == standard_file_extension
+                or alternative_suffix in other_allowed_extensions
+            ):
                 result.append(file_format)
+                continue
         return result
 
     def search_query(self, query):

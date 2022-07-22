@@ -55,6 +55,25 @@ VCF_FILE_ITEM_WITH_GENOME_BUILD = copy.copy(VCF_FILE_ITEM)
 VCF_FILE_ITEM_WITH_GENOME_BUILD.update({"genome_assembly": GENOME_BUILD})
 VCF_ALIAS_TO_FILE_ITEM = {VCF_FILE_ALIAS: VCF_FILE_ITEM}
 VCF_ALIAS_TO_FILE_ITEM_GENOME_BUILD = {VCF_FILE_ALIAS: VCF_FILE_ITEM_WITH_GENOME_BUILD}
+VCF_EXTRA_FILE_1 = "foo_bar.vcf.gz.tbi"
+VCF_EXTRA_FILE_2 = "foo_bar.vcf.gz.tbj"
+VCF_GZ_TBI_FILE_FORMAT = "/file-formats/vcf_gz_tbi/"
+VCF_FILE_ITEM_WITH_EXTRA_FILE_1 = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_EXTRA_FILE_1.update(
+    {
+        "extra_files": [
+            {"filename": VCF_EXTRA_FILE_1, "file_format": VCF_GZ_TBI_FILE_FORMAT},
+        ]
+    }
+)
+VCF_FILE_ITEM_WITH_EXTRA_FILE_2 = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_EXTRA_FILE_2.update(
+    {
+        "extra_files": [
+            {"filename": VCF_EXTRA_FILE_2, "file_format": VCF_GZ_TBI_FILE_FORMAT},
+        ]
+    }
+)
 FASTQ_FILE_NAME_1_R1 = "file_1_R1.fastq.gz"
 FASTQ_FILE_NAME_1_R2 = "file_1_R2.fastq.gz"
 FASTQ_FILE_NAME_UNMATCHED = "file_2_R1.fastq.gz"
@@ -110,6 +129,88 @@ VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS = copy.copy(VCF_ALIAS_TO_FILE_ITEM)
 VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS.update(FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS)
 PROBAND_BAM_SAMPLE_ID = "3464467-WGS-2"
 UNCLE_BAM_SAMPLE_ID = "3464460-WGS-1"
+
+
+def make_file_format_properties(
+    file_format, standard_file_extension, other_allowed_extensions=None,
+    extra_file_formats=None,
+):
+    """"""
+    properties = {
+        "@id": f"/file-formats/{file_format}/",
+        "file_format": file_format,
+        "standard_file_extension": standard_file_extension,
+    }
+    if other_allowed_extensions:
+        if isinstance(other_allowed_extensions, str):
+            other_allowed_extensions = [other_allowed_extensions]
+        properties["other_allowed_extensions"] = other_allowed_extensions
+    if extra_file_formats:
+        if isinstance(extra_file_formats, str):
+            extra_file_formats = [extra_file_formats]
+        extra_file_format_atids = []
+        for extra_file_format in extra_file_formats:
+            at_id = f"/file-formats/{extra_file_format}/"
+            extra_file_format_atids.append(
+                {"@id": at_id}
+            )
+        properties["extra_file_formats"] = extra_file_format_atids
+    return properties
+
+
+FASTQ_FILE_FORMAT = make_file_format_properties(
+    "fastq", "fastq.gz", other_allowed_extensions=".fq"
+)
+BAM_FILE_FORMAT = make_file_format_properties(
+    "bam", "bam", extra_file_formats=["bai", "fai"])
+BAI_FILE_FORMAT = make_file_format_properties("bai", "bai")
+FAI_FILE_FORMAT = make_file_format_properties(
+    "fai", "fai", other_allowed_extensions=["fam", "fan"]
+)
+FILE_FORMATS = [FASTQ_FILE_FORMAT, BAM_FILE_FORMAT]
+EXTRA_FILE_FORMATS = [BAI_FILE_FORMAT, FAI_FILE_FORMAT]
+FILE_FORMAT_ATIDS_TO_ITEMS = {
+    item["@id"]: item for item in FILE_FORMATS
+}
+EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS = {
+    item["@id"]: item for item in EXTRA_FILE_FORMATS
+}
+PRIMARY_TO_EXTRA_FILE_FORMATS = {
+    item["@id"]: [
+        extra_file_format["@id"] for extra_file_format in item.get("extra_file_formats")
+    ]
+    for item in FILE_FORMATS if item.get("extra_file_formats")
+}
+FILES_TO_CHECK_EXTRA_FILES = {
+    "foo.bar": ([FAI_FILE_FORMAT["@id"]], "bar"),
+    "some_bam.bam": ([BAI_FILE_FORMAT["@id"], FAI_FILE_FORMAT["@id"]], "bam"),
+}
+FILE_NAMES_TO_ITEMS = {
+    "foo.bar": {"filename": "foo.bar"},
+    "some_bam.bam": {"filename": "some_bam.bam"},
+    "some_bam.fan": {"filename": "some_bam.fan"},
+}
+FILES_WITHOUT_FILE_FORMAT = {
+    "foo.fai": "foo.fai",
+    "foo.fan": "foo.fan",
+    "some_bam.bai": "some_bam.bai",
+}
+EXPECTED_FILE_NAMES_TO_ITEMS = {
+    "foo.bar": {
+        "filename": "foo.bar",
+        "extra_files": [
+            {"filename": "foo.fai", "file_format": FAI_FILE_FORMAT["@id"]},
+        ]
+    },
+    "some_bam.bam": {
+        "filename": "some_bam.bam",
+        "extra_files": [
+            {"filename": "some_bam.bai", "file_format": BAI_FILE_FORMAT["@id"]},
+            {"filename": "some_bam.fan", "file_format": FAI_FILE_FORMAT["@id"]},
+        ],
+    },
+}
+EXPECTED_FILES_WITHOUT_FILE_FORMAT = {"foo.fan": "foo.fan"}
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -1052,6 +1153,30 @@ class TestSubmittedFilesParser:
                 FASTQ_ALIASES_ERRORS,
                 2,
             ),
+            (
+                ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_1]),
+                None,
+                0,
+                [VCF_FILE_ITEM_WITH_EXTRA_FILE_1],
+                [VCF_FILE_ALIAS],
+                0,
+            ),
+            (
+                ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_2]),
+                None,
+                0,
+                [VCF_FILE_ITEM_WITH_EXTRA_FILE_2],
+                [VCF_FILE_ALIAS],
+                0,
+            ),
+            (
+                ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_1, VCF_EXTRA_FILE_2]),
+                None,
+                1,
+                [VCF_FILE_ITEM_WITH_EXTRA_FILE_1],
+                [VCF_FILE_ALIAS],
+                1,
+            ),
         ],
     )
     def test_extract_file_metadata(
@@ -1392,6 +1517,152 @@ class TestSubmittedFilesParser:
         """
         result = file_parser.make_expected_paired_end_2_name(file_name)
         assert result == expected
+
+    @pytest.mark.parametrize(
+        (
+            "files_to_check_extra_files,file_names_to_items,files_without_file_format,"
+            "expected_file_names_to_items,expected_files_without_file_format"
+        ),
+        [
+            ({}, {}, {}, {}, {}),
+            (FILES_TO_CHECK_EXTRA_FILES, copy.deepcopy(FILE_NAMES_TO_ITEMS),
+                copy.deepcopy(FILES_WITHOUT_FILE_FORMAT), EXPECTED_FILE_NAMES_TO_ITEMS,
+                EXPECTED_FILES_WITHOUT_FILE_FORMAT
+            ),
+        ]
+    )
+    def test_associate_extra_files(
+        self, file_parser, files_to_check_extra_files, file_names_to_items,
+        files_without_file_format, expected_file_names_to_items,
+        expected_files_without_file_format
+    ):
+        """"""
+        file_parser.extra_file_formats = EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS
+        file_parser.associate_extra_files(
+            files_to_check_extra_files, file_names_to_items, files_without_file_format
+        )
+        assert file_names_to_items == expected_file_names_to_items
+        assert files_without_file_format == expected_files_without_file_format
+
+    @pytest.mark.parametrize(
+        "file_item,extra_file_name,extra_file_format_atid,expected_extra_files",
+        [
+            (
+                {},
+                "foo.bar",
+                "some_atid",
+                [{"file_format": "some_atid", "filename": "foo.bar"}],
+            ),
+            (
+                {"extra_files": [{}]},
+                "foo.bar",
+                "some_atid",
+                [{}, {"file_format": "some_atid", "filename": "foo.bar"}],
+            ),
+        ]
+    )
+    def test_associate_file_with_extra_file(
+        self, file_parser, file_item, extra_file_name, extra_file_format_atid,
+        expected_extra_files
+    ):
+        """"""
+        file_parser.associate_file_with_extra_file(
+            file_item, extra_file_name, extra_file_format_atid
+        )
+        assert file_item.get("extra_files") == expected_extra_files
+
+    @pytest.mark.parametrize(
+        "extra_file_formats,file_name,file_suffix,file_format_atid,expected",
+        [
+            ({}, "", "", "", []),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_fastq.fastq.gz",
+                "fastq.gz",
+                FASTQ_FILE_FORMAT["@id"],
+                [],
+            ),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_bam.bam",
+                "bam",
+                BAM_FILE_FORMAT["@id"],
+                [],
+            ),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_bam.bam",
+                "bam",
+                [BAI_FILE_FORMAT["@id"], FAI_FILE_FORMAT["@id"]],
+                [
+                    (["some_bam.bai"], BAI_FILE_FORMAT["@id"]),
+                    (["some_bam.fai", "some_bam.fam", "some_bam.fan"], FAI_FILE_FORMAT["@id"]),
+                ],
+            ),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_bam.something.bam",
+                "bam",
+                [BAI_FILE_FORMAT["@id"], FAI_FILE_FORMAT["@id"]],
+                [
+                    (["some_bam.something.bai"], BAI_FILE_FORMAT["@id"]),
+                    (
+                        [
+                            "some_bam.something.fai",
+                            "some_bam.something.fam",
+                            "some_bam.something.fan",
+                        ],
+                        FAI_FILE_FORMAT["@id"]
+                    ),
+                ],
+            ),
+        ]
+    )
+    def test_generate_extra_file_names_with_formats(
+        self, file_parser, extra_file_formats,
+        file_name, file_suffix, file_format_atid, expected
+    ):
+        """"""
+        file_parser.extra_file_formats = extra_file_formats
+        result = file_parser.generate_extra_file_names_with_formats(
+            file_name, file_suffix, file_format_atid
+        )
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "file_name,suffix,expected",
+        [
+            ("", "", ""),
+            ("foo.bar", "", "foo.bar"),
+            ("foo.bar", "bar", "foo"),
+            ("foo.bar", ".bar", "foo"),
+            ("foo.bar.bar", "bar", "foo.bar"),
+            ("foo.bar.bar", "bar.bar", "foo"),
+        ]
+    )
+    def test_get_file_name_without_suffix(self, file_parser, file_name, suffix, expected):
+        """"""
+        result = file_parser.get_file_name_without_suffix(file_name, suffix)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "file_name,extension,expected",
+        [
+            ("", "", "."),
+            ("foo", "", "foo."),
+            ("", "bar", ".bar"),
+            ("foo", "bar", "foo.bar"),
+            ("foo.", "bar", "foo.bar"),
+            ("foo", ".bar", "foo.bar"),
+            ("foo.", ".bar", "foo.bar"),
+            ("fu.foo", "bar", "fu.foo.bar"),
+        ]
+    )
+    def test_make_file_name_for_extension(self, file_parser, file_name, extension, expected):
+        """"""
+        result = file_parser.make_file_name_for_extension(file_name, extension)
+        assert result == expected
+
 
 
 class TestPedigreeRow:

@@ -25,9 +25,28 @@
             "FileSubmitted"
         ],
         "standard_file_extension": "vcf.gz",
+        "extrafile_formats": [
+            "f84f1922-7f4e-4afc-922f-bec620969bf1"
+        ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "file_format": "vcf_gz",
         "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "date_created": "2020-08-19T02:37:43.305689+00:00",
+        "schema_version": "1"
+    },
+    {
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "description": "tabix index file of vcf, compressed",
+        "valid_item_types": [
+            "FileReference",
+            "FileProcessed"
+        ],
+        "standard_file_extension": "vcf.gz.tbi",
+        "other_allowed_extensions": ["vcf.gz.tbj"],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "file_format": "vcf_gz_tbi",
+        "uuid": "f84f1922-7f4e-4afc-922f-bec620969bf1",
         "date_created": "2020-08-19T02:37:43.305689+00:00",
         "schema_version": "1"
     }

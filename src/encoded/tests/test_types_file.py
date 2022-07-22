@@ -193,6 +193,7 @@ def test_validate_extra_files_extra_files_ok_patch_existing_extra_format(testapp
     res1 = testapp.post_json('/files-processed', processed_file_data, status=201)
     pfid = res1.json['@graph'][0]['@id']
     res2 = testapp.patch_json(pfid, {'extra_files': [extf]}, status=200)
+    import pdb; pdb.set_trace()
     assert not res2.json.get('errors')
 
 

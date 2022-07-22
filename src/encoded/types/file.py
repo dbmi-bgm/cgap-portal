@@ -317,7 +317,9 @@ class File(Item):
 
                 xfile['accession'] = properties.get('accession')
                 # just need a filename to trigger creation of credentials
-                xfile['filename'] = xfile['accession']
+                xfile_name = xfile.get("filename")
+                if xfile_name is None:
+                    xfile['filename'] = xfile['accession']
                 xfile['uuid'] = str(uuid)
                 # if not 'status' in xfile or not bool(xfile['status']):
                 #    xfile['status'] = properties.get('status')
