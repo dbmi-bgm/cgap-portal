@@ -121,9 +121,8 @@ export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
             ...originalColExtMap,
             /** Depends on temporary/unsaved state ... */
             "technical_review.assessment.call": {
-                "colTitle": "TechRev",
                 "minColumnWidth": 90,
-                "widthMap": { 'lg' : 110, 'md' : 100, 'sm' : 90 },
+                "widthMap": { 'lg' : 108, 'md' : 98, 'sm' : 90 },
                 "render": function(result, propsFromSearchTable){
                     const { uuid: vsUUID } = result;
                     const { rowNumber } = propsFromSearchTable;
@@ -139,8 +138,8 @@ export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
                 "disabled": false, // Is disabled:true by default in Schemas, so as to be hidden on search views not wrapped by SelectedItemsController.
                 "noSort": true,
                 "minColumnWidth": 36,
-                "widthMap": { 'lg' : 50, 'md' : 45, 'sm' : 36 },
-                "colTitle": <i className="icon icon-fw icon-book-medical fas"/>,
+                "widthMap": { 'lg' : 70, 'md' : 68, 'sm' : 68 },
+                "colTitle": "Move to Interpretation",
                 "render": function(result, props) {
                     return <VariantSampleSelectionCheckbox {...interpretationSelectionCommonProps} result={result} />;
                 }

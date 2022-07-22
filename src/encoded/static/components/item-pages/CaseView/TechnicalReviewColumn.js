@@ -407,10 +407,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
             ));
 
 
-        const recentlySavedAsterisk = <span className="text-warning position-absolute" data-tip="Recently saved and possibly not yet in search results">*</span>;
+        const recentlySavedAsterisk = <span className="text-warning position-absolute ml-n1" data-tip="Recently saved and possibly not yet in search results">*</span>;
 
         return (
-            <div className="w-100 d-flex align-items-center justify-content-around text-truncate py-1">
+            <div className="w-100 d-flex align-items-center justify-content-around py-1">
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
                     data-call="true" data-technical-review="true">
@@ -431,7 +431,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     { typeof lastSavedNoteText !== "undefined" ? recentlySavedAsterisk : null }
                     { typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ?
                         // Will be equal to null if saved text exists but unsaved text is blank (== will remove field upon save).
-                        <span className="text-danger text-700 position-absolute" data-tip="Note text has not been saved yet.">*</span>
+                        <span className="text-danger text-700 position-absolute ml-n1" data-tip="Note text has not been saved yet.">*</span>
                         : null }
                 </button>
 
@@ -661,7 +661,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
     );
 });
 
-
+/** Shown within NotePopoverContents */
 function NoteClassificationIndicator (props) {
     const { showCall, showClassification, showAsterisk } = props;
     return (
