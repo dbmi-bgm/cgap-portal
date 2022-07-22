@@ -19,17 +19,17 @@ export function IconCheckbox (props) {
         ...passProps
     } = props;
 
-    const iconCls = (
-        "icon"
-        + (iconCommonClassName ? " " + iconCommonClassName : "")
-        + " icon-" + (checked ? iconOn : iconOff)
-        + (disabled ? " text-muted" : checked ? " text-" + iconOnColor : " text-" + iconOffColor)
-    );
+    const iconClassList = ["icon"];
+    if (iconCommonClassName){
+        iconClassList.push(iconCommonClassName);
+    }
+    iconClassList.push("icon-" + (checked ? iconOn : iconOff));
+    iconClassList.push("text-" + (disabled ? "muted" : checked ? iconOnColor : iconOffColor));
 
     return (
         <label className={className}>
             <input {...passProps} {...{ type, checked, disabled }} className="d-none" />
-            <i className={iconCls}/>
+            <i className={iconClassList.join(" ")}/>
         </label>
     );
 }
