@@ -308,7 +308,8 @@ class AccessionRow:
 
     # Class constants
     ACCEPTED_GENOME_BUILDS = {
-        "GRCh37": ["19", "hg19", "grch37"],
+        "hg19": ["19", "hg19"],
+        "GRCh37": ["37", "grch37"],
         "GRCh38": ["38", "hg38", "grch38"],
     }
     FILE_SUBMITTED = "file_submitted"

@@ -349,6 +349,7 @@
             "description": "The genome assembly associated with the file",
             "type": "string",
             "enum": [
+                "hg19",
                 "GRCh37",
                 "GRCh38"
             ]

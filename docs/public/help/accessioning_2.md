@@ -101,7 +101,7 @@ As above, file names are recommended over full paths.
 
 **Genome Build**: The genome build applicable to all submitted files
 present under the **Files** and **Case Files** headers for the submission.
-- Valid options include: **GChR37**, **hg19**, **GChR38**, **hg38**.
+- Valid options include: **hg19**, **GRCh37**, **GRCh38**.
 - Since the value applies to all submitted files, please submit
 multiple times as required to match the genome build to the
 corresponding file names. For example, if submitting both FASTQ
