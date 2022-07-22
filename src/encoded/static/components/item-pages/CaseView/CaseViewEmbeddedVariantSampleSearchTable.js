@@ -110,7 +110,10 @@ export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
         ...passProps
     } = props;
 
-    // For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
+    /**
+     * For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
+     * @todo Potentially make this re-usable and part of shared-portal-components table, so any column can open popover easily.
+     */
     const [ openPopoverData, setOpenPopoverData ] = useState(null);
 
     const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, cacheUnsavedTechnicalReviewNoteTextForVSUUID, haveCaseEditPermission };
@@ -121,6 +124,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
             ...originalColExtMap,
             /** Depends on temporary/unsaved state ... */
             "technical_review.assessment.call": {
+                "disabled": false,
                 "minColumnWidth": 90,
                 "widthMap": { 'lg' : 108, 'md' : 98, 'sm' : 90 },
                 "render": function(result, propsFromSearchTable){
@@ -180,7 +184,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
 }
 
 
-
+/** @todo Potentially make this re-usable and part of shared-portal-components table */
 const TechnicalReviewPopoverOverlay = React.memo(function TechnicalReviewPopoverOverlay ({ openPopoverData, setOpenPopoverData }) {
     const {
         ref: openPopoverRef = null,

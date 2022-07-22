@@ -143,6 +143,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
             haveCaseEditPermission
         } = this.props;
 
+        if (typeof setOpenPopoverData !== "function") {
+            return false;
+        }
+
         const {
             uuid: vsUUID,
             technical_review: savedTechnicalReview,
@@ -193,6 +197,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
             // So are relying on haveCaseEditPermission and assume it is same permission for VariantSample.
             haveCaseEditPermission
         } = this.props;
+
+        if (typeof setOpenPopoverData !== "function") {
+            return false;
+        }
 
         const {
             uuid: vsUUID,
@@ -280,6 +288,10 @@ export class TechnicalReviewColumn extends React.PureComponent {
             project_technical_review: projectTechnicalReview
         } = result;
 
+        if (typeof setOpenPopoverData !== "function") {
+            return false;
+        }
+
         const projectTechnicalReviewInformation = this.memoized.projectTechnicalReviewInformation(projectTechnicalReview, lastSavedTechnicalReviewForResult || savedTechnicalReview);
 
         setOpenPopoverData((existingPopoverData) => {
@@ -310,21 +322,21 @@ export class TechnicalReviewColumn extends React.PureComponent {
     }
 
     render() {
-        const { result, lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult } = this.props;
+        const { result, lastSavedTechnicalReviewForResult, unsavedTechnicalReviewNoteTextForResult, setOpenPopoverData } = this.props;
 
         const {
             uuid: vsUUID,
-            variant: { ID } = {},
             technical_review: savedTechnicalReviewItem,
             project_technical_review: projectTechnicalReview
         } = result;
         const {
-            assessment: {
-                call: projectCall,
-                classification: projectClassification
-            } = {},
+            assessment: projectAssessment,
             note_text: projectNoteText
         } = projectTechnicalReview || {};
+        const {
+            call: projectCall,
+            classification: projectClassification
+        } = projectAssessment || {};
         const {
             assessment: savedTechnicalReviewAssessment,
             note_text: savedTechnicalReviewNoteText,
@@ -358,36 +370,36 @@ export class TechnicalReviewColumn extends React.PureComponent {
         //     )
         // );
 
+        const popoversDisabled = typeof setOpenPopoverData !== "function";
+
+        const showClassification = lastSavedAssessment ? lastSavedClassification
+            : projectTechnicalReview ? projectClassification
+                : savedTechnicalReviewItem ? savedClassification
+                    : null;
+
         // Green (success) if first option, else yellow/orange for the 'Present - with concerns' options
-        const callTrueIconColor = (
-            (
-                lastSavedCall === true
-                || (!lastSavedAssessment && projectCall === true)
-                || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true)
-                // If we want savedAssessment to take precedence over project, then:
-                // || (!lastSavedAssessment && savedCall === true)
-                // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true)
-            ) ? (
-                    (lastSavedAssessment && lastSavedClassification === "Present")
-                    || (!lastSavedAssessment && projectCall === true && projectClassification === "Present")
-                    || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true && savedClassification === "Present") ? "success"
-                    // If we want savedAssessment to take precedence over project, then:
-                    // || (!lastSavedAssessment && savedCall === true && savedClassification === "Present")
-                    // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true && projectClassification === "Present") ? "success"
-                        : "warning"
-                ) : "muted" // (savedCall === true ? "secondary" : "muted")
+        const isCallTrue = (
+            lastSavedCall === true
+            || (!lastSavedAssessment && projectCall === true)
+            || (!lastSavedAssessment && !projectTechnicalReview && savedCall === true)
+            // If we want savedAssessment to take precedence over project, then:
+            // || (!lastSavedAssessment && savedCall === true)
+            // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === true)
         );
 
-        const callFalseIconColor = (
-            (
-                (lastSavedCall === false)
-                || (!lastSavedAssessment && projectCall === false)
-                || (!lastSavedAssessment && !projectTechnicalReview && savedCall === false)
-                // If we want savedAssessment to take precedence over project, then:
-                // || (!lastSavedAssessment && savedCall === false)
-                // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === false)
-            ) ? "danger" : "muted" // (savedCall === false ? "secondary" : "muted")
+        const callTrueIconColor = isCallTrue ?
+            (showClassification === "Present" ? "success" : "warning")
+            : "muted";
+
+        const isCallFalse = (
+            (lastSavedCall === false)
+            || (!lastSavedAssessment && projectCall === false)
+            || (!lastSavedAssessment && !projectTechnicalReview && savedCall === false)
+            // If we want savedAssessment to take precedence over project, then:
+            // || (!lastSavedAssessment && savedCall === false)
+            // || (!lastSavedAssessment && !savedTechnicalReviewItem && projectCall === false)
         );
+        const callFalseIconColor = isCallFalse ? "danger" : "muted";
 
         const isNoteUnsaved = typeof unsavedTechnicalReviewNoteTextForResult !== "undefined";
 
@@ -395,15 +407,18 @@ export class TechnicalReviewColumn extends React.PureComponent {
         const callDateLastMade = lastSavedDateCallMade || savedDateCallMade || null;
         const isNotePotentiallyOutdated = noteTextDateLastEdited && callDateLastMade && noteTextDateLastEdited < callDateLastMade; //lastSavedAssessment && savedTechnicalReviewNoteText && typeof lastSavedNoteText === "undefined";
 
+        const showNoteText = (
+            unsavedTechnicalReviewNoteTextForResult
+            || (!isNoteUnsaved && lastSavedNoteText)
+            || (!isNoteUnsaved && typeof lastSavedNoteText === "undefined" && projectNoteText)
+            || (!isNoteUnsaved && typeof lastSavedNoteText === "undefined" && !projectTechnicalReview && savedTechnicalReviewNoteText)
+        );
+
         const notesIconCls = (
             "icon text-larger icon-fw icon-sticky-note " + (
                 isNotePotentiallyOutdated ? "far text-danger"
-                    : (
-                        unsavedTechnicalReviewNoteTextForResult
-                        || (!isNoteUnsaved && lastSavedNoteText)
-                        || (!isNoteUnsaved && typeof lastSavedNoteText === "undefined" && savedTechnicalReviewNoteText)
-                        || (!isNoteUnsaved && typeof lastSavedNoteText === "undefined" && !savedTechnicalReviewItem && projectNoteText)
-                    ) ? "fas text-secondary" : "far text-muted"
+                    : showNoteText ? "fas text-secondary"
+                        : "far text-muted"
             ));
 
 
@@ -413,20 +428,22 @@ export class TechnicalReviewColumn extends React.PureComponent {
             <div className="w-100 d-flex align-items-center justify-content-around py-1">
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownCall} ref={this.callTrueButtonRef}
-                    data-call="true" data-technical-review="true">
+                    data-call="true" data-technical-review="true" data-tip={isCallTrue ? showClassification : null} disabled={popoversDisabled && !isCallTrue}>
                     <i className={"icon text-larger icon-fw fas icon-check text-" + callTrueIconColor} />
                     {/* If was just saved or if was previously saved but now removed (in which case lastSavedAssessment exists but is equal to {}) */}
                     { lastSavedAssessment && (lastSavedCall === true || (typeof lastSavedCall === "undefined" && savedCall === true)) ? recentlySavedAsterisk : null }
                 </button>
 
                 <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenDropdownNoCall} ref={this.callFalseButtonRef}
-                    data-call="false" data-technical-review="true">
+                    data-call="false" data-technical-review="true" data-tip={isCallFalse ? showClassification : null} disabled={popoversDisabled && !isCallFalse}>
                     <i className={"icon text-larger icon-fw fas icon-times text-" + callFalseIconColor} />
                     { lastSavedAssessment && (lastSavedCall === false || (typeof lastSavedCall === "undefined" && savedCall === false)) ? recentlySavedAsterisk : null }
                 </button>
 
-                <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenNotesPopover} ref={this.notesButtonRef} data-technical-review="true">
-                    <i data-tip={isNotePotentiallyOutdated ? "This note is potentially outdated." : null} className={notesIconCls} />
+                <button type="button" className="btn btn-link p-0 text-decoration-none" onClick={this.handleOpenNotesPopover} ref={this.notesButtonRef}
+                    data-technical-review="true" data-html data-tip={isNotePotentiallyOutdated ? "<b>This note is potentially outdated:</b><br/>" + showNoteText : showNoteText}
+                    disabled={popoversDisabled && !showNoteText}>
+                    <i className={notesIconCls} />
                     {/* If was note_text just removed, then would === null. */}
                     { typeof lastSavedNoteText !== "undefined" ? recentlySavedAsterisk : null }
                     { typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ?
@@ -540,7 +557,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
     // Including if any, not just this one. Re-enable maybe later (?).
     const isSavedToProject = justSavedToProject || (projectTechnicalReview && !justRemovedFromProject);
     // If project technical review exists but was not set on this VariantSample, disable it for time being at least.
-    const textareaDisabled = propDisabled || isSavedToProject;
+    const textareaDisabled = propDisabled || isSavedToProject || typeof cacheUnsavedTechnicalReviewNoteTextForVSUUID !== "function" || typeof cacheSavedTechnicalReviewForVSUUID !== "function";
     const saveDisabled = textareaDisabled || typeof unsavedTechnicalReviewNoteTextForResult === "undefined";
 
 
@@ -1046,7 +1063,8 @@ class CallClassificationButton extends React.PureComponent {
             lastSavedTechnicalReviewForResult,
             highlightColorStyle = null,
             disabled: propDisabled = false,
-            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject }
+            projectTechnicalReviewInformation: { isTechnicalReviewSavedToProject, justSavedToProject, justRemovedFromProject },
+            cacheSavedTechnicalReviewForVSUUID
         } = this.props;
         const {
             uuid: vsUUID,
@@ -1096,6 +1114,7 @@ class CallClassificationButton extends React.PureComponent {
             propDisabled
             || noViewPermissions
             || (projectTechnicalReview && !isTechnicalReviewSavedToProject && !justSavedToProject && !justRemovedFromProject)
+            || typeof cacheSavedTechnicalReviewForVSUUID !== "function"
         );
 
         const isCurrentlySavedToProject = (isTechnicalReviewSavedToProject && !justRemovedFromProject) || justSavedToProject;
