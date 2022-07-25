@@ -904,9 +904,30 @@ class SubmittedFilesParser:
         """Initialize class and set attributes.
 
         :param virtualapp: App for requests
-        :type virtualapp: WebTest  # TODO: update
+        :type virtualapp: WebTest Testapp
         :param project_name: Project name for created Files
         :type project_name: str
+
+        :var virtualapp: App for requests
+        :vartype: WebTest Testapp
+        :var project_name: Project name used for the submission
+        :vartype project_name: str
+        :var errors: Errors across rows that don't need to be repeated
+        :vartype errors: list(str)
+        :var accepted_file_formats: FileFormats accepted for submission,
+            mapped @id to properties. Updated from None via
+            self.get_accepted_file_formats()
+        :vartype accepted_file_formats: dict or None
+        :var primary_to_extra_file_formats: Mapping of @ids from
+            FileFormats accepted for submission to their extra file
+            FileFormats
+        :vartype: primary_to_extra_file_formats: dict
+        :var unidentified_file_format: Whether a submitted file name
+            could not be associated with a suitable FileFormat
+        :vartype unidentified_file_format: bool
+        :var file_extensions_to_file_formats: Mapping of file
+            extensions to found FileFormat @ids
+        :vartype file_extensions_to_file_formats: dict
         """
         self.virtualapp = virtualapp
         self.project_name = project_name
@@ -1044,7 +1065,19 @@ class SubmittedFilesParser:
     def associate_extra_files(
         self, files_to_check_extra_files, file_names_to_items, files_without_file_format
     ):
-        """"""
+        """For files that accept extra files, find them and update the
+        metadata accordingly.
+
+        :param files_to_check_extra_files: Mapping of files accepting
+            extra files to possible extra file file formats and the
+            file's suffix
+        :type files_to_check_extra_files: dict
+        :param file_names_to_items: Mapping of files to properties
+        :type file_names_to_items: dict
+        :param files_without_file_format: Mapping of files without
+            associated file format to submitted file names
+        :type files_without_file_format: dict
+        """
         for (
             file_name, (extra_file_format_atids, file_suffix)
         ) in files_to_check_extra_files.items():
@@ -1076,7 +1109,20 @@ class SubmittedFilesParser:
     def generate_extra_file_names_with_formats(
         self, file_name, file_suffix, extra_file_format_atids
     ):
-        """"""
+        """For given file, create expected file names for given extra
+        file formats.
+
+        :param file_name: File name (without path info)
+        :type file_name: str
+        :param file_suffix: Suffix found for file
+        :type file_suffix: str
+        :param extra_file_format_atids: Possible extra file format @id
+            identifiers
+        :type extra_file_format_atids: list(str)
+        :returns: Expected file names and FileFormat @ids for all extra
+            files
+        :rtype: list(tuple(str, str))
+        """
         result = []
         base_file_name = self.get_file_name_without_suffix(file_name, file_suffix)
         for extra_file_format_atid in extra_file_format_atids:
@@ -1105,13 +1151,29 @@ class SubmittedFilesParser:
         return result
 
     def get_file_name_without_suffix(self, file_name, suffix):
-        """"""
+        """Remove suffix from file name.
+
+        :param file_name: File name (without path)
+        :type file_name: str
+        :param suffix: File suffix
+        :type suffix: str
+        :returns: File name without given suffix
+        :rtype: str
+        """
         suffix = suffix.lstrip(".")
         result = file_name.rstrip(suffix)
         return result.rstrip(".")
 
     def make_file_name_for_extension(self, base_file_name, extension):
-        """"""
+        """Add suffix to given file name.
+
+        :param base_file_name: File name stripped of accepted suffix
+        :type base_file_name: str
+        :param extension: Suffix to add
+        :type extension: str
+        :returns: File name with new suffix
+        :rtype: str
+        """
         base_file_name = base_file_name.rstrip(".")
         extension = extension.lstrip(".")
         return f"{base_file_name}.{extension}"
@@ -1119,16 +1181,43 @@ class SubmittedFilesParser:
     def associate_file_with_extra_file(
         self, file_item, extra_file_name, extra_file_format_atid
     ):
-        """"""
-        extra_file_properties = {
-            self.FILE_FORMAT: extra_file_format_atid,
-            self.FILE_NAME: extra_file_name,
-        }
-        existing_extra_files = file_item.get(self.EXTRA_FILES)
-        if existing_extra_files:
-            existing_extra_files.append(extra_file_properties)
-        else:
-            file_item[self.EXTRA_FILES] = [extra_file_properties]
+        """Update file properties with extra file metadata, if
+        required.
+
+        NOTE: PATCHing "extra_files" property does not overwrite the
+        existing property but adds the new extra file, so need to check
+        the item on the portal (if exists) and see if extra file
+        already exists before adding the extra file metadata.
+
+        :param file_item: File properties
+        :type file_item: dict
+        :param extra_file_name: Extra file name
+        :type extra_file_name: str
+        :param extra_file_format_atid: @id of FileFormat for extra file
+        :type extra_file_format_atid: str
+        """
+        patch_extra_file = True
+        file_alias = file_item.get(self.ALIASES, [""])[0]
+        existing_file_item = self.make_get_request(
+            file_alias, query_string="frame=object"
+        )
+        if existing_file_item:
+            existing_extra_files = existing_file_item.get(self.EXTRA_FILES, [])
+            for existing_extra_file in existing_extra_files:
+                existing_extra_file_format = existing_extra_file.get(self.FILE_FORMAT)
+                if existing_extra_file_format == extra_file_format_atid:
+                    patch_extra_file = False
+                    break
+        if patch_extra_file:
+            extra_file_properties = {
+                self.FILE_FORMAT: extra_file_format_atid,
+                self.FILE_NAME: extra_file_name,
+            }
+            existing_extra_files = file_item.get(self.EXTRA_FILES)
+            if existing_extra_files:
+                existing_extra_files.append(extra_file_properties)
+            else:
+                file_item[self.EXTRA_FILES] = [extra_file_properties]
 
     def parse_file_names(self, submitted_file_names):
         """Parse submitted file names.
@@ -1155,7 +1244,8 @@ class SubmittedFilesParser:
         return sorted(list(set(result)))
 
     def get_accepted_file_formats(self):
-        """Find all FileFormats acceptable for FileSubmitted items.
+        """Find all FileFormats acceptable for FileSubmitted items as
+        well as all FileFormats utilized for extra files.
 
         Only make this search request once and store as attribute.
 
@@ -1180,7 +1270,13 @@ class SubmittedFilesParser:
         return self.accepted_file_formats
 
     def update_extra_file_formats(self, extra_file_format_atids):
-        """"""
+        """Update attribute (self.extra_file_formats) with extra file
+        FileFormat properties, if not already present.
+
+        :param extra_file_format_atids: FileFormat @ids found for extra
+            files
+        :type extra_file_format_atid: list(str)
+        """
         for file_format_atid in extra_file_format_atids:
             extra_file_format = self.extra_file_formats.get(file_format_atid)
             if extra_file_format:
@@ -1189,7 +1285,16 @@ class SubmittedFilesParser:
             self.extra_file_formats[file_format_atid] = file_format_properties
 
     def associate_file_formats(self, primary_file_format_atid, extra_file_format_atids):
-        """"""
+        """Associate "primary" FileFormats with extra file FileFormats
+        via attribute (self.primary_to_extra_file_formats).
+
+        :param primary_file_format_atid: @id for FileFormat accepted
+            for "primary" file submission
+        :type primary_file_format_atid: str
+        :param extra_file_format_atids: @ids for FileFormats acceptable
+            for extra files for the "primary" FileFormat
+        :type extra_file_format_atids: list(str)
+        """
         existing_values = self.primary_to_extra_file_formats.get(
             primary_file_format_atid
         )
@@ -1215,8 +1320,9 @@ class SubmittedFilesParser:
 
         :param file_suffixes: Suffixes of submitted file name
         :type file_suffixes: list(str)
-        :returns: Valid matching FileFormat @id if unique match found
-        :rtype: str or None
+        :returns: Valid matching FileFormat @id, associated extra file
+            FileFormat @ids, and file extension
+        :rtype: tuple(str or None, set(str) or None, str or None)
         """
         file_format_atid = None
         extra_file_formats = None
@@ -1285,18 +1391,22 @@ class SubmittedFilesParser:
         """
         return self.make_get_request(query).get("@graph", [])
 
-    def make_get_request(self, url):
+    def make_get_request(self, url, query_string=None):
         """Make GET request.
 
         Follow response if re-directed, and handle response errors.
 
         :param url: URL to GET
         :type url: str
+        :param query_string: Query string add-on
+        :type query_string: str or None
         :returns: GET response
         :rtype: dict
         """
+        if not url.startswith("/"):
+            url = "/" + url
         try:
-            response = self.virtualapp.get(url, status=[200, 301])
+            response = self.virtualapp.get(url, params=query_string, status=[200, 301])
             if response.status_code == 301:
                 response = response.follow()
             result = response.json

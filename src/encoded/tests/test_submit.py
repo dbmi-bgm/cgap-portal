@@ -135,7 +135,7 @@ def make_file_format_properties(
     file_format, standard_file_extension, other_allowed_extensions=None,
     extra_file_formats=None,
 ):
-    """"""
+    """Make FileFormat properties for testing."""
     properties = {
         "@id": f"/file-formats/{file_format}/",
         "file_format": file_format,
@@ -1217,23 +1217,25 @@ class TestSubmittedFilesParser:
             ("foo,  foo , bar ,", ["foo", "bar"]),
         ]
     )
-    def test_get_file_names(self, file_parser, submitted_file_names, expected):
+    def test_parse_file_names(self, file_parser, submitted_file_names, expected):
         """Test parsing submitted file names."""
-        result = file_parser.get_file_names(submitted_file_names)
+        result = file_parser.parse_file_names(submitted_file_names)
         assert result == set(expected)
 
     @pytest.mark.parametrize(
         "accepted_file_formats,expected",
         [
-            ([], []),
+            ({}, []),
             (
-                [
-                    {"standard_file_extension": "foo.bar"},
-                    {
+                {
+                    "/file-formats/foo_bar/": {
+                        "standard_file_extension": "foo.bar"
+                    },
+                    "/file-formats/bar/": {
                         "standard_file_extension": "bar",
                         "other_allowed_extensions": ["foo", "bar", "foo.bar"],
                     },
-                ],
+                },
                 ["bar", "foo", "foo.bar"],
             ),
         ],
@@ -1259,37 +1261,37 @@ class TestSubmittedFilesParser:
         expected_file_formats = ["fastq", "vcf_gz"]
         result = file_parser_with_search.get_accepted_file_formats()
         assert len(result) == 2
-        for item in result:
+        for item in result.values():
             result_file_formats.append(item.get("file_format"))
         assert sorted(result_file_formats) == sorted(expected_file_formats)
 
     @pytest.mark.parametrize(
         "file_suffixes,return_values,expected_calls,expected",
         [
-            ([], [], [], None),
+            ([], [], [], (None, None, None)),
             (
                 [".foo"],
                 [[]],
                 ["foo"],
-                None,
+                (None, None, None),
             ),
             (
                 [".foo", ".bar"],
                 [[], [{"@id": "atid_1"}]],
                 ["foo.bar", "bar"],
-                "atid_1",
+                ("atid_1", ["extra_file_atid_1", "extra_file_atid_2"], "bar"),
             ),
             (
                 [".foo", ".bar"],
                 [[{"@id": "atid_1"}]],
                 ["foo.bar"],
-                "atid_1",
+                ("atid_1", ["extra_file_atid_1", "extra_file_atid_2"], "foo.bar"),
             ),
             (
                 [".foo", ".bar"],
                 [[{"@id": "atid_1"}, {"@id": "atid_2"}], []],
                 ["foo.bar"],
-                None,
+                (None, None, None),
             ),
         ],
     )
@@ -1304,6 +1306,9 @@ class TestSubmittedFilesParser:
         """Test iteratively matching file extensions to FileFormats with
         mocked search results.
         """
+        file_parser.primary_to_extra_file_formats = {
+            "atid_1": ["extra_file_atid_1", "extra_file_atid_2"]
+        }
         with mock.patch(
             "encoded.submit.SubmittedFilesParser.search_file_format_for_suffix",
             side_effect=return_values,
@@ -1353,14 +1358,23 @@ class TestSubmittedFilesParser:
         assert len(result) == expected_length
 
     @pytest.mark.workbook
-    def test_make_get_request(self, file_parser_with_search, wb_project):
+    def test_make_get_request(self, es_testapp, file_parser_with_search, wb_project):
         """Test GET request made with appropriate response following
         and error handling.
         """
-        get_result = file_parser_with_search.make_get_request(wb_project["@id"])
+        wb_project_atid = wb_project["@id"]
+
+        get_result = file_parser_with_search.make_get_request(wb_project_atid)
         for key, value in wb_project.items():
             result_value = get_result.get(key)
             assert result_value == value
+
+        query_params = "frame=object"
+        get_result = file_parser_with_search.make_get_request(
+            wb_project_atid, query_string=query_params
+        )
+        expected_result = es_testapp.get(wb_project_atid, params=query_params).json
+        assert get_result == expected_result
 
         url = "/search/?type=Project&uuid=" + wb_project["uuid"]
         get_result = file_parser_with_search.make_get_request(url)
@@ -1526,8 +1540,11 @@ class TestSubmittedFilesParser:
         ),
         [
             ({}, {}, {}, {}, {}),
-            (FILES_TO_CHECK_EXTRA_FILES, copy.deepcopy(FILE_NAMES_TO_ITEMS),
-                copy.deepcopy(FILES_WITHOUT_FILE_FORMAT), EXPECTED_FILE_NAMES_TO_ITEMS,
+            (
+                FILES_TO_CHECK_EXTRA_FILES,
+                copy.deepcopy(FILE_NAMES_TO_ITEMS),
+                copy.deepcopy(FILES_WITHOUT_FILE_FORMAT),
+                EXPECTED_FILE_NAMES_TO_ITEMS,
                 EXPECTED_FILES_WITHOUT_FILE_FORMAT
             ),
         ]
@@ -1537,7 +1554,7 @@ class TestSubmittedFilesParser:
         files_without_file_format, expected_file_names_to_items,
         expected_files_without_file_format
     ):
-        """"""
+        """Test associating "primary" to extra file FileFormats."""
         file_parser.extra_file_formats = EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS
         file_parser.associate_extra_files(
             files_to_check_extra_files, file_names_to_items, files_without_file_format
@@ -1546,31 +1563,60 @@ class TestSubmittedFilesParser:
         assert files_without_file_format == expected_files_without_file_format
 
     @pytest.mark.parametrize(
-        "file_item,extra_file_name,extra_file_format_atid,expected_extra_files",
+        (
+            "file_item,existing_item_properties,extra_file_name,extra_file_format_atid,"
+            "expected_extra_files"
+        ),
         [
             (
                 {},
+                None,
                 "foo.bar",
                 "some_atid",
                 [{"file_format": "some_atid", "filename": "foo.bar"}],
             ),
             (
                 {"extra_files": [{}]},
+                None,
                 "foo.bar",
                 "some_atid",
                 [{}, {"file_format": "some_atid", "filename": "foo.bar"}],
             ),
+            (
+                {},
+                {"extra_files": [{"file_format": "some_atid"}]},
+                "foo.bar",
+                "some_atid",
+                None,
+            ),
+            (
+                {},
+                {"extra_files": [{"file_format": "some_atid"}]},
+                "foo.bar",
+                "some_other_atid",
+                [{"file_format": "some_other_atid", "filename": "foo.bar"}],
+            ),
         ]
     )
     def test_associate_file_with_extra_file(
-        self, file_parser, file_item, extra_file_name, extra_file_format_atid,
+        self,
+        file_parser,
+        file_item,
+        existing_item_properties,
+        extra_file_name,
+        extra_file_format_atid,
         expected_extra_files
     ):
-        """"""
-        file_parser.associate_file_with_extra_file(
-            file_item, extra_file_name, extra_file_format_atid
-        )
-        assert file_item.get("extra_files") == expected_extra_files
+        """Test adding extra file metadata to file properties"""
+        with mock.patch(
+            "encoded.submit.SubmittedFilesParser.make_get_request",
+            return_value=existing_item_properties,
+        ) as mock_make_get_request:
+            file_parser.associate_file_with_extra_file(
+                file_item, extra_file_name, extra_file_format_atid
+            )
+            assert file_item.get("extra_files") == expected_extra_files
+            mock_make_get_request.assert_called_once()
 
     @pytest.mark.parametrize(
         "extra_file_formats,file_name,file_suffix,file_format_atid,expected",
@@ -1623,7 +1669,9 @@ class TestSubmittedFilesParser:
         self, file_parser, extra_file_formats,
         file_name, file_suffix, file_format_atid, expected
     ):
-        """"""
+        """Test making possible extra file names from a given file
+        name and FileFormat.
+        """
         file_parser.extra_file_formats = extra_file_formats
         result = file_parser.generate_extra_file_names_with_formats(
             file_name, file_suffix, file_format_atid
@@ -1642,7 +1690,7 @@ class TestSubmittedFilesParser:
         ]
     )
     def test_get_file_name_without_suffix(self, file_parser, file_name, suffix, expected):
-        """"""
+        """Test removing given suffix from file name."""
         result = file_parser.get_file_name_without_suffix(file_name, suffix)
         assert result == expected
 
@@ -1660,7 +1708,7 @@ class TestSubmittedFilesParser:
         ]
     )
     def test_make_file_name_for_extension(self, file_parser, file_name, extension, expected):
-        """"""
+        """Test make new file name from given name and extension."""
         result = file_parser.make_file_name_for_extension(file_name, extension)
         assert result == expected
 
