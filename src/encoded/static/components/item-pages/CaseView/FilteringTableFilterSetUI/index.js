@@ -274,16 +274,18 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
         if (isActiveDotRouterTab) {
             aboveTableControls = (
                 <React.Fragment>
-                    <div className="filtering-tab-table-controls pb-08 row">
-                        <div className="col-12 col-md-auto">
-                            <h5 className="text-600">Interpretation</h5>
-                            { selectedVariantSamples instanceof Map ?
+                    { selectedVariantSamples instanceof Map ?
+                        <div className="filtering-tab-table-controls pb-08 row align-items-center mt-12">
+                            <div className="col-12 col-md col text-md-right pr-md-0">
+                                <h5 className="text-600">Move to Interpretation</h5>
+                            </div>
+                            <div className="col-12 col-md-auto">
                                 <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
                                     intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
-                                    isEditDisabled, haveCaseEditPermission }} />
-                                : null }
+                                    isEditDisabled, haveCaseEditPermission }} width={200} />
+                            </div>
                         </div>
-                    </div>
+                        : null }
                     <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
                         <div className="col-12 col-lg-4 py-2">
                             <SearchBar context={searchContext} navigate={virtualNavigate} {...{ isContextLoading }}
