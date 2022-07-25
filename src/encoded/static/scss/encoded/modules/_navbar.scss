@@ -225,7 +225,7 @@ div#top-nav.navbar-fixed-top {
             margin-right: 0;
 
             @include navbar-fixed-position { // = md
-                min-width: 210px;
+                min-width: 215px;
             }
 
             @include navbar-static-position { // Unsure if needed
@@ -237,8 +237,8 @@ div#top-nav.navbar-fixed-top {
                 line-height: 1;
                 position: relative;
                 height: 100%;
-                padding-right: 20px;
-                padding-left: 20px;
+                padding-right: 16px;
+                padding-left: 16px;
                 max-height: inherit;
                 background-color: transparent;
 
