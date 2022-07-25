@@ -30,7 +30,7 @@ export const SvSampleTabBody = (props) => {
                     <div className="info-header-title">
                         <h4>
                             Structural Variant - Caller Properties (Manta)
-                            <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-1.html#manta" rel="noopener noreferrer" target="_blank"
+                            <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/overview-SV_germline.html" rel="noopener noreferrer" target="_blank"
                                 className="px-1" data-tip="View Manta Documentation">
                                 <i className="icon icon-external-link-alt fas ml-07 text-small"/>
                             </a>
