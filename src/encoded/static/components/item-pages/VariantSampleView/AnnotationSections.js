@@ -466,7 +466,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
 /**
  * Takes in a potentially falsy (0) string or number value and if actually not present, returns fallback
  */
-function falsyZeroCheck(value, fallback) {
+export function falsyZeroCheck(value, fallback) {
     if (value || value === "0" || value === 0) {
         return value;
     }

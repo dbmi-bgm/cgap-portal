@@ -3,6 +3,7 @@
 import React from 'react';
 import { getInitialTranscriptIndex, getMostSevereConsequence } from '../item-pages/VariantSampleView/AnnotationSections';
 import { onClickLinkNavigateChildWindow } from '../item-pages/components/child-window-controls';
+import { TechnicalReviewColumn } from './../item-pages/CaseView/TechnicalReviewColumn';
 
 /**
  * This gets merged into the columnExtensionMap.js.
@@ -150,6 +151,20 @@ export const variantSampleColumnExtensionMap = {
                 return null;
             }
             return <BAMSnapshotColumn {...{ result }} />;
+        }
+    },
+    /**
+     * This is overriden in CaseViewEmbeddedVariantSampleSearchTableBase with render function that provides props for interactive features.
+     * This version is _read-only_.
+     */
+    "technical_review.assessment.call": {
+        "disabled": false,
+        "minColumnWidth": 90,
+        "widthMap": { 'lg' : 108, 'md' : 98, 'sm' : 90 },
+        "render": function(result, propsFromSearchTable){
+            return (
+                <TechnicalReviewColumn {...{ result }} />
+            );
         }
     }
 };

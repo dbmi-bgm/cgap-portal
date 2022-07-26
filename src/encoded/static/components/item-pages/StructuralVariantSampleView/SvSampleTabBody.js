@@ -4,7 +4,7 @@ import React from 'react';
 import _ from 'underscore';
 import { schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { shortenToSignificantDigits } from '../VariantSampleView/AnnotationSections';
-
+import { falsyZeroCheck } from '../VariantSampleView/AnnotationSections';
 
 export const SvSampleTabBody = (props) => {
     const { context = {}, schemas } = props;
@@ -13,6 +13,7 @@ export const SvSampleTabBody = (props) => {
         if (!schemas) return null;
         const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
 
+        console.log("schemaProperty", schemaProperty);
         if (!nestedField) {
             return (schemaProperty || {}).description || null;
         }
@@ -28,7 +29,13 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>Manta - Caller Properties</h4>
+                        <h4>
+                            Structural Variant - Caller Properties (Manta)
+                            <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/overview-SV_germline.html" rel="noopener noreferrer" target="_blank"
+                                className="px-1" data-tip="View Manta Documentation">
+                                <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                            </a>
+                        </h4>
                     </div>
                     <div className="info-body">
                         <SvMantaTable {...{ context, getTipForField }} />
@@ -38,7 +45,13 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>BIC-seq2 - Caller Properties</h4>
+                        <h4>
+                            Copy Number Variant - Caller Properties (BicSeq2)
+                            <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/CNV_germline/overview-CNV_germline.html" rel="noopener noreferrer" target="_blank"
+                                className="px-1" data-tip="View BIC-seq2 Documentation">
+                                <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                            </a>
+                        </h4>
                     </div>
                     <div className="info-body">
                         <SvBicSeqTable {...{ context, getTipForField }} />
@@ -48,7 +61,7 @@ export const SvSampleTabBody = (props) => {
             <div className="row flex-column flex-lg-row">
                 <div className="inner-card-section col mt-2 pb-2 pb-lg-0">
                     <div className="info-header-title">
-                        <h4>Genotype</h4>
+                        <h4>Genotype Information</h4>
                     </div>
                     <div className="info-body">
                         <GenotypeQualityTable {...{ context, getTipForField }} />
@@ -66,7 +79,12 @@ function SvMantaTable(props) {
             callers = [],
             confidence_interval_start = [],
             confidence_interval_end = [],
-            imprecise = null
+            imprecise = null,
+            quality_score: qualityScore = null,
+            reference_split_reads,
+            alternate_split_reads,
+            reference_paired_reads,
+            alternate_paired_reads
         } = {},
         getTipForField
     } = props;
@@ -85,7 +103,7 @@ function SvMantaTable(props) {
             <table className="w-100">
                 <thead>
                     <tr>
-                        <th className="text-left" style={{ width: "325px" }}>Quality</th>
+                        <th className="text-left" style={{ width: "385px" }}>Quality</th>
                         <th className="text-left">Value</th>
                         <th className="text-left">Definition</th>
                     </tr>
@@ -105,6 +123,31 @@ function SvMantaTable(props) {
                         <td className="text-600 text-left">Confidence interval around right breakpoint</td>
                         <td className="text-left">{endExists ? confidence_interval_end.join(", "): fallbackElem}</td>
                         <td className="text-left">{ getTipForField("confidence_interval_end", "StructuralVariantSample", "items") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of split reads supporting the alternative allele</td>
+                        <td className="text-left">{ falsyZeroCheck(alternate_split_reads, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("alternate_split_reads", "StructuralVariantSample") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of split reads supporting the reference allele</td>
+                        <td className="text-left">{ falsyZeroCheck(reference_split_reads, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("reference_split_reads", "StructuralVariantSample") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of spanning reads supporting the alternative allele</td>
+                        <td className="text-left">{ falsyZeroCheck(alternate_paired_reads, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("alternate_paired_reads", "StructuralVariantSample") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Number of spanning reads supporting the reference allele</td>
+                        <td className="text-left">{ falsyZeroCheck(reference_paired_reads, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("reference_paired_reads", "StructuralVariantSample") }</td>
+                    </tr>
+                    <tr>
+                        <td className="text-600 text-left">Manta Quality Score</td>
+                        <td className="text-left">{ falsyZeroCheck(qualityScore, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("quality_score", "StructuralVariantSample") }</td>
                     </tr>
                 </tbody>
             </table>
