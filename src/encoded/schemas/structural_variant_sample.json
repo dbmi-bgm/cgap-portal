@@ -302,6 +302,8 @@
             "title": "Paired Read Support",
             "type": "array",
             "field_name": "paired_reads",
+            "minItems": 2,
+            "maxItems": 2,
             "items": {
                 "title": "Paired Read Support",
                 "field_name": "paired_reads",
@@ -390,6 +392,8 @@
             "title": "Split Read Support",
             "type": "array",
             "field_name": "split_reads",
+            "minItems": 2,
+            "maxItems": 2,
             "items": {
                 "title": "Split Read Support",
                 "field_name": "split_reads",

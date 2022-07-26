@@ -445,10 +445,9 @@ class StructuralVariantSample(Item):
             for tr_uuid in structural_variant.get("technical_reviews", []):
                 # frame=object returns linkTos in form of @id, frame=raw returns them in form of UUID.
                 technical_review = get_item_or_none(request, tr_uuid, 'NoteTechnicalReview', frame='object')
-                if technical_review.get("project") == project: # Comparing @IDs
+                if technical_review.get("project") == project:  # Comparing @IDs
                     return tr_uuid
         return None
-
 
     @calculated_property(
         schema={
@@ -636,6 +635,54 @@ class StructuralVariantSample(Item):
                 new_labels[role_key] = " ".join(label)  # just in case
 
         return new_labels
+
+    @calculated_property(
+        schema={
+            "title": "Reference Split Read Support",
+            "description": "Split reads where P(ref allele|read)>0.999",
+            "type": "integer",
+        }
+    )
+    def reference_split_reads(self, split_reads=None):
+        """Get reference split reads (1st item in split_reads)."""
+        if isinstance(split_reads, list) and len(split_reads) == 2:
+            return split_reads[0]
+
+    @calculated_property(
+        schema={
+            "title": "Alternate split Read Support",
+            "description": "Split reads where P(alt allele|read)>0.999",
+            "type": "integer",
+        }
+    )
+    def alternate_split_reads(self, split_reads=None):
+        """Get alternate split reads (2nd item in split_reads)."""
+        if isinstance(split_reads, list) and len(split_reads) == 2:
+            return split_reads[1]
+
+    @calculated_property(
+        schema={
+            "title": "Reference Paired Read Support",
+            "description": "Read pairs mapping consistent with reference allele",
+            "type": "integer",
+        }
+    )
+    def reference_paired_reads(self, paired_reads=None):
+        """Get reference paired reads (1st item in paired_reads)."""
+        if isinstance(paired_reads, list) and len(paired_reads) == 2:
+            return paired_reads[0]
+
+    @calculated_property(
+        schema={
+            "title": "Alternate Paired Read Support",
+            "description": "Read pairs mapping consistent with alternate allele",
+            "type": "integer",
+        }
+    )
+    def alternate_paired_reads(self, paired_reads=None):
+        """Get alternate paired reads (2nd item in paired_reads)."""
+        if isinstance(paired_reads, list) and len(paired_reads) == 2:
+            return paired_reads[1]
 
 
 @view_config(
