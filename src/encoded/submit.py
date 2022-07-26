@@ -7,12 +7,15 @@ from pathlib import PurePath
 from urllib import parse
 
 import openpyxl
-from dcicutils.lang_utils import n_of
+import structlog
+from dcicutils.lang_utils import conjoined_list, n_of
 from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
 
 from .util import s3_local_file
 
+
+log = structlog.getLogger(__name__)
 
 GENERIC_FIELD_MAPPINGS = {  # for spreadsheet column names that are different from schema property names
     'individual': {
@@ -537,13 +540,10 @@ class AccessionRow:
                     break
             if result is None:
                 msg = (
-                    "Row %s - Invalid genome build provided: %s. Consider replacing"
-                    " with one of the following: %s."
-                    % (
-                        self.row,
-                        submitted_genome_build,
-                        ", ".join(self.ACCEPTED_GENOME_BUILDS.keys()),
-                    )
+                    f"Row {self.row} - Invalid genome build provided:"
+                    f" {submitted_genome_build}. Consider replacing with one of the"
+                    f" following:"
+                    f" {conjoined_list(self.ACCEPTED_GENOME_BUILDS.keys(), oxford_comma=True)}."
                 )
                 self.errors.append(msg)
         return result
@@ -721,14 +721,12 @@ class AccessionMetadata:
                 new_property_value = sp_item.metadata.get(field)
                 if new_property_value:
                     existing_property_value = self.sample_processings[sp_item.alias].get(field)
-                    if (
-                        existing_property_value
-                        and new_property_value != existing_property_value
-                    ):
-                        existing_property_value += [
-                            value for value in new_property_value
-                            if value not in existing_property_value
-                        ]
+                    if existing_property_value:
+                        if existing_property_value != existing_property_value:
+                            existing_property_value += [
+                                value for value in new_property_value
+                                if value not in existing_property_value
+                            ]
                     else:
                         self.sample_processings[sp_item.alias][field] = new_property_value
         else:
@@ -964,9 +962,9 @@ class SubmittedFilesParser:
         if multiple_file_formats:
             msg = (
                 "Could not identify a unique file format for the following file"
-                " extensions: %s. Please report this error to the CGAP team for"
-                "assistance: %s."
-                % (", ".join(multiple_file_formats.keys()), multiple_file_formats)
+                f" extensions: {conjoined_list(multiple_file_formats.keys())}."
+                f" Please report this error to the CGAP team for assistance:"
+                f" {multiple_file_formats}."
             )
             self.errors.append(msg)
 
@@ -1032,32 +1030,31 @@ class SubmittedFilesParser:
             invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(fastq_files)
             if invalid_fastq_names:
                 msg = (
-                    "Row %s - Invalid FASTQ file name(s) found: %s. FASTQ file names"
-                    " must contain read information; see documentation for details."
-                    % (row_index, ", ".join(invalid_fastq_names))
+                    f"Row {row_index} - Invalid FASTQ file name(s) found:"
+                    f" {conjoined_list(invalid_fastq_names)}. FASTQ file names"
+                    f" must contain read information; see documentation for details."
                 )
                 errors.append(msg)
             if unpaired_fastqs:
                 msg = (
-                    "Row %s - No matched pair-end file found for FASTQ file name(s): %s."
-                    " Matched FASTQ file names must differ only in the read number."
-                    % (row_index, ", ".join(unpaired_fastqs))
+                    f"Row {row_index} - No matched pair-end file found for FASTQ file"
+                    f" name(s): {conjoined_list(unpaired_fastqs)}."
+                    f" Matched FASTQ file names must differ only in the read number."
                 )
                 errors.append(msg)
         if files_without_file_format:
             if self.unidentified_file_format is False:
                 accepted_file_extensions = self.get_accepted_file_extensions()
                 msg = (
-                    "Unable to identify at least 1 file extension on this submission."
-                    " The following extensions are currently accepted: %s."
-                    % ", ".join(accepted_file_extensions)
+                    f"Unable to identify at least 1 file extension on this submission."
+                    f" The following extensions are currently accepted:"
+                    f" {conjoined_list(accepted_file_extensions)}."
                 )
                 self.errors.append(msg)
                 self.unidentified_file_format = True
             msg = (
-                "Row %s - Invalid file extensions provided for the following file"
-                " name(s): %s."
-                % (row_index, ", ".join(files_without_file_format.keys()))
+                f"Row {row_index} - Invalid file extensions provided for the following"
+                f" file name(s): {conjoined_list(files_without_file_format.keys())}."
             )
             errors.append(msg)
         return file_items, file_aliases, errors
@@ -1083,7 +1080,12 @@ class SubmittedFilesParser:
         ) in files_to_check_extra_files.items():
             file_properties = file_names_to_items.get(file_name)
             if not file_properties:
-                # log
+                log.warning(
+                    f"Cannot match a file to its extra files during submission."
+                    f" FileFormats may have recursive or nested chains of extra file"
+                    f" FileFormats. File name: {file_name}, file suffix: {file_suffix},"
+                    f" extra file FileFormat @ids: {extra_file_format_atids}."
+                )
                 continue
             extra_file_names_and_formats = self.generate_extra_file_names_with_formats(
                 file_name, file_suffix, extra_file_format_atids
@@ -1127,10 +1129,7 @@ class SubmittedFilesParser:
         base_file_name = self.get_file_name_without_suffix(file_name, file_suffix)
         for extra_file_format_atid in extra_file_format_atids:
             file_names_for_extra_file_format = []
-            extra_file_format = self.extra_file_formats.get(extra_file_format_atid)
-            if not extra_file_format:
-                # log
-                continue
+            extra_file_format = self.extra_file_formats.get(extra_file_format_atid, {})
             extra_file_format_extension = extra_file_format.get(
                 self.STANDARD_FILE_EXTENSION
             )
@@ -1199,7 +1198,7 @@ class SubmittedFilesParser:
         patch_extra_file = True
         file_alias = file_item.get(self.ALIASES, [""])[0]
         existing_file_item = self.make_get_request(
-            file_alias, query_string="frame=object"
+            file_alias, query_string="frame=object", result_expected=False
         )
         if existing_file_item:
             existing_extra_files = existing_file_item.get(self.EXTRA_FILES, [])
@@ -1391,7 +1390,7 @@ class SubmittedFilesParser:
         """
         return self.make_get_request(query).get("@graph", [])
 
-    def make_get_request(self, url, query_string=None):
+    def make_get_request(self, url, query_string=None, result_expected=True):
         """Make GET request.
 
         Follow response if re-directed, and handle response errors.
@@ -1412,6 +1411,11 @@ class SubmittedFilesParser:
             result = response.json
         except (VirtualAppError, AppError):
             result = {}
+            if result_expected:
+                log.warning(
+                    f"GET request failed when a result was expected."
+                    f" URL: {url}, parameters: {query_string}."
+                )
         return result
 
     def validate_and_pair_fastqs(self, fastq_files):

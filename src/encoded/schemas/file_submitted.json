@@ -63,17 +63,6 @@
     "properties": {
         "schema_version": {
             "default": "1"
-        },
-        "file_classification": {
-            "title": "General Classification",
-            "type": "string",
-            "default": "raw file",
-            "exclude_from": [
-                "FFedit-create"
-            ],
-            "enum": [
-                "raw file"
-            ]
         }
     }
 }
