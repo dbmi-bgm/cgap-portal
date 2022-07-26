@@ -1538,7 +1538,7 @@ def get_spreadsheet_mappings(request = None):
             if isinstance(note_project_id, dict):
                 # We might get string OR @@embedded representation, e.g. if from search response.
                 note_project_id = note_project_id.get("@id")
-            if project_at_id == note["project"]:
+            if project_at_id == note_project_id:
                 return note
         return None
 
@@ -1583,7 +1583,7 @@ def get_spreadsheet_mappings(request = None):
         ("HGVSP",                                   "variant.genes.genes_most_severe_hgvsp",                        "HGVS pPos nomenclature"),
         ("dbSNP ID",                                "variant.ID",                                                   "dbSNP ID of variant"),
         ("Genes",                                   "variant.genes.genes_most_severe_gene.display_title",           "Gene symbol(s)"),
-        ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
+        # Not embedded ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
         # ONLY FOR variant.transcript.csq_canonical=true
         ("Canonical transcript ID",                 canonical_transcript_csq_feature,                               "Ensembl ID of canonical transcript of gene variant is in"),
         # ONLY FOR variant.transcript.csq_canonical=true; use `variant.transcript.csq_intron` if `variant.transcript.csq_exon` not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
