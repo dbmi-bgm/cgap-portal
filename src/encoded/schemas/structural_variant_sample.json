@@ -625,8 +625,7 @@
         },
         "confidence_class": {
             "title": "Call Confidence",
-            "order": 52,
-            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_confidence_class.html"
+            "order": 52
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
