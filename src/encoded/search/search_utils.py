@@ -363,8 +363,8 @@ def execute_search(*, es, query, index, from_, size, session_id=None):
     return es_results
 
 
-def make_search_subreq(request, path):
-    subreq = make_subrequest(request, path)
+def make_search_subreq(request, path, **kwargs):
+    subreq = make_subrequest(request, path, **kwargs)
     if hasattr(request, "_stats"):
         subreq._stats = request._stats
     subreq.registry = request.registry

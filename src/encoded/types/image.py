@@ -33,7 +33,7 @@ class Image(ItemWithAttachment, Item):
     def unique_keys(self, properties):
         """smth."""
         keys = super(Image, self).unique_keys(properties)
-        value = properties.get('attachment', {}).get('download')
+        value = properties.get("attachment", {}).get("download")
         if value:
             keys.setdefault('image:filename', []).append(value)
         return keys

@@ -15,6 +15,15 @@ def common_note_1_2_upgrade(value, system):
             value["date_approved"] += "+00:00"
 
 
+def common_note_2_3_upgrade(value, system):
+    """
+    Checks if "status" is "current", and if so, then sets "is_saved_to_project" to true.
+    We will likely use "status" :  "shared" and similar things in future, so adding explicit field.
+    """
+    if value.get("status") == "current":
+        value["is_saved_to_project"] = True
+
+
 
 @upgrade_step('note_discovery', '1', '2')
 def note_discovery_1_2(value, system):
@@ -27,3 +36,17 @@ def note_interpretation_1_2(value, system):
 @upgrade_step('note_standard', '1', '2')
 def note_standard_1_2(value, system):
     common_note_1_2_upgrade(value, system)
+
+
+
+@upgrade_step('note_discovery', '2', '3')
+def note_discovery_2_3(value, system):
+    common_note_2_3_upgrade(value, system)
+
+@upgrade_step('note_interpretation', '2', '3')
+def note_interpretation_2_3(value, system):
+    common_note_2_3_upgrade(value, system)
+
+@upgrade_step('note_standard', '2', '3')
+def note_standard_2_3(value, system):
+    common_note_2_3_upgrade(value, system)

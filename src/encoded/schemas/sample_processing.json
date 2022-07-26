@@ -40,6 +40,9 @@
         },
         {
             "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
         }
     ],
     "properties": {
