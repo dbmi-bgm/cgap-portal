@@ -357,7 +357,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
     const isPatchingPreset = patchingPresetResultUUID === presetFSUUID;
 
     // Separate from import (view) permission (which is implictly allowed for all presets here, else wouldnt have been returned from /search/?type=FilterSet request)
-    const haveEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
+    const havePresetFSEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
 
 
     // If in uneditable state (no save permissions, duplicate blocks, etc) then don't warn.
@@ -437,7 +437,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
             </a>
         );
 
-        if (haveEditPermission) {
+        if (havePresetFSEditPermission) {
 
             // We use user's project UUID for this --
             // People may browse Core Project and want to make it preset for their own

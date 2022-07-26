@@ -348,6 +348,11 @@
             "type": "string",
             "linkTo": "StructuralVariant"
         },
+        "technical_review": {
+            "title": "Technical Review",
+            "type": "string",
+            "linkTo": "NoteTechnicalReview"
+        },
         "variant_notes": {
             "title": "Variant Notes",
             "description": "Notes related to the relevant Variant",
@@ -370,11 +375,21 @@
         },
         "structural_variant.SV_TYPE": {
             "title": "Type",
-            "order": 20
+            "order": 20,
+            "widthMap": {
+                "lg": 120,
+                "md": 100,
+                "sm": 100
+            }
         },
         "structural_variant.size": {
             "title": "Size",
-            "order": 30
+            "order": 30,
+            "widthMap": {
+                "lg": 120,
+                "md": 100,
+                "sm": 100
+            }
         },
         "structural_variant.transcript.csq_gene.display_title": {
             "title": "Gene(s)",
@@ -411,6 +426,36 @@
                     "title": "Internal AF"
                 }
             ]
+        },
+        "sv_browser": {
+            "title": "SV/CNV Browser",
+            "order": 100,
+            "noSort": true
+        },
+        "technical_review.assessment.call": {
+            "title": "Technical Review",
+            "order": 200,
+            "sort_fields": [
+                {
+                    "field": "technical_review.assessment.call",
+                    "title": "Technical Review Call"
+                },
+                {
+                    "field": "technical_review.assessment.classification",
+                    "title": "Technical Review Classification"
+                },
+                {
+                    "field": "technical_review.assessment.date_call_made",
+                    "title": "Call Made Date"
+                }
+            ]
+        },
+        "interpretation_selection": {
+            "title": "Move to Interpretation",
+            "disabled": true,
+            "noSort": true,
+            "notes": "Becomes 'not disabled' only on CaseViewEmbeddedVariantSampleSearchTableBase",
+            "order": 230
         }
     },
     "facets": {

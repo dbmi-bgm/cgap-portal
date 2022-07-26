@@ -20,6 +20,7 @@ Building an Image
 ^^^^^^^^^^^^^^^^^
 
 NOTE: the following documentation is preserved for historical reasons in order to understand the build process.
+
 YOU SHOULD NOT BUILD PRODUCTION IMAGES LOCALLY. ALWAYS USE CODEBUILD.
 
 The production application configuration is in ``deploy/docker/production``. A description of all the relevant files follows.

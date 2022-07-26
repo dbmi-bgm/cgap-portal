@@ -7,6 +7,10 @@ from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_request
 from snovault.schema_utils import server_default
 from string import digits, ascii_uppercase
+from snovault import (
+    ROOT,
+    COLLECTIONS
+)
 
 
 ACCESSION_FACTORY = __name__ + ':accession_factory'
@@ -71,9 +75,35 @@ def accession(instance, subschema):
     raise AssertionError("Free accession not found in %d attempts" % ATTEMPTS)
 
 
+@server_default
+def userproject(instance, subschema):
+    user = get_user_resource()
+    if user == NO_DEFAULT:
+        return NO_DEFAULT
+    project_roles = user.properties.get("project_roles", [])
+    if len(project_roles) > 0:
+        return project_roles[0]["project"]
+    return NO_DEFAULT
+
+
+@server_default
+def userinstitution(instance, subschema):
+    user = get_user_resource()
+    if user == NO_DEFAULT:
+        return NO_DEFAULT
+    return user.properties.get("user_institution", NO_DEFAULT)
+
+
 def get_userid():
     """ Wrapper for the server_default 'userid' above so it is not called through SERVER_DEFAULTS in our code """
     return _userid()
+
+def get_user_resource():
+    request = get_current_request()
+    userid_found = _userid()
+    if userid_found == NO_DEFAULT:
+        return NO_DEFAULT
+    return request.registry[COLLECTIONS]['user'][userid_found]
 
 
 def get_now():
@@ -81,28 +111,37 @@ def get_now():
     return utc_now_str()
 
 
-def add_last_modified(properties, userid=None):
+def add_last_modified(properties, **kwargs):
     """
         Uses the above two functions to add the last_modified information to the item
         May have no effect
         Allow someone to override the request userid (none in this case) by passing in a different uuid
+        CONSIDER: `last_modified` (and `last_text_edited`) are not really 'server defaults' but rather system-managed fields.
     """
+
+    userid = kwargs.get("userid", None)
+    field_name_portion = kwargs.get("field_name_portion", "modified")
+
+    last_field_name = "last_" + field_name_portion  # => last_modified
+    by_field_name = field_name_portion + "_by"      # => modified_by
+    date_field_name = "date_" + field_name_portion  # => date_modified
+
     try:
         last_modified = {
-            'modified_by': get_userid(),
-            'date_modified': get_now(),
+            by_field_name: get_userid(),
+            date_field_name: get_now(),
         }
     except AttributeError:  # no request in scope ie: we are outside the core application.
         if userid:
             last_modified = {
-                'modified_by': userid,
-                'date_modified': get_now(),
+                by_field_name: userid,
+                date_field_name: get_now(),
             }
-            properties['last_modified'] = last_modified
+            properties[last_field_name] = last_modified
     else:
         # get_userid returns NO_DEFAULT if no userid
-        if last_modified['modified_by'] != NO_DEFAULT:
-            properties['last_modified'] = last_modified
+        if last_modified[by_field_name] != NO_DEFAULT:
+            properties[last_field_name] = last_modified
 
 
 #FDN_ACCESSION_FORMAT = (digits, digits, digits, ascii_uppercase, ascii_uppercase, ascii_uppercase)
