@@ -1619,21 +1619,21 @@ class TestSubmittedFilesParser:
             mock_make_get_request.assert_called_once()
 
     @pytest.mark.parametrize(
-        "extra_file_formats,file_name,file_suffix,file_format_atid,expected",
+        "extra_file_formats,file_name,file_suffix,file_format_atids,expected",
         [
-            ({}, "", "", "", []),
+            ({}, "", "", [], []),
             (
                 EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
                 "some_fastq.fastq.gz",
                 "fastq.gz",
-                FASTQ_FILE_FORMAT["@id"],
+                [FASTQ_FILE_FORMAT["@id"]],
                 [],
             ),
             (
                 EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
                 "some_bam.bam",
                 "bam",
-                BAM_FILE_FORMAT["@id"],
+                [BAM_FILE_FORMAT["@id"]],
                 [],
             ),
             (
@@ -1667,14 +1667,14 @@ class TestSubmittedFilesParser:
     )
     def test_generate_extra_file_names_with_formats(
         self, file_parser, extra_file_formats,
-        file_name, file_suffix, file_format_atid, expected
+        file_name, file_suffix, file_format_atids, expected
     ):
         """Test making possible extra file names from a given file
         name and FileFormat.
         """
         file_parser.extra_file_formats = extra_file_formats
         result = file_parser.generate_extra_file_names_with_formats(
-            file_name, file_suffix, file_format_atid
+            file_name, file_suffix, file_format_atids
         )
         assert result == expected
 

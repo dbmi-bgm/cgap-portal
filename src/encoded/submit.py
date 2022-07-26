@@ -543,7 +543,7 @@ class AccessionRow:
                     f"Row {self.row} - Invalid genome build provided:"
                     f" {submitted_genome_build}. Consider replacing with one of the"
                     f" following:"
-                    f" {conjoined_list(self.ACCEPTED_GENOME_BUILDS.keys(), oxford_comma=True)}."
+                    f" {conjoined_list(list(self.ACCEPTED_GENOME_BUILDS.keys()))}."
                 )
                 self.errors.append(msg)
         return result
@@ -722,7 +722,7 @@ class AccessionMetadata:
                 if new_property_value:
                     existing_property_value = self.sample_processings[sp_item.alias].get(field)
                     if existing_property_value:
-                        if existing_property_value != existing_property_value:
+                        if existing_property_value != new_property_value:
                             existing_property_value += [
                                 value for value in new_property_value
                                 if value not in existing_property_value
@@ -962,7 +962,7 @@ class SubmittedFilesParser:
         if multiple_file_formats:
             msg = (
                 "Could not identify a unique file format for the following file"
-                f" extensions: {conjoined_list(multiple_file_formats.keys())}."
+                f" extensions: {conjoined_list(list(multiple_file_formats.keys()))}."
                 f" Please report this error to the CGAP team for assistance:"
                 f" {multiple_file_formats}."
             )
@@ -1054,7 +1054,8 @@ class SubmittedFilesParser:
                 self.unidentified_file_format = True
             msg = (
                 f"Row {row_index} - Invalid file extensions provided for the following"
-                f" file name(s): {conjoined_list(files_without_file_format.keys())}."
+                f" file name(s):"
+                f" {conjoined_list(list(files_without_file_format.keys()))}."
             )
             errors.append(msg)
         return file_items, file_aliases, errors
@@ -1146,7 +1147,10 @@ class SubmittedFilesParser:
                 file_names_for_extra_file_format.append(
                     self.make_file_name_for_extension(base_file_name, extension)
                 )
-            result.append((file_names_for_extra_file_format, extra_file_format_atid))
+            if file_names_for_extra_file_format:
+                result.append(
+                    (file_names_for_extra_file_format, extra_file_format_atid)
+                )
         return result
 
     def get_file_name_without_suffix(self, file_name, suffix):
