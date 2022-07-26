@@ -136,13 +136,13 @@ function SvMantaTable(props) {
                     </tr>
                     <tr>
                         <td className="text-600 text-left">Number of spanning reads supporting the alternative allele</td>
-                        <td className="text-left">{ falsyZeroCheck(reference_paired_reads, fallbackElem)}</td>
-                        <td className="text-left">{ getTipForField("reference_paired_reads", "StructuralVariantSample") }</td>
+                        <td className="text-left">{ falsyZeroCheck(alternate_paired_reads, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("alternate_paired_reads", "StructuralVariantSample") }</td>
                     </tr>
                     <tr>
                         <td className="text-600 text-left">Number of spanning reads supporting the reference allele</td>
-                        <td className="text-left">{ falsyZeroCheck(alternate_paired_reads, fallbackElem)}</td>
-                        <td className="text-left">{ getTipForField("alternate_paired_reads", "StructuralVariantSample") }</td>
+                        <td className="text-left">{ falsyZeroCheck(reference_paired_reads, fallbackElem)}</td>
+                        <td className="text-left">{ getTipForField("reference_paired_reads", "StructuralVariantSample") }</td>
                     </tr>
                     <tr>
                         <td className="text-600 text-left">Manta Quality Score</td>
