@@ -39,6 +39,228 @@ TEST_PEDIGREE_WITH_ERRORS = (
     "src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx"
 )
 
+# for row counting tests (xls processing)
+BLANK_ROW_ACCESSION = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+HEADER_ROW_ACCESSION = [
+    "Unique Analysis ID*:",
+    "Analysis ID*:",
+    "Family ID:",
+    "Individual ID*:",
+    "Sex*:",
+    "Age:",
+    "Age Units:",
+    "Birth Year:",
+    "Relation to Proband*:",
+    "Specimen Type*:",
+    "Specimen ID*:",
+    "Report Required*:",
+    "Test Requested*:",
+    "Specimen Collection Date:",
+    "Sequencing Date:",
+    "Files:",
+]
+ERRONEOUS_ROW_1_ACCESSION = [
+    "Case1_Person1-1",
+    "",
+    "Fam1",
+    "Person1-1",
+    "M",
+    "20",
+    "year",
+    "",
+    "proband",
+    "peripheral blood",
+    "Specimen1-1",
+    "N",
+    "WGS",
+    "",
+    "",
+    "",
+]
+ERRONEOUS_ROW_2_ACCESSION = [
+    "Case1_Person1-2",
+    "Case1",
+    "Fam1",
+    "Person1-2",
+    "F",
+    "50",
+    "year",
+    "",
+    "mother",
+    "peripheral blood",
+    "Specimen1-2",
+    "N",
+    "WGS",
+    "",
+    "",
+    "",
+]
+CORRECT_ROW_ACCESSION = [
+    "Case1_Person1-1",
+    "Accession1",
+    "Fam1",
+    "Person1-1",
+    "M",
+    "20",
+    "year",
+    "",
+    "proband",
+    "peripheral blood",
+    "Specimen1-1",
+    "N",
+    "WGS",
+    "",
+    "",
+    "",
+]
+
+BLANK_BEFORE_HEADER = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+]
+BLANK_AFTER_HEADER = [
+    HEADER_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+]
+BLANK_BT_ROWS = [
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+]
+BLANK_BEFORE_HEADER_AND_BT_ROWS = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+]
+BLANK_AFTER_HEADER_AND_BT_ROWS = [
+    HEADER_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+]
+BLANK_AFTER_ROWS = [
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+]
+BLANK_COMBINATION = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+    BLANK_ROW_ACCESSION,
+]
+BLANK_NO_ERRORS = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    CORRECT_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+]
+
+BLANK_ROW_PEDIGREE = ["", "", "", "", "", "", "", "", "", "", ""]
+HEADER_ROW_PEDIGREE = [
+    "Family ID:",
+    "Individual ID",
+    "Mother ID",
+    "Father ID",
+    "Sex",
+    "HPO terms",
+    "MONDO terms",
+    "Proband",
+    "life status",
+    "deceased",
+    "infertile",
+]
+ERRONEOUS_ROW_1_PEDIGREE = [
+    "111",
+    "IND204",
+    "",
+    "",
+    "F",
+    "HP:00000821, HP:0000716",
+    "",
+    "N",
+    "alive & well",
+    "",
+    "",
+]
+ERRONEOUS_ROW_2_PEDIGREE = [
+    "111",
+    "IND206",
+    "",
+    "",
+    "F",
+    "HP:00000833, HP:0000722",
+    "",
+    "N",
+    "deceased",
+    "",
+    "",
+]
+CORRECT_ROW_PEDIGREE = ["111", "IND205", "", "", "M", "", "", "N", "deceased", "Y", ""]
+
+BLANK_BEFORE_HEADER_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+]
+BLANK_AFTER_HEADER_PED = [
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+]
+BLANK_BT_ROWS_PED = [
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+]
+BLANK_BEFORE_HEADER_AND_BT_ROWS_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+]
+BLANK_AFTER_HEADER_AND_BT_ROWS_PED = [
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+]
+BLANK_AFTER_ROWS_PED = [
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+]
+BLANK_COMBINATION_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+]
+BLANK_NO_ERRORS_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    CORRECT_ROW_PEDIGREE,
+]
+
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
 #       that could affect other tests, so I have marked this as requiring manual invocation until we
@@ -1820,134 +2042,6 @@ def test_xls_to_json_pedigree_errors(testapp, project, institution):
     assert success
 
 
-BLANK_ROW_ACCESSION = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
-HEADER_ROW_ACCESSION = [
-    "Unique Analysis ID*:",
-    "Analysis ID*:",
-    "Family ID:",
-    "Individual ID*:",
-    "Sex*:",
-    "Age:",
-    "Age Units:",
-    "Birth Year:",
-    "Relation to Proband*:",
-    "Specimen Type*:",
-    "Specimen ID*:",
-    "Report Required*:",
-    "Test Requested*:",
-    "Specimen Collection Date:",
-    "Sequencing Date:",
-    "Files:",
-]
-ERRONEOUS_ROW_1_ACCESSION = [
-    "Case1_Person1-1",
-    "",
-    "Fam1",
-    "Person1-1",
-    "M",
-    "20",
-    "year",
-    "",
-    "proband",
-    "peripheral blood",
-    "Specimen1-1",
-    "N",
-    "WGS",
-    "",
-    "",
-    "",
-]
-ERRONEOUS_ROW_2_ACCESSION = [
-    "Case1_Person1-2",
-    "Case1",
-    "Fam1",
-    "Person1-2",
-    "F",
-    "50",
-    "year",
-    "",
-    "mother",
-    "peripheral blood",
-    "Specimen1-2",
-    "N",
-    "WGS",
-    "",
-    "",
-    "",
-]
-CORRECT_ROW_ACCESSION = [
-    "Case1_Person1-1",
-    "Accession1",
-    "Fam1",
-    "Person1-1",
-    "M",
-    "20",
-    "year",
-    "",
-    "proband",
-    "peripheral blood",
-    "Specimen1-1",
-    "N",
-    "WGS",
-    "",
-    "",
-    "",
-]
-
-BLANK_BEFORE_HEADER = [
-    BLANK_ROW_ACCESSION,
-    HEADER_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-]
-BLANK_AFTER_HEADER = [
-    HEADER_ROW_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-]
-BLANK_BT_ROWS = [
-    HEADER_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_2_ACCESSION,
-]
-BLANK_BEFORE_HEADER_AND_BT_ROWS = [
-    BLANK_ROW_ACCESSION,
-    HEADER_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_2_ACCESSION,
-]
-BLANK_AFTER_HEADER_AND_BT_ROWS = [
-    HEADER_ROW_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_2_ACCESSION,
-]
-BLANK_AFTER_ROWS = [
-    HEADER_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    BLANK_ROW_ACCESSION,
-]
-BLANK_COMBINATION = [
-    BLANK_ROW_ACCESSION,
-    HEADER_ROW_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_1_ACCESSION,
-    BLANK_ROW_ACCESSION,
-    ERRONEOUS_ROW_2_ACCESSION,
-    BLANK_ROW_ACCESSION,
-]
-BLANK_NO_ERRORS = [
-    BLANK_ROW_ACCESSION,
-    HEADER_ROW_ACCESSION,
-    CORRECT_ROW_ACCESSION,
-    BLANK_ROW_ACCESSION,
-]
-
-
 @pytest.mark.parametrize(
     "digested_xlsx, expected_error_rows",
     [
@@ -1988,101 +2082,6 @@ def test_xls_to_json_accession_row_counting(
     for row_with_error in expected_error_rows:
         assert f"Row {str(row_with_error)}" in joined_errors
     assert success
-
-
-BLANK_ROW_PEDIGREE = ["", "", "", "", "", "", "", "", "", "", ""]
-HEADER_ROW_PEDIGREE = [
-    "Family ID:",
-    "Individual ID",
-    "Mother ID",
-    "Father ID",
-    "Sex",
-    "HPO terms",
-    "MONDO terms",
-    "Proband",
-    "life status",
-    "deceased",
-    "infertile",
-]
-ERRONEOUS_ROW_1_PEDIGREE = [
-    "111",
-    "IND204",
-    "",
-    "",
-    "F",
-    "HP:00000821, HP:0000716",
-    "",
-    "N",
-    "alive & well",
-    "",
-    "",
-]
-ERRONEOUS_ROW_2_PEDIGREE = [
-    "111",
-    "IND206",
-    "",
-    "",
-    "F",
-    "HP:00000833, HP:0000722",
-    "",
-    "N",
-    "deceased",
-    "",
-    "",
-]
-CORRECT_ROW_PEDIGREE = ["111", "IND205", "", "", "M", "", "", "N", "deceased", "Y", ""]
-
-BLANK_BEFORE_HEADER_PED = [
-    BLANK_ROW_PEDIGREE,
-    HEADER_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-]
-BLANK_AFTER_HEADER_PED = [
-    HEADER_ROW_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-]
-BLANK_BT_ROWS_PED = [
-    HEADER_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_2_PEDIGREE,
-]
-BLANK_BEFORE_HEADER_AND_BT_ROWS_PED = [
-    BLANK_ROW_PEDIGREE,
-    HEADER_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_2_PEDIGREE,
-]
-BLANK_AFTER_HEADER_AND_BT_ROWS_PED = [
-    HEADER_ROW_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_2_PEDIGREE,
-]
-BLANK_AFTER_ROWS_PED = [
-    HEADER_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-]
-BLANK_COMBINATION_PED = [
-    BLANK_ROW_PEDIGREE,
-    HEADER_ROW_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_1_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    ERRONEOUS_ROW_2_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-]
-BLANK_NO_ERRORS_PED = [
-    BLANK_ROW_PEDIGREE,
-    HEADER_ROW_PEDIGREE,
-    BLANK_ROW_PEDIGREE,
-    CORRECT_ROW_PEDIGREE,
-]
 
 
 @pytest.mark.parametrize(
