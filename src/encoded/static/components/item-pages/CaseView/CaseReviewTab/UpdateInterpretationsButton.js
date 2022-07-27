@@ -16,6 +16,12 @@ import { InnerTabToggle } from './../FilteringTab';
 
 export class UpdateInterpretationsButton extends React.Component {
 
+    /**
+     * @param {{ "@id": string }[]} existingReportVariantSamples - Report.variant_samples or Report.structural_variant_samples
+     * @param {{ "@id": string }} vslVariantSampleItems - `variant_sample_item` from VariantSampleList.variant_samples or VariantSampleList.structural_variant_samples
+     * @param {string} reportUUID - Current Report UUID to be assigned to Note.associated_items
+     * @param {Object<string, boolean>} sendToReportStore - Dictionary of Note UUIDs to be saved to report.
+     */
     static buildSaveToReportPatchPayloads (
         existingReportVariantSamples,
         vslVariantSampleItems,
@@ -31,6 +37,7 @@ export class UpdateInterpretationsButton extends React.Component {
         });
 
         // Added into all Note.associated_items[] which are sent to report to identify them as being part of report.
+        // TODO: Delete existing entry if any exists? Currently less of an issue since can't remove from Report..
         const newAssociatedItemEntry = { "item_type": "Report", "item_identifier": reportUUID };
 
         vslVariantSampleItems.forEach(function(variantSampleItem){
@@ -298,11 +305,11 @@ export class UpdateInterpretationsButton extends React.Component {
         const {
             notePayloads: snvNotePayloads,
             reportVariantSampleUUIDsToPatch: reportSNVUUIDList
-        } = SaveNotesToReportButton.buildSaveToReportPatchPayloads(reportVariantSamples, snvVSItems, reportUUID, sendToReportStore);
+        } = UpdateInterpretationsButton.buildSaveToReportPatchPayloads(reportVariantSamples, snvVSItems, reportUUID, sendToReportStore);
         const {
             notePayloads: cnvNotePayloads,
             reportVariantSampleUUIDsToPatch: reportCNVUUIDList
-        } = SaveNotesToReportButton.buildSaveToReportPatchPayloads(reportStructuralVariantSamples, cnvVSItems, reportUUID, sendToReportStore);
+        } = UpdateInterpretationsButton.buildSaveToReportPatchPayloads(reportStructuralVariantSamples, cnvVSItems, reportUUID, sendToReportStore);
 
         const allPayloads = snvNotePayloads.concat(cnvNotePayloads);
         let reportPayload = null;
@@ -353,6 +360,10 @@ export class UpdateInterpretationsButton extends React.Component {
             // TODO:
             // if (patchErrors.length > 0) {}
         });
+    }
+
+    saveFindings(){
+
     }
 
     handleClick(e) {
@@ -417,9 +428,12 @@ export class UpdateInterpretationsButton extends React.Component {
 
 
 function countVariantSamplesWithAnySelectionSize(variantSampleListItem, selectionStore){
-    const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
+    const {
+        variant_samples: snvVSObjects = [],
+        structural_variant_samples: cnvVSObjects = []
+    } = variantSampleListItem || {}; // Might not yet be loaded.
     let count = 0;
-    vsObjects.forEach(function({ variant_sample_item }){
+    snvVSObjects.concat(cnvVSObjects).forEach(function({ variant_sample_item }){
         if (_.any(getAllNotesFromVariantSample(variant_sample_item), function({ uuid }){ return selectionStore[uuid]; })) {
             count++;
         }
