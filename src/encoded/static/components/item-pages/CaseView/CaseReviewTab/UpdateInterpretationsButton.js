@@ -17,8 +17,8 @@ import { InnerTabToggle } from './../FilteringTab';
 export class UpdateInterpretationsButton extends React.Component {
 
     /**
-     * @param {{ "@id": string }[]} existingReportVariantSamples - Report.variant_samples or Report.structural_variant_samples
-     * @param {{ "@id": string }} vslVariantSampleItems - `variant_sample_item` from VariantSampleList.variant_samples or VariantSampleList.structural_variant_samples
+     * @param {{ "@id": string, uuid: string }[]} existingReportVariantSamples - Report.variant_samples or Report.structural_variant_samples
+     * @param {{ "@id": string, uuid: string }[]} vslVariantSampleItems - `variant_sample_item` from VariantSampleList.variant_samples or VariantSampleList.structural_variant_samples
      * @param {string} reportUUID - Current Report UUID to be assigned to Note.associated_items
      * @param {Object<string, boolean>} sendToReportStore - Dictionary of Note UUIDs to be saved to report.
      */
