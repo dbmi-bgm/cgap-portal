@@ -16,6 +16,7 @@ import { SearchBar } from './../../browse/SearchBar';
 import { AboveTableControlsBaseCGAP } from './../../browse/AboveTableControlsBaseCGAP';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
+import FeedbackButton from '../../item-pages/components/FeedbackButton';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -36,9 +37,12 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
         <React.Fragment>
 
             <div className="dashboard-header">
-                <div className="container-wide d-flex align-items-center">
-                    <i className="icon icon-fw icon-home fas mr-1" />
-                    <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
+                <div className="container-wide d-flex align-items-center justify-content-between">
+                    <div className="align-items-center d-flex">
+                        <i className="icon icon-fw icon-home fas mr-1" />
+                        <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
+                    </div>
+                    <FeedbackButton />
                 </div>
             </div>
 
