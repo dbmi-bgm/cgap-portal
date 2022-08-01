@@ -1,10 +1,18 @@
 'use strict';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useCallback } from 'react';
 import _ from 'underscore';
+// import url from 'url';
+import queryString from 'query-string';
+import ReactTooltip from 'react-tooltip';
+import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import Popover from 'react-bootstrap/esm/Popover';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+
 
 
 
@@ -269,4 +277,106 @@ export function AddToVariantSampleListButton(props){
             </button>
         );
     }
+}
+
+export function AddAllResultsToVariantSampleListButton (props) {
+    const {
+        selectedVariantSamples,
+        onSelectVariantSample,
+        onResetSelectedVariantSamples,
+        totalCount: totalSearchResultsCount = 0,
+        requestedCompoundFilterSet,
+        savedVariantSampleIDMap
+    } = props;
+
+    const [ isLoading, setIsLoading ] = useState(false);
+
+    // const totalSelectableCount = totalSearchResultsCount; // TODO: subtract already-in-VSL ones.
+    const selectedCount = selectedVariantSamples.size;
+
+    // const isAllSelected = selectedCount === totalSearchResultsCount && totalSearchResultsCount !== 0;
+
+    /**
+     * @todo
+     * Currently we save @ids in SPC SelectedItemsController.
+     * We could consider switching to UUIDs for performance (shorter strings).
+     * But would require some edits on 4DN also.
+     */
+    const performSearchRequest = useCallback(function(){
+        const { global_flags: origGlobalFlags = "" } = requestedCompoundFilterSet || {};
+        const globalURLParams = queryString.parse(origGlobalFlags);
+        delete globalURLParams.additional_facets;
+        globalURLParams.field = "uuid";
+
+        // TODO: Handle technical_review OR project_technical_review.
+        // if (intKey === 1) {
+        //     globalURLParams.technical_review.call ...
+        // }
+
+        // Compound Search endpoint supports only up to limit=1000 for time being.
+        // However compound search itself supports limit=all if called with generator=true.
+        // Can be changed later probably. Or keep the 1k limit b.c. realistically no one
+        // is expected to add 1000 variants to interpretation.
+        const compoundSearchRequest = {
+            ...requestedCompoundFilterSet,
+            "global_flags": queryString.stringify(globalURLParams),
+            "limit": 1000
+        };
+
+        setIsLoading(true);
+
+        ajax.promise("/compound_search", "POST", {}, JSON.stringify(compoundSearchRequest))
+            .then(function(res){
+                const { "@graph": resultList } = res || {};
+                // Filter out already-in-interpretation variants
+                const filteredResultList = resultList.filter(function({ "@id": resultAtID }){
+                    return !savedVariantSampleIDMap[resultAtID];
+                });
+                onSelectVariantSample(filteredResultList, true);
+                setIsLoading(false);
+            });
+    }, [ savedVariantSampleIDMap, requestedCompoundFilterSet ]);
+
+    const onMenuOpen = useCallback(function(e){
+        e.stopPropagation();
+        setTimeout(ReactTooltip.rebuild, 300);
+    });
+
+    /** @param {string} eventKey - Param will be a string always */
+    const onOptionSelect = useCallback(function(eventKey, e){
+        e.stopPropagation();
+        e.preventDefault();
+        const intKey = parseInt(eventKey);
+        switch (intKey) {
+            case 0: // All
+            case 1: // w. TechReviews
+            case 2: // w. TechReviews excl Recurring Artifacts
+                performSearchRequest(intKey);
+                break;
+            case 3: // Clear
+                onResetSelectedVariantSamples();
+                break;
+        }
+    }, [ performSearchRequest ]);
+
+    // Compound Search endpoint supports only up to limit=1000 for time being. See notes above.
+    const selectAllDisabled = totalSearchResultsCount > 1000;
+
+    return (
+        <DropdownButton className="d-inline-flex" variant="primary" title="Select..."
+            disabled={isLoading || totalSearchResultsCount === 0} onClick={onMenuOpen} onSelect={onOptionSelect}>
+            <DropdownItem eventKey={0} disabled={selectAllDisabled}>Select All Variants</DropdownItem>
+            {/* TODO:
+            <DropdownItem eventKey={1} disabled={selectAllDisabled} data-tip="Please wait for all recent Technical Review changes to be indexed (not pending) before selecting this option.">
+                Select All Variants with a Technical Review
+                <i className="icon icon-exclamation-triangle fas text-secondary ml-08 text-small" />
+            </DropdownItem>
+            <DropdownItem eventKey={2} disabled={selectAllDisabled} data-tip="Please wait for all recent Technical Review changes to be indexed (not pending) before selecting this option.">
+                Select All Variants with a Technical Review, excluding Recurring Artifacts
+                <i className="icon icon-exclamation-triangle fas text-secondary ml-08 text-small" />
+            </DropdownItem>
+            */}
+            <DropdownItem eventKey={3} disabled={selectedCount === 0}>Clear Selections</DropdownItem>
+        </DropdownButton>
+    );
 }
