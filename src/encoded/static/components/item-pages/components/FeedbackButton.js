@@ -27,9 +27,10 @@ Comments%3A%0D%0A%0D%0A%0D%0A`;
 
 export default function FeedbackButton(props) {
     const browserInfo = detectBrowser();
-    const { name: browserName = null, os = null } = browserInfo || {};
+    const { name: browserName = null, version = null, os = null } = browserInfo || {};
+    const browser = encodeURI(`${browserName} ${version ? "v" + version : ""}`);
  
-    const SPECIFICATIONS = `Browser%3A%20${browserName}%0D%0AOperating%20System%3A%20${os}%0D%0A`;
+    const SPECIFICATIONS = `Browser%3A%20${browser}%0D%0AOperating%20System%3A%20${os}%0D%0A`;
 
     return (
         <Dropdown>
