@@ -279,30 +279,21 @@ export function AddToVariantSampleListButton(props){
     }
 }
 
-export function AddAllResultsToVariantSampleListButton (props) {
-    const {
-        selectedVariantSamples,
-        onSelectVariantSample,
-        onResetSelectedVariantSamples,
-        totalCount: totalSearchResultsCount = 0,
-        requestedCompoundFilterSet,
-        savedVariantSampleIDMap
-    } = props;
 
-    const [ isLoading, setIsLoading ] = useState(false);
+export class AddAllResultsToVariantSampleListButton extends React.Component {
 
-    // const totalSelectableCount = totalSearchResultsCount; // TODO: subtract already-in-VSL ones.
-    const selectedCount = selectedVariantSamples.size;
+    constructor(props) {
+        super(props);
+        this.performSearchRequest = this.performSearchRequest.bind(this);
+        this.onMenuOpen = this.onMenuOpen.bind(this);
+        this.onOptionSelect = this.onOptionSelect.bind(this);
+        this.state = {
+            "isLoading": false
+        };
+    }
 
-    // const isAllSelected = selectedCount === totalSearchResultsCount && totalSearchResultsCount !== 0;
-
-    /**
-     * @todo
-     * Currently we save @ids in SPC SelectedItemsController.
-     * We could consider switching to UUIDs for performance (shorter strings).
-     * But would require some edits on 4DN also.
-     */
-    const performSearchRequest = useCallback(function(){
+    performSearchRequest(){
+        const { onSelectVariantSample, requestedCompoundFilterSet, savedVariantSampleIDMap } = this.props;
         const { global_flags: origGlobalFlags = "" } = requestedCompoundFilterSet || {};
         const globalURLParams = queryString.parse(origGlobalFlags);
         delete globalURLParams.additional_facets;
@@ -323,27 +314,29 @@ export function AddAllResultsToVariantSampleListButton (props) {
             "limit": 1000
         };
 
-        setIsLoading(true);
+        this.setState({ "isLoading": true });
 
         ajax.promise("/compound_search", "POST", {}, JSON.stringify(compoundSearchRequest))
-            .then(function(res){
+            .then((res) => {
                 const { "@graph": resultList } = res || {};
                 // Filter out already-in-interpretation variants
                 const filteredResultList = resultList.filter(function({ "@id": resultAtID }){
                     return !savedVariantSampleIDMap[resultAtID];
                 });
                 onSelectVariantSample(filteredResultList, true);
-                setIsLoading(false);
+            })
+            .finally(() => {
+                this.setState({ "isLoading": false });
             });
-    }, [ savedVariantSampleIDMap, requestedCompoundFilterSet ]);
+    }
 
-    const onMenuOpen = useCallback(function(e){
+    onMenuOpen(e){
         e.stopPropagation();
         setTimeout(ReactTooltip.rebuild, 300);
-    });
+    }
 
-    /** @param {string} eventKey - Param will be a string always */
-    const onOptionSelect = useCallback(function(eventKey, e){
+    onOptionSelect(eventKey, e) {
+        const { onResetSelectedVariantSamples } = this.props;
         e.stopPropagation();
         e.preventDefault();
         const intKey = parseInt(eventKey);
@@ -351,32 +344,39 @@ export function AddAllResultsToVariantSampleListButton (props) {
             case 0: // All
             case 1: // w. TechReviews
             case 2: // w. TechReviews excl Recurring Artifacts
-                performSearchRequest(intKey);
+                this.performSearchRequest(intKey);
                 break;
             case 3: // Clear
                 onResetSelectedVariantSamples();
                 break;
         }
-    }, [ performSearchRequest ]);
+    }
 
-    // Compound Search endpoint supports only up to limit=1000 for time being. See notes above.
-    const selectAllDisabled = totalSearchResultsCount > 1000;
+    render(){
+        const { selectedVariantSamples, totalCount: totalSearchResultsCount = 0 } = this.props;
+        const { isLoading } = this.state;
 
-    return (
-        <DropdownButton className="d-inline-flex" variant="primary" title="Select..."
-            disabled={isLoading || totalSearchResultsCount === 0} onClick={onMenuOpen} onSelect={onOptionSelect}>
-            <DropdownItem eventKey={0} disabled={selectAllDisabled}>Select All Variants</DropdownItem>
-            {/* TODO:
-            <DropdownItem eventKey={1} disabled={selectAllDisabled} data-tip="Please wait for all recent Technical Review changes to be indexed (not pending) before selecting this option.">
-                Select All Variants with a Technical Review
-                <i className="icon icon-exclamation-triangle fas text-secondary ml-08 text-small" />
-            </DropdownItem>
-            <DropdownItem eventKey={2} disabled={selectAllDisabled} data-tip="Please wait for all recent Technical Review changes to be indexed (not pending) before selecting this option.">
-                Select All Variants with a Technical Review, excluding Recurring Artifacts
-                <i className="icon icon-exclamation-triangle fas text-secondary ml-08 text-small" />
-            </DropdownItem>
-            */}
-            <DropdownItem eventKey={3} disabled={selectedCount === 0}>Clear Selections</DropdownItem>
-        </DropdownButton>
-    );
+        const selectedCount = selectedVariantSamples.size;
+        // Compound Search endpoint supports only up to limit=1000 for time being. See notes above.
+        const selectAllDisabled = totalSearchResultsCount > 1000;
+
+        return (
+            <DropdownButton className="d-inline-flex" variant="primary" title="Select..."
+                disabled={isLoading || totalSearchResultsCount === 0} onClick={this.onMenuOpen} onSelect={this.onOptionSelect}>
+                <DropdownItem eventKey={0} disabled={selectAllDisabled}>Select All Variants</DropdownItem>
+                {/* TODO:
+                <DropdownItem eventKey={1} disabled={selectAllDisabled} data-tip="Please wait for all recent Technical Review changes to be indexed (not pending) before selecting this option.">
+                    Select All Variants with a Technical Review
+                    <i className="icon icon-exclamation-triangle fas text-secondary ml-08 text-small" />
+                </DropdownItem>
+                <DropdownItem eventKey={2} disabled={selectAllDisabled} data-tip="Please wait for all recent Technical Review changes to be indexed (not pending) before selecting this option.">
+                    Select All Variants with a Technical Review, excluding Recurring Artifacts
+                    <i className="icon icon-exclamation-triangle fas text-secondary ml-08 text-small" />
+                </DropdownItem>
+                */}
+                <DropdownItem eventKey={3} disabled={selectedCount === 0}>Clear Selections</DropdownItem>
+            </DropdownButton>
+        );
+    }
+
 }

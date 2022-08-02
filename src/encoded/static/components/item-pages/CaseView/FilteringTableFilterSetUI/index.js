@@ -271,8 +271,6 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             fsuiBlocksBody = <FilterSetUIBody {...bodyProps} />;
         }
 
-        console.log("PROPS", this.props);
-
         if (isActiveDotRouterTab) {
             aboveTableControls = (
                 <React.Fragment>

@@ -463,7 +463,7 @@
             "order": 40
         },
         "associated_genotype_labels.proband_genotype_label": {
-            "title": "Genotype",
+            "title": "Genotype Label",
             "order": 50,
             "sort_fields": [
                 {
