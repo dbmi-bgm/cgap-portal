@@ -26,6 +26,8 @@ Type%3A%20General%20Feedback%0D%0A%0D%0A\
 Comments%3A%0D%0A%0D%0A%0D%0A`;
 
 export default function FeedbackButton(props) {
+    const { variant = "link", dropCls = "navbar-nav", toggleCls = "text-decoration-none rounded-0" } = props;
+
     const browserInfo = detectBrowser();
     const { name: browserName = null, version = null, os = null } = browserInfo || {};
     const browser = encodeURI(`${browserName} ${version ? "v" + version : ""}`);
@@ -33,9 +35,9 @@ export default function FeedbackButton(props) {
     const SPECIFICATIONS = `Browser%3A%20${browser}%0D%0AOperating%20System%3A%20${os}%0D%0A`;
 
     return (
-        <Dropdown>
-            <Dropdown.Toggle variant="link" id="feedback-btn-drop">
-                <i className="icon icon-question-circle fas text-primary mr-04" />
+        <Dropdown className={dropCls}>
+            <Dropdown.Toggle variant={variant} className={toggleCls} id="feedback-btn-drop">
+                <i className="icon icon-question-circle fas mr-04" />
                 Feedback or Issues?
             </Dropdown.Toggle>
 
