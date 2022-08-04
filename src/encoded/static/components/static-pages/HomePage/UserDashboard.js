@@ -42,7 +42,6 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
                         <i className="icon icon-fw icon-home fas mr-1" />
                         <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
                     </div>
-                    <FeedbackButton />
                 </div>
             </div>
 
