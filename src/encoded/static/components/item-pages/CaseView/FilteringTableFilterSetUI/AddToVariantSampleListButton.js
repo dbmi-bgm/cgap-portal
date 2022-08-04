@@ -123,7 +123,10 @@ export function AddToVariantSampleListButton(props){
                 // These are sorted in order of insertion/selection.
                 // See https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map/forEach
                 selectedVariantSamples.forEach(function(variantSampleItem, variantSampleAtID){
-                    const { __matching_filter_block_names: matchingFilterBlockNamesForVS = [], uuid: vsUUID } = variantSampleItem;
+                    const {
+                        __matching_filter_block_names: matchingFilterBlockNamesForVS = [],
+                        uuid: vsUUID
+                    } = variantSampleItem;
                     const matchingFilterBlocksLen = matchingFilterBlockNamesForVS.length;
                     let filterBlocksUsed = null;
                     if (matchingFilterBlocksLen === 0) {
@@ -297,7 +300,7 @@ export class AddAllResultsToVariantSampleListButton extends React.Component {
         const { global_flags: origGlobalFlags = "" } = requestedCompoundFilterSet || {};
         const globalURLParams = queryString.parse(origGlobalFlags);
         delete globalURLParams.additional_facets;
-        globalURLParams.field = "uuid";
+        globalURLParams.field = ["uuid", "__matching_filter_block_names"];
 
         // TODO: Handle technical_review OR project_technical_review.
         // if (intKey === 1) {
