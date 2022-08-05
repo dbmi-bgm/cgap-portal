@@ -341,19 +341,23 @@ class TestInvalidationScopeViewCGAP:
                 'target_type': target_type
             }
 
+    # source_type is the item being edited, target_type is the item we are simulating invalidation one
     @pytest.mark.parametrize('source_type, target_type, invalidated', [
-        # Test WorkflowRun (same as fourfront)
         ('FileProcessed', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['accession', 'filename', 'file_format', 'file_size']
+            DEFAULT_SCOPE + ['accession', 'file_format', 'file_size', 'filename', 'quality_metric']
          ),
         ('Software', 'WorkflowRunAwsem',
             DEFAULT_SCOPE + ['name', 'title', 'version', 'source_url']
          ),
         ('Workflow', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['category', 'experiment_types', 'app_name', 'title']
+            DEFAULT_SCOPE + ['app_name', 'category', 'experiment_types', 'name', 'steps.name', 'title']
          ),
-        ('WorkflowRunAwsem', 'FileProcessed',  # no link
-            DEFAULT_SCOPE
+        ('Software', 'WorkflowRunAwsem',
+            DEFAULT_SCOPE + ['name', 'version', 'title', 'source_url']
+         ),
+        ('WorkflowRunAwsem', 'FileProcessed',
+            DEFAULT_SCOPE + ['input_files.workflow_argument_name', 'output_files.workflow_argument_name', 'title',
+                             'workflow']
          ),
         # Test Case as it has the most links and thus the most ways things can go wrong
         ('VariantSample', 'Case',
@@ -368,7 +372,9 @@ class TestInvalidationScopeViewCGAP:
                              'schema_version', 'aliases', 'institution', 'project', 'individual_id', 'age',
                              'age_units', 'is_pregnancy', 'gestational_age', 'sex', 'quantity',
                              'phenotypic_features.phenotypic_feature', 'phenotypic_features.onset_age',
-                             'phenotypic_features.onset_age_units', 'disorders', 'clinic_notes', 'birth_year',
+                             'phenotypic_features.onset_age_units', 'clinic_notes', 'birth_year',
+                             'disorders.disorder', 'disorders.onset_age', 'disorders.onset_age_units',
+                             'disorders.diagnostic_confidence', 'disorders.is_primary_diagnosis',
                              'is_deceased', 'life_status', 'is_termination_of_pregnancy',
                              'is_spontaneous_abortion', 'is_still_birth', 'cause_of_death',
                              'age_at_death', 'age_at_death_units', 'is_no_children_by_choice',
@@ -377,11 +383,11 @@ class TestInvalidationScopeViewCGAP:
                              'mother', 'father', 'samples']
          ),
         ('Sample', 'Case',
-            DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type',
-                             'specimen_accession_date', 'specimen_collection_date',
-                             'specimen_accession', 'specimen_notes', 'sequence_id',
-                             'sequencing_date', 'completed_processes', 'bam_sample_id',
-                             'indication']
+            DEFAULT_SCOPE + ['accession', 'bam_sample_id', 'completed_processes', 'files', 'indication',
+                             'last_modified.date_modified', 'last_modified.modified_by', 'other_processed_files.files',
+                             'processed_files', 'sequence_id', 'sequencing_date', 'specimen_accession',
+                             'specimen_accession_date', 'specimen_collection_date', 'specimen_notes',
+                             'specimen_type', 'workup_type']
          ),
         ('Family', 'Case',
             DEFAULT_SCOPE + ['institution', 'project', 'tags', 'last_modified.date_modified',
@@ -394,11 +400,12 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']
          ),
         ('FileProcessed', 'Case',
-            DEFAULT_SCOPE + ['accession', 'quality_metric', 'file_ingestion_status',
-                             'file_type', 'variant_type']
+            DEFAULT_SCOPE + ['accession', 'file_format', 'file_ingestion_status', 'file_type',
+                             'last_modified.date_modified', 'last_modified.modified_by', 'quality_metric',
+                             'variant_type']
          ),
         ('Report', 'Case',
-            DEFAULT_SCOPE + ['accession']
+            DEFAULT_SCOPE + ['accession', 'last_modified.date_modified', 'last_modified.modified_by']
          ),
         ('FilterSet', 'Case',
             DEFAULT_SCOPE + ['notes', 'tags', 'last_modified.date_modified', 'last_modified.modified_by',
@@ -410,7 +417,7 @@ class TestInvalidationScopeViewCGAP:
          ),
         ('Project', 'Case',
             DEFAULT_SCOPE + ['name']
-         ),
+         )
     ])
     def test_invalidation_scope_view_parametrized(self, indexer_testapp, source_type, target_type, invalidated):
         """ Just call the route function - test some basic interactions.
@@ -421,5 +428,4 @@ class TestInvalidationScopeViewCGAP:
         """
         req = self.MockedRequest(indexer_testapp.app.registry, source_type, target_type)
         scope = compute_invalidation_scope(None, req)
-        print(scope['Invalidated'])
         assert sorted(scope['Invalidated']) == sorted(invalidated)

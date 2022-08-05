@@ -13,7 +13,7 @@ import DropdownItem from "react-bootstrap/esm/DropdownItem";
  * and then submits form.
  */
 export const ExportSearchSpreadsheetButton = React.memo(function ExportSearchSpreadsheetButton(props){
-    const { requestedCompoundFilterSet, caseItem } = props;
+    const { requestedCompoundFilterSet, caseItem, disabled: propDisabled = false } = props;
     const { accession: caseAccession, case_title = null } = caseItem || {};
     const formRef = useRef(null);
     const onSelect = useCallback(function(eventKey, e){
@@ -26,11 +26,11 @@ export const ExportSearchSpreadsheetButton = React.memo(function ExportSearchSpr
         return false;
     }, [ formRef, requestedCompoundFilterSet ]);
 
-    const disabled = !requestedCompoundFilterSet; // TODO: Check if >0 results, as well.
+    const disabled = propDisabled || !requestedCompoundFilterSet; // TODO: Check if >0 results, as well.
 
     return (
         // target=_blank causes new tab to open (and then auto-close), but bypasses the isSubmitting onBeforeUnload check in app.js
-        <form method="POST" className="mb-0" action="/variant-sample-search-spreadsheet/" target="_blank" ref={formRef}>
+        <form method="POST" className="mb-0" action="/variant-sample-search-spreadsheet/" target="_blank" ref={formRef} disabled={disabled}>
             <input type="hidden" name="file_format" />
             <input type="hidden" name="compound_search_request" />
             <input type="hidden" name="case_accession" value={caseAccession} />

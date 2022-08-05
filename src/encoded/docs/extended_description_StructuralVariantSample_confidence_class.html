@@ -1,0 +1,59 @@
+
+<h5>
+    Confidence classes are calculated according to fixed filters.
+</h5>
+
+<p>
+    The relevant filters for Structural Variants (SVs) called by <a href=https://github.com/Illumina/manta/blob/master/docs/userGuide/README.md target="_blank">Manta</a> include:
+    <ul>
+        <li> <b> length </b>: The length of the call</li>
+        <li> <b> split-reads </b>: The number of split reads supporting the call</li>
+        <li> <b> split-read-ratio </b>: The number of split reads supporting the call divided by the number of split reads supporting the reference</li>
+        <li> <b> spanning-reads </b>: The number of spanning reads supporting the call</li>
+        <li> <b> spanning-read-ratio </b>: The number of spanning reads supporting the call divided by the number of spanning reads supporting the reference</li>
+    </ul>
+</p>
+
+<p>
+    The relevant filters for Copy Number Variants (CNVs) called by BIC-seq2 include:
+    <ul>
+        <li> <b> length </b>: The length of the call</li>
+        <li> <b> log-ratio </b>: log2(observed reads/expected reads)</li>
+    </ul>
+</p>
+
+<h5>
+    High Confidence Calls
+</h5>
+<ul>
+    <li> SVs called by Manta:
+        <ul>
+            <li>length&gt;250 bp & split-reads&gt;5 & split-read-ratio&gt;0.3 & spanning-reads&gt;5 & spanning-read-ratio&gt;0.3 </li>
+            <li> length&lt;250 bp & split-reads&gt;5 & split-read-ratio&gt;0.3 </li>
+        </ul>
+    </li>
+    <li> CNVs called by BIC-seq2:
+        <ul>
+            <li>length&gt;1 Mbp & 0.4&lt;log-ratio&lt;0.8</li>
+        </ul>
+    </li>
+</ul>
+
+<h5>
+    Medium Confidence Calls
+</h5>
+<ul>
+    <li> SVs called by Manta:
+        <ul>
+            <li>length&gt;250 bp & split-reads&gt;3 & split-read-ratio&gt;0.3 & spanning-reads&gt;3 & spanning-read-ratio&gt;0.3 </li>
+            <li> length&lt;250 bp & split-reads&gt;3 & split-read-ratio&gt;0.3 </li>
+        </ul>
+    </li>
+</ul>
+
+<h5>
+    Low Confidence Calls
+</h5>
+<ul>
+    <li> All other variants</li>
+</ul>

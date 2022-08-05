@@ -157,7 +157,8 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                 <div className="col-12 text-center">
                     <em>No transcripts available</em>
                 </div>
-            </div>);
+            </div>
+        );
     }
 
     const {

@@ -5,8 +5,8 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { CSSTransition } from 'react-transition-group';
 import ReactTooltip from 'react-tooltip';
-import { layout, console, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-
+import { layout, console, analytics, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import _ from 'underscore';
 
 export class BigDropdownContainer extends React.PureComponent {
 
@@ -19,6 +19,7 @@ export class BigDropdownContainer extends React.PureComponent {
     constructor(props){
         super(props);
         this.onBackgroundClick = this.onBackgroundClick.bind(this);
+        this.menuNodeRef = React.createRef();
     }
 
     componentDidUpdate(pastProps){
@@ -59,7 +60,19 @@ export class BigDropdownContainer extends React.PureComponent {
     onBackgroundClick(evt){
         const targetElem = (evt && evt.target) || null;
 
-        if (layout.elementIsChildOfLink(targetElem)){
+        const target = layout.elementIsChildOfLink(targetElem);
+
+        if (target){
+            // Allow external links to the marketing site by not allowing event to bubble up to window click handler
+            // in BigDropdownGroupController.
+            const targetHref = target.getAttribute('href') || target.getAttribute('data-href');
+            if (
+                targetHref &&
+                !navigate.sameOrigin(targetHref)
+            ) {
+                evt.stopPropagation();
+            }
+
             // Let bubble up - app.js will catch and navigate via handleClick and BigDropdownGroupController will catch and hide menu.
             return false;
         }
@@ -101,8 +114,9 @@ export class BigDropdownContainer extends React.PureComponent {
         const body = React.Children.map(children, (child) => React.cloneElement(child, passProps));
         const renderedElem = (
             <CSSTransition appear in={open || closing} classNames="big-dropdown-menu-transition" unmountOnExit mountOnEnter
-                timeout={{ appear: 0, exit: otherDropdownOpen ? 0 : 300 }} key="dropdown-transition-container">
-                <div className={outerCls} onClick={this.onBackgroundClick} key="dropdown-transition-container-inner"
+                timeout={{ appear: 0, exit: otherDropdownOpen ? 0 : 300 }} key="dropdown-transition-container" nodeRef={this.menuNodeRef}>
+                <div className={outerCls} onClick={this.onBackgroundClick} ref={this.menuNodeRef}
+                    key="dropdown-transition-container-inner"
                     data-is-mobile-view={!isDesktopView}
                     data-is-test-warning-visible={testWarningVisible}
                     data-is-closing={closing}

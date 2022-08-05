@@ -25,7 +25,7 @@ KEYS_TO_IGNORE = [
     "actions",
 ]
 FORBIDDEN_MSG = {"error": "no view permissions"}
-DATABASE_ITEM_KEY = "@type"  #Key specific to JSON objects that are CGAP items
+DATABASE_ITEM_KEY = "@type"  # Key specific to JSON objects that are CGAP items
 
 
 def includeme(config):
@@ -84,8 +84,8 @@ class CustomEmbed:
     def user_embed(self, item_id, initial_item=False):
         """
         Use request's embed method to find given item in the database.
-        
-        If the user who made the call to the API does not have 
+
+        If the user who made the call to the API does not have
         permissions to view the item, the item will not be embedded.
         Instead, if the item is the initial ID given to the API, nothing is
         embedded; if the item is to be embedded at a subsequent depth, a
@@ -259,17 +259,16 @@ class CustomEmbed:
         :param field_keys: list of keys of a requested field
         :return field_dict: existing dict updated with new field_keys
         """
-        key = field_keys[0]
-        if key == field_keys[-1]:
+        key = field_keys.pop(0)
+        if not field_keys:
             if "fields_to_keep" in field_dict:
                 field_dict["fields_to_keep"].append(key)
             else:
                 field_dict["fields_to_keep"] = [key]
-            return field_dict
-        if key not in field_dict:
-            field_dict[key] = {}
-        field_keys = field_keys[1:]
-        field_dict[key] = self.build_nested_dict(field_dict[key], field_keys)
+        else:
+            if key not in field_dict:
+                field_dict[key] = {}
+            field_dict[key] = self.build_nested_dict(field_dict[key], field_keys)
         return field_dict
 
     def field_embed(self, item, field_dict, initial_item=False):
@@ -352,7 +351,6 @@ def embed(context, request):
     ids = []
     ignored_embeds = []
     desired_embeds = []
-    cache = {}
     requested_fields = []
     results = []
     invalid_ids = []
@@ -391,6 +389,6 @@ def embed(context, request):
     invalid_ids += [item for item in results if isinstance(item, str)]
     if invalid_ids:
         raise HTTPBadRequest(
-            "The following IDs were invalid: %s." % ", ".join(invalid_ids)
+            "The following IDs were invalid: %s" % ", ".join(invalid_ids)
         )
     return results

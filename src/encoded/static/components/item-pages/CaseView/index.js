@@ -295,6 +295,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
     // Filtering props shared among both tables, then SV and SNV specific props
     const filteringTableProps = {
         context, windowHeight, session, schemas,
+        haveCaseEditPermission,
         setIsSubmitting, variantSampleListItem,
         updateVariantSampleListID, savedVariantSampleIDMap,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem
@@ -362,7 +363,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
                         <BioinformaticsTab {...{ context, idToGraphIdentifier, canonicalFamily }} />
                     </DotRouterTab>
-                    <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering">
+                    <DotRouterTab dotPath=".filtering" cache disabled={disableFiltering} tabTitle="Filtering"
+                        contentsClassName="container-wide bg-light pt-36 pb-0">
                         <FilteringTab {...filteringTableProps} />
                     </DotRouterTab>
                     <DotRouterTab dotPath=".interpretation" cache disabled={disableInterpretation} tabTitle={
@@ -371,14 +373,14 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
-                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
+                            <InterpretationTab {...{ schemas, context, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType, haveCaseEditPermission }} />
                         </InterpretationTabController>
                     </DotRouterTab>
                     <DotRouterTab dotPath=".review" cache disabled={anyAnnotatedVariantSamples ? false : true} tabTitle="Case Review">
                         <CaseReviewController {...{ context, variantSampleListItem }}>
                             <CaseReviewSelectedNotesStore>
                                 <NoteSubSelectionStateController>
-                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType }} />
+                                    <CaseReviewTab {...{ schemas, isLoadingVariantSampleListItem, fetchVariantSampleListItem, updateVariantSampleListSort, vslSortType, haveCaseEditPermission }} />
                                 </NoteSubSelectionStateController>
                             </CaseReviewSelectedNotesStore>
                         </CaseReviewController>
@@ -492,7 +494,7 @@ class DotRouter extends React.PureComponent {
         const { children, className, prependDotPath, navClassName, contentsClassName, elementID, isActive = true } = this.props;
         const currentTab = this.getCurrentTab();
         const { props : { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
-        const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
+        // const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
         const allTabContents = [];
 
         const adjustedChildren = React.Children.map(children, function(childTab, index){
@@ -500,7 +502,8 @@ class DotRouter extends React.PureComponent {
                 props: {
                     dotPath,
                     children: tabChildren,
-                    cache = false
+                    cache = false,
+                    contentsClassName: overridingContentsClassName
                 }
             } = childTab;
 
@@ -520,8 +523,10 @@ class DotRouter extends React.PureComponent {
                     } // Else is React component
                     return React.cloneElement(child, { "isActiveDotRouterTab": active });
                 });
+                const clsSuffix = overridingContentsClassName || contentsClassName || null;
+                const cls = "tab-router-contents" + (clsSuffix ? " " + clsSuffix : "") + (!active ? " d-none" : "");
                 allTabContents.push(
-                    <div className={contentClassName + (!active ? " d-none" : "")} id={(prependDotPath || "") + dotPath} data-tab-index={index} key={dotPath}>
+                    <div className={cls} id={(prependDotPath || "") + dotPath} data-tab-index={index} key={dotPath}>
                         <TabPaneErrorBoundary>
                             { transformedChildren }
                         </TabPaneErrorBoundary>
@@ -546,7 +551,16 @@ class DotRouter extends React.PureComponent {
 }
 
 const DotRouterTab = React.memo(function DotRouterTab(props) {
-    const { tabTitle, dotPath, disabled = false, active, prependDotPath, children, ...passProps } = props;
+    const {
+        tabTitle,
+        dotPath,
+        disabled = false,
+        active,
+        prependDotPath,
+        children,
+        className = "",
+        ...passProps
+    } = props;
 
     const onClick = useCallback(function(){
         const targetDotPath = prependDotPath + dotPath;
@@ -597,7 +611,7 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
         <div className="pt-2">
-            <button type="button" className="btn btn-block btn-outline-dark" onClick={function(){ setSecondaryFamiliesOpen(!isSecondaryFamiliesOpen); }}>
+            <button type="button" className="btn btn-block btn-outline-dark" onClick={function(){ setSecondaryFamiliesOpen(function(currentIsSecondaryFamiliesOpen){ return !currentIsSecondaryFamiliesOpen; }); }}>
                 { !isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families' }
             </button>
         </div>

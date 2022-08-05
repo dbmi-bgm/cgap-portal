@@ -54,7 +54,6 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
 const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, windowWidth }){
     const searchHref = (
         "/search/?type=Case"
-        + "&report.uuid!=No+value"
         + "&proband_case=true"
         + "&status!=inactive"
         + "&sort=-last_modified.date_modified"
@@ -278,7 +277,7 @@ function ProjectSelectDropdown(props){
         <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
             title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
             variant="outline-dark" className={className}>
-            <DropdownItem eventKey={0} active={!projectFilterTerm}>
+            <DropdownItem eventKey={null} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
             </DropdownItem>
             { renderedOptions }

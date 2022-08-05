@@ -715,8 +715,7 @@ class StructuralVariantVCFParser(VCFParser):
     """
     # Schema constants
     VCF_FIELD = "vcf_field"
-    SAMPLE_ID_VCF_FIELD = "sample"  # Arbritrary name but must be consistent with
-                                    # mapping table
+    SAMPLE_ID_VCF_FIELD = "sample"  # Arbritrary name but must be consistent with schema
     SAMPLEGENO = "samplegeno"
     PROPERTIES = "properties"
     DEFAULT = "default"
@@ -803,7 +802,7 @@ class StructuralVariantVCFParser(VCFParser):
         value_type = value.get(self.TYPE, "")
         vcf_field = value.get(self.VCF_FIELD, "")
         sub_embedded_field = value.get(self.SUB_EMBEDDING_GROUP, "")
-        field_default = value.get(self.DEFAULT, None) 
+        field_default = value.get(self.DEFAULT, None)
         if vcf_field:
             result[key] = {self.VCF_FIELD: vcf_field, self.TYPE: value_type}
             if sub_embedded_field:
@@ -815,7 +814,7 @@ class StructuralVariantVCFParser(VCFParser):
             if field_default is not None:
                 result[key][self.DEFAULT] = field_default
 
-    def parse_props_for_vcf_info(self, schema_props): 
+    def parse_props_for_vcf_info(self, schema_props):
         """
         Searches through schema self.PROPERTIES fields and extracts those
         that come from the VCF.
@@ -902,7 +901,6 @@ class StructuralVariantVCFParser(VCFParser):
         :param index: int provided for sub-embedded objects from field
             found in annotations
         """
-        vcf_field = schema_props[self.VCF_FIELD]
         field_type = schema_props[self.TYPE]
         field_sub_type = schema_props.get(self.SUB_TYPE, "")
         sub_embedded_group = schema_props.get(self.SUB_EMBEDDING_GROUP, "")
@@ -975,7 +973,7 @@ class StructuralVariantVCFParser(VCFParser):
         found, value extracted and self.add_result_value called to create
         appropriate format according to field type from schema.
 
-        Note: Some SV-specific handling here for ALT key not applicable 
+        Note: Some SV-specific handling here for ALT key not applicable
         to SNVs.
 
         :param schema_vcf_fields: dict of VCF-specific fields from schema
@@ -1008,7 +1006,7 @@ class StructuralVariantVCFParser(VCFParser):
                 sample and vcf_field in (
                     sample.data._fields + tuple([self.SAMPLE_ID_VCF_FIELD])
                 )
-            ): # Genotype fields
+            ):  # Genotype fields
                 sample_results = self.get_sample_value(
                     schema_key, schema_props, record, sample
                 )
@@ -1053,7 +1051,7 @@ class StructuralVariantVCFParser(VCFParser):
                     # its default, if present.
                     self.add_result_value(result, schema_key, schema_props, None)
         return result
-            
+
     def create_variant_from_record(self, record):
         """
         Process record for variant fields.

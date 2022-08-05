@@ -17,7 +17,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
-    name: Test Suite for cgap-portal (Python 3.7, Node 16)
+    name: Test Suite for cgap-portal (Python 3.8, Node 16)
 
     # The type of runner that the job will run on
     runs-on: ubuntu-18.04
@@ -27,7 +27,7 @@ jobs:
       matrix:
         test_type: ['UNIT', 'NPM', 'Docker']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
-        python_version: ['3.7']
+        python_version: ['3.8']
         node_version: ['16']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
