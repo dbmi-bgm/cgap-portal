@@ -218,6 +218,226 @@ EXPECTED_FILE_NAMES_TO_ITEMS = {
     },
 }
 EXPECTED_FILES_WITHOUT_FILE_FORMAT = {"foo.fan": "foo.fan"}
+BLANK_ROW_ACCESSION = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
+HEADER_ROW_ACCESSION = [
+    "Unique Analysis ID*:",
+    "Analysis ID*:",
+    "Family ID:",
+    "Individual ID*:",
+    "Sex*:",
+    "Age:",
+    "Age Units:",
+    "Birth Year:",
+    "Relation to Proband*:",
+    "Specimen Type*:",
+    "Specimen ID*:",
+    "Report Required*:",
+    "Test Requested*:",
+    "Specimen Collection Date:",
+    "Sequencing Date:",
+    "Files:",
+]
+ERRONEOUS_ROW_1_ACCESSION = [
+    "Case1_Person1-1",
+    "",
+    "Fam1",
+    "Person1-1",
+    "M",
+    "20",
+    "year",
+    "",
+    "proband",
+    "peripheral blood",
+    "Specimen1-1",
+    "N",
+    "WGS",
+    "",
+    "",
+    "",
+]
+ERRONEOUS_ROW_2_ACCESSION = [
+    "Case1_Person1-2",
+    "Case1",
+    "Fam1",
+    "Person1-2",
+    "F",
+    "50",
+    "year",
+    "",
+    "mother",
+    "peripheral blood",
+    "Specimen1-2",
+    "N",
+    "WGS",
+    "",
+    "",
+    "",
+]
+CORRECT_ROW_ACCESSION = [
+    "Case1_Person1-1",
+    "Accession1",
+    "Fam1",
+    "Person1-1",
+    "M",
+    "20",
+    "year",
+    "",
+    "proband",
+    "peripheral blood",
+    "Specimen1-1",
+    "N",
+    "WGS",
+    "",
+    "",
+    "",
+]
+
+BLANK_BEFORE_HEADER = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+]
+BLANK_AFTER_HEADER = [
+    HEADER_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+]
+BLANK_BT_ROWS = [
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+]
+BLANK_BEFORE_HEADER_AND_BT_ROWS = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+]
+BLANK_AFTER_HEADER_AND_BT_ROWS = [
+    HEADER_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+]
+BLANK_AFTER_ROWS = [
+    HEADER_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+]
+BLANK_COMBINATION = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_1_ACCESSION,
+    BLANK_ROW_ACCESSION,
+    ERRONEOUS_ROW_2_ACCESSION,
+    BLANK_ROW_ACCESSION,
+]
+BLANK_NO_ERRORS = [
+    BLANK_ROW_ACCESSION,
+    HEADER_ROW_ACCESSION,
+    CORRECT_ROW_ACCESSION,
+    BLANK_ROW_ACCESSION,
+]
+
+BLANK_ROW_PEDIGREE = ["", "", "", "", "", "", "", "", "", "", ""]
+HEADER_ROW_PEDIGREE = [
+    "Family ID:",
+    "Individual ID",
+    "Mother ID",
+    "Father ID",
+    "Sex",
+    "HPO terms",
+    "MONDO terms",
+    "Proband",
+    "life status",
+    "deceased",
+    "infertile",
+]
+ERRONEOUS_ROW_1_PEDIGREE = [
+    "111",
+    "IND204",
+    "",
+    "",
+    "F",
+    "HP:00000821, HP:0000716",
+    "",
+    "N",
+    "alive & well",
+    "",
+    "",
+]
+ERRONEOUS_ROW_2_PEDIGREE = [
+    "111",
+    "IND206",
+    "",
+    "",
+    "F",
+    "HP:00000833, HP:0000722",
+    "",
+    "N",
+    "deceased",
+    "",
+    "",
+]
+CORRECT_ROW_PEDIGREE = ["111", "IND205", "", "", "M", "", "", "N", "deceased", "Y", ""]
+
+BLANK_BEFORE_HEADER_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+]
+BLANK_AFTER_HEADER_PED = [
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+]
+BLANK_BT_ROWS_PED = [
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+]
+BLANK_BEFORE_HEADER_AND_BT_ROWS_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+]
+BLANK_AFTER_HEADER_AND_BT_ROWS_PED = [
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+]
+BLANK_AFTER_ROWS_PED = [
+    HEADER_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+]
+BLANK_COMBINATION_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_1_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    ERRONEOUS_ROW_2_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+]
+BLANK_NO_ERRORS_PED = [
+    BLANK_ROW_PEDIGREE,
+    HEADER_ROW_PEDIGREE,
+    BLANK_ROW_PEDIGREE,
+    CORRECT_ROW_PEDIGREE,
+]
 
 
 # TODO: Check if these work or not.  These tests seem to be working, but they may do posting
@@ -488,127 +708,163 @@ def case_with_ingestion_id2(testapp, project, institution, fam, sample_proc_fam)
 @pytest.fixture
 def example_rows():
     return [
-        {
-            "individual id": "456",
-            "sex": "F",
-            "analysis id": "1111",
-            "relation to proband": "proband",
-            "report required": "Y",
-            "workup type": "WGS",
-            "specimen id": "1",
-        },
-        {
-            "individual id": "123",
-            "sex": "F",
-            "analysis id": "1111",
-            "relation to proband": "mother",
-            "report required": "N",
-            "workup type": "WGS",
-            "specimen id": "2",
-        },
-        {
-            "individual id": "789",
-            "sex": "M",
-            "analysis id": "1111",
-            "relation to proband": "father",
-            "report required": "N",
-            "workup type": "WGS",
-            "specimen id": "3",
-        },
-        {
-            "individual id": "456",
-            "sex": "F",
-            "analysis id": "2222",
-            "relation to proband": "proband",
-            "report required": "Y",
-            "workup type": "WGS",
-            "specimen id": "1",
-        },
-        {
-            "individual id": "456",
-            "sex": "F",
-            "analysis id": "4444",
-            "relation to proband": "proband",
-            "report required": "Y",
-            "workup type": "WES",
-            "specimen id": "7",
-        },
-        {
-            "individual id": "555",
-            "sex": "M",
-            "analysis id": "3333",
-            "relation to proband": "proband",
-            "report required": "Y",
-            "workup type": "WES",
-            "specimen id": "5",
-        },
-        {
-            "individual id": "546",
-            "sex": "F",
-            "analysis id": "3333",
-            "relation to proband": "mother",
-            "report required": "N",
-            "workup type": "WES",
-            "specimen id": "6",
-        },
+        (
+            {
+                "individual id": "456",
+                "sex": "F",
+                "analysis id": "1111",
+                "relation to proband": "proband",
+                "report required": "Y",
+                "workup type": "WGS",
+                "specimen id": "1",
+            },
+            1,
+        ),
+        (
+            {
+                "individual id": "123",
+                "sex": "F",
+                "analysis id": "1111",
+                "relation to proband": "mother",
+                "report required": "N",
+                "workup type": "WGS",
+                "specimen id": "2",
+            },
+            2,
+        ),
+        (
+            {
+                "individual id": "789",
+                "sex": "M",
+                "analysis id": "1111",
+                "relation to proband": "father",
+                "report required": "N",
+                "workup type": "WGS",
+                "specimen id": "3",
+            },
+            3,
+        ),
+        (
+            {
+                "individual id": "456",
+                "sex": "F",
+                "analysis id": "2222",
+                "relation to proband": "proband",
+                "report required": "Y",
+                "workup type": "WGS",
+                "specimen id": "1",
+            },
+            4,
+        ),
+        (
+            {
+                "individual id": "456",
+                "sex": "F",
+                "analysis id": "4444",
+                "relation to proband": "proband",
+                "report required": "Y",
+                "workup type": "WES",
+                "specimen id": "7",
+            },
+            5,
+        ),
+        (
+            {
+                "individual id": "555",
+                "sex": "M",
+                "analysis id": "3333",
+                "relation to proband": "proband",
+                "report required": "Y",
+                "workup type": "WES",
+                "specimen id": "5",
+            },
+            6,
+        ),
+        (
+            {
+                "individual id": "546",
+                "sex": "F",
+                "analysis id": "3333",
+                "relation to proband": "mother",
+                "report required": "N",
+                "workup type": "WES",
+                "specimen id": "6",
+            },
+            7,
+        ),
     ]
 
 
 @pytest.fixture
 def example_rows_with_test_number(example_rows):
-    example_rows[0]["test number"] = "1"
-    example_rows[3]["test number"] = "2"
+    example_rows[0][0]["test number"] = "1"
+    example_rows[3][0]["test number"] = "2"
     return example_rows
 
 
 @pytest.fixture
 def big_family_rows():
     return [
-        {
-            "individual id": "456",
-            "sex": "M",
-            "analysis id": "1111",
-            "relation to proband": "proband",
-            "report required": "Y",
-            "workup type": "WGS",
-            "specimen id": "1",
-        },
-        {
-            "individual id": "123",
-            "sex": "F",
-            "analysis id": "1111",
-            "relation to proband": "mother",
-            "report required": "N",
-            "workup type": "WGS",
-            "specimen id": "2",
-        },
-        {
-            "individual id": "789",
-            "sex": "M",
-            "analysis id": "1111",
-            "relation to proband": "father",
-            "report required": "N",
-            "workup type": "WGS",
-            "specimen id": "3",
-        },
-        {
-            "individual id": "546",
-            "sex": "F",
-            "analysis id": "1111",
-            "relation to proband": "sister",
-            "report required": "Y",
-            "workup type": "WGS",
-            "specimen id": "4",
-        },
-        {
-            "individual id": "555",
-            "sex": "M",
-            "analysis id": "1111",
-            "relation to proband": "full brother 1",
-            "report required": "Y",
-            "workup type": "WGS",
-            "specimen id": "5",
-        },
+        (
+            {
+                "individual id": "456",
+                "sex": "M",
+                "analysis id": "1111",
+                "relation to proband": "proband",
+                "report required": "Y",
+                "workup type": "WGS",
+                "specimen id": "1",
+            },
+            1,
+        ),
+        (
+            {
+                "individual id": "123",
+                "sex": "F",
+                "analysis id": "1111",
+                "relation to proband": "mother",
+                "report required": "N",
+                "workup type": "WGS",
+                "specimen id": "2",
+            },
+            2,
+        ),
+        (
+            {
+                "individual id": "789",
+                "sex": "M",
+                "analysis id": "1111",
+                "relation to proband": "father",
+                "report required": "N",
+                "workup type": "WGS",
+                "specimen id": "3",
+            },
+            3,
+        ),
+        (
+            {
+                "individual id": "546",
+                "sex": "F",
+                "analysis id": "1111",
+                "relation to proband": "sister",
+                "report required": "Y",
+                "workup type": "WGS",
+                "specimen id": "4",
+            },
+            4,
+        ),
+        (
+            {
+                "individual id": "555",
+                "sex": "M",
+                "analysis id": "1111",
+                "relation to proband": "full brother 1",
+                "report required": "Y",
+                "workup type": "WGS",
+                "specimen id": "5",
+            },
+            5,
+        ),
     ]
 
 
@@ -622,79 +878,100 @@ def example_rows_obj(testapp, example_rows, project, institution):
 @pytest.fixture
 def example_rows_pedigree():
     return [
-        {
-            "family id": "0101",
-            "individual id": "456",
-            "mother id": "123",
-            "father id": "789",
-            "sex": "F",
-            "proband": "Y",
-            "hpo terms": "HP:0000001, HP:0099994",
-            "mondo terms": "MONDO:0012345",
-        },
-        {
-            "family id": "0101",
-            "individual id": "123",
-            "mother id": "223",
-            "father id": "323",
-            "sex": "F",
-            "proband": "N",
-            "hpo terms": "HP:0099994",
-            "mondo terms": "",
-        },
-        {
-            "family id": "0101",
-            "individual id": "789",
-            "mother id": "",
-            "father id": "",
-            "sex": "M",
-            "proband": "N",
-            "hpo terms": "",
-            "mondo terms": "",
-        },
-        {
-            "family id": "0101",
-            "individual id": "423",
-            "mother id": "223",
-            "father id": "323",
-            "sex": "M",
-            "proband": "N",
-            "hpo terms": "",
-            "mondo terms": "",
-        },
-        {
-            "family id": "0101",
-            "individual id": "223",
-            "mother id": "",
-            "father id": "",
-            "sex": "F",
-            "proband": "N",
-            "hpo terms": "HP:0099994, HP:0012345",
-            "mondo terms": "",
-        },
-        {
-            "family id": "0101",
-            "individual id": "323",
-            "mother id": "",
-            "father id": "",
-            "sex": "F",
-            "proband": "N",
-            "hpo terms": "",
-            "mondo terms": "MONDO:0045732, MONDO:0043872",
-        },
-        {
-            "family id": "0101",
-            "individual id": "156",
-            "mother id": "456",
-            "father id": "",
-            "sex": "F",
-            "proband": "N",
-            "hpo terms": "",
-            "mondo terms": "",
-            "pregnancy": "y",
-            "gestational age": "25",
-            "gestational age units": "week",
-        },
+        (
+            {
+                "family id": "0101",
+                "individual id": "456",
+                "mother id": "123",
+                "father id": "789",
+                "sex": "F",
+                "proband": "Y",
+                "hpo terms": "HP:0000001, HP:0099994",
+                "mondo terms": "MONDO:0012345",
+            },
+            1,
+        ),
+        (
+            {
+                "family id": "0101",
+                "individual id": "123",
+                "mother id": "223",
+                "father id": "323",
+                "sex": "F",
+                "proband": "N",
+                "hpo terms": "HP:0099994",
+                "mondo terms": "",
+            },
+            2,
+        ),
+        (
+            {
+                "family id": "0101",
+                "individual id": "789",
+                "mother id": "",
+                "father id": "",
+                "sex": "M",
+                "proband": "N",
+                "hpo terms": "",
+                "mondo terms": "",
+            },
+            3,
+        ),
+        (
+            {
+                "family id": "0101",
+                "individual id": "423",
+                "mother id": "223",
+                "father id": "323",
+                "sex": "M",
+                "proband": "N",
+                "hpo terms": "",
+                "mondo terms": "",
+            },
+            4,
+        ),
+        (
+            {
+                "family id": "0101",
+                "individual id": "223",
+                "mother id": "",
+                "father id": "",
+                "sex": "F",
+                "proband": "N",
+                "hpo terms": "HP:0099994, HP:0012345",
+                "mondo terms": "",
+            },
+            5,
+        ),
+        (
+            {
+                "family id": "0101",
+                "individual id": "323",
+                "mother id": "",
+                "father id": "",
+                "sex": "F",
+                "proband": "N",
+                "hpo terms": "",
+                "mondo terms": "MONDO:0045732, MONDO:0043872",
+            },
+            6,
+        ),
+        (
+            {
+                "family id": "0101",
+                "individual id": "156",
+                "mother id": "456",
+                "father id": "",
+                "sex": "F",
+                "proband": "N",
+                "hpo terms": "",
+                "mondo terms": "",
+                "pregnancy": "y",
+                "gestational age": "25",
+                "gestational age units": "week",
+            },
+            7,
+        ),
     ]
 
 
@@ -1087,7 +1364,7 @@ class TestAccessionMetadata:
         assert a_types["1111"] == "WGS-Trio"
         assert a_types["2222"] == "WGS"
         assert a_types["3333"] == "WES-Group"
-        example_rows[1]["test requested"] = "WES"
+        example_rows[1][0]["test requested"] = "WES"
         new_obj = AccessionMetadata(
             testapp, example_rows, project, institution, TEST_INGESTION_ID1
         )
@@ -1105,12 +1382,12 @@ class TestAccessionMetadata:
         """
         for rowidx in (1, 2):
             data = [
-                {k: v for k, v in example_rows[0].items()},
+                ({k: v for k, v in example_rows[0][0].items()}, 0),
                 # 2 rows have same sample
-                {k: v for k, v in example_rows[1].items()},
-                {k: v for k, v in example_rows[1].items()},
+                ({k: v for k, v in example_rows[1][0].items()}, 1),
+                ({k: v for k, v in example_rows[1][0].items()}, 2),
             ]
-            data[rowidx]["specimen accepted by ref lab"] = "Y"
+            data[rowidx][0]["specimen accepted by ref lab"] = "Y"
         submission = AccessionMetadata(
             testapp, data, project, institution, TEST_INGESTION_ID1
         )
@@ -1160,7 +1437,7 @@ class TestAccessionMetadata:
         tests handling of duplicate relations for parents vs siblings.
         before modification, fixture contains proband, mother, father, sister.
         """
-        big_family_rows[4]["relation to proband"] = last_relation
+        big_family_rows[4][0]["relation to proband"] = last_relation
         submission = AccessionMetadata(
             testapp, big_family_rows, project, institution, TEST_INGESTION_ID1
         )
@@ -1172,7 +1449,7 @@ class TestAccessionMetadata:
 
     def test_add_sample_processing(self, testapp, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
-        example_rows[6][
+        example_rows[6][0][
             "test requested"
         ] = "WGS"  # analysis 3333 will have mismatched workup type values
         submission = AccessionMetadata(
@@ -1205,7 +1482,7 @@ class TestAccessionMetadata:
             row_dict["report required"] = "N"
         row_dict["unique analysis id"] = case_id
         submission = AccessionMetadata(
-            testapp, [row_dict], project, institution, TEST_INGESTION_ID1
+            testapp, [(row_dict, 0)], project, institution, TEST_INGESTION_ID1
         )
         case = list(submission.cases.values())[0]
         assert row_dict["individual id"] in case["individual"]
@@ -1228,7 +1505,7 @@ class TestAccessionMetadata:
         """tests that case ID from row gets added to proper dictionary attribute"""
         row_dict["unique analysis id"] = case_id
         submission = AccessionMetadata(
-            testapp, [row_dict], project, institution, TEST_INGESTION_ID1
+            testapp, [(row_dict, 0)], project, institution, TEST_INGESTION_ID1
         )
         key = "{}-{}".format(row_dict["analysis id"], row_dict["specimen id"])
         assert submission.case_info.get(key)["case id"] == case_id
@@ -1382,7 +1659,7 @@ class TestAccessionMetadata:
         row_dict_uncle["case files"] = uncle_case_files
         row_dict["genome build"] = genome_build
         row_dict_uncle["genome_build"] = genome_build
-        rows = [row_dict, row_dict_uncle]
+        rows = [(row_dict, 1), (row_dict_uncle, 2)]
         accession_metadata = AccessionMetadata(
             es_testapp, rows, wb_project, wb_institution, "some_ingestion_id"
         )
@@ -2456,10 +2733,10 @@ class TestPedigreeMetadata:
         """
         for rowidx in (1, 2):
             data = [
-                {k: v for k, v in example_rows_pedigree[0].items()},
+                ({k: v for k, v in example_rows_pedigree[0][0].items()}, 1),
                 # 2 rows have same sample
-                {k: v for k, v in example_rows_pedigree[6].items()},
-                {k: v for k, v in example_rows_pedigree[6].items()},
+                ({k: v for k, v in example_rows_pedigree[6][0].items()}, 2),
+                ({k: v for k, v in example_rows_pedigree[6][0].items()}, 3),
             ]
             submission = PedigreeMetadata(
                 testapp, data, project, institution, TEST_INGESTION_ID1
@@ -2469,7 +2746,7 @@ class TestPedigreeMetadata:
             )  # row 0, row 6, + 2 parents of row[0]
             # assert len(submission.families) == 1
             assert "is_pregnancy" in list(submission.individuals.values())[1]
-            assert list(submission.individuals.values())[1]["is_pregnancy"] == True
+            assert list(submission.individuals.values())[1]["is_pregnancy"] is True
 
     def test_add_family_metadata(
         self,
@@ -2492,7 +2769,7 @@ class TestPedigreeMetadata:
         of the new alias. Additionally, if the proband designation is missing from the family history rows,
         the PedigreeMetadata object still gets created without error messages when the family is in the DB already.
         """
-        example_rows_pedigree[0]["proband"] == "N"
+        example_rows_pedigree[0][0]["proband"] == "N"
         submission = PedigreeMetadata(
             es_testapp,
             example_rows_pedigree,
@@ -2513,7 +2790,7 @@ class TestPedigreeMetadata:
         """Tests that if 2 items are in the DB with same familyID, that both of these are reflected in the
         PedigreeMetadata object. Checks that both items have all members and proband of each isn't changed."""
         for row in example_rows_pedigree:
-            row["family id"] = "0102"
+            row[0]["family id"] = "0102"
         submission = PedigreeMetadata(
             es_testapp,
             example_rows_pedigree,
@@ -2532,7 +2809,7 @@ class TestPedigreeMetadata:
     def test_add_family_metadata_no_proband(
         self, testapp, example_rows_pedigree, project, institution
     ):
-        del example_rows_pedigree[0]["proband"]
+        del example_rows_pedigree[0][0]["proband"]
         submission = PedigreeMetadata(
             testapp, example_rows_pedigree, project, institution, TEST_INGESTION_ID1
         )
@@ -2611,7 +2888,8 @@ class TestSpreadsheetProcessing:
         )
         assert obj.keys
         assert len(obj.rows) == 3
-        for row in obj.rows:
+        rows = list(map(lambda x: x[0], obj.rows))
+        for row in rows:
             assert all(key in row for key in obj.keys)
 
     def test_create_row_dict_missing_col(self, testapp, xls_list, project, institution):
@@ -2668,7 +2946,8 @@ class TestSpreadsheetProcessing:
         )
         assert obj.keys
         assert len(obj.rows) == 8
-        for row in obj.rows:
+        rows = list(map(lambda x: x[0], obj.rows))
+        for row in rows:
             assert all(key in row for key in obj.keys)
 
     @pytest.mark.parametrize(
@@ -2737,7 +3016,7 @@ def test_xls_to_json_accessioning(testapp, project, institution):
 
 def test_xls_to_json_pedigree(testapp, project, institution):
     """tests that xls_to_json returns expected output when a spreadsheet is formatted correctly"""
-    rows = digest_xlsx("src/encoded/tests/data/documents/pedigree_test_example.xlsx")
+    rows = digest_xlsx(TEST_WORKBOOK_PEDIGREE)
     json_out, success = xls_to_json(
         testapp, rows, project, institution, TEST_INGESTION_ID1, "family_history"
     )
@@ -2782,6 +3061,93 @@ def test_xls_to_json_pedigree_errors(testapp, project, institution):
     assert "Row 5" in joined_errors
     assert "HP:00000821" in joined_errors
     assert "Row 9 - missing required field(s) family id." in joined_errors
+    assert success
+
+
+@pytest.mark.parametrize(
+    "digested_xlsx, expected_error_rows",
+    [
+        (BLANK_BEFORE_HEADER, [3]),
+        (BLANK_AFTER_HEADER, [3]),
+        (BLANK_BT_ROWS, [2, 4]),
+        (BLANK_AFTER_HEADER_AND_BT_ROWS, [3, 5]),
+        (BLANK_AFTER_ROWS, [2]),
+        (BLANK_COMBINATION, [4, 6]),
+        (BLANK_NO_ERRORS, []),
+    ],
+)
+def test_xls_to_json_accession_row_counting(
+    testapp, project, institution, digested_xlsx, expected_error_rows
+):
+    """
+    Test for correct row counting in SpreadsheetProcessing, specifically
+    accounting for blank rows in Case ingestion submissions.
+
+    Types of cases:
+        - blank row(s) before header
+        - blank row(s) directly after header
+        - blank row(s) between rows with erroneous data
+        - blank row(s) after rows with erroneous data
+        - combination of placement of blank row(s)
+        - blank row(s) in spreadsheet with no erroneous rows
+
+    :param digested_xlsx: list representing contents of spreadsheet
+    :type digested_xlsx: list[lists[str]]
+    :param expected_error_rows: row positions within spreadsheet with erroneous rows
+    :type expected_error_rows: list[int]
+    """
+    rows = (row for row in digested_xlsx)
+    json_out, success = xls_to_json(
+        testapp, rows, project, institution, TEST_INGESTION_ID1, "accessioning"
+    )
+    joined_errors = "".join(json_out["errors"])
+    for row_with_error in expected_error_rows:
+        assert f"Row {str(row_with_error)}" in joined_errors
+    assert success
+
+
+@pytest.mark.parametrize(
+    "digested_xlsx, expected_error_rows",
+    [
+        (BLANK_BEFORE_HEADER_PED, [3]),
+        (BLANK_AFTER_HEADER_PED, [3]),
+        (BLANK_BT_ROWS_PED, [2, 4]),
+        (BLANK_BEFORE_HEADER_AND_BT_ROWS_PED, [3, 5]),
+        (BLANK_AFTER_HEADER_AND_BT_ROWS_PED, [3, 5]),
+        (BLANK_AFTER_ROWS_PED, [2]),
+        (BLANK_COMBINATION_PED, [4, 6]),
+        (BLANK_NO_ERRORS_PED, []),
+    ],
+)
+def test_xls_to_json_pedigree_row_counting(
+    testapp, project, institution, digested_xlsx, expected_error_rows
+):
+    """
+    Test for correct row counting in SpreadsheetProcessing, specifically
+    accounting for blank rows in Family History ingestion submissions.
+
+    Types of cases:
+        - blank row(s) before header
+        - blank row(s) directly after header
+        - blank row(s) between rows with erroneous data
+        - blank row(s) after rows with erroneous data
+        - combination of placement of blank row(s)
+        - blank row(s) in spreadsheet with no erroneous rows
+
+    :param digested_xlsx: list representing contents of spreadsheet
+    :type digested_xlsx: list[lists[str]]
+    :param expected_error_rows: row positions within spreadsheet with erroneous rows
+    :type expected_error_rows: list[int]
+    """
+    rows = (
+        row for row in digested_xlsx
+    )  # make generator out of the digested_xlsx parameter
+    json_out, success = xls_to_json(
+        testapp, rows, project, institution, TEST_INGESTION_ID1, "family_history"
+    )
+    joined_errors = "".join(json_out["errors"])
+    for row_with_error in expected_error_rows:
+        assert f"Row {str(row_with_error)}" in joined_errors
     assert success
 
 
