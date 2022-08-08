@@ -1,0 +1,24 @@
+[
+    {
+        "status": "shared",
+        "aliases": [
+            "cypress-main:report-HG002"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPREET87DZF",
+        "description": "Analysis Report for Individual ID NA24385 (Analysis HG002-1)",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "uuid": "71118eb1-3e09-414d-8776-cd240fc095de"
+    },
+    {
+        "status": "shared",
+        "aliases": [
+            "cypress-main:report-NA12879-WGS-Trio"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPRE5XHBDRF",
+        "description": "Analysis Report for Individual ID NA12879 (Analysis NA12879-1)",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "uuid": "a082f33f-37db-4dde-aea2-0c518ad832ba"
+    }
+]
