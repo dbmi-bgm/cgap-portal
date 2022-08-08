@@ -1,0 +1,762 @@
+[
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "6d816021-b632-46a9-afa7-fa9b3571ee13",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "5adbb18e-5866-4e91-8fb2-e61525253e76",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "cc910b04-a079-4803-b4c3-bf18055db659"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "0db4b210-b36c-4a07-84d2-69e5e270dd6f",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "de612d2f-96dd-4093-877b-0b97be6ddb71",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
+        ],
+        "uuid": "efd33397-d98a-454b-b30f-787329128da2"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "12e989c3-216f-47d3-bd49-68c33300e3b1",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "f44b96c4-e108-4ba8-8ce7-c97815bb891c",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "8758e49c-6c86-44ac-bd89-921a503b7544"
+        ],
+        "uuid": "e0749896-14ee-45a9-a26f-5338fe364841"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "fc6136db-d756-4896-9546-dfd367197c3c",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "bc89bafe-231e-4c29-9ab7-fdd7a99c6b4c",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "60eb5168-b6c9-46ce-8c6a-e1fe54940e71"
+        ],
+        "uuid": "95dede75-4c42-4aee-89d5-6099e816479e"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "2a251118-8900-4648-9930-4beed48950cf",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "69f0f0f2-b0fa-4465-b089-58861bc2e8cf",
+                "qc_type": "quality_metric_peddyqc"
+            },
+            {
+                "value": "f9ee7582-cffb-459e-b5de-7e43e6b6a1a6",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "8758e49c-6c86-44ac-bd89-921a503b7544"
+        ],
+        "uuid": "d5fed49f-815f-4ecc-9e5f-162e24daed5c"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "b34ddcd1-4d66-4e6f-9424-d6a9732e4232",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "171ee410-78d8-40de-b5bd-4aff33e7696a",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "e3993170-dc06-4af9-b185-bc784d4fa662"
+        ],
+        "uuid": "000fb194-1b1c-4c9c-8048-1ecf48ff11ea"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "f02f4945-c6a6-4129-bb44-069c88a45a3c",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "48705187-4196-4f35-9f72-545326d20dcd",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "aee6c203-3eb4-48b4-9b39-73c858de2af6"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "8853737a-d7ca-4f95-a120-4f7f4d2d8961",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "0d826a69-4e50-4f9f-85e4-329ede7b18a1",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "8ebec863-9f1c-4984-8876-b161adb8dde5"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "1113904e-d463-446f-83b5-49b5ddeaf275",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "db83712b-a61d-4872-879c-449daada5e5d",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "8758e49c-6c86-44ac-bd89-921a503b7544"
+        ],
+        "uuid": "961a0303-7939-4ea9-89d6-32e4126afc26"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "672c359a-4103-497c-b653-3d8dbabae7e6",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "2dec68bd-0c6c-4e1d-af98-f0073f354b6a",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "434d4041-91af-4697-b6cd-f1a05f68f4ea"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "221a001f-01dc-4645-9d16-b4d2c4a0ef09",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "2a106dd7-19d2-45eb-99ac-4db78e14b7af",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "8854427b-6ad1-4201-9fc5-64b92721e421"
+        ],
+        "uuid": "05d0f589-598d-45c4-aab1-bc218476bada"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "00a85e27-edec-472d-a11c-717854574c0e",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "19d7176c-fe99-4ad6-9f2e-4f2a2e1a2a0d",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "9d0b5f82-35fe-4d10-aa93-47de75042c7c"
+        ],
+        "uuid": "a9fd6eeb-87b0-47c6-9e08-dba28052d6a8"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "3b0bfae1-55ca-4330-b1d2-2aefbc026767",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "535b02f6-e5ff-4e1b-a4a4-20c2dc135a42",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "a164c5d5-67cf-480d-b8b7-6f9ec2fd8540",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "f81a4821-955e-40e5-a107-86ab7e41b14e",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "b83a55e9-41bd-446e-993a-35077f8a482a"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "b816feeb-98e3-462c-9bcd-7f70d2c8ca4e",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "b7181e35-f811-4ec4-8dcd-48a64cf32ff1",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "76af584b-7e11-47a2-b00a-e49dd9c0030d"
+        ],
+        "uuid": "73aa742c-303f-4871-9be3-aa17071267a7"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "e0304ea2-fe84-41d7-b039-c6623c117a7e",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "8a70bb14-fc15-465f-b54a-5ff2e8d9f37d",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "d4ffa4f4-43ee-4e7f-bfeb-c939bf93615d"
+        ],
+        "uuid": "d86bd822-96f1-4385-b6e8-26bb828c96de"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "f676d775-398b-4278-8f80-e0f2fbceabac",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "698d3eff-2eb7-40ef-a962-ad548710b1b2",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "e3993170-dc06-4af9-b185-bc784d4fa662"
+        ],
+        "uuid": "b4f4ce8b-32a2-4b4c-80db-915a289d4cfc"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "9e5392e5-0804-4db0-87a4-bedecd663a75",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "6561d7cf-a5c1-4ada-9eab-9e1ba62b3699",
+                "qc_type": "quality_metric_peddyqc"
+            },
+            {
+                "value": "1a6c85b3-2d60-4428-b449-0771abdf787a",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "c9df0265-50c5-4706-9327-86d9f18f8130"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "ea0ead41-0681-4f52-af99-53560b5f3c33",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "bb722818-b24e-4bbd-9a1b-95eab164e473",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "1f46227e-09a1-43ad-9cce-f7512802272e"
+        ],
+        "uuid": "b14006b3-63d4-466d-be57-a9edefc0b933"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "d06ed38e-1188-43c8-8019-eb8e0c96028e",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "6de5ab2e-5d7b-4fe2-af24-e110c2baff0a",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "4958d415-8b82-49e9-ad09-ce8e062e40bf"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "463f4011-7ff9-49a5-916c-199509008cc6",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "762c129b-0852-4e5f-bf46-91f70692f339",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "1a976eb2-7e3e-44cc-9a8a-cc3af516dd00"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "f311e857-4518-4620-89ad-27dc5f2c3de9",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "ba6fb0bb-d069-4659-81d6-cec32a4632e8",
+                "qc_type": "quality_metric_peddyqc"
+            },
+            {
+                "value": "a6d2172a-8c00-4f1c-a510-ccbad8884776",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
+        ],
+        "uuid": "62998125-97e8-448e-9eb5-32fb9813a041"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "91cf4dda-01c7-4d14-8eab-b821c7c231bd",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "aed45846-5c73-4301-bab8-a22586ac560e",
+                "qc_type": "quality_metric_peddyqc"
+            },
+            {
+                "value": "6fa47809-d473-431c-a866-ae411daf66b7",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "5405be9b-fe9c-43fc-8d04-abf387344f8c"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "0f2aa167-114f-4901-91c0-1bb754d5aa1c",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "7408f740-26fc-4ce0-aeb7-3e65e60fbbc8",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "742fee96-0c64-43ec-a075-b484b0dee273"
+        ],
+        "uuid": "c9ffbd79-c5da-48f5-9373-3319b106d77e"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "0b79e5ae-c37b-497b-90be-51eb3caa5d50",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "35155393-9288-43d9-90f1-3f5d0ee9e445",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "8854427b-6ad1-4201-9fc5-64b92721e421"
+        ],
+        "uuid": "48448a59-8af1-4fc0-8c02-41afe14a581c"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "f43c0742-c05e-43c1-bf1e-0506725b5fc6",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "d2fa04ed-c1f7-481b-806f-7df83bf81dd3",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "47d1781b-b1c5-4561-a7b5-bf40a70bf69c"
+        ],
+        "uuid": "c713f15d-f9ff-44a0-ad73-a1ebcbe6a1c7"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "ccf84a75-10e0-4408-9072-f5fb1b66d09f",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "76735767-eb83-489c-b44a-79af3cd91926",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "47d1781b-b1c5-4561-a7b5-bf40a70bf69c"
+        ],
+        "uuid": "35055307-145e-41f4-83f2-8ab424294d94"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "c2f9e029-6214-4ded-826e-37e544af802f",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "820ac4dd-0ac3-4cc4-b53f-d4f3a54af8b6",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "76af584b-7e11-47a2-b00a-e49dd9c0030d"
+        ],
+        "uuid": "5c190205-f2cd-4fb0-97d0-93e1aa7b0954"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "3951d309-038b-4e81-a6ef-a027da9fcef9",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "8533f4a4-9614-4a46-b453-43e9fa49e371",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "60eb5168-b6c9-46ce-8c6a-e1fe54940e71"
+        ],
+        "uuid": "dcad119f-f342-46ec-badd-eb09b37ca3e9"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "0dd71910-f11c-432d-b212-2678309630cc",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "df893eff-16df-46dd-8440-a9449a9ac40c",
+                "qc_type": "quality_metric_peddyqc"
+            },
+            {
+                "value": "6f1ea90b-6546-4514-b26d-7b5092b81139",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "5e637484-4afa-4d91-97ce-050bf2a6bcd6"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "fc3f3dcb-2ba2-485f-8684-8f5e2a801faf",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "6c964d3b-0250-4b2e-9df3-7cd6713ea3d6",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "d4ffa4f4-43ee-4e7f-bfeb-c939bf93615d"
+        ],
+        "uuid": "d8d96729-4cc4-4141-8b0b-afad5291af45"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "95c2ac4e-edee-4bd6-9558-9595f8ef7a8f",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "31e0c956-9bf0-4123-8758-02995043833c",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "742fee96-0c64-43ec-a075-b484b0dee273"
+        ],
+        "uuid": "2f1d16f9-36ba-42c0-a3db-a27df9edeff2"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "cf2fd39d-052f-4ca7-bd07-4cda51199c47",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "726cfda9-cf5d-4f9c-9077-664b593e0e54",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
+        ],
+        "uuid": "37556964-08ce-4b3c-8848-074fb9d5a3d6"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "b599c38a-35ad-4c4f-a4bf-80b398bff4b2",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "13c31319-1dfe-4b1b-8058-4519c353bfbb",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "090eb6b5-7af1-4a64-9fd3-bc9e62955660"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "72c24ef7-49bf-4e0c-9667-0a62f9f0397d",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "866988a5-2aa3-4f27-a103-1d17b3dd0fcc",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "ac83094c-6bb2-4754-9573-ec6f9dc74ee5"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "4679ce39-dca1-4b71-9584-f419f0a17823",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "688bdfae-a43b-4811-9cb2-73e85448b1d2",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "9d0b5f82-35fe-4d10-aa93-47de75042c7c"
+        ],
+        "uuid": "a570ab94-8915-4fb2-ae0f-f004136832dd"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "2195e818-55e5-496e-a0cc-5db0a8c827cb",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "6cbc38ee-2ec8-4900-971d-13bfe7fce708",
+                "qc_type": "quality_metric_peddyqc"
+            },
+            {
+                "value": "04e7f5a1-853a-472a-8360-18e43e1f35a2",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "uuid": "3b5bd52f-e245-49b5-894c-4ad174839a59"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "qc_list": [
+            {
+                "value": "09fb8b9a-4bc9-4f1b-905b-41b356fb741f",
+                "qc_type": "quality_metric_vcfcheck"
+            },
+            {
+                "value": "be78977b-ceec-4460-8118-a716674b0f30",
+                "qc_type": "quality_metric_vcfqc"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "1f46227e-09a1-43ad-9cce-f7512802272e"
+        ],
+        "uuid": "f63644db-a34a-46a2-82fb-185507966be5"
+    }
+]

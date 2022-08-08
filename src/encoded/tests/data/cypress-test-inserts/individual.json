@@ -1,0 +1,96 @@
+[
+    {
+        "sex": "F",
+        "father": "af208b30-2405-45b9-bdb8-a9e51741b7c8",
+        "mother": "9308eb7b-eb42-482e-b022-3f3051fbbf69",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:individual-NA12879"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "samples": [
+            "304fc930-ff45-4fa8-b554-e928600b1925"
+        ],
+        "accession": "GAPID43VJKQ6",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "individual_id": "NA12879",
+        "uuid": "27200afa-2124-4e66-b99c-58a0ecd06e2f"
+    },
+    {
+        "sex": "M",
+        "father": "51bee3b6-2566-4af3-a53d-9c8afd45fb6a",
+        "mother": "529f846a-b12d-4814-b7d5-ca91cca3ff47",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:individual-NA24385"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "samples": [
+            "1f1bba19-117e-4300-be43-04f107e9c1e5"
+        ],
+        "accession": "GAPIDUOL9GFV",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "individual_id": "NA24385",
+        "uuid": "97dd4897-6e3b-4a56-afe0-dfda92c9d958"
+    },
+    {
+        "sex": "F",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:individual-NA12878"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "samples": [
+            "a9a58f78-a1c1-4624-987d-4d451b1e7e75"
+        ],
+        "accession": "GAPIDUZDOX4R",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "individual_id": "NA12878",
+        "uuid": "9308eb7b-eb42-482e-b022-3f3051fbbf69"
+    },
+    {
+        "sex": "F",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:individual-NA24143"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "samples": [
+            "5648a8db-e89c-40a3-8df8-75c9386f31e3"
+        ],
+        "accession": "GAPIDE8VJXKD",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "individual_id": "NA24143",
+        "uuid": "529f846a-b12d-4814-b7d5-ca91cca3ff47"
+    },
+    {
+        "sex": "M",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:individual-NA24149"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "samples": [
+            "3047f331-2f4f-4389-9e87-f7e2b4b17c88"
+        ],
+        "accession": "GAPIDEYNQCP4",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "individual_id": "NA24149",
+        "uuid": "51bee3b6-2566-4af3-a53d-9c8afd45fb6a"
+    },
+    {
+        "sex": "M",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:individual-NA12877"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "samples": [
+            "7514c6c1-9600-4290-b982-402b72fbe917"
+        ],
+        "accession": "GAPIDQV37Z5Y",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "individual_id": "NA12877",
+        "uuid": "af208b30-2405-45b9-bdb8-a9e51741b7c8"
+    }
+]
