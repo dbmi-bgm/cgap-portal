@@ -788,21 +788,32 @@ class AccessionMetadata:
             analysis_relations[row.get(SS_ANALYSIS_ID)][1].append(
                 row.get(workup_col, "").upper()
             )
-            # dict now has format {analysis id: (relations list, workup types list)}
-        for k, v in analysis_relations.items():
-            workups = list(set(v[1]))
-            relations = v[0]
-            if len(workups) == 1 and "" not in workups:
-                # if all samples in analysis have same workup type, determine if it is Trio or Group
-                if len(relations) == 1:
-                    [analysis_types[k]] = workups
-                elif sorted(relations) == ["father", "mother", "proband"]:
-                    analysis_types[k] = f"{workups[0]}-Trio"
-                else:
-                    analysis_types[k] = f"{workups[0]}-Group"
-            else:  # analysis type not determined if multiple workup types present in one analysis
-                analysis_types[k] = None
+        for analysis_id, (relations, workup_types) in analysis_relations.items():
+            workups = sorted(list(set(item for item in workup_types if item)))
+            analysis_type_add_on = self.get_analysis_type_add_on(relations)
+            if workups:
+                workup_name = "/".join(workups)
+                analysis_type = workup_name + analysis_type_add_on
+            else:
+                analysis_type = None
+            analysis_types[analysis_id] = analysis_type
         return analysis_types
+
+    def get_analysis_type_add_on(self, relations):
+        """Get analysis type label based on relations.
+
+        :param relations: Relations across the case submission
+        :type relations: list
+        :returns: Analysis type label
+        :rtype: str
+        """
+        if relations == ["proband"]:
+            result = ""
+        elif sorted(relations) == ["father", "mother", "proband"]:
+            result = "-Trio"
+        else:
+            result = "-Group"
+        return result
 
     def add_metadata_single_item(self, item):
         """
@@ -945,7 +956,7 @@ class AccessionMetadata:
         created here, if spreadsheet row indicates it is required.
         """
         for k, v in self.sample_processings.items():
-            analysis_id = k[k.index("analysis-") + 9 :]
+            analysis_id = k[k.index("analysis-") + 9:]
             for sample in v["samples"]:
                 case_key = "{}-{}".format(
                     analysis_id, self.samples[sample].get("specimen_accession", "")
@@ -1043,7 +1054,6 @@ class AccessionMetadata:
         Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
         Case creation and family relations added after all rows have been processed.
         """
-        self.get_analysis_types()
         for (row, row_number) in self.rows:
             try:
                 fam = self.family_dict[row.get("analysis id")]

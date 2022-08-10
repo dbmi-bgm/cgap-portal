@@ -1048,7 +1048,7 @@ class TestAccessionMetadata:
     def test_get_analysis_types(
         self, testapp, example_rows_obj, example_rows, project, institution
     ):
-        """analysis type should be none if workup types in samples don't match"""
+        """Test analysis type string calculation for cases."""
         a_types = example_rows_obj.analysis_types
         assert a_types["1111"] == "WGS-Trio"
         assert a_types["2222"] == "WGS"
@@ -1058,7 +1058,23 @@ class TestAccessionMetadata:
             testapp, example_rows, project, institution, TEST_INGESTION_ID1
         )
         new_a_types = new_obj.analysis_types
-        assert new_a_types["1111"] is None
+        assert new_a_types["1111"] == "WES/WGS-Trio"
+
+    @pytest.mark.parametrize(
+        "relations,expected",
+        [
+            (["proband"], ""),
+            (["proband", "mother", "father"], "-Trio"),
+            (["mother", "proband", "father"], "-Trio"),
+            (["proband", "mother"], "-Group"),
+            (["foo"], "-Group"),
+            ([], "-Group"),
+        ]
+    )
+    def test_get_analysis_type_add_on(self, example_rows_obj, relations, expected):
+        """Test analysis label based on relations."""
+        result = example_rows_obj.get_analysis_type_add_on(relations)
+        assert result == expected
 
     def test_add_metadata_single_item(
         self, testapp, example_rows, project, institution
