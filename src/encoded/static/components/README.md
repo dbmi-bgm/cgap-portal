@@ -6,12 +6,6 @@
 ---
 
 
-<div>
-
-<img src="https://framerusercontent.com/images/3jVAmsyQ9VOVNSRTk7lQUqqwL4.png"/>
-</div>
-
-
 ## Overview
 
 The client/front-end for the [4DN Data Portal](https://data.4dnucleome.org) functions as a single-page application (SPA) and is written entirely in [ReactJS](https://reactjs.org/). This includes the output/rendering of the `<head>` document HTML element¹.
