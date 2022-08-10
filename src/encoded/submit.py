@@ -786,7 +786,7 @@ class AccessionMetadata:
             workup_value = row.get(workup_col, "").upper()
             if not workup_value:
                 msg = (
-                    f"Row {row_index} - missing required field \"{workup_col}\"."
+                    f'Row {row_index} - missing required field "{workup_col}".'
                     f" Please re-submit with appropriate value."
                 )
                 self.errors.append(msg)
@@ -959,7 +959,7 @@ class AccessionMetadata:
         created here, if spreadsheet row indicates it is required.
         """
         for k, v in self.sample_processings.items():
-            analysis_id = k[k.index("analysis-") + 9:]
+            analysis_id = k[k.index("analysis-") + 9 :]
             for sample in v["samples"]:
                 case_key = "{}-{}".format(
                     analysis_id, self.samples[sample].get("specimen_accession", "")

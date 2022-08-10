@@ -1076,7 +1076,7 @@ class TestAccessionMetadata:
             (["proband", "mother"], "-Group"),
             (["foo"], "-Group"),
             ([], "-Group"),
-        ]
+        ],
     )
     def test_get_analysis_type_add_on(self, example_rows_obj, relations, expected):
         """Test analysis label based on relations."""
