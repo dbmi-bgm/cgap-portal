@@ -1209,9 +1209,7 @@ class TestAccessionMetadata:
 
     def test_add_sample_processing(self, testapp, example_rows, project, institution):
         """tests metadata creation for sample_processing item from a set of rows"""
-        example_rows[6][0][
-            "test requested"
-        ] = "WGS"  # analysis 3333 will have mismatched workup type values
+        example_rows[6][0]["workup type"] = ""  # trigger error for row 7
         submission = AccessionMetadata(
             testapp, example_rows, project, institution, TEST_INGESTION_ID1
         )
@@ -1226,10 +1224,7 @@ class TestAccessionMetadata:
         assert sps["encode-project:analysis-2222"]["samples"] == [
             "encode-project:sample-1-WGS"
         ]
-        assert not sps["encode-project:analysis-3333"]["analysis_type"]
-        assert "3333 contain mis-matched or invalid workup type values" in "".join(
-            submission.errors
-        )
+        assert "Row 7" in "".join(submission.errors)
 
     @pytest.mark.parametrize(
         "case_id, report", [(None, True), ("Case123", True), ("Case123", False)]
@@ -2150,26 +2145,6 @@ def test_xls_to_json_pedigree_row_counting(
     for row_with_error in expected_error_rows:
         assert f"Row {str(row_with_error)}" in joined_errors
     assert success
-
-
-def test_xls_to_json_invalid_workup(testapp, project, institution, xls_list):
-    """
-    tests that an invalid workup type is caught as an error -
-    tested via xls_to_json to ensure that errors generated in child objects are passed
-    all the way up to parent function that calls them
-    """
-    idx = xls_list[1].index("Workup Type")
-    xls_list[4] = xls_list[4][0:idx] + ["Other"] + xls_list[4][idx + 1 :]
-    rows = iter(xls_list)
-    json_out, success = xls_to_json(
-        testapp, rows, project, institution, TEST_INGESTION_ID1, "accessioning"
-    )
-    assert json_out["errors"]
-    assert success
-    assert (
-        "Row 5 - Samples with analysis ID 55432 contain mis-matched "
-        "or invalid workup type values."
-    ) in "".join(json_out["errors"])
 
 
 def test_parse_exception_invalid_alias(testapp, a_case):

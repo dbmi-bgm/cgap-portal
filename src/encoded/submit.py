@@ -251,7 +251,7 @@ def get_column_name(row, columns):
     Final column in list must be the default name.
     """
     for col in columns:
-        if row.get(col):
+        if row.get(col) is not None:
             return col
     return columns[-1]
 
