@@ -772,22 +772,25 @@ class AccessionMetadata:
             '111': (['proband', 'mother', 'father'], ['WGS', 'WGS', 'WGS']),  # --> WGS-Trio
             '222': (['proband'], ['WES']),                                    # --> WES
             '333': (['proband', 'father', 'sibling'], ['WGS', 'WGS', 'WGS']), # --> WGS-Group
-            '234': (['proband', 'mother'], ['WGS', 'WES']),                   # --> None
+            '234': (['proband', 'mother'], ['WGS', 'WES']),                   # --> WES/WGS-Group
         }
-        The last entry in the dict will get an analysis_type of None because the workup types are mixed which is
-        not allowed.
         """
         analysis_relations = {}
         analysis_types = {}
-        for row in self.row_data_dicts:
+        for row, row_index in self.rows:
             analysis_relations.setdefault(row.get(SS_ANALYSIS_ID), [[], []])
             analysis_relations[row.get(SS_ANALYSIS_ID)][0].append(
                 row.get(SS_RELATION, "").lower()
             )
             workup_col = get_column_name(row, ["test requested", "workup type"])
-            analysis_relations[row.get(SS_ANALYSIS_ID)][1].append(
-                row.get(workup_col, "").upper()
-            )
+            workup_value = row.get(workup_col, "").upper()
+            if not workup_value:
+                msg = (
+                    f"Row {row_index} - missing required field \"{workup_col}\"."
+                    f" Please re-submit with appropriate value."
+                )
+                self.errors.append(msg)
+            analysis_relations[row.get(SS_ANALYSIS_ID)][1].append(workup_value)
         for analysis_id, (relations, workup_types) in analysis_relations.items():
             workups = sorted(list(set(item for item in workup_types if item)))
             analysis_type_add_on = self.get_analysis_type_add_on(relations)

@@ -1057,8 +1057,15 @@ class TestAccessionMetadata:
         new_obj = AccessionMetadata(
             testapp, example_rows, project, institution, TEST_INGESTION_ID1
         )
+        assert not new_obj.errors
         new_a_types = new_obj.analysis_types
         assert new_a_types["1111"] == "WES/WGS-Trio"
+        del example_rows[1][0]["workup type"]
+        example_rows[1][0]["test requested"] = ""
+        new_obj = AccessionMetadata(
+            testapp, example_rows, project, institution, TEST_INGESTION_ID1
+        )
+        assert new_obj.errors
 
     @pytest.mark.parametrize(
         "relations,expected",
