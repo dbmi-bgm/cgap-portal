@@ -44,6 +44,7 @@ def test_omittable():
     assert omittable("foo=$X", "foo=   \r\n \r\n ")
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_environment_template_filename():
 
     with pytest.raises(ValueError):
@@ -57,12 +58,14 @@ def test_environment_template_filename():
     assert environment_template_filename('cgapdev') == environment_template_filename('fourfront-cgapdev')
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_any_environment_template_filename():
 
     actual = os.path.abspath(any_environment_template_filename())
     assert actual.endswith("/ini_files/any.ini")
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_legacy_template_environment_names():
     # Containerized CGAP uses a single generic template, but while we're still using beanstalks,
     # we do some minimal testing to make sure all the templates are there. -kmp 4-Oct-2021

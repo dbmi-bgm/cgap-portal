@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "9.4.2.1b9"
+version = "9.4.2.1b10"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -91,8 +91,6 @@ python_magic = ">=0.4.24,<1"
 pytz = ">=2021.3"
 rdflib = "^4.2.2"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
-# repoze.debug is needed to use pyramid.pserve - Will Feb 17 2022
-"repoze.debug" = ">=1.0.2"
 requests = "^2.23.0"
 rfc3986 = "^1.4.0"
 rsa = "3.3"

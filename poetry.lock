@@ -1711,21 +1711,6 @@ python-versions = "*"
 rdflib = "*"
 
 [[package]]
-name = "repoze.debug"
-version = "1.1"
-description = "Forensic debugging WSGI middleware"
-category = "main"
-optional = false
-python-versions = "*"
-
-[package.dependencies]
-WebOb = "*"
-
-[package.extras]
-docs = ["sphinx", "webob"]
-testing = ["webob", "coverage", "nose"]
-
-[[package]]
 name = "requests"
 version = "2.28.1"
 description = "Python HTTP for Humans."
@@ -2238,7 +2223,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.9"
-content-hash = "0656c307a63749f8f0b7812df9a509697f9005e49ae612d7e4c81060cedc50b3"
+content-hash = "6273b832c0df64cb8a953d9767f3cca3d4c7fddc87ffc184b3590a84f4a7c894"
 
 [metadata.files]
 apipkg = [
@@ -3275,10 +3260,6 @@ rdflib = [
 rdflib-jsonld = [
     {file = "rdflib-jsonld-0.6.0.tar.gz", hash = "sha256:03af8b5540a8e7bb0dae0d9ba1a3bd7f6435abd82cfb4b3ad5e0cdb1bf45a2a6"},
     {file = "rdflib_jsonld-0.6.0-py2.py3-none-any.whl", hash = "sha256:d290c03c5097ec3d96bd20dad8ff8b535e3e7cf53d05acf8ac48983eb36a4572"},
-]
-"repoze.debug" = [
-    {file = "repoze.debug-1.1-py2-none-any.whl", hash = "sha256:1d90e5b088b167bcde13bdedfe2e34f15fe8a1f53103e406e49b7c11be4d994d"},
-    {file = "repoze.debug-1.1.tar.gz", hash = "sha256:f897fbb3a09499b0cee3fe2c5e4579ff04e5b0b87b1aad6098d242cbbf573000"},
 ]
 requests = [
     {file = "requests-2.28.1-py3-none-any.whl", hash = "sha256:8fefa2a1a1365bf5520aac41836fbee479da67864514bdb821f31ce07ce65349"},
