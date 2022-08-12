@@ -989,9 +989,9 @@ def pseudo_run(context, request):
 
     return res_dict
 
-
 def _wfoutput_bucket_for_env(env):
     # XXX: this function should no longer be used.
+    raise NotImplementedError("_wfoutput_bucket_for_env is a beanstalk operation that shouldn't be used.")
     return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
 
 
