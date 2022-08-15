@@ -54,8 +54,8 @@ enter the individual's relation to the proband.
 - Valid options include: **proband**, **mother**, **father**,
  **sibling**.
 - If the individual is a sibling, a numerical identifier can
- be appended if necessary (e.g., 'sibling 1'). Currently
- half-siblings and other relations aren't supported by our
+ be appended if necessary (e.g., 'sibling 1').
+- Currently half-siblings and other relations aren't supported by our
  submission software; if you need to submit these, please
  contact us directly.
 
@@ -87,6 +87,8 @@ collected from the individual. Format should be YYYY-MM-DD.
  sequenced. Format should be YYYY-MM-DD.
 
 **Files**: Comma-separated file names to upload for the *sample*.
+These files should contain data related only to one individual in
+the case, e.g. FASTQs, BAMs, or CRAMs.
 While full file paths are accepted, best practice is to submit
 only the file name and to provide the path during upload if needed.
 If the files are FASTQs, the following requirements apply:
