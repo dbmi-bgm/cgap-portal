@@ -1,6 +1,6 @@
 {
     "title": "Processed file from workflow runs",
-    "description": "Files produced by 4DN pipelines.",
+    "description": "Files produced by CGAP pipelines.",
     "id": "/profiles/file_processed.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
@@ -140,14 +140,7 @@
             }
         },
         "genome_assembly": {
-            "title": "Genome Assembly",
-            "description": "The genome assembly associated with the file - for processing or reference",
-            "type": "string",
-            "default": "GRCh38",
-            "lookup": 30,
-            "enum": [
-                "GRCh38"
-            ]
+            "default": "GRCh38"
         },
         "produced_from": {
             "title": "Produced From",
