@@ -27,10 +27,10 @@ _app_settings = {
     'sqlalchemy.url': 'dummy@dummy',
     'retry.attempts': 3,
     # some file specific stuff for testing
-    'file_upload_bucket': 'test-wfout-bucket',
-    'file_wfout_bucket': 'test-wfout-bucket',
+    'file_upload_bucket': 'cgap-unit-testing-wfout',
+    'file_wfout_bucket': 'cgap-unit-testing-wfout',
     'file_upload_profile_name': 'test-profile',
-    'metadata_bundles_bucket': 'elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles',
+    'metadata_bundles_bucket': 'cgap-unit-testing-metadata-bundles',
 }
 
 

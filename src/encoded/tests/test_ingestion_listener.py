@@ -5,14 +5,14 @@ import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored
+from dcicutils.misc_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
+from ..ingestion.common import IngestionReport, IngestionError
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
     STATUS_INGESTED,
 )
-from ..ingestion.common import IngestionReport, IngestionError
 from ..util import debuglog
 
 
@@ -259,7 +259,10 @@ def test_ingestion_report_basic(success):
 
 def mock_request_get(*args, **kwargs):
     """Mock request.get() result for SV VCF ingestion."""
+    ignored(args, kwargs)
+
     class MockContent:
+
         @property
         def content(self):
             """
@@ -277,13 +280,17 @@ def mock_request_get(*args, **kwargs):
             file_contents = file_contents.encode("utf-8")
             content = gzip.compress(file_contents)
             return content
+
     return MockContent()
+
 
 def mock_ingest_vcf(*args, **kwargs):
     """
     Mock for StructuralVariantBuilder.ingest_vcf() for SV VCF ingestion.
     """
+    ignored(args, kwargs)
     return [1, 0]
+
 
 @mock.patch("requests.get", new=mock_request_get)
 @mock.patch(

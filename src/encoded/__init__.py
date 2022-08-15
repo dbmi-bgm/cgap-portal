@@ -1,10 +1,8 @@
-import hashlib
 import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
 import mimetypes
 import netaddr
 import os
 import pkg_resources
-import subprocess
 import sys
 import sentry_sdk
 
@@ -12,14 +10,14 @@ from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from dcicutils.log_utils import set_logging
 from dcicutils.env_utils import get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
-from dcicutils.ecs_utils import CGAP_ECS_REGION
+from dcicutils.ecs_utils import ECSUtils
 from codeguru_profiler_agent import Profiler
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
 from .local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
-from snovault.app import session, json_from_path, configure_dbsession, changelogs, json_asset
+from snovault.app import session, json_from_path, configure_dbsession, changelogs
 from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
@@ -108,7 +106,7 @@ def init_sentry(dsn):
                         integrations=[PyramidIntegration(), SqlalchemyIntegration()])
 
 
-def init_code_guru(*, group_name, region=CGAP_ECS_REGION):
+def init_code_guru(*, group_name, region=ECSUtils.REGION):
     """ Starts AWS CodeGuru process for profiling the app remotely. """
     Profiler(profiling_group_name=group_name, region_name=region).start()
 
