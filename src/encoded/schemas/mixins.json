@@ -480,7 +480,7 @@
     "submitted_files": {
         "files": {
             "title": "Submitted Files",
-            "description": "Submitted files associated withthe item",
+            "description": "Submitted files associated with the item",
             "type": "array",
             "items": {
                 "title": "Submitted File",

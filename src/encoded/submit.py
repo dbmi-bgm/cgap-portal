@@ -369,6 +369,8 @@ class AccessionRow:
         :param str family_alias: analysis ID value for the current row being processed
         :param str project: project name
         :param str institution: institution name
+        :param file_parser: handler for submitted files
+        :type file_parser: SubmittedFileParser object
 
         :ivar str project: initial value: project
         :ivar str institution: initial value: institution
