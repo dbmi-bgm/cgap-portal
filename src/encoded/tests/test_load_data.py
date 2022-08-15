@@ -8,44 +8,10 @@ from ..commands.load_data import load_data_should_proceed, main as load_data_mai
 
 def test_load_data_should_proceed():
 
-    cgap_envs = ['fourfront-cgap', 'fourfront-cgapdev', 'fourfront-cgaptest', 'fourfront-cgapwolf',
-                 'cgap-blue', 'cgap-green', 'cgap-dev', 'cgap-test', 'cgap-wolf']
+    for ignored_env in ["cgap-wolf", "cgap-devtest", "cgap-mgb", "cgap-anything"]:
 
-    # This shows concisely what's going on...
-
-    for cgap_env in cgap_envs:
-        for allow_prod in [True, False]:
-            expected = True if cgap_env == 'fourfront-cgaptest' else allow_prod
-            assert load_data_should_proceed(cgap_env, allow_prod=allow_prod) == expected
-
-    # This is redundant, doing it longhand for review...
-
-    assert load_data_should_proceed('fourfront-cgap', allow_prod=True) is True
-    assert load_data_should_proceed('fourfront-cgap', allow_prod=False) is False
-
-    assert load_data_should_proceed('fourfront-cgapdev', allow_prod=True) is True
-    assert load_data_should_proceed('fourfront-cgapdev', allow_prod=False) is False
-
-    assert load_data_should_proceed('fourfront-cgaptest', allow_prod=True) is True
-    assert load_data_should_proceed('fourfront-cgaptest', allow_prod=False) is True
-
-    assert load_data_should_proceed('fourfront-cgapwolf', allow_prod=True) is True
-    assert load_data_should_proceed('fourfront-cgapwolf', allow_prod=False) is False
-
-    assert load_data_should_proceed('cgap-blue', allow_prod=True) is True
-    assert load_data_should_proceed('cgap-blue', allow_prod=False) is False
-
-    assert load_data_should_proceed('cgap-green', allow_prod=True) is True
-    assert load_data_should_proceed('cgap-green', allow_prod=False) is False
-
-    assert load_data_should_proceed('cgap-dev', allow_prod=True) is True
-    assert load_data_should_proceed('cgap-dev', allow_prod=False) is False
-
-    assert load_data_should_proceed('cgap-test', allow_prod=True) is True
-    assert load_data_should_proceed('cgap-test', allow_prod=False) is False
-
-    assert load_data_should_proceed('cgap-wolf', allow_prod=True) is True
-    assert load_data_should_proceed('cgap-wolf', allow_prod=False) is False
+        assert load_data_should_proceed(ignored_env, allow_prod=True) is True
+        assert load_data_should_proceed(ignored_env, allow_prod=False) is False
 
 
 def test_load_data_main():

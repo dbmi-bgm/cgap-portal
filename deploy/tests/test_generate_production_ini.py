@@ -6,11 +6,10 @@ import re
 import subprocess
 import typing
 
+from dcicutils.env_utils import data_set_for_env
+from dcicutils.misc_utils import ignored, override_environ
 from io import StringIO
 from unittest import mock
-
-from dcicutils.qa_utils import override_environ
-from dcicutils.env_utils import data_set_for_env
 from ..generate_production_ini import ProductionIniFileManager
 
 
@@ -45,6 +44,7 @@ def test_omittable():
     assert omittable("foo=$X", "foo=   \r\n \r\n ")
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_environment_template_filename():
 
     with pytest.raises(ValueError):
@@ -58,12 +58,14 @@ def test_environment_template_filename():
     assert environment_template_filename('cgapdev') == environment_template_filename('fourfront-cgapdev')
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_any_environment_template_filename():
 
     actual = os.path.abspath(any_environment_template_filename())
     assert actual.endswith("/ini_files/any.ini")
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_legacy_template_environment_names():
     # Containerized CGAP uses a single generic template, but while we're still using beanstalks,
     # we do some minimal testing to make sure all the templates are there. -kmp 4-Oct-2021
@@ -80,6 +82,7 @@ MOCKED_SOURCE_BUNDLE = "/some/source/bundle"
 MOCKED_BUNDLE_VERSION = 'v-12345-bundle-version'
 MOCKED_LOCAL_GIT_VERSION = 'v-67890-git-version'
 MOCKED_PROJECT_VERSION = '11.22.33'
+
 
 def make_mocked_check_output_for_get_version(simulate_git_command=True, simulate_git_repo=True):
     def mocked_check_output(command):
@@ -100,7 +103,8 @@ def test_build_ini_file_from_template():
     some_template_file_name = "mydir/whatever"
     some_ini_file_name = "mydir/production.ini"
     env_vars = dict(RDS_DB_NAME='snow_white', RDS_USERNAME='user', RDS_PASSWORD='my-secret',
-                    RDS_HOSTNAME='unittest', RDS_PORT="6543")
+                    RDS_HOSTNAME='unittest', RDS_PORT="6543", ENCODED_ENV_NAME='cgap-devtest',
+                    ENCODED_IDENTITY='C4DatastoreCgapDevtestApplicationConfiguration')
 
     with override_environ(**env_vars):
 
@@ -111,15 +115,19 @@ def test_build_ini_file_from_template():
 
         class MockFileStream:
             FILE_SYSTEM = {}
+
             @classmethod
             def reset(cls):
                 cls.FILE_SYSTEM = {}
+
             def __init__(self, filename, mode):
                 assert 'w' in mode
                 self.filename = filename
                 self.output_string_stream = StringIO()
+
             def __enter__(self):
                 return self.output_string_stream
+
             def __exit__(self, type, value, traceback):
                 self.FILE_SYSTEM[self.filename] = self.output_string_stream.getvalue().strip().split('\n')
 
@@ -217,11 +225,14 @@ def test_build_ini_file_from_template():
                     # because we're simulating the absence of Git.
                     return filename in [some_template_file_name]
                 mock_exists.side_effect = mocked_exists
+
                 class MockDateTime:
                     DATETIME = datetime.datetime
+
                     @classmethod
                     def now(cls):
-                        return cls.DATETIME(2001,2,3,4,55,6)
+                        return cls.DATETIME(2001, 2, 3, 4, 55, 6)
+
                 with mock.patch("io.open", side_effect=mocked_open):
                     with mock.patch.object(datetime, "datetime", MockDateTime()):
                         build_ini_file_from_template(some_template_file_name, some_ini_file_name)
@@ -297,11 +308,13 @@ def test_get_eb_bundled_version():
         mock_exists.return_value = False
         with mock.patch("io.open") as mock_open:
             def mocked_open_error(filename, mode='r'):
+                ignored(filename, mode)
                 raise Exception("Simulated file error (file not found or permissions problem).")
             mock_open.side_effect = mocked_open_error
             assert get_eb_bundled_version() is None
 
 
+@pytest.mark.skip  # obsolete, all are now generated from cgap_any_alpha.ini
 def test_transitional_equivalence():
     """
     We used to use separate files for each environment. This tests that the new any.ini technology,
@@ -450,4 +463,3 @@ def test_transitional_equivalence():
                     tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
                            es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
                            line_checker=ProdChecker(expect_indexer=None))
-
