@@ -142,7 +142,13 @@
             "items": {
                 "title": "Item Type",
                 "description": "Item class name (e.g. FileFastq)",
-                "type": "string"
+                "type": "string",
+                "enum": [
+                    "FileProcessed",
+                    "FileReference",
+                    "FileFastq",
+                    "FileSubmitted"
+                ]
             }
         }
     },

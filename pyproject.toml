@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "9.4.3"
+version = "10.1.1"
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -31,21 +31,22 @@ classifiers = [
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.6',
-    'Programming Language :: Python :: 3.7'
+    'Programming Language :: Python :: 3.7',
+    'Programming Language :: Python :: 3.8',
 ]
 
 [tool.poetry.dependencies]
 python = ">=3.7.1,<3.9"
-boto3 = "^1.21.5"
-botocore = "^1.24.5"
+awscli = ">=1.25.36"
+boto3 = "^1.24.36"
+botocore = "^1.27.36"
 certifi = ">=2021.5.30"
 chardet = "3.0.4"
 codeguru-profiler-agent = "^1.2.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "^5.7.0"
-dcicutils = "^3.13.1"
+dcicsnovault = "^6.0.4"
+dcicutils = "^4.1.0"
 elasticsearch = "6.8.1"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -125,8 +126,8 @@ WSGIProxy2 = "0.4.2"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-botocore-stubs = "^1.24.5"
-boto3-stubs = "^1.21.5"
+boto3-stubs = "^1.24.36"
+botocore-stubs = "^1.27.36"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"
@@ -168,13 +169,18 @@ wheel = ">=0.29.0"
 # See details at https://pytest.org/en/stable/customize.html
 
 [tool.poetry.scripts]
+# dcicutils commands
+add-image-tag = "dcicutils.ecr_scripts:add_image_tag_main"
+show-global-env-bucket = "dcicutils.env_scripts:show_global_env_bucket_main"
+show-image-manifest = "dcicutils.ecr_scripts:show_image_manifest_main"
+show-image-catalog = "dcicutils.ecr_scripts:show_image_catalog_main"
+unrelease-most-recent-image = "dcicutils.ecr_scripts:unrelease_most_recent_image_main"
 # snovault commands
 batchupgrade = "snovault.batchupgrade:main"
 create-mapping = "snovault.elasticsearch.create_mapping:main"
 wipe-test-indices = "snovault.commands.wipe_test_indices:main"
 # encoded commands
 add-date-created = "encoded.commands.add_date_created:main"
-add-image-tag = "encoded.commands.ecr_scripts:add_image_tag_main"
 check-rendering = "encoded.commands.check_rendering:main"
 clear-db-es-contents = "encoded.commands.clear_db_es_contents:main"
 configure-kibana-index = "encoded.commands.configure_kibana_index:main"
@@ -200,23 +206,19 @@ profiler = "encoded.commands.profiler:main"
 prepare-docker = "encoded.commands.prepare_docker:main"
 purge-item-type = "encoded.commands.purge_item_type:main"
 run-upgrade-on-inserts = "encoded.commands.run_upgrader_on_inserts:main"
-show-image-manifest = "encoded.commands.ecr_scripts:show_image_manifest_main"
-show-image-catalog = "encoded.commands.ecr_scripts:show_image_catalog_main"
 spreadsheet-to-json = "encoded.commands.spreadsheet_to_json:main"
 submission-test = "encoded.commands.submission_test:main"
 # Use the same-named script in SubmitCGAP instead.
 # submit-metadata-bundle = "encoded.commands.submit_metadata_bundle:main"
-unrelease-most-recent-image = "encoded.commands.ecr_scripts:unrelease_most_recent_image_main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
-
-# cgap commands
-variant-table-intake = "encoded.commands.variant_table_intake:main"
-ingest-vcf = "encoded.commands.ingest_vcf:main"
-gene-table-intake = "encoded.commands.gene_table_intake:main"
+# cgap-specific commands
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
+gene-table-intake = "encoded.commands.gene_table_intake:main"
+ingest-vcf = "encoded.commands.ingest_vcf:main"
 ingestion-listener = "encoded.ingestion_listener:main"
 reformat-vcf = "encoded.commands.reformat_vcf:main"
+variant-table-intake = "encoded.commands.variant_table_intake:main"
 
 # container commands
 simulate-environment = "encoded.commands.simulate_environment:main"

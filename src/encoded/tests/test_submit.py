@@ -1,3 +1,6 @@
+import copy
+from unittest import mock
+
 import openpyxl
 import pytest
 
@@ -7,10 +10,12 @@ from ..submit import (
     AccessionMetadata,
     AccessionProcessing,
     AccessionRow,
+    MetadataItem,
     PedigreeMetadata,
     PedigreeProcessing,
     PedigreeRow,
     SpreadsheetProcessing,
+    SubmittedFilesParser,
     compare_fields,
     digest_xlsx,
     format_ontology_term_with_colon,
@@ -39,7 +44,180 @@ TEST_PEDIGREE_WITH_ERRORS = (
     "src/encoded/tests/data/documents/pedigree_test_example_errors.xlsx"
 )
 
-# for row counting tests (xls processing)
+PROJECT_NAME = "hms-dbmi"  # Project name of wb_project fixture
+GENOME_BUILD = "GRCh38"
+FILE_NAME_NOT_ACCEPTED = "foo_bar.foo.bar"
+VCF_FILE_NAME = "foo_bar.vcf.gz"
+VCF_FILE_PATH = "/path/to/" + VCF_FILE_NAME
+VCF_FILE_ALIAS = "%s:%s" % (PROJECT_NAME, VCF_FILE_NAME)
+VCF_FILE_ITEM = {
+    "aliases": [VCF_FILE_ALIAS],
+    "file_format": "/file-formats/vcf_gz/",
+    "filename": VCF_FILE_PATH,
+}
+VCF_FILE_ITEM_WITH_GENOME_BUILD = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_GENOME_BUILD.update({"genome_assembly": GENOME_BUILD})
+VCF_ALIAS_TO_FILE_ITEM = {VCF_FILE_ALIAS: VCF_FILE_ITEM}
+VCF_ALIAS_TO_FILE_ITEM_GENOME_BUILD = {VCF_FILE_ALIAS: VCF_FILE_ITEM_WITH_GENOME_BUILD}
+VCF_EXTRA_FILE_1 = "foo_bar.vcf.gz.tbi"
+VCF_EXTRA_FILE_2 = "foo_bar.vcf.gz.tbj"
+VCF_GZ_TBI_FILE_FORMAT = "/file-formats/vcf_gz_tbi/"
+VCF_FILE_ITEM_WITH_EXTRA_FILE_1 = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_EXTRA_FILE_1.update(
+    {
+        "extra_files": [
+            {"filename": VCF_EXTRA_FILE_1, "file_format": VCF_GZ_TBI_FILE_FORMAT},
+        ]
+    }
+)
+VCF_FILE_ITEM_WITH_EXTRA_FILE_2 = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_EXTRA_FILE_2.update(
+    {
+        "extra_files": [
+            {"filename": VCF_EXTRA_FILE_2, "file_format": VCF_GZ_TBI_FILE_FORMAT},
+        ]
+    }
+)
+FASTQ_FILE_NAME_1_R1 = "file_1_R1.fastq.gz"
+FASTQ_FILE_NAME_1_R2 = "file_1_R2.fastq.gz"
+FASTQ_FILE_NAME_UNMATCHED = "file_2_R1.fastq.gz"
+FASTQ_FILE_NAME_BAD_FORMAT = "file_2.fastq.gz"
+FASTQ_FILE_NAME_1_R1_ALIAS = "%s:%s" % (PROJECT_NAME, FASTQ_FILE_NAME_1_R1)
+FASTQ_FILE_NAME_1_R2_ALIAS = "%s:%s" % (PROJECT_NAME, FASTQ_FILE_NAME_1_R2)
+FASTQ_FILE_NAME_UNMATCHED_ALIAS = "%s:%s" % (PROJECT_NAME, FASTQ_FILE_NAME_UNMATCHED)
+FASTQ_FILE_NAME_BAD_FORMAT_ALIAS = "%s:%s" % (PROJECT_NAME, FASTQ_FILE_NAME_BAD_FORMAT)
+FASTQ_FILE_NAMES_NO_ERRORS = ", ".join([FASTQ_FILE_NAME_1_R1, FASTQ_FILE_NAME_1_R2])
+FASTQ_FILE_NAMES_ERRORS = ", ".join(
+    [
+        FASTQ_FILE_NAME_1_R1,
+        FASTQ_FILE_NAME_1_R2,
+        FASTQ_FILE_NAME_UNMATCHED,
+        FASTQ_FILE_NAME_BAD_FORMAT,
+    ]
+)
+FILE_FORMAT_FASTQ = "/file-formats/fastq/"
+FASTQ_FILE_ITEMS_NO_ERRORS = [
+    {
+        "aliases": [FASTQ_FILE_NAME_1_R1_ALIAS],
+        "file_format": FILE_FORMAT_FASTQ,
+        "filename": FASTQ_FILE_NAME_1_R1,
+        "related_files": [
+            {"relationship_type": "paired with", "file": FASTQ_FILE_NAME_1_R2_ALIAS},
+        ],
+    },
+    {
+        "aliases": [FASTQ_FILE_NAME_1_R2_ALIAS],
+        "file_format": FILE_FORMAT_FASTQ,
+        "filename": FASTQ_FILE_NAME_1_R2,
+    },
+]
+FASTQ_ALIASES_NO_ERRORS = [FASTQ_FILE_NAME_1_R1_ALIAS, FASTQ_FILE_NAME_1_R2_ALIAS]
+FASTQ_FILE_ITEMS_ERRORS = FASTQ_FILE_ITEMS_NO_ERRORS + [
+    {
+        "aliases": [FASTQ_FILE_NAME_UNMATCHED_ALIAS],
+        "file_format": FILE_FORMAT_FASTQ,
+        "filename": FASTQ_FILE_NAME_UNMATCHED,
+    },
+    {
+        "aliases": [FASTQ_FILE_NAME_BAD_FORMAT_ALIAS],
+        "file_format": FILE_FORMAT_FASTQ,
+        "filename": FASTQ_FILE_NAME_BAD_FORMAT,
+    },
+]
+FASTQ_ALIASES_ERRORS = FASTQ_ALIASES_NO_ERRORS + [
+    FASTQ_FILE_NAME_UNMATCHED_ALIAS,
+    FASTQ_FILE_NAME_BAD_FORMAT_ALIAS,
+]
+FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS = {
+    item["aliases"][0]: item for item in FASTQ_FILE_ITEMS_NO_ERRORS
+}
+FASTQ_ALIAS_TO_FILE_ITEMS_ERRORS = {
+    item["aliases"][0]: item for item in FASTQ_FILE_ITEMS_ERRORS
+}
+VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS = copy.copy(VCF_ALIAS_TO_FILE_ITEM)
+VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS.update(FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS)
+PROBAND_BAM_SAMPLE_ID = "3464467-WGS-2"
+UNCLE_BAM_SAMPLE_ID = "3464460-WGS-1"
+
+
+def make_file_format_properties(
+    file_format,
+    standard_file_extension,
+    other_allowed_extensions=None,
+    extra_file_formats=None,
+):
+    """Make FileFormat properties for testing."""
+    properties = {
+        "@id": f"/file-formats/{file_format}/",
+        "file_format": file_format,
+        "standard_file_extension": standard_file_extension,
+    }
+    if other_allowed_extensions:
+        if isinstance(other_allowed_extensions, str):
+            other_allowed_extensions = [other_allowed_extensions]
+        properties["other_allowed_extensions"] = other_allowed_extensions
+    if extra_file_formats:
+        if isinstance(extra_file_formats, str):
+            extra_file_formats = [extra_file_formats]
+        extra_file_format_atids = []
+        for extra_file_format in extra_file_formats:
+            at_id = f"/file-formats/{extra_file_format}/"
+            extra_file_format_atids.append({"@id": at_id})
+        properties["extra_file_formats"] = extra_file_format_atids
+    return properties
+
+
+FASTQ_FILE_FORMAT = make_file_format_properties(
+    "fastq", "fastq.gz", other_allowed_extensions=".fq"
+)
+BAM_FILE_FORMAT = make_file_format_properties(
+    "bam", "bam", extra_file_formats=["bai", "fai"]
+)
+BAI_FILE_FORMAT = make_file_format_properties("bai", "bai")
+FAI_FILE_FORMAT = make_file_format_properties(
+    "fai", "fai", other_allowed_extensions=["fam", "fan"]
+)
+FILE_FORMATS = [FASTQ_FILE_FORMAT, BAM_FILE_FORMAT]
+EXTRA_FILE_FORMATS = [BAI_FILE_FORMAT, FAI_FILE_FORMAT]
+FILE_FORMAT_ATIDS_TO_ITEMS = {item["@id"]: item for item in FILE_FORMATS}
+EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS = {item["@id"]: item for item in EXTRA_FILE_FORMATS}
+PRIMARY_TO_EXTRA_FILE_FORMATS = {
+    item["@id"]: [
+        extra_file_format["@id"] for extra_file_format in item.get("extra_file_formats")
+    ]
+    for item in FILE_FORMATS
+    if item.get("extra_file_formats")
+}
+FILES_TO_CHECK_EXTRA_FILES = {
+    "foo.bar": ([FAI_FILE_FORMAT["@id"]], "bar"),
+    "some_bam.bam": ([BAI_FILE_FORMAT["@id"], FAI_FILE_FORMAT["@id"]], "bam"),
+}
+FILE_NAMES_TO_ITEMS = {
+    "foo.bar": {"filename": "foo.bar"},
+    "some_bam.bam": {"filename": "some_bam.bam"},
+    "some_bam.fan": {"filename": "some_bam.fan"},
+}
+FILES_WITHOUT_FILE_FORMAT = {
+    "foo.fai": "foo.fai",
+    "foo.fan": "foo.fan",
+    "some_bam.bai": "some_bam.bai",
+}
+EXPECTED_FILE_NAMES_TO_ITEMS = {
+    "foo.bar": {
+        "filename": "foo.bar",
+        "extra_files": [
+            {"filename": "foo.fai", "file_format": FAI_FILE_FORMAT["@id"]},
+        ],
+    },
+    "some_bam.bam": {
+        "filename": "some_bam.bam",
+        "extra_files": [
+            {"filename": "some_bam.bai", "file_format": BAI_FILE_FORMAT["@id"]},
+            {"filename": "some_bam.fan", "file_format": FAI_FILE_FORMAT["@id"]},
+        ],
+    },
+}
+EXPECTED_FILES_WITHOUT_FILE_FORMAT = {"foo.fan": "foo.fan"}
 BLANK_ROW_ACCESSION = ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""]
 HEADER_ROW_ACCESSION = [
     "Unique Analysis ID*:",
@@ -429,9 +607,49 @@ def post_data(project, institution):
                     "bam_sample_id": "samp1-WGS",
                     "workup_type": "WGS",
                     "specimen_accession": "samp1",
+                    "files": [
+                        "test-proj:file_name_R1.fastq.gz",
+                        "test-proj:file_name_R2.fastq.gz",
+                    ],
                     "project": project["@id"],
                     "institution": institution["@id"],
                 }
+            ],
+            "sample_processing": [
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:sample-processing-1"],
+                    "samples": ["test-proj:samp1"],
+                    "families": ["test-proj:fam1"],
+                    "files": ["test-proj:file_name.vcf.gz"],
+                },
+            ],
+            "file_submitted": [
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:file_name_R1.fastq.gz"],
+                    "file_format": "fastq",
+                    "related_files": [
+                        {
+                            "file": "test-proj:file_name_R1.fastq.gz",
+                            "relationship_type": "paired with",
+                        },
+                    ],
+                },
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:file_name_R2.fastq.gz"],
+                    "file_format": "fastq",
+                },
+                {
+                    "project": project["@id"],
+                    "institution": institution["@id"],
+                    "aliases": ["test-proj:file_name.vcf.gz"],
+                    "file_format": "vcf_gz",
+                },
             ],
         },
         "patch": {},
@@ -789,7 +1007,57 @@ def new_family(child, mother, father):
 @pytest.fixture
 def pedigree_row(row_dict_pedigree, project, institution):
     """A PedigreeRow without errors."""
-    return PedigreeRow(row_dict_pedigree, 1, project["name"], institution["name"])
+    result = PedigreeRow(row_dict_pedigree, 1, project["name"], institution["name"])
+    assert not result.errors
+    return result
+
+
+@pytest.fixture
+def accession_row(row_dict, testapp, project, institution):
+    """An AccessionRow without errors."""
+    result = AccessionRow(
+        testapp, row_dict, 1, "test-proj:fam1", project["name"], institution["name"]
+    )
+    assert not result.errors
+    return result
+
+
+@pytest.fixture
+def file_parser(testapp):
+    """A SubmittedFilesParser without errors and without ES."""
+    result = SubmittedFilesParser(testapp, "some_project_name")
+    assert not result.errors
+    return result
+
+
+@pytest.fixture
+def file_parser_with_search(es_testapp, wb_project):
+    """A SubmittedFilesParser without errors and with ES."""
+    result = SubmittedFilesParser(es_testapp, wb_project["name"])
+    assert not result.errors
+    return result
+
+
+@pytest.fixture
+def accession_row_with_file_parser_and_search(
+    es_testapp, file_parser_with_search, wb_project, wb_institution
+):
+    """An AccessionRow without errors and with a file parser with
+    search.
+
+    Useful for testing integration of file parsing with row parsing.
+    """
+    result = AccessionRow(
+        es_testapp,
+        row_dict,
+        1,
+        "test-proj:fam1",
+        wb_project["name"],
+        wb_institution["name"],
+        file_parser=file_parser_with_search,
+    )
+    assert not result.errors
+    return result
 
 
 def test_hp_term_id_pattern():
@@ -941,6 +1209,7 @@ class TestAccessionRow:
         assert "Row 1 - Invalid relation" in "".join(obj.errors)
         assert "please submit family history first" in "".join(obj.errors)
 
+    @pytest.mark.workbook
     def test_extract_family_metadata_extended_pass(
         self, workbook, es_testapp, row_dict_uncle
     ):
@@ -978,46 +1247,6 @@ class TestAccessionRow:
         assert obj.analysis.metadata["samples"] == [obj.sample.alias]
         assert obj.individual.metadata["samples"] == [obj.sample.alias]
 
-    def test_extract_file_metadata_valid(self, testapp, row_dict, project, institution):
-        """expected file extensions in spreadsheet"""
-        row_dict["files"] = "f1.fastq.gz, f2.cram, f3.vcf.gz"
-        files = [f.strip() for f in row_dict["files"].split(",")]
-        obj = AccessionRow(
-            testapp, row_dict, 1, "fam1", project["name"], institution["name"]
-        )
-        assert files[0] in obj.files_fastq[0].alias
-        assert obj.files_fastq[0].metadata["file_format"] == "/file-formats/fastq/"
-        assert obj.files_fastq[0].metadata["file_type"] == "reads"
-        assert obj.files_processed[0].alias == "encode-project:f2.cram"
-        assert files[2] in obj.files_processed[1].alias
-        assert not obj.errors
-
-    def test_extract_file_metadata_uncompressed(
-        self, testapp, row_dict, project, institution
-    ):
-        """filenames indicating uncompressed fastqs/vcfs should lead to errors"""
-        row_dict["files"] = "f1.fastq, f2.cram, f3.vcf"
-        files = [f.strip() for f in row_dict["files"].split(",")]
-        obj = AccessionRow(
-            testapp, row_dict, 1, "fam1", project["name"], institution["name"]
-        )
-        assert not obj.files_fastq
-        assert obj.files_processed[0].alias == "encode-project:f2.cram"
-        assert files[2] not in "".join([f.alias for f in obj.files_processed])
-        assert all("File must be compressed" in error for error in obj.errors)
-
-    def test_extract_file_metadata_invalid(
-        self, testapp, row_dict, project, institution
-    ):
-        """# file extensions other than fastq.gz,.cram, .vcf.gz should generate an error"""
-        row_dict["files"] = "f3.gvcf.gz"
-        files = [f.strip() for f in row_dict["files"].split(",")]
-        obj = AccessionRow(
-            testapp, row_dict, 1, "fam1", project["name"], institution["name"]
-        )
-        assert not obj.files_processed
-        assert "File extension on f3.gvcf.gz not supported - " in "".join(obj.errors)
-
     @pytest.mark.parametrize(
         "field, error",
         [
@@ -1047,10 +1276,92 @@ class TestAccessionRow:
         ) == error
 
     @pytest.mark.parametrize(
-        "num, val", [(0, 1), (1, 2), (2, 1), (3, 2), (4, 1), (5, 2)]
+        "sample,expected_calls",
+        [
+            ({}, 0),
+            ({"genome_build": None, "files": None, "case_files": None}, 0),
+            ({"genome_build": "", "files": "", "case_files": ""}, 0),
+            ({"genome_build": "foo", "files": "", "case_files": ""}, 0),
+            ({"genome_build": "foo", "files": "bar.vcf.gz", "case_files": ""}, 1),
+            (
+                {
+                    "genome_build": "foo",
+                    "files": "bar.vcf.gz",
+                    "case_files": "bar.vcf.gz",
+                },
+                2,
+            ),
+        ],
     )
-    def test_get_paired_end_value(self, num, val):
-        assert AccessionRow.get_paired_end_value(num) == val
+    def test_process_and_add_file_metadata(self, accession_row, sample, expected_calls):
+        """Test spreadsheet fields removed from Sample and
+        Sample/SampleProcessing updated based on fields present.
+        """
+        sample_processing = {}
+        expected_dropped_keys = ["genome_build", "files", "case_files"]
+        with mock.patch(
+            "encoded.submit.AccessionRow.update_item_files"
+        ) as mocked_update_item_files:
+            accession_row.process_and_add_file_metadata(sample, sample_processing)
+            for key in expected_dropped_keys:
+                assert key not in sample
+            assert len(mocked_update_item_files.call_args_list) == expected_calls
+
+    @pytest.mark.parametrize(
+        "file_items,file_aliases,file_errors",
+        [
+            ([], [], []),
+            ([{"foo": "bar"}], ["some_alias"], ["some_error"]),
+        ],
+    )
+    def test_update_item_files(
+        self, accession_row, file_items, file_aliases, file_errors
+    ):
+        """Test output of file parsing handled appropriately: aliases
+        added to items, errors reported, and files added.
+        """
+        item = {}
+        with mock.patch.object(accession_row, "file_parser") as mocked_file_parser:
+            mocked_file_parser.extract_file_metadata.return_value = (
+                file_items,
+                file_aliases,
+                file_errors,
+            )
+            accession_row.update_item_files(item, "some_file_names", None)
+            assert len(accession_row.files) == len(file_items)
+            for index, file_item in enumerate(accession_row.files):
+                assert isinstance(file_item, MetadataItem)
+                assert file_item.metadata == file_items[index]
+            if file_aliases:
+                assert item["files"] == file_aliases
+            else:
+                assert "files" not in item
+            assert accession_row.errors == file_errors
+
+    @pytest.mark.parametrize(
+        "genome_build,expected_errors,expected",
+        [
+            (None, 0, None),
+            ("", 0, None),
+            ("foo", 1, None),
+            ("GRCh37", 0, "GRCh37"),
+            ("grch37", 0, "GRCh37"),
+            ("hg19", 0, "hg19"),
+            ("19", 0, "hg19"),
+            ("GRCh38", 0, "GRCh38"),
+            ("hg38", 0, "GRCh38"),
+            ("38", 0, "GRCh38"),
+        ],
+    )
+    def test_validate_genome_build(
+        self, accession_row, genome_build, expected_errors, expected
+    ):
+        """Test submitted genome build converted to appropriate value
+        if valid.
+        """
+        result = accession_row.validate_genome_build(genome_build)
+        assert result == expected
+        assert len(accession_row.errors) == expected_errors
 
 
 class TestAccessionMetadata:
@@ -1124,54 +1435,6 @@ class TestAccessionMetadata:
         assert len(submission.individuals) == 2
         assert len(submission.samples) == 2
         assert "specimen_accepted" in list(submission.samples.values())[1]
-
-    def test_add_metadata_single_item_fastq(
-        self, testapp, example_rows, project, institution
-    ):
-        """
-        if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
-        duplicated if it is consistent.
-        """
-        # for rowidx in (1, 2):
-        example_rows[0][0]["files"] = "f1.fastq.gz, f2.fastq.gz"
-        example_rows[1][0]["files"] = "f1.fastq.gz, f2.fastq.gz"
-        submission = AccessionMetadata(
-            testapp, example_rows, project, institution, TEST_INGESTION_ID1
-        )
-        fastqs = list(submission.files_fastq.values())
-        assert len(fastqs[1]["related_files"]) == 1
-
-    @pytest.mark.parametrize(
-        "files1, files2",
-        [
-            (
-                "f1.fastq.gz, f2.fastq.gz",
-                "f1.fastq.gz, f3.fastq.gz",
-            ),  # inconsistent pairing on first
-            (
-                "f1.fastq.gz, f2.fastq.gz",
-                "f4.fastq.gz, f2.fastq.gz",
-            ),  # inconsistent pairing on second
-        ],
-    )
-    def test_add_metadata_single_item_fastq_inconsistent(
-        self, testapp, example_rows, files1, files2, project, institution
-    ):
-        """
-        if fastq files appear multiple times in the sheet, the related_file array prop shouldn't be
-        duplicated if it is consistent.
-        """
-        # for rowidx in (1, 2):
-        example_rows[0][0]["files"] = files1
-        example_rows[1][0]["files"] = files2
-        submission = AccessionMetadata(
-            testapp, example_rows, project, institution, TEST_INGESTION_ID1
-        )
-        assert "Please ensure fastq is paired with correct file in all rows" in "".join(
-            submission.errors
-        )
-        # fastqs = list(submission.files_fastq.values())
-        # assert len(fastqs[1]['related_files']) == 1
 
     def test_add_metadata_single_item_same_sample_accession(
         self, testapp, example_rows_with_test_number, project, institution
@@ -1344,6 +1607,763 @@ class TestAccessionMetadata:
                     assert all(
                         val3 for val3 in val2.values()
                     )  # test all None values are removed
+
+    @pytest.mark.workbook
+    @pytest.mark.parametrize(
+        (
+            "proband_files,proband_case_files,uncle_files,uncle_case_files,"
+            "genome_build,expected_files,expected_errors"
+        ),
+        [
+            (None, None, None, None, None, {}, 0),
+            ("", "", "", "", None, {}, 0),
+            (FILE_NAME_NOT_ACCEPTED, None, None, None, None, {}, 2),
+            (None, FILE_NAME_NOT_ACCEPTED, None, None, None, {}, 2),
+            (
+                FASTQ_FILE_NAMES_ERRORS,
+                None,
+                None,
+                None,
+                None,
+                FASTQ_ALIAS_TO_FILE_ITEMS_ERRORS,
+                2,
+            ),
+            (
+                None,
+                None,
+                FASTQ_FILE_NAMES_NO_ERRORS,
+                None,
+                None,
+                FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS,
+                0,
+            ),
+            (None, VCF_FILE_PATH, None, None, None, VCF_ALIAS_TO_FILE_ITEM, 0),
+            (None, VCF_FILE_PATH, None, VCF_FILE_NAME, None, VCF_ALIAS_TO_FILE_ITEM, 0),
+            (
+                None,
+                VCF_FILE_PATH,
+                None,
+                VCF_FILE_NAME,
+                "hg38",
+                VCF_ALIAS_TO_FILE_ITEM_GENOME_BUILD,
+                0,
+            ),
+            (
+                None,
+                VCF_FILE_PATH,
+                None,
+                VCF_FILE_NAME,
+                "foo",
+                VCF_ALIAS_TO_FILE_ITEM,
+                1,
+            ),
+            (
+                None,
+                VCF_FILE_PATH,
+                None,
+                FASTQ_FILE_NAMES_NO_ERRORS,
+                None,
+                VCF_FASTQ_ALIAS_TO_FILE_ITEMS_NO_ERRORS,
+                0,
+            ),
+        ],
+    )
+    def test_integrated_with_files(
+        self,
+        es_testapp,
+        wb_project,
+        wb_institution,
+        row_dict,
+        row_dict_uncle,
+        proband_files,
+        proband_case_files,
+        uncle_files,
+        uncle_case_files,
+        genome_build,
+        expected_files,
+        expected_errors,
+    ):
+        """Test integration of SubmittedFilesParser with
+        AccessionMetadata.
+
+        Ensure expected errors reported correctly, files placed on
+        appropriate items, and file properties created.
+        """
+        row_dict["files"] = proband_files
+        row_dict["case files"] = proband_case_files
+        row_dict_uncle["files"] = uncle_files
+        row_dict_uncle["case files"] = uncle_case_files
+        row_dict["genome build"] = genome_build
+        row_dict_uncle["genome_build"] = genome_build
+        rows = [(row_dict, 1), (row_dict_uncle, 2)]
+        accession_metadata = AccessionMetadata(
+            es_testapp, rows, wb_project, wb_institution, "some_ingestion_id"
+        )
+        accession_metadata_files = accession_metadata.files
+        for file_alias, file_item in accession_metadata_files.items():
+            assert file_item.get("row")
+            del file_item["row"]
+        assert accession_metadata_files == expected_files
+        assert len(accession_metadata.errors) == expected_errors
+        if expected_files:
+            expected_aliases = set(expected_files.keys())
+            for sample in accession_metadata.samples.values():
+                bam_sample_id = sample.get("bam_sample_id")
+                if bam_sample_id == PROBAND_BAM_SAMPLE_ID:
+                    proband_sample = sample
+                elif bam_sample_id == UNCLE_BAM_SAMPLE_ID:
+                    uncle_sample = sample
+            if proband_files:
+                assert set(proband_sample.get("files", [])) == expected_aliases
+            elif uncle_files:
+                assert set(uncle_sample.get("files", [])) == expected_aliases
+            else:
+                sample_processing = next(
+                    iter(accession_metadata.sample_processings.values())
+                )
+                assert set(sample_processing.get("files", [])) == expected_aliases
+
+
+class TestSubmittedFilesParser:
+    def assert_lists_equal(self, list_1, list_2):
+        """Simple helper to compare lists of dicts."""
+        assert len(list_1) == len(list_2)
+        for item in list_1:
+            assert item in list_2
+        for item in list_2:
+            assert item in list_1
+
+    @pytest.mark.parametrize(
+        "extensions_to_formats,expected_errors",
+        [
+            ({}, 0),
+            ({"foo": ["file_format_1"], "bar": []}, 0),
+            ({"foo": ["file_format_1"], "bar": ["file_format_1", "file_format_2"]}, 1),
+        ],
+    )
+    def test_check_for_multiple_file_formats(
+        self, file_parser, extensions_to_formats, expected_errors
+    ):
+        """Test multiple file formats for a given extension produce an
+        error that is reported.
+        """
+        file_parser.file_extensions_to_file_formats = extensions_to_formats
+        file_parser.check_for_multiple_file_formats()
+        assert len(file_parser.errors) == expected_errors
+
+    @pytest.mark.workbook
+    @pytest.mark.parametrize(
+        (
+            "submitted_file_names,genome_build,expected_general_errors,expected_items,"
+            "expected_aliases,expected_row_errors"
+        ),
+        [
+            ("", None, 0, [], [], 0),
+            ("foo.bar", None, 1, [], [], 1),
+            (VCF_FILE_PATH, None, 0, [VCF_FILE_ITEM], [VCF_FILE_ALIAS], 0),
+            (
+                "foo.bar, " + VCF_FILE_PATH,
+                None,
+                1,
+                [VCF_FILE_ITEM],
+                [VCF_FILE_ALIAS],
+                1,
+            ),
+            (
+                VCF_FILE_PATH,
+                GENOME_BUILD,
+                0,
+                [VCF_FILE_ITEM_WITH_GENOME_BUILD],
+                [VCF_FILE_ALIAS],
+                0,
+            ),
+            (
+                FASTQ_FILE_NAMES_NO_ERRORS,
+                None,
+                0,
+                FASTQ_FILE_ITEMS_NO_ERRORS,
+                FASTQ_ALIASES_NO_ERRORS,
+                0,
+            ),
+            (
+                FASTQ_FILE_NAMES_ERRORS,
+                None,
+                0,
+                FASTQ_FILE_ITEMS_ERRORS,
+                FASTQ_ALIASES_ERRORS,
+                2,
+            ),
+            (
+                ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_1]),
+                None,
+                0,
+                [VCF_FILE_ITEM_WITH_EXTRA_FILE_1],
+                [VCF_FILE_ALIAS],
+                0,
+            ),
+            (
+                ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_2]),
+                None,
+                0,
+                [VCF_FILE_ITEM_WITH_EXTRA_FILE_2],
+                [VCF_FILE_ALIAS],
+                0,
+            ),
+            (
+                ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_1, VCF_EXTRA_FILE_2]),
+                None,
+                1,
+                [VCF_FILE_ITEM_WITH_EXTRA_FILE_1],
+                [VCF_FILE_ALIAS],
+                1,
+            ),
+        ],
+    )
+    def test_extract_file_metadata(
+        self,
+        file_parser_with_search,
+        submitted_file_names,
+        genome_build,
+        expected_general_errors,
+        expected_items,
+        expected_aliases,
+        expected_row_errors,
+    ):
+        """Test submitted file names parsing, File alias/property
+        creation, and error reporting.
+
+        NOTE: Essentially an integrated test of the class, so check
+        helper functions if failing.
+        """
+        (
+            result_items,
+            result_aliases,
+            result_row_errors,
+        ) = file_parser_with_search.extract_file_metadata(
+            submitted_file_names, genome_build=genome_build, row_index=1
+        )
+        assert len(file_parser_with_search.errors) == expected_general_errors
+        assert len(result_row_errors) == expected_row_errors
+        self.assert_lists_equal(result_items, expected_items)
+        self.assert_lists_equal(result_aliases, expected_aliases)
+
+    @pytest.mark.parametrize(
+        "submitted_file_names,expected",
+        [
+            (None, []),
+            ("", []),
+            ("foo,foo,bar,", ["foo", "bar"]),
+            ("foo,  foo , bar ,", ["foo", "bar"]),
+        ],
+    )
+    def test_parse_file_names(self, file_parser, submitted_file_names, expected):
+        """Test parsing submitted file names."""
+        result = file_parser.parse_file_names(submitted_file_names)
+        assert result == set(expected)
+
+    @pytest.mark.parametrize(
+        "accepted_file_formats,expected",
+        [
+            ({}, []),
+            (
+                {
+                    "/file-formats/foo_bar/": {"standard_file_extension": "foo.bar"},
+                    "/file-formats/bar/": {
+                        "standard_file_extension": "bar",
+                        "other_allowed_extensions": ["foo", "bar", "foo.bar"],
+                    },
+                },
+                ["bar", "foo", "foo.bar"],
+            ),
+        ],
+    )
+    def test_get_accepted_file_extensions(
+        self, file_parser, accepted_file_formats, expected
+    ):
+        """Test accumulating acceptable file extensions from mocked
+        search results for FileFormats.
+        """
+        with mock.patch(
+            "encoded.submit.SubmittedFilesParser.get_accepted_file_formats",
+            return_value=accepted_file_formats,
+        ) as mocked_file_formats:
+            result = file_parser.get_accepted_file_extensions()
+            mocked_file_formats.assert_called_once()
+            assert result == expected
+
+    @pytest.mark.workbook
+    def test_get_accepted_file_formats(self, file_parser_with_search):
+        """Test retrieval of accepted FileFormats via search."""
+        result_file_formats = []
+        expected_file_formats = ["fastq", "vcf_gz"]
+        result = file_parser_with_search.get_accepted_file_formats()
+        assert len(result) == 2
+        for item in result.values():
+            result_file_formats.append(item.get("file_format"))
+        assert sorted(result_file_formats) == sorted(expected_file_formats)
+
+    @pytest.mark.parametrize(
+        "file_suffixes,return_values,expected_calls,expected",
+        [
+            ([], [], [], (None, None, None)),
+            (
+                [".foo"],
+                [[]],
+                ["foo"],
+                (None, None, None),
+            ),
+            (
+                [".foo", ".bar"],
+                [[], [{"@id": "atid_1"}]],
+                ["foo.bar", "bar"],
+                ("atid_1", ["extra_file_atid_1", "extra_file_atid_2"], "bar"),
+            ),
+            (
+                [".foo", ".bar"],
+                [[{"@id": "atid_1"}]],
+                ["foo.bar"],
+                ("atid_1", ["extra_file_atid_1", "extra_file_atid_2"], "foo.bar"),
+            ),
+            (
+                [".foo", ".bar"],
+                [[{"@id": "atid_1"}, {"@id": "atid_2"}], []],
+                ["foo.bar"],
+                (None, None, None),
+            ),
+        ],
+    )
+    def test_identify_file_format(
+        self,
+        file_parser,
+        file_suffixes,
+        return_values,
+        expected_calls,
+        expected,
+    ):
+        """Test iteratively matching file extensions to FileFormats with
+        mocked search results.
+        """
+        file_parser.primary_to_extra_file_formats = {
+            "atid_1": ["extra_file_atid_1", "extra_file_atid_2"]
+        }
+        with mock.patch(
+            "encoded.submit.SubmittedFilesParser.search_file_format_for_suffix",
+            side_effect=return_values,
+        ) as mocked_search:
+            result = file_parser.identify_file_format(file_suffixes)
+            assert result == expected
+            for expected_call in expected_calls:
+                mocked_search.assert_any_call(expected_call)
+
+    @pytest.mark.workbook
+    @pytest.mark.parametrize(
+        "suffix,expected",
+        [
+            ("", []),
+            ("foo.bar", []),
+            ("fastq.gz", ["fastq"]),
+            ("fq.gz", ["fastq"]),
+        ],
+    )
+    def test_search_file_format_for_suffix(
+        self, file_parser_with_search, suffix, expected
+    ):
+        """Test matching of file extension to FileFormat(s) via search
+        results.
+        """
+        result = file_parser_with_search.search_file_format_for_suffix(suffix)
+        assert len(result) == len(expected)
+        result_file_formats = [item["file_format"] for item in result]
+        for file_format in result_file_formats:
+            assert file_format in expected
+
+    @pytest.mark.workbook
+    @pytest.mark.parametrize(
+        "query,expected_length",
+        [
+            ("", 0),
+            ("/search/?type=FooBar", 0),
+            ("/search/?type=FileFormat&file_format=fastq", 1),
+        ],
+    )
+    def test_search_query(self, file_parser_with_search, query, expected_length):
+        """Test search results retrieved and returned as list of
+        items found.
+        """
+        result = file_parser_with_search.search_query(query)
+        assert isinstance(result, list)
+        assert len(result) == expected_length
+
+    @pytest.mark.workbook
+    def test_make_get_request(self, es_testapp, file_parser_with_search, wb_project):
+        """Test GET request made with appropriate response following
+        and error handling.
+        """
+        wb_project_atid = wb_project["@id"]
+
+        get_result = file_parser_with_search.make_get_request(wb_project_atid)
+        for key, value in wb_project.items():
+            result_value = get_result.get(key)
+            assert result_value == value
+
+        query_params = "frame=object"
+        get_result = file_parser_with_search.make_get_request(
+            wb_project_atid, query_string=query_params
+        )
+        expected_result = es_testapp.get(wb_project_atid, params=query_params).json
+        assert get_result == expected_result
+
+        url = "/search/?type=Project&uuid=" + wb_project["uuid"]
+        get_result = file_parser_with_search.make_get_request(url)
+        assert get_result["@graph"][0] == wb_project
+
+        url = "/search/?type=Project&uuid!=No value"  # 301 follow
+        get_result = file_parser_with_search.make_get_request(url)
+        assert get_result["@graph"]
+
+        url = "/search/?type=FooBar"
+        get_result = file_parser_with_search.make_get_request(url)
+        assert not get_result
+
+    def make_file_dicts_for_names(file_names):
+        """Helper function to create simple File item with alias
+        property for all given file names.
+        """
+        result = {}
+        for file_name in file_names:
+            result[file_name] = {SubmittedFilesParser.ALIASES: ["alias-" + file_name]}
+        return result
+
+    @pytest.mark.parametrize(
+        "fastqs,expected_unknown_paired_end,expected_unpaired_fastqs",
+        [
+            (make_file_dicts_for_names(["foo.fastq.gz"]), ["foo.fastq.gz"], []),
+            (make_file_dicts_for_names(["foo_R1.fastq.gz"]), [], ["foo_R1.fastq.gz"]),
+            (make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_R2.fastq.gz"]), [], []),
+            (
+                make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_r2.fastq.gz"]),
+                [],
+                ["foo_R1.fastq.gz", "foo_r2.fastq.gz"],
+            ),
+            (
+                make_file_dicts_for_names(
+                    ["foo_R1.fastq.gz", "bar_R1.fastq.gz", "foo_R2.fastq.gz"]
+                ),
+                [],
+                ["bar_R1.fastq.gz"],
+            ),
+        ],
+    )
+    def test_validate_and_pair_fastqs(
+        self, file_parser, fastqs, expected_unknown_paired_end, expected_unpaired_fastqs
+    ):
+        """Test paired-end identification and subsequent file pairing
+        of FASTQs.
+        """
+        (
+            result_unknown_paired_end,
+            result_unpaired_fastqs,
+        ) = file_parser.validate_and_pair_fastqs(fastqs)
+        assert result_unknown_paired_end == expected_unknown_paired_end
+        assert result_unpaired_fastqs == expected_unpaired_fastqs
+
+    @pytest.mark.parametrize(
+        "file_name,expected",
+        [
+            ("", None),
+            ("foo bar", None),
+            ("fastq_fileR1.fastq.gz", None),
+            ("fastq_filer1.fastq.gz", None),
+            ("fastq_file_R1.fastq.gz", 1),
+            ("fastq_file_r1.fastq.gz", 1),
+            ("fastq_file_R1_001.fastq.gz", 1),
+            ("fastq_file_r1_001.fastq.gz", 1),
+            ("fastq_file_R2.fastq.gz", 2),
+            ("fastq_file_r2.fastq.gz", 2),
+            ("fastq_file_R2_001.fastq.gz", 2),
+            ("fastq_file_r2_001.fastq.gz", 2),
+            ("fastq_file_r2_001_r1.fastq.gz", None),
+            ("fastq_file_R1_001_R2.fastq.gz", None),
+        ],
+    )
+    def test_get_paired_end_from_name(self, file_parser, file_name, expected):
+        """Test paired-end identification from FASTQ file name."""
+        result = file_parser.get_paired_end_from_name(file_name)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "fastq_paired_end_1,fastq_paired_end_2,expected_matches,expected_unmatched",
+        [
+            ({}, {}, [], []),
+            ({"foo": {}}, {"bar": {}}, [], ["foo", "bar"]),
+            (
+                {"fastq_r1_001.gz": {}},
+                {"fastq_r2.gz": {"aliases": ["fastq_r2_alias"]}},
+                [],
+                ["fastq_r1_001.gz", "fastq_r2.gz"],
+            ),
+            (
+                {"fastq_r1.gz": {}},
+                {"fastq_r2.gz": {"aliases": ["fastq_r2_alias"]}},
+                [("fastq_r1.gz", "fastq_r2.gz")],
+                [],
+            ),
+            (
+                {"fastq_r1_001.gz": {}, "fastq_r1.gz": {}},
+                {"fastq_r2.gz": {"aliases": ["fastq_r2_alias"]}},
+                [("fastq_r1.gz", "fastq_r2.gz")],
+                ["fastq_r1_001.gz"],
+            ),
+            (
+                {"fastq_r1_001.gz": {}, "fastq_r1.gz": {}},
+                {
+                    "fastq_r2.gz": {"aliases": ["fastq_r2_alias"]},
+                    "fastq_r2_001.gz": {"aliases": ["fastq_r2_001_alias"]},
+                },
+                [
+                    ("fastq_r1.gz", "fastq_r2.gz"),
+                    ("fastq_r1_001.gz", "fastq_r2_001.gz"),
+                ],
+                [],
+            ),
+        ],
+    )
+    def test_pair_fastqs_by_name(
+        self,
+        file_parser,
+        fastq_paired_end_1,
+        fastq_paired_end_2,
+        expected_matches,
+        expected_unmatched,
+    ):
+        """Test pairing of FASTQ files by name, with file properties
+        updated and unpaired file names returned.
+        """
+        unmatched = file_parser.pair_fastqs_by_name(
+            fastq_paired_end_1, fastq_paired_end_2
+        )
+        assert unmatched == expected_unmatched
+        for paired_end_1_file_name, paired_end_2_file_name in expected_matches:
+            paired_end_1_item = fastq_paired_end_1.get(paired_end_1_file_name)
+            paired_end_2_item = fastq_paired_end_2.get(paired_end_2_file_name)
+            assert paired_end_1_item and paired_end_2_item
+            paired_end_1_match = paired_end_1_item[file_parser.RELATED_FILES][0][
+                file_parser.FILE
+            ]
+            assert paired_end_1_match == paired_end_2_item[file_parser.ALIASES][0]
+
+    @pytest.mark.parametrize(
+        "file_name,expected",
+        [
+            ("", ""),
+            ("foo bar", "foo bar"),
+            ("fastq_fileR1.fastq.gz", "fastq_fileR1.fastq.gz"),
+            ("fastq_file_R1.fastq.gz", "fastq_file_R2.fastq.gz"),
+            ("fastq_file_R1_L001.fastq.gz", "fastq_file_R2_L001.fastq.gz"),
+            ("fastq_file_R1_L001_R1.fastq.gz", "fastq_file_R2_L001_R2.fastq.gz"),
+        ],
+    )
+    def test_make_expected_paired_end_2_name(self, file_parser, file_name, expected):
+        """Test making paired-end 2 name from paired-end 1 FASTQ file
+        name.
+        """
+        result = file_parser.make_expected_paired_end_2_name(file_name)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        (
+            "files_to_check_extra_files,file_names_to_items,files_without_file_format,"
+            "expected_file_names_to_items,expected_files_without_file_format"
+        ),
+        [
+            ({}, {}, {}, {}, {}),
+            (
+                FILES_TO_CHECK_EXTRA_FILES,
+                copy.deepcopy(FILE_NAMES_TO_ITEMS),
+                copy.deepcopy(FILES_WITHOUT_FILE_FORMAT),
+                EXPECTED_FILE_NAMES_TO_ITEMS,
+                EXPECTED_FILES_WITHOUT_FILE_FORMAT,
+            ),
+        ],
+    )
+    def test_associate_extra_files(
+        self,
+        file_parser,
+        files_to_check_extra_files,
+        file_names_to_items,
+        files_without_file_format,
+        expected_file_names_to_items,
+        expected_files_without_file_format,
+    ):
+        """Test associating "primary" to extra file FileFormats."""
+        file_parser.extra_file_formats = EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS
+        file_parser.associate_extra_files(
+            files_to_check_extra_files, file_names_to_items, files_without_file_format
+        )
+        assert file_names_to_items == expected_file_names_to_items
+        assert files_without_file_format == expected_files_without_file_format
+
+    @pytest.mark.parametrize(
+        (
+            "file_item,existing_item_properties,extra_file_name,extra_file_format_atid,"
+            "expected_extra_files"
+        ),
+        [
+            (
+                {},
+                None,
+                "foo.bar",
+                "some_atid",
+                [{"file_format": "some_atid", "filename": "foo.bar"}],
+            ),
+            (
+                {"extra_files": [{}]},
+                None,
+                "foo.bar",
+                "some_atid",
+                [{}, {"file_format": "some_atid", "filename": "foo.bar"}],
+            ),
+            (
+                {},
+                {"extra_files": [{"file_format": "some_atid"}]},
+                "foo.bar",
+                "some_atid",
+                None,
+            ),
+            (
+                {},
+                {"extra_files": [{"file_format": "some_atid"}]},
+                "foo.bar",
+                "some_other_atid",
+                [{"file_format": "some_other_atid", "filename": "foo.bar"}],
+            ),
+        ],
+    )
+    def test_associate_file_with_extra_file(
+        self,
+        file_parser,
+        file_item,
+        existing_item_properties,
+        extra_file_name,
+        extra_file_format_atid,
+        expected_extra_files,
+    ):
+        """Test adding extra file metadata to file properties"""
+        with mock.patch(
+            "encoded.submit.SubmittedFilesParser.make_get_request",
+            return_value=existing_item_properties,
+        ) as mock_make_get_request:
+            file_parser.associate_file_with_extra_file(
+                file_item, extra_file_name, extra_file_format_atid
+            )
+            assert file_item.get("extra_files") == expected_extra_files
+            mock_make_get_request.assert_called_once()
+
+    @pytest.mark.parametrize(
+        "extra_file_formats,file_name,file_suffix,file_format_atids,expected",
+        [
+            ({}, "", "", [], []),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_fastq.fastq.gz",
+                "fastq.gz",
+                [FASTQ_FILE_FORMAT["@id"]],
+                [],
+            ),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_bam.bam",
+                "bam",
+                [BAM_FILE_FORMAT["@id"]],
+                [],
+            ),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_bam.bam",
+                "bam",
+                [BAI_FILE_FORMAT["@id"], FAI_FILE_FORMAT["@id"]],
+                [
+                    (["some_bam.bai"], BAI_FILE_FORMAT["@id"]),
+                    (
+                        ["some_bam.fai", "some_bam.fam", "some_bam.fan"],
+                        FAI_FILE_FORMAT["@id"],
+                    ),
+                ],
+            ),
+            (
+                EXTRA_FILE_FORMAT_ATIDS_TO_ITEMS,
+                "some_bam.something.bam",
+                "bam",
+                [BAI_FILE_FORMAT["@id"], FAI_FILE_FORMAT["@id"]],
+                [
+                    (["some_bam.something.bai"], BAI_FILE_FORMAT["@id"]),
+                    (
+                        [
+                            "some_bam.something.fai",
+                            "some_bam.something.fam",
+                            "some_bam.something.fan",
+                        ],
+                        FAI_FILE_FORMAT["@id"],
+                    ),
+                ],
+            ),
+        ],
+    )
+    def test_generate_extra_file_names_with_formats(
+        self,
+        file_parser,
+        extra_file_formats,
+        file_name,
+        file_suffix,
+        file_format_atids,
+        expected,
+    ):
+        """Test making possible extra file names from a given file
+        name and FileFormat.
+        """
+        file_parser.extra_file_formats = extra_file_formats
+        result = file_parser.generate_extra_file_names_with_formats(
+            file_name, file_suffix, file_format_atids
+        )
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "file_name,suffix,expected",
+        [
+            ("", "", ""),
+            ("foo.bar", "", "foo.bar"),
+            ("foo.bar", "bar", "foo"),
+            ("foo.bar", ".bar", "foo"),
+            ("foo.bar.bar", "bar", "foo.bar"),
+            ("foo.bar.bar", "bar.bar", "foo"),
+        ],
+    )
+    def test_get_file_name_without_suffix(
+        self, file_parser, file_name, suffix, expected
+    ):
+        """Test removing given suffix from file name."""
+        result = file_parser.get_file_name_without_suffix(file_name, suffix)
+        assert result == expected
+
+    @pytest.mark.parametrize(
+        "file_name,extension,expected",
+        [
+            ("", "", "."),
+            ("foo", "", "foo."),
+            ("", "bar", ".bar"),
+            ("foo", "bar", "foo.bar"),
+            ("foo.", "bar", "foo.bar"),
+            ("foo", ".bar", "foo.bar"),
+            ("foo.", ".bar", "foo.bar"),
+            ("fu.foo", "bar", "fu.foo.bar"),
+        ],
+    )
+    def test_make_file_name_for_extension(
+        self, file_parser, file_name, extension, expected
+    ):
+        """Test make new file name from given name and extension."""
+        result = file_parser.make_file_name_for_extension(file_name, extension)
+        assert result == expected
 
 
 class TestPedigreeRow:
@@ -1762,7 +2782,7 @@ class TestPedigreeMetadata:
             )  # row 0, row 6, + 2 parents of row[0]
             # assert len(submission.families) == 1
             assert "is_pregnancy" in list(submission.individuals.values())[1]
-            assert list(submission.individuals.values())[1]["is_pregnancy"] == True
+            assert list(submission.individuals.values())[1]["is_pregnancy"] is True
 
     def test_add_family_metadata(
         self,
@@ -1777,6 +2797,7 @@ class TestPedigreeMetadata:
         assert fam["proband"] == "encode-project:individual-456"
         assert len(fam["members"]) == len(example_rows_pedigree)
 
+    @pytest.mark.workbook
     def test_add_family_metadata_db_single(
         self, workbook, es_testapp, example_rows_pedigree, wb_project, wb_institution
     ):
@@ -1798,6 +2819,7 @@ class TestPedigreeMetadata:
         assert len(fam["members"]) == len(example_rows_pedigree)
         assert len(submission.errors) == 0
 
+    @pytest.mark.workbook
     def test_add_family_metadata_db_multi(
         self, workbook, es_testapp, example_rows_pedigree, wb_project, wb_institution
     ):
@@ -2334,12 +3356,17 @@ def test_validate_all_items_errors(testapp, mother, empty_items):
     assert mother["aliases"][0] not in errors
 
 
-def test_post_and_patch_all_items(testapp, post_data):
+def test_post_and_patch_all_items(testapp, post_data, file_formats):
     output, success, file_info = post_and_patch_all_items(testapp, post_data)
     assert success
     for itemtype in post_data["post"]:
+        item_count = len(post_data["post"][itemtype])
+        item_name = "item"
+        if item_count > 1:
+            item_name = "items"
         assert (
-            f"{itemtype}: 1 item created (with POST); 0 items failed creation" in output
+            f"{itemtype}: {item_count} {item_name} created (with POST); 0 items failed creation"
+            in output
         )
         if post_data["patch"].get(itemtype):
             assert (
@@ -2348,7 +3375,7 @@ def test_post_and_patch_all_items(testapp, post_data):
             )
 
 
-def test_post_and_patch_all_items_error(testapp, post_data):
+def test_post_and_patch_all_items_error(testapp, post_data, file_formats):
     """
     additional property introduced into 'family' item json  -
     designed to test appropriate error message produced in 'output' when item fails to post

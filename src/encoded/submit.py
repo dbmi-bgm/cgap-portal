@@ -3,14 +3,18 @@ import datetime
 import json
 import re
 from copy import deepcopy
+from pathlib import PurePath
 from urllib import parse
 
 import openpyxl
-from dcicutils.lang_utils import n_of
+import structlog
+from dcicutils.lang_utils import conjoined_list, n_of
 from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
 
 from .util import s3_local_file
+
+log = structlog.getLogger(__name__)
 
 GENERIC_FIELD_MAPPINGS = (
     {  # for spreadsheet column names that are different from schema property names
@@ -104,8 +108,7 @@ SIBLINGS = [
 RELATIONS = SIBLINGS + ["proband", "mother", "father"]
 
 POST_ORDER = [
-    "file_fastq",
-    "file_processed",
+    "file_submitted",
     "sample",
     "individual",
     "family",
@@ -127,6 +130,7 @@ LINKTO_FIELDS = [  # linkTo properties that we will want to patch in second-roun
     "families",
     "family",
     "files",
+    "related_files",
 ]
 
 
@@ -305,6 +309,8 @@ def is_yes_value(str_value):
 
 def string_to_array(str_value):
     """converts cell contents to list, splitting by commas"""
+    if str_value is None:
+        str_value = ""
     return [item.strip() for item in str_value.split(",") if item.strip()]
 
 
@@ -339,7 +345,28 @@ class AccessionRow:
     from class AccessionMetadata
     """
 
-    def __init__(self, vapp, metadata, idx, family_alias, project, institution):
+    # Schema constants
+    ALIASES = "aliases"
+    SAMPLES = "samples"
+    FAMILIES = "families"
+    SUBMITTED_FILES = "files"
+
+    # Spreadsheet constants
+    GENOME_BUILD = "genome_build"
+    FILES = "files"
+    CASE_FILES = "case_files"
+
+    # Class constants
+    ACCEPTED_GENOME_BUILDS = {
+        "hg19": ["19", "hg19"],
+        "GRCh37": ["37", "grch37"],
+        "GRCh38": ["38", "hg38", "grch38"],
+    }
+    FILE_SUBMITTED = "file_submitted"
+
+    def __init__(
+        self, vapp, metadata, idx, family_alias, project, institution, file_parser=None
+    ):
         """
         :param vapp: used for pytesting
         :type vapp: webtest TestApp object
@@ -348,6 +375,8 @@ class AccessionRow:
         :param str family_alias: analysis ID value for the current row being processed
         :param str project: project name
         :param str institution: institution name
+        :param file_parser: handler for submitted files
+        :type file_parser: SubmittedFileParser object
 
         :ivar str project: initial value: project
         :ivar str institution: initial value: institution
@@ -379,8 +408,10 @@ class AccessionRow:
         self.virtualapp = vapp
         self.metadata = metadata
         self.row = idx
+        self.file_parser = file_parser
         self.errors = []
         if not self.found_missing_values():
+            self.files = []
             self.indiv_alias = generate_individual_alias(
                 project, metadata[SS_INDIVIDUAL_ID]
             )
@@ -405,9 +436,6 @@ class AccessionRow:
             self.individual = self.extract_individual_metadata()
             self.family = self.extract_family_metadata()
             self.sample, self.analysis = self.extract_sample_metadata()
-            self.files_fastq = []
-            self.files_processed = []
-            self.extract_file_metadata()
 
     def found_missing_values(self):
         # makes sure no required values from spreadsheet are missing
@@ -528,6 +556,9 @@ class AccessionRow:
             "sent_by",
             "physician_id",
             "bam_sample_id",
+            self.FILES,
+            self.CASE_FILES,
+            self.GENOME_BUILD,
         ]
         info = map_fields(self.metadata, info, fields, "sample")
         # handle enum values
@@ -555,96 +586,96 @@ class AccessionRow:
         info["requisition_acceptance"] = {k: v for k, v in req_info.items() if v}
         if self.individual:
             self.individual.metadata["samples"] = [self.sample_alias]
-        # metadata for sample_processing item
-        new_sp_item = {
-            "aliases": [self.analysis_alias],
-            "samples": [self.sample_alias],
-            "families": [self.fam_alias],
-        }
+        sample_processing = self.make_sample_processing_metadata()
+        self.process_and_add_file_metadata(info, sample_processing)
         return (
             MetadataItem(info, self.row, "sample"),
-            MetadataItem(new_sp_item, self.row, "sample_processing"),
+            MetadataItem(sample_processing, self.row, "sample_processing"),
         )
 
-    @staticmethod
-    def get_paired_end_value(index):
-        """
-        Returns the 'paired end' value for fastq pairs (1 or 2) given an index in a list.
-        0 --> 1
-        1 --> 2
-        2 --> 1
-        3 --> 2
-        4 --> 1
-        5 --> 2
-        ..
-        etc.
-        """
-        return int(2 - ((index + 1) % 2))
+    def make_sample_processing_metadata(self):
+        """Create SampleProcessing properties, except possibly files.
 
-    def extract_file_metadata(self):
+        :returns: SampleProcessing properties
+        :rtype: dict
         """
-        Extracts 'file' item metadata from each row, generating MetadataItem
-        object(s). Objects are appended to self.files_fastq or self.files_processed,
-        as appropriate, which are initialized as empty lists.
-        """
-        valid_extensions = {
-            ".fastq.gz": ("fastq", "reads"),
-            ".fq.gz": ("fastq", "reads"),
-            ".cram": ("cram", "alignments"),
-            ".vcf.gz": ("vcf_gz", "raw VCF"),
+        properties = {
+            self.ALIASES: [self.analysis_alias],
+            self.SAMPLES: [self.sample_alias],
+            self.FAMILIES: [self.fam_alias],
         }
-        filenames = [
-            f.strip() for f in self.metadata.get("files", "").split(",") if f.strip()
-        ]
-        paired = True if len(filenames) % 2 == 0 else False
-        for i, filename in enumerate(filenames):
-            extension = [ext for ext in valid_extensions if filename.endswith(ext)]
-            if not extension:
-                if [ext for ext in [".fastq", ".fq", ".vcf"] if filename.endswith(ext)]:
-                    self.errors.append(
-                        "File must be compressed - please gzip file {}".format(filename)
-                    )
-                else:
-                    self.errors.append(
-                        (
-                            "File extension on {} not supported - expecting one of: "
-                            ".fastq.gz, .fq.gz, .cram, .vcf.gz"
-                        ).format(filename)
-                    )
-                continue
-            file_alias = "{}:{}".format(self.project, filename.strip().split("/")[-1])
-            fmt = valid_extensions[extension[0]][0]
-            file_info = {
-                "aliases": [file_alias],
-                # 'row': self.row,
-                "file_format": "/file-formats/{}/".format(fmt),
-                "file_type": valid_extensions[extension[0]][1],
-                "filename": filename.strip(),
-            }
-            # file relationships if paired
-            if fmt == "fastq":
-                self.sample.metadata.setdefault("files", []).append(file_alias)
-                if paired:
-                    paired_end = str(AccessionRow.get_paired_end_value(i))
-                    file_info["paired_end"] = paired_end
-                    if paired_end == "2":
-                        file_info["related_files"] = [
-                            {
-                                "relationship_type": "paired with",
-                                "file": self.files_fastq[-1].alias,
-                            }
-                        ]
-                self.files_fastq.append(MetadataItem(file_info, self.row, "file_fastq"))
-            else:
-                if fmt == "cram":
-                    self.sample.metadata.setdefault("cram_files", []).append(file_alias)
-                else:
-                    self.sample.metadata.setdefault("processed_files", []).append(
-                        file_alias
-                    )
-                self.files_processed.append(
-                    MetadataItem(file_info, self.row, "file_processed")
+        return properties
+
+    def process_and_add_file_metadata(self, sample, sample_processing):
+        """Parse/validate file information and update Sample or
+        SampleProcessing properties accordingly.
+
+        :param sample: Sample properties
+        :type sample: dict
+        :param sample_processing: SampleProcessing properties
+        :type sample_processing: dict
+        """
+        submitted_genome_build = sample.pop(self.GENOME_BUILD, None)
+        genome_build = self.validate_genome_build(submitted_genome_build)
+        submitted_sample_files = sample.pop(self.FILES, None)
+        submitted_sample_processing_files = sample.pop(self.CASE_FILES, None)
+        if submitted_sample_files:
+            self.update_item_files(sample, submitted_sample_files, genome_build)
+        if submitted_sample_processing_files:
+            self.update_item_files(
+                sample_processing, submitted_sample_processing_files, genome_build
+            )
+
+    def update_item_files(self, item, submitted_files, genome_build):
+        """Attempt to build File items and update the given item's
+        properties accordingly.
+
+        Add created File aliases to the item, and add any errors to the
+        class' errors for reporting.
+
+        :param item: The Item to update with created Files
+        :type item: dict
+        :param submitted_files: Comma-separated file names
+        :type submitted_files: str or None
+        :param genome_build: Validated genome assembly to set as
+            property on all created File items
+        :type genome_build: str or None
+        """
+        file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
+            submitted_files, genome_build=genome_build, row_index=self.row
+        )
+        for file_item in file_items:
+            file_metadata_item = MetadataItem(file_item, self.row, self.FILE_SUBMITTED)
+            self.files.append(file_metadata_item)
+        if file_aliases:
+            item[self.SUBMITTED_FILES] = file_aliases
+        self.errors.extend(file_errors)
+
+    def validate_genome_build(self, submitted_genome_build):
+        """Validate submitted genome build and report any errors.
+
+        :param submitted_genome_build: Submitted genome assembly
+        :type submitted_genome_build: str or None
+        :returns: Validated genome assembly if found
+        :rtype: str or None
+        """
+        result = None
+        if submitted_genome_build:
+            submitted_genome_build_lower = submitted_genome_build.lower()
+            for genome_build, accepted_values in self.ACCEPTED_GENOME_BUILDS.items():
+                accepted_values = map(str.lower, accepted_values)
+                if submitted_genome_build_lower in accepted_values:
+                    result = genome_build
+                    break
+            if result is None:
+                msg = (
+                    f"Row {self.row} - Invalid genome build provided:"
+                    f" {submitted_genome_build}. Consider replacing with one of the"
+                    f" following:"
+                    f" {conjoined_list(list(self.ACCEPTED_GENOME_BUILDS.keys()))}."
                 )
+                self.errors.append(msg)
+        return result
 
 
 class AccessionMetadata:
@@ -731,8 +762,7 @@ class AccessionMetadata:
         self.sample_processings = {}
         self.reports = {}
         self.cases = {}
-        self.files_fastq = {}
-        self.files_processed = {}
+        self.files = {}
         self.errors = []
         self.analysis_types = self.get_analysis_types()
         self.case_info = {}
@@ -742,8 +772,7 @@ class AccessionMetadata:
             "family": self.families,
             "sample": self.samples,
             "sample_processing": self.sample_processings,
-            "file_fastq": self.files_fastq,
-            "file_processed": self.files_processed,
+            "file_submitted": self.files,
             "case": self.cases,
             "report": self.reports,
         }
@@ -872,28 +901,6 @@ class AccessionMetadata:
                     else:
                         previous[item.alias][key] = list(set(previous[item.alias][key]))
 
-    def check_fastq_paired_info(self):
-        """
-        Makes sure fastq files appearing more than once have consistent paired with
-        information. Specifically, checks that paired end 1 files have consistent
-        pairing info.
-        """
-        paired_info = {}
-        for val in self.files_fastq.values():
-            if "related_files" in val:
-                for file_dict in val["related_files"]:
-                    if file_dict["file"] not in paired_info:
-                        paired_info[file_dict["file"]] = val["filename"]
-                    elif paired_info[file_dict["file"]] != val["filename"]:
-                        msg = (
-                            "Fastq file {} appears multiple times in sheet"
-                            " with inconsistent paired file. Please ensure fastq is"
-                            " paired with correct file in all rows where it appears."
-                            "".format(file_dict["file"])
-                        )
-                        self.errors.append(msg)
-        return
-
     def add_family_metadata(self, idx, family, individual):
         """
         Looks at 'family' metadata from AccessionRow object. Adds family to AccessionMetadata
@@ -946,17 +953,26 @@ class AccessionMetadata:
                 )
                 self.errors.append(msg)
         if sp_item.alias in self.sample_processings:
-            for field in ["samples", "families"]:
+            for field in ["samples", "families", "files"]:
                 # the sp_item.metadata generated by a single row is expected to only have one
                 # sample and family even though these props are arrays - extend the arrays in
                 # sample_processings dict when necessary.
-                if (
-                    sp_item.metadata[field][0]
-                    not in self.sample_processings[sp_item.alias][field]
-                ):
-                    self.sample_processings[sp_item.alias][field].extend(
-                        sp_item.metadata[field]
-                    )
+                new_property_value = sp_item.metadata.get(field)
+                if new_property_value:
+                    existing_property_value = self.sample_processings[
+                        sp_item.alias
+                    ].get(field)
+                    if existing_property_value:
+                        if existing_property_value != new_property_value:
+                            existing_property_value += [
+                                value
+                                for value in new_property_value
+                                if value not in existing_property_value
+                            ]
+                    else:
+                        self.sample_processings[sp_item.alias][
+                            field
+                        ] = new_property_value
         else:
             self.sample_processings[sp_item.alias] = sp_item.metadata
 
@@ -1064,6 +1080,7 @@ class AccessionMetadata:
         Method for iterating over spreadsheet rows to process each one and compare it to previous rows.
         Case creation and family relations added after all rows have been processed.
         """
+        file_parser = SubmittedFilesParser(self.virtualapp, self.project)
         for (row, row_number) in self.rows:
             try:
                 fam = self.family_dict[row.get("analysis id")]
@@ -1081,13 +1098,12 @@ class AccessionMetadata:
                     fam,
                     self.project,
                     self.institution,
+                    file_parser=file_parser,
                 )
                 simple_add_items = [processed_row.individual, processed_row.sample]
-                simple_add_items.extend(processed_row.files_fastq)
-                simple_add_items.extend(processed_row.files_processed)
+                simple_add_items.extend(processed_row.files)
                 for item in simple_add_items:
                     self.add_metadata_single_item(item)
-                self.check_fastq_paired_info()
                 self.add_family_metadata(
                     processed_row.row, processed_row.family, processed_row.individual
                 )
@@ -1099,6 +1115,8 @@ class AccessionMetadata:
             except AttributeError:
                 self.errors.extend(processed_row.errors)
                 continue
+        file_parsing_general_errors = file_parser.check_for_errors()
+        self.errors.extend(file_parsing_general_errors)
         self.add_individual_relations()
         self.create_case_metadata()
 
@@ -1114,6 +1132,678 @@ class AccessionMetadata:
                 new_metadata["institution"] = self.institution_atid
                 self.json_out[key][alias] = new_metadata
             self.json_out["errors"] = self.errors
+
+
+class SubmittedFilesParser:
+    """Class to manage File item creation during submission."""
+
+    # Schema constants
+    FILES = "files"
+    ALIASES = "aliases"
+    SAMPLES = "samples"
+    FAMILIES = "families"
+    RELATED_FILES = "related_files"
+    RELATIONSHIP_TYPE = "relationship_type"
+    PAIRED_WITH = "paired with"
+    FILE = "file"
+    FILE_FORMAT = "file_format"
+    EXTRA_FILE_FORMATS = "extrafile_formats"
+    FILE_NAME = "filename"
+    EXTRA_FILES = "extra_files"
+    STANDARD_FILE_EXTENSION = "standard_file_extension"
+    OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
+    GENOME_ASSEMBLY = "genome_assembly"
+    AT_ID = "@id"
+
+    # Spreadsheet constants
+    GENOME_BUILD = "genome_build"
+    CASE_FILES = "case_files"
+
+    # Class constants
+    FILE_FORMAT_FASTQ_ATID = "/file-formats/fastq/"
+    PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
+    PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
+    PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
+
+    def __init__(self, virtualapp, project_name):
+        """Initialize class and set attributes.
+
+        :param virtualapp: App for requests
+        :type virtualapp: WebTest Testapp
+        :param project_name: Project name for created Files
+        :type project_name: str
+
+        :var virtualapp: App for requests
+        :vartype: WebTest Testapp
+        :var project_name: Project name used for the submission
+        :vartype project_name: str
+        :var errors: Errors across rows that don't need to be repeated
+        :vartype errors: list(str)
+        :var accepted_file_formats: FileFormats accepted for submission,
+            mapped @id to properties. Updated from None via
+            self.get_accepted_file_formats()
+        :vartype accepted_file_formats: dict or None
+        :var primary_to_extra_file_formats: Mapping of @ids from
+            FileFormats accepted for submission to their extra file
+            FileFormats
+        :vartype: primary_to_extra_file_formats: dict
+        :var unidentified_file_format: Whether a submitted file name
+            could not be associated with a suitable FileFormat
+        :vartype unidentified_file_format: bool
+        :var file_extensions_to_file_formats: Mapping of file
+            extensions to found FileFormat @ids
+        :vartype file_extensions_to_file_formats: dict
+        """
+        self.virtualapp = virtualapp
+        self.project_name = project_name
+        self.errors = []  # Errors across rows that don't need to be repeated
+        self.accepted_file_formats = None
+        self.extra_file_formats = {}
+        self.primary_to_extra_file_formats = {}
+        self.unidentified_file_format = False
+        self.file_extensions_to_file_formats = {}  # Cache extensions --> file formats
+
+    def check_for_errors(self):
+        """Identify any global errors, i.e. those found across multiple
+        spreadsheet rows that only need to be reported once.
+
+        Method called within AccessionMetadata.process_rows().
+        Intended to call helper functions that will update self.errors
+        prior to returning them for reporting purposes.
+
+        :returns: Global errors found while processing all submitted
+            file information on the spreadsheet
+        :rtype: list
+        """
+        self.check_for_multiple_file_formats()
+        return self.errors
+
+    def check_for_multiple_file_formats(self):
+        """Identify file extensions that matched to multiple FileFormat
+        items and update self.errors for reporting.
+        """
+        multiple_file_formats = {}
+        for (
+            file_extension,
+            file_formats,
+        ) in self.file_extensions_to_file_formats.items():
+            if len(file_formats) > 1:
+                multiple_file_formats[file_extension] = file_formats
+        if multiple_file_formats:
+            msg = (
+                "Could not identify a unique file format for the following file"
+                f" extensions: {conjoined_list(list(multiple_file_formats.keys()))}."
+                f" Please report this error to the CGAP team for assistance:"
+                f" {multiple_file_formats}."
+            )
+            self.errors.append(msg)
+
+    def extract_file_metadata(
+        self, submitted_file_names, genome_build=None, row_index=None
+    ):
+        """Primary method for validating and creating Files from
+        submitted information.
+
+        Updates self.errors with any errors to report for an individual
+        accession row (see self.check_for_errors() for "global" errors
+        that should only be reported once across all rows).
+
+        :param submitted_file_names: Comma-separated submitted file
+            names
+        :type submitted_file_names: str or None
+        :param genome_build: Validated genome assembly
+        :type genome_build: str or None
+        :param row_index: Row index within spreadsheet
+        :type row_index: int or None
+        :returns: Validated File items, validated File aliases, errors
+            to report for this row
+        :rtype: tuple(dict, list, list)
+        """
+        file_names_to_items = {}
+        file_aliases = []
+        fastq_files = {}
+        files_without_file_format = {}
+        files_to_check_extra_files = {}
+        errors = []
+        submitted_file_names = self.parse_file_names(submitted_file_names)
+        for submitted_file_name in submitted_file_names:
+            file_path = PurePath(submitted_file_name)
+            file_name = file_path.name
+            file_suffixes = file_path.suffixes
+            (
+                file_format_atid,
+                extra_file_format_atids,
+                suffix_found,
+            ) = self.identify_file_format(file_suffixes)
+            if not file_format_atid:
+                files_without_file_format[file_name] = submitted_file_name
+                continue
+            if extra_file_format_atids:
+                files_to_check_extra_files[file_name] = (
+                    extra_file_format_atids,
+                    suffix_found,
+                )
+            file_alias = "{}:{}".format(self.project_name, file_name)
+            file_properties = {
+                self.ALIASES: [file_alias],
+                self.FILE_FORMAT: file_format_atid,
+                self.FILE_NAME: submitted_file_name,
+            }
+            if genome_build:
+                file_properties[self.GENOME_ASSEMBLY] = genome_build
+            file_names_to_items[file_name] = file_properties
+            if file_format_atid == self.FILE_FORMAT_FASTQ_ATID:
+                fastq_files[file_name] = file_properties
+        self.associate_extra_files(
+            files_to_check_extra_files, file_names_to_items, files_without_file_format
+        )
+        file_items = file_names_to_items.values()
+        file_aliases = [item[self.ALIASES][0] for item in file_items]
+        if fastq_files:
+            invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(
+                fastq_files
+            )
+            if invalid_fastq_names:
+                msg = (
+                    f"Row {row_index} - Invalid FASTQ file name(s) found:"
+                    f" {conjoined_list(invalid_fastq_names)}. FASTQ file names"
+                    f" must contain read information; see documentation for details."
+                )
+                errors.append(msg)
+            if unpaired_fastqs:
+                msg = (
+                    f"Row {row_index} - No matched pair-end file found for FASTQ file"
+                    f" name(s): {conjoined_list(unpaired_fastqs)}."
+                    f" Matched FASTQ file names must differ only in the read number."
+                )
+                errors.append(msg)
+        if files_without_file_format:
+            if self.unidentified_file_format is False:
+                accepted_file_extensions = self.get_accepted_file_extensions()
+                msg = (
+                    f"Unable to identify at least 1 file extension on this submission."
+                    f" The following extensions are currently accepted:"
+                    f" {conjoined_list(accepted_file_extensions)}."
+                )
+                self.errors.append(msg)
+                self.unidentified_file_format = True
+            msg = (
+                f"Row {row_index} - Invalid file extensions provided for the following"
+                f" file name(s):"
+                f" {conjoined_list(list(files_without_file_format.keys()))}."
+            )
+            errors.append(msg)
+        return file_items, file_aliases, errors
+
+    def associate_extra_files(
+        self, files_to_check_extra_files, file_names_to_items, files_without_file_format
+    ):
+        """For files that accept extra files, find them and update the
+        metadata accordingly.
+
+        :param files_to_check_extra_files: Mapping of files accepting
+            extra files to possible extra file file formats and the
+            file's suffix
+        :type files_to_check_extra_files: dict
+        :param file_names_to_items: Mapping of files to properties
+        :type file_names_to_items: dict
+        :param files_without_file_format: Mapping of files without
+            associated file format to submitted file names
+        :type files_without_file_format: dict
+        """
+        for (
+            file_name,
+            (extra_file_format_atids, file_suffix),
+        ) in files_to_check_extra_files.items():
+            file_properties = file_names_to_items.get(file_name)
+            if not file_properties:
+                log.warning(
+                    f"Cannot match a file to its extra files during submission."
+                    f" FileFormats may have recursive or nested chains of extra file"
+                    f" FileFormats. File name: {file_name}, file suffix: {file_suffix},"
+                    f" extra file FileFormat @ids: {extra_file_format_atids}."
+                )
+                continue
+            extra_file_names_and_formats = self.generate_extra_file_names_with_formats(
+                file_name, file_suffix, extra_file_format_atids
+            )
+            for (
+                extra_file_names,
+                extra_file_format_atid,
+            ) in extra_file_names_and_formats:
+                for extra_file_name in extra_file_names:
+                    existing_file_item = file_names_to_items.get(extra_file_name)
+                    if existing_file_item:
+                        submitted_file_name = existing_file_item.get(self.FILE_NAME)
+                        self.associate_file_with_extra_file(
+                            file_properties, submitted_file_name, extra_file_format_atid
+                        )
+                        del file_names_to_items[extra_file_name]
+                        break
+                    submitted_file_name = files_without_file_format.get(extra_file_name)
+                    if submitted_file_name:
+                        self.associate_file_with_extra_file(
+                            file_properties, submitted_file_name, extra_file_format_atid
+                        )
+                        del files_without_file_format[extra_file_name]
+                        break
+
+    def generate_extra_file_names_with_formats(
+        self, file_name, file_suffix, extra_file_format_atids
+    ):
+        """For given file, create expected file names for given extra
+        file formats.
+
+        :param file_name: File name (without path info)
+        :type file_name: str
+        :param file_suffix: Suffix found for file
+        :type file_suffix: str
+        :param extra_file_format_atids: Possible extra file format @id
+            identifiers
+        :type extra_file_format_atids: list(str)
+        :returns: Expected file names and FileFormat @ids for all extra
+            files
+        :rtype: list(tuple(str, str))
+        """
+        result = []
+        base_file_name = self.get_file_name_without_suffix(file_name, file_suffix)
+        for extra_file_format_atid in extra_file_format_atids:
+            file_names_for_extra_file_format = []
+            extra_file_format = self.extra_file_formats.get(extra_file_format_atid, {})
+            extra_file_format_extension = extra_file_format.get(
+                self.STANDARD_FILE_EXTENSION
+            )
+            if extra_file_format_extension:
+                file_names_for_extra_file_format.append(
+                    self.make_file_name_for_extension(
+                        base_file_name, extra_file_format_extension
+                    )
+                )
+            other_extra_file_extensions = extra_file_format.get(
+                self.OTHER_ALLOWED_EXTENSIONS, []
+            )
+            for extension in other_extra_file_extensions:
+                file_names_for_extra_file_format.append(
+                    self.make_file_name_for_extension(base_file_name, extension)
+                )
+            if file_names_for_extra_file_format:
+                result.append(
+                    (file_names_for_extra_file_format, extra_file_format_atid)
+                )
+        return result
+
+    def get_file_name_without_suffix(self, file_name, suffix):
+        """Remove suffix from file name.
+
+        :param file_name: File name (without path)
+        :type file_name: str
+        :param suffix: File suffix
+        :type suffix: str
+        :returns: File name without given suffix
+        :rtype: str
+        """
+        suffix = suffix.lstrip(".")
+        result = file_name.rstrip(suffix)
+        return result.rstrip(".")
+
+    def make_file_name_for_extension(self, base_file_name, extension):
+        """Add suffix to given file name.
+
+        :param base_file_name: File name stripped of accepted suffix
+        :type base_file_name: str
+        :param extension: Suffix to add
+        :type extension: str
+        :returns: File name with new suffix
+        :rtype: str
+        """
+        base_file_name = base_file_name.rstrip(".")
+        extension = extension.lstrip(".")
+        return f"{base_file_name}.{extension}"
+
+    def associate_file_with_extra_file(
+        self, file_item, extra_file_name, extra_file_format_atid
+    ):
+        """Update file properties with extra file metadata, if
+        required.
+
+        NOTE: PATCHing "extra_files" property does not overwrite the
+        existing property but adds the new extra file, so need to check
+        the item on the portal (if exists) and see if extra file
+        already exists before adding the extra file metadata.
+
+        :param file_item: File properties
+        :type file_item: dict
+        :param extra_file_name: Extra file name
+        :type extra_file_name: str
+        :param extra_file_format_atid: @id of FileFormat for extra file
+        :type extra_file_format_atid: str
+        """
+        patch_extra_file = True
+        file_alias = file_item.get(self.ALIASES, [""])[0]
+        existing_file_item = self.make_get_request(
+            file_alias, query_string="frame=object", result_expected=False
+        )
+        if existing_file_item:
+            existing_extra_files = existing_file_item.get(self.EXTRA_FILES, [])
+            for existing_extra_file in existing_extra_files:
+                existing_extra_file_format = existing_extra_file.get(self.FILE_FORMAT)
+                if existing_extra_file_format == extra_file_format_atid:
+                    patch_extra_file = False
+                    break
+        if patch_extra_file:
+            extra_file_properties = {
+                self.FILE_FORMAT: extra_file_format_atid,
+                self.FILE_NAME: extra_file_name,
+            }
+            existing_extra_files = file_item.get(self.EXTRA_FILES)
+            if existing_extra_files:
+                existing_extra_files.append(extra_file_properties)
+            else:
+                file_item[self.EXTRA_FILES] = [extra_file_properties]
+
+    def parse_file_names(self, submitted_file_names):
+        """Parse submitted file names.
+
+        :param submitted_file_names: Comma-separated file names
+        :type submitted_file_names: str
+        :returns: Unique, parsed file names
+        :rtype: set(str)
+        """
+        return set(string_to_array(submitted_file_names))
+
+    def get_accepted_file_extensions(self):
+        """Grab all accepted extensions for FileFormats that can be
+        used for FileSubmitted items.
+
+        :returns: Unique file extensions in alphabetical order
+        :rtype: set(str)
+        """
+        result = []
+        file_format_atids_to_items = self.get_accepted_file_formats()
+        for file_format in file_format_atids_to_items.values():
+            result.append(file_format.get(self.STANDARD_FILE_EXTENSION))
+            result += file_format.get(self.OTHER_ALLOWED_EXTENSIONS, [])
+        return sorted(list(set(result)))
+
+    def get_accepted_file_formats(self):
+        """Find all FileFormats acceptable for FileSubmitted items as
+        well as all FileFormats utilized for extra files.
+
+        Only make this search request once and store as attribute.
+
+        :returns: Acceptable FileFormats found
+        :rtype: list(dict)
+        """
+        if self.accepted_file_formats is None:
+            query = "/search/?type=FileFormat&valid_item_types=FileSubmitted"
+            search_results = self.search_query(query)
+            file_format_atids_to_items = {}
+            for file_format in search_results:
+                file_format_atid = file_format.get(self.AT_ID)
+                file_format_atids_to_items[file_format_atid] = file_format
+                extra_file_formats = file_format.get(self.EXTRA_FILE_FORMATS)
+                if extra_file_formats:
+                    extra_file_format_atids = [
+                        item.get(self.AT_ID) for item in extra_file_formats
+                    ]
+                    self.update_extra_file_formats(extra_file_format_atids)
+                    self.associate_file_formats(
+                        file_format_atid, extra_file_format_atids
+                    )
+            self.accepted_file_formats = file_format_atids_to_items
+        return self.accepted_file_formats
+
+    def update_extra_file_formats(self, extra_file_format_atids):
+        """Update attribute (self.extra_file_formats) with extra file
+        FileFormat properties, if not already present.
+
+        :param extra_file_format_atids: FileFormat @ids found for extra
+            files
+        :type extra_file_format_atid: list(str)
+        """
+        for file_format_atid in extra_file_format_atids:
+            extra_file_format = self.extra_file_formats.get(file_format_atid)
+            if extra_file_format:
+                continue
+            file_format_properties = self.make_get_request(file_format_atid)
+            self.extra_file_formats[file_format_atid] = file_format_properties
+
+    def associate_file_formats(self, primary_file_format_atid, extra_file_format_atids):
+        """Associate "primary" FileFormats with extra file FileFormats
+        via attribute (self.primary_to_extra_file_formats).
+
+        :param primary_file_format_atid: @id for FileFormat accepted
+            for "primary" file submission
+        :type primary_file_format_atid: str
+        :param extra_file_format_atids: @ids for FileFormats acceptable
+            for extra files for the "primary" FileFormat
+        :type extra_file_format_atids: list(str)
+        """
+        existing_values = self.primary_to_extra_file_formats.get(
+            primary_file_format_atid
+        )
+        if existing_values is None:
+            self.primary_to_extra_file_formats[primary_file_format_atid] = set(
+                extra_file_format_atids
+            )
+        else:
+            existing_values.update(extra_file_format_atids)
+
+    def identify_file_format(self, file_suffixes):
+        """Find FileFormat(s) that accept the given file extension.
+
+        Attempt to find FileFormats from largest possible extension to
+        smallest to provide flexibility for users to name files with
+        extensions; e.g. foo_bar.updated.fastq.gz should match to a
+        FASTQ file format by not finding a match for the extension
+        updated.fastq.gz and then finding one for fastq.gz.
+
+        Cache all file extension --> matched FileFormats so can be
+        re-used across entire spreadsheet to avoid repeated identical
+        requests.
+
+        :param file_suffixes: Suffixes of submitted file name
+        :type file_suffixes: list(str)
+        :returns: Valid matching FileFormat @id, associated extra file
+            FileFormat @ids, and file extension
+        :rtype: tuple(str or None, set(str) or None, str or None)
+        """
+        file_format_atid = None
+        extra_file_formats = None
+        suffix_found = None
+        for idx in range(len(file_suffixes)):  # Iterate through largest to smallest
+            suffix_for_search = "".join(file_suffixes[idx:]).lstrip(".")
+            cached_formats = self.file_extensions_to_file_formats.get(suffix_for_search)
+            if cached_formats is not None:
+                search_result = cached_formats
+            else:
+                search_result = self.search_file_format_for_suffix(suffix_for_search)
+                self.file_extensions_to_file_formats[suffix_for_search] = search_result
+            if not search_result:
+                continue
+            else:
+                if len(search_result) == 1:
+                    [file_format] = search_result
+                    file_format_atid = file_format.get(self.AT_ID)
+                    extra_file_formats = self.primary_to_extra_file_formats.get(
+                        file_format_atid
+                    )
+                    suffix_found = suffix_for_search
+                break
+        return file_format_atid, extra_file_formats, suffix_found
+
+    def search_file_format_for_suffix(self, suffix):
+        """Find all FileFormats that can be used for the given file
+        extension.
+
+        NOTE: We grab all FileFormats that can be used for FileSubmitted
+        items via self.get_accepted_file_formats() (caches search
+        result) and then iterate through them here. Expecting
+        reasonably small number of accepted FileFormats so iterating
+        through them for every extension rather than making separate
+        search request for all such extensions.
+
+        :param suffix: File extension
+        :type suffix: str
+        :returns: FileFormats accepting the extension
+        :rtype: list
+        """
+        result = []
+        file_format_atids_to_items = self.get_accepted_file_formats()
+        for file_format in file_format_atids_to_items.values():
+            standard_file_extension = file_format.get(self.STANDARD_FILE_EXTENSION, "")
+            other_allowed_extensions = file_format.get(
+                self.OTHER_ALLOWED_EXTENSIONS, []
+            )
+            alternative_suffix = "." + suffix
+            if (
+                suffix == standard_file_extension
+                or suffix in other_allowed_extensions
+                or alternative_suffix == standard_file_extension
+                or alternative_suffix in other_allowed_extensions
+            ):
+                result.append(file_format)
+                continue
+        return result
+
+    def search_query(self, query):
+        """Make GET request for given search query and return items
+        found.
+
+        :param query: Search query
+        :type query: str
+        :returns: Items matching query
+        :rtype: list
+        """
+        return self.make_get_request(query).get("@graph", [])
+
+    def make_get_request(self, url, query_string=None, result_expected=True):
+        """Make GET request.
+
+        Follow response if re-directed, and handle response errors.
+
+        :param url: URL to GET
+        :type url: str
+        :param query_string: Query string add-on
+        :type query_string: str or None
+        :returns: GET response
+        :rtype: dict
+        """
+        if not url.startswith("/"):
+            url = "/" + url
+        try:
+            response = self.virtualapp.get(url, params=query_string, status=[200, 301])
+            if response.status_code == 301:
+                response = response.follow()
+            result = response.json
+        except (VirtualAppError, AppError):
+            result = {}
+            if result_expected:
+                log.warning(
+                    f"GET request failed when a result was expected."
+                    f" URL: {url}, parameters: {query_string}."
+                )
+        return result
+
+    def validate_and_pair_fastqs(self, fastq_files):
+        """Enforce increased validation for FASTQ files.
+
+        Require strict name formatting and pairing of FASTQs.
+
+        Updates paired file properties accordingly.
+
+        :param fastq_files: Mapping of file names to corresponding item
+            properties
+        :type fastq_files: dict
+        :returns: File names for which paired-end unknown, file names
+            with paired-end but not paired
+        :rtype: tuple(list, list)
+        """
+        fastq_paired_end_1 = {}
+        fastq_paired_end_2 = {}
+        fastq_unknown_paired_end = []
+        for file_name, file_item in fastq_files.items():
+            paired_end = self.get_paired_end_from_name(file_name)
+            if paired_end == 1:
+                fastq_paired_end_1[file_name] = file_item
+            elif paired_end == 2:
+                fastq_paired_end_2[file_name] = file_item
+            else:
+                fastq_unknown_paired_end.append(file_name)
+        unpaired_fastqs = self.pair_fastqs_by_name(
+            fastq_paired_end_1, fastq_paired_end_2
+        )
+        return fastq_unknown_paired_end, unpaired_fastqs
+
+    def get_paired_end_from_name(self, file_name):
+        """Identify unique FASTQ paired-end from file name.
+
+        :param file_name: File name
+        :type file_name: str
+        :returns: Paired-end, if found and unique
+        :rtype: str or None
+        """
+        result = None
+        matches = []
+        if self.PAIRED_END_1_REGEX.search(file_name):
+            matches.append(1)
+        if self.PAIRED_END_2_REGEX.search(file_name):
+            matches.append(2)
+        if len(matches) == 1:
+            [result] = matches
+        return result
+
+    def pair_fastqs_by_name(self, fastq_paired_end_1, fastq_paired_end_2):
+        """Attempt to pair FASTQ files by name, updating File
+        properties accordingly.
+
+        NOTE: Expecting paired-end 1 and 2 file names to match exactly
+        besides the paired-end info within the name.
+
+        :param fastq_paired_end_1: Mapping of file names --> File
+            properties for paired-end 1 FASTQs
+        :type fastq_paired_end_1: dict
+        :param fastq_paired_end_2: Mapping of file names --> File
+            properties for paired-end 2 FASTQs
+        :type fastq_paired_end_2: dict
+        :returns: File names that could not be paired
+        :rtype: list
+        """
+        unmatched_fastqs = []
+        matched_paired_end_2 = set()
+        for file_name, file_item in fastq_paired_end_1.items():
+            expected_paired_end_2_name = self.make_expected_paired_end_2_name(file_name)
+            match = fastq_paired_end_2.get(expected_paired_end_2_name)
+            if match is not None:
+                matched_paired_end_2.add(expected_paired_end_2_name)
+                match_alias = match[self.ALIASES][0]
+                file_item[self.RELATED_FILES] = [
+                    {
+                        self.RELATIONSHIP_TYPE: self.PAIRED_WITH,
+                        self.FILE: match_alias,
+                    }
+                ]
+            else:
+                unmatched_fastqs.append(file_name)
+        for file_name in fastq_paired_end_2.keys():
+            if file_name not in matched_paired_end_2:
+                unmatched_fastqs.append(file_name)
+        return unmatched_fastqs
+
+    def make_expected_paired_end_2_name(self, file_name):
+        """Create expected paired-end 2 file name from a paired-end 1
+        file name.
+
+        :param file_name: Paired-end 1 file name
+        :type file_name: str
+        :returns: Expected paired-end 2 file name
+        :rtype: str
+        """
+
+        def r1_to_r2(match):
+            return match.group().replace("1", "2")
+
+        return re.sub(self.PAIRED_END_1_REGEX, r1_to_r2, file_name)
 
 
 class PedigreeRow:
@@ -1808,16 +2498,12 @@ class SpreadsheetProcessing:
             ).format('", "'.join(missing))
             self.errors.append(msg)
         else:
-            # enumerate through generator of input from spreadsheet
             for i, row in enumerate(self.input):
                 r = [val for val in row]
                 # skip comments/description/blank row if present
                 if "y/n" in "".join(r).lower() or "".join(r) == "":
-                    continue  # then jumps to the beginning of for loop
-
-                # the cell values within this row
+                    continue
                 row_dict = {self.keys[i]: item for i, item in enumerate(r)}
-                # row number populated, taking into account header and preheader rows
                 self.rows.append((row_dict, i + self.preheader_rows_counter + 1))
 
     def extract_metadata(self):
