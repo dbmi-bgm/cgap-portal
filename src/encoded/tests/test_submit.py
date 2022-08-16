@@ -21,6 +21,7 @@ from ..submit import (
     validate_all_items,
     validate_item,
     xls_to_json,
+    get_column_name,
 )
 
 
@@ -815,6 +816,24 @@ def test_map_fields(sample_info):
     assert result["specimen_accession"] == "9034"
     assert result["specimen_collection_date"] == "2020-01-06"
     assert not result.get("sequencing_lab")
+
+
+@pytest.mark.parametrize(
+    "row,columns,expected",
+    [
+        ({}, ["foo", "bar"], "bar"),
+        ({"bar": ""}, ["foo"], "foo"),
+        ({"bar": ""}, ["foo", "bar"], "bar"),
+        ({"bar": ""}, ["bar", "foo"], "bar"),
+        ({"bar": None}, ["bar", "foo"], "foo"),
+    ]
+)
+def test_get_column_name(row, columns, expected):
+    """Test retrieval of header from row when multiple headers
+    corresponding to same data field exist.
+    """
+    result = get_column_name(row, columns)
+    assert result == expected
 
 
 @pytest.mark.parametrize(

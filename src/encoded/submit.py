@@ -246,9 +246,16 @@ def use_abbrev(value):
 
 
 def get_column_name(row, columns):
-    """
-    For cases where there is a variation on a particular column name.
-    Final column in list must be the default name.
+    """Get header in row when multiple headers exist for the field.
+
+    Defaults to last header given.
+
+    :param row: Spreadsheet row, headers mapped to values
+    :type row: dict
+    :param columns: Header names possible for the desired value
+    :type columns: list(str)
+    :returns: Header found in row (or last header given)
+    :rtype: str
     """
     for col in columns:
         if row.get(col) is not None:
