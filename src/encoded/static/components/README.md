@@ -13,6 +13,12 @@ The client/front-end for the [4DN Data Portal](https://data.4dnucleome.org) func
 **¹** [Rendering 'head' element is against React best practices as of 2014](https://github.com/facebook/react/pull/2311#issuecomment-58743271) -- a long-term to-do includes refactoring this aspect of our front-end.
 
 
+### UI-Centric Diagram
+
+View with clickable links in [Google Drawings](https://docs.google.com/drawings/d/1xeWXa9bhURPuxa9HrDueUBCQY35HysQBwGRSTKsX_Eg/edit?pli=1).
+[![](https://docs.google.com/drawings/d/e/2PACX-1vSZYDhRKweAjSwv7Fg3PLEsouyEgSD3rGI0XByrkE0l-XQuk-djlYmJTE9_JtAh71VAETH6JpLb604g/pub?w=1440&amp;h=1080)](https://docs.google.com/drawings/d/1xeWXa9bhURPuxa9HrDueUBCQY35HysQBwGRSTKsX_Eg/edit?pli=1)
+
+
 ## Server-Side Rendering
 
 The back-end system uses a [subprocess](https://docs.python.org/3/library/subprocess.html), which launches and runs [NodeJS](https://nodejs.org/en/) , to use React Server-Side Rendering to output a plaintext HTML source code, which is then streamed to end-user's browser. React, as part of the [babel](https://babeljs.io/)-compiled JS bundle, is then loaded through a `<script>` tag (defined in aforementioned HTML source code) and initalized to ["hydrate"](https://reactjs.org/docs/react-dom.html#hydrate) over (re-use) the server-side-rendered markup and make it interactive.
@@ -38,7 +44,7 @@ A registry is used to determine which 'page view' to use for a given URI/endpoin
 
 ### Direct Descendant Components/Elements
 
-Some of the components that App/BodyElement renders (or branches out to) are 'ever-present' on each page and don't change or change minimally in response to navigation, this includes Components such as `NavigationBar`, `PageTitle`, `Footer`, `QuickInfoBar`, and `FacetCharts`, as well as some elements (e.g. most things inside the `<head>` tag). Some of these render/return `null` when on a page which does not require them - namely `QuickInfoBar` and `FacetCharts`. `FacetCharts` & `QuickInfoBar` are defined in the root level BodyElement instead of deeper in tree, e.g. `HomePage` + `BrowseView` components, because it must stay present when transitioning/navigating from one page to the other (Home ↔ Browse); being present twice on two separate views would cause it to be dismounted and re-mounted.
+Some of the components that App/BodyElement renders (or branches out to) are 'ever-present' on each page and don't change or change minimally in response to navigation, this includes Components such as `NavigationBar`, `PageTitle`, `Footer`, `QuickInfoBar`, and `FacetCharts`, as well as some elements (e.g. most things inside the `<head>` tag). Some of these render/return `null` when on a page which does not require them - namely `QuickInfoBar` and `FacetCharts`. `FacetCharts` & `QuickInfoBar` are defined in the root level BodyElement instead of deeper in tree, e.g. `HomePage` + `BrowseView` components, because it must stay present when transitioning/navigating from one page to the other (Home ⮂ Browse); being present twice on two separate views would cause it to be dismounted and re-mounted.
 
 `NavigationBar` & `QuickInfoBar` receive selected props/state from App + BodyElement and render their (lack of) visibility - as well as other visual states, data, etc. - in response to them.
 
