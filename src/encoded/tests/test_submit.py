@@ -4,16 +4,17 @@ import pytest
 from ..submit import (
     HPO_TERM_ID_PATTERN,
     MONDO_TERM_ID_PATTERN,
+    AccessionMetadata,
+    AccessionProcessing,
+    AccessionRow,
+    PedigreeMetadata,
+    PedigreeProcessing,
+    PedigreeRow,
+    SpreadsheetProcessing,
     compare_fields,
     digest_xlsx,
     format_ontology_term_with_colon,
-    AccessionRow,
-    AccessionMetadata,
-    PedigreeRow,
-    PedigreeMetadata,
-    SpreadsheetProcessing,
-    AccessionProcessing,
-    PedigreeProcessing,
+    get_column_name,
     map_fields,
     parse_exception,
     post_and_patch_all_items,
@@ -21,9 +22,7 @@ from ..submit import (
     validate_all_items,
     validate_item,
     xls_to_json,
-    get_column_name,
 )
-
 
 TEST_INGESTION_ID1 = "123456-1243-1234-123456abcdef"
 TEST_INGESTION_ID2 = "abcdef-1234-1234-abcdef123456"
@@ -826,7 +825,7 @@ def test_map_fields(sample_info):
         ({"bar": ""}, ["foo", "bar"], "bar"),
         ({"bar": ""}, ["bar", "foo"], "bar"),
         ({"bar": None}, ["bar", "foo"], "foo"),
-    ]
+    ],
 )
 def test_get_column_name(row, columns, expected):
     """Test retrieval of header from row when multiple headers

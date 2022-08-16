@@ -1,16 +1,16 @@
-from copy import deepcopy
-from urllib import parse
 import csv
 import datetime
 import json
 import re
-import openpyxl
+from copy import deepcopy
+from urllib import parse
 
+import openpyxl
 from dcicutils.lang_utils import n_of
 from dcicutils.misc_utils import VirtualAppError, ignored
 from webtest import AppError
-from .util import s3_local_file
 
+from .util import s3_local_file
 
 GENERIC_FIELD_MAPPINGS = (
     {  # for spreadsheet column names that are different from schema property names
