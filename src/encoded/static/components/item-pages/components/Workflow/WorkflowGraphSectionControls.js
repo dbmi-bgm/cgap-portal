@@ -9,16 +9,16 @@ import { CollapsibleItemViewButtonToolbar } from './../CollapsibleItemViewButton
 
 export const WorkflowGraphSectionControls = React.memo(function WorkflowGraphSectionControls(props){
     const {
-        parsingOptions: { showReferenceFiles, showIndirectFiles },
-        onParsingOptChange, windowWidth,
+        showReferenceFiles,
+        onToggleReferenceFiles, windowWidth,
         rowSpacingType, onRowSpacingTypeSelect,
         includeAllRunsInSteps, toggleAllRuns, isLoadingGraphSteps
     } = props;
     return (
         <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
             <ShowAllRunsCheckbox checked={includeAllRunsInSteps} onChange={toggleAllRuns} disabled={isLoadingGraphSteps} />
-            <ReferenceFilesCheckbox checked={showReferenceFiles} onChange={onParsingOptChange} />
-            <IndirectFilesCheckbox checked={showIndirectFiles} onChange={onParsingOptChange} />
+            <ReferenceFilesCheckbox checked={showReferenceFiles} onChange={onToggleReferenceFiles} />
+            {/* <IndirectFilesCheckbox checked={showIndirectFiles} onChange={onParsingOptChange} /> */}
             <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onSelect={onRowSpacingTypeSelect} />
         </CollapsibleItemViewButtonToolbar>
     );
