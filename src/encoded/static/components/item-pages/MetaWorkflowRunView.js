@@ -3838,7 +3838,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             output
         } = workflowRunObject;
 
-        return {
+        const initialStep = {
             name,
             "meta": {
                 "@id": workflowRunAtID,
@@ -3848,7 +3848,47 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             "inputs": [],
             "outputs": []
         };
+
+        input.forEach(function(wfrObjectInputObject){
+            const {
+                argument_name,
+                source,
+                source_argument_name,
+                files = []
+            } = wfrObjectInputObject;
+            const initialSource = { "name": source_argument_name || argument_name };
+            if (source) {
+                initialSource.step = source;
+            }
+            const initialSourceList = [];
+            if (files.length > 0) {
+                files.forEach(function(fileObject){
+                    const { file: fileItem } = fileObject;
+                    const { "@id": fileAtID } = fileItem || {};
+                    initialSourceList.push( { ...initialSource, "for_file": fileAtID } );
+                });
+            } else {
+                initialSourceList.push(initialSource);
+            }
+            // const initialSourceList = [ initialSource ];
+            // TODO: Add "for_file", subdivide sources per file
+            const stepInputObject = {
+                "name": argument_name,
+                "source": initialSourceList,
+                "meta": {}, // TODO fill
+                "run_data": {} // TODO
+            };
+            initialStep.inputs.push(stepInputObject);
+        });
+
+        return initialStep;
+
     });
+
+    // TODO:
+    // Create mirrored "target" with "target step"
+
+    console.log("TTT4", incompleteSteps);
 
     return [
         {
