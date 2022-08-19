@@ -3768,7 +3768,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
         input:  mwfrInputList = []
     } = metaWorkflowRunItem;
 
-    const { workflows = [] } = meta_workflow;
+    const { workflows = [], input: mwfInputList = [] } = meta_workflow;
     const workflowsByName = {};
     workflows.forEach(function(workflow){
         const { name } = workflow;
@@ -3787,7 +3787,26 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
         };
     });
 
+
+
+    const allInputsDict = {};
+    mwfInputList.forEach(function(inputObject){
+        const { argument_name } = inputObject;
+        allInputsDict[argument_name] = { ...inputObject };
+    });
+
     mwfrInputList.forEach(function(inputObject){
+        const { argument_name } = inputObject;
+        allInputsDict[argument_name] = allInputsDict[argument_name] || {};
+        Object.assign(allInputsDict[argument_name], inputObject);
+    });
+
+    const combinedInputList = Object.keys(allInputsDict).map(function(k){
+        return allInputsDict[k];
+    });
+
+
+    combinedInputList.forEach(function(inputObject){
         const {
             argument_name: inputObjectArgName,
             argument_type: inputObjectArgType,
@@ -3809,8 +3828,12 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                     if (inputObjectArgType === "file") {
                         wfrObjectInputObject.files = wfrObjectInputObject.files || [];
                         inputObjectFiles.forEach(function(fileObject){
-                            const { dimension = null } = fileObject;
-                            if (dimension === shard) {
+                            const { dimension } = fileObject;
+                            if (typeof dimension !== "undefined") {
+                                if (dimension === shard) {
+                                    wfrObjectInputObject.files.push(fileObject);
+                                }
+                            } else {
                                 wfrObjectInputObject.files.push(fileObject);
                             }
                         });
@@ -3835,8 +3858,10 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 "@id": workflowRunAtID
             },
             input,
-            output
+            output = []
         } = workflowRunObject;
+
+        const { "@id": workflowAtID } = workflow || {};
 
         const initialStep = {
             name,
@@ -3849,19 +3874,31 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             "outputs": []
         };
 
+
+
         input.forEach(function(wfrObjectInputObject){
             const {
                 argument_name,
-                source,
+                argument_type,
+                source: wfrSourceStepName,
                 source_argument_name,
-                files = []
+                files = [],
+                value
             } = wfrObjectInputObject;
-            const initialSource = { "name": source_argument_name || argument_name };
-            if (source) {
-                initialSource.step = source;
+
+            const initialSource = {
+                "name": source_argument_name || argument_name
+            };
+
+            if (wfrSourceStepName) {
+                initialSource.step = wfrSourceStepName;
+                // Maybe include later if needed:
+                // initialSource.workflow = workflowAtID;
             }
+
             const initialSourceList = [];
-            if (files.length > 0) {
+            const filesLen = files.length;
+            if (filesLen > 0) {
                 files.forEach(function(fileObject){
                     const { file: fileItem } = fileObject;
                     const { "@id": fileAtID } = fileItem || {};
@@ -3870,15 +3907,105 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             } else {
                 initialSourceList.push(initialSource);
             }
+
+            let isReferenceFileInput = false;
+            if (filesLen > 0) {
+                isReferenceFileInput = _.every(files, function(fileObject){
+                    const { file: fileItem } = fileObject;
+                    const { "@type": fileAtType } = fileItem || {}; 
+                    return fileAtType.indexOf("FileReference") > -1;
+                });
+            }
+
             // const initialSourceList = [ initialSource ];
             // TODO: Add "for_file", subdivide sources per file
             const stepInputObject = {
                 "name": argument_name,
                 "source": initialSourceList,
-                "meta": {}, // TODO fill
-                "run_data": {} // TODO
+                "meta": {
+                    "global": !wfrSourceStepName,
+                    // "in_path": ???,
+                    "type": (
+                        // Don't need to set QC or report for input... I think...
+                        argument_type === "parameter" ? "parameter"
+                            : isReferenceFileInput ? "reference file"
+                                : filesLen > 0 ? "data file"
+                                    : null
+                    ),
+                    // "cardinality": // TODO maybe
+                },
+                "run_data": {
+                    "type": "input"
+                }
             };
+
+            if (filesLen > 0) {
+                stepInputObject.run_data.file = _.pluck(files, "file");
+                stepInputObject.run_data.meta = files.map(function({ file, ...remainingProperties }){
+                    return remainingProperties;
+                });
+            } else if (typeof value !== "undefined") {
+                stepInputObject.run_data.value = [ value ];
+                stepInputObject.run_data.meta = [ { "ordinal": 1 } ];
+            }
+
             initialStep.inputs.push(stepInputObject);
+        });
+
+
+        output.forEach(function(wfrOutputObject){
+
+            const {
+                argument_name,
+                argument_type,
+                source: wfrSourceStepName,
+                source_argument_name,
+                file,
+                value
+            } = wfrOutputObject;
+
+            const initialTarget = {
+                "name": source_argument_name || argument_name
+            };
+
+            const initialTargetList = [];
+            if (file) {
+                const { "@id": fileAtID } = file || {};
+                initialTargetList.push( { ...initialTarget, "for_file": fileAtID } );
+            } else {
+                initialTargetList.push(initialTarget);
+            }
+
+            // TODO handle values other than file...
+
+            const stepOutputObject = {
+                "name": argument_name,
+                "target": initialTargetList,
+                "meta": {
+                    // "global": !wfrSourceStepName,
+                    // "in_path": ???,
+                    "type": (
+                        // TODO Check if QC or report for input... I think...
+                        // Re-use strategy for determining is reference file from inputs
+                        argument_type === "parameter" ? "parameter"
+                            : file ? "data file"
+                                : null
+                    ),
+                    // "cardinality": // TODO maybe
+                },
+                "run_data": {
+                    "type": "input"
+                }
+            };
+
+            if (file) {
+                stepOutputObject.run_data.file = [ file ];
+                stepOutputObject.run_data.meta = [ { "type": "Output processed file" } ];
+            }
+            // TODO handle 'value' if needed.
+
+            initialStep.outputs.push(stepOutputObject);
+
         });
 
         return initialStep;
