@@ -17,6 +17,7 @@ from ..util import (
     check_user_is_logged_in,
     vapp_for_email,
     convert_integer_to_comma_string,
+    title_to_snake_case,
 )
 from .. import util as util_module
 
@@ -308,4 +309,27 @@ def test_vapp_for_email(testapp, non_admin_persona):
 def test_convert_integer_to_comma_string(value, expected):
     """Test converting integer to comma-formatted string."""
     result = convert_integer_to_comma_string(value)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("", ""),
+        (" ", ""),
+        ("A Title", "a_title"),
+        (" A Title ", "a_title"),
+        ("A     Title", "a_title"),
+        ("A Title With-Dash", "a_title_with_dash"),
+        ("A Title With--Dashes", "a_title_with_dashes"),
+        ("A Title With_Underscore", "a_title_with_underscore"),
+        ("A Title With__Underscores", "a_title_with_underscores"),
+        ("a title", "a_title"),
+        ("snake_case", "snake_case"),
+        ("camelCase", "camelcase"),
+    ]
+)
+def test_title_to_snake_case(value, expected):
+    """"""
+    result = title_to_snake_case(value)
     assert result == expected

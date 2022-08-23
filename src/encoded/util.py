@@ -517,3 +517,15 @@ def convert_integer_to_comma_string(value):
     if isinstance(value, int):
         result = format(value, ",d")
     return result
+
+
+SPACE_PATTERN = re.compile(r"[ ]+")
+
+
+def title_to_snake_case(input_string):
+    """Convert string title case (e.g. "Some Title") to snake case."""
+    lower_string = input_string.lower()
+    no_dash_string = lower_string.replace("-", " ").replace("_", " ")
+    no_space_string = re.sub(SPACE_PATTERN, "_", no_dash_string)
+    result = no_space_string.strip("_")
+    return result
