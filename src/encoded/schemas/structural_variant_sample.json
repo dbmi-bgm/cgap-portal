@@ -181,7 +181,7 @@
             "source_name": "VCF",
             "description": "Confidence class for the variant call",
             "scope": "sample_variant",
-	    "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_confidence_class.html",
+            "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_confidence_class.html",
             "schema_title": "Confidence Class"
         },
         "confidence_interval_end": {
