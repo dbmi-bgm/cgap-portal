@@ -336,7 +336,8 @@ const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
         return !!renderedTable;
     });
 
-    console.log("FINDINGs GROUPS", findingsTableGroupings);
+    // console.log("FINDINGs GROUPS", findingsTableGroupings, findingsTableKeysFound);
+
     return (
         <div className="mb-2 findings-tables-section border-bottom">
             { renderedTables }

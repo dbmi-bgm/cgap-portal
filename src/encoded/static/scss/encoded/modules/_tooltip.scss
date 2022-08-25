@@ -1,18 +1,23 @@
 
 /*** Override ReactTooltip styles ***/
 
-.__react_component_tooltip {
-    // May bring back later if needed for anything
-    // max-width: 630px;
-    // @include media-breakpoint-down(xs) {
-    //     max-width : 400px;
-    // }
-    // @include media-breakpoint-down(sm) {
-    //     max-width : 500px;
-    // }
-    // @include media-breakpoint-down(md) {
-    //     max-width : 600px;
-    // }
+/**************** React Tooltips (NPM: react-tooltip) overwrite of styling *********************/
+
+body .__react_component_tooltip {
+
+    padding: 6px 15px;
+	z-index: 9999 !important;
+
+    max-width: 630px;
+    @include media-breakpoint-down(xs) {
+        max-width : 400px;
+    }
+    @include media-breakpoint-down(sm) {
+        max-width : 500px;
+    }
+    @include media-breakpoint-down(md) {
+        max-width : 600px;
+    }
 
     h1,h2,h3,h4,h5,h6 {
         color: #fff;
@@ -28,6 +33,7 @@
 
 }
 
+/* Probably doesn't do anything useful -- */
 .__react_component_tooltip.has-links-or-buttons {
     pointer-events: all !important;
     &:hover {

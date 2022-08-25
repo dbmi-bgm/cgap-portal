@@ -401,7 +401,7 @@ function FilteringTabBody(props) {
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 178) : undefined;
+    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 142) : undefined;
 
     // Table re-initializes upon change of key so we use it refresh table based on session.
     const searchTableKey = "session:" + session;

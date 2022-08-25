@@ -2,6 +2,7 @@
 
 import React, { useCallback, useMemo } from 'react';
 
+import { IconCheckbox } from '../../forms/IconCheckbox';
 import { SvGeneDetailPane } from './SvDetailPanes';
 import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
@@ -161,7 +162,7 @@ export const HighlightedGeneSelector = React.memo(function HighlightedGeneSelect
     }, [ onSelectGene, result ]);
 
     // return <input type="checkbox" cls="m-0 mr-2" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
-    return <StarCheckboxInput cls="m-0 mr-2" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
+    return <IconCheckbox className="my-0 mr-2" iconOn="star fas" iconOff="star far" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
 });
 
 const geneTableColumns = {
@@ -198,30 +199,4 @@ const geneTableColumns = {
         "title": "o/e (LoF)",
         "order": 4
     }
-};
-
-export const StarCheckboxInput = function(props) {
-    const { disabled, checked, onChange, cls } = props;
-    const checkedJSX = <i className="icon icon-star fas text-primary" />;
-    const uncheckedJSX = <i className="icon icon-star far text-secondary" />;
-    const disabledJSX = <i className="icon icon-star fas text-muted unclickable" />;
-    const uncheckedDisabledJSX = <i className="icon icon-star far text-muted unclickable" />;
-    return <CustomCheckboxInput {...{ disabled, checked, onChange, checkedJSX, uncheckedJSX, disabledJSX, uncheckedDisabledJSX, cls }} />;
-};
-
-
-export const CustomCheckboxInput = function(props) {
-    const { disabled, checked, onChange, checkedJSX, uncheckedJSX, disabledJSX, uncheckedDisabledJSX, cls } = props;
-
-    return (
-        <label className={"custom-checkbox-input inline-block " + cls}>
-            <input className="d-none" type="checkbox" {...{ checked, disabled, onChange }} />
-            <span>
-                { (!checked && !disabled) && <span className="custom-check-unchecked">{ uncheckedJSX }</span>}
-                { (checked && !disabled) && <span className="custom-check-checked">{ checkedJSX }</span>}
-                { (checked && disabled) && <span className="custom-check-checked-disabled">{ disabledJSX }</span>}
-                { (!checked && disabled) && <span className="custom-check-unchecked-disabled">{ uncheckedDisabledJSX }</span>}
-            </span>
-        </label>
-    );
 };
