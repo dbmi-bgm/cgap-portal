@@ -107,6 +107,7 @@ def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     assert bam_snapshot_location == test_variant_sample['file'] + '/bamsnap/chr1_12125898.png'
     download = es_testapp.get('/' + uuid + '/@@download').location
     # download location is https://cgap-unit-testing-wfout.s3.amazonaws.com/dummy-file-name2/bamsnap/chr1_12125898.png
+    import pdb; pdb.set_trace()
     resp = requests.get(download)
     assert 'hello world' in resp.content.decode('utf-8')
 
