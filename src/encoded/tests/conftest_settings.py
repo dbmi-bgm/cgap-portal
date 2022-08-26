@@ -1,3 +1,9 @@
+import os
+
+
+REPOSITORY_ROOT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../.."))
+
+
 _app_settings = {
     "collection_datastore": "database",
     "item_datastore": "database",
