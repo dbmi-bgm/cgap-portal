@@ -3,7 +3,7 @@ import pytest
 import tempfile
 
 from dcicutils.env_utils import EnvUtils
-from dcicutils.misc_utils import PRINT
+from dcicutils.misc_utils import PRINT, override_environ
 
 
 def pytest_addoption(parser):
@@ -35,34 +35,33 @@ PRINT("Configuring environment variables...")
 
 my_selected_account = os.environ.get("ACCOUNT_NUMBER")
 
-# TODO: Maybe make this test programmable in env_utils sometime. -kmp 21-Jul-2022
-desired_env = 'cgap-devtest'
-
 my_selected_env = os.environ.get("ENV_NAME")
 
 if not my_selected_account or my_selected_account == "643366669028":
     PRINT("The legacy account can no longer be used for testing cgap-portal.")
     exit(1)
-elif not my_selected_env:
-    print("ENV_NAME was not set. It is being set to ")
-    os.environ['ENV_NAME'] = desired_env
-elif my_selected_env != desired_env:
-    PRINT(f"ENV_NAME must be set to {desired_env} (or left unset) for testing. (It is set to {my_selected_env}.)")
-    exit(1)
-else:
-    PRINT(f"Leaving ENV_NAME set to {desired_env}.")
 
-old_identity = os.environ.get("IDENTITY")
-new_identity = 'C4DatastoreCgapDevtestApplicationConfiguration'
-if old_identity == new_identity:
-    PRINT(f"IDENTITY is already set to the desired value ({new_identity}). That value will be used.")
-elif old_identity:
-    PRINT(f"IDENTITY is set incompatibly for ENV_NAME={desired_env}.")
-    exit(1)
-else:
-    PRINT(f"The IDENTITY environment variable is being set to {new_identity} so you can assume its credentials.")
-    os.environ['IDENTITY'] = new_identity
+os.environ['BS_ENV'] = os.environ['ENCODED_BS_ENV'] = os.environ['ENV_NAME'] = 'cgap-devtest'
+os.environ['IDENTITY'] = 'C4DatastoreCgapDevtestApplicationConfiguration'
 
-EnvUtils.init(force=True)
+EnvUtils.init(force=True, ecosystem='main')
+
+env_name = f'cgap-testing-{os.environ.get("USER", "testuser")}'
+es_namespace = env_name
+
+os.environ['ENCODED_BS_ENV'] = os.environ['BS_ENV'] = env_name
+os.environ['ENCODED_ENV_NAME'] = os.environ['ENV_NAME'] = env_name
+os.environ['ENCODED_ES_NAMESPACE'] = os.environ['ES_NAMESPACE'] = es_namespace
 
 PRINT("=" * 80)
+
+
+@pytest.yield_fixture(scope='session', autouse=True)
+def bind_env_names():
+    with override_environ(ENCODED_BS_ENV=env_name, BS_ENV=env_name, ENCODED_ENV_NAME=env_name, ENV_NAME=env_name,
+                          ENCODED_ES_NAMESPACE=es_namespace, ES_NAMESPACE=es_namespace):
+        yield
+        for env_var in ['ENCODED_BS_ENV', 'BS_ENV', 'ENCODED_ENV_NAME', 'ENV_NAME']:
+            assert os.environ.get(env_var) == env_name
+        for env_var in ['ENCODED_ES_NAMESPACE', 'ES_NAMESPACE']:
+            assert os.environ.get(env_var) == es_namespace
