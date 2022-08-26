@@ -49,7 +49,7 @@ class MockQueueManager:
 def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test_pseudoenv, fake_tester_email):
 
     def mocked_get_trusted_email(request, context, raise_errors):
-        assert context is "Submission"
+        assert context == "Submission"
         assert raise_errors is False
         if request.remote_user == 'TEST':
             return fake_tester_email
