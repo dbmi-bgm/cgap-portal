@@ -93,26 +93,27 @@ Incompatible Changes:
     to use the methods on ``dcicutils.env_base.EnvBase`` such as ``EnvBase.global_env_bucket_name`` to
     obtain the value and ``EnvBase.global_env_bucket_named``, a context manager, to bind the value.
 
- * ``dcicsnovault`` (``^6.0.0``) requires ``dcicutils 4.x``.
+  * ``dcicsnovault`` (``^6.0.0``) requires ``dcicutils 4.x``.
 
 New Features:
 
 * New commands (available from a ``bash`` shell)
 
- * Commands for managing ECR images:
+  * Commands for managing ECR images:
 
-   * ``add-image-tag``
-   * ``show-image-manifest``
-   * ``show-image-catalog``
-   * ``unrelease-most-recent-image``
+    * ``add-image-tag``
+    * ``show-image-manifest``
+    * ``show-image-catalog``
+    * ``unrelease-most-recent-image``
 
- * Commands for managing the new ``env_utils`` data:
+  * Commands for managing the new ``env_utils`` data:
 
-   * ``show-global-env-bucket``
+    * ``show-global-env-bucket``
 
 Compatible Changes and Bug Fixes:
 
 * Changes to buckets used for testing in `test.ini`.
+
   * ``file_upload_bucket = cgap-unit-testing-files`` (formerly ``elasticbeanstalk-encoded-4dn-files``)
   * ``blob_bucket = cgap-unit-testing-blobs`` (formerly ``elasticbeanstalk-encoded-4dn-blobs``)
   * ``metadata_bundles_bucket = cgap-unit-testing-metadata-bundles``
@@ -221,42 +222,60 @@ Notes: Built this off of Doug's SV confidence branch
 `PR 595: Technical Review on Filtering Tab <https://github.com/dbmi-bgm/cgap-portal/pull/595>`_
 
 * Adjustments to documentation
+
   * ``docs/source/index.rst``
   * ``docs/source/dataflow_overview.rst``
   * ``docs/source/docker-local.rst``
   * ``docs/source/infrastructure_overview.rst``
   * ``docs/source/ingestion.rst``
   * ``docs/source/local_installation.rst``
+
 * Diagram Upgrades to pretty diagrams made by Shannon
+
   * ``docs/source/img/cgap_infra_diagram.png``
   * ``docs/source/img/portal_dataflow_diagram.png``
+
 * Some ``package.lock`` updates
+
   * ``sass``
   * ``shared-portal-components``
   * ``auth0-lock``
+
 * Some python dependency updates
+
   * ``dcicutils``
   * ``dcicsnovault``
+
 * Schema changes
+
   * New schema type
+
     * ``NoteTechnicalReview``
+
   * In mixins, ``attribution`` changed
+
     * ``Institution`` to be ``"serverDefault": "userinstitution"``
     * ``Project`` to be ``"serverDefault": "userproject"``
+
   * Bump version
+
     * ``NoteDiscovery``
     * ``NoteInterpretation``
     * ``NoteStandard``
+
   * Added fields (some of which may have calculated property support;
     see ``the PR <https://github.com/dbmi-bgm/cgap-portal/pull/595>`_ for details)
+
     * In ``Note``, add ``"last_text_edited"``
     * In ``Report``, add ``"structural_variant_samples"``
     * In ``StructuralVariant``, add ``"technical_reviews"``
     * In ``StructuralVariantSample``:
+
       * Add ``"technical_review"``
       * Add ``"widthMap"`` to ``"structural_variant.SV_TYPE"``
       * Add ``"sv_browser"``
       * Add ``"technical_review.assessment.call"``
+
     * In ``Variant``, add ``"technical_reviews"``.
     * In ``VariantSample``, add ``"technical_review"`` and ``"technical_review.assessment.call"``
 
@@ -284,7 +303,7 @@ Notes: Built this off of Doug's SV confidence branch
     ``--only-if-env <env>`` or ``--only-if-envs <env1>,<env2>,...``
 
   * Using ``--confirm`` and ``--no-confirm`` controls whether you are interactively queried for confirmation.
-   The default is not to prompt if you provide ``--only-if-env`` or ``--only-if-envs``, and otherwise to prompt.
+    The default is not to prompt if you provide ``--only-if-env`` or ``--only-if-envs``, and otherwise to prompt.
 
 8.9.5
 =====
