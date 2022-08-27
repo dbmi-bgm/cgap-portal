@@ -165,6 +165,114 @@ Small Additional Changes:
 * Small change to propTypes in SPC to go with this branch: ``4dn-dcic/shared-portal-components#137``
 
 
+9.4.0
+=====
+
+`PR 624: Sv confidence UI <https://github.com/dbmi-bgm/cgap-portal/pull/624>`_
+
+* Added call confidence to Variant Info pane for SVs
+* Updated title of BIC-seq2 & Manta properties sections and added a link to cgap's docs
+* Updated manta properties section with split_reads and paired_reads (values + descriptions from schema)
+
+Notes: Built this off of Doug's SV confidence branch
+
+
+9.3.0.1
+=======
+
+`PR 621 Technical Review Follow-Up <https://github.com/dbmi-bgm/cgap-portal/pull/621>`_
+
+**NOTE:** There was no version change in this PR merge, so officially it was still calling itself 9.3.0.
+
+* UI Change: Separates Interpretation Selection functionality/checkbox into own column plus some minor styling + refactoring.
+
+
+9.3.0
+=====
+
+`PR 617: Cypress v10 update + test fix <https://github.com/dbmi-bgm/cgap-portal/pull/617>`_
+
+* Update to cypress 10.
+* Fix for a couple of tests.
+
+
+9.2.4
+=====
+
+`PR 619: Added self (V. Stevens) as user for local deployment <https://github.com/dbmi-bgm/cgap-portal/pull/619>`_
+
+* Added a developer profile under src/encoded/tests/data/master-inserts/user.json
+
+
+9.2.3.1
+=======
+
+`PR 620: July Security Update <https://github.com/dbmi-bgm/cgap-portal/pull/620>`_
+
+**NOTE:** There was no version change in this PR merge, so officially it was still calling itself 9.2.3.
+
+* Brings in snovault fixes for invalidation scope, updating tests as needed
+* Updates libraries wherever possible
+
+
+9.2.3
+=====
+
+`PR 595: Technical Review on Filtering Tab <https://github.com/dbmi-bgm/cgap-portal/pull/595>`_
+
+* Adjustments to documentation
+  * ``docs/source/index.rst``
+  * ``docs/source/dataflow_overview.rst``
+  * ``docs/source/docker-local.rst``
+  * ``docs/source/infrastructure_overview.rst``
+  * ``docs/source/ingestion.rst``
+  * ``docs/source/local_installation.rst``
+* Diagram Upgrades to pretty diagrams made by Shannon
+  * ``docs/source/img/cgap_infra_diagram.png``
+  * ``docs/source/img/portal_dataflow_diagram.png``
+* Some ``package.lock`` updates
+  * ``sass``
+  * ``shared-portal-components``
+  * ``auth0-lock``
+* Some python dependency updates
+  * ``dcicutils``
+  * ``dcicsnovault``
+* Schema changes
+  * New schema type
+    * ``NoteTechnicalReview``
+  * In mixins, ``attribution`` changed
+    * ``Institution`` to be ``"serverDefault": "userinstitution"``
+    * ``Project`` to be ``"serverDefault": "userproject"``
+  * Bump version
+    * ``NoteDiscovery``
+    * ``NoteInterpretation``
+    * ``NoteStandard``
+  * Added fields (some of which may have calculated property support;
+    see ``the PR <https://github.com/dbmi-bgm/cgap-portal/pull/595>`_ for details)
+    * In ``Note``, add ``"last_text_edited"``
+    * In ``Report``, add ``"structural_variant_samples"``
+    * In ``StructuralVariant``, add ``"technical_reviews"``
+    * In ``StructuralVariantSample``:
+      * Add ``"technical_review"``
+      * Add ``"widthMap"`` to ``"structural_variant.SV_TYPE"``
+      * Add ``"sv_browser"``
+      * Add ``"technical_review.assessment.call"``
+    * In ``Variant``, add ``"technical_reviews"``.
+    * In ``VariantSample``, add ``"technical_review"`` and ``"technical_review.assessment.call"``
+
+* Functional changes
+  * ``get_basic_properties_for_user`` returns several properties, where ``project`` was changed to ``project_roles``.
+  * ``get_iterable_search_result`` adds optional ``inherit_user`` argument.
+
+* UI static component changes not enumerated here. See `the PR <https://github.com/dbmi-bgm/cgap-portal/pull/595>`_
+  for details if interested.
+
+9.2.2
+=====
+
+...
+
+
 8.10.0
 ======
 
