@@ -178,18 +178,12 @@ Small Additional Changes:
 Notes: Built this off of Doug's SV confidence branch
 
 
-9.3.0.1
-=======
+9.3.0
+=====
 
 `PR 621 Technical Review Follow-Up <https://github.com/dbmi-bgm/cgap-portal/pull/621>`_
 
-**NOTE:** There was no version change in this PR merge, so officially it was still calling itself 9.3.0.
-
 * UI Change: Separates Interpretation Selection functionality/checkbox into own column plus some minor styling + refactoring.
-
-
-9.3.0
-=====
 
 `PR 617: Cypress v10 update + test fix <https://github.com/dbmi-bgm/cgap-portal/pull/617>`_
 
@@ -205,19 +199,13 @@ Notes: Built this off of Doug's SV confidence branch
 * Added a developer profile under src/encoded/tests/data/master-inserts/user.json
 
 
-9.2.3.1
-=======
+9.2.3
+=====
 
 `PR 620: July Security Update <https://github.com/dbmi-bgm/cgap-portal/pull/620>`_
 
-**NOTE:** There was no version change in this PR merge, so officially it was still calling itself 9.2.3.
-
 * Brings in snovault fixes for invalidation scope, updating tests as needed
 * Updates libraries wherever possible
-
-
-9.2.3
-=====
 
 `PR 595: Technical Review on Filtering Tab <https://github.com/dbmi-bgm/cgap-portal/pull/595>`_
 
@@ -289,13 +277,116 @@ Notes: Built this off of Doug's SV confidence branch
 9.2.2
 =====
 
-...
+`PR 618: Invalidation Scope Test Fixes + Doc <https://github.com/dbmi-bgm/cgap-portal/pull/618>`_
+
+* Fixes some invalidation scope tests under the new version
+* Makes some doc updates, including new diagrams
+
+
+9.2.1
+=====
+
+`PR 615: Bring in updated snovault <https://github.com/dbmi-bgm/cgap-portal/pull/615>`_
+
+* Small updateto snovault requirement, general update of poetry.lock with various new versions.
+* Add unit test ``test_project_lifecycle_policy_properties``
+
+
+9.2.0
+=====
+
+`PR 577 Data model updates for MetaWorkflowRuns <https://github.com/dbmi-bgm/cgap-portal/pull/577>`_
+
+In this PR, we create new metadata properties on ``MetaWorkflows``, ``MetaWorkflowRuns``, and ``MetaWorkflowRun``
+outputs (``FileProcessed``, ``QualityMetric``) that are required for related changes in foursight and magma.
+
+Specifically, we:
+
+* Move ``MetaWorkflowRuns`` off of ``Cases`` and onto ``SampleProcessings`` ``
+  (will handle existing Case items once merged and then delete properties on Case)
+* Add properties to MWFR's output to facilitate searches on output items
+* Add 2 new MWFR final_status options (stopped for manually stopped items,
+  quality metric failed for those stopped due to output QC failure)
+* Add properties to handle PATCHing of MWFR output files to appropriate destinations
+  (Sample.processed_files or SampleProcessing.processed_files, currently)
+* Fix a small embed API error noticed incidentally during foursight testing
+* Add properties related to identifying VCFs for ingestion and files for HiGlass display,
+  as bioinformatics is insisting on changing/having flexible file type descriptions
+  (which kills current routes of finding these)
+
+9.1.2
+=====
+
+`PR 614 Show cases without reports by default <https://github.com/dbmi-bgm/cgap-portal/pull/614>`_
+
+* Small change to the homepage case display such that cases without reports are included by default.
+  Users can click the button to show only those with reports. We make this change since many of our
+  users are accessioning cases without reports since they don't require the item.
+
+* Fix a calcprop on Image items.
+
+
+9.1.1
+=====
+
+`PR 613: Nav updates <https://github.com/dbmi-bgm/cgap-portal/pull/613>`_
+
+* Add 3 links to the top nav on the portal
+* Adjustments to BigDropdown components to make it possible to navigate to the marketing website without a double click
+
+9.1.0
+=====
+
+`PR 612: Schema changes for lifecycle management <https://github.com/dbmi-bgm/cgap-portal/pull/612>`_
+
+* Schema changes required for
+  `foursight-cgap PR 79: Lifecycle management <https://github.com/dbmi-bgm/foursight-cgap/pull/79>`_,
+  adding to ``File`` these attributes:
+
+  * ``"s3_lifecycle_category"``
+  * ``"s3_lifecycle_status"``
+  * ``"s3_lifecycle_last_checked"``
+
+  See `foursight-cgap PR 79 <https://github.com/dbmi-bgm/foursight-cgap/pull/79>`_
+  for more detailed description and rationale.
+
+
+9.0.1
+=====
+
+`PR 611: Upgrader Fix for Schema Version <https://github.com/dbmi-bgm/cgap-portal/pull/611>`_
+
+* Bring in latest ``snovault`` version, which includes further fixes to the upgrader process to handle
+  items without a ``"schema_version"`` property.
+* Add a test to ensure all non-abstract items contain proper ``"schema_version"`` properties.
+
+Dependabot changes (no version bump):
+
+* `PR 576: Bump numpy from 1.19.1 to 1.21.0 <https://github.com/dbmi-bgm/cgap-portal/pull/576>`_
+
+9.0.0
+=====
+
+`PR 610  May Security Update <https://github.com/dbmi-bgm/cgap-portal/pull/610>`_
+`PR 602  May Security Update <https://github.com/dbmi-bgm/cgap-portal/pull/602>`_
+
+* Allow ``cgap-portal`` to run in both Python 3.7 and Python 3.8, with intent it be run in 3.8 in production.
+  * Adjust ``pyproject.toml``
+  * Adjust ``Dockerfile``
+  * Adjust github workflow ``main.yml``
+* Add ``auth0.options`` in registry settings.
+* ``nginx`` change: Fall back to next server on 502 in case of out of memory
+* Let ``supervisord`` start service for workers in ``entrypoint_portal.sh``
+* In ``base.ini``:
+
+  * lower ``rss_limit`` from 500MB to 450MB
+  * remove ``rss_percent_limit``
 
 
 8.10.0
 ======
 
-`PR 605: Syntax makeover for clear-db-es-contents <https://github.com/dbmi-bgm/cgap-portal/pull/605>`_
+`PR 605 Syntax makeover for clear-db-es-contents <https://github.com/dbmi-bgm/cgap-portal/pull/605>`_
 
 * Adjustments to ``clear-db-es-contents`` to make arguments more intelligible and error messages more clear.
 
@@ -305,10 +396,48 @@ Notes: Built this off of Doug's SV confidence branch
   * Using ``--confirm`` and ``--no-confirm`` controls whether you are interactively queried for confirmation.
     The default is not to prompt if you provide ``--only-if-env`` or ``--only-if-envs``, and otherwise to prompt.
 
+`PR 599 New Pedigree Submission Fields <https://github.com/dbmi-bgm/cgap-portal/pull/599>`_
+
+* Handle upgrade from version 1 to version 2 of ``Individual``.
+* Testing of the ``Individual`` upgrade.
+* Updates to ``FamilyHistory`` doc.
+* Miscellaneous detailed updates to ``submit.py``.
+  (See `the PR <https://github.com/dbmi-bgm/cgap-portal/pull/599/files#diff-1dc4281734eec738e7416859045a7927e57021c4e102f1a9e8b53d4ba56c054d>`_
+  for additional detail.)
+
+
 8.9.5
 =====
 
-...
+*version missing?*
+
+8.9.4
+=====
+
+`PR 607: Add a CONTRIBUTING.rst <https://github.com/dbmi-bgm/cgap-portal/pull/607>`_
+
+* Add file ``CONTRIBUTING.rst``.
+
+
+8.9.3
+=====
+
+`PR 606 PedigreeViz parsing - try to handle subfamilies - skip/ignore relatives not present in jsonList. <https://github.com/dbmi-bgm/cgap-portal/pull/606>`_
+
+* Attempt to skip relatives missing from ``Family.members``
+
+
+8.9.2
+=====
+
+`PR 600 Remove Departed Admins <https://github.com/dbmi-bgm/cgap-portal/pull/600>`_
+
+* Remove user inserts for Sarah Reiff and Phil Grayson from ``master-inserts``.
+* Remove ``submitted_by``, etc. from ``VariantSample`` inserts in ``master-inserts``.
+
+Dependabot changes (no version bump):
+
+* `PR 603: Bump auth0-lock from 11.32.2 to 11.33.0 <https://github.com/dbmi-bgm/cgap-portal/pull/603>`_
 
 
 Older Versions
