@@ -10389,67 +10389,6 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
         };
     });
 
-
-
-    const allInputsDict = {};
-    mwfInputList.forEach(function(inputObject){
-        const { argument_name } = inputObject;
-        allInputsDict[argument_name] = { ...inputObject };
-    });
-
-    mwfrInputList.forEach(function(inputObject){
-        const { argument_name } = inputObject;
-        allInputsDict[argument_name] = allInputsDict[argument_name] || {};
-        Object.assign(allInputsDict[argument_name], inputObject);
-    });
-
-    const combinedInputList = Object.keys(allInputsDict).map(function(k){
-        return allInputsDict[k];
-    });
-
-
-    combinedInputList.forEach(function(inputObject){
-        const {
-            argument_name: inputObjectArgName,
-            argument_type: inputObjectArgType,
-            files: inputObjectFiles = []
-        } = inputObject;
-
-        combinedMWFRs.forEach(function(workflowRunObject){
-            const {
-                input: wfrObjectInputs,
-                shard = null
-            } = workflowRunObject;
-            wfrObjectInputs.forEach(function(wfrObjectInputObject){
-                const {
-                    source_argument_name: wfrSourceArgName,
-                    argument_name: wfrArgName
-                } = wfrObjectInputObject;
-                const useArgName = wfrSourceArgName || wfrArgName;
-                if (useArgName === inputObjectArgName) {
-                    if (inputObjectArgType === "file") {
-                        wfrObjectInputObject.files = wfrObjectInputObject.files || [];
-                        inputObjectFiles.forEach(function(fileObject){
-                            const { dimension } = fileObject;
-                            if (typeof dimension !== "undefined") {
-                                if (dimension === shard) {
-                                    wfrObjectInputObject.files.push(fileObject);
-                                }
-                            } else {
-                                wfrObjectInputObject.files.push(fileObject);
-                            }
-                        });
-                    } else if (inputObjectArgType === "parameter") {
-                        Object.assign(
-                            wfrObjectInputObject,
-                            _.omit(inputObject, "argument_name")
-                        );
-                    }
-                }
-            });
-        });
-    });
-
     console.log("TTTT3", combinedMWFRs);
 
     const incompleteSteps = combinedMWFRs.map(function(workflowRunObject){
@@ -10576,7 +10515,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             const {
                 argument_name,
                 argument_type,
-                source: mwfrSourceStepName,
+                //source: mwfrSourceStepName,
                 source_argument_name,
                 file,
                 value: nonFileValue
@@ -10584,8 +10523,6 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
 
             // Each file contains "workflow_run_outputs" (WFR it came from) + "workflow_run_inputs" (WFR it going to) (if applicable)
             const [ outputFileObject ] = outputFileObjectsGroupedByArgName[argument_name] || [];
-
-            console.log("TTT2", outputFileObject, outputFileObjectsGroupedByArgName);
 
             const initialTargetList = [];
             const initialTarget = {
