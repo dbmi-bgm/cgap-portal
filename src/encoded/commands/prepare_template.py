@@ -18,8 +18,6 @@ TEST_INI_FILE = os.path.join(ROOT_DIR, "test.ini")
 DATA_SET_CHOICES = ['prod', 'test', 'local', 'deploy']
 DEFAULT_DATA_SET = 'local'
 
-DEFAULT_LOCAL_ENV = f"cgap-devlocal-{os.environ.get('USER', 'testuser')}"
-
 
 def empty_assignment(line, expanded):
     ignored(line)
@@ -76,10 +74,8 @@ def prepare_docker_main():
                    s3_encrypt_key_id=args.s3_encrypt_key_id)
 
 
-def prepare_local_dev(env_name=DEFAULT_LOCAL_ENV, force=False):
-    extra_vars = {
-        "ENV_NAME": env_name,
-    }
+def prepare_local_dev(force=False):
+    extra_vars = {}
     prepare_from_template = template_creator(extra_vars)
     for file in [TEST_INI_FILE, DEVELOPMENT_INI_FILE]:
         exists = os.path.exists(file)
@@ -97,12 +93,10 @@ def prepare_local_dev_main():
         description="Prepare files used for local development (test.ini and development.ini)", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
     )
-    parser.add_argument("--env", default=DEFAULT_LOCAL_ENV,
-                        help=f"the environment to use for local testing and debugging (default: {DEFAULT_LOCAL_ENV})")
     parser.add_argument("--force", default=False, action="store_true",
                         help="forces creation of a development.ini and test.ini even if they already exist."
                              " By default, creation is skipped for any file that already exists.")
     args = parser.parse_args()
 
     logging.basicConfig()
-    prepare_local_dev(env_name=args.env, force=args.force)
+    prepare_local_dev(force=args.force)
