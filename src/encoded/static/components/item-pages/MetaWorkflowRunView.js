@@ -2542,15 +2542,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFI9CNINA2/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI9CNINA2.rck.gz",
                         "uuid": "90d5572a-3cb5-40bd-8cec-68346c28705b",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI9CNINA2/",
-                        "display_title": "GAPFI9CNINA2.rck.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -2570,202 +2570,29 @@ const TEMPORARY_DUMMY_CONTEXT = {
             ],
             "status": "completed",
             "workflow_run": {
-                "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:35.675189",
-                "@id": "/workflow-runs-awsem/d9b35c06-6911-4b67-ac04-395331a98e55/",
                 "uuid": "d9b35c06-6911-4b67-ac04-395331a98e55",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:35.675189",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
-                                "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIMIARUOB.bam",
-                            "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
-                            "file_size": 106616301305,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIMIARUOB/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86",
-                                "@id": "/quality-metrics-bamqc/b5978c20-271c-4ac4-8407-8b3fd3c0bb86/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricBamqc",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_bam"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
-                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
-                            "file_size": 3263683042,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIXRDPDK5/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "reference"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
-                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
-                            "file_size": 7603,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIBGEOI72/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "regions"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/d9b35c06-6911-4b67-ac04-395331a98e55/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFI9CNINA2/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 11922164723,
-                            "display_title": "GAPFI9CNINA2.rck.gz",
                             "status": "uploaded",
+                            "display_title": "GAPFI9CNINA2.rck.gz",
+                            "uuid": "90d5572a-3cb5-40bd-8cec-68346c28705b",
                             "file_format": {
-                                "display_title": "rck_gz",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "rck_gz",
                                 "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
                                 "@id": "/file-formats/rck_gz/",
                                 "principals_allowed": {
@@ -2777,8 +2604,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "90d5572a-3cb5-40bd-8cec-68346c28705b",
-                            "workflow_run_inputs": [],
+                            "file_size": 11922164723,
+                            "@id": "/files-processed/GAPFI9CNINA2/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "6fb5a7f0-2156-49e3-bf42-95f4e8decdde",
+                                    "@id": "/workflow-runs-awsem/6fb5a7f0-2156-49e3-bf42-95f4e8decdde/",
+                                    "display_title": "workflow_granite-rckTar v1.0.0 run 2022-04-29 21:10:35.118284",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -2812,72 +2665,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "rck"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_granite-mpileupCounts",
-            "jobid": "AAhwVmgHrjKw",
-            "shard": "1",
-            "output": [
-                {
-                    "file": {
-                        "uuid": "76111407-5e86-48dd-bd13-f3a167638140",
-                        "@type": [
-                            "FileProcessed",
-                            "File",
-                            "Item"
-                        ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFID5AE9ME/",
-                        "display_title": "GAPFID5AE9ME.rck.gz",
-                        "principals_allowed": {
-                            "view": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin",
-                                "group.read-only-admin",
-                                "remoteuser.EMBED",
-                                "remoteuser.INDEXER"
-                            ],
-                            "edit": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin"
-                            ]
-                        }
-                    },
-                    "argument_name": "rck"
-                }
-            ],
-            "status": "completed",
-            "workflow_run": {
-                "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:38.581075",
-                "@id": "/workflow-runs-awsem/8bca34d8-54c4-4de8-9057-ffb868d44795/",
-                "uuid": "8bca34d8-54c4-4de8-9057-ffb868d44795",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -2887,27 +2687,47 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "display_title": "GAPFICEE9LEN.bam",
-                            "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
-                            "file_size": 104992897560,
+                            "display_title": "GAPFIMIARUOB.bam",
+                            "file_size": 106616301305,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
+                            "@id": "/files-processed/GAPFIMIARUOB/",
                             "status": "uploaded",
-                            "@id": "/files-processed/GAPFICEE9LEN/",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:35.950498",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/784f3f5f-d3cf-432b-8c0f-3dcd957b2042/",
+                                    "uuid": "784f3f5f-d3cf-432b-8c0f-3dcd957b2042",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
-                                "uuid": "23408f2f-13ca-49d6-b8bf-162623795dd6",
-                                "@id": "/quality-metrics-bamqc/23408f2f-13ca-49d6-b8bf-162623795dd6/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "uuid": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "@type": [
                                     "QualityMetricBamqc",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/b5978c20-271c-4ac4-8407-8b3fd3c0bb86/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -2917,7 +2737,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -2938,15 +2757,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
                                 "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -2957,15 +2777,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_size": 3263683042,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -2986,15 +2805,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
                                 "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3005,15 +2825,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_size": 7603,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3033,26 +2852,74 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_granite-mpileupCounts",
+            "jobid": "AAhwVmgHrjKw",
+            "shard": "1",
+            "output": [
+                {
+                    "file": {
+                        "@id": "/files-processed/GAPFID5AE9ME/",
+                        "status": "uploaded",
+                        "display_title": "GAPFID5AE9ME.rck.gz",
+                        "uuid": "76111407-5e86-48dd-bd13-f3a167638140",
+                        "@type": [
+                            "FileProcessed",
+                            "File",
+                            "Item"
+                        ],
+                        "principals_allowed": {
+                            "view": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin",
+                                "group.read-only-admin",
+                                "remoteuser.EMBED",
+                                "remoteuser.INDEXER"
+                            ],
+                            "edit": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin"
+                            ]
+                        }
+                    },
+                    "argument_name": "rck"
+                }
+            ],
+            "status": "completed",
+            "workflow_run": {
+                "uuid": "8bca34d8-54c4-4de8-9057-ffb868d44795",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:38.581075",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/8bca34d8-54c4-4de8-9057-ffb868d44795/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFID5AE9ME/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 11874191792,
-                            "display_title": "GAPFID5AE9ME.rck.gz",
                             "status": "uploaded",
+                            "display_title": "GAPFID5AE9ME.rck.gz",
+                            "uuid": "76111407-5e86-48dd-bd13-f3a167638140",
                             "file_format": {
-                                "display_title": "rck_gz",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "rck_gz",
                                 "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
                                 "@id": "/file-formats/rck_gz/",
                                 "principals_allowed": {
@@ -3064,8 +2931,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "76111407-5e86-48dd-bd13-f3a167638140",
-                            "workflow_run_inputs": [],
+                            "file_size": 11874191792,
+                            "@id": "/files-processed/GAPFID5AE9ME/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "6fb5a7f0-2156-49e3-bf42-95f4e8decdde",
+                                    "@id": "/workflow-runs-awsem/6fb5a7f0-2156-49e3-bf42-95f4e8decdde/",
+                                    "display_title": "workflow_granite-rckTar v1.0.0 run 2022-04-29 21:10:35.118284",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3099,72 +2992,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "rck"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_granite-mpileupCounts",
-            "jobid": "vqBh5nx47BKk",
-            "shard": "2",
-            "output": [
-                {
-                    "file": {
-                        "uuid": "87e8832d-9ece-439a-8602-152b1ee74b0f",
-                        "@type": [
-                            "FileProcessed",
-                            "File",
-                            "Item"
-                        ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI5T4QIBP/",
-                        "display_title": "GAPFI5T4QIBP.rck.gz",
-                        "principals_allowed": {
-                            "view": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin",
-                                "group.read-only-admin",
-                                "remoteuser.EMBED",
-                                "remoteuser.INDEXER"
-                            ],
-                            "edit": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin"
-                            ]
-                        }
-                    },
-                    "argument_name": "rck"
-                }
-            ],
-            "status": "completed",
-            "workflow_run": {
-                "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:45.405166",
-                "@id": "/workflow-runs-awsem/e93fc945-f186-41e0-a0c3-b19a007ce81c/",
-                "uuid": "e93fc945-f186-41e0-a0c3-b19a007ce81c",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3174,47 +3014,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "display_title": "GAPFITNHTOZI.bam",
-                            "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
-                            "file_size": 111610806810,
+                            "display_title": "GAPFICEE9LEN.bam",
+                            "file_size": 104992897560,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
+                            "@id": "/files-processed/GAPFICEE9LEN/",
                             "status": "uploaded",
-                            "@id": "/files-processed/GAPFITNHTOZI/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b",
-                                "@id": "/quality-metrics-bamqc/5530ced5-5252-42f2-afde-0d14e30a669b/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricBamqc",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
                             "workflow_run_outputs": [
                                 {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:39.481922",
                                     "@type": [
                                         "WorkflowRunAwsem",
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "@id": "/workflow-runs-awsem/d4b58584-ecc6-41ad-a0ce-81d4b600b033/",
-                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:46.368031",
-                                    "status": "shared",
-                                    "uuid": "d4b58584-ecc6-41ad-a0ce-81d4b600b033",
+                                    "@id": "/workflow-runs-awsem/25d04009-a2fe-481b-ada7-da5c1216d52e/",
+                                    "uuid": "25d04009-a2fe-481b-ada7-da5c1216d52e",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -3225,6 +3044,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
+                            "quality_metric": {
+                                "uuid": "23408f2f-13ca-49d6-b8bf-162623795dd6",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricBamqc",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/23408f2f-13ca-49d6-b8bf-162623795dd6/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3245,15 +3084,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
                                 "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3264,15 +3104,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_size": 3263683042,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3293,15 +3132,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
                                 "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3312,15 +3152,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_size": 7603,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3340,26 +3179,74 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_granite-mpileupCounts",
+            "jobid": "vqBh5nx47BKk",
+            "shard": "2",
+            "output": [
+                {
+                    "file": {
+                        "@id": "/files-processed/GAPFI5T4QIBP/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI5T4QIBP.rck.gz",
+                        "uuid": "87e8832d-9ece-439a-8602-152b1ee74b0f",
+                        "@type": [
+                            "FileProcessed",
+                            "File",
+                            "Item"
+                        ],
+                        "principals_allowed": {
+                            "view": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin",
+                                "group.read-only-admin",
+                                "remoteuser.EMBED",
+                                "remoteuser.INDEXER"
+                            ],
+                            "edit": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin"
+                            ]
+                        }
+                    },
+                    "argument_name": "rck"
+                }
+            ],
+            "status": "completed",
+            "workflow_run": {
+                "uuid": "e93fc945-f186-41e0-a0c3-b19a007ce81c",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:45.405166",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/e93fc945-f186-41e0-a0c3-b19a007ce81c/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFI5T4QIBP/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 12086253767,
-                            "display_title": "GAPFI5T4QIBP.rck.gz",
                             "status": "uploaded",
+                            "display_title": "GAPFI5T4QIBP.rck.gz",
+                            "uuid": "87e8832d-9ece-439a-8602-152b1ee74b0f",
                             "file_format": {
-                                "display_title": "rck_gz",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "rck_gz",
                                 "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
                                 "@id": "/file-formats/rck_gz/",
                                 "principals_allowed": {
@@ -3371,8 +3258,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "87e8832d-9ece-439a-8602-152b1ee74b0f",
-                            "workflow_run_inputs": [],
+                            "file_size": 12086253767,
+                            "@id": "/files-processed/GAPFI5T4QIBP/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "6fb5a7f0-2156-49e3-bf42-95f4e8decdde",
+                                    "@id": "/workflow-runs-awsem/6fb5a7f0-2156-49e3-bf42-95f4e8decdde/",
+                                    "display_title": "workflow_granite-rckTar v1.0.0 run 2022-04-29 21:10:35.118284",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3406,72 +3319,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "rck"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_gatk-HaplotypeCaller",
-            "jobid": "jJvXPOKdKSQn",
-            "shard": "0",
-            "output": [
-                {
-                    "file": {
-                        "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
-                        "@type": [
-                            "FileProcessed",
-                            "File",
-                            "Item"
-                        ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIH71G455/",
-                        "display_title": "GAPFIH71G455.gvcf.gz",
-                        "principals_allowed": {
-                            "view": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin",
-                                "group.read-only-admin",
-                                "remoteuser.EMBED",
-                                "remoteuser.INDEXER"
-                            ],
-                            "edit": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin"
-                            ]
-                        }
-                    },
-                    "argument_name": "gvcf"
-                }
-            ],
-            "status": "completed",
-            "workflow_run": {
-                "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:10:52.092723",
-                "@id": "/workflow-runs-awsem/d2063a22-99c7-420e-b179-6daedad12499/",
-                "uuid": "d2063a22-99c7-420e-b179-6daedad12499",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3481,27 +3341,47 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "display_title": "GAPFIMIARUOB.bam",
-                            "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
-                            "file_size": 106616301305,
+                            "display_title": "GAPFITNHTOZI.bam",
+                            "file_size": 111610806810,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
+                            "@id": "/files-processed/GAPFITNHTOZI/",
                             "status": "uploaded",
-                            "@id": "/files-processed/GAPFIMIARUOB/",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:46.368031",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/d4b58584-ecc6-41ad-a0ce-81d4b600b033/",
+                                    "uuid": "d4b58584-ecc6-41ad-a0ce-81d4b600b033",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
-                                "uuid": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86",
-                                "@id": "/quality-metrics-bamqc/b5978c20-271c-4ac4-8407-8b3fd3c0bb86/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "@type": [
                                     "QualityMetricBamqc",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/5530ced5-5252-42f2-afde-0d14e30a669b/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3511,7 +3391,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3532,15 +3411,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
                                 "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3551,15 +3431,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_size": 3263683042,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3580,15 +3459,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
                                 "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3599,15 +3479,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_size": 7603,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3627,26 +3506,74 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_gatk-HaplotypeCaller",
+            "jobid": "jJvXPOKdKSQn",
+            "shard": "0",
+            "output": [
+                {
+                    "file": {
+                        "@id": "/files-processed/GAPFIH71G455/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIH71G455.gvcf.gz",
+                        "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
+                        "@type": [
+                            "FileProcessed",
+                            "File",
+                            "Item"
+                        ],
+                        "principals_allowed": {
+                            "view": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin",
+                                "group.read-only-admin",
+                                "remoteuser.EMBED",
+                                "remoteuser.INDEXER"
+                            ],
+                            "edit": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin"
+                            ]
+                        }
+                    },
+                    "argument_name": "gvcf"
+                }
+            ],
+            "status": "completed",
+            "workflow_run": {
+                "uuid": "d2063a22-99c7-420e-b179-6daedad12499",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:10:52.092723",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/d2063a22-99c7-420e-b179-6daedad12499/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFIH71G455/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 2212472843,
-                            "display_title": "GAPFIH71G455.gvcf.gz",
                             "status": "uploaded",
+                            "display_title": "GAPFIH71G455.gvcf.gz",
+                            "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
                             "file_format": {
-                                "display_title": "gvcf_gz",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "gvcf_gz",
                                 "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
                                 "@id": "/file-formats/gvcf_gz/",
                                 "principals_allowed": {
@@ -3658,8 +3585,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
-                            "workflow_run_inputs": [],
+                            "file_size": 2212472843,
+                            "@id": "/files-processed/GAPFIH71G455/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "59fc114b-ccd6-416d-9555-4d2270c4c3dd",
+                                    "@id": "/workflow-runs-awsem/59fc114b-ccd6-416d-9555-4d2270c4c3dd/",
+                                    "display_title": "workflow_gatk-CombineGVCFs v1.0.0 run 2022-04-29 19:55:36.043928",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3693,72 +3646,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "gvcf"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_gatk-HaplotypeCaller",
-            "jobid": "Ygjei1p00cGa",
-            "shard": "1",
-            "output": [
-                {
-                    "file": {
-                        "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
-                        "@type": [
-                            "FileProcessed",
-                            "File",
-                            "Item"
-                        ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIXEYX9Q1/",
-                        "display_title": "GAPFIXEYX9Q1.gvcf.gz",
-                        "principals_allowed": {
-                            "view": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin",
-                                "group.read-only-admin",
-                                "remoteuser.EMBED",
-                                "remoteuser.INDEXER"
-                            ],
-                            "edit": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin"
-                            ]
-                        }
-                    },
-                    "argument_name": "gvcf"
-                }
-            ],
-            "status": "completed",
-            "workflow_run": {
-                "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:10:58.741225",
-                "@id": "/workflow-runs-awsem/a59335b9-d462-4578-b718-0fc54428cc77/",
-                "uuid": "a59335b9-d462-4578-b718-0fc54428cc77",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3768,27 +3668,47 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "display_title": "GAPFICEE9LEN.bam",
-                            "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
-                            "file_size": 104992897560,
+                            "display_title": "GAPFIMIARUOB.bam",
+                            "file_size": 106616301305,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
+                            "@id": "/files-processed/GAPFIMIARUOB/",
                             "status": "uploaded",
-                            "@id": "/files-processed/GAPFICEE9LEN/",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:35.950498",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/784f3f5f-d3cf-432b-8c0f-3dcd957b2042/",
+                                    "uuid": "784f3f5f-d3cf-432b-8c0f-3dcd957b2042",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
-                                "uuid": "23408f2f-13ca-49d6-b8bf-162623795dd6",
-                                "@id": "/quality-metrics-bamqc/23408f2f-13ca-49d6-b8bf-162623795dd6/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "uuid": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "@type": [
                                     "QualityMetricBamqc",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/b5978c20-271c-4ac4-8407-8b3fd3c0bb86/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3798,7 +3718,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3819,15 +3738,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
                                 "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3838,15 +3758,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_size": 3263683042,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3867,15 +3786,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
                                 "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -3886,15 +3806,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_size": 7603,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3914,26 +3833,74 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_gatk-HaplotypeCaller",
+            "jobid": "Ygjei1p00cGa",
+            "shard": "1",
+            "output": [
+                {
+                    "file": {
+                        "@id": "/files-processed/GAPFIXEYX9Q1/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIXEYX9Q1.gvcf.gz",
+                        "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
+                        "@type": [
+                            "FileProcessed",
+                            "File",
+                            "Item"
+                        ],
+                        "principals_allowed": {
+                            "view": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin",
+                                "group.read-only-admin",
+                                "remoteuser.EMBED",
+                                "remoteuser.INDEXER"
+                            ],
+                            "edit": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin"
+                            ]
+                        }
+                    },
+                    "argument_name": "gvcf"
+                }
+            ],
+            "status": "completed",
+            "workflow_run": {
+                "uuid": "a59335b9-d462-4578-b718-0fc54428cc77",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:10:58.741225",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/a59335b9-d462-4578-b718-0fc54428cc77/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFIXEYX9Q1/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 2200279777,
-                            "display_title": "GAPFIXEYX9Q1.gvcf.gz",
                             "status": "uploaded",
+                            "display_title": "GAPFIXEYX9Q1.gvcf.gz",
+                            "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
                             "file_format": {
-                                "display_title": "gvcf_gz",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "gvcf_gz",
                                 "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
                                 "@id": "/file-formats/gvcf_gz/",
                                 "principals_allowed": {
@@ -3945,8 +3912,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
-                            "workflow_run_inputs": [],
+                            "file_size": 2200279777,
+                            "@id": "/files-processed/GAPFIXEYX9Q1/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "59fc114b-ccd6-416d-9555-4d2270c4c3dd",
+                                    "@id": "/workflow-runs-awsem/59fc114b-ccd6-416d-9555-4d2270c4c3dd/",
+                                    "display_title": "workflow_gatk-CombineGVCFs v1.0.0 run 2022-04-29 19:55:36.043928",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -3980,72 +3973,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "gvcf"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_gatk-HaplotypeCaller",
-            "jobid": "yqu8bgzcBm7A",
-            "shard": "2",
-            "output": [
-                {
-                    "file": {
-                        "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
-                        "@type": [
-                            "FileProcessed",
-                            "File",
-                            "Item"
-                        ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFINHTTKUZ/",
-                        "display_title": "GAPFINHTTKUZ.gvcf.gz",
-                        "principals_allowed": {
-                            "view": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin",
-                                "group.read-only-admin",
-                                "remoteuser.EMBED",
-                                "remoteuser.INDEXER"
-                            ],
-                            "edit": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin"
-                            ]
-                        }
-                    },
-                    "argument_name": "gvcf"
-                }
-            ],
-            "status": "completed",
-            "workflow_run": {
-                "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:11:05.391428",
-                "@id": "/workflow-runs-awsem/3f8e7c4e-254b-4981-81c8-d54821b0676c/",
-                "uuid": "3f8e7c4e-254b-4981-81c8-d54821b0676c",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -4055,47 +3995,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "display_title": "GAPFITNHTOZI.bam",
-                            "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
-                            "file_size": 111610806810,
+                            "display_title": "GAPFICEE9LEN.bam",
+                            "file_size": 104992897560,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
+                            "@id": "/files-processed/GAPFICEE9LEN/",
                             "status": "uploaded",
-                            "@id": "/files-processed/GAPFITNHTOZI/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b",
-                                "@id": "/quality-metrics-bamqc/5530ced5-5252-42f2-afde-0d14e30a669b/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricBamqc",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
                             "workflow_run_outputs": [
                                 {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:39.481922",
                                     "@type": [
                                         "WorkflowRunAwsem",
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "@id": "/workflow-runs-awsem/d4b58584-ecc6-41ad-a0ce-81d4b600b033/",
-                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:46.368031",
-                                    "status": "shared",
-                                    "uuid": "d4b58584-ecc6-41ad-a0ce-81d4b600b033",
+                                    "@id": "/workflow-runs-awsem/25d04009-a2fe-481b-ada7-da5c1216d52e/",
+                                    "uuid": "25d04009-a2fe-481b-ada7-da5c1216d52e",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -4106,6 +4025,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
+                            "quality_metric": {
+                                "uuid": "23408f2f-13ca-49d6-b8bf-162623795dd6",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricBamqc",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/23408f2f-13ca-49d6-b8bf-162623795dd6/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4126,15 +4065,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
                                 "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -4145,15 +4085,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_size": 3263683042,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4174,15 +4113,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
                                 "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -4193,15 +4133,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
                             "file_size": 7603,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4221,26 +4160,74 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_gatk-HaplotypeCaller",
+            "jobid": "yqu8bgzcBm7A",
+            "shard": "2",
+            "output": [
+                {
+                    "file": {
+                        "@id": "/files-processed/GAPFINHTTKUZ/",
+                        "status": "uploaded",
+                        "display_title": "GAPFINHTTKUZ.gvcf.gz",
+                        "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
+                        "@type": [
+                            "FileProcessed",
+                            "File",
+                            "Item"
+                        ],
+                        "principals_allowed": {
+                            "view": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin",
+                                "group.read-only-admin",
+                                "remoteuser.EMBED",
+                                "remoteuser.INDEXER"
+                            ],
+                            "edit": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin"
+                            ]
+                        }
+                    },
+                    "argument_name": "gvcf"
+                }
+            ],
+            "status": "completed",
+            "workflow_run": {
+                "uuid": "3f8e7c4e-254b-4981-81c8-d54821b0676c",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:11:05.391428",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/3f8e7c4e-254b-4981-81c8-d54821b0676c/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFINHTTKUZ/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 2250854837,
-                            "display_title": "GAPFINHTTKUZ.gvcf.gz",
                             "status": "uploaded",
+                            "display_title": "GAPFINHTTKUZ.gvcf.gz",
+                            "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
                             "file_format": {
-                                "display_title": "gvcf_gz",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "gvcf_gz",
                                 "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
                                 "@id": "/file-formats/gvcf_gz/",
                                 "principals_allowed": {
@@ -4252,8 +4239,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
-                            "workflow_run_inputs": [],
+                            "file_size": 2250854837,
+                            "@id": "/files-processed/GAPFINHTTKUZ/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "59fc114b-ccd6-416d-9555-4d2270c4c3dd",
+                                    "@id": "/workflow-runs-awsem/59fc114b-ccd6-416d-9555-4d2270c4c3dd/",
+                                    "display_title": "workflow_gatk-CombineGVCFs v1.0.0 run 2022-04-29 19:55:36.043928",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4287,6 +4300,193 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "gvcf"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
+                            "file_format": {
+                                "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFITNHTOZI.bam",
+                            "file_size": 111610806810,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFITNHTOZI/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:46.368031",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/d4b58584-ecc6-41ad-a0ce-81d4b600b033/",
+                                    "uuid": "d4b58584-ecc6-41ad-a0ce-81d4b600b033",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricBamqc",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/5530ced5-5252-42f2-afde-0d14e30a669b/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_bam"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                            "file_format": {
+                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIXRDPDK5.fa",
+                            "file_size": 3263683042,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "reference"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                            "file_format": {
+                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIBGEOI72.txt",
+                            "file_size": 7603,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "regions"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -4304,15 +4504,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFI7TBYWC7/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI7TBYWC7.rck.tar",
                         "uuid": "3e8a17d1-e07f-4226-bd6a-a4ca13606528",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI7TBYWC7/",
-                        "display_title": "GAPFI7TBYWC7.rck.tar",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4337,204 +4537,29 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-mpileupCounts:2"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-rckTar v1.0.0 run 2022-04-29 21:10:35.118284",
-                "@id": "/workflow-runs-awsem/6fb5a7f0-2156-49e3-bf42-95f4e8decdde/",
                 "uuid": "6fb5a7f0-2156-49e3-bf42-95f4e8decdde",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-rckTar v1.0.0 run 2022-04-29 21:10:35.118284",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "rck_gz",
-                                "@id": "/file-formats/rck_gz/",
-                                "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI9CNINA2.rck.gz",
-                            "uuid": "90d5572a-3cb5-40bd-8cec-68346c28705b",
-                            "file_size": 11922164723,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFI9CNINA2/",
-                            "workflow_run_outputs": [
-                                {
-                                    "@type": [
-                                        "WorkflowRunAwsem",
-                                        "WorkflowRun",
-                                        "Item"
-                                    ],
-                                    "@id": "/workflow-runs-awsem/d9b35c06-6911-4b67-ac04-395331a98e55/",
-                                    "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:35.675189",
-                                    "status": "shared",
-                                    "uuid": "d9b35c06-6911-4b67-ac04-395331a98e55",
-                                    "principals_allowed": {
-                                        "view": [
-                                            "system.Authenticated"
-                                        ],
-                                        "edit": [
-                                            "group.admin"
-                                        ]
-                                    }
-                                }
-                            ],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_rcks"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "rck_gz",
-                                "@id": "/file-formats/rck_gz/",
-                                "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFID5AE9ME.rck.gz",
-                            "uuid": "76111407-5e86-48dd-bd13-f3a167638140",
-                            "file_size": 11874191792,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFID5AE9ME/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 2,
-                        "dimension": "1",
-                        "workflow_argument_name": "input_rcks"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "rck_gz",
-                                "@id": "/file-formats/rck_gz/",
-                                "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI5T4QIBP.rck.gz",
-                            "uuid": "87e8832d-9ece-439a-8602-152b1ee74b0f",
-                            "file_size": 12086253767,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFI5T4QIBP/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 3,
-                        "dimension": "2",
-                        "workflow_argument_name": "input_rcks"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/6fb5a7f0-2156-49e3-bf42-95f4e8decdde/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFI7TBYWC7/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 35891374080,
-                            "display_title": "GAPFI7TBYWC7.rck.tar",
                             "status": "uploaded",
+                            "display_title": "GAPFI7TBYWC7.rck.tar",
+                            "uuid": "3e8a17d1-e07f-4226-bd6a-a4ca13606528",
                             "file_format": {
-                                "display_title": "rck_tar",
-                                "status": "shared",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "display_title": "rck_tar",
                                 "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
                                 "@id": "/file-formats/rck_tar/",
                                 "principals_allowed": {
@@ -4546,8 +4571,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "3e8a17d1-e07f-4226-bd6a-a4ca13606528",
-                            "workflow_run_inputs": [],
+                            "file_size": 35891374080,
+                            "@id": "/files-processed/GAPFI7TBYWC7/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "2160c911-2d1b-466b-9643-ed30c74228a8",
+                                    "@id": "/workflow-runs-awsem/2160c911-2d1b-466b-9643-ed30c74228a8/",
+                                    "display_title": "workflow_granite-novoCaller-rck-check v1.0.0 run 2022-04-30 02:55:36.042917",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4581,6 +4632,215 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "rck_tar"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "90d5572a-3cb5-40bd-8cec-68346c28705b",
+                            "file_format": {
+                                "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
+                                "display_title": "rck_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/rck_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI9CNINA2.rck.gz",
+                            "file_size": 11922164723,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFI9CNINA2/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:35.675189",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/d9b35c06-6911-4b67-ac04-395331a98e55/",
+                                    "uuid": "d9b35c06-6911-4b67-ac04-395331a98e55",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_rcks"
+                    },
+                    {
+                        "value": {
+                            "uuid": "76111407-5e86-48dd-bd13-f3a167638140",
+                            "file_format": {
+                                "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
+                                "display_title": "rck_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/rck_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFID5AE9ME.rck.gz",
+                            "file_size": 11874191792,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFID5AE9ME/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:38.581075",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/8bca34d8-54c4-4de8-9057-ffb868d44795/",
+                                    "uuid": "8bca34d8-54c4-4de8-9057-ffb868d44795",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 2,
+                        "dimension": "1",
+                        "workflow_argument_name": "input_rcks"
+                    },
+                    {
+                        "value": {
+                            "uuid": "87e8832d-9ece-439a-8602-152b1ee74b0f",
+                            "file_format": {
+                                "uuid": "20d4d3aa-5f1c-4b75-9e25-73f9f370fefa",
+                                "display_title": "rck_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/rck_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI5T4QIBP.rck.gz",
+                            "file_size": 12086253767,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFI5T4QIBP/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-mpileupCounts v1.0.0 run 2022-04-29 17:10:45.405166",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/e93fc945-f186-41e0-a0c3-b19a007ce81c/",
+                                    "uuid": "e93fc945-f186-41e0-a0c3-b19a007ce81c",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 3,
+                        "dimension": "2",
+                        "workflow_argument_name": "input_rcks"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -4598,15 +4858,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFI4589EXS/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI4589EXS.gvcf.gz",
                         "uuid": "2021801b-9f49-4fc9-9e86-9b8046edd5e9",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI4589EXS/",
-                        "display_title": "GAPFI4589EXS.gvcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -4631,292 +4891,47 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_gatk-HaplotypeCaller:2"
             ],
             "workflow_run": {
-                "display_title": "workflow_gatk-CombineGVCFs v1.0.0 run 2022-04-29 19:55:36.043928",
-                "@id": "/workflow-runs-awsem/59fc114b-ccd6-416d-9555-4d2270c4c3dd/",
                 "uuid": "59fc114b-ccd6-416d-9555-4d2270c4c3dd",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_gatk-CombineGVCFs v1.0.0 run 2022-04-29 19:55:36.043928",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "gvcf_gz",
-                                "@id": "/file-formats/gvcf_gz/",
-                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIH71G455.gvcf.gz",
-                            "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
-                            "file_size": 2212472843,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIH71G455/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_gvcfs"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "gvcf_gz",
-                                "@id": "/file-formats/gvcf_gz/",
-                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIXEYX9Q1.gvcf.gz",
-                            "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
-                            "file_size": 2200279777,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIXEYX9Q1/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 2,
-                        "dimension": "1",
-                        "workflow_argument_name": "input_gvcfs"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "gvcf_gz",
-                                "@id": "/file-formats/gvcf_gz/",
-                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFINHTTKUZ.gvcf.gz",
-                            "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
-                            "file_size": 2250854837,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFINHTTKUZ/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 3,
-                        "dimension": "2",
-                        "workflow_argument_name": "input_gvcfs"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
-                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
-                            "file_size": 3263683042,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIXRDPDK5/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "reference"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
-                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIGJVJDUY.txt",
-                            "uuid": "a1d504ee-a313-4064-b6ae-65fed9738980",
-                            "file_size": 138,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIGJVJDUY/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "chromosomes"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/59fc114b-ccd6-416d-9555-4d2270c4c3dd/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFI4589EXS.gvcf.gz",
+                            "uuid": "2021801b-9f49-4fc9-9e86-9b8046edd5e9",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "gvcf_gz",
+                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                                "@id": "/file-formats/gvcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 6071718531,
                             "@id": "/files-processed/GAPFI4589EXS/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 6071718531,
-                            "display_title": "GAPFI4589EXS.gvcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "gvcf_gz",
-                                "status": "shared",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
-                                "@id": "/file-formats/gvcf_gz/",
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "uuid": "2021801b-9f49-4fc9-9e86-9b8046edd5e9",
                             "workflow_run_inputs": [
                                 {
                                     "@type": [
@@ -4924,10 +4939,10 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
-                                    "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
-                                    "status": "shared",
                                     "uuid": "3e3530ef-c67d-4708-be5f-84349f49b182",
+                                    "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
+                                    "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
+                                    "status": "shared",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -4971,6 +4986,311 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "combined_gvcf"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
+                            "file_format": {
+                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                                "display_title": "gvcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/gvcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIH71G455.gvcf.gz",
+                            "file_size": 2212472843,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFIH71G455/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:10:52.092723",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/d2063a22-99c7-420e-b179-6daedad12499/",
+                                    "uuid": "d2063a22-99c7-420e-b179-6daedad12499",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_gvcfs"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
+                            "file_format": {
+                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                                "display_title": "gvcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/gvcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIXEYX9Q1.gvcf.gz",
+                            "file_size": 2200279777,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFIXEYX9Q1/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:10:58.741225",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/a59335b9-d462-4578-b718-0fc54428cc77/",
+                                    "uuid": "a59335b9-d462-4578-b718-0fc54428cc77",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 2,
+                        "dimension": "1",
+                        "workflow_argument_name": "input_gvcfs"
+                    },
+                    {
+                        "value": {
+                            "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
+                            "file_format": {
+                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                                "display_title": "gvcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/gvcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFINHTTKUZ.gvcf.gz",
+                            "file_size": 2250854837,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFINHTTKUZ/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_gatk-HaplotypeCaller v1.0.0 run 2022-04-29 17:11:05.391428",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/3f8e7c4e-254b-4981-81c8-d54821b0676c/",
+                                    "uuid": "3f8e7c4e-254b-4981-81c8-d54821b0676c",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 3,
+                        "dimension": "2",
+                        "workflow_argument_name": "input_gvcfs"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                            "file_format": {
+                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIXRDPDK5.fa",
+                            "file_size": 3263683042,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "reference"
+                    },
+                    {
+                        "value": {
+                            "uuid": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                            "file_format": {
+                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIGJVJDUY.txt",
+                            "file_size": 138,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIGJVJDUY/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "chromosomes"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -4988,15 +5308,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFI6J5MLR9/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI6J5MLR9.vcf.gz",
                         "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI6J5MLR9/",
-                        "display_title": "GAPFI6J5MLR9.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -5019,254 +5339,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_gatk-CombineGVCFs:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
-                "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
                 "uuid": "3e3530ef-c67d-4708-be5f-84349f49b182",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "gvcf_gz",
-                                "@id": "/file-formats/gvcf_gz/",
-                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI4589EXS.gvcf.gz",
-                            "uuid": "2021801b-9f49-4fc9-9e86-9b8046edd5e9",
-                            "file_size": 6071718531,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFI4589EXS/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_gvcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
-                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
-                            "file_size": 3263683042,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIXRDPDK5/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "reference"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
-                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIGJVJDUY.txt",
-                            "uuid": "a1d504ee-a313-4064-b6ae-65fed9738980",
-                            "file_size": 138,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIGJVJDUY/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "chromosomes"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI4LJRN98.vcf.gz",
-                            "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0",
-                            "file_size": 1595848625,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI4LJRN98/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "known-sites-snp"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFI6J5MLR9.vcf.gz",
+                            "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 449938897,
                             "@id": "/files-processed/GAPFI6J5MLR9/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 449938897,
-                            "display_title": "GAPFI6J5MLR9.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
-                            "workflow_run_inputs": [],
                             "quality_metric": {
                                 "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-29",
-                                "@id": "/quality-metrics-qclist/ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b/",
-                                "status": "shared",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "display_title": "QualityMetricQclist from 2022-04-29",
+                                "@id": "/quality-metrics-qclist/ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -5276,6 +5400,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "6aea60a0-18c8-4e4d-9a1c-fd993346baf2",
+                                    "@id": "/workflow-runs-awsem/6aea60a0-18c8-4e4d-9a1c-fd993346baf2/",
+                                    "display_title": "workflow_samplegeno v1.0.0 run 2022-04-29 22:10:36.226203",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "bf1f8c90-5f99-435f-85c9-52ac471de600",
+                                    "@id": "/workflow-runs-awsem/bf1f8c90-5f99-435f-85c9-52ac471de600/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:10:39.971610",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -5314,75 +5478,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "vcf-check"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_samplegeno",
-            "jobid": "sng5iNR61xlj",
-            "shard": "0",
-            "output": [
-                {
-                    "file": {
-                        "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
-                        "@type": [
-                            "FileProcessed",
-                            "File",
-                            "Item"
-                        ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI68EKBY2/",
-                        "display_title": "GAPFI68EKBY2.vcf.gz",
-                        "principals_allowed": {
-                            "view": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin",
-                                "group.read-only-admin",
-                                "remoteuser.EMBED",
-                                "remoteuser.INDEXER"
-                            ],
-                            "edit": [
-                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                "group.admin"
-                            ]
-                        }
-                    },
-                    "argument_name": "samplegeno_vcf"
-                }
-            ],
-            "status": "completed",
-            "dependencies": [
-                "workflow_gatk-GenotypeGVCFs-check:0"
-            ],
-            "workflow_run": {
-                "display_title": "workflow_samplegeno v1.0.0 run 2022-04-29 22:10:36.226203",
-                "@id": "/workflow-runs-awsem/6aea60a0-18c8-4e4d-9a1c-fd993346baf2/",
-                "uuid": "6aea60a0-18c8-4e4d-9a1c-fd993346baf2",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "2021801b-9f49-4fc9-9e86-9b8046edd5e9",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "uuid": "ad47d469-4561-4234-bce2-820f08f58e7c",
+                                "display_title": "gvcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/gvcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -5392,47 +5500,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "display_title": "GAPFI6J5MLR9.vcf.gz",
-                            "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
-                            "file_size": 449938897,
+                            "display_title": "GAPFI4589EXS.gvcf.gz",
+                            "file_size": 6071718531,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
+                            "@id": "/files-processed/GAPFI4589EXS/",
                             "status": "uploaded",
-                            "@id": "/files-processed/GAPFI6J5MLR9/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b",
-                                "@id": "/quality-metrics-qclist/ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b/",
-                                "display_title": "QualityMetricQclist from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
                             "workflow_run_outputs": [
                                 {
+                                    "status": "shared",
+                                    "display_title": "workflow_gatk-CombineGVCFs v1.0.0 run 2022-04-29 19:55:36.043928",
                                     "@type": [
                                         "WorkflowRunAwsem",
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
-                                    "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
-                                    "status": "shared",
-                                    "uuid": "3e3530ef-c67d-4708-be5f-84349f49b182",
+                                    "@id": "/workflow-runs-awsem/59fc114b-ccd6-416d-9555-4d2270c4c3dd/",
+                                    "uuid": "59fc114b-ccd6-416d-9555-4d2270c4c3dd",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -5459,29 +5546,224 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         },
                         "ordinal": 1,
                         "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    }
-                ],
-                "output_files": [
+                        "workflow_argument_name": "input_gvcf"
+                    },
                     {
-                        "type": "Output processed file",
                         "value": {
-                            "@id": "/files-processed/GAPFI68EKBY2/",
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "file_size": 565028521,
-                            "display_title": "GAPFI68EKBY2.vcf.gz",
-                            "status": "uploaded",
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
+                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIXRDPDK5.fa",
+                            "file_size": 3263683042,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "reference"
+                    },
+                    {
+                        "value": {
+                            "uuid": "a1d504ee-a313-4064-b6ae-65fed9738980",
+                            "file_format": {
+                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIGJVJDUY.txt",
+                            "file_size": 138,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIGJVJDUY/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "chromosomes"
+                    },
+                    {
+                        "value": {
+                            "uuid": "8ed35691-0af4-467a-adbc-81eb088549f0",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI4LJRN98.vcf.gz",
+                            "file_size": 1595848625,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI4LJRN98/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "known-sites-snp"
+                    }
+                ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_samplegeno",
+            "jobid": "sng5iNR61xlj",
+            "shard": "0",
+            "output": [
+                {
+                    "file": {
+                        "@id": "/files-processed/GAPFI68EKBY2/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI68EKBY2.vcf.gz",
+                        "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
+                        "@type": [
+                            "FileProcessed",
+                            "File",
+                            "Item"
+                        ],
+                        "principals_allowed": {
+                            "view": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin",
+                                "group.read-only-admin",
+                                "remoteuser.EMBED",
+                                "remoteuser.INDEXER"
+                            ],
+                            "edit": [
+                                "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                "group.admin"
+                            ]
+                        }
+                    },
+                    "argument_name": "samplegeno_vcf"
+                }
+            ],
+            "status": "completed",
+            "dependencies": [
+                "workflow_gatk-GenotypeGVCFs-check:0"
+            ],
+            "workflow_run": {
+                "uuid": "6aea60a0-18c8-4e4d-9a1c-fd993346baf2",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_samplegeno v1.0.0 run 2022-04-29 22:10:36.226203",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/6aea60a0-18c8-4e4d-9a1c-fd993346baf2/",
+                "output_files": [
+                    {
+                        "type": "Output processed file",
+                        "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFI68EKBY2.vcf.gz",
+                            "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
                                 "@id": "/file-formats/vcf_gz/",
                                 "principals_allowed": {
@@ -5493,7 +5775,33 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
+                            "file_size": 565028521,
+                            "@id": "/files-processed/GAPFI68EKBY2/",
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "quality_metric": {
+                                "uuid": "367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a",
+                                "@type": [
+                                    "QualityMetricVcfqc",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "display_title": "QualityMetricVcfqc from 2022-04-29",
+                                "@id": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
                             "workflow_run_inputs": [
                                 {
                                     "@type": [
@@ -5501,10 +5809,29 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:40:34.865115",
-                                    "@id": "/workflow-runs-awsem/856f03f2-c89b-4291-94a0-6aa036673de0/",
+                                    "uuid": "cf4811eb-3f1f-4951-8d84-00a2c7ffe352",
+                                    "@id": "/workflow-runs-awsem/cf4811eb-3f1f-4951-8d84-00a2c7ffe352/",
+                                    "display_title": "workflow_vep-annot-check v1.0.0 run 2022-04-29 22:40:46.334063",
                                     "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
                                     "uuid": "856f03f2-c89b-4291-94a0-6aa036673de0",
+                                    "@id": "/workflow-runs-awsem/856f03f2-c89b-4291-94a0-6aa036673de0/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:40:34.865115",
+                                    "status": "shared",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -5515,26 +5842,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
-                            "quality_metric": {
-                                "uuid": "367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricVcfqc from 2022-04-29",
-                                "@id": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
-                                "status": "shared",
-                                "@type": [
-                                    "QualityMetricVcfqc",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -5568,46 +5875,19 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "samplegeno_vcf"
                     }
                 ],
-                "principals_allowed": {
-                    "view": [
-                        "system.Authenticated"
-                    ],
-                    "edit": [
-                        "group.admin"
-                    ]
-                }
-            }
-        },
-        {
-            "name": "workflow_granite-qcVCF",
-            "jobid": "M2ezVrAPnQrw",
-            "shard": "0",
-            "status": "completed",
-            "dependencies": [
-                "workflow_gatk-GenotypeGVCFs-check:0"
-            ],
-            "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:10:39.971610",
-                "@id": "/workflow-runs-awsem/bf1f8c90-5f99-435f-85c9-52ac471de600/",
-                "uuid": "bf1f8c90-5f99-435f-85c9-52ac471de600",
-                "@type": [
-                    "WorkflowRunAwsem",
-                    "WorkflowRun",
-                    "Item"
-                ],
-                "status": "shared",
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -5618,45 +5898,24 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFI6J5MLR9.vcf.gz",
-                            "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
                             "file_size": 449938897,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFI6J5MLR9/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b",
-                                "@id": "/quality-metrics-qclist/ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b/",
-                                "display_title": "QualityMetricQclist from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
+                            "status": "uploaded",
                             "workflow_run_outputs": [
                                 {
+                                    "status": "shared",
+                                    "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
                                     "@type": [
                                         "WorkflowRunAwsem",
                                         "WorkflowRun",
                                         "Item"
                                     ],
                                     "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
-                                    "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
-                                    "status": "shared",
                                     "uuid": "3e3530ef-c67d-4708-be5f-84349f49b182",
                                     "principals_allowed": {
                                         "view": [
@@ -5668,6 +5927,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
+                            "quality_metric": {
+                                "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -5687,6 +5966,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "input_vcf"
                     }
                 ],
+                "principals_allowed": {
+                    "view": [
+                        "system.Authenticated"
+                    ],
+                    "edit": [
+                        "group.admin"
+                    ]
+                }
+            }
+        },
+        {
+            "name": "workflow_granite-qcVCF",
+            "jobid": "M2ezVrAPnQrw",
+            "shard": "0",
+            "status": "completed",
+            "dependencies": [
+                "workflow_gatk-GenotypeGVCFs-check:0"
+            ],
+            "workflow_run": {
+                "uuid": "bf1f8c90-5f99-435f-85c9-52ac471de600",
+                "@type": [
+                    "WorkflowRunAwsem",
+                    "WorkflowRun",
+                    "Item"
+                ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:10:39.971610",
+                "status": "shared",
+                "@id": "/workflow-runs-awsem/bf1f8c90-5f99-435f-85c9-52ac471de600/",
                 "output_files": [
                     {
                         "type": "Output QC file",
@@ -5697,6 +6004,97 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "type": "Output QC file",
                         "value_qc": "/quality-metrics-vcfqc/535b02f6-e5ff-4e1b-a4a4-20c2dc135a42/",
                         "workflow_argument_name": "uniq_variants"
+                    }
+                ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI6J5MLR9.vcf.gz",
+                            "file_size": 449938897,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFI6J5MLR9/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_gatk-GenotypeGVCFs-check v1.0.0 run 2022-04-29 21:10:40.235957",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/3e3530ef-c67d-4708-be5f-84349f49b182/",
+                                    "uuid": "3e3530ef-c67d-4708-be5f-84349f49b182",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
                     }
                 ],
                 "principals_allowed": {
@@ -5718,27 +6116,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_samplegeno:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:40:34.865115",
-                "@id": "/workflow-runs-awsem/856f03f2-c89b-4291-94a0-6aa036673de0/",
                 "uuid": "856f03f2-c89b-4291-94a0-6aa036673de0",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-29 22:40:34.865115",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/856f03f2-c89b-4291-94a0-6aa036673de0/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -5749,26 +6160,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFI68EKBY2.vcf.gz",
-                            "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
                             "file_size": 565028521,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFI68EKBY2/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_samplegeno v1.0.0 run 2022-04-29 22:10:36.226203",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/6aea60a0-18c8-4e4d-9a1c-fd993346baf2/",
+                                    "uuid": "6aea60a0-18c8-4e4d-9a1c-fd993346baf2",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a",
-                                "@id": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
-                                "display_title": "QualityMetricVcfqc from 2022-04-29",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricVcfqc from 2022-04-29",
                                 "@type": [
                                     "QualityMetricVcfqc",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -5778,7 +6209,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -5798,18 +6228,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "input_vcf"
                     }
                 ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
-                        "workflow_argument_name": "uniq_variants"
-                    }
-                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -5827,15 +6245,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFIACVY8U8/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIACVY8U8.vcf.gz",
                         "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIACVY8U8/",
-                        "display_title": "GAPFIACVY8U8.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -5858,850 +6276,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_samplegeno:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_vep-annot-check v1.0.0 run 2022-04-29 22:40:46.334063",
-                "@id": "/workflow-runs-awsem/cf4811eb-3f1f-4951-8d84-00a2c7ffe352/",
                 "uuid": "cf4811eb-3f1f-4951-8d84-00a2c7ffe352",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_vep-annot-check v1.0.0 run 2022-04-29 22:40:46.334063",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI68EKBY2.vcf.gz",
-                            "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
-                            "file_size": 565028521,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFI68EKBY2/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a",
-                                "@id": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
-                                "display_title": "QualityMetricVcfqc from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricVcfqc",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
-                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
-                            "file_size": 3263683042,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIXRDPDK5/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "reference"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
-                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
-                            "file_size": 7603,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIBGEOI72/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "regions"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vep_tar",
-                                "@id": "/file-formats/vep_tar/",
-                                "uuid": "d05f9688-0ee1-4a86-83f4-656e6e21352a",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIL8XMTIV.vep.tar.gz",
-                            "uuid": "ea103486-b65a-4439-9d0b-1186f8e59388",
-                            "file_size": 14459657412,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIL8XMTIV/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "vep"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI121RWQE.vcf.gz",
-                            "uuid": "7db786d5-13d2-4622-bdd2-99866036b9b9",
-                            "file_size": 34029026,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI121RWQE/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "clinvar"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "dbnsfp_gz",
-                                "@id": "/file-formats/dbnsfp_gz/",
-                                "uuid": "65a2cca2-dae8-4ff2-ac8b-aa1e92f5416b",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIKJ66FKY.dbnsfp.gz",
-                            "uuid": "dc02df4c-49ac-4532-b85c-02800941aa44",
-                            "file_size": 32749109158,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIKJ66FKY/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "dbnsfp"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "tar_gz",
-                                "@id": "/file-formats/tar_gz/",
-                                "uuid": "f2ec3b9f-a898-4e6c-8da5-734a7a6410b8",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI6BNNTKA.tar.gz",
-                            "uuid": "71a7d16b-8452-4266-ae80-bbede2e305e2",
-                            "file_size": 1505157,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI6BNNTKA/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "maxent"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFISUOC64Q.vcf.gz",
-                            "uuid": "a35e580c-7579-4312-a3a1-66810e6d9366",
-                            "file_size": 28829788377,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFISUOC64Q/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "spliceai_snv"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIZOPCWIU.vcf.gz",
-                            "uuid": "3b7c0c29-5ee2-47c8-95a8-d28e15d5de47",
-                            "file_size": 69322106029,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIZOPCWIU/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "spliceai_indel"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIJOMA2Q8.vcf.gz",
-                            "uuid": "52c6cbf6-ae94-4c10-ad03-26ed34f74a3e",
-                            "file_size": 56752948861,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIJOMA2Q8/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "gnomad"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIC5416E6.vcf.gz",
-                            "uuid": "dd6f0384-d0b5-47d6-99a8-395c0b72feed",
-                            "file_size": 1461686984,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIC5416E6/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "gnomad2"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "tsv_gz",
-                                "@id": "/file-formats/tsv_gz/",
-                                "uuid": "11ca3783-db6e-430e-997b-9cf0ca275814",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI566QQCV.tsv.gz",
-                            "uuid": "672de47f-d058-4dbd-9fc4-3e134cfe71d8",
-                            "file_size": 86592987071,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI566QQCV/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "CADD_snv"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "tsv_gz",
-                                "@id": "/file-formats/tsv_gz/",
-                                "uuid": "11ca3783-db6e-430e-997b-9cf0ca275814",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI1GC6AXF.tsv.gz",
-                            "uuid": "b9f123dd-be05-4a14-957a-5e1e5a5ce254",
-                            "file_size": 1165363333,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI1GC6AXF/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "CADD_indel"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "BigWig",
-                                "@id": "/file-formats/BigWig/",
-                                "uuid": "33f30c42-d582-4163-af44-fecf586b9dd3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIMQ7MHGA.bw",
-                            "uuid": "af93aecb-6b8e-4c8b-b159-eefb3f9d0ffb",
-                            "file_size": 9870053206,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIMQ7MHGA/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "phylop100bw"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "BigWig",
-                                "@id": "/file-formats/BigWig/",
-                                "uuid": "33f30c42-d582-4163-af44-fecf586b9dd3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI5MRTDLN.bw",
-                            "uuid": "f6809af1-f7b9-43c0-882a-16764ccc431d",
-                            "file_size": 8400229101,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI5MRTDLN/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "phylop30bw"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "BigWig",
-                                "@id": "/file-formats/BigWig/",
-                                "uuid": "33f30c42-d582-4163-af44-fecf586b9dd3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI6KXAQMV.bw",
-                            "uuid": "19f03828-175b-4594-ba1a-52ddabcf640d",
-                            "file_size": 5886377734,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI6KXAQMV/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "phastc100bw"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/cf4811eb-3f1f-4951-8d84-00a2c7ffe352/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFIACVY8U8.vcf.gz",
+                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 2727278155,
                             "@id": "/files-processed/GAPFIACVY8U8/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 2727278155,
-                            "display_title": "GAPFIACVY8U8.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
-                            "workflow_run_inputs": [],
                             "quality_metric": {
                                 "uuid": "c9df0265-50c5-4706-9327-86d9f18f8130",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
-                                "status": "shared",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -6711,6 +6337,65 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "58210479-cf6c-40db-8a03-fbd2541be2c2",
+                                    "@id": "/workflow-runs-awsem/58210479-cf6c-40db-8a03-fbd2541be2c2/",
+                                    "display_title": "workflow_peddy v1.0.0 run 2022-04-30 02:10:35.255342",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "64a59f36-a856-47e1-be09-d0c6b8694252",
+                                    "@id": "/workflow-runs-awsem/64a59f36-a856-47e1-be09-d0c6b8694252/",
+                                    "display_title": "workflow_granite-filtering-check v1.0.0 run 2022-04-30 02:10:40.339145",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "eba22967-9efc-4071-a3df-fa5b55943db8",
+                                    "@id": "/workflow-runs-awsem/eba22967-9efc-4071-a3df-fa5b55943db8/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:40:35.197316",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -6749,6 +6434,817 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "annotated_vcf-check"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "56c0a779-c771-4a67-acce-f7bbc2707d6e",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI68EKBY2.vcf.gz",
+                            "file_size": 565028521,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFI68EKBY2/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_samplegeno v1.0.0 run 2022-04-29 22:10:36.226203",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/6aea60a0-18c8-4e4d-9a1c-fd993346baf2/",
+                                    "uuid": "6aea60a0-18c8-4e4d-9a1c-fd993346baf2",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricVcfqc from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricVcfqc",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-vcfqc/367b0795-c6f2-4ce3-85e2-b63f4d1b1b4a/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
+                            "file_format": {
+                                "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIXRDPDK5.fa",
+                            "file_size": 3263683042,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "reference"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                            "file_format": {
+                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIBGEOI72.txt",
+                            "file_size": 7603,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "regions"
+                    },
+                    {
+                        "value": {
+                            "uuid": "ea103486-b65a-4439-9d0b-1186f8e59388",
+                            "file_format": {
+                                "uuid": "d05f9688-0ee1-4a86-83f4-656e6e21352a",
+                                "display_title": "vep_tar",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vep_tar/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIL8XMTIV.vep.tar.gz",
+                            "file_size": 14459657412,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIL8XMTIV/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "vep"
+                    },
+                    {
+                        "value": {
+                            "uuid": "7db786d5-13d2-4622-bdd2-99866036b9b9",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI121RWQE.vcf.gz",
+                            "file_size": 34029026,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI121RWQE/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "clinvar"
+                    },
+                    {
+                        "value": {
+                            "uuid": "dc02df4c-49ac-4532-b85c-02800941aa44",
+                            "file_format": {
+                                "uuid": "65a2cca2-dae8-4ff2-ac8b-aa1e92f5416b",
+                                "display_title": "dbnsfp_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/dbnsfp_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIKJ66FKY.dbnsfp.gz",
+                            "file_size": 32749109158,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIKJ66FKY/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "dbnsfp"
+                    },
+                    {
+                        "value": {
+                            "uuid": "71a7d16b-8452-4266-ae80-bbede2e305e2",
+                            "file_format": {
+                                "uuid": "f2ec3b9f-a898-4e6c-8da5-734a7a6410b8",
+                                "display_title": "tar_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/tar_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI6BNNTKA.tar.gz",
+                            "file_size": 1505157,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI6BNNTKA/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "maxent"
+                    },
+                    {
+                        "value": {
+                            "uuid": "a35e580c-7579-4312-a3a1-66810e6d9366",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFISUOC64Q.vcf.gz",
+                            "file_size": 28829788377,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFISUOC64Q/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "spliceai_snv"
+                    },
+                    {
+                        "value": {
+                            "uuid": "3b7c0c29-5ee2-47c8-95a8-d28e15d5de47",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIZOPCWIU.vcf.gz",
+                            "file_size": 69322106029,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIZOPCWIU/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "spliceai_indel"
+                    },
+                    {
+                        "value": {
+                            "uuid": "52c6cbf6-ae94-4c10-ad03-26ed34f74a3e",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIJOMA2Q8.vcf.gz",
+                            "file_size": 56752948861,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIJOMA2Q8/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "gnomad"
+                    },
+                    {
+                        "value": {
+                            "uuid": "dd6f0384-d0b5-47d6-99a8-395c0b72feed",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIC5416E6.vcf.gz",
+                            "file_size": 1461686984,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIC5416E6/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "gnomad2"
+                    },
+                    {
+                        "value": {
+                            "uuid": "672de47f-d058-4dbd-9fc4-3e134cfe71d8",
+                            "file_format": {
+                                "uuid": "11ca3783-db6e-430e-997b-9cf0ca275814",
+                                "display_title": "tsv_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/tsv_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI566QQCV.tsv.gz",
+                            "file_size": 86592987071,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI566QQCV/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "CADD_snv"
+                    },
+                    {
+                        "value": {
+                            "uuid": "b9f123dd-be05-4a14-957a-5e1e5a5ce254",
+                            "file_format": {
+                                "uuid": "11ca3783-db6e-430e-997b-9cf0ca275814",
+                                "display_title": "tsv_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/tsv_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI1GC6AXF.tsv.gz",
+                            "file_size": 1165363333,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI1GC6AXF/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "CADD_indel"
+                    },
+                    {
+                        "value": {
+                            "uuid": "af93aecb-6b8e-4c8b-b159-eefb3f9d0ffb",
+                            "file_format": {
+                                "uuid": "33f30c42-d582-4163-af44-fecf586b9dd3",
+                                "display_title": "BigWig",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/BigWig/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIMQ7MHGA.bw",
+                            "file_size": 9870053206,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIMQ7MHGA/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "phylop100bw"
+                    },
+                    {
+                        "value": {
+                            "uuid": "f6809af1-f7b9-43c0-882a-16764ccc431d",
+                            "file_format": {
+                                "uuid": "33f30c42-d582-4163-af44-fecf586b9dd3",
+                                "display_title": "BigWig",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/BigWig/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI5MRTDLN.bw",
+                            "file_size": 8400229101,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI5MRTDLN/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "phylop30bw"
+                    },
+                    {
+                        "value": {
+                            "uuid": "19f03828-175b-4594-ba1a-52ddabcf640d",
+                            "file_format": {
+                                "uuid": "33f30c42-d582-4163-af44-fecf586b9dd3",
+                                "display_title": "BigWig",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/BigWig/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI6KXAQMV.bw",
+                            "file_size": 5886377734,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI6KXAQMV/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "phastc100bw"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -6768,27 +7264,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_vep-annot-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_peddy v1.0.0 run 2022-04-30 02:10:35.255342",
-                "@id": "/workflow-runs-awsem/58210479-cf6c-40db-8a03-fbd2541be2c2/",
                 "uuid": "58210479-cf6c-40db-8a03-fbd2541be2c2",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_peddy v1.0.0 run 2022-04-30 02:10:35.255342",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/58210479-cf6c-40db-8a03-fbd2541be2c2/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-peddyqc/6561d7cf-a5c1-4ada-9eab-9e1ba62b3699/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-peddyqc/6561d7cf-a5c1-4ada-9eab-9e1ba62b3699/",
+                        "workflow_argument_name": "qc_html"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -6799,26 +7308,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIACVY8U8.vcf.gz",
-                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
                             "file_size": 2727278155,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIACVY8U8/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_vep-annot-check v1.0.0 run 2022-04-29 22:40:46.334063",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/cf4811eb-3f1f-4951-8d84-00a2c7ffe352/",
+                                    "uuid": "cf4811eb-3f1f-4951-8d84-00a2c7ffe352",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "c9df0265-50c5-4706-9327-86d9f18f8130",
-                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -6828,7 +7357,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -6846,18 +7374,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "ordinal": 1,
                         "dimension": "0",
                         "workflow_argument_name": "input_vcf"
-                    }
-                ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-peddyqc/6561d7cf-a5c1-4ada-9eab-9e1ba62b3699/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-peddyqc/6561d7cf-a5c1-4ada-9eab-9e1ba62b3699/",
-                        "workflow_argument_name": "qc_html"
                     }
                 ],
                 "principals_allowed": {
@@ -6880,27 +7396,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_vep-annot-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:40:35.197316",
-                "@id": "/workflow-runs-awsem/eba22967-9efc-4071-a3df-fa5b55943db8/",
                 "uuid": "eba22967-9efc-4071-a3df-fa5b55943db8",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:40:35.197316",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/eba22967-9efc-4071-a3df-fa5b55943db8/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/1a6c85b3-2d60-4428-b449-0771abdf787a/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/1a6c85b3-2d60-4428-b449-0771abdf787a/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -6911,26 +7440,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIACVY8U8.vcf.gz",
-                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
                             "file_size": 2727278155,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIACVY8U8/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_vep-annot-check v1.0.0 run 2022-04-29 22:40:46.334063",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/cf4811eb-3f1f-4951-8d84-00a2c7ffe352/",
+                                    "uuid": "cf4811eb-3f1f-4951-8d84-00a2c7ffe352",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "c9df0265-50c5-4706-9327-86d9f18f8130",
-                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -6940,7 +7489,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -6960,18 +7508,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "input_vcf"
                     }
                 ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/1a6c85b3-2d60-4428-b449-0771abdf787a/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/1a6c85b3-2d60-4428-b449-0771abdf787a/",
-                        "workflow_argument_name": "uniq_variants"
-                    }
-                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -6989,15 +7525,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFIF8PBOT6/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIF8PBOT6.vcf.gz",
                         "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIF8PBOT6/",
-                        "display_title": "GAPFIF8PBOT6.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7020,156 +7556,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_vep-annot-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-filtering-check v1.0.0 run 2022-04-30 02:10:40.339145",
-                "@id": "/workflow-runs-awsem/64a59f36-a856-47e1-be09-d0c6b8694252/",
                 "uuid": "64a59f36-a856-47e1-be09-d0c6b8694252",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-filtering-check v1.0.0 run 2022-04-30 02:10:40.339145",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIACVY8U8.vcf.gz",
-                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
-                            "file_size": 2727278155,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIACVY8U8/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "c9df0265-50c5-4706-9327-86d9f18f8130",
-                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
-                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI5MKCART.txt",
-                            "uuid": "84f2bb24-edd7-459b-ab89-0a21866d7826",
-                            "file_size": 349968,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFI5MKCART/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "genes"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/64a59f36-a856-47e1-be09-d0c6b8694252/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFIF8PBOT6.vcf.gz",
+                            "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 4212759,
                             "@id": "/files-processed/GAPFIF8PBOT6/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 4212759,
-                            "display_title": "GAPFIF8PBOT6.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
+                            "quality_metric": {
+                                "uuid": "22c5255f-ef08-4660-8524-887067eebb2e",
                                 "@type": [
-                                    "FileFormat",
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
                                     "Item"
                                 ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@id": "/quality-metrics-qclist/22c5255f-ef08-4660-8524-887067eebb2e/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7179,7 +7617,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
                             "workflow_run_inputs": [
                                 {
                                     "@type": [
@@ -7187,10 +7624,29 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:55:39.004849",
-                                    "@id": "/workflow-runs-awsem/99c36be0-a667-456a-9b8c-b08bb3b4da17/",
-                                    "status": "shared",
                                     "uuid": "99c36be0-a667-456a-9b8c-b08bb3b4da17",
+                                    "@id": "/workflow-runs-awsem/99c36be0-a667-456a-9b8c-b08bb3b4da17/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:55:39.004849",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "2160c911-2d1b-466b-9643-ed30c74228a8",
+                                    "@id": "/workflow-runs-awsem/2160c911-2d1b-466b-9643-ed30c74228a8/",
+                                    "display_title": "workflow_granite-novoCaller-rck-check v1.0.0 run 2022-04-30 02:55:36.042917",
+                                    "status": "shared",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -7201,26 +7657,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
-                            "quality_metric": {
-                                "uuid": "22c5255f-ef08-4660-8524-887067eebb2e",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "@id": "/quality-metrics-qclist/22c5255f-ef08-4660-8524-887067eebb2e/",
-                                "status": "shared",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7259,6 +7695,145 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "merged_vcf-check"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIACVY8U8.vcf.gz",
+                            "file_size": 2727278155,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFIACVY8U8/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_vep-annot-check v1.0.0 run 2022-04-29 22:40:46.334063",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/cf4811eb-3f1f-4951-8d84-00a2c7ffe352/",
+                                    "uuid": "cf4811eb-3f1f-4951-8d84-00a2c7ffe352",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "c9df0265-50c5-4706-9327-86d9f18f8130",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/c9df0265-50c5-4706-9327-86d9f18f8130/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
+                    },
+                    {
+                        "value": {
+                            "uuid": "84f2bb24-edd7-459b-ab89-0a21866d7826",
+                            "file_format": {
+                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI5MKCART.txt",
+                            "file_size": 349968,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFI5MKCART/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "genes"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -7276,15 +7851,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFIRZZWDQL/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIRZZWDQL.vcf.gz",
                         "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIRZZWDQL/",
-                        "display_title": "GAPFIRZZWDQL.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7308,227 +7883,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-rckTar:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-novoCaller-rck-check v1.0.0 run 2022-04-30 02:55:36.042917",
-                "@id": "/workflow-runs-awsem/2160c911-2d1b-466b-9643-ed30c74228a8/",
                 "uuid": "2160c911-2d1b-466b-9643-ed30c74228a8",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-novoCaller-rck-check v1.0.0 run 2022-04-30 02:55:36.042917",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIF8PBOT6.vcf.gz",
-                            "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
-                            "file_size": 4212759,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIF8PBOT6/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "22c5255f-ef08-4660-8524-887067eebb2e",
-                                "@id": "/quality-metrics-qclist/22c5255f-ef08-4660-8524-887067eebb2e/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "rck_tar",
-                                "@id": "/file-formats/rck_tar/",
-                                "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIMO8Y4PZ.rck.tar",
-                            "uuid": "eac862c0-8c87-4838-83cb-9a77412bff6f",
-                            "file_size": 209874647040,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIMO8Y4PZ/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "unrelated"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "rck_tar",
-                                "@id": "/file-formats/rck_tar/",
-                                "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI7TBYWC7.rck.tar",
-                            "uuid": "3e8a17d1-e07f-4226-bd6a-a4ca13606528",
-                            "file_size": 35891374080,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFI7TBYWC7/",
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "trio"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/2160c911-2d1b-466b-9643-ed30c74228a8/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFIRZZWDQL.vcf.gz",
+                            "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 4980651,
                             "@id": "/files-processed/GAPFIRZZWDQL/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 4980651,
-                            "display_title": "GAPFIRZZWDQL.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
-                            "workflow_run_inputs": [],
                             "quality_metric": {
                                 "uuid": "8c3fe2b7-5186-451d-b273-b775f65afdf4",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "@id": "/quality-metrics-qclist/8c3fe2b7-5186-451d-b273-b775f65afdf4/",
-                                "status": "shared",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@id": "/quality-metrics-qclist/8c3fe2b7-5186-451d-b273-b775f65afdf4/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7538,6 +7944,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "31fad2bc-d98e-446e-8cc5-a695aee8ba47",
+                                    "@id": "/workflow-runs-awsem/31fad2bc-d98e-446e-8cc5-a695aee8ba47/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:10:33.627859",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "e71195e4-f32c-4cf7-866b-15b522b3998c",
+                                    "@id": "/workflow-runs-awsem/e71195e4-f32c-4cf7-866b-15b522b3998c/",
+                                    "display_title": "workflow_granite-comHet-check v1.0.0 run 2022-04-30 05:10:39.280286",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7576,6 +8022,214 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "novoCaller_vcf-check"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIF8PBOT6.vcf.gz",
+                            "file_size": 4212759,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFIF8PBOT6/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-filtering-check v1.0.0 run 2022-04-30 02:10:40.339145",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/64a59f36-a856-47e1-be09-d0c6b8694252/",
+                                    "uuid": "64a59f36-a856-47e1-be09-d0c6b8694252",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "22c5255f-ef08-4660-8524-887067eebb2e",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/22c5255f-ef08-4660-8524-887067eebb2e/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
+                    },
+                    {
+                        "value": {
+                            "uuid": "eac862c0-8c87-4838-83cb-9a77412bff6f",
+                            "file_format": {
+                                "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+                                "display_title": "rck_tar",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/rck_tar/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIMO8Y4PZ.rck.tar",
+                            "file_size": 209874647040,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIMO8Y4PZ/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "unrelated"
+                    },
+                    {
+                        "value": {
+                            "uuid": "3e8a17d1-e07f-4226-bd6a-a4ca13606528",
+                            "file_format": {
+                                "uuid": "39f836d8-bbb1-46c7-80d4-e321d4a44204",
+                                "display_title": "rck_tar",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/rck_tar/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI7TBYWC7.rck.tar",
+                            "file_size": 35891374080,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFI7TBYWC7/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-rckTar v1.0.0 run 2022-04-29 21:10:35.118284",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/6fb5a7f0-2156-49e3-bf42-95f4e8decdde/",
+                                    "uuid": "6fb5a7f0-2156-49e3-bf42-95f4e8decdde",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "trio"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -7595,27 +8249,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-filtering-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:55:39.004849",
-                "@id": "/workflow-runs-awsem/99c36be0-a667-456a-9b8c-b08bb3b4da17/",
                 "uuid": "99c36be0-a667-456a-9b8c-b08bb3b4da17",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 02:55:39.004849",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/99c36be0-a667-456a-9b8c-b08bb3b4da17/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/dd4ca4bd-746c-483e-8c49-0ff28d6e5aa3/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/dd4ca4bd-746c-483e-8c49-0ff28d6e5aa3/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7626,26 +8293,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIF8PBOT6.vcf.gz",
-                            "uuid": "c11cb753-5ae1-4298-b714-e30b67b46653",
                             "file_size": 4212759,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIF8PBOT6/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-filtering-check v1.0.0 run 2022-04-30 02:10:40.339145",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/64a59f36-a856-47e1-be09-d0c6b8694252/",
+                                    "uuid": "64a59f36-a856-47e1-be09-d0c6b8694252",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "22c5255f-ef08-4660-8524-887067eebb2e",
-                                "@id": "/quality-metrics-qclist/22c5255f-ef08-4660-8524-887067eebb2e/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/22c5255f-ef08-4660-8524-887067eebb2e/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7655,7 +8342,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7673,18 +8359,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "ordinal": 1,
                         "dimension": "0",
                         "workflow_argument_name": "input_vcf"
-                    }
-                ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/dd4ca4bd-746c-483e-8c49-0ff28d6e5aa3/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/dd4ca4bd-746c-483e-8c49-0ff28d6e5aa3/",
-                        "workflow_argument_name": "uniq_variants"
                     }
                 ],
                 "principals_allowed": {
@@ -7706,27 +8380,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-novoCaller-rck-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:10:33.627859",
-                "@id": "/workflow-runs-awsem/31fad2bc-d98e-446e-8cc5-a695aee8ba47/",
                 "uuid": "31fad2bc-d98e-446e-8cc5-a695aee8ba47",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:10:33.627859",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/31fad2bc-d98e-446e-8cc5-a695aee8ba47/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/8bd8d24f-e436-4e4b-92e3-b65932fd0b02/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/8bd8d24f-e436-4e4b-92e3-b65932fd0b02/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7737,26 +8424,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIRZZWDQL.vcf.gz",
-                            "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
                             "file_size": 4980651,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIRZZWDQL/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-novoCaller-rck-check v1.0.0 run 2022-04-30 02:55:36.042917",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/2160c911-2d1b-466b-9643-ed30c74228a8/",
+                                    "uuid": "2160c911-2d1b-466b-9643-ed30c74228a8",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "8c3fe2b7-5186-451d-b273-b775f65afdf4",
-                                "@id": "/quality-metrics-qclist/8c3fe2b7-5186-451d-b273-b775f65afdf4/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/8c3fe2b7-5186-451d-b273-b775f65afdf4/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7766,7 +8473,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7786,18 +8492,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "input_vcf"
                     }
                 ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/8bd8d24f-e436-4e4b-92e3-b65932fd0b02/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/8bd8d24f-e436-4e4b-92e3-b65932fd0b02/",
-                        "workflow_argument_name": "uniq_variants"
-                    }
-                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -7815,15 +8509,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFIUXS6TY7/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIUXS6TY7.vcf.gz",
                         "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIUXS6TY7/",
-                        "display_title": "GAPFIUXS6TY7.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -7846,108 +8540,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-novoCaller-rck-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-comHet-check v1.0.0 run 2022-04-30 05:10:39.280286",
-                "@id": "/workflow-runs-awsem/e71195e4-f32c-4cf7-866b-15b522b3998c/",
                 "uuid": "e71195e4-f32c-4cf7-866b-15b522b3998c",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-comHet-check v1.0.0 run 2022-04-30 05:10:39.280286",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIRZZWDQL.vcf.gz",
-                            "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
-                            "file_size": 4980651,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIRZZWDQL/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "8c3fe2b7-5186-451d-b273-b775f65afdf4",
-                                "@id": "/quality-metrics-qclist/8c3fe2b7-5186-451d-b273-b775f65afdf4/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/e71195e4-f32c-4cf7-866b-15b522b3998c/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFIUXS6TY7.vcf.gz",
+                            "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 5015079,
                             "@id": "/files-processed/GAPFIUXS6TY7/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 5015079,
-                            "display_title": "GAPFIUXS6TY7.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
+                            "quality_metric": {
+                                "uuid": "06a62061-7f6f-4e9e-995d-24c274509290",
                                 "@type": [
-                                    "FileFormat",
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
                                     "Item"
                                 ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@id": "/quality-metrics-qclist/06a62061-7f6f-4e9e-995d-24c274509290/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -7957,7 +8601,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
                             "workflow_run_inputs": [
                                 {
                                     "@type": [
@@ -7965,10 +8608,29 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                         "WorkflowRun",
                                         "Item"
                                     ],
-                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:40:39.370350",
-                                    "@id": "/workflow-runs-awsem/dd927729-294a-4cff-bf20-115dc9561ff7/",
+                                    "uuid": "703d75f8-4fdf-4cb4-a65b-6181e1079660",
+                                    "@id": "/workflow-runs-awsem/703d75f8-4fdf-4cb4-a65b-6181e1079660/",
+                                    "display_title": "workflow_dbSNP_ID_fixer-check v1.0.0 run 2022-04-30 05:40:37.109983",
                                     "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
                                     "uuid": "dd927729-294a-4cff-bf20-115dc9561ff7",
+                                    "@id": "/workflow-runs-awsem/dd927729-294a-4cff-bf20-115dc9561ff7/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:40:39.370350",
+                                    "status": "shared",
                                     "principals_allowed": {
                                         "view": [
                                             "system.Authenticated"
@@ -7979,26 +8641,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
-                            "quality_metric": {
-                                "uuid": "06a62061-7f6f-4e9e-995d-24c274509290",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "@id": "/quality-metrics-qclist/06a62061-7f6f-4e9e-995d-24c274509290/",
-                                "status": "shared",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8042,6 +8684,97 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "comHet_vcf-check"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "0d5b70d8-3ab9-474b-92ff-0b41bfa1919b",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIRZZWDQL.vcf.gz",
+                            "file_size": 4980651,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFIRZZWDQL/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-novoCaller-rck-check v1.0.0 run 2022-04-30 02:55:36.042917",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/2160c911-2d1b-466b-9643-ed30c74228a8/",
+                                    "uuid": "2160c911-2d1b-466b-9643-ed30c74228a8",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "8c3fe2b7-5186-451d-b273-b775f65afdf4",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/8c3fe2b7-5186-451d-b273-b775f65afdf4/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -8059,15 +8792,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFI7UFWBGA/",
+                        "status": "uploaded",
+                        "display_title": "GAPFI7UFWBGA.vcf.gz",
                         "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFI7UFWBGA/",
-                        "display_title": "GAPFI7UFWBGA.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8090,226 +8823,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-comHet-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_dbSNP_ID_fixer-check v1.0.0 run 2022-04-30 05:40:37.109983",
-                "@id": "/workflow-runs-awsem/703d75f8-4fdf-4cb4-a65b-6181e1079660/",
                 "uuid": "703d75f8-4fdf-4cb4-a65b-6181e1079660",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_dbSNP_ID_fixer-check v1.0.0 run 2022-04-30 05:40:37.109983",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIUXS6TY7.vcf.gz",
-                            "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
-                            "file_size": 5015079,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFIUXS6TY7/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "06a62061-7f6f-4e9e-995d-24c274509290",
-                                "@id": "/quality-metrics-qclist/06a62061-7f6f-4e9e-995d-24c274509290/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIF4JKLTH.vcf.gz",
-                            "uuid": "aa542c8e-b31c-4cff-b2d4-aa4037bb913c",
-                            "file_size": 6596050744,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIF4JKLTH/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "dbSNP_ref_vcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "txt",
-                                "@id": "/file-formats/txt/",
-                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIBGEOI72.txt",
-                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
-                            "file_size": 7603,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIBGEOI72/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "region_file"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/703d75f8-4fdf-4cb4-a65b-6181e1079660/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFI7UFWBGA.vcf.gz",
+                            "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 5033581,
                             "@id": "/files-processed/GAPFI7UFWBGA/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 5033581,
-                            "display_title": "GAPFI7UFWBGA.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
-                            "workflow_run_inputs": [],
                             "quality_metric": {
                                 "uuid": "ed1b017f-45f5-4609-9972-14991d203897",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "@id": "/quality-metrics-qclist/ed1b017f-45f5-4609-9972-14991d203897/",
-                                "status": "shared",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@id": "/quality-metrics-qclist/ed1b017f-45f5-4609-9972-14991d203897/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8319,6 +8884,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "da4c3ef1-7cee-42cf-a6d1-ea60dbd60169",
+                                    "@id": "/workflow-runs-awsem/da4c3ef1-7cee-42cf-a6d1-ea60dbd60169/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 06:10:34.657719",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "5df3ef23-0e93-4510-8ebb-63ebcc1214a7",
+                                    "@id": "/workflow-runs-awsem/5df3ef23-0e93-4510-8ebb-63ebcc1214a7/",
+                                    "display_title": "workflow_hg19lo_hgvsg-check v1.0.0 run 2022-04-30 06:10:40.434728",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8357,6 +8962,193 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "vcf-check"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIUXS6TY7.vcf.gz",
+                            "file_size": 5015079,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFIUXS6TY7/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-comHet-check v1.0.0 run 2022-04-30 05:10:39.280286",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/e71195e4-f32c-4cf7-866b-15b522b3998c/",
+                                    "uuid": "e71195e4-f32c-4cf7-866b-15b522b3998c",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "06a62061-7f6f-4e9e-995d-24c274509290",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/06a62061-7f6f-4e9e-995d-24c274509290/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
+                    },
+                    {
+                        "value": {
+                            "uuid": "aa542c8e-b31c-4cff-b2d4-aa4037bb913c",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIF4JKLTH.vcf.gz",
+                            "file_size": 6596050744,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIF4JKLTH/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "dbSNP_ref_vcf"
+                    },
+                    {
+                        "value": {
+                            "uuid": "1c07a3aa-e2a3-498c-b838-15991c4a2f28",
+                            "file_format": {
+                                "uuid": "0cd4e777-a596-4927-95c8-b07716121aa3",
+                                "display_title": "txt",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/txt/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIBGEOI72.txt",
+                            "file_size": 7603,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIBGEOI72/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "region_file"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -8376,27 +9168,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_granite-comHet-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:40:39.370350",
-                "@id": "/workflow-runs-awsem/dd927729-294a-4cff-bf20-115dc9561ff7/",
                 "uuid": "dd927729-294a-4cff-bf20-115dc9561ff7",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 05:40:39.370350",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/dd927729-294a-4cff-bf20-115dc9561ff7/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/ff13b07a-d3e0-4a75-836f-837c79c116fc/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/ff13b07a-d3e0-4a75-836f-837c79c116fc/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8407,26 +9212,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIUXS6TY7.vcf.gz",
-                            "uuid": "2bdf5b97-b382-4c11-a70a-b6a5210bf319",
                             "file_size": 5015079,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIUXS6TY7/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_granite-comHet-check v1.0.0 run 2022-04-30 05:10:39.280286",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/e71195e4-f32c-4cf7-866b-15b522b3998c/",
+                                    "uuid": "e71195e4-f32c-4cf7-866b-15b522b3998c",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "06a62061-7f6f-4e9e-995d-24c274509290",
-                                "@id": "/quality-metrics-qclist/06a62061-7f6f-4e9e-995d-24c274509290/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/06a62061-7f6f-4e9e-995d-24c274509290/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8436,7 +9261,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8454,18 +9278,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "ordinal": 1,
                         "dimension": "0",
                         "workflow_argument_name": "input_vcf"
-                    }
-                ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/ff13b07a-d3e0-4a75-836f-837c79c116fc/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/ff13b07a-d3e0-4a75-836f-837c79c116fc/",
-                        "workflow_argument_name": "uniq_variants"
                     }
                 ],
                 "principals_allowed": {
@@ -8487,27 +9299,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_dbSNP_ID_fixer-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 06:10:34.657719",
-                "@id": "/workflow-runs-awsem/da4c3ef1-7cee-42cf-a6d1-ea60dbd60169/",
                 "uuid": "da4c3ef1-7cee-42cf-a6d1-ea60dbd60169",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 06:10:34.657719",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/da4c3ef1-7cee-42cf-a6d1-ea60dbd60169/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/fddd9992-b13c-4844-9a30-2933f9fd909b/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/fddd9992-b13c-4844-9a30-2933f9fd909b/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8518,26 +9343,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFI7UFWBGA.vcf.gz",
-                            "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
                             "file_size": 5033581,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFI7UFWBGA/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_dbSNP_ID_fixer-check v1.0.0 run 2022-04-30 05:40:37.109983",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/703d75f8-4fdf-4cb4-a65b-6181e1079660/",
+                                    "uuid": "703d75f8-4fdf-4cb4-a65b-6181e1079660",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "ed1b017f-45f5-4609-9972-14991d203897",
-                                "@id": "/quality-metrics-qclist/ed1b017f-45f5-4609-9972-14991d203897/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/ed1b017f-45f5-4609-9972-14991d203897/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8547,7 +9392,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8567,18 +9411,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "input_vcf"
                     }
                 ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/fddd9992-b13c-4844-9a30-2933f9fd909b/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/fddd9992-b13c-4844-9a30-2933f9fd909b/",
-                        "workflow_argument_name": "uniq_variants"
-                    }
-                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -8596,15 +9428,15 @@ const TEMPORARY_DUMMY_CONTEXT = {
             "output": [
                 {
                     "file": {
+                        "@id": "/files-processed/GAPFIRGHPIDQ/",
+                        "status": "uploaded",
+                        "display_title": "GAPFIRGHPIDQ.vcf.gz",
                         "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
                         "@type": [
                             "FileProcessed",
                             "File",
                             "Item"
                         ],
-                        "status": "uploaded",
-                        "@id": "/files-processed/GAPFIRGHPIDQ/",
-                        "display_title": "GAPFIRGHPIDQ.vcf.gz",
                         "principals_allowed": {
                             "view": [
                                 "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8627,178 +9459,58 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_dbSNP_ID_fixer-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_hg19lo_hgvsg-check v1.0.0 run 2022-04-30 06:10:40.434728",
-                "@id": "/workflow-runs-awsem/5df3ef23-0e93-4510-8ebb-63ebcc1214a7/",
                 "uuid": "5df3ef23-0e93-4510-8ebb-63ebcc1214a7",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_hg19lo_hgvsg-check v1.0.0 run 2022-04-30 06:10:40.434728",
                 "status": "shared",
-                "input_files": [
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFI7UFWBGA.vcf.gz",
-                            "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
-                            "file_size": 5033581,
-                            "@type": [
-                                "FileProcessed",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-processed/GAPFI7UFWBGA/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "ed1b017f-45f5-4609-9972-14991d203897",
-                                "@id": "/quality-metrics-qclist/ed1b017f-45f5-4609-9972-14991d203897/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricQclist",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "workflow_run_outputs": [],
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "input_vcf"
-                    },
-                    {
-                        "value": {
-                            "file_format": {
-                                "status": "shared",
-                                "display_title": "chain",
-                                "@id": "/file-formats/chain/",
-                                "uuid": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "display_title": "GAPFIYPTSAU8.chain.gz",
-                            "uuid": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
-                            "file_size": 1246411,
-                            "@type": [
-                                "FileReference",
-                                "File",
-                                "Item"
-                            ],
-                            "status": "uploaded",
-                            "@id": "/files-reference/GAPFIYPTSAU8/",
-                            "principals_allowed": {
-                                "view": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin",
-                                    "group.read-only-admin",
-                                    "remoteuser.EMBED",
-                                    "remoteuser.INDEXER"
-                                ],
-                                "edit": [
-                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                                    "group.admin"
-                                ]
-                            }
-                        },
-                        "ordinal": 1,
-                        "dimension": "0",
-                        "workflow_argument_name": "chainfile"
-                    }
-                ],
+                "@id": "/workflow-runs-awsem/5df3ef23-0e93-4510-8ebb-63ebcc1214a7/",
                 "output_files": [
                     {
                         "type": "Output processed file",
                         "value": {
+                            "status": "uploaded",
+                            "display_title": "GAPFIRGHPIDQ.vcf.gz",
+                            "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
+                            "file_format": {
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "display_title": "vcf_gz",
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "@id": "/file-formats/vcf_gz/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "file_size": 5196340,
                             "@id": "/files-processed/GAPFIRGHPIDQ/",
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "file_size": 5196340,
-                            "display_title": "GAPFIRGHPIDQ.vcf.gz",
-                            "status": "uploaded",
-                            "file_format": {
-                                "display_title": "vcf_gz",
-                                "status": "shared",
-                                "@type": [
-                                    "FileFormat",
-                                    "Item"
-                                ],
-                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-                                "@id": "/file-formats/vcf_gz/",
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
-                            "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
-                            "workflow_run_inputs": [],
                             "quality_metric": {
                                 "uuid": "ac83094c-6bb2-4754-9573-ec6f9dc74ee5",
-                                "overall_quality_status": "PASS",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
-                                "@id": "/quality-metrics-qclist/ac83094c-6bb2-4754-9573-ec6f9dc74ee5/",
-                                "status": "shared",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@id": "/quality-metrics-qclist/ac83094c-6bb2-4754-9573-ec6f9dc74ee5/",
+                                "overall_quality_status": "PASS",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8808,6 +9520,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
+                            "workflow_run_inputs": [
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "b847a5ad-670e-4b3c-92be-a1d3e9951b99",
+                                    "@id": "/workflow-runs-awsem/b847a5ad-670e-4b3c-92be-a1d3e9951b99/",
+                                    "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 06:40:35.011633",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                },
+                                {
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "uuid": "106be8c3-5b02-4809-8205-4b7dae0fc375",
+                                    "@id": "/workflow-runs-awsem/106be8c3-5b02-4809-8205-4b7dae0fc375/",
+                                    "display_title": "bamsnap v1.0.0 run 2022-04-30 06:40:40.145843",
+                                    "status": "shared",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8846,6 +9598,145 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "vcf-check"
                     }
                 ],
+                "input_files": [
+                    {
+                        "value": {
+                            "uuid": "352d3ace-c687-41de-9027-db84bf8af10a",
+                            "file_format": {
+                                "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFI7UFWBGA.vcf.gz",
+                            "file_size": 5033581,
+                            "@type": [
+                                "FileProcessed",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-processed/GAPFI7UFWBGA/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_dbSNP_ID_fixer-check v1.0.0 run 2022-04-30 05:40:37.109983",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/703d75f8-4fdf-4cb4-a65b-6181e1079660/",
+                                    "uuid": "703d75f8-4fdf-4cb4-a65b-6181e1079660",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
+                            "quality_metric": {
+                                "uuid": "ed1b017f-45f5-4609-9972-14991d203897",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
+                                "@type": [
+                                    "QualityMetricQclist",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/ed1b017f-45f5-4609-9972-14991d203897/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "input_vcf"
+                    },
+                    {
+                        "value": {
+                            "uuid": "297c872a-5b6b-4fc3-83d3-f4a853f8805c",
+                            "file_format": {
+                                "uuid": "dd1ef82d-da5e-4680-bd5c-cf471a87eb5b",
+                                "display_title": "chain",
+                                "@type": [
+                                    "FileFormat",
+                                    "Item"
+                                ],
+                                "@id": "/file-formats/chain/",
+                                "status": "shared",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
+                            "display_title": "GAPFIYPTSAU8.chain.gz",
+                            "file_size": 1246411,
+                            "@type": [
+                                "FileReference",
+                                "File",
+                                "Item"
+                            ],
+                            "@id": "/files-reference/GAPFIYPTSAU8/",
+                            "status": "uploaded",
+                            "principals_allowed": {
+                                "view": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin",
+                                    "group.read-only-admin",
+                                    "remoteuser.EMBED",
+                                    "remoteuser.INDEXER"
+                                ],
+                                "edit": [
+                                    "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                                    "group.admin"
+                                ]
+                            }
+                        },
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "chainfile"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -8865,27 +9756,40 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_hg19lo_hgvsg-check:0"
             ],
             "workflow_run": {
-                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 06:40:35.011633",
-                "@id": "/workflow-runs-awsem/b847a5ad-670e-4b3c-92be-a1d3e9951b99/",
                 "uuid": "b847a5ad-670e-4b3c-92be-a1d3e9951b99",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "workflow_granite-qcVCF v1.0.0 run 2022-04-30 06:40:35.011633",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/b847a5ad-670e-4b3c-92be-a1d3e9951b99/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/866988a5-2aa3-4f27-a103-1d17b3dd0fcc/",
+                        "workflow_argument_name": "qc_json"
+                    },
+                    {
+                        "type": "Output QC file",
+                        "value_qc": "/quality-metrics-vcfqc/866988a5-2aa3-4f27-a103-1d17b3dd0fcc/",
+                        "workflow_argument_name": "uniq_variants"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8896,26 +9800,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIRGHPIDQ.vcf.gz",
-                            "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
                             "file_size": 5196340,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIRGHPIDQ/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_hg19lo_hgvsg-check v1.0.0 run 2022-04-30 06:10:40.434728",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/5df3ef23-0e93-4510-8ebb-63ebcc1214a7/",
+                                    "uuid": "5df3ef23-0e93-4510-8ebb-63ebcc1214a7",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "ac83094c-6bb2-4754-9573-ec6f9dc74ee5",
-                                "@id": "/quality-metrics-qclist/ac83094c-6bb2-4754-9573-ec6f9dc74ee5/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/ac83094c-6bb2-4754-9573-ec6f9dc74ee5/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -8925,7 +9849,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -8943,18 +9866,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "ordinal": 1,
                         "dimension": "0",
                         "workflow_argument_name": "input_vcf"
-                    }
-                ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/866988a5-2aa3-4f27-a103-1d17b3dd0fcc/",
-                        "workflow_argument_name": "qc_json"
-                    },
-                    {
-                        "type": "Output QC file",
-                        "value_qc": "/quality-metrics-vcfqc/866988a5-2aa3-4f27-a103-1d17b3dd0fcc/",
-                        "workflow_argument_name": "uniq_variants"
                     }
                 ],
                 "principals_allowed": {
@@ -8976,27 +9887,34 @@ const TEMPORARY_DUMMY_CONTEXT = {
                 "workflow_hg19lo_hgvsg-check:0"
             ],
             "workflow_run": {
-                "display_title": "bamsnap v1.0.0 run 2022-04-30 06:40:40.145843",
-                "@id": "/workflow-runs-awsem/106be8c3-5b02-4809-8205-4b7dae0fc375/",
                 "uuid": "106be8c3-5b02-4809-8205-4b7dae0fc375",
                 "@type": [
                     "WorkflowRunAwsem",
                     "WorkflowRun",
                     "Item"
                 ],
+                "display_title": "bamsnap v1.0.0 run 2022-04-30 06:40:40.145843",
                 "status": "shared",
+                "@id": "/workflow-runs-awsem/106be8c3-5b02-4809-8205-4b7dae0fc375/",
+                "output_files": [
+                    {
+                        "type": "Output QC file",
+                        "workflow_argument_name": "bamsnap_images"
+                    }
+                ],
                 "input_files": [
                     {
                         "value": {
+                            "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9007,26 +9925,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIMIARUOB.bam",
-                            "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
                             "file_size": 106616301305,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIMIARUOB/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:35.950498",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/784f3f5f-d3cf-432b-8c0f-3dcd957b2042/",
+                                    "uuid": "784f3f5f-d3cf-432b-8c0f-3dcd957b2042",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86",
-                                "@id": "/quality-metrics-bamqc/b5978c20-271c-4ac4-8407-8b3fd3c0bb86/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "@type": [
                                     "QualityMetricBamqc",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/b5978c20-271c-4ac4-8407-8b3fd3c0bb86/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9036,7 +9974,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -9057,15 +9994,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9076,26 +10014,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFICEE9LEN.bam",
-                            "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
                             "file_size": 104992897560,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFICEE9LEN/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:39.481922",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/25d04009-a2fe-481b-ada7-da5c1216d52e/",
+                                    "uuid": "25d04009-a2fe-481b-ada7-da5c1216d52e",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "23408f2f-13ca-49d6-b8bf-162623795dd6",
-                                "@id": "/quality-metrics-bamqc/23408f2f-13ca-49d6-b8bf-162623795dd6/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
                                 "@type": [
                                     "QualityMetricBamqc",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/23408f2f-13ca-49d6-b8bf-162623795dd6/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9105,7 +10063,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -9126,15 +10083,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "bam",
-                                "@id": "/file-formats/bam/",
                                 "uuid": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+                                "display_title": "bam",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/bam/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9145,45 +10103,24 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFITNHTOZI.bam",
-                            "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
                             "file_size": 111610806810,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFITNHTOZI/",
-                            "quality_metric": {
-                                "status": "shared",
-                                "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b",
-                                "@id": "/quality-metrics-bamqc/5530ced5-5252-42f2-afde-0d14e30a669b/",
-                                "display_title": "QualityMetricBamqc from 2022-04-29",
-                                "overall_quality_status": "PASS",
-                                "@type": [
-                                    "QualityMetricBamqc",
-                                    "QualityMetric",
-                                    "Item"
-                                ],
-                                "principals_allowed": {
-                                    "view": [
-                                        "system.Authenticated"
-                                    ],
-                                    "edit": [
-                                        "group.admin"
-                                    ]
-                                }
-                            },
+                            "status": "uploaded",
                             "workflow_run_outputs": [
                                 {
+                                    "status": "shared",
+                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:46.368031",
                                     "@type": [
                                         "WorkflowRunAwsem",
                                         "WorkflowRun",
                                         "Item"
                                     ],
                                     "@id": "/workflow-runs-awsem/d4b58584-ecc6-41ad-a0ce-81d4b600b033/",
-                                    "display_title": "workflow_sentieon_dedup-recal v1.0.0 run 2022-04-29 04:25:46.368031",
-                                    "status": "shared",
                                     "uuid": "d4b58584-ecc6-41ad-a0ce-81d4b600b033",
                                     "principals_allowed": {
                                         "view": [
@@ -9195,6 +10132,26 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     }
                                 }
                             ],
+                            "quality_metric": {
+                                "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b",
+                                "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricBamqc from 2022-04-29",
+                                "@type": [
+                                    "QualityMetricBamqc",
+                                    "QualityMetric",
+                                    "Item"
+                                ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-bamqc/5530ced5-5252-42f2-afde-0d14e30a669b/",
+                                "principals_allowed": {
+                                    "view": [
+                                        "system.Authenticated"
+                                    ],
+                                    "edit": [
+                                        "group.admin"
+                                    ]
+                                }
+                            },
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -9215,15 +10172,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "vcf_gz",
-                                "@id": "/file-formats/vcf_gz/",
                                 "uuid": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+                                "display_title": "vcf_gz",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/vcf_gz/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9234,26 +10192,46 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIRGHPIDQ.vcf.gz",
-                            "uuid": "77ae0d41-f922-4646-bee2-029deaefdf49",
                             "file_size": 5196340,
                             "@type": [
                                 "FileProcessed",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-processed/GAPFIRGHPIDQ/",
+                            "status": "uploaded",
+                            "workflow_run_outputs": [
+                                {
+                                    "status": "shared",
+                                    "display_title": "workflow_hg19lo_hgvsg-check v1.0.0 run 2022-04-30 06:10:40.434728",
+                                    "@type": [
+                                        "WorkflowRunAwsem",
+                                        "WorkflowRun",
+                                        "Item"
+                                    ],
+                                    "@id": "/workflow-runs-awsem/5df3ef23-0e93-4510-8ebb-63ebcc1214a7/",
+                                    "uuid": "5df3ef23-0e93-4510-8ebb-63ebcc1214a7",
+                                    "principals_allowed": {
+                                        "view": [
+                                            "system.Authenticated"
+                                        ],
+                                        "edit": [
+                                            "group.admin"
+                                        ]
+                                    }
+                                }
+                            ],
                             "quality_metric": {
-                                "status": "shared",
                                 "uuid": "ac83094c-6bb2-4754-9573-ec6f9dc74ee5",
-                                "@id": "/quality-metrics-qclist/ac83094c-6bb2-4754-9573-ec6f9dc74ee5/",
-                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "overall_quality_status": "PASS",
+                                "display_title": "QualityMetricQclist from 2022-04-30",
                                 "@type": [
                                     "QualityMetricQclist",
                                     "QualityMetric",
                                     "Item"
                                 ],
+                                "status": "shared",
+                                "@id": "/quality-metrics-qclist/ac83094c-6bb2-4754-9573-ec6f9dc74ee5/",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9263,7 +10241,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                     ]
                                 }
                             },
-                            "workflow_run_outputs": [],
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -9284,15 +10261,16 @@ const TEMPORARY_DUMMY_CONTEXT = {
                     },
                     {
                         "value": {
+                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_format": {
-                                "status": "shared",
-                                "display_title": "fa",
-                                "@id": "/file-formats/fa/",
                                 "uuid": "5ced774b-a73e-4d1b-8186-d7fbbde7a3c2",
+                                "display_title": "fa",
                                 "@type": [
                                     "FileFormat",
                                     "Item"
                                 ],
+                                "@id": "/file-formats/fa/",
+                                "status": "shared",
                                 "principals_allowed": {
                                     "view": [
                                         "system.Authenticated"
@@ -9303,15 +10281,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                                 }
                             },
                             "display_title": "GAPFIXRDPDK5.fa",
-                            "uuid": "1936f246-22e1-45dc-bb5c-9cfd55537fe7",
                             "file_size": 3263683042,
                             "@type": [
                                 "FileReference",
                                 "File",
                                 "Item"
                             ],
-                            "status": "uploaded",
                             "@id": "/files-reference/GAPFIXRDPDK5/",
+                            "status": "uploaded",
                             "principals_allowed": {
                                 "view": [
                                     "editor_for.12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -9329,12 +10306,6 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "ordinal": 1,
                         "dimension": "0",
                         "workflow_argument_name": "ref"
-                    }
-                ],
-                "output_files": [
-                    {
-                        "type": "Output QC file",
-                        "workflow_argument_name": "bamsnap_images"
                     }
                 ],
                 "principals_allowed": {
@@ -9487,13 +10458,15 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             workflow,
             workflow_run: {
                 "@id": workflowRunAtID,
-                input_files: wfrItemInputFileObjects
+                input_files: wfrItemInputFileObjects,
+                output_files: wfrItemOutputFileObjects
             },
             input,
             output = []
         } = workflowRunObject;
 
         const inputFileObjectsGroupedByArgName = _.groupBy(wfrItemInputFileObjects, "workflow_argument_name");
+        const outputFileObjectsGroupedByArgName = _.groupBy(wfrItemOutputFileObjects, "workflow_argument_name");
 
         const { "@id": workflowAtID } = workflow || {};
 
@@ -9540,8 +10513,8 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             if (filesLen > 0) {
                 filesForThisInput.forEach(function(fileObject){
                     const { value: fileItem } = fileObject;
-                    const { "@id": fileAtID, workflow_run_output } = fileItem || {};
-                    const { "@id": outputOfWFRAtID } = workflow_run_output || {};
+                    const { "@id": fileAtID, workflow_run_outputs = [] } = fileItem || {};
+                    const [ { "@id": outputOfWFRAtID } = {} ] = workflow_run_outputs;
                     const sourceObject = { ...initialSource, "for_file": fileAtID };
                     if (outputOfWFRAtID) {
                         sourceObject.step = outputOfWFRAtID;
@@ -9603,23 +10576,52 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             const {
                 argument_name,
                 argument_type,
-                source: wfrSourceStepName,
+                source: mwfrSourceStepName,
                 source_argument_name,
                 file,
                 value: nonFileValue
             } = wfrOutputObject;
 
+            // Each file contains "workflow_run_outputs" (WFR it came from) + "workflow_run_inputs" (WFR it going to) (if applicable)
+            const [ outputFileObject ] = outputFileObjectsGroupedByArgName[argument_name] || [];
+
+            console.log("TTT2", outputFileObject, outputFileObjectsGroupedByArgName);
+
+            const initialTargetList = [];
             const initialTarget = {
                 "name": source_argument_name || argument_name
             };
 
-            const initialTargetList = [];
-            if (file) {
-                const { "@id": fileAtID } = file || {};
-                initialTargetList.push( { ...initialTarget, "for_file": fileAtID } );
+
+            if (outputFileObject) {
+                const { value: fileItem } = outputFileObject;
+                const { "@id": fileAtID, workflow_run_inputs = [] } = fileItem || {};
+                //const { "@id": outputOfWFRAtID } = workflow_run_output || {};
+                if (workflow_run_inputs.length > 0){
+                    workflow_run_inputs.forEach(function(inputOfWFR){
+                        const { "@id": inputOfWFRAtID } = inputOfWFR || {};
+                        // TODO: Exclude targets that aren't in MWFR.workflow_runs
+                        const targetObject = {
+                            ...initialTarget,
+                            "for_file": fileAtID,
+                            "step": inputOfWFRAtID
+                        };
+                        initialTargetList.push(targetObject);
+                    });
+                } else {
+                    initialTargetList.push({ ...initialTarget, "for_file": fileAtID });
+                }
             } else {
                 initialTargetList.push(initialTarget);
             }
+
+            // if (file) {
+            //     const { "@id": fileAtID } = file || {};
+            //     initialTargetList.push( { ...initialTarget, "for_file": fileAtID } );
+            // } else {
+            //     initialTargetList.push(initialTarget);
+            // }
+
 
             // TODO handle values other than file...
 
@@ -9643,8 +10645,8 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 }
             };
 
-            if (file) {
-                stepOutputObject.run_data.file = [ file ];
+            if (outputFileObject) {
+                stepOutputObject.run_data.file = [ outputFileObject.value ];
                 stepOutputObject.run_data.meta = [ { "type": "Output processed file" } ];
             }
 
