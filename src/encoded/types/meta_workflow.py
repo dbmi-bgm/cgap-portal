@@ -18,6 +18,8 @@ def _build_meta_workflow_run_embedded_list():
         # MetaWorkflow linkTo
         "meta_workflow.title",
         "meta_workflow.version",
+        "workflow_runs.workflow_run.input_files.workflow_run_inputs",
+        "workflow_runs.workflow_run.input_files.workflow_run_outputs"
     ]
 
 
