@@ -7,6 +7,26 @@ Change Log
 ----------
 
 
+11.0.0
+======
+
+**Nature of Breaking Change**
+
+This breaking change should not affect production builds or GA, but you should report problems if you see them. This change is intended only to affect developers who are doing local testing (e.g., ``make test`` or a call to ``pytest``) that would use ``test.ini`` or who are doing local deploys (e.g., ``make deploy1``) that would use ``development.ini``.
+
+Prior to this change, ``development.ini`` and ``test.ini`` were in source control. This PR chagnes this so that what's in source control is ``development.ini.template`` and ``test.ini.template``. There is a command introduced, ``prepare-local-dev`` that you can run to create a ``development.ini`` and ``test.ini``. Once the file exists, the ``prepare-local-dev`` command will not touch it, so you can do other edits as well without concern that they will get checked in. The primary change that this command does is to make a local environment of ``cgap-devlocal-<yourusername>`` or ``cgap-test-<yourusername>`` so that testing and debugging that you do locally will be in an environment that does not collide with other users. You can give a ``--env`` argument to ``prepare-local-dev`` to use a different name, though it's probably easier to just edit the resulting file.
+
+Changes made by this PR:
+
+* Renames ``development.ini`` to ``development.ini.template``, parameterizing ``env.name``.
+* Renames ``test.ini`` to ``test.ini.template``, parameterizing ``env.name``.
+* Adds new script ``prepare-local-dev``.
+* Adjusts ``Makefile`` to run the ``prepare-local-dev`` script in target ``build-after-poetry``.
+* Renames ``commands/prepare_docker.py`` to ``commands/prepare_template.py`` so that the two commands ``prepare-docker`` and ``prepare-local-dev`` can live in the same file. They do similar things.
+* There is no change to docker setup, since that already does ``make build``.
+* There is no change to GA workflows, since they already do ``make build``.
+
+
 10.2.2
 ======
 

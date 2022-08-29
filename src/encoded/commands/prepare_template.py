@@ -11,9 +11,14 @@ EPILOG = __doc__
 ROOT_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
 DOCKER_COMPOSE_FILE = os.path.join(ROOT_DIR, 'docker-compose.yml')
 DOCKER_DEVELOPMENT_INI_FILE = os.path.join(ROOT_DIR, "deploy/docker/local/docker_development.ini")
+DEVELOPMENT_INI_FILE = os.path.join(ROOT_DIR, "development.ini")
+TEST_INI_FILE = os.path.join(ROOT_DIR, "test.ini")
+
 
 DATA_SET_CHOICES = ['prod', 'test', 'local', 'deploy']
 DEFAULT_DATA_SET = 'local'
+
+DEFAULT_LOCAL_ENV = f"cgap-devlocal-{os.environ.get('USER', 'testuser')}"
 
 
 def empty_assignment(line, expanded):
@@ -49,7 +54,7 @@ def prepare_docker(data_set=DEFAULT_DATA_SET, load_inserts=False, run_tests=Fals
     prepare_from_template(DOCKER_DEVELOPMENT_INI_FILE)
 
 
-def main():
+def prepare_docker_main():
     parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
         description="Prepare docker files", epilog=EPILOG,
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -62,8 +67,8 @@ def main():
                         help="if supplied, causes tests to be run in container (default: not tested)")
     parser.add_argument('--s3-encrypt-key-id', default=None,
                         help="an encrypt key id (default: None)")
-
     args = parser.parse_args()
+
     logging.basicConfig()
     prepare_docker(data_set=args.data_set,
                    load_inserts=args.load_inserts,
@@ -71,5 +76,27 @@ def main():
                    s3_encrypt_key_id=args.s3_encrypt_key_id)
 
 
-if __name__ == '__main__':
-    main()
+def prepare_local_dev(env_name=DEFAULT_LOCAL_ENV, force=False):
+    extra_vars = {
+        "ENV_NAME": env_name,
+    }
+    prepare_from_template = template_creator(extra_vars)
+    for file in [TEST_INI_FILE, DEVELOPMENT_INI_FILE]:
+        if force or not os.path.exists(file):
+            prepare_from_template(file, expect_change=True)
+
+
+def prepare_local_dev_main():
+    parser = argparse.ArgumentParser(  # noqa - PyCharm wrongly thinks the formatter_class is specified wrong here.
+        description="Prepare files used for local development (test.ini and development.ini)", epilog=EPILOG,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("--env", default=DEFAULT_LOCAL_ENV,
+                        help=f"the environment to use for local testing and debugging (default: {DEFAULT_LOCAL_ENV})")
+    parser.add_argument("--force", default=False, action="store_true",
+                        help="forces creation of a development.ini and test.ini even if they already exist."
+                             " By default, creation is skipped for any file that already exists.")
+    args = parser.parse_args()
+
+    logging.basicConfig()
+    prepare_local_dev(env_name=args.env, force=args.force)
