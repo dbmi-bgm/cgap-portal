@@ -3,7 +3,7 @@ import os
 
 import logging
 from dcicutils.deployment_utils import create_file_from_template
-from dcicutils.misc_utils import ignored
+from dcicutils.misc_utils import ignored, PRINT
 
 EPILOG = __doc__
 
@@ -82,8 +82,14 @@ def prepare_local_dev(env_name=DEFAULT_LOCAL_ENV, force=False):
     }
     prepare_from_template = template_creator(extra_vars)
     for file in [TEST_INI_FILE, DEVELOPMENT_INI_FILE]:
-        if force or not os.path.exists(file):
+        exists = os.path.exists(file)
+        if not exists or force:
+            reason = "it doesn't exist" if not exists else "--force was given to prepare-local-dev"
+            PRINT(f"{'Recreating' if exists else 'Creating'} {file} because {reason} ...")
             prepare_from_template(file, expect_change=True)
+            PRINT(f"{'Recreated' if exists else 'Created'} {file}.")
+        else:
+            PRINT(f"The file {file} already exists and will not be changed.")
 
 
 def prepare_local_dev_main():
