@@ -42,7 +42,7 @@ def prepare_docker(data_set=DEFAULT_DATA_SET, load_inserts=False, run_tests=Fals
         "DATA_SET": data_set,
         "LOAD_INSERTS": "true" if load_inserts else "",
         "RUN_TESTS": "true" if run_tests else "",
-        "S3_ENCRYPT_KEY_ID": s3_encrypt_key_id,
+        "S3_ENCRYPT_KEY_ID": s3_encrypt_key_id or "",
     }
     prepare_from_template = template_creator(extra_vars)
     prepare_from_template(DOCKER_COMPOSE_FILE, expect_change=True)
