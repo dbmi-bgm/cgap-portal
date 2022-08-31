@@ -14,7 +14,6 @@ from webtest import AppError
 
 from .util import s3_local_file
 
-
 log = structlog.getLogger(__name__)
 
 GENERIC_FIELD_MAPPINGS = (
@@ -251,12 +250,19 @@ def use_abbrev(value):
 
 
 def get_column_name(row, columns):
-    """
-    For cases where there is a variation on a particular column name.
-    Final column in list must be the default name.
+    """Get header in row when multiple headers exist for the field.
+
+    Defaults to last header given.
+
+    :param row: Spreadsheet row, headers mapped to values
+    :type row: dict
+    :param columns: Header names possible for the desired value
+    :type columns: list(str)
+    :returns: Header found in row (or last header given)
+    :rtype: str
     """
     for col in columns:
-        if row.get(col):
+        if row.get(col) is not None:
             return col
     return columns[-1]
 
@@ -802,37 +808,51 @@ class AccessionMetadata:
             '111': (['proband', 'mother', 'father'], ['WGS', 'WGS', 'WGS']),  # --> WGS-Trio
             '222': (['proband'], ['WES']),                                    # --> WES
             '333': (['proband', 'father', 'sibling'], ['WGS', 'WGS', 'WGS']), # --> WGS-Group
-            '234': (['proband', 'mother'], ['WGS', 'WES']),                   # --> None
+            '234': (['proband', 'mother'], ['WGS', 'WES']),                   # --> WES/WGS-Group
         }
-        The last entry in the dict will get an analysis_type of None because the workup types are mixed which is
-        not allowed.
         """
         analysis_relations = {}
         analysis_types = {}
-        for row in self.row_data_dicts:
+        for row, row_index in self.rows:
             analysis_relations.setdefault(row.get(SS_ANALYSIS_ID), [[], []])
             analysis_relations[row.get(SS_ANALYSIS_ID)][0].append(
                 row.get(SS_RELATION, "").lower()
             )
             workup_col = get_column_name(row, ["test requested", "workup type"])
-            analysis_relations[row.get(SS_ANALYSIS_ID)][1].append(
-                row.get(workup_col, "").upper()
-            )
-            # dict now has format {analysis id: (relations list, workup types list)}
-        for k, v in analysis_relations.items():
-            workups = list(set(v[1]))
-            relations = v[0]
-            if len(workups) == 1 and "" not in workups:
-                # if all samples in analysis have same workup type, determine if it is Trio or Group
-                if len(relations) == 1:
-                    [analysis_types[k]] = workups
-                elif sorted(relations) == ["father", "mother", "proband"]:
-                    analysis_types[k] = f"{workups[0]}-Trio"
-                else:
-                    analysis_types[k] = f"{workups[0]}-Group"
-            else:  # analysis type not determined if multiple workup types present in one analysis
-                analysis_types[k] = None
+            workup_value = row.get(workup_col, "").upper()
+            if not workup_value:
+                msg = (
+                    f'Row {row_index} - missing required field "{workup_col}".'
+                    f" Please re-submit with appropriate value."
+                )
+                self.errors.append(msg)
+            analysis_relations[row.get(SS_ANALYSIS_ID)][1].append(workup_value)
+        for analysis_id, (relations, workup_types) in analysis_relations.items():
+            workups = sorted(list(set(item for item in workup_types if item)))
+            analysis_type_add_on = self.get_analysis_type_add_on(relations)
+            if workups:
+                workup_name = "/".join(workups)
+                analysis_type = workup_name + analysis_type_add_on
+            else:
+                analysis_type = None
+            analysis_types[analysis_id] = analysis_type
         return analysis_types
+
+    def get_analysis_type_add_on(self, relations):
+        """Get analysis type label based on relations.
+
+        :param relations: Relations across the case submission
+        :type relations: list
+        :returns: Analysis type label
+        :rtype: str
+        """
+        if relations == ["proband"]:
+            result = ""
+        elif sorted(relations) == ["father", "mother", "proband"]:
+            result = "-Trio"
+        else:
+            result = "-Group"
+        return result
 
     def add_metadata_single_item(self, item):
         """
@@ -1061,7 +1081,6 @@ class AccessionMetadata:
         Case creation and family relations added after all rows have been processed.
         """
         file_parser = SubmittedFilesParser(self.virtualapp, self.project)
-        self.get_analysis_types()
         for (row, row_number) in self.rows:
             try:
                 fam = self.family_dict[row.get("analysis id")]
