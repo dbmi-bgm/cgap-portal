@@ -7,6 +7,16 @@ Change Log
 ----------
 
 
+10.2.3
+======
+
+`PR 631: SV Confidence Pop-overs <https://github.com/dbmi-bgm/cgap-portal/pull/631>`_
+
+* Add pop-over to the confidence class facet on ``StructuralVariantSamples``
+  with links to the more thorough documentation available
+  via the pipeline repos.
+
+
 10.2.2
 ======
 
