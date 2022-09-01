@@ -7,6 +7,14 @@ Change Log
 ----------
 
 
+10.2.3
+======
+
+`PR 641: Pin poetry 1.1.15 <https://github.com/dbmi-bgm/cgap-portal/pull/641>`_
+
+* Fixed broken hyperlinks in static documentation pages, updating links as necessary.
+
+
 10.2.2
 ======
 
