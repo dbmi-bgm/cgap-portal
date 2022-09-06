@@ -7,6 +7,13 @@ Change Log
 ----------
 
 
+10.3.1
+======
+
+* Fix a bug in ``prepare-local-dev`` script.
+* Cosmetic changes to Dockerfile to bring in line with Fourfront.
+
+
 10.3.0
 ======
 
