@@ -86,7 +86,6 @@ ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
     rm -rf node_modules/ && \
-    npm prune --production && \
     apt-get remove --purge --auto-remove -y ca-certificates
 
 # Copy config files in (down here for quick debugging)
