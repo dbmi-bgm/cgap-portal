@@ -69,7 +69,6 @@ COPY poetry.lock .
 RUN poetry install --no-root --no-dev
 
 # Do the front-end dependency install
-ENV NODE_ENV=production
 COPY package.json .
 COPY package-lock.json .
 RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python
@@ -83,9 +82,11 @@ RUN poetry install --no-dev -vvv && \
     make fix-dist-info
 
 # Build front-end, remove node_modules when done
+ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
     rm -rf node_modules/ && \
+    npm prune --production && \
     apt-get remove --purge --auto-remove -y ca-certificates
 
 # Copy config files in (down here for quick debugging)
