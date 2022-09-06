@@ -10,12 +10,16 @@ Change Log
 10.3.1
 ======
 
-* Fix a bug in ``prepare-local-dev`` script.
+`PR 642: Fix problems in development.init.template and test.ini.template <https://github.com/dbmi-bgm/cgap-portal/pull/642>`_
+
+* Fix a bug in ``prepare-local-dev`` script (C4-907).
 * Cosmetic changes to Dockerfile to bring in line with Fourfront.
 
 
 10.3.0
 ======
+
+`PR 637: Manage development.ini and test.ini outside of source control <https://github.com/dbmi-bgm/cgap-portal/pull/637>`_
 
 Changes made by this PR:
 
