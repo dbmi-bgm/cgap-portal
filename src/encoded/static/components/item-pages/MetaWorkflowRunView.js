@@ -14,26 +14,8 @@ import Graph, { parseAnalysisSteps, parseBasicIOAnalysisSteps } from '@hms-dbmi-
 import { WorkflowDetailPane } from './components/Workflow/WorkflowDetailPane';
 import { WorkflowNodeElement } from './components/Workflow/WorkflowNodeElement';
 import { WorkflowGraphSectionControls } from './components/Workflow/WorkflowGraphSectionControls';
-
 import DefaultItemView from './DefaultItemView';
 
-
-/**
- * Pass this to props.onNodeClick for Graph.
- *
- * @export
- * @param {Object} node - Node clicked on.
- * @param {Object|null} selectedNode - Node currently selected, if any.
- * @param {MouseEvent} evt - onClick MouseEvent.
- */
-export function onItemPageNodeClick(node, selectedNode, evt){
-    var navOpts = { 'inPlace' : true, 'skipRequest' : true, 'replace' : true };
-    if (node !== selectedNode){
-        navigate('#' + (node.id || node.name), navOpts);
-    } else {
-        navigate('#', navOpts);
-    }
-}
 
 export function checkIfIndirectOrReferenceNodesExist(steps){
     const graphData = parseAnalysisSteps(steps, { 'showIndirectFiles' : true, 'showReferenceFiles' : true });
@@ -2852,6 +2834,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "parameters": [
+                    {
+                        "value": "15",
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "nthreads"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -3179,6 +3169,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "workflow_argument_name": "regions"
                     }
                 ],
+                "parameters": [
+                    {
+                        "value": "15",
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "nthreads"
+                    }
+                ],
                 "principals_allowed": {
                     "view": [
                         "system.Authenticated"
@@ -3504,6 +3502,14 @@ const TEMPORARY_DUMMY_CONTEXT = {
                         "ordinal": 1,
                         "dimension": "0",
                         "workflow_argument_name": "regions"
+                    }
+                ],
+                "parameters": [
+                    {
+                        "value": "15",
+                        "ordinal": 1,
+                        "dimension": "0",
+                        "workflow_argument_name": "nthreads"
                     }
                 ],
                 "principals_allowed": {
@@ -10367,10 +10373,11 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
     const {
         workflow_runs = [],
         meta_workflow = {},
-        input:  mwfrInputList = []
+        // No longer used
+        // input:  mwfrInputList = []
     } = metaWorkflowRunItem;
 
-    const { workflows = [], input: mwfInputList = [] } = meta_workflow;
+    const { workflows = [] } = meta_workflow;
     const workflowsByName = {};
     workflows.forEach(function(workflow){
         const { name } = workflow;
@@ -10382,32 +10389,32 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
         const { name } = workflowRun;
         const workflowForRun = workflowsByName[name];
         return {
-            // Deep-copy (or selectively deep copy), else "input" lists/objects from workflow
-            // will be shared.
+            // Deep-copy (or selectively deep copy), else "input" list/object references from workflow
+            // will be shared between different runs of same workflow.
             ...JSON.parse(JSON.stringify(workflowForRun)),
             ...workflowRun
         };
     });
 
-    console.log("TTTT3", combinedMWFRs);
-
     const incompleteSteps = combinedMWFRs.map(function(workflowRunObject){
         const {
-            name,
+            // This 'name' is same as workflow name, we don't use it because want unique name/identifier for each step.
+            // name,
             workflow,
             workflow_run: {
+                display_title,
                 "@id": workflowRunAtID,
                 input_files: wfrItemInputFileObjects,
-                output_files: wfrItemOutputFileObjects
+                output_files: wfrItemOutputFileObjects,
+                parameters: wfrItemInputParameters
             },
-            input,
+            input = [],
             output = []
         } = workflowRunObject;
 
-        const inputFileObjectsGroupedByArgName = _.groupBy(wfrItemInputFileObjects, "workflow_argument_name");
+        const inputFileObjectsGroupedByArgName  = _.groupBy(wfrItemInputFileObjects, "workflow_argument_name");
+        const inputParametersGroupedByArgName   = _.groupBy(wfrItemInputParameters, "workflow_argument_name");
         const outputFileObjectsGroupedByArgName = _.groupBy(wfrItemOutputFileObjects, "workflow_argument_name");
-
-        const { "@id": workflowAtID } = workflow || {};
 
         const initialStep = {
             // name,
@@ -10415,6 +10422,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             "meta": {
                 "@id": workflowRunAtID,
                 workflow,
+                display_title,
                 "analysis_types": "dummy analysis type",
             },
             "inputs": [],
@@ -10429,23 +10437,19 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 source: mwfrSourceStepName,
                 source_argument_name,
                 // files = [],
-                value: nonFileValue
+                // value: nonFileValue
             } = wfrObjectInputObject;
 
             // Each file contains "workflow_run_outputs" (WFR it came from) + "workflow_run_inputs" (WFR it going to) (if applicable)
             const filesForThisInput = inputFileObjectsGroupedByArgName[argument_name] || [];
             const filesLen = filesForThisInput.length;
 
+            const parametersForThisInput = inputParametersGroupedByArgName[argument_name] || [];
+            const paramsLen = parametersForThisInput.length;
+
             const initialSource = {
                 "name": source_argument_name || argument_name
             };
-
-            // if (wfrSourceStepName) {
-            //     // TODO Make it workflow_run @id....
-            //     initialSource.step = wfrSourceStepName;
-            //     // Maybe include later if needed:
-            //     // initialSource.workflow = workflowAtID;
-            // }
 
             const initialSourceList = [];
 
@@ -10464,6 +10468,8 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 initialSourceList.push(initialSource);
             }
 
+            const isParameter = argument_type === "parameter";
+
             let isReferenceFileInput = false;
             if (filesLen > 0) {
                 isReferenceFileInput = _.every(filesForThisInput, function(fileObject){
@@ -10473,18 +10479,19 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 });
             }
 
-            // const initialSourceList = [ initialSource ];
-            // TODO: Add "for_file", subdivide sources per file
             const stepInputObject = {
                 "name": argument_name,
                 "source": initialSourceList,
                 "meta": {
                     // TODO: Reconsider this evaluation of "global"
                     "global": !mwfrSourceStepName,
-                    // "in_path": ???,
+                    // TODO: It seems all MWFR output files provided are 'in-path' and we don't see the indirect files
+                    // in the MWFR.workflow_runs.outputs. If this changes (or is currently inaccurate) maybe we can infer or
+                    // have "in_path=false" added to those outputs and then enable the "Show Indirect Files" checkbox.
+                    "in_path": true,
                     "type": (
                         // Don't need to set QC or report for input... I think...
-                        argument_type === "parameter" ? "parameter"
+                        isParameter ? "parameter"
                             : isReferenceFileInput ? "reference file"
                                 : filesLen > 0 ? "data file"
                                     : null
@@ -10492,7 +10499,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                     // "cardinality": // TODO maybe
                 },
                 "run_data": {
-                    "type": "input"
+                    "type": isParameter ? "parameter" : "input"
                 }
             };
 
@@ -10501,9 +10508,12 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 stepInputObject.run_data.meta = filesForThisInput.map(function({ value, ...remainingProperties }){
                     return remainingProperties;
                 });
-            } else if (typeof nonFileValue !== "undefined") {
-                stepInputObject.run_data.value = [ nonFileValue ];
-                stepInputObject.run_data.meta = [ { "ordinal": 1 } ];
+            } else if (paramsLen > 0) { // WorkflowViz supports only 1 parameter per input argument at time being.
+                const [ firstParameterObject ] = parametersForThisInput;
+                const { value, ...remainingFirstParameterObjectProperties } = firstParameterObject;
+                // We can have multiple values but only 1 'meta' object.
+                stepInputObject.run_data.value = _.pluck(parametersForThisInput, "value");
+                stepInputObject.run_data.meta = remainingFirstParameterObjectProperties;
             }
 
             initialStep.inputs.push(stepInputObject);
@@ -10597,12 +10607,48 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
 
     });
 
-    // TODO:
-    // Create mirrored "target" with "target step"
-
-    console.log("TTT4", incompleteSteps);
-
     return incompleteSteps;
+}
+
+/**
+ * Converts all step names (and sources/targets' step names) to integers.
+ *
+ * @todo Improve if needed.
+ * @todo Move into ReactWorkflowViz project.
+ */
+function identifiersToIntegers(steps){
+    const nameDict = {};
+
+    function convertNameToInt(name){
+        let returnInt;
+        const existingInt = nameDict[name];
+        if (typeof existingInt === "undefined") {
+            // Start count from 1.
+            returnInt = nameDict[name] = Object.keys(nameDict).length + 1;
+        } else {
+            returnInt = existingInt;
+        }
+        return returnInt;
+    }
+
+    steps.forEach(function(step){
+        const { name, inputs = [], outputs = [] } = step;
+        step.name = convertNameToInt(name);
+        inputs.forEach(function({ source = [] }){
+            source.forEach(function(sourceEntry){
+                if (!sourceEntry.step) return;
+                sourceEntry.step = convertNameToInt(sourceEntry.step);
+            });
+        });
+        outputs.forEach(function({ target = [] }){
+            target.forEach(function(targetEntry){
+                if (!targetEntry.step) return;
+                targetEntry.step = convertNameToInt(targetEntry.step);
+            });
+        });
+
+    });
+    return steps;
 }
 
 
@@ -10611,11 +10657,13 @@ function MetaWorkflowRunDataTransformer(props){
     // TODO: parse context.workflow_runs, context.meta_workflow, context.input, etc...
 
     const steps = useMemo(function(){
-        return transformMetaWorkflowRunToSteps(TEMPORARY_DUMMY_CONTEXT);
+        return identifiersToIntegers(transformMetaWorkflowRunToSteps(TEMPORARY_DUMMY_CONTEXT));
     }, [ TEMPORARY_DUMMY_CONTEXT ]);
 
     return React.cloneElement(children, { steps });
 }
+
+
 
 
 
@@ -10628,7 +10676,10 @@ export class WorkflowGraphSection extends React.PureComponent {
         this.parseAnalysisSteps = this.parseAnalysisSteps.bind(this);
         this.onToggleShowParameters     = _.throttle(this.onToggleShowParameters.bind(this), 1000);
         this.onToggleReferenceFiles     = _.throttle(this.onToggleReferenceFiles.bind(this), 1000);
+        this.onToggleIndirectFiles      = _.throttle(this.onToggleIndirectFiles.bind(this), 1000);
         this.onChangeRowSpacingType     = _.throttle(this.onChangeRowSpacingType.bind(this), 1000, { trailing : false });
+        this.renderDetailPane = this.renderDetailPane.bind(this);
+        this.renderNodeElement = this.renderNodeElement.bind(this);
 
         this.memoized = {
             parseAnalysisSteps : memoize(parseAnalysisSteps),
@@ -10639,13 +10690,14 @@ export class WorkflowGraphSection extends React.PureComponent {
             'showParameters' : false,
             'showReferenceFiles' : false,
             'rowSpacingType' : 'compact',
+            'showIndirectFiles': false
         };
     }
 
 
     parseAnalysisSteps(steps){
-        const { showReferenceFiles, showParameters } = this.state;
-        const parsingOptions = { showReferenceFiles, showParameters };
+        const { showReferenceFiles, showParameters, showIndirectFiles } = this.state;
+        const parsingOptions = { showReferenceFiles, showParameters, "showIndirectFiles": true };
         return this.memoized.parseAnalysisSteps(steps, parsingOptions);
     }
 
@@ -10669,7 +10721,9 @@ export class WorkflowGraphSection extends React.PureComponent {
         return {
             ...commonGraphProps,
             ...graphData,
-            rowSpacingType
+            rowSpacingType,
+            renderDetailPane: this.renderDetailPane,
+            renderNodeElement: this.renderNodeElement
         };
     }
 
@@ -10685,40 +10739,62 @@ export class WorkflowGraphSection extends React.PureComponent {
         });
     }
 
+    onToggleIndirectFiles(){
+        this.setState(function({ showIndirectFiles }){
+            return { 'showIndirectFiles' : !showIndirectFiles };
+        });
+    }
+
     onChangeRowSpacingType(eventKey, evt){
         this.setState(function({ rowSpacingType }){
-            console.log("TTT", eventKey, rowSpacingType);
             if (eventKey === rowSpacingType) return null;
             return { 'rowSpacingType' : eventKey };
         });
     }
 
+    renderNodeElement(node, graphProps){
+        const { windowWidth, schemas } = this.props;
+        return <WorkflowNodeElement {...graphProps} schemas={schemas} windowWidth={windowWidth} node={node}/>;
+    }
+
+    renderDetailPane(node, graphProps){
+        const { context, schemas } = this.props;
+        return <WorkflowDetailPane {...graphProps} {...{ context, node, schemas }} />;
+    }
+
     render(){
-        const { rowSpacingType, showParameters, showReferenceFiles } = this.state;
+        const { rowSpacingType, showParameters, showReferenceFiles, showIndirectFiles } = this.state;
         const { context, mounted, width, steps = [] } = this.props;
         const { anyIndirectPathIONodes, anyReferenceFileNodes } = this.memoized.checkIfIndirectOrReferenceNodesExist(context.steps);
 
         let body = null;
-
-        if (!Array.isArray(steps)) {
+        if (!Array.isArray(steps) || !mounted) {
             body = null;
         } else {
-            body = <Graph { ...this.commonGraphProps() } />;
+            body = (
+                <Graph { ...this.commonGraphProps() } />
+            );
         }
-
-        console.log("ROWSPACING", rowSpacingType);
 
         return (
             <div className="tabview-container-fullscreen-capable workflow-view-container workflow-viewing-detail">
-                <h3 className="tab-section-title">
+                <h3 className="tab-section-title container-wide">
                     <span>Graph</span>
                     <WorkflowGraphSectionControls
                         {..._.pick(this.props, 'context', 'href', 'windowWidth')}
-                        showChartType="detail" rowSpacingType={rowSpacingType} showParameters={showParameters}
+                        showChartType="detail"
+                        rowSpacingType={rowSpacingType}
+                        // Parameters are available but not visualized because of high number of them
+                        // In future, need to adjust ReactWorkflowViz parsing code to re-use paramater nodes
+                        // of same value and same/similar target, if possible.
+                        // showParameters={showParameters}
                         showReferenceFiles={showReferenceFiles}
+                        // `showIndirectFiles=false` doesn't currently work in parsing for MWFRs, needs research.
+                        // showIndirectFiles={showIndirectFiles}
                         onRowSpacingTypeSelect={this.onChangeRowSpacingType}
-                        onToggleShowParameters={this.onToggleShowParameters}
+                        // onToggleShowParameters={this.onToggleShowParameters}
                         onToggleReferenceFiles={this.onToggleReferenceFiles}
+                        // onToggleIndirectFiles={this.onToggleIndirectFiles}
                         isReferenceFilesCheckboxDisabled={!anyReferenceFileNodes}
                     />
                 </h3>

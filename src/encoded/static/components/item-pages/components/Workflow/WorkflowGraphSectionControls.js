@@ -9,15 +9,24 @@ import { CollapsibleItemViewButtonToolbar } from './../CollapsibleItemViewButton
 
 export const WorkflowGraphSectionControls = React.memo(function WorkflowGraphSectionControls(props){
     const {
-        showReferenceFiles,
-        onToggleReferenceFiles, windowWidth,
+        showReferenceFiles, showParameters, showIndirectFiles,
+        onToggleReferenceFiles, onToggleShowParameters, onToggleIndirectFiles,
+        windowWidth,
         rowSpacingType, onRowSpacingTypeSelect,
         includeAllRunsInSteps, toggleAllRuns, isLoadingGraphSteps
     } = props;
     return (
         <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
             <ShowAllRunsCheckbox checked={includeAllRunsInSteps} onChange={toggleAllRuns} disabled={isLoadingGraphSteps} />
-            <ReferenceFilesCheckbox checked={showReferenceFiles} onChange={onToggleReferenceFiles} />
+            { typeof showReferenceFiles === "boolean" ?
+                <ReferenceFilesCheckbox checked={showReferenceFiles} onChange={onToggleReferenceFiles} />
+                : null }
+            { typeof showParameters === "boolean" ?
+                <ParametersFileCheckbox checked={showParameters} onChange={onToggleShowParameters} />
+                : null }
+            { typeof showIndirectFiles === "boolean" ?
+                <IndirectFilesCheckbox checked={showIndirectFiles} onChange={onToggleIndirectFiles} />
+                : null }
             {/* <IndirectFilesCheckbox checked={showIndirectFiles} onChange={onParsingOptChange} /> */}
             <RowSpacingTypeSelect rowSpacingType={rowSpacingType} onSelect={onRowSpacingTypeSelect} />
         </CollapsibleItemViewButtonToolbar>
@@ -75,4 +84,13 @@ function ShowAllRunsCheckbox({ checked, onChange, disabled }){
     );
 }
 
-
+function ParametersFileCheckbox({ checked, onChange, disabled }) {
+    if (typeof onChange !== 'function') return null;
+    if (typeof checked === 'undefined') return null;
+    return (
+        <Checkbox checked={checked} onChange={onChange} disabled={disabled || checked === null}
+            className="checkbox-container for-state-showParameters" name="showParameters">
+            Parameters
+        </Checkbox>
+    );
+}

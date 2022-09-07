@@ -29,11 +29,9 @@ export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView
     if (!Array.isArray(graphSteps) || graphSteps.length === 0){
         return (
             <div>
-                <div className="container-wide">
-                    <h3 className="tab-section-title">
-                        { heading }
-                    </h3>
-                </div>
+                <h3 className="tab-section-title container-wide">
+                    { heading }
+                </h3>
                 <hr className="tab-section-title-horiz-divider mb-5"/>
                 <div className="container-wide text-center">
                     { isLoadingGraphSteps?
@@ -57,16 +55,14 @@ export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView
 
     return (
         <div>
-            <div className="container-wide">
-                <h3 className="tab-section-title">
-                    { heading }
-                    <WorkflowGraphSectionControls
-                        {...{ rowSpacingType, toggleAllRuns, isLoadingGraphSteps, windowWidth, onRowSpacingTypeSelect, onParsingOptChange }}
-                        parsingOptions={parsingOptionsForControls}
-                        includeAllRunsInSteps={anyGroupNodes || includeAllRunsInSteps ? includeAllRunsInSteps : null}
-                        rowSpacingTitleMap={ProvenanceGraphOptionsStateController.rowSpacingTitleMap} />
-                </h3>
-            </div>
+            <h3 className="tab-section-title container-wide">
+                { heading }
+                <WorkflowGraphSectionControls
+                    {...{ rowSpacingType, toggleAllRuns, isLoadingGraphSteps, windowWidth, onRowSpacingTypeSelect, onParsingOptChange }}
+                    parsingOptions={parsingOptionsForControls}
+                    includeAllRunsInSteps={anyGroupNodes || includeAllRunsInSteps ? includeAllRunsInSteps : null}
+                    rowSpacingTitleMap={ProvenanceGraphOptionsStateController.rowSpacingTitleMap} />
+            </h3>
             <hr className="tab-section-title-horiz-divider"/>
             <GraphParser parsingOptions={parsingOptsForGraph} parentItem={lastStep} steps={graphSteps}>
                 <Graph {...graphProps} />

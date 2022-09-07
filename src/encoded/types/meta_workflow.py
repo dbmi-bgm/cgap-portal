@@ -19,12 +19,20 @@ def _build_meta_workflow_run_embedded_list():
         "meta_workflow.title",
         "meta_workflow.version",
         # "workflow_runs.workflow_run.input_files.value.workflow_run_inputs.@id",
+
+        # When part of `input_files`, `value` is a File linkTo/embed
         "workflow_runs.workflow_run.input_files.value.workflow_run_outputs.@id",
         "workflow_runs.workflow_run.input_files.value.quality_metric.overall_quality_status",
         "workflow_runs.workflow_run.input_files.value.file_size",
         "workflow_runs.workflow_run.input_files.value.file_format",
         "workflow_runs.workflow_run.input_files.workflow_argument_name",
         "workflow_runs.workflow_run.input_files.*",
+
+        # When part of `parameters`, `value` is a string (maybe number)
+        # Removed for now, until we maybe update ReactWorkflowViz to re-use param nodes. Not high priority.
+        # "workflow_runs.workflow_run.parameters.value",
+        # "workflow_runs.workflow_run.parameters.workflow_argument_name",
+        # "workflow_runs.workflow_run.parameters.*",
 
         "workflow_runs.workflow_run.output_files.value.workflow_run_inputs.@id",
         "workflow_runs.workflow_run.output_files.value.quality_metric.overall_quality_status",
