@@ -7,6 +7,59 @@ Change Log
 ----------
 
 
+10.3.1
+======
+
+`PR 642: Fix problems in development.init.template and test.ini.template <https://github.com/dbmi-bgm/cgap-portal/pull/642>`_
+
+* Fix a bug in ``prepare-local-dev`` script (C4-907).
+* Cosmetic changes to Dockerfile to bring in line with Fourfront.
+
+
+10.3.0
+======
+
+`PR 637: Manage development.ini and test.ini outside of source control <https://github.com/dbmi-bgm/cgap-portal/pull/637>`_
+
+Changes made by this PR:
+
+* Renames ``development.ini`` to ``development.ini.template``, parameterizing ``env.name``.
+* Renames ``test.ini`` to ``test.ini.template``, parameterizing ``env.name``.
+* Adds new script ``prepare-local-dev``.
+* Adjusts ``Makefile`` to run the ``prepare-local-dev`` script in target ``build-after-poetry``.
+* Renames ``commands/prepare_docker.py`` to ``commands/prepare_template.py``
+  so that the two commands ``prepare-docker`` and ``prepare-local-dev`` can live in the same file.
+  They do similar things.
+* There is no change to docker setup, since that already does ``make build``.
+* There is no change to GA workflows, since they already do ``make build``.
+
+**Special Notes for Developers**
+
+This change should **not** affect production builds or GA. You should report problems if you see them.
+
+This change might affect developers who are doing local testing
+(e.g., ``make test`` or a call to ``pytest``) that would use ``test.ini``
+or who are doing local deploys (e.g., ``make deploy1``) that would use ``development.ini``.
+
+Prior to this change, ``development.ini`` and ``test.ini`` were in source control.
+This PR chagnes this so that what's in source control is ``development.ini.template`` and ``test.ini.template``.
+There is a command introduced, ``prepare-local-dev`` that you can run to create a ``development.ini``
+and ``test.ini``. Once the file exists, the ``prepare-local-dev`` command will not touch it,
+so you can do other edits as well without concern that they will get checked in.
+The primary change that this command does is to make a local environment of ``cgap-devlocal-<yourusername>``
+or ``cgap-test-<yourusername>`` so that testing and debugging that you do locally will be in an environment
+that does not collide with other users. To use a different name, though, just edit the resulting file,
+which is no longer in source control.
+
+
+10.2.3
+======
+
+`PR 641: Pin poetry 1.1.15 <https://github.com/dbmi-bgm/cgap-portal/pull/641>`_
+
+* Fixed broken hyperlinks in static documentation pages, updating links as necessary.
+
+
 10.2.2
 ======
 
@@ -112,7 +165,7 @@ New Features:
 
 Compatible Changes and Bug Fixes:
 
-* Changes to buckets used for testing in `test.ini`.
+* Changes to buckets used for testing in ``test.ini``.
 
   * ``file_upload_bucket = cgap-unit-testing-files`` (formerly ``elasticbeanstalk-encoded-4dn-files``)
   * ``blob_bucket = cgap-unit-testing-blobs`` (formerly ``elasticbeanstalk-encoded-4dn-blobs``)
@@ -135,7 +188,7 @@ Small Additional Changes:
 
 `PR 622: VS: row tracking <https://github.com/dbmi-bgm/cgap-portal/pull/622>`_
 
-* Solving the row tracking issue in `SpreadsheetProcessing` class within `src/encoded/submit.py`,
+* Solving the row tracking issue in ``SpreadsheetProcessing`` class within ``src/encoded/submit.py``,
   which is used when processing spreadsheets for accession submissions (cases)
   and pedigree submissions (family histories).
 
