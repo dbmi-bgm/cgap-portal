@@ -45,7 +45,9 @@ configure:  # does any pre-requisite installs
 	@#pip install --upgrade pip==21.0.1
 	pip install --upgrade pip
 	@#pip install poetry==1.1.9  # this version is known to work. -kmp 11-Mar-2021
-	pip install poetry
+	# Pin to version 1.1.15 for now to avoid this error:
+	#   Because encoded depends on wheel (>=0.29.0) which doesn't match any versions, version solving failed.
+	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
@@ -86,6 +88,7 @@ build-after-poetry:  # continuation of build after poetry install
 	make npm-setup-if-needed
 	poetry run python setup_eb.py develop
 	make fix-dist-info
+	poetry run prepare-local-dev
 
 fix-dist-info:
 	@scripts/fix-dist-info
@@ -178,10 +181,10 @@ remote-test:  # Actually, we don't normally use this. Instead the GA workflow se
 	make remote-test-npm
 
 remote-test-npm:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -vv -r w --instafail --force-flaky --max-runs=3 --timeout=400 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -vv -r w --instafail --force-flaky --max-runs=2 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
 
 remote-test-unit:  # Note this does the 'indexing' tests
-	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update

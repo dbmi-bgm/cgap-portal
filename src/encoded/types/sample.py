@@ -23,11 +23,6 @@ def _build_sample_embedded_list():
         "files.accession",
 
         # File linkTo
-        "cram_files.status",
-        "cram_files.accession",
-        "cram_files.file_format.file_format",
-
-        # File linkTo
         "processed_files.accession",
         "processed_files.file_format.file_format",
         "processed_files.workflow_run_outputs.@id"
@@ -88,8 +83,8 @@ def _build_sample_processing_embedded_list():
         "processed_files.accession",  # used to locate this file from annotated VCF via search
         "processed_files.variant_type",
         "processed_files.file_type",
-        "processed_files.upload_key", # used by Higlass browsers
-        "processed_files.higlass_file", # used by Higlass browsers
+        "processed_files.upload_key",  # used by Higlass browsers
+        "processed_files.higlass_file",  # used by Higlass browsers
 
         # Sample linkTo
         "samples.completed_processes",

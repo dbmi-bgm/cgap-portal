@@ -6,7 +6,8 @@ import pytest
 import tempfile
 
 from unittest import mock
-from dcicutils.qa_utils import ControlledTime, ignored
+from dcicutils.misc_utils import ignored
+from dcicutils.qa_utils import ControlledTime
 from ..util import (
     debuglog,
     deduplicate_list,
