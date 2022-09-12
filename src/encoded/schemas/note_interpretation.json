@@ -44,8 +44,8 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "2",
-            "notes": "v2 renamed approved_date to date_approved in note.json"
+            "default": "3",
+            "notes": "v2 renamed approved_date to date_approved in note.json; v3 added 'is_saved_to_project'"
         },
         "classification": {
             "title": "Classification",

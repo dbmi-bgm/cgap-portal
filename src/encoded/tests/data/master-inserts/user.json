@@ -353,6 +353,23 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
+        "email": "victoria_stevens@hms.harvard.edu",
+        "first_name": "Victoria",
+        "last_name": "Stevens",
+        "uuid": "e34b090e-aa4e-494c-9bb3-79d0dbce0355",
+        "groups": [
+            "admin"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [
+            {
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                "role": "developer"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
         "email": "shannon_ehmsen@hms.harvard.edu",
         "first_name": "Shannon",
         "last_name": "Ehmsen",
@@ -385,5 +402,23 @@
             }
         ],
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
+        "email": "david_michaels@hms.harvard.edu",
+        "groups": [
+            "admin"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "timezone": "US/Eastern",
+        "last_name": "Michaels",
+        "first_name": "David",
+        "project_roles": [
+            {
+                "role": "developer",
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "74fef71a-dfc1-4aa4-acc0-cedcb7ac1d68"
     }
 ]

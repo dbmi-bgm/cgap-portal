@@ -737,7 +737,7 @@ def file_formats(testapp, institution, project):
     format_info = {
         'fastq': {'standard_file_extension': 'fastq.gz',
                   'other_allowed_extensions': ['fq.gz'],
-                  "valid_item_types": ["FileFastq"]},
+                  "valid_item_types": ["FileFastq", "FileSubmitted"]},
         # 'pairs': {'standard_file_extension': 'pairs.gz',
         #           "extrafile_formats": ['pairs_px2', 'pairsam_px2'],
         #           "valid_item_types": ["FileProcessed"]},
@@ -765,7 +765,7 @@ def file_formats(testapp, institution, project):
                 "extrafile_formats": ['beddb'],
                 "valid_item_types": ["FileProcessed", "FileReference"]},
         'vcf_gz': {"standard_file_extension": "vcf.gz",
-                   "valid_item_types": ["FileProcessed"]}
+                   "valid_item_types": ["FileProcessed", "FileSubmitted"]}
     }
 
     for eff, info in ef_format_info.items():

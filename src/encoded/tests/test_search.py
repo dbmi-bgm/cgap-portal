@@ -4,8 +4,8 @@ import pytest
 import webtest
 
 from datetime import datetime, timedelta
-from dcicutils.misc_utils import Retry, ignored
-from dcicutils.qa_utils import notice_pytest_fixtures, local_attrs
+from dcicutils.misc_utils import Retry, ignored, local_attrs
+from dcicutils.qa_utils import notice_pytest_fixtures
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping

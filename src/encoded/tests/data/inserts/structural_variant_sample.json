@@ -7,7 +7,11 @@
         "CALL_INFO": "test001_sample",
         "file": "GAPFIFYGNO4A",
         "callers": ["Manta"],
-        "caller_types": ["SV"]
+        "caller_types": ["SV"],
+        "quality_score": 35.0,
+        "paired_reads": [0, 3],
+        "split_reads": [5, 10],
+        "confidence_class": "HIGH"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -21,6 +25,8 @@
         "bicseq2_expected_reads": 6310.3,
         "bicseq2_log2_copy_ratio": -1.02878685487,
         "bicseq2_observed_reads": 3103,
-        "bicseq2_pvalue": 1.82888e-60
+        "bicseq2_pvalue": 1.82888e-60,
+        "quality_score": 35.0,
+        "confidence_class": "LOW"
     }
 ]

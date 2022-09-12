@@ -140,14 +140,16 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
     const [ showOrderBasedName, setShowOrderBasedName ] = useState(true);
     //const [ showAsDiseases, setShowAsDiseases ] = useState("Case Phenotypic Features");
 
-    function onTogglePedigreeOptionCheckbox(evt){
+    const onTogglePedigreeOptionCheckbox = useCallback(function(evt){
         const name = evt.target.getAttribute("name");
         if (!name) return false;
         if (name === "showOrderBasedName") {
-            setShowOrderBasedName(!showOrderBasedName);
+            setShowOrderBasedName(function(currentShowOrderBasedName){
+                return !currentShowOrderBasedName;
+            });
         }
         return false;
-    }
+    });
 
     const { selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease } = usePhenotypicFeatureStrings(currPedigreeFamily);
 

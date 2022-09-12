@@ -114,7 +114,8 @@ function StructuralVariantInfoSection({ context }) {
         structural_variant = {},
         CALL_INFO = null,
         genotype_labels = {},
-        callers = []
+        callers = [],
+        confidence_class = fallbackElem
     } = context;
     const {
         size_display = fallbackElem,
@@ -158,6 +159,14 @@ function StructuralVariantInfoSection({ context }) {
                         </div>
                         <div className="col-12 col-md-6">
                             <span id="vi_grch37">{hg19_position_display}</span>
+                        </div>
+                    </div>
+                    <div className="row">
+                        <div className="col-12 col-md-6">
+                            <label htmlFor="vi_confidence" className="mb-0">Call Confidence:</label>
+                        </div>
+                        <div className="col-12 col-md-6">
+                            <span id="vi_confidence">{confidence_class}</span>
                         </div>
                     </div>
                 </div>

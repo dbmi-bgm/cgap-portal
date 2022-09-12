@@ -185,7 +185,10 @@ module.exports = [
         externals: [
             {
                 'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}',
-                'jsdom': '{JSDOM:{}}'
+                'jsdom': '{JSDOM:{}}',
+                // If load via CDN (to-do in future)
+                // 'react': 'React',
+                // 'react-dom': 'ReactDOM'
             }
         ],
         module: {

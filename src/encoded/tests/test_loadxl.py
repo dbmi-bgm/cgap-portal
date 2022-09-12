@@ -193,6 +193,7 @@ def test_load_all_gen(testapp):
         assert 'Failure loading inserts' in catch4.caught
 
 
+@pytest.mark.skip  # obsolete
 def test_legacy_load_data_should_proceed():
     """
     Tests that load_data_should_proceed does the right thing in various environment scenarios.

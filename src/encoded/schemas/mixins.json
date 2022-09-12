@@ -131,7 +131,7 @@
             "lookup": 1000,
             "properties": {
                 "date_modified": {
-                    "title": "Date modified",
+                    "title": "Date Modified",
                     "description": "Do not submit, value is assigned by the server. The date the object is modified.",
                     "type": "string",
                     "anyOf": [
@@ -145,7 +145,7 @@
                     "permission": "restricted_fields"
                 },
                 "modified_by": {
-                    "title": "Modified by",
+                    "title": "Modified By",
                     "description": "Do not submit, value is assigned by the server. The user that modfied the object.",
                     "type": "string",
                     "linkTo": "User",
@@ -162,7 +162,9 @@
             "exclude_from": [
                 "FFedit-create"
             ],
-            "linkTo": "Institution"
+            "linkTo": "Institution",
+            "serverDefault": "userinstitution"
+
         },
         "project": {
             "title": "Project",
@@ -171,7 +173,8 @@
             "exclude_from": [
                 "FFedit-create"
             ],
-            "linkTo": "Project"
+            "linkTo": "Project",
+            "serverDefault": "userproject"
         }
     },
     "notes": {
@@ -471,6 +474,19 @@
                         }
                     }
                 }
+            }
+        }
+    },
+    "submitted_files": {
+        "files": {
+            "title": "Submitted Files",
+            "description": "Submitted files associated with the item",
+            "type": "array",
+            "items": {
+                "title": "Submitted File",
+                "description": "File metadata.",
+                "type": "string",
+                "linkTo": "File"
             }
         }
     },
