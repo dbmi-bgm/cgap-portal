@@ -477,6 +477,19 @@
             }
         }
     },
+    "submitted_files": {
+        "files": {
+            "title": "Submitted Files",
+            "description": "Submitted files associated with the item",
+            "type": "array",
+            "items": {
+                "title": "Submitted File",
+                "description": "File metadata.",
+                "type": "string",
+                "linkTo": "File"
+            }
+        }
+    },
     "paired_end": {
         "paired_end": {
             "title": "Paired End Identifier",
