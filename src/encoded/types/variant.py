@@ -2,7 +2,6 @@ import datetime
 import io
 import json
 import os
-import csv
 from math import inf
 from urllib.parse import parse_qs, urlparse
 from pyramid.httpexceptions import (
@@ -11,10 +10,8 @@ from pyramid.httpexceptions import (
     HTTPNotModified
 )
 from pyramid.traversal import find_resource
-from pyramid.request import Request
 from pyramid.response import Response
 
-import boto3
 import negspy.coordinates as nc
 import pytz
 import structlog
@@ -77,42 +74,16 @@ CMPHET_UNPHASED_STRONG = 'Compound Het (Unphased/strong_pair)'
 CMPHET_UNPHASED_MED = 'Compound Het (Unphased/medium_pair)'
 CMPHET_UNPHASED_WEAK = 'Compound Het (Unphased/weak_pair)'
 
-# Shared embeds for variants and variant samples also used for corresponding SV items
+# Shared embeds for variants and variant samples also used for
+# StructuralVariant(Sample)s
 SHARED_VARIANT_EMBEDS = [
+    # Notes saved to project
     "interpretations.@id",
-    "interpretations.classification",
-    "interpretations.acmg_rules_invoked.*",
-    "interpretations.acmg_rules_with_modifier",
-    "interpretations.conclusion",
-    "interpretations.note_text",
-    "interpretations.version",
-    "interpretations.project.@id",
-    "interpretations.institution.@id",
-    "interpretations.status",
-    "interpretations.last_modified.date_modified",
-    "interpretations.last_modified.modified_by.display_title",
     "discovery_interpretations.@id",
-    "discovery_interpretations.gene_candidacy",
-    "discovery_interpretations.variant_candidacy",
-    "discovery_interpretations.note_text",
-    "discovery_interpretations.version",
-    "discovery_interpretations.project.@id",
-    "discovery_interpretations.institution.@id",
-    "discovery_interpretations.status",
-    "discovery_interpretations.last_modified.date_modified",
-    "discovery_interpretations.last_modified.modified_by.display_title",
     "variant_notes.@id",
 ]
 
 SHARED_VARIANT_SAMPLE_EMBEDS = [
-    # The following 4 "@id" fields are now requested through /embed API when on the VariantSample ItemView
-    # and available through VariantSampleList item (datastore=database request) for when in Case ItemView's
-    # Interpretation+Review Tabs.
-    "variant_notes.@id",
-    "gene_notes.@id",
-    "interpretation.@id",
-    "discovery_interpretation.@id",
-
     "variant_sample_list.created_for_case",
 
     # We need Technical Review data in our search result rows, so we must embed these here and not use /embed API.
@@ -127,8 +98,8 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.note_text",
     "technical_review.last_text_edited.date_text_edited",
     "technical_review.last_text_edited.text_edited_by",
-    #"technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
-    #"technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
+    # "technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
+    # "technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
     "technical_review.last_modified.date_modified",
@@ -180,7 +151,8 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = SHARED_VARIANT_EMBEDS + [
-        "genes.genes_most_severe_gene.gene_notes.@id", # `genes` not present on StructuralVariant
+        # Notes saved to project
+        "genes.genes_most_severe_gene.gene_notes.@id",  # `genes` not present on StructuralVariant
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -1566,7 +1538,7 @@ def get_spreadsheet_mappings(request = None):
             if isinstance(note_project_id, dict):
                 # We might get string OR @@embedded representation, e.g. if from search response.
                 note_project_id = note_project_id.get("@id")
-            if project_at_id == note["project"]:
+            if project_at_id == note_project_id:
                 return note
         return None
 
@@ -1611,7 +1583,7 @@ def get_spreadsheet_mappings(request = None):
         ("HGVSP",                                   "variant.genes.genes_most_severe_hgvsp",                        "HGVS pPos nomenclature"),
         ("dbSNP ID",                                "variant.ID",                                                   "dbSNP ID of variant"),
         ("Genes",                                   "variant.genes.genes_most_severe_gene.display_title",           "Gene symbol(s)"),
-        ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
+        # Not embedded ("Gene type",                               "variant.genes.genes_most_severe_gene.gene_biotype",            "Type of Gene"),
         # ONLY FOR variant.transcript.csq_canonical=true
         ("Canonical transcript ID",                 canonical_transcript_csq_feature,                               "Ensembl ID of canonical transcript of gene variant is in"),
         # ONLY FOR variant.transcript.csq_canonical=true; use `variant.transcript.csq_intron` if `variant.transcript.csq_exon` not present (display as in annotation space: eg. exon 34/45 or intron 4/7)
@@ -1665,7 +1637,7 @@ def get_spreadsheet_mappings(request = None):
         ("Gene notes (curr)",                       "gene_notes.note_text",                                         "Additional notes on gene written for this case"),
         # For next 6, grab only from note from same project as the VariantSample
         ("ACMG classification (prev)",              own_project_note_factory("variant.interpretations", "classification"),                      "ACMG classification for variant in previous cases"),
-        ("ACMG rules (prev)",                       own_project_note_factory("variant.interpretations", "acmg"),                                "ACMG rules invoked for variant in previous cases"),
+        ("ACMG rules (prev)",                       own_project_note_factory("variant.interpretations",                                           "acmg.acmg_rules_invoked.acmg_rule_name"),                       "ACMG rules invoked for variant in previous cases"),
         ("Clinical interpretation (prev)",          own_project_note_factory("variant.interpretations", "note_text"),                           "Clinical interpretation notes written for previous cases"),
         ("Gene candidacy (prev)",                   own_project_note_factory("variant.discovery_interpretations", "gene_candidacy"),            "Gene candidacy level selected for previous cases"),
         ("Variant candidacy (prev)",                own_project_note_factory("variant.discovery_interpretations", "variant_candidacy"),         "Variant candidacy level selected for previous cases"),
