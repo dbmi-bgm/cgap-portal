@@ -1,0 +1,182 @@
+{
+    "title": "MetaWorkflow Handler",
+    "description": "Schema for a meta workflow that connects a set of computational analysis workflows",
+    "id": "/profiles/meta_workflow_handler.json", 
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "title",
+        "project",
+        "institution"
+    ],
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "accession"
+    ],
+    "mixinProperties": [ 
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/documents"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds" 
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common" 
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession": {
+            "accessionType": "MWH" 
+        },
+        "title": {
+            "title": "Title",
+            "description": "The preferred viewable name of the meta workflow handler.",
+            "type": "string"
+        },
+        "name": {
+            "title": "Name",
+            "description": "The name of the meta workflow handler",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "A short text description of the meta workflow handler.",
+            "type": "string",
+            "formInput": "textarea" 
+        },
+        "version": {
+            "title": "Version",
+            "description": "The version of the meta workflow handler.",
+            "type": "string"
+        },
+        "previous_version": {
+            "title": "Previous versions",
+            "description": "Link to the previous versions of the meta workflow handler.",
+            "type": "array",
+            "items": {
+                "title": "Previous version",
+                "description": "Link to a previous version of the meta workflow handler.",
+                "type": "string",
+                "linkTo": "MetaWorkflowHandler"
+            }
+        },
+        "version_upgrade_log": {
+            "title": "Version upgrade log",
+            "description": "Version upgrade log",
+            "type": "string"
+        },
+        "metaworkflows": {
+            "title": "MetaWorkflows",
+            "type": "array",
+            "items": {
+                "title": "MetaWorkflows",
+                "type": "object",
+                "required": [
+                    "metaworkflow",
+                    "duplication_flag"
+                ],
+                "oneOf": [
+                    {
+                        "required": [
+                            "items_for_creation_pt"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "items_for_creation_uuid"
+                        ]
+                    }
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "metaworkflow": {
+                        "title": "MetaWorkflow",
+                        "description": "Link to the metaworkflow item",
+                        "type": "string",
+                        "linkTo": "MetaWorkflow"
+                    },
+                    "items_for_creation_pt": {
+                        "title": "Items for MWFR Creation (property trace)",
+                        "description": "List of item property traces needed for this MWFR's creation",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "items_for_creation_uuid": {
+                        "title": "Items for MWFR Creation (UUID)",
+                        "description": "List of item UUIDs needed for this MWFR's creation",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "dependencies": {
+                        "title": "Dependencies",
+                        "description": "forced dependencies (other than deduced from input-output connections)",
+                        "type": "array",
+                        "items": {
+                            "title": "Dependency",
+                            "description": "One of the forced dependencies",
+                            "type": "string"
+                        }
+                    },
+                    "duplication_flag": {
+                        "title": "Duplication flag",
+                        "description": "For existing MWFRs based on this MWF: True to duplicate, False to not create another MWFR",
+                        "type": "boolean"
+                    }
+                }
+            }
+        }
+    },
+    "facets": { 
+        "name": {
+            "title": "Name"
+        }
+    },
+    "columns": { 
+        "name": {
+            "title": "Name"
+        },
+        "version": {
+            "title": "Version",
+            "colTitle": "Version"
+        }
+    }
+}
