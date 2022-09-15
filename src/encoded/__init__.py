@@ -1,5 +1,5 @@
 import hashlib
-import logging  # used only in CGAP, not Fourfront
+import logging
 import mimetypes
 import netaddr
 import os
@@ -150,13 +150,12 @@ def main(global_config, **local_config):
             # Assume GAC and load env utils (once)
             EnvUtils.init()
 
-    # BEGIN PART THAT'S NOT IN FOURFRONT
     # adjust log levels for some annoying loggers
     lnames = ['boto', 'urllib', 'elasticsearch', 'dcicutils']
     for name in logging.Logger.manager.loggerDict:
         if any(logname in name for logname in lnames):
             logging.getLogger(name).setLevel(logging.WARNING)
-    # END PART THAT'S NOT IN FOURFRONT
+
     set_logging(in_prod=settings.get('production'))
     # set_logging(settings.get('elasticsearch.server'), settings.get('production'))
 
