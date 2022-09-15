@@ -138,7 +138,7 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
     const { currPedigreeFamily } = passProps;
 
     const [ showOrderBasedName, setShowOrderBasedName ] = useState(true);
-    //const [ showAsDiseases, setShowAsDiseases ] = useState("Case Phenotypic Features");
+    const [ showAsDiseases, setShowAsDiseases ] = useState("Case Phenotypic Features");
 
     const onTogglePedigreeOptionCheckbox = useCallback(function(evt){
         const name = evt.target.getAttribute("name");
@@ -161,8 +161,8 @@ export const PedigreeTabViewOptionsController = React.memo(function PedigreeTabV
             onToggleSelectedDisease,
             onTogglePedigreeOptionCheckbox,
             showOrderBasedName,
-            // showAsDiseases,
-            // setShowAsDiseases
+            showAsDiseases,
+            setShowAsDiseases
         };
         return React.Children.map(children, function(child){
             return React.cloneElement(child, childProps);
@@ -182,7 +182,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
         context, schemas, windowWidth, windowHeight, href, session, graphData,
         availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, onTogglePedigreeOptionCheckbox,
         showOrderBasedName,
-        // showAsDiseases, setShowAsDiseases,
+        showAsDiseases, setShowAsDiseases,
         familiesWithViewPermission,
         pedigreeFamiliesIdx,
         currPedigreeFamily,
@@ -217,7 +217,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                         {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
                         <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={onTogglePedigreeOptionCheckbox} />
                         {/* <SelectDiseasesDropdown {...{ selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease }} /> */}
-                        {/* <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  /> */}
+                        <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  />
                         <FamilySelectionDropdown {...{ familiesWithViewPermission, pedigreeFamiliesIdx }} onSelect={onFamilySelect} />
                         <PedigreeFullScreenBtn />
                     </CollapsibleItemViewButtonToolbar>
@@ -256,16 +256,16 @@ const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox(
 
 /* DEPRECATED COMPONENTS */
 
-// const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
-//     return (
-//         <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
-//             <DropdownItem active={showAsDiseases === "Case Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
-//             <DropdownItem active={showAsDiseases === "All Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
-//             <DropdownItem active={showAsDiseases === "Case Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
-//             <DropdownItem active={showAsDiseases === "All Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
-//         </DropdownButton>
-//     );
-// });
+const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
+    return (
+        <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
+            <DropdownItem active={showAsDiseases === "Case Phenotypic Features"} eventKey="Case Phenotypic Features">Case Phenotypic Features</DropdownItem>
+            <DropdownItem active={showAsDiseases === "All Phenotypic Features"} eventKey="All Phenotypic Features">All Phenotypic Features</DropdownItem>
+            <DropdownItem active={showAsDiseases === "Case Disorders"} disabled eventKey="Case Disorders">Case Disorders</DropdownItem>
+            <DropdownItem active={showAsDiseases === "All Disorders"} disabled eventKey="All Disorders">All Disorders</DropdownItem>
+        </DropdownButton>
+    );
+});
 
 
 const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(props){
