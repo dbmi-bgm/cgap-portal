@@ -137,7 +137,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
                 input_files: wfrItemInputFileObjects,
                 output_files: wfrItemOutputFileObjects,
                 parameters: wfrItemInputParameters
-            },
+            } = {},
             input = [],
             output = []
         } = workflowRunObject;
