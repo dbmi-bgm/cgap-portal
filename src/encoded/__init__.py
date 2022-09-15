@@ -1,48 +1,56 @@
-import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
+import hashlib
+import logging  # used only in CGAP, not Fourfront
 import mimetypes
 import netaddr
 import os
 import pkg_resources
-import sys
 import sentry_sdk
+import subprocess
 
-from dcicutils.beanstalk_utils import source_beanstalk_env_vars
-from dcicutils.log_utils import set_logging
-from dcicutils.env_utils import get_mirror_env_from_context
-from dcicutils.ff_utils import get_health_page
-from dcicutils.ecs_utils import ECSUtils
 from codeguru_profiler_agent import Profiler
+from dcicutils.beanstalk_utils import source_beanstalk_env_vars
+from dcicutils.ecs_utils import ECSUtils
+from dcicutils.env_utils import EnvUtils, get_mirror_env_from_context
+from dcicutils.ff_utils import get_health_page
+from dcicutils.log_utils import set_logging
+from dcicutils.misc_utils import VirtualApp
+from dcicutils.secrets_utils import assumed_identity
+from pyramid.config import Configurator
+from pyramid.settings import asbool
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
-from pyramid.config import Configurator
-from .local_roles import LocalRolesAuthorizationPolicy
-from pyramid.settings import asbool
-from snovault.app import session, json_from_path, configure_dbsession, changelogs
+from snovault.app import (
+    session, json_from_path, configure_dbsession, changelogs,
+)
 from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
-from dcicutils.misc_utils import VirtualApp
+
 from .appdefs import APP_VERSION_REGISTRY_KEY
 from .ingestion_listener import INGESTION_QUEUE
 from .loadxl import load_all
+from .local_roles import LocalRolesAuthorizationPolicy
 
 
-if sys.version_info.major < 3:
-    raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
+# snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles in CGAP - Will March 15 2022
+# The default value from snovault is apparently fine for Fourfront.
+STATIC_MAX_AGE = 1800
 
+# Assign a custom default trace_rate for sentry.
+# Tune this to get more data points when analyzing performance
+# See https://docs.sentry.io/platforms/python/guides/logging/configuration/sampling/ for details.
+#
+# The default value from Sentry seems to be 1.0, but the code is convoluted, so if we set this to None
+# here, it won't get passed and will be allowed to default in whatever manner they select. -kmp 15-Sep-2022
+SENTRY_TRACE_RATE = 0.1
 
-# snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022
-CGAP_STATIC_MAX_AGE = 1800
-# default trace_rate for sentry
-# tune this to get more data points when analyzing performance
-SENTRY_TRACE_RATE = .1
 DEFAULT_AUTH0_DOMAIN = 'hms-dbmi.auth0.com'
 
 
 def static_resources(config):
     mimetypes.init()
     mimetypes.init([pkg_resources.resource_filename('encoded', 'static/mime.types')])
-    config.add_static_view('static', 'static', cache_max_age=CGAP_STATIC_MAX_AGE)
-    config.add_static_view('profiles', 'schemas', cache_max_age=CGAP_STATIC_MAX_AGE)
+    config.add_static_view('static', 'static', cache_max_age=STATIC_MAX_AGE)
+    config.add_static_view('profiles', 'schemas', cache_max_age=STATIC_MAX_AGE)
 
     # Favicon
     favicon_path = '/static/img/favicon.ico'
@@ -92,18 +100,33 @@ def app_version(config):
     if not config.registry.settings.get(APP_VERSION_REGISTRY_KEY):
         # we update version as part of deployment process `deploy_beanstalk.py`
         # but if we didn't check env then git
-        version = os.environ.get("ENCODED_VERSION", "test")
+        version = os.environ.get("ENCODED_VERSION")
+        if not version:
+            try:
+                version = subprocess.check_output(
+                    ['git', '-C', os.path.dirname(__file__), 'describe']).decode('utf-8').strip()
+                diff = subprocess.check_output(
+                    ['git', '-C', os.path.dirname(__file__), 'diff', '--no-ext-diff'])
+                if diff:
+                    version += '-patch' + hashlib.sha1(diff).hexdigest()[:7]
+            except Exception:
+                version = "test"
+
         config.registry.settings[APP_VERSION_REGISTRY_KEY] = version
 
-    # Fourfront does GA stuff here that makes no sense in CGAP (yet).
+    # Fourfront does GA Config at this point, but CGAP does not need that.
+
+
+CLOUD_INFRA_PLACEHOLDER = 'XXX: ENTER VALUE'
 
 
 def init_sentry(dsn):
     """ Helper function that initializes sentry SDK if a dsn is specified. """
-    if dsn:
-        sentry_sdk.init(dsn,
-                        traces_sample_rate=SENTRY_TRACE_RATE,
-                        integrations=[PyramidIntegration(), SqlalchemyIntegration()])
+    if dsn and dsn != CLOUD_INFRA_PLACEHOLDER:
+        options = {}
+        if SENTRY_TRACE_RATE is not None:
+            options['traces_sample_rate'] = SENTRY_TRACE_RATE
+        sentry_sdk.init(dsn, integrations=[PyramidIntegration(), SqlalchemyIntegration()], **options)
 
 
 def init_code_guru(*, group_name, region=ECSUtils.REGION):
@@ -118,6 +141,14 @@ def main(global_config, **local_config):
 
     settings = global_config
     settings.update(local_config)
+
+    doing_testing = asbool(settings.get('testing', False))
+
+    # If running on a real server (not a unit test or local deploy), assume identity and resolve EnvUtils
+    if not doing_testing:
+        with assumed_identity():
+            # Assume GAC and load env utils (once)
+            EnvUtils.init()
 
     # BEGIN PART THAT'S NOT IN FOURFRONT
     # adjust log levels for some annoying loggers
@@ -161,11 +192,12 @@ def main(global_config, **local_config):
     settings[INVALIDATION_SCOPE_ENABLED] = True
 
     # set mirrored Elasticsearch location (for staging and production servers)
-    # does not exist for CGAP currently
+    # Although this is a Fourfront-only feature for now, not used by CGAP, this code is generic.
     mirror = get_mirror_env_from_context(settings)
     if mirror is not None:
         settings['mirror.env.name'] = mirror
         settings['mirror_health'] = get_health_page(ff_env=mirror)
+
     config = Configurator(settings=settings)
 
     config.registry[APP_FACTORY] = main  # used by mp_indexer
@@ -213,7 +245,7 @@ def main(global_config, **local_config):
     config.registry['aws_ipset'] = netaddr.IPSet(
         record['ip_prefix'] for record in aws_ip_ranges['prefixes'] if record['service'] == 'AMAZON')
 
-    if asbool(settings.get('testing', False)):
+    if doing_testing:
         config.include('.tests.testing_views')
 
     # Load upgrades last so that all views (including testing views) are
@@ -221,7 +253,8 @@ def main(global_config, **local_config):
     config.include('.upgrade')
 
     # initialize sentry reporting
-    init_sentry(settings.get('sentry_dsn', None))
+    sentry_dsn = settings.get('sentry_dsn', None)
+    init_sentry(sentry_dsn)
 
     # initialize CodeGuru profiling, if set
     # note that this is intentionally an env variable (so it is a TASK level setting)
