@@ -6,10 +6,10 @@ cgap-portal
 Change Log
 ----------
 
-10.3.3
+10.3.4
 ======
 
-`PR : Update snovault to v6.0.6 <>`_
+`PR 645: Update snovault to v6.0.6 <https://github.com/dbmi-bgm/cgap-portal/pull/645>`_
 
 * Fix bug in blob storage for empty string KMS key
 
