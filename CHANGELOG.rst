@@ -9,9 +9,26 @@ Change Log
 10.3.3
 ======
 
+`PR : Update snovault to v6.0.6 <>`_
+
+* Fix bug in blob storage for empty string KMS key
+
+
+
+10.3.3
+======
+
 `PR 634: Vs fix broken links <https://github.com/dbmi-bgm/cgap-portal/pull/634>`_
 
 * Fixed broken hyperlinks in static documentation pages, updating links as necessary
+
+
+10.3.2
+======
+
+`PR 631: SV Confidence Pop-overs <https://github.com/dbmi-bgm/cgap-portal/pull/631>`_
+
+* Add pop-over to SV confidence class facet with links to further documentation
 
 
 10.3.1
