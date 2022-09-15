@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+10.3.4
+======
+
+* Miscellaneous cosmetics and refactoring to align better with Fourfront
+  in how the file ``src/encoded/__init__.py`` is arranged.
+
+
 10.3.3
 ======
 
@@ -17,8 +24,9 @@ Change Log
 10.3.2
 ======
 
-* Miscellaneous cosmetics and refactoring to align better with Fourfront
-  in how the file src/encoded/__init__.py is arranged.
+`PR 631: SV Confidence Pop-overs <https://github.com/dbmi-bgm/cgap-portal/pull/631>`_
+
+* Add pop-over to SV confidence class facet with links to further documentation
 
 
 10.3.1
