@@ -8,7 +8,6 @@ import sentry_sdk
 import subprocess
 
 from codeguru_profiler_agent import Profiler
-from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from dcicutils.ecs_utils import ECSUtils
 from dcicutils.env_utils import EnvUtils, get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
@@ -155,10 +154,6 @@ def main(global_config, **local_config):
 
     set_logging(in_prod=settings.get('production'))
     # set_logging(settings.get('elasticsearch.server'), settings.get('production'))
-
-    # TODO: Is this still needed? It might be a no-op now. -kmp 15-Sep-2022
-    # source environment variables on elastic beanstalk
-    source_beanstalk_env_vars()
 
     # settings['snovault.jsonld.namespaces'] = json_asset('encoded:schemas/namespaces.json')
     # settings['snovault.jsonld.terms_namespace'] = 'https://www.encodeproject.org/terms/'
