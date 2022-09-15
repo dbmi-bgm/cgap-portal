@@ -29,4 +29,4 @@ CGAP deployment:
 <br>
 If you need more information on which environment or URL
 to use, reach out to a CGAP data wrangler or send an email
-to [cgap@hms-dbmi.atlassian.net](cgap@hms-dbmi.atlassian.net).
+to [cgap@hms-dbmi.atlassian.net](mailto:cgap@hms-dbmi.atlassian.net).

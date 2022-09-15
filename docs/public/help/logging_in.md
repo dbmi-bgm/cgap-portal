@@ -7,7 +7,7 @@ Requesting An Account
 
 To **request a new account** or if you have **trouble**
  **logging in**, please contact us for support at
- [cgap-support@hms-dbmi.atlassian.net](cgap-support@hms-dbmi.atlassian.net).
+ [cgap-support@hms-dbmi.atlassian.net](mailto:cgap-support@hms-dbmi.atlassian.net).
 
 CGAP Login Workflow
 -------------------
