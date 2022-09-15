@@ -7,6 +7,13 @@ Change Log
 ----------
 
 
+10.3.2
+======
+
+* Miscellaneous cosmetics and refactoring to align better with Fourfront
+  in how the file src/encoded/__init__.py is arranged.
+
+
 10.3.1
 ======
 
