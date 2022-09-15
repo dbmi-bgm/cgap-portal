@@ -14,7 +14,7 @@ from dcicutils.env_utils import EnvUtils, get_mirror_env_from_context
 from dcicutils.ff_utils import get_health_page
 from dcicutils.log_utils import set_logging
 from dcicutils.misc_utils import VirtualApp
-from dcicutils.secrets_utils import assumed_identity
+from dcicutils.secrets_utils import assumed_identity, SecretsTable
 from pyramid.config import Configurator
 from pyramid.settings import asbool
 from sentry_sdk.integrations.pyramid import PyramidIntegration
@@ -117,12 +117,9 @@ def app_version(config):
     # Fourfront does GA Config at this point, but CGAP does not need that.
 
 
-CLOUD_INFRA_PLACEHOLDER = 'XXX: ENTER VALUE'
-
-
 def init_sentry(dsn):
     """ Helper function that initializes sentry SDK if a dsn is specified. """
-    if dsn and dsn != CLOUD_INFRA_PLACEHOLDER:
+    if not SecretsTable.is_empty_value(dsn):
         options = {}
         if SENTRY_TRACE_RATE is not None:
             options['traces_sample_rate'] = SENTRY_TRACE_RATE
@@ -159,6 +156,7 @@ def main(global_config, **local_config):
     set_logging(in_prod=settings.get('production'))
     # set_logging(settings.get('elasticsearch.server'), settings.get('production'))
 
+    # TODO: Is this still needed? It might be a no-op now. -kmp 15-Sep-2022
     # source environment variables on elastic beanstalk
     source_beanstalk_env_vars()
 
