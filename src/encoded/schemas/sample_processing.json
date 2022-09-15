@@ -74,7 +74,27 @@
         },
         "samples": {
             "title": "Samples",
-            "description": "Samples used in the analysis",
+            "description": "Samples used in a case analysis",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        },
+        "control_samples": {
+            "title": "Samples",
+            "description": "Control samples used in a cohort analysis",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        },
+        "case_samples": {
+            "title": "Samples",
+            "description": "Case samples used in a cohort analysis",
             "type": "array",
             "items": {
                 "title": "Sample",
