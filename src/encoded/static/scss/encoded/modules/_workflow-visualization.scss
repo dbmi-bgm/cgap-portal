@@ -33,3 +33,7 @@
 
     }
 }
+
+.meta-workflow-view-container .workflow-chart-outer-container .workflow-chart-inner-container .scroll-container {
+    height: calc(100vh - 214px) !important; // Need to override styles from react-workflow-viz graph
+}

@@ -507,7 +507,7 @@ export class WorkflowGraphSection extends React.PureComponent {
         }
 
         return (
-            <div className="tabview-container-fullscreen-capable workflow-view-container workflow-viewing-detail">
+            <div className="tabview-container-fullscreen-capable meta-workflow-view-container meta-workflow-viewing-detail">
                 <h3 className="tab-section-title container-wide">
                     <span>Graph</span>
                     <WorkflowGraphSectionControls
