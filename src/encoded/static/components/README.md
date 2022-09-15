@@ -1,4 +1,4 @@
-# Documentation for 4DN/Fourfront Front-End
+# Documentation for CGAP Front-End
 
 
 #### This is a living document. Edit it as needed.
@@ -7,7 +7,7 @@
 
 ## Overview
 
-The client/front-end for the [4DN Data Portal](https://data.4dnucleome.org) functions as a single-page application (SPA) and is written entirely in [ReactJS](https://reactjs.org/). This includes the output/rendering of the `<head>` document HTML element¹.
+The client/front-end for CGAP functions as a single-page application (SPA) and is written entirely in [ReactJS](https://reactjs.org/). This includes the output/rendering of the `<head>` document HTML element¹.
 
 
 **¹** [Rendering 'head' element is against React best practices as of 2014](https://github.com/facebook/react/pull/2311#issuecomment-58743271) -- a long-term to-do includes refactoring this aspect of our front-end.
