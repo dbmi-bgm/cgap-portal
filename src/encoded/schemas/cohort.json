@@ -4,7 +4,6 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [
-        "title",
         "project",
         "institution"
     ],
@@ -42,7 +41,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "accession": {
             "accessionType": "CO"
@@ -52,85 +51,16 @@
             "description": "Title for this Cohort",
             "type": "string"
         },
-        "families": {
-            "title": "Families",
-            "type": "array",
-            "uniqueItems": true,
-            "items": {
-                "title": "Family",
-                "type": "object",
-                "properties": {
-                    "members": {
-                        "title": "Members",
-                        "description": "Family members",
-                        "type": "array",
-                        "items": {
-                            "title": "Member",
-                            "type": "string",
-                            "linkTo": "Individual"
-                        }
-                    },
-                    "proband": {
-                        "title": "Member",
-                        "description": "Proband member of the family",
-                        "type": "string",
-                        "linkTo": "Individual"
-                    },
-                    "pedigree_source": {
-                        "title": "Pedigree Source",
-                        "description": "Source of the input pedigree. Include version information, if applicable",
-                        "type": "string"
-                    },
-                    "original_pedigree": {
-                        "title": "Original Pedigree File",
-                        "description": "The original pedigree file used for this family",
-                        "type": "string",
-                        "linkTo": "Document"
-                    },
-                    "clinic_notes": {
-                        "title": "Pedigree Notes from the Clinic",
-                        "type": "string"
-                    },
-                    "timestamp": {
-                        "title": "Pedigree Timestamp",
-                        "description": "Date of original pedigree file generation",
-                        "type": "string",
-                        "anyOf": [
-                            {
-                                "format": "date-time"
-                            },
-                            {
-                                "format": "date"
-                            }
-                        ]
-                    },
-                    "family_phenotypic_features": {
-                        "title": "Family phenotypic features",
-                        "description": "Main phenotypic features for the family",
-                        "type": "array",
-                        "items": {
-                            "title": "Family phenotypic feature",
-                            "type": "string",
-                            "linkTo": "Phenotype"
-                        }
-                    }
-                }
-            }
-        },
         "description": {
             "title": "Description",
             "description": "Description of the cohort",
             "type": "string"
         },
-        "sample_processes": {
-            "title": "Sample Processes",
-            "description": "Downstream analyses performed on the sample",
-            "type": "array",
-            "items": {
-                "title": "Sample Processing",
-                "type": "string",
-                "linkTo": "SampleProcessing"
-            }
+        "sample_processing": {
+            "title": "Sample Processing",
+            "description": "Collection of Samples for this Cohort",
+            "type": "string",
+            "linkTo": "SampleProcessing"
         }
     }
 }
