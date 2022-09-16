@@ -165,10 +165,10 @@ test-any:
 	poetry run python -m pytest -xvv -r w --timeout=200
 
 test-npm:
-	poetry run python -m pytest -xvv -r w --timeout=600 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
 
 test-unit:
-	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"
 
 test-performance:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and not integratedx and performance and not broken and not sloppy"
