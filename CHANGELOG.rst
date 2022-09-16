@@ -6,11 +6,26 @@ cgap-portal
 Change Log
 ----------
 
-10.3.4
+
+10.3.5
 ======
 
 * Miscellaneous cosmetics and refactoring to align better with Fourfront
   in how the file ``src/encoded/__init__.py`` is arranged.
+
+
+10.3.4
+======
+
+`PR 647: Small fixes 2022-09-16 <https://github.com/dbmi-bgm/cgap-portal/pull/647>`_
+
+* Fix a broken test (``test_test_port``
+  in ``src/encoded/tests/test_ingestion_listener.py``).
+
+* Update to require at least snovault 6.0.6 to pick up blob storage fix.
+  (Locked to include 6.0.7, but that upgrade's not required.)
+
+* Repair a missing changelog entry for 10.3.2.
 
 
 10.3.3
