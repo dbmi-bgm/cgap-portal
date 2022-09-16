@@ -5,7 +5,7 @@ import tempfile
 
 from pyramid.httpexceptions import HTTPForbidden
 from unittest import mock
-from .. import source_beanstalk_env_vars
+from dcicutils.beanstalk_utils import source_beanstalk_env_vars
 from ..types import file as tf
 from ..types.file import FileFastq, post_upload, external_creds
 
@@ -43,6 +43,9 @@ def test_external_creds():
         assert 'upload_credentials' in ret.keys()
 
 
+# TODO: Do we need this test at all any more? It seems to be testing behavior we just removed.
+#       I'm assuming this setup stuff comes from the GAC now. Maybe we should test that instead?
+#       -kmp 15-Sep-2022
 def test_force_beanstalk_env():
     """
     This test is a bit outdated, since env variable loading has moved to
@@ -61,6 +64,10 @@ def test_force_beanstalk_env():
 
     # mock_boto
     with mock.patch('encoded.tests.test_types_file.boto3', autospec=True) as mock_boto:
+        # TODO: This mock.patch is just patching the boto3.client call below.
+        #       Might as well just call os.environ.get and test the results that come back.
+        #       There's nothing more going on here than that except the test setup.
+        #       The boto3 part is a red herring. -kmp 15-Sep-2022
 
         source_beanstalk_env_vars(test_cfg_name)
         boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
