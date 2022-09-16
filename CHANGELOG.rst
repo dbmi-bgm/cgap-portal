@@ -10,7 +10,9 @@ Change Log
 10.3.4
 ======
 
-* Fix a broken test (``test_test_port`` 
+`PR 647: Small fixes 2022-09-16 <https://github.com/dbmi-bgm/cgap-portal/pull/647>`_
+
+* Fix a broken test (``test_test_port``
   in ``src/encoded/tests/test_ingestion_listener.py``).
 
 * Update to require at least snovault 6.0.6 to pick up blob storage fix.
