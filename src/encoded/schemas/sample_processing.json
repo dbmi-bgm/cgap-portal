@@ -52,6 +52,16 @@
         "schema_version": {
             "default": "1"
         },
+        "title": {
+            "title": "Title",
+            "description": "Title for the analysis",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the analysis",
+            "type": "string"
+        },
         "analysis_type": {
             "title": "Analysis Type",
             "description": "The type of analysis performed, e.g. trio",
