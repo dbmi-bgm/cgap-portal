@@ -2238,7 +2238,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7.1,<3.9"
-content-hash = "cdcc617be239839c93a6d21b1615b0c2dec594db8e72fb0a0982cba999cf7b47"
+content-hash = "9f2ea82220a038a686b33a70dc62c6831a3eb8fc7707c3e7ada82f1fef29a4d6"
 
 [metadata.files]
 apipkg = [
