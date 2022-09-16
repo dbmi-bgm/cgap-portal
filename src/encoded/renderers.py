@@ -443,7 +443,7 @@ def render_page_html_tween_factory(handler, registry):
     # tricky to enforce (we would need to create one cgroup per process.)
     # So we just manually check the resource usage after each transform.
 
-    rss_limit = 256 * (1024 ** 2)  # MB
+    rss_limit = 512 * (1024 ** 2)  # MB
 
     reload_process = (True
                       if registry.settings.get('reload_templates', False)

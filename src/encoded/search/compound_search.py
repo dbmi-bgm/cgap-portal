@@ -96,7 +96,7 @@ class CompoundSearchBuilder:
         :return: dictionary response
         """
 
-        if es_results['hits']['total'] == 0:
+        if es_results['hits']['total']['value'] == 0:
             request.response.status_code = 404  # see google webmaster doc on why
 
         if search_builder_instance.search_session_id:  # Is 'None' if e.g. limit=all
@@ -245,8 +245,8 @@ class CompoundSearchBuilder:
                 subreq = cls.build_subreq_from_single_query(request, query, route=cls.BUILD_QUERY_URL,
                                                             from_=from_, to=to)
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
-                # See https://www.elastic.co/guide/en/elasticsearch/reference/6.8/search-request-named-queries-and-filters.html
-                sub_query["bool"]["_name"] = block.get("name", block_index)
+                # See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-bool-query.html#named-queries
+                sub_query["bool"]["_name"] = block.get("name", str(block_index))  # note in ES7 numbers here must be cast to string
                 sub_queries.append(sub_query)
 
 

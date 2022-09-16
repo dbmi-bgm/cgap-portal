@@ -1,7 +1,7 @@
 import datetime
 import gzip
 import json
-import mock
+from unittest import mock
 import pytest
 import time
 
@@ -229,7 +229,7 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
 
 
 def test_test_port():
-    from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
+    from snovault.tests.postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
 
 
@@ -302,7 +302,7 @@ def test_ingestion_listener_run(
 ):
     """
     Test successful SV VCF recognition, read, and hand-off to ingestion
-    within the endpoint, while SV VCF ingestion tested elsewhere. 
+    within the endpoint, while SV VCF ingestion tested elsewhere.
 
     Mocks a simple gzipped VCF for reading by vcf.Reader as well as
     ingestion results to prompt patch of file indicating VCF was

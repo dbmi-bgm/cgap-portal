@@ -1,5 +1,4 @@
 import json
-import mock
 import pytest
 import webtest
 
@@ -490,7 +489,7 @@ def test_search_with_no_value(workbook, es_testapp):
 
 def test_search_with_static_header(workbook, es_testapp, indexer_testapp):
     """ Performs a search which should be accompanied by a search header """
-    indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
+    #indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
 
     # No items, just checking header
     search = '/search/?type=Workflow'
@@ -596,7 +595,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         item_type = es_testapp.app.registry[COLLECTIONS][item_name].type_info.item_type
         namespaced_index = get_namespaced_index(es_testapp.app, item_type)
 
-        es_direct_count = es.count(index=namespaced_index, doc_type=item_type).get('count')
+        es_direct_count = es.count(index=namespaced_index).get('count')
         assert es_item_count == es_direct_count
 
         if es_item_count == 0:
@@ -607,8 +606,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         print("search_url=", search_url)
         items = ItemTypeChecker.get_all_items_of_type(client=es_testapp, item_type=item_type)
         for item_res in items:
-            index_view_res = es.get(index=namespaced_index, doc_type=item_type,
-                                    id=item_res['uuid'])['_source']
+            index_view_res = es.get(index=namespaced_index, id=item_res['uuid'])['_source']
             # make sure that the linked_uuids match the embedded data
             assert 'linked_uuids_embedded' in index_view_res
             assert 'embedded' in index_view_res

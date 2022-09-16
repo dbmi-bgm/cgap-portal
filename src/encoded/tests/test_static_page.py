@@ -31,8 +31,8 @@ def static_help_page_deleted():
 
 
 def test_get_help_page(workbook, es_testapp, static_help_page_default):
-    wait_for_index(es_testapp)
-    help_page_url = "/" + static_help_page_default['name']
+    #wait_for_index(es_testapp)
+    help_page_url = '/' + static_help_page_default['name']
     res = es_testapp.get(help_page_url, status=200)
     assert res.json['@id'] == help_page_url
     assert res.json['@context'] == help_page_url
@@ -45,15 +45,15 @@ def test_get_help_page(workbook, es_testapp, static_help_page_default):
 
 
 def test_get_help_page_in_review(workbook, anon_html_es_testapp, html_es_testapp, static_help_page_in_review):
-    wait_for_index(html_es_testapp)
-    help_page_url = "/" + static_help_page_in_review['name']
+    #wait_for_index(es_testapp)
+    help_page_url = '/' + static_help_page_in_review['name']
     anon_html_es_testapp.get(help_page_url, status=403)
     html_es_testapp.get(help_page_url, status=200)
 
 
 def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, static_help_page_deleted):
-    wait_for_index(html_es_testapp)
-    help_page_url = "/" + static_help_page_deleted['name']
+    #wait_for_index(html_es_testapp)
+    help_page_url = '/' + static_help_page_deleted['name']
     anon_html_es_testapp.get(help_page_url, status=403)
     # The page is still in DB (and accessible by admins at its URL) but has status=deleted (so we get back status=200)
     # Might be worth considering making it 404 for both admins & non-admins
@@ -64,7 +64,7 @@ def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, 
 def test_get_help_page_no_access(workbook, anon_es_testapp, es_testapp, anon_html_es_testapp, html_es_testapp,
                                  static_help_page_default, static_help_page_in_review, static_help_page_deleted):
     notice_pytest_fixtures(workbook)
-    wait_for_index(es_testapp)
+    #wait_for_index(es_testapp)
     success = True
     for app_name, testapp, role in [("anon_es", anon_es_testapp, 'anon'),
                                     ("es", es_testapp, 'system'),
@@ -88,7 +88,7 @@ def test_get_help_page_no_access(workbook, anon_es_testapp, es_testapp, anon_htm
 
 
 def check_page_unique_name(testapp, conflicting_page, page_to_patch):
-    wait_for_index(testapp)
+    #wait_for_index(testapp)
     # POST again with same name and expect validation error
     conflicting_document = {'name': conflicting_page['name']}
     conflict_message = "%s already exists with name '%s'" % (conflicting_page['uuid'], conflicting_page['name'])
