@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "11.0.0.0b0"
+version = "10.3.5.2b2"  # to become 11.0.1
 description = "Clinical Genomics Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -37,16 +37,16 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.7.1,<3.9"
-awscli = ">=1.25.36"
-boto3 = "^1.24.36"
-botocore = "^1.27.36"
+awscli = ">=1.25.76"
+boto3 = "^1.24.47"
+botocore = "^1.27.75"
 certifi = ">=2021.5.30"
 chardet = "3.0.4"
 codeguru-profiler-agent = "^1.2.4"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0"
-dcicsnovault = "6.0.6.0b1"
-dcicutils = "5.0.0.1b1"
+dcicsnovault = "6.0.7.1b2"  # "^6.0.7" or higher
+dcicutils = "5.1.0.1b0"  # "^5.1.0" or higher
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -125,8 +125,8 @@ WSGIProxy2 = "0.4.2"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = "^1.24.36"
-botocore-stubs = "^1.27.36"
+boto3-stubs = "^1.24.47"
+botocore-stubs = "^1.27.75"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"
