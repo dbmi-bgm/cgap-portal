@@ -100,10 +100,12 @@ def make_mocked_check_output_for_get_version(simulate_git_command=True, simulate
 def test_build_ini_file_from_template():
     # NOTE: This implicitly also tests build_ini_file_from_stream.
 
+    global_env_name = os.environ['ENV_NAME']
+
     some_template_file_name = "mydir/whatever"
     some_ini_file_name = "mydir/production.ini"
     env_vars = dict(RDS_DB_NAME='snow_white', RDS_USERNAME='user', RDS_PASSWORD='my-secret',
-                    RDS_HOSTNAME='unittest', RDS_PORT="6543", ENCODED_ENV_NAME='cgap-devtest',
+                    RDS_HOSTNAME='unittest', RDS_PORT="6543", ENCODED_ENV_NAME=global_env_name,
                     ENCODED_IDENTITY='C4DatastoreCgapDevtestApplicationConfiguration')
 
     with override_environ(**env_vars):

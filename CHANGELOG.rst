@@ -7,6 +7,14 @@ Change Log
 ----------
 
 
+10.3.5
+======
+
+`PR 635: Changes to Will's test changes <https://github.com/dbmi-bgm/cgap-portal/pull/635>`_
+
+* Various testing changes to stabilize unit tests.
+
+
 10.3.4
 ======
 
