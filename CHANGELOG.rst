@@ -10,8 +10,12 @@ Change Log
 10.3.5
 ======
 
+`PR 635: Changes to Will's test changes <https://github.com/dbmi-bgm/cgap-portal/pull/635>`_
+
 * Miscellaneous cosmetics and refactoring to align better with Fourfront
   in how the file ``src/encoded/__init__.py`` is arranged.
+
+* Various testing changes to stabilize unit tests.
 
 
 10.3.4
