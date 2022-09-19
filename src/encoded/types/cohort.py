@@ -29,14 +29,13 @@ class Cohort(Item):
         "title": "Display Title",
         "type": "string"
     })
-    def display_title(self, request, title=None, accession=None):
+    def display_title(self, accession, title=None):
         """TODO: handle alternatives when no title available
         """
-        result = "Cohort from date"
         if title:
-            result = title
-        elif accession:
-            result = f"Cohort {accession}"
+            result = f"{title} ({accession})"
+        else:
+            result = accession
         return result
 
     @calculated_property(
@@ -51,15 +50,13 @@ class Cohort(Item):
             }
         }
     )
-    def samples(self, sample_processings=None):
+    def samples(self, request, sample_processings=None):
         """"""
         result = None
         if sample_processings:
             samples = set()
             for sample_processing_atid in sample_processings:
-                sample_processing = get_item_or_none(
-                    sample_processing_atid, "sample-processing"
-                )
+                sample_processing = get_item_or_none(request, sample_processing_atid)
                 if sample_processing:
                     samples.update(sample_processing.get("case_samples", []))
                     samples.update(sample_processing.get("control_samples", []))
