@@ -32,6 +32,9 @@ jobs:
           make configure
           poetry install
       - name: Static Checks
+        env:
+          GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
+          ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
           make test-static
           make lint
