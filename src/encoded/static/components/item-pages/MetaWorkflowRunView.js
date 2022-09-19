@@ -117,7 +117,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
     // Combine MWF + MWFR data:
     const combinedMWFRs = workflow_runs.map(function(workflowRun){
         const { name } = workflowRun;
-        const workflowForRun = workflowsByName[name];
+        const workflowForRun = workflowsByName[name] || {};
         return {
             // Deep-copy (or selectively deep copy), else "input" list/object references from workflow
             // will be shared between different runs of same workflow.
