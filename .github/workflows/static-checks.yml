@@ -1,6 +1,6 @@
 # PyPi publish for dcicsnovault
 
-name: Syntactic Checks
+name: Static Checks
 
 # Controls when the action will run.
 on:
@@ -17,6 +17,7 @@ on:
 jobs:
   # This workflow contains a single job called "build"
   build:
+    name: Static checks of source code (PEP8 and our custom checks)
     # The type of runner that the job will run on
     runs-on: ubuntu-18.04
 
