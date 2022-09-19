@@ -7,6 +7,12 @@ Change Log
 ----------
 
 
+10.3.5
+======
+
+* Raise an error if change log inconsistent.
+
+
 10.3.4
 ======
 
