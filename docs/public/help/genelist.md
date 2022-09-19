@@ -3,7 +3,7 @@ Gene lists can be submitted directly on the CGAP
 website or with command line tools. 
 
 For the web interface, click on the ["Submit New 
-Gene List(s)"](/search/?type=IngestionSubmission&currentAction=add&submissionType=GeneList)
+Gene List(s)"](/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene%20List)
  button on the home page once logged in. 
 
 For the command line, submission is accomplished 
@@ -31,8 +31,7 @@ MYL2
 
 A formatted Excel file that submits the same
 gene list can be downloaded 
-[here](https://raw.githubusercontent.com/dbmi-bgm/cgap-portal/master/docs/public/help/help_linked_docs/genelist_template.xlsx)
-. 
+[here](https://raw.githubusercontent.com/dbmi-bgm/cgap-portal/master/docs/public/help/help_linked_docs/genelist_template.xlsx). 
 Simply replace the title and genes with your own
 and save the file with a new name to create your
 Excel submission. 
