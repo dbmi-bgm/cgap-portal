@@ -181,10 +181,10 @@ remote-test:  # Actually, we don't normally use this. Instead the GA workflow se
 	make remote-test-npm
 
 remote-test-npm:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -xvv -r w --instafail --force-flaky --max-runs=2 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -xvv -r w --instafail --force-flaky --max-runs=2 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
 remote-test-unit:  # Note this does the 'indexing' tests
-	poetry run python -m pytest -xvv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -xvv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
