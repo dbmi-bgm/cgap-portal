@@ -11,7 +11,7 @@ from dcicutils.misc_utils import TestApp
 from .conftest_settings import ORDER
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.flaky]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
 def _type_length():
