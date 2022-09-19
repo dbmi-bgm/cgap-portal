@@ -33,6 +33,8 @@ jobs:
           poetry install
       - name: Static Checks
         env:
+          # This variable should not get used, but it's here for separation "just in case"
+          TEST_JOB_ID: cgap-static-test-${{ github.run_number }}-
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
