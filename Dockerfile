@@ -1,5 +1,6 @@
 # CGAP-Portal (Production) Dockerfile
-# Take latest 3.8.13 Debian variant
+
+# Debian Buster with Python 3.8.13
 FROM python:3.8.13-slim-buster
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
@@ -32,11 +33,17 @@ ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
 COPY deploy/docker/production/install_nginx.sh /install_nginx.sh
+
+# Temporarily replacing
+#     curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
+# with
+#     pip install poetry==1.1.15
+# because of a problem with wheel compatibility in 1.2.0. Need to debug that later. -kmp 31-Aug-2022
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates build-essential \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
     pip install --upgrade pip && \
-    curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
+    pip install poetry==1.1.15 && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
@@ -64,13 +71,13 @@ RUN poetry install --no-root --no-dev
 # Do the front-end dependency install
 COPY package.json .
 COPY package-lock.json .
-RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python
+RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python && npm cache clean --force
 
 # Copy over the rest of the code
 COPY . .
 
 # Build remaining back-end
-RUN poetry install --no-dev && \
+RUN poetry install --no-dev -vvv && \
     python setup_eb.py develop && \
     make fix-dist-info
 

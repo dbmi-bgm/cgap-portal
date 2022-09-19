@@ -4,56 +4,24 @@
 </h5>
 
 <p>
-    The relevant filters for Structural Variants (SVs) called by <a href=https://github.com/Illumina/manta/blob/master/docs/userGuide/README.md target="_blank">Manta</a> include:
-    <ul>
-        <li> <b> length </b>: The length of the call</li>
-        <li> <b> split-reads </b>: The number of split reads supporting the call</li>
-        <li> <b> split-read-ratio </b>: The number of split reads supporting the call divided by the number of split reads supporting the reference</li>
-        <li> <b> spanning-reads </b>: The number of spanning reads supporting the call</li>
-        <li> <b> spanning-read-ratio </b>: The number of spanning reads supporting the call divided by the number of spanning reads supporting the reference</li>
-    </ul>
+    Call confidence can be HIGH, MEDIUM, or LOW.
 </p>
 
 <p>
-    The relevant filters for Copy Number Variants (CNVs) called by BIC-seq2 include:
+    The confidence categories for structural variants (SVs) called by Manta are calculated based on the following parameters:
     <ul>
-        <li> <b> length </b>: The length of the call</li>
-        <li> <b> log-ratio </b>: log2(observed reads/expected reads)</li>
+	    <li> <b> length </b>: The length of the call </li>
+	    <li> <b> split-reads </b>: The number of split reads supporting the call </li>
+	    <li> <b> spanning-reads </b>: The number of spanning reads supporting the call </li>
     </ul>
+    For more details on how these parameters are used for SVs, see our extended documentation <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-2.html#confidence-classes" target="_blank">here</a>.
 </p>
 
-<h5>
-    High Confidence Calls
-</h5>
-<ul>
-    <li> SVs called by Manta:
-        <ul>
-            <li>length&gt;250 bp & split-reads&gt;5 & split-read-ratio&gt;0.3 & spanning-reads&gt;5 & spanning-read-ratio&gt;0.3 </li>
-            <li> length&lt;250 bp & split-reads&gt;5 & split-read-ratio&gt;0.3 </li>
-        </ul>
-    </li>
-    <li> CNVs called by BIC-seq2:
-        <ul>
-            <li>length&gt;1 Mbp & 0.4&lt;log-ratio&lt;0.8</li>
-        </ul>
-    </li>
-</ul>
-
-<h5>
-    Medium Confidence Calls
-</h5>
-<ul>
-    <li> SVs called by Manta:
-        <ul>
-            <li>length&gt;250 bp & split-reads&gt;3 & split-read-ratio&gt;0.3 & spanning-reads&gt;3 & spanning-read-ratio&gt;0.3 </li>
-            <li> length&lt;250 bp & split-reads&gt;3 & split-read-ratio&gt;0.3 </li>
-        </ul>
-    </li>
-</ul>
-
-<h5>
-    Low Confidence Calls
-</h5>
-<ul>
-    <li> All other variants</li>
-</ul>
+<p>
+    The confidence categories for copy number variants (CNVs) called by BIC-seq2 are calculated based on the following parameters:
+    <ul>
+	    <li> <b> length </b>: The length of the call </li>
+	    <li> <b> log-ratio </b>: log2(observed reads/expected reads)
+    </ul>
+    For more details on how these parameters are used for CNVs, see our extended documentation <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/CNV_germline/Pages/CNV_germline-step-part-2.html#confidence-classes" target="_blank">here</a>.
+</p>
