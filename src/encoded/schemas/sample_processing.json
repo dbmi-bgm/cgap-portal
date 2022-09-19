@@ -10,7 +10,8 @@
     ],
     "identifyingProperties": [
         "uuid",
-        "aliases"
+        "aliases",
+        "accession"
     ],
     "additionalProperties": false,
     "mixinProperties": [
@@ -46,11 +47,17 @@
         },
         {
             "$ref": "mixins.json#/meta_workflow_runs"
+        },
+        {
+            "$ref": "mixins.json#/accession"
         }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "accession": {
+            "accessionType": "SP"
         },
         "title": {
             "title": "Title",
