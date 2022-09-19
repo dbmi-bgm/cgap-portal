@@ -39,6 +39,18 @@ class Cohort(Item):
             result = f"Cohort {accession}"
         return result
 
+    @calculated_property(
+        schema={
+            "title": "Samples",
+            "description": "Samples involved in the cohort",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        }
+    )
     def samples(self, sample_processings=None):
         """"""
         result = None
@@ -54,4 +66,3 @@ class Cohort(Item):
             if samples:
                 result = sorted(list(samples))
         return result
-
