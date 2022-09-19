@@ -381,7 +381,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     # collect schemas
     profiles = testapp.get('/profiles/?frame=raw').json
 
-    # run step1 - if item does not exist, post with minimal metadata
+    # run step1 - if item does not exist, post with minimal metadata (and skip indexing since we will patch
+    # in round 2)
     second_round_items = {}
     if not patch_only:
         for a_type in all_types:
@@ -426,7 +427,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         to_post = {key: value for (key, value) in an_item.items() if key in first_fields}
                     to_post = format_for_attachment(to_post, docsdir)
                     try:
-                        res = testapp.post_json('/' + a_type, to_post)
+                        res = testapp.post_json('/' + a_type + '?skip_indexing=true', to_post)  # skip indexing in round 1
                         assert res.status_code == 201
                         posted += 1
                         # yield bytes to work with Response.app_iter
@@ -452,7 +453,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             logger.info('{}: {} items will be patched in second round'
                         .format(a_type, str(len(second_round_items.get(a_type, [])))))
 
-    # Round II - patch the rest of the metadata
+    # Round II - patch the rest of the metadata (ensuring to index by not passing the query param)
     rnd = ' 2nd' if not patch_only else ''
     for a_type in all_types:
         patched = 0
@@ -617,7 +618,7 @@ def load_data_by_type(app, indir='master-inserts', overwrite=True, itype=None):
         'REMOTE_USER': 'TEST',
     }
     testapp = webtest.TestApp(app, environ)
-   
+
     if not indir.endswith('/'):
         indir += '/'
     inserts = resource_filename('encoded', 'tests/data/' + indir)
