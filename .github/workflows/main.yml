@@ -97,10 +97,10 @@ jobs:
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
-          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
-          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
-          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: QA (UNIT)
         if: ${{ matrix.test_type == 'UNIT' }}
@@ -126,10 +126,10 @@ jobs:
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
-          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
-          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
-          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
         if: ${{ matrix.test_type == 'Docker' && matrix.node_version == '16' && matrix.python_version == '3.8' }}
