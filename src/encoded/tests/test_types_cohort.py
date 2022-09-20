@@ -6,7 +6,7 @@ pytestmark = [pytest.mark.working, pytest.mark.schema]
 
 @pytest.fixture
 def empty_sample_processing(testapp, cgap_core_project, institution):
-    """"""
+    """A simple SampleProcessing."""
     item = {
         "project": cgap_core_project["@id"],
         "institution": institution["@id"],
@@ -17,7 +17,7 @@ def empty_sample_processing(testapp, cgap_core_project, institution):
 
 @pytest.fixture
 def empty_cohort(testapp, cgap_core_project, institution, empty_sample_processing):
-    """"""
+    """A simple Cohort."""
     item = {
         "project": cgap_core_project["@id"],
         "institution": institution["@id"],
@@ -28,7 +28,7 @@ def empty_cohort(testapp, cgap_core_project, institution, empty_sample_processin
 
 
 def test_display_title(testapp, empty_cohort):
-    """"""
+    """Test display title calcprop."""
     accession = empty_cohort.get("accession")
     assert empty_cohort.get("display_title") == accession
 

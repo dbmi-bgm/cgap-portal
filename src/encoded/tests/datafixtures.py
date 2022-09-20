@@ -1490,14 +1490,3 @@ def bgm_structural_variant_sample(bgm_project, institution, structural_variant):
         "file": "some_bgm_vcf_file",
     }
     return item
-
-
-@pytest.fixture
-def empty_cohort(testapp, cgap_core_project, institution):
-    """"""
-    item = {
-        "project": cgap_core_project["@id"],
-        "institution": institution["@id"],
-    }
-    result = testapp.post_json("/cohort", item).json["@graph"][0]
-    return result
