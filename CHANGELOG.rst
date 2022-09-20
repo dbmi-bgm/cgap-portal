@@ -10,6 +10,8 @@ Change Log
 10.3.7
 ======
 
+`PR 655: Small administrative fixes <https://github.com/dbmi-bgm/cgap-portal/pull/655>`_
+
 * Fix pyproject.toml to use released ``snovault ^6.0.8`` rather than a beta.
 * Update ``poetry.lock`` to match.
 * Adjust ``Makefile`` to still run static tests now that they're factored out.
