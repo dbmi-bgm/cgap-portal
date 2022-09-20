@@ -13,6 +13,12 @@ Change Log
   so it can be searched for.
 
 
+10.3.5
+======
+
+* Raise an error if change log inconsistent.
+
+
 10.3.4
 ======
 

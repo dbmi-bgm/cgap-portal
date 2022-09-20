@@ -1,13 +1,15 @@
 import os
+import pytest
 
-from dcicutils.qa_utils import VersionChecker
+from dcicutils.qa_utils import ChangeLogChecker
 from .conftest_settings import REPOSITORY_ROOT_DIR
 
 
-def test_version_and_changelog():
+@pytest.mark.static
+def test_changelog_consistency():
 
-    class MyAppVersionChecker(VersionChecker):
+    class MyAppChangeLogChecker(ChangeLogChecker):
         PYPROJECT = os.path.join(REPOSITORY_ROOT_DIR, "pyproject.toml")
         CHANGELOG = os.path.join(REPOSITORY_ROOT_DIR, "CHANGELOG.rst")
 
-    MyAppVersionChecker.check_version()
+    MyAppChangeLogChecker.check_version()
