@@ -154,7 +154,8 @@ test:
 	@git log -1 --decorate | head -1
 	@date
 	make test-unit || echo "unit tests failed"
-	make test-npm
+	make test-npm || echo "npm tests failed"
+	make test-static || echo "static tests failed"
 	@git log -1 --decorate | head -1
 	@date
 
