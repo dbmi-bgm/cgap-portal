@@ -515,8 +515,20 @@
     "identifier": {
         "identifier": {
             "title": "Identifier",
-            "description": "An identifier for the item.",
+            "description": "An identifier for the item",
             "type": "string"
+        }
+    },
+    "processed_files": {
+        "processed_files": {
+            "title": "Processed Files",
+            "description": "Processed files from bioinformatics pipelines",
+            "type": "array",
+            "items": {
+                "title": "Processed File",
+                "type": "string",
+                "linkTo": "FileProcessed"
+            }
         }
     }
 }

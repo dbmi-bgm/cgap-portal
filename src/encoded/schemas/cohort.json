@@ -59,7 +59,7 @@
             "description": "Description of the cohort",
             "type": "string"
         },
-        "sample_processings": {
+        "analyses": {
             "title": "Cohort Analyses",
             "description": "Collection of analyses for the cohort",
             "type": "array",
@@ -67,7 +67,7 @@
                 "title": "Cohort Analysis",
                 "description": "An analysis for the cohort",
                 "type": "string",
-                "linkTo": "SampleProcessing"
+                "linkTo": "CohortAnalysis"
             }
         }
     }

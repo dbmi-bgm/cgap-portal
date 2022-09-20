@@ -49,28 +49,12 @@
             "$ref": "mixins.json#/meta_workflow_runs"
         },
         {
-            "$ref": "mixins.json#/accession"
-        },
-        {
-            "$ref": "mixins.json#/identifier"
+            "$ref": "mixins.json#/processed_files"
         }
     ],
     "properties": {
         "schema_version": {
             "default": "1"
-        },
-        "accession": {
-            "accessionType": "SP"
-        },
-        "title": {
-            "title": "Title",
-            "description": "Title for the analysis",
-            "type": "string"
-        },
-        "description": {
-            "title": "Description",
-            "description": "Description of the analysis",
-            "type": "string"
         },
         "analysis_type": {
             "title": "Analysis Type",
@@ -95,26 +79,6 @@
         "samples": {
             "title": "Samples",
             "description": "Samples used in a case analysis",
-            "type": "array",
-            "items": {
-                "title": "Sample",
-                "type": "string",
-                "linkTo": "Sample"
-            }
-        },
-        "control_samples": {
-            "title": "Samples",
-            "description": "Control samples used in a cohort analysis",
-            "type": "array",
-            "items": {
-                "title": "Sample",
-                "type": "string",
-                "linkTo": "Sample"
-            }
-        },
-        "case_samples": {
-            "title": "Samples",
-            "description": "Case samples used in a cohort analysis",
             "type": "array",
             "items": {
                 "title": "Sample",
@@ -157,16 +121,6 @@
                         }
                     }
                 }
-            }
-        },
-        "processed_files": {
-            "title": "Processed Files",
-            "description": "Processed files that are combined results for the sample analysis.",
-            "type": "array",
-            "items": {
-                "title": "Processed File",
-                "type": "string",
-                "linkTo": "FileProcessed"
             }
         },
         "completed_processes": {
