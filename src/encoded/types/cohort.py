@@ -6,7 +6,7 @@ from snovault import (
     load_schema,
 )
 
-from .base import Item, get_item_or_none
+from .base import Item
 
 
 log = structlog.getLogger(__name__)
@@ -27,39 +27,12 @@ class Cohort(Item):
 
     @calculated_property(schema={
         "title": "Display Title",
+        "description": "Cohort display title",
         "type": "string"
     })
     def display_title(self, accession, title=None):
-        """TODO: handle alternatives when no title available
-        """
         if title:
             result = f"{title} ({accession})"
         else:
             result = accession
-        return result
-
-    @calculated_property(
-        schema={
-            "title": "Samples",
-            "description": "Samples involved in the cohort",
-            "type": "array",
-            "items": {
-                "title": "Sample",
-                "type": "string",
-                "linkTo": "Sample"
-            }
-        }
-    )
-    def samples(self, request, sample_processings=None):
-        """"""
-        result = None
-        if sample_processings:
-            samples = set()
-            for sample_processing_atid in sample_processings:
-                sample_processing = get_item_or_none(request, sample_processing_atid)
-                if sample_processing:
-                    samples.update(sample_processing.get("case_samples", []))
-                    samples.update(sample_processing.get("control_samples", []))
-            if samples:
-                result = sorted(list(samples))
         return result
