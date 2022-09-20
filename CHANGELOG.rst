@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-10.3.5
+10.3.6
 ======
 
 * Add `lifecycle_management_active` to `project` schema and embed it into the `file` type
