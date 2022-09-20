@@ -37,6 +37,9 @@
         },
         {
             "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/identifier"
         }
     ],
     "properties": {

@@ -164,7 +164,6 @@
             ],
             "linkTo": "Institution",
             "serverDefault": "userinstitution"
-
         },
         "project": {
             "title": "Project",
@@ -511,6 +510,13 @@
                 "type": "string",
                 "linkTo": "MetaWorkflowRun"
             }
+        }
+    },
+    "identifier": {
+        "identifier": {
+            "title": "Identifier",
+            "description": "An identifier for the item.",
+            "type": "string"
         }
     }
 }

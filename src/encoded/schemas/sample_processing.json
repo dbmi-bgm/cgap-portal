@@ -50,6 +50,9 @@
         },
         {
             "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/identifier"
         }
     ],
     "properties": {
