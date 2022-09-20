@@ -57,10 +57,11 @@
             "type": "string"
         },
         "sample_processings": {
-            "title": "Sample Processings",
+            "title": "Cohort Analyses",
             "description": "Collection of analyses for the cohort",
             "type": "array",
             "items": {
+                "title": "Cohort Analysis",
                 "description": "An analysis for the cohort",
                 "type": "string",
                 "linkTo": "SampleProcessing"
