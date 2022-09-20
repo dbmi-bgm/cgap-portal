@@ -30,10 +30,13 @@ def pytest_configure():
     tempfile.tempdir = '/tmp'
 
 
-NO_ENVUTILS_INIT = environ_bool("NO_ENVUTILS_INIT")
+USE_SAMPLE_ENVUTILS = environ_bool("USE_SAMPLE_ENVUTILS")
 
-if NO_ENVUTILS_INIT:
-    PRINT(f"Skipping EnvUtils setup due to NO_ENVUTILS_INIT={NO_ENVUTILS_INIT!r}.")
+if USE_SAMPLE_ENVUTILS:
+
+    PRINT(f"EnvUtils using sample configuration template.")
+    EnvUtils.set_declared_data(EnvUtils.SAMPLE_TEMPLATE_FOR_CGAP_TESTING)
+
 else:
 
     PRINT("=" * 80)

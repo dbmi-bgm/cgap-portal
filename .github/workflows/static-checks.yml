@@ -35,7 +35,7 @@ jobs:
       - name: Static Checks
         env:
           NO_SERVER_FIXTURES: TRUE
-          NO_ENVUTILS_INIT: TRUE
+          USE_SAMPLE_ENVUTILS: TRUE
         run: |
           make test-static
           make lint
