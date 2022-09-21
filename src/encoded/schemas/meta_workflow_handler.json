@@ -1,11 +1,10 @@
 {
     "title": "MetaWorkflow Handler",
-    "description": "Schema for a meta workflow that connects a set of computational analysis workflows",
+    "description": "Schema for a handler that connects a set of metaworkflows, outlining an entire pipeline",
     "id": "/profiles/meta_workflow_handler.json", 
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [
-        "title",
         "project",
         "institution"
     ],
@@ -39,15 +38,6 @@
         },
         {
             "$ref": "mixins.json#/attribution"
-        },
-        {
-            "$ref": "mixins.json#/documents"
-        },
-        {
-            "$ref": "mixins.json#/tags"
-        },
-        {
-            "$ref": "mixins.json#/static_embeds" 
         }
     ],
     "mixinFacets": [
@@ -64,32 +54,32 @@
         },
         "title": {
             "title": "Title",
-            "description": "The preferred viewable name of the meta workflow handler.",
+            "description": "The preferred viewable name of the metaworkflow handler",
             "type": "string"
         },
         "name": {
             "title": "Name",
-            "description": "The name of the meta workflow handler",
+            "description": "The name of the metaworkflow handler",
             "type": "string"
         },
         "description": {
             "title": "Description",
-            "description": "A short text description of the meta workflow handler.",
+            "description": "A short text description of the metaworkflow handler",
             "type": "string",
             "formInput": "textarea" 
         },
         "version": {
             "title": "Version",
-            "description": "The version of the meta workflow handler.",
+            "description": "The version of the metaworkflow handler",
             "type": "string"
         },
         "previous_version": {
             "title": "Previous versions",
-            "description": "Link to the previous versions of the meta workflow handler.",
+            "description": "Link to the previous versions of the metaworkflow handler",
             "type": "array",
             "items": {
                 "title": "Previous version",
-                "description": "Link to a previous version of the meta workflow handler.",
+                "description": "Link to a previous version of the metaworkflow handler",
                 "type": "string",
                 "linkTo": "MetaWorkflowHandler"
             }
@@ -99,20 +89,19 @@
             "description": "Version upgrade log",
             "type": "string"
         },
-        "metaworkflows": {
+        "meta_workflows": {
             "title": "MetaWorkflows",
             "type": "array",
             "items": {
                 "title": "MetaWorkflows",
                 "type": "object",
                 "required": [
-                    "metaworkflow",
-                    "duplication_flag"
+                    "meta_workflow"
                 ],
                 "oneOf": [
                     {
                         "required": [
-                            "items_for_creation_pt"
+                            "items_for_creation_property_trace"
                         ]
                     },
                     {
@@ -123,23 +112,23 @@
                 ],
                 "additionalProperties": false,
                 "properties": {
-                    "metaworkflow": {
+                    "meta_workflow": {
                         "title": "MetaWorkflow",
                         "description": "Link to the metaworkflow item",
                         "type": "string",
                         "linkTo": "MetaWorkflow"
                     },
-                    "items_for_creation_pt": {
-                        "title": "Items for MWFR Creation (property trace)",
-                        "description": "List of item property traces needed for this MWFR's creation",
+                    "items_for_creation_property_trace": {
+                        "title": "Required items for creation (property traces)",
+                        "description": "List of item property traces needed for creation of the associated metaworkflow run",
                         "type": "array",
                         "items": {
                             "type": "string"
                         }
                     },
                     "items_for_creation_uuid": {
-                        "title": "Items for MWFR Creation (UUID)",
-                        "description": "List of item UUIDs needed for this MWFR's creation",
+                        "title": "Required items for creation (UUIDs)",
+                        "description": "List of item UUIDs needed for creation of the associated metaworkflow run",
                         "type": "array",
                         "items": {
                             "type": "string",
@@ -148,18 +137,19 @@
                     },
                     "dependencies": {
                         "title": "Dependencies",
-                        "description": "forced dependencies (other than deduced from input-output connections)",
+                        "description": "List of dependencies that must be fulfilled to create the associated metaworkflow run",
                         "type": "array",
                         "items": {
                             "title": "Dependency",
-                            "description": "One of the forced dependencies",
+                            "description": "One of the dependencies",
                             "type": "string"
                         }
                     },
                     "duplication_flag": {
                         "title": "Duplication flag",
-                        "description": "For existing MWFRs based on this MWF: True to duplicate, False to not create another MWFR",
-                        "type": "boolean"
+                        "description": "Whether to duplicate an existing metaworkflow run for this metaworkflow",
+                        "type": "boolean",
+                        "default": false
                     }
                 }
             }

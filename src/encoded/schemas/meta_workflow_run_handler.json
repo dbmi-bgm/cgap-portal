@@ -1,11 +1,10 @@
 {
-    "title": "Meta Workflow Run Handler",
-    "description": "Schema for submitting metadata on the meta workflows' (from MetaWorkflow Handler) executation and tracking",
+    "title": "MetaWorkflow Run Handler",
+    "description": "Schema for tracking execution of a metaworkflow handler",
     "id": "/profiles/meta_workflow_run_handler.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [
-        "title",
         "project",
         "institution",
         "meta_workflow_handler",
@@ -37,15 +36,6 @@
         },
         {
             "$ref": "mixins.json#/attribution"
-        },
-        {
-            "$ref": "mixins.json#/interpretation"
-        },
-        {
-            "$ref": "mixins.json#/tags"
-        },
-        {
-            "$ref": "mixins.json#/static_embeds"
         }
     ],
     "mixinFacets": [
@@ -59,17 +49,17 @@
         },
         "title": {
             "title": "Title",
-            "description": "The preferred viewable name of the meta-workflow run handler.",
+            "description": "The preferred viewable name of the metaworkflow run handler",
             "type": "string"
         },
         "description": {
             "title": "Description",
-            "description": "A plain text description of the meta-workflow run handler",
+            "description": "A plain text description of the metaworkflow run handler",
             "type": "string"
         },
         "meta_workflow_handler": {
-            "title": "Meta Workflow Handler",
-            "description": "The meta-workflow handler associated with the meta-workflow run handler.",
+            "title": "MetaWorkflow Handler",
+            "description": "The metaworkflow handler associated with the metaworkflow run handler",
             "type": "string",
             "linkTo": "MetaWorkflowHandler" 
         },
@@ -94,20 +84,20 @@
         },
         "cost": {
             "title": "Cost",
-            "description": "Total cost of the meta workflow run handler (includes failed jobs)",
+            "description": "Total cost of the metaworkflow run handler (includes failed jobs)",
             "type": "number"
         },   
-        "metaworkflow_runs": {
+        "meta_workflow_runs": {
             "title": "MetaWorkflow Runs",
             "description": "The list of metaworkflow runs with their status and output files",
             "type": "array", 
             "items": {
                 "title": "MetaWorkflow Run",
-                "description": "Individual metaworkflow run the meta workflow run handler.",
+                "description": "Individual metaworkflow run step on the metaworkflow run handler",
                 "type": "object",
                 "additionalProperties": false,
                 "properties": {
-                    "metaworkflow_run": {
+                    "meta_workflow_run": {
                         "title": "MetaWorkflow Run",
                         "description": "Link to the corresponding metaworkflow run item",
                         "type": "string",
@@ -130,17 +120,25 @@
                         "type": "array",
                         "items": {
                             "title": "Dependency",
-                            "description": "A dependency of the current metaworkflow run on preexisting metaworkflow runs.",
+                            "description": "A dependency of the current metaworkflow run on preexisting metaworkflow runs",
                             "type": "string"
                         }
                     },
                     "items_for_creation": {
-                        "title": "Items used for MWFR Creation",
-                        "description": "List of Item linkTos that were required for this MWFR's creation",
+                        "title": "Items used for creation",
+                        "description": "List of Item linkTos that were required for this metaworkflow run's creation",
                         "type": "array",
                         "items": {
                             "type": "string",
                             "linkTo": "Item"
+                        }
+                    },
+                    "error": {
+                        "title": "Error in creation",
+                        "description": "Error traceback arising from this metaworkflow run's creation, if applicable",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
                         }
                     }
                 }
