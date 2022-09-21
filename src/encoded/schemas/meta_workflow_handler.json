@@ -118,6 +118,11 @@
                         "type": "string",
                         "linkTo": "MetaWorkflow"
                     },
+                    "name": {
+                        "title": "MetaWorkflow name",
+                        "description": "User-submitted name of the metaworkflow",
+                        "type": "string"
+                    },
                     "items_for_creation_property_trace": {
                         "title": "Required items for creation (property traces)",
                         "description": "List of item property traces needed for creation of the associated metaworkflow run",
