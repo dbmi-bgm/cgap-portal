@@ -161,9 +161,6 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
         'higlass_view_config.json'
     ]
 
-    if schema == "cohort_analysis.json":
-        import pdb; pdb.set_trace()
-        pass
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
     assert(loaded_schema)
 
