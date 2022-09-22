@@ -139,6 +139,8 @@ def pluralize(name):
     # otherwise just add 's/es/ies'
     if name.endswith('ly'):
         return name[:-1] + 'ies'
+    if name.endswith('sis'):
+        return name[:-2] + 'es'
     if name.endswith('s'):
         return name + 'es'
     return name + 's'
@@ -159,6 +161,9 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
         'higlass_view_config.json'
     ]
 
+    if schema == "cohort_analysis.json":
+        import pdb; pdb.set_trace()
+        pass
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
     assert(loaded_schema)
 
