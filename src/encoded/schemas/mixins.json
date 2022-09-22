@@ -512,13 +512,6 @@
             }
         }
     },
-    "identifier": {
-        "identifier": {
-            "title": "Identifier",
-            "description": "An identifier for the item",
-            "type": "string"
-        }
-    },
     "processed_files": {
         "processed_files": {
             "title": "Processed Files",

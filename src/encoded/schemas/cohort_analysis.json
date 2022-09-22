@@ -46,9 +46,6 @@
             "$ref": "mixins.json#/accession"
         },
         {
-            "$ref": "mixins.json#/identifier"
-        },
-        {
             "$ref": "mixins.json#/processed_files"
         }
     ],
