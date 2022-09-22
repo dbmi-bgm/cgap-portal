@@ -113,6 +113,12 @@
             "lookup": 80,
             "linkTo": "User"
         },
+        "lifecycle_management_active": {
+            "title": "Lifecycle management",
+            "type": "boolean",
+            "description": "Whether lifecycle management is active or not",
+            "default": false
+        },
         "lifecycle_policy": {
             "title": "Lifecycle policy",
             "description": "Contains rules for how different categories of files are managed during their lifetime",

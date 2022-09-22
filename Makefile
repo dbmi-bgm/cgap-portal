@@ -154,7 +154,8 @@ test:
 	@git log -1 --decorate | head -1
 	@date
 	make test-unit || echo "unit tests failed"
-	make test-npm
+	make test-npm || echo "npm tests failed"
+	make test-static || echo "static tests failed"
 	@git log -1 --decorate | head -1
 	@date
 
@@ -177,7 +178,7 @@ test-integrated:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "not static and not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
 
 test-static:
-	poetry run python -m pytest -m static
+	poetry run python -m pytest -vv -m static
 
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
 	make remote-test-unit

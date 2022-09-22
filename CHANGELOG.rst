@@ -16,8 +16,43 @@ Change Log
   deployment
 
 
+10.3.7
+======
+
+`PR 655: Small administrative fixes <https://github.com/dbmi-bgm/cgap-portal/pull/655>`_
+
+* Fix pyproject.toml to use released ``snovault ^6.0.8`` rather than a beta.
+* Update ``poetry.lock`` to match.
+* Adjust ``Makefile`` to still run static tests now that they're factored out.
+* Small changes to repair recent changelogs and versions.
+
+
+10.3.6
+======
+
+`PR 651: Add lifecycle_management_active to schema <https://github.com/dbmi-bgm/cgap-portal/pull/651>`_
+
+* Add ``lifecycle_management_active`` to ``project`` schema and embed it into the ``file`` type
+  so it can be searched for.
+
+
+10.3.5.1
+========
+
+`PR 653: GA Static checks sans db fixtures and EnvUtils setup <https://github.com/dbmi-bgm/cgap-portal/pull/653>`_
+
+A PR was merged at this point that had no actual version number bump. That PR did:
+
+* Implements ``USE_SAMPLE_ENVUTILS`` to cause ``EnvUtils`` to be initialized from the sample (Acme) configuration.
+
+* Uses ``USE_SAMPLE_ENVUTILS`` and (from ``snovault``) ``NO_SERVER_FIXTURES``
+  in the GA ``Static Checks`` script to not have to put in complicated credentials and setup.
+
+
 10.3.5
 ======
+
+`PR 649: Adjustments to changelog handling <https://github.com/dbmi-bgm/cgap-portal/pull/649>`_
 
 * Raise an error if change log inconsistent.
 
