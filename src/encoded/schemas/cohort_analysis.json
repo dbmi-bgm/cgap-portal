@@ -67,7 +67,7 @@
             "type": "string"
         },
         "control_samples": {
-            "title": "Samples",
+            "title": "Control Samples",
             "description": "Control samples used in a cohort analysis",
             "type": "array",
             "items": {
@@ -77,7 +77,7 @@
             }
         },
         "case_samples": {
-            "title": "Samples",
+            "title": "Case Samples",
             "description": "Case samples used in a cohort analysis",
             "type": "array",
             "items": {
