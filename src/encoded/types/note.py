@@ -1,16 +1,8 @@
-import datetime
-from snovault.util import debug_log
-from snovault import (
-    abstract_collection,
-    calculated_property,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item
-)
+# import datetime
+# from snovault.util import debug_log
+from snovault import abstract_collection, calculated_property, collection, load_schema
+from .base import Item
 from ..server_defaults import add_last_modified
-
 
 
 @abstract_collection(

@@ -3,11 +3,11 @@ import os
 import pytest
 import tempfile
 
-from pyramid.httpexceptions import HTTPForbidden
+# from pyramid.httpexceptions import HTTPForbidden
 from unittest import mock
 from .. import source_beanstalk_env_vars
 from ..types import file as tf
-from ..types.file import FileFastq, post_upload, external_creds
+from ..types.file import external_creds  # , FileFastq, post_upload
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]

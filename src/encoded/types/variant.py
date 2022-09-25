@@ -1,43 +1,33 @@
+# import boto3
+# import csv
 import datetime
 import io
 import json
-import os
-import csv
-from math import inf
-from urllib.parse import parse_qs, urlparse
-from pyramid.httpexceptions import (
-    HTTPBadRequest,
-    HTTPServerError,
-    HTTPNotModified
-)
-from pyramid.traversal import find_resource
-from pyramid.request import Request
-from pyramid.response import Response
-
-import boto3
 import negspy.coordinates as nc
+import os
 import pytz
 import structlog
-from pyramid.httpexceptions import HTTPTemporaryRedirect
-from pyramid.settings import asbool
-from pyramid.view import view_config
-from snovault import calculated_property, collection, load_schema, TYPES
-from snovault.calculated import calculate_properties
-from snovault.util import simple_path_ids, debug_log, IndexSettings
-from snovault.embed import make_subrequest
 
-from ..batch_download_utils import (
-    stream_tsv_output,
-    convert_item_to_sheet_dict
-)
+from math import inf
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotModified, HTTPServerError, HTTPTemporaryRedirect
+# from pyramid.request import Request
+from pyramid.response import Response
+from pyramid.settings import asbool
+from pyramid.traversal import find_resource
+from pyramid.view import view_config
+from snovault import calculated_property, collection, load_schema  # , TYPES
+from snovault.calculated import calculate_properties
+from snovault.embed import make_subrequest
+from snovault.util import simple_path_ids, debug_log, IndexSettings
+from urllib.parse import parse_qs, urlparse
+
+from ..batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import (
-    resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
-)
-from ..types.base import Item, get_item_or_none
 from ..search.search import get_iterable_search_results
+from ..types.base import Item, get_item_or_none
+from ..util import resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
 
 
 log = structlog.getLogger(__name__)
@@ -1097,7 +1087,7 @@ def update_project_notes_process(context, request):
 
         payload[vg_field_name] = item_ids
 
-        if existing_item_from_project_idx != None:
+        if existing_item_from_project_idx is not None:
             existing_item_from_project_at_id = vg_item[vg_field_name][existing_item_from_project_idx]["@id"]
             # Set existing note's status to "obsolete", and populate previous/superseding field if applicable
             notes_patch_payloads[existing_item_from_project_at_id] = notes_patch_payloads.get(existing_item_from_project_at_id, {})
@@ -1116,7 +1106,7 @@ def update_project_notes_process(context, request):
     ## Handle Saves -
     for note_field in save_to_project_notes:
         item_field_mapping = vs_to_item_mappings[note_field]
-        if loaded_notes[note_field]["is_saved_to_project"] != True:
+        if loaded_notes[note_field]["is_saved_to_project"] is not True:
             create_note_patch_payload(loaded_notes[note_field])
         if "Variant" in item_field_mapping:     # Add to Variant
             add_or_replace_note_for_project_on_variant_or_gene_item(note_field, variant, variant_patch_payload)
@@ -1129,7 +1119,7 @@ def update_project_notes_process(context, request):
 
     for note_field in remove_from_project_notes:
         item_field_mapping = vs_to_item_mappings[note_field]
-        if loaded_notes[note_field]["is_saved_to_project"] == True:
+        if loaded_notes[note_field]["is_saved_to_project"] is True:
             create_note_patch_payload(loaded_notes[note_field], remove=True)
         if "Variant" in item_field_mapping: # Remove from Variant
             add_or_replace_note_for_project_on_variant_or_gene_item(note_field, variant, variant_patch_payload, remove=True)

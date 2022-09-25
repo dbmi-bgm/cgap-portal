@@ -34,17 +34,13 @@ from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionR
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
 from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import (
-    VariantBuilder,
-    StructuralVariantBuilder,
-    CNVBuilder,
-)
+from .ingestion.variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
     resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
+    subrequest_object, register_path_content_type, vapp_for_email,  # vapp_for_ingestion,
     SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
 

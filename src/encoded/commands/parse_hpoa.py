@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
 import logging
 import logging.config
 import os
@@ -11,10 +10,10 @@ import sys
 
 from datetime import datetime
 from dcicutils.ff_utils import (
-    get_authentication_with_server,
-    get_metadata,
-    patch_metadata,
-    post_metadata,
+    # get_authentication_with_server,
+    # get_metadata,
+    # patch_metadata,
+    # post_metadata,
     search_metadata,
 )
 from uuid import uuid4

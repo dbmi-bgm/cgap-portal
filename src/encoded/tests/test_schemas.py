@@ -160,7 +160,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
     ]
 
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
-    assert(loaded_schema)
+    assert loaded_schema
 
     typename = schema.replace('.json', '')
     collection_names = [camel_case(typename), pluralize(typename)]
@@ -181,7 +181,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
             assert not any([regex.search(bv) for bv in bad_vals if bad_vals])
 
     # check the mixin properties for each schema
-    if not schema == ('mixins.json'):
+    if schema != 'mixins.json':
         verify_mixins(loaded_schema, master_mixins)
 
     if schema not in ['namespaces.json', 'mixins.json']:
@@ -286,7 +286,7 @@ def test_changelogs(testapp, registry):
 
 @pytest.mark.parametrize('schema', SCHEMA_FILES)
 def test_facets_and_columns_orders(schema, testapp):
-    '''This tests depends on Python 3.6's ordered dicts'''
+    """This tests depends on Python 3.6's ordered dicts"""
 
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
 

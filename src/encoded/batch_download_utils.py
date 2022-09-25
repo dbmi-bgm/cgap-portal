@@ -1,7 +1,7 @@
 import csv
 from urllib.parse import parse_qs
 import structlog
-from snovault.util import simple_path_ids, debug_log
+from snovault.util import simple_path_ids  # , debug_log
 
 
 

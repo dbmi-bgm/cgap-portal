@@ -7,12 +7,12 @@ from urllib.parse import urlencode
 from snovault import TYPES
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from .search_utils import (
-    find_nested_path, convert_search_to_dictionary,
+    find_nested_path,  # convert_search_to_dictionary,
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
-    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED, STATS,
+    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS,  # REVERSE_NESTED,
+    STATS,
     schema_for_field, get_query_field, search_log, MAX_FACET_COUNTS,
-
 )
 
 
@@ -1084,7 +1084,7 @@ class LuceneBuilder:
         This method depends on the query structure defined in 'build_filters'.
 
         :param request: the current request
-        :param search: search object to inspect
+        :param query: search query object to inspect
         :raises: HTTPBadRequest if permissions not present
         """
         effective_principals_on_query = None

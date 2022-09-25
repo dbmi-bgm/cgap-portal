@@ -1,9 +1,11 @@
 #!/usr/bin/env python3
+
 import argparse
 import logging
 import logging.config
-import os
 import json
+import os
+
 from datetime import datetime
 from dcicutils import ff_utils
 
@@ -70,13 +72,15 @@ def parse_args():
                         action='store_true', help='Use if only posting new items')
     parser.add_argument('--item_types',
                         nargs='*',
-                        help="Type(s) of Item(s) to load - if not provided then a dictionary of jsons keyed by item_type is required \
-                              NOTE if you do provide more than one value to item_types then as long as the item_types are keys of the store only \
-                              the values of those keys will be loaded")
+                        help=("Type(s) of Item(s) to load - if not provided then a dictionary of jsons keyed"
+                              " by item_type is required."
+                              " NOTE: if you do provide more than one value to item_types"
+                              " then as long as the item_types are keys of the store"
+                              " only the values of those keys will be loaded"))
     return parser.parse_args()
 
 
-def get_auth(key=None, keyfile=None):
+def get_auth(*, key, keyfile, logger):
     """Sets up credentials for accessing the server.  Generates a key using info
        from the named keyname in the keyfile and checks that the server can be
        reached with that key.
@@ -95,7 +99,7 @@ def get_auth(key=None, keyfile=None):
     return auth
 
 
-def set_load_params(auth, env):
+def set_load_params(*, auth, env):
     # authentication with Fourfront
     # auth is dict: key, secret, server - set config appropriately
     if not (auth or env):
@@ -117,7 +121,7 @@ def set_load_params(auth, env):
     return auth, config_uri
 
 
-def load_json_to_store(json_input, itype=None):
+def load_json_to_store(json_input, *, itypes, logger):
     if isinstance(json_input, str):
         with open(json_input) as infile:
             try:
@@ -128,17 +132,17 @@ def load_json_to_store(json_input, itype=None):
     else:
         json_data = json_input
     if isinstance(json_data, dict):
-        if itype:
+        if itypes:
             # just make sure the keys exist
-            if [i for i in itype if i not in json_data]:
-                logger.error('{} type(s) not in dictionary -- abort!!!'.format(', '.join(itype)))
+            if [i for i in itypes if i not in json_data]:
+                logger.error('{} type(s) not in dictionary -- abort!!!'.format(', '.join(itypes)))
                 return {}
         return {'store': json_data}
     elif isinstance(json_data, list):
-        if not itype or len(itype) != 1:
+        if not itypes or len(itypes) != 1:
             logger.error('you need to pass a single item_type with your json list -- abort!!!')
             return {}
-        return {'store': {itype[0]: json_data}}
+        return {'store': {itypes[0]: json_data}}
     else:
         logger.error("I don't understand the data in the file -- abort!!!")
         return{}
@@ -150,14 +154,14 @@ def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, p
     or a list (as long as a single itype param value is provided) to a server using
     the `load_data` endpoint defined in loadxl.
     """
-    auth, config_uri = set_load_params(auth, env)
+    auth, config_uri = set_load_params(auth=auth, env=env)
     load_endpoint = '/'.join([auth['server'], 'load_data'])
     logger.info('load_items: Starting POST to %s' % load_endpoint)
     json_data = {'config_uri': config_uri, 'overwrite': True, 'iter_response': True,
                  'patch_only': patch_only, 'post_only': post_only}
     if itypes:
         json_data['itype'] = itypes
-    json_data.update(load_json_to_store(json_input, itypes))
+    json_data.update(load_json_to_store(json_input, itypes=itypes, logger=logger))
     logger.info('Will attempt to load to {}'.format(auth['server']))
     num_to_load = 0
     for iname, idata in json_data.get('store', {}).items():
@@ -196,7 +200,8 @@ def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, p
             logger.error("ERROR encountered during load_data! Error: %s" % load_res['ERROR'])
         if not post_only and (len(load_res['POST']) + len(load_res['SKIP'])) > len(load_res['PATCH']):
             missed = set(load_res['POST'] + load_res['SKIP']) - set(load_res['PATCH'])
-            logger.error("The following {} items passed round I (POST/skip) but not round II (PATCH): {}".format(len(missed), missed))
+            logger.error("The following {} items passed round I (POST/skip) but not round II (PATCH): {}"
+                         .format(len(missed), missed))
     request_time = datetime.utcnow() - start
     logger.info("Finished request in {}".format(str(request_time)))
 
@@ -211,10 +216,10 @@ def main():
     logger = get_logger(__name__, logfile)
     auth = None
     if not args.env and args.key:
-        auth = get_auth(args.key, args.keyfile)
+        auth = get_auth(key=args.key, keyfile=args.keyfile, logger=logger)
     load_items(args.json_input, args.item_types, args.env, auth, args.patch_only, args.post_only, logger)
-    end = datetime.now()
-    et = utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+    # end = datetime.now()
+    et = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
     logger.info("DONE! {}".format(et))
 
 

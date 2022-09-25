@@ -25,7 +25,7 @@ from snovault.validators import (
 from urllib.parse import urlparse, urlencode
 from ..search.search import get_iterable_search_results
 from .base import Item, collection_add, item_edit
-from .user_content import StaticSection
+# from .user_content import StaticSection
 
 
 def get_pyramid_http_exception_for_redirect_code(code):

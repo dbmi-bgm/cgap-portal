@@ -16,11 +16,15 @@
 #       requires granite library
 #
 ################################################
-import io
 import argparse
+import io
+import sys
+
+from dcicutils.misc_utils import ignored
 from granite.lib import vcf_parser
 # shared_functions as *
-from granite.lib.shared_functions import *
+# from granite.lib.shared_functions import *
+from granite.lib.shared_functions import get_tag_idx, variant_type_ext
 # shared_vars
 from granite.lib.shared_vars import DStags
 
@@ -33,7 +37,13 @@ from granite.lib.shared_vars import DStags
 
 
 def get_maxds(vnt_obj, SpAItag_list, SpAI_idx_list):
-    ''' TODO add docstring. '''
+    """
+    ...TODO: add doc...
+
+    :param vnt_obj: ...
+    :param SpAItag_list: ...
+    :param SpAI_idx_list: ...
+    """
     # if SpliceAI is within VEP
     # fetching only the first transcript
     # expected the same scores for all transcripts
@@ -52,7 +62,16 @@ def get_maxds(vnt_obj, SpAItag_list, SpAI_idx_list):
 
 
 def get_worst_trscrpt(VEP_val, VEP_order, CNONICL_idx, CONSEQUENCE_idx, sep='&'):
-    ''' TODO add docstring. '''
+    """
+    ...TODO: add doc...
+
+    :param VEP_val: ...
+    :param VEP_order: ...
+    :param CNONICL_idx: ...
+    :param CONSEQUENCE_idx: ...
+    :param sep: [UNUSED] a separator (default is '&')
+    """
+    ignored(sep)
     # Check transcripts
     worst_trscrpt_tup = []
     trscrpt_list = VEP_val.split(',')
@@ -72,7 +91,7 @@ def get_worst_trscrpt(VEP_val, VEP_order, CNONICL_idx, CONSEQUENCE_idx, sep='&')
     for worst_cnsqce, trscrpt in sorted_worst_trscrpt_tup:
         if worst_cnsqce == worst_impact:
             trscrpt_cnonicl = trscrpt.split('|')[CNONICL_idx]
-            if (trscrpt_cnonicl == 'YES' or trscrpt_cnonicl == '1'):
+            if trscrpt_cnonicl == 'YES' or trscrpt_cnonicl == '1':
                 return trscrpt
             worst_trscrpt_list.append(trscrpt)
         else:
@@ -81,7 +100,12 @@ def get_worst_trscrpt(VEP_val, VEP_order, CNONICL_idx, CONSEQUENCE_idx, sep='&')
 
 
 def update_worst(VEP_val, worst_trscrpt):
-    ''' TODO add docstring. '''
+    """
+    ...TODO: add doc...
+
+    :param VEP_val: ...
+    :param worst_trscrpt: ...
+    """
     # Get VEP
     trscrpt_update = []
     trscrpt_list = VEP_val.split(',')
@@ -96,7 +120,13 @@ def update_worst(VEP_val, worst_trscrpt):
 
 
 def get_worst_consequence(consequence, VEP_order, sep='&'):
-    ''' TODO add docstring. '''
+    """
+    ...TODO: add doc...
+
+    :param consequence: ...
+    :param VEP_order: ...
+    :param sep: a separator (default '&')
+    """
     consequence_tup = []
     for cnsqce in consequence.split(sep):
         try:
@@ -107,7 +137,16 @@ def get_worst_consequence(consequence, VEP_order, sep='&'):
 
 
 def clean_dbnsfp(vnt_obj, VEPtag, dbNSFP_fields, dbnsfp_ENST_idx, ENST_idx, sep='&'):
-    ''' TODO add docstring. '''
+    """
+    ...TODO: add doc...
+
+    :param vnt_obj: ...
+    :param VEPtag: ...
+    :param dbNSFP_fields: ...
+    :param dbnsfp_ENST_idx: ...
+    :param ENST_idx: ...
+    :param sep: a separator (default '&')
+    """
     # Get VEP
     try:
         val_get = vnt_obj.get_tag_value(VEPtag)
@@ -143,7 +182,11 @@ def clean_dbnsfp(vnt_obj, VEPtag, dbNSFP_fields, dbnsfp_ENST_idx, ENST_idx, sep=
 
 
 def runner(args):
-    ''' TODO add docstring '''
+    """
+    ...TODO: add doc...
+
+    :param args: ...
+    """
     # Variables
     is_verbose = args['verbose']
     VEPtag = 'CSQ'
@@ -201,7 +244,7 @@ def runner(args):
     # Modify VEP definition
     vep_def = '##INFO=<ID={0},Number=.,Type=String,Description="Consequence annotations from Ensembl VEP.  Subembedded:\'transcript\':Format:\'{1}\'">'
     for line in vcf_obj.header.definitions.split('\n')[:-1]:
-        if line.startswith('##INFO=<ID=' + VEPtag + ','): ##<tag_type>=<ID=<tag>,...
+        if line.startswith('##INFO=<ID=' + VEPtag + ','):  # '##<tag_type>=<ID=<tag>,...'
             format = line.split('Format:')[1]
             # Cleaning format
             format = format.replace(' ', '')
@@ -245,7 +288,7 @@ def runner(args):
     CNONICL_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'CANONICAL')
     ENSG_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'Gene')
     ENST_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'Feature')
-    MANE_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'MANE') #feature_ncbi
+    MANE_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'MANE')  # feature_ncbi
     HGVSC_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'HGVSc')
     HGVSP_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'HGVSp')
     AACIDS_idx = vcf_obj.header.get_tag_field_idx(VEPtag, 'Amino_acids')
@@ -293,18 +336,19 @@ def runner(args):
         # Add GENES to variant INFO
         worst_trscrpt_ = worst_trscrpt.split('|')
         worst_consequence_ = get_worst_consequence(worst_trscrpt_[CONSEQUENCE_idx], VEP_order)
-        genes = '{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}'.format(
-                                                        worst_trscrpt_[ENSG_idx],
-                                                        worst_trscrpt_[ENST_idx],
-                                                        worst_trscrpt_[MANE_idx],
-                                                        worst_trscrpt_[HGVSC_idx],
-                                                        worst_trscrpt_[HGVSP_idx],
-                                                        worst_trscrpt_[AACIDS_idx],
-                                                        worst_trscrpt_[SIFT_idx],
-                                                        worst_trscrpt_[PPHEN_idx],
-                                                        worst_trscrpt_[MAXENTDIFF_idx],
-                                                        worst_consequence_
-                                                )
+        genes_as_list = [
+            worst_trscrpt_[ENSG_idx],
+            worst_trscrpt_[ENST_idx],
+            worst_trscrpt_[MANE_idx],
+            worst_trscrpt_[HGVSC_idx],
+            worst_trscrpt_[HGVSP_idx],
+            worst_trscrpt_[AACIDS_idx],
+            worst_trscrpt_[SIFT_idx],
+            worst_trscrpt_[PPHEN_idx],
+            worst_trscrpt_[MAXENTDIFF_idx],
+            worst_consequence_]
+        # genes = '{0}|{1}|{2}|{3}|{4}|{5}|{6}|{7}|{8}|{9}'.format(*genes_as_list)
+        genes = "|".join(map(str, genes_as_list))
         vnt_obj.add_tag_info('GENES={0}'.format(genes))
 
         # Write variant
@@ -319,8 +363,8 @@ if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='Reformat VCF and add custom tags and fields in VCF file for portal ingestion')
 
-    parser.add_argument('-i','--inputfile', help='input VCF file', required=True)
-    parser.add_argument('-o','--outputfile', help='output VCF file', required=True)
+    parser.add_argument('-i', '--inputfile', help='input VCF file', required=True)
+    parser.add_argument('-o', '--outputfile', help='output VCF file', required=True)
     parser.add_argument('--verbose', help='verbose', action='store_true', required=False)
 
     args = vars(parser.parse_args())

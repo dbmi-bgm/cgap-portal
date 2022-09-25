@@ -5,10 +5,7 @@ from snovault import (
     collection,
     load_schema,
 )
-from .base import (
-    Item,
-    get_item_or_none,
-)
+from .base import Item  # , get_item_or_none
 
 
 @abstract_collection(

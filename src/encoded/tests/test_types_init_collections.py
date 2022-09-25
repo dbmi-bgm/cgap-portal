@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import datetime
+# from datetime import datetime
 from dcicutils.misc_utils import utc_today_str
 from ..types.image import Image
 
