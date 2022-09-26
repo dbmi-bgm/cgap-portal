@@ -177,6 +177,9 @@ test-performance:
 test-integrated:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
 
+test-static:
+	poetry run python -m pytest -vv -m static
+
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
 	make remote-test-unit
 	make remote-test-npm

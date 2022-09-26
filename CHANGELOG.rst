@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+11.0.0
+======
+
+* ElasticSearch 7 support
+* SQLAlchemy 1.4 support
+* Cascading library updates to support the above
+* B-Tree index on sid column to optimize indexing
+
 
 10.4.0
 ======
