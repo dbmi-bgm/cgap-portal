@@ -154,7 +154,8 @@ test:
 	@git log -1 --decorate | head -1
 	@date
 	make test-unit || echo "unit tests failed"
-	make test-npm
+	make test-npm || echo "npm tests failed"
+	make test-static || echo "static tests failed"
 	@git log -1 --decorate | head -1
 	@date
 
@@ -162,29 +163,32 @@ retest:
 	poetry run python -m pytest -vv -r w --last-failed
 
 test-any:
-	poetry run python -m pytest -vv -r w --timeout=200
+	poetry run python -m pytest -xvv -r w --timeout=200
 
 test-npm:
-	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "not static and not manual and not integratedx and not performance and not broken and not sloppy and not indexing"
 
 test-unit:
-	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing"
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "not static and not manual and not integratedx and not performance and not broken and not sloppy and indexing"
 
 test-performance:
-	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and not integratedx and performance and not broken and not sloppy"
+	poetry run python -m pytest -xvv -r w --timeout=200 -m "not static and not manual and not integratedx and performance and not broken and not sloppy"
 
 test-integrated:
-	poetry run python -m pytest -vv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
+	poetry run python -m pytest -xvv -r w --timeout=200 -m "not static and not manual and (integrated or integratedx) and not performance and not broken and not sloppy"
+
+test-static:
+	poetry run python -m pytest -vv -m static
 
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
 	make remote-test-unit
 	make remote-test-npm
 
 remote-test-npm:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -vv -r w --instafail --force-flaky --max-runs=2 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -xvv -r w --instafail --force-flaky --max-runs=2 --timeout=600 -m "not static and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing" --aws-auth --durations=20 --cov src/encoded --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
 
 remote-test-unit:  # Note this does the 'indexing' tests
-	poetry run python -m pytest -vv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+	poetry run python -m pytest -xvv -r w --timeout=300 -m "not static and not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing" --aws-auth --es search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
 	poetry update
@@ -244,6 +248,9 @@ tag-and-push-docker-production:
 	date
 	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
 	date
+
+lint:
+	@echo "simulated flake8 for now. we're not ready for a real one"
 
 help:
 	@make info
