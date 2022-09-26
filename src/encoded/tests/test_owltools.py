@@ -163,8 +163,8 @@ def test_removeDuplicates(dupe_lists):
     for i, lst in enumerate(dupe_lists):
         if i == 0:
 
-            def id_func(l):
-                return l[0]
+            def id_func(lst):
+                return lst[0]
 
             result = ot.removeDuplicates(lst, id_func)
             assert len(result) == 1

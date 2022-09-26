@@ -219,7 +219,7 @@ def test_variant_sample_patch_notes_process_success(
         "variant_notes": [ note_pre_existing["@id"] ],
         "genes": [ {"genes_most_severe_gene": gene["@id"] }, {"genes_most_severe_gene": gene_2["@id"] } ]
     }
-    variant_loaded = testapp.patch_json(variant_sample["variant"], variant_payload_for_initial_state, status=200).json['@graph'][0]
+    testapp.patch_json(variant_sample["variant"], variant_payload_for_initial_state, status=200)
 
     # Test /@@update-project-notes/ endpoint
     save_patch_process_payload = {

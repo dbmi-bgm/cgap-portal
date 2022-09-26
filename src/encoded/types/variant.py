@@ -8,7 +8,7 @@ import os
 import pytz
 import structlog
 
-from dcicutils.misc_utils import ignorable
+from dcicutils.misc_utils import ignorable, ignored
 from math import inf
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotModified, HTTPServerError, HTTPTemporaryRedirect
 # from pyramid.request import Request
@@ -1284,6 +1284,7 @@ def add_selections(context, request):
         return HTTPNotModified("Nothing submitted")
 
     patch_result = perform_request_as_admin(request, context.jsonld_id(request), patch_payload, request_method="PATCH")
+    ignored(patch_result)  # TODO: Is that the right thing?
 
     return {
         "status": "success",

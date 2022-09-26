@@ -295,8 +295,11 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
     res_stem = es_testapp.get(search).json
     assert len(res_stem['@graph']) > 1
     uuids = [r['uuid'] for r in res_stem['@graph'] if 'uuid' in r]
+    ignored(uuids)  # TODO: Should this be ignored? Does it relate to the not_induced_uuids below?
     wrangler_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e3b"
     tester_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e4c"
+    # TODO: I suspect the next assert suffers from variables having changed names in the interim.
+    #       Is it something that should refer to the unused 'uuids' variable above? -kmp 26-Sep-2022
     # assert induced_stem_uuid not in not_induced_uuids
     # now search for stem +induced (AND is now "+")
     search_and = '/search/?type=User&q=scientist+%2Bcurrent'
