@@ -51,13 +51,13 @@ def test_postgres_version(session):
 TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 
-@pytest.yield_fixture(scope='session', params=[False])
+@pytest.yield_fixture(scope='session')
 def app(es_app_settings, request):
     # for now, don't run with mpindexer. Add `True` to params above to do so
-    if request.param:
-        # we disable the MPIndexer since the build runs on a small machine
-        # snovault should be testing the mpindexer - Will 12/12/2020
-        es_app_settings['mpindexer'] = True
+    # if request.param:
+    #     # we disable the MPIndexer since the build runs on a small machine
+    #     # snovault should be testing the mpindexer - Will 12/12/2020
+    #     es_app_settings['mpindexer'] = True
     app = main({}, **es_app_settings)
 
     yield app
