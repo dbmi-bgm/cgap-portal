@@ -41,7 +41,7 @@ def variant_sample_search_spreadsheet(context, request):
     try:
         # This is what we should be receiving
         request_body = request.POST
-    except:
+    except Exception:
         # TODO: Consider accepting JSON body for unit test purposes only
         pass
 

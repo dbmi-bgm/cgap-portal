@@ -8,6 +8,7 @@ import os
 import pytz
 import structlog
 
+from dcicutils.misc_utils import ignorable
 from math import inf
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotModified, HTTPServerError, HTTPTemporaryRedirect
 # from pyramid.request import Request
@@ -117,8 +118,8 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.note_text",
     "technical_review.last_text_edited.date_text_edited",
     "technical_review.last_text_edited.text_edited_by",
-    #"technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
-    #"technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
+    # "technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
+    # "technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
     "technical_review.last_modified.date_modified",
@@ -170,7 +171,7 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = SHARED_VARIANT_EMBEDS + [
-        "genes.genes_most_severe_gene.gene_notes.@id", # `genes` not present on StructuralVariant
+        "genes.genes_most_severe_gene.gene_notes.@id",  # `genes` not present on StructuralVariant
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -241,7 +242,7 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                                               "../../..",
                                               field_schema["extended_description"])
                 with io.open(html_file_path) as open_file:
-                    field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
+                    field_schema["extended_description"] = "".join([line.strip() for line in open_file.readlines()])
 
         # Applicable only to "properties" of Item schema, not columns or facets:
         if "type" in field_schema:
@@ -954,8 +955,8 @@ def update_project_notes_process(context, request):
 
             # Compare UUID submitted vs UUID present on VS Item
             if uuid_to_process != context.properties[vs_field_name]:
-                raise HTTPBadRequest("Not all submitted Item UUIDs are present on [Structural]VariantSample. " + \
-                    "Check 'save_to_project_notes." + vs_field_name + "'.")
+                raise HTTPBadRequest(f"Not all submitted Item UUIDs are present on [Structural]VariantSample."
+                                     f" Check 'save_to_project_notes.{vs_field_name}'.")
 
         elif vs_field_name in remove_from_project_notes:
             uuid_to_process = remove_from_project_notes[vs_field_name]
@@ -967,8 +968,8 @@ def update_project_notes_process(context, request):
         loaded_item = request.embed("/" + uuid_to_process, "@@object", as_user=True)
         item_resource = find_resource(request.root, loaded_item["@id"])
         if not request.has_permission("edit", item_resource):
-            raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
-                "Check 'save_to_project_notes." + vs_field_name + "'.")
+            raise HTTPBadRequest(f"No edit permission for at least one submitted Item UUID."
+                                 f" Check 'save_to_project_notes.{vs_field_name}'.")
         else:
             loaded_notes[vs_field_name] = loaded_item
 
@@ -1145,6 +1146,7 @@ def update_project_notes_process(context, request):
     variant_patch_count = 0
     if variant_fields_needed:
         variant_response = perform_request_as_admin(request, variant["@id"], variant_patch_payload, request_method="PATCH")
+        ignorable(variant_response)
         variant_patch_count += 1
         # print('\n\n\nVARIANT RESPONSE', json.dumps(variant_response, indent=4))
 

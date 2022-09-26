@@ -267,6 +267,7 @@ def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=Non
     try:
         email = data['email']
     except KeyError as e:
+        ignored(e)
         debuglog("Manifest data is missing 'email' field.")
         if DEBUG_SUBMISSIONS:
             pass

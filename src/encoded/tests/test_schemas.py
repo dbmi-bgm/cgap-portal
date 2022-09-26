@@ -120,7 +120,7 @@ def compute_master_mixins():
         'supplementary_files'
     ]
     for key in mixin_keys:
-        assert(mixins[key])
+        assert mixins[key]
 
 
 def camel_case(name):
@@ -235,7 +235,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
 
 
 def verify_property(loaded_schema, property):
-    assert(loaded_schema['properties'][property])
+    assert loaded_schema['properties'][property]
 
 
 def verify_mixins(loaded_schema, master_mixins):

@@ -160,15 +160,17 @@ def dupe_lists():
 
 
 def test_removeDuplicates(dupe_lists):
-    for i, l in enumerate(dupe_lists):
+    for i, lst in enumerate(dupe_lists):
         if i == 0:
+
             def id_func(l):
                 return l[0]
-            result = ot.removeDuplicates(l, id_func)
+
+            result = ot.removeDuplicates(lst, id_func)
             assert len(result) == 1
             assert result == [[1, 2]]
         else:
-            for sl in l:
+            for sl in lst:
                 result = ot.removeDuplicates(sl)
                 if i == 1:
                     assert result == ['a', 'b', 'c']

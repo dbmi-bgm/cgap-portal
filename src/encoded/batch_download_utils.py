@@ -63,10 +63,10 @@ def convert_item_to_sheet_dict(item, spreadsheet_mappings):
     proper embedded_list.
     '''
 
-    if not "@id" in item:
+    if '@id' not in item:
         return None
 
-    sheet_dict = {} # OrderedDict() # Keyed by column title. Maybe OrderedDict not necessary now..
+    sheet_dict = {}  # OrderedDict() # Keyed by column title. Maybe OrderedDict not necessary now..
 
     for column_title, cgap_field_or_func, description in spreadsheet_mappings:
         if cgap_field_or_func is None: # Skip
@@ -74,7 +74,7 @@ def convert_item_to_sheet_dict(item, spreadsheet_mappings):
 
         is_field_str = isinstance(cgap_field_or_func, str)
 
-        if not is_field_str: # Assume render or custom-logic function
+        if not is_field_str:  # Assume render or custom-logic function
             sheet_dict[column_title] = cgap_field_or_func(item)
         else:
             sheet_dict[column_title] = get_values_for_field(item, cgap_field_or_func)
@@ -165,15 +165,15 @@ def stream_tsv_output(
             yield writer.writerow(row)
 
 
-
-def build_xlsx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
-    '''TODO'''
-    from tempfile import NamedTemporaryFile
-    from openpyxl import Workbook
-    wb = Workbook()
-
-    with NamedTemporaryFile() as tmp:
-        wb.save(tmp.name)
-        tmp.seek(0)
-        stream = tmp.read()
-        
+# TODO: Fortunately, I don't see any uses of this function. -kmp 25-Sep-2022
+#
+# def build_xlsx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
+#     """TODO"""
+#     from tempfile import NamedTemporaryFile
+#     from openpyxl import Workbook
+#     wb = Workbook()
+#
+#     with NamedTemporaryFile() as tmp:
+#         wb.save(tmp.name)
+#         tmp.seek(0)
+#         stream = tmp.read()  # TODO: Seems like you'd want to return this value? -kmp 25-Sep-2022

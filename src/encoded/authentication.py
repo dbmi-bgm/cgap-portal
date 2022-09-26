@@ -7,7 +7,7 @@ import structlog
 
 from dateutil.parser import isoparse
 from dcicutils.lang_utils import conjoined_list
-from dcicutils.misc_utils import remove_element
+from dcicutils.misc_utils import remove_element, ignorable, ignored
 from operator import itemgetter
 from passlib.context import CryptContext
 from pyramid.authentication import (
@@ -123,6 +123,7 @@ class NamespacedAuthenticationPolicy(object):
         return super(NamespacedAuthenticationPolicy, klass).__new__(klass)
 
     def __init__(self, namespace, base, *args, **kw):
+        ignored(namespace, base)  # TODO: SHOULD this be ignored?
         super().__init__(*args, **kw)
 
     def unauthenticated_userid(self, request):
@@ -148,7 +149,10 @@ class NamespacedAuthenticationPolicy(object):
                 if not user_props.get('details'):
                     raise HTTPUnauthorized(
                         title="Could not find user info for {}".format(userid),
-                        headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
+                        headers={
+                            'WWW-Authenticate':
+                                "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain)
+                        }
                     )
                 return user_props
 
@@ -263,15 +267,19 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 warn_msg = "No Auth0 keys present - falling back to making outbound network request to have Auth0 validate for us"
                 log.warning(warn_msg)
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
-                resp = requests.post(user_url, {'id_token':token})
+                resp = requests.post(user_url, {'id_token': token})
                 payload = resp.json()
                 if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
         except jwt.exceptions.ExpiredSignatureError as e:
+            ignorable(e)
             # Normal/expected expiration.
-            request.set_property(lambda r: True, 'auth0_expired')  # Allow us to return 403 code &or unset cookie in renderers.py
+
+            # Allow us to return 403 code &or unset cookie in renderers.py
+            request.set_property(lambda r: True, 'auth0_expired')
+
             return None
 
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
@@ -322,6 +330,7 @@ def login(context, request):
     """
     Save JWT as httpOnly cookie
     """
+    ignored(context)
 
     # Allow providing token thru Authorization header as well as POST request body.
     # Should be about equally secure if using HTTPS.
@@ -359,6 +368,7 @@ def logout(context, request):
     The front-end handles logging out by discarding the locally-held JWT from
     browser cookies and re-requesting the current 4DN URL.
     """
+    ignored(context)
 
     # Deletes the cookie
     request.response.set_cookie(
@@ -398,6 +408,7 @@ def logout(context, request):
 @debug_log
 def me(context, request):
     """Alias /users/<uuid-of-current-user>"""
+    ignored(context)
     for principal in request.effective_principals:
         if principal.startswith('userid.'):
             break
@@ -408,7 +419,7 @@ def me(context, request):
 
     # return { "uuid" : userid } # Uncomment and delete below code to just grab UUID.
 
-    request.response.status_code = 307  # Prevent from creating 301 redirects which are then cached permanently by browser
+    request.response.status_code = 307  # Prevent from creating 301 redirects that get cached permanently by browser
     properties = request.embed('/users/' + userid, as_user=userid)
     return properties
 
@@ -437,6 +448,7 @@ def get_basic_properties_for_user(request, userid):
              permission=NO_PERMISSION_REQUIRED)
 @debug_log
 def session_properties(context, request):
+    ignored(context)
     for principal in request.effective_principals:
         if principal.startswith('userid.'):
             break
@@ -491,6 +503,7 @@ def basic_auth_check(username, password, request):
 @debug_log
 def impersonate_user(context, request):
     """As an admin, impersonate a different user."""
+    ignored(context)
 
     userid = request.validated['userid']
     users = request.registry[COLLECTIONS]['user']
@@ -510,7 +523,7 @@ def impersonate_user(context, request):
     registry = request.registry
     auth0_client = registry.settings.get('auth0.client')
     auth0_secret = registry.settings.get('auth0.secret')
-    if not(auth0_client and auth0_secret):
+    if not (auth0_client and auth0_secret):
         raise HTTPForbidden(title="No keys to impersonate user")
 
     jwt_contents = {
@@ -579,6 +592,7 @@ def create_unauthorized_user(context, request):
     are successful, POST a new user and login
 
     Args:
+        context: (ignored)
         request: Request object
 
     Returns:
@@ -587,6 +601,7 @@ def create_unauthorized_user(context, request):
     Raises:
         LoginDenied, HTTPForbidden, or ValidationFailure
     """
+    ignored(context)
     # env check
     env_name = request.registry.settings.get('env.name')
     if env_name not in AUTO_REGISTRATION_ENVS:

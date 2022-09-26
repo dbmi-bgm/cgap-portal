@@ -145,7 +145,7 @@ def load_json_to_store(json_input, *, itypes, logger):
         return {'store': {itypes[0]: json_data}}
     else:
         logger.error("I don't understand the data in the file -- abort!!!")
-        return{}
+        return {}
 
 
 def load_items(json_input, itypes=None, env=None, auth=None, patch_only=False, post_only=False, logger=None):

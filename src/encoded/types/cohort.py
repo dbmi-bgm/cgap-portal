@@ -630,7 +630,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
     family_members = {}
     uuids_by_ref = {}
     proband = None
-    errors = []
+    # errors = []
     xml_type = 'people'
     item_type = 'Individual'
     for round in ['first', 'second']:
@@ -708,7 +708,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, cohort,
             if round == 'first' and xml_obj.get('proband') == '1':
                 if proband and idv_props['uuid'] != proband:
                     log.error('Cohort %s: Multiple probands found! %s conflicts with %s'
-                              % (idv_props['uuid'], proband))
+                              % (cohort, idv_props['uuid'], proband))
                 else:
                     proband = idv_props['uuid']
 

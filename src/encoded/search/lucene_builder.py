@@ -145,12 +145,14 @@ class LuceneBuilder:
                     should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_not_filters_nested.append((query_field, should_arr))
-                    if must_terms: must_filters_nested.append((query_field, must_terms))
+                    if must_terms:
+                        must_filters_nested.append((query_field, must_terms))
                 else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
                     must_filters_nested.append((query_field, should_arr))
-                    if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
+                    if must_not_terms:
+                        must_not_filters_nested.append((query_field, must_not_terms))
 
             # if we are not nested, handle this with 'terms' query like usual
             else:

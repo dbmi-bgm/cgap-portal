@@ -145,8 +145,8 @@ def get_input_gen(input):
                 if r.encoding is None:
                     r.encoding = 'utf-8'
                 res = r.text
-                for l in res.split('\n'):
-                    yield l
+                for line in res.split('\n'):
+                    yield line
         except Exception as e:
             print(e)
             return []

@@ -302,7 +302,7 @@ def evi_items():
 
 
 def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, evi_items):
-    itemcnt = len(evi_items)
+    # itemcnt = len(evi_items)
     with mock.patch.object(ph, 'search_metadata', return_value=[]):
         evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
         assert evi == evi_items
@@ -313,7 +313,7 @@ def test_compare_existing_to_newly_generated_all_new(mock_logger, connection, ev
 def test_compare_existing_to_newly_generated_all_same(mock_logger, connection, evi_items):
     itemcnt = len(evi_items)
     with mock.patch.object(ph, 'search_metadata', return_value=evi_items[:]):
-         with mock.patch.object(ph, 'get_raw_form', side_effect=evi_items[:]):
+        with mock.patch.object(ph, 'get_raw_form', side_effect=evi_items[:]):
             evi, exist, to_obs = ph.compare_existing_to_newly_generated(mock_logger, connection, evi_items, 'EvidenceDisPheno')
             assert not evi
             assert not to_obs
