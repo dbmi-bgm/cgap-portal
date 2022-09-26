@@ -41,14 +41,14 @@ requests = ">=0.14.0"
 
 [[package]]
 name = "awscli"
-version = "1.25.76"
+version = "1.25.81"
 description = "Universal Command Line Environment for AWS."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = "1.27.75"
+botocore = "1.27.80"
 colorama = ">=0.2.5,<0.4.5"
 docutils = ">=0.10,<0.17"
 PyYAML = ">=3.10,<5.5"
@@ -88,14 +88,14 @@ python-versions = "*"
 
 [[package]]
 name = "boto3"
-version = "1.24.75"
+version = "1.24.80"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-botocore = ">=1.27.75,<1.28.0"
+botocore = ">=1.27.80,<1.28.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -104,8 +104,8 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.24.75"
-description = "Type annotations for boto3 1.24.75 generated with mypy-boto3-builder 7.11.8"
+version = "1.24.80"
+description = "Type annotations for boto3 1.24.80 generated with mypy-boto3-builder 7.11.9"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
@@ -285,7 +285,6 @@ kinesis-video-media = ["mypy-boto3-kinesis-video-media (>=1.24.0,<1.25.0)"]
 kinesis-video-signaling = ["mypy-boto3-kinesis-video-signaling (>=1.24.0,<1.25.0)"]
 kinesisanalytics = ["mypy-boto3-kinesisanalytics (>=1.24.0,<1.25.0)"]
 kinesisanalyticsv2 = ["mypy-boto3-kinesisanalyticsv2 (>=1.24.0,<1.25.0)"]
-sso = ["mypy-boto3-sso (>=1.24.0,<1.25.0)"]
 kinesisvideo = ["mypy-boto3-kinesisvideo (>=1.24.0,<1.25.0)"]
 kms = ["mypy-boto3-kms (>=1.24.0,<1.25.0)"]
 lakeformation = ["mypy-boto3-lakeformation (>=1.24.0,<1.25.0)"]
@@ -405,6 +404,7 @@ sqs = ["mypy-boto3-sqs (>=1.24.0,<1.25.0)"]
 ssm = ["mypy-boto3-ssm (>=1.24.0,<1.25.0)"]
 ssm-contacts = ["mypy-boto3-ssm-contacts (>=1.24.0,<1.25.0)"]
 ssm-incidents = ["mypy-boto3-ssm-incidents (>=1.24.0,<1.25.0)"]
+sso = ["mypy-boto3-sso (>=1.24.0,<1.25.0)"]
 sso-admin = ["mypy-boto3-sso-admin (>=1.24.0,<1.25.0)"]
 sso-oidc = ["mypy-boto3-sso-oidc (>=1.24.0,<1.25.0)"]
 stepfunctions = ["mypy-boto3-stepfunctions (>=1.24.0,<1.25.0)"]
@@ -436,7 +436,7 @@ xray = ["mypy-boto3-xray (>=1.24.0,<1.25.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.27.75"
+version = "1.27.80"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -452,7 +452,7 @@ crt = ["awscrt (==0.14.0)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.27.75"
+version = "1.27.80"
 description = "Type annotations and code completion for botocore"
 category = "dev"
 optional = false
@@ -463,7 +463,7 @@ types-awscrt = "*"
 
 [[package]]
 name = "certifi"
-version = "2022.9.14"
+version = "2022.9.24"
 description = "Python package for providing Mozilla's CA Bundle."
 category = "main"
 optional = false
@@ -1738,7 +1738,7 @@ crt = ["botocore[crt] (>=1.20.29,<2.0a.0)"]
 
 [[package]]
 name = "sentry-sdk"
-version = "1.9.8"
+version = "1.9.9"
 description = "Python client for Sentry (https://sentry.io)"
 category = "main"
 optional = false
@@ -2160,15 +2160,33 @@ apipkg = []
 atomicwrites = []
 attrs = []
 aws-requests-auth = []
-awscli = []
+awscli = [
+    {file = "awscli-1.25.81-py3-none-any.whl", hash = "sha256:e8dc29f17376feadfedd3edb7f64f14481b5f2fd9741cf7b28405ac3389c1d53"},
+    {file = "awscli-1.25.81.tar.gz", hash = "sha256:4cb2f8a12d2772ade9a093125f39bdc48434502813d6326a39e707d73b47d90b"},
+]
 "backports.statistics" = []
 beautifulsoup4 = []
 bitarray = []
-boto3 = []
-boto3-stubs = []
-botocore = []
-botocore-stubs = []
-certifi = []
+boto3 = [
+    {file = "boto3-1.24.80-py3-none-any.whl", hash = "sha256:0c5732a78f75ff3e2692e6ed1765c5c9d4960ba0e8b0694066864b86f9537350"},
+    {file = "boto3-1.24.80.tar.gz", hash = "sha256:c686295e7829cf54127f7ab9c20088cc7b2a7d24768fcf355aebffa65879e2c9"},
+]
+boto3-stubs = [
+    {file = "boto3-stubs-1.24.80.tar.gz", hash = "sha256:163acbd913831928d74c1e04d59151981ea3dd5d21abed023a7e46842795717d"},
+    {file = "boto3_stubs-1.24.80-py3-none-any.whl", hash = "sha256:1a85f945f1eba05f2f91477a4b4cef819afb371ba2e4cbc839c3a1116832f1b2"},
+]
+botocore = [
+    {file = "botocore-1.27.80-py3-none-any.whl", hash = "sha256:412145ab8b9ec2ee3c9ecf43e06f9fe0fc03cc645add8314327e69e58be78cab"},
+    {file = "botocore-1.27.80.tar.gz", hash = "sha256:0f8b937c41e7ea92c5374e83d54c006d99d9f9fa203175fbfb1ded74c28e9759"},
+]
+botocore-stubs = [
+    {file = "botocore-stubs-1.27.80.tar.gz", hash = "sha256:05b012a3fdef12eb7b392c4aacf764d9dc07c4e549da59ab4ace8f3090d51259"},
+    {file = "botocore_stubs-1.27.80-py3-none-any.whl", hash = "sha256:b067a529ea95b62447596b6309a6978702c9088eadd61428216a1cff805f972a"},
+]
+certifi = [
+    {file = "certifi-2022.9.24-py3-none-any.whl", hash = "sha256:90c1a32f1d68f940488354e36370f6cca89f0f106db09518524c88d6ed83f382"},
+    {file = "certifi-2022.9.24.tar.gz", hash = "sha256:0d9c601124e5a6ba9712dbc60d9c53c21e34f5f641fe83002317394311bdce14"},
+]
 cffi = []
 chardet = []
 charset-normalizer = []
@@ -2272,7 +2290,10 @@ rfc3986 = []
 rsa = []
 rutter = []
 s3transfer = []
-sentry-sdk = []
+sentry-sdk = [
+    {file = "sentry-sdk-1.9.9.tar.gz", hash = "sha256:d6c71d2f85710b66822adaa954af7912bab135d6c85febd5b0f3dfd4ab37e181"},
+    {file = "sentry_sdk-1.9.9-py2.py3-none-any.whl", hash = "sha256:ef925b5338625448645a778428d8f22a3d17de8b28cc8e6fba60b93393ad86fe"},
+]
 simplejson = []
 six = []
 smmap = []

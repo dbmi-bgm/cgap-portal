@@ -154,7 +154,8 @@ test:
 	@git log -1 --decorate | head -1
 	@date
 	make test-unit || echo "unit tests failed"
-	make test-npm
+	make test-npm || echo "npm tests failed"
+	make test-static || echo "static tests failed"
 	@git log -1 --decorate | head -1
 	@date
 
@@ -244,6 +245,9 @@ tag-and-push-docker-production:
 	date
 	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
 	date
+
+lint:
+	@echo "simulated flake8 for now. we're not ready for a real one"
 
 help:
 	@make info
