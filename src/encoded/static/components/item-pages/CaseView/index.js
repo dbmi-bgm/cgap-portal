@@ -23,7 +23,7 @@ import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
 import { PedigreeTabViewBody, PedigreeFullScreenBtn } from '../components/PedigreeTabViewBody';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
 import { parseFamilyIntoDataset } from './family-parsing';
-import { CurrentFamilyController } from './CurrentFamilyController';
+import { CurrentFamilyController, FamilyItemParser } from './CurrentFamilyController';
 import { CaseStats } from './CaseStats';
 import { FilteringTab } from './FilteringTab';
 import { InterpretationTab, InterpretationTabController } from './InterpretationTab';
@@ -74,7 +74,8 @@ export default class CaseView extends DefaultItemView {
         return [
             PedigreeVizLoader,
             CurrentFamilyController, // <- This passes down props.currFamily into PedigreeTabViewOptionsController. Could possibly change to just use context.family now.
-            PedigreeTabViewOptionsController
+            PedigreeTabViewOptionsController,
+            FamilyItemParser
         ];
     }
 

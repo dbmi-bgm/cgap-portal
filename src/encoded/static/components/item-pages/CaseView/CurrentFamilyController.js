@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 
@@ -50,9 +50,9 @@ function calculateIdToGraphIdentifier(objectGraph, isRelationshipNodeFunc){
 
 
 
-/**
- * @deprecated Somewhat -- commented out parts -- unless brought back later.
- */
+
+
+
 export class CurrentFamilyController extends React.PureComponent {
 
     static haveFullViewPermissionForFamily(family){
@@ -145,7 +145,6 @@ export class CurrentFamilyController extends React.PureComponent {
 
     render(){
         const { children, context, PedigreeVizLibrary, ...passProps } = this.props;
-        const { buildPedigreeGraphData = null, isRelationshipNode } = PedigreeVizLibrary || {};
         const {
             family: canonicalFamilyPartialEmbed,
             sample_processing: {
@@ -166,12 +165,6 @@ export class CurrentFamilyController extends React.PureComponent {
         if (familiesLen > 0){
             canonicalFamily = familiesWithViewPermission[canonicalFamilyIdx];
             currPedigreeFamily = familiesWithViewPermission[pedigreeFamiliesIdx];
-            graphData = this.memoized.buildGraphData(
-                this.memoized.parseFamilyIntoDataset(currPedigreeFamily),
-                buildPedigreeGraphData
-            );
-            idToGraphIdentifier = graphData && isRelationshipNode ?
-                this.memoized.calculateIdToGraphIdentifier(graphData.objectGraph, isRelationshipNode) : {};
         }
 
         const childProps = {
@@ -180,8 +173,6 @@ export class CurrentFamilyController extends React.PureComponent {
             context,
             canonicalFamily,
             currPedigreeFamily,
-            graphData,
-            idToGraphIdentifier,
             familiesWithViewPermission,
             pedigreeFamiliesIdx,
             onFamilySelect: this.handleFamilySelect
@@ -193,3 +184,34 @@ export class CurrentFamilyController extends React.PureComponent {
     }
 
 }
+
+
+
+
+export function FamilyItemParser(props){
+    const { children, currPedigreeFamily, PedigreeVizLibrary, showAsDiseases, ...passProps } = props;
+    const { buildPedigreeGraphData = null, isRelationshipNode } = PedigreeVizLibrary || {};
+
+    const graphData = useMemo(function(){
+        if (!buildPedigreeGraphData) return null;
+        return buildPedigreeGraphData(
+            parseFamilyIntoDataset(currPedigreeFamily, showAsDiseases)
+        );
+    }, [ buildPedigreeGraphData, currPedigreeFamily, showAsDiseases ]);
+
+    const idToGraphIdentifier = useMemo(function(){
+        if (!graphData || !isRelationshipNode) return {};
+        return calculateIdToGraphIdentifier(graphData.objectGraph, isRelationshipNode);
+    }, [ graphData ]);
+
+    const childProps = {
+        ...passProps,
+        PedigreeVizLibrary, currPedigreeFamily,
+        showAsDiseases, graphData, idToGraphIdentifier
+    };
+
+    return React.Children.map(children, function(child){
+        return React.cloneElement(child, childProps);
+    });
+}
+
