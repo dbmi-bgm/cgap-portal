@@ -137,7 +137,7 @@ export function parseFamilyIntoDataset(family){
  *
  * @param {{ members: { "@id": string }[], proband: { "@id" : string } }} family - Current Family
  */
-export function gatherPhenotypicFeatureItems(family){
+export function gatherDiseaseItemStrings(family, diseaseType = "phenotypic_feature"){
     if (!family) return [];
     const {
         members = [],
@@ -148,18 +148,20 @@ export function gatherPhenotypicFeatureItems(family){
     const seenIDs = {};
 
     function addToDiseases(individual){
-        const { phenotypic_features = [] } = individual;
-        phenotypic_features.forEach(function(pfObj){
-            const { phenotypic_feature } = pfObj;
+        const { phenotypic_features = [], disorders = [] } = individual;
+        const useLinkToItems = diseaseType === "phenotypic_feature" ? phenotypic_features : disorders;
+        useLinkToItems.forEach(function(pfObj){
+            const useLinkToItemField = diseaseType === "phenotypic_feature" ? phenotypic_feature : disorder;
+            const { [useLinkToItemField]: useLinkToItemFieldValue } = pfObj;
             const {
-                '@id': featureID,
-                display_title: featureTitle
-            } = phenotypic_feature;
-            if (!featureID || seenIDs[featureID]){
+                '@id': diseaseID,
+                display_title: diseaseTitle
+            } = useLinkToItemFieldValue;
+            if (!diseaseID || seenIDs[diseaseID]){
                 return; // Skip, perhaps no view permission.
             }
-            seenIDs[featureID] = true;
-            diseases.push(phenotypic_feature);
+            seenIDs[diseaseID] = true;
+            diseases.push(diseaseTitle);
         });
     }
 
