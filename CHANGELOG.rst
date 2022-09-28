@@ -8,6 +8,9 @@ Change Log
 
 10.5.0
 ======
+
+`PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`
+
 * Add UI/workflow visualization support for MetaWorkflowRun items
 
 10.4.0
