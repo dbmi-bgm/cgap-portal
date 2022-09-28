@@ -10,10 +10,100 @@ Change Log
 10.4.1
 ======
 
-* Lots of changes to satisfy PEP8, including some changes that may well be small bug fixes becaue existing
-  code could not have worked.
+`PR 656: PEP8 fixes so that make test-static can use make lint <https://github.com/dbmi-bgm/cgap-portal/pull/656>`_
 
-* New static testing workflow in GA.
+Lots of changes to satisfy PEP8, including some changes that may well be small bug fixes because existing
+code could not have worked. More specifically...
+
+* Renamed (disabled) some files in preparation for their later removal:
+
+  * ``.ebextensions`` to ``.ebextensions.DISABLED``
+  * Various files in ``deploy/`` that seemed to have no callers:
+
+    * ``deploy/last_git_commit.py`` to ``deploy/last_git_commit.py.DISABLED``
+    * ``deploy/set_beanstalk_config.py`` to ``deploy/set_beanstalk_config.py.DISABLED``
+    * ``deploy/travis_after_all.py`` to ``deploy/travis_after_all.py.DISABLED``
+
+* Make ``make lint`` actually invoke ``flake8`` instead of just saying it's coming soon.
+
+* Add ``make static-test`` and appropriate GA workflow for that.
+
+  * This required adjusting some fixtures to be conditional on environment variables
+    similarly to what I did with ``snovault``.
+
+* ``pyproject.toml`` uses ``dcicutils 5.2.0`` for new static check support, and ``poetry.lock`` is updated.
+
+* Edits that were not just syntactic include:
+
+  * Some unused variables in ``test_search_ngram`` in ``src/encoded/tests/test_search.py``
+    seemed to be tests of the wrong variable value, so I fixed a test (which fortunately was still passing).
+
+  * Removed ``build_xlsx_spreadsheet`` in ``batch_download_utils.py``. It does not appear to have any callers,
+    and it has some problems that were not obvious how to fix. In particular there's an unused variable
+    at the end, but I wonder if it doesn't want to return some value.
+
+  * Commented out the content of ``src/encoded/commands/extract_test_data.py``,
+    which had numerous problems in the code (undefined functions, etc.)
+    and couldn't possibly have worked. (Probably unused?)
+
+  * Rewrote some code in ``src/encoded/commands/generate_items_from_owl.py``
+    to call ``dcicutils.command_utils.y_or_n`` rather than using lower level primitives.
+    Adjusted some prompts in the process.
+
+  * In ``src/encoded/commands/load_items.py``, rewrote some functions to require keyword-argument-calling
+    because I don't think there are non-adjusted callers but I wanted to make sure that my addition of
+    a ``logger`` argument to make some undefined varaibles work again was not going to cause a problem.
+    I doubt anyone was calling this or they'd have complained about the undefined variables,
+    so probably this is all fine. (Probably we should do auth stuff differently here,
+    but I didn't bother with that.)
+
+  * PEP8 doesn't like assigning lambda expressions to variables.
+    I mostly do not think it's right about that, but the one case where we were doing it
+    needed to be rewritten for other reasons, and I'd already done that rewrite in ``snovault``,
+    so I ported the fix from there.
+
+  * Rewrote a few cases of ``print`` as ``PRINT``. Maybe some as logger calls, too.
+    Added static checkers for stray print statements.
+    There are still a lot of them that need review. For now I just have it issuing a warning,
+    not an error, while we work through those.
+    I wrote ticket `C4-929 <https://hms-dbmi.atlassian.net/browse/C4-929>`_ on this.
+
+* Removed a lot of unused imports, and alphabetized/merged many imports.
+
+  * In some cases the unused imports were removed, and in others where they were "harder to find" names,
+    I just commented them out while we let things shake out to make sure I didn't make an error.
+  * In some cases I added an ``ignorable`` declaration for things where I expected a later change
+    to bring back the need for the import.
+  * In some cases I added ``notice_pytest_fixtures`` because the use of the name as a fixture
+    is not lexically observable and PyCharm is bad about understanding what's going on.
+
+* Rewrote some ``'''...'''`` doc strings as ``"""..."""``.
+
+* Reviewed unused variables.
+
+  * Some were marked ignored.
+  * Some were statements that could be removed entirely.
+  * Some were side-effects where we could ignore return value and the left-hand side
+    of the assignment could be removed.
+
+* Adjusted whitespace in some expressions per PEP8.
+
+* Removed some parentheses that PEP8 insisted were redundant.
+
+  * Some of these were things like assert, which is not a function but was being "called" by doing ``assert(...)``.
+
+    * Same with ``del(...)`` that isn't a function either.
+
+* Rewrote some ``except:`` as ``except Exception:``.
+
+* Updated some ``.format()`` calls to use f-strings.
+
+* PEP8 doesn't like lowercase-l as a variable name because it looks like a digit-1 in some fonts,
+  so I rewrote some uses of that variable (usually as ``lst`` instead,
+  though in a few cases there were obviously better names).
+
+* Rewrote some ``== True/False`` as ``is True/False`` in testing.
+
 
 10.4.0
 ======
