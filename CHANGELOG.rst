@@ -6,6 +6,9 @@ cgap-portal
 Change Log
 ----------
 
+10.5.0
+======
+* Add UI/workflow visualization support for MetaWorkflowRun items
 
 10.4.0
 ======
