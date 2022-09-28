@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+10.4.1
+======
+
+`PR 658: Enabled nested for samplegeno  <https://github.com/dbmi-bgm/cgap-portal/pull/658>`_
+
+* Turn on nested mappings for samplegeno fields
+* Add some facets for the associated fields
+
 
 10.4.0
 ======
