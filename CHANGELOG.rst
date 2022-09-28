@@ -7,6 +7,14 @@ Change Log
 ----------
 
 
+10.4.1
+======
+
+* Lots of changes to satisfy PEP8, including some changes that may well be small bug fixes becaue existing
+  code could not have worked.
+
+* New static testing workflow in GA.
+
 10.4.0
 ======
 
