@@ -743,6 +743,22 @@
             "order": 8,
             "grouping": "Variant Quality"
         },
+        "samplegeno.samplegeno_sampleid": {
+            "title": "Sample Genotype Sample ID",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_ac": {
+            "title": "Sample Genotype Alt Allele Count",
+            "order": 9,
+            "aggregation_type": "stats",
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_gt": {
+            "title": "Sample Genotype",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
         "AD_ALT": {
             "title": "AD (Alt)",
             "aggregation_type": "range",
