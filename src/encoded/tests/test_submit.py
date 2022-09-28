@@ -20,6 +20,7 @@ from ..submit import (
     digest_xlsx,
     format_ontology_term_with_colon,
     get_column_name,
+    make_conjoined_list,
     map_fields,
     parse_exception,
     post_and_patch_all_items,
@@ -1114,6 +1115,24 @@ def test_get_column_name(row, columns, expected):
 )
 def test_format_ontology_term_with_colon(term, result):
     assert format_ontology_term_with_colon(term) == result
+
+
+@pytest.mark.parametrize(
+    "items,conjunction,expected",
+    [
+        ([], None, " "),
+        (["foo", "bar"], None, "foo and bar"),
+        (["foo", "bar"], "or", "foo or bar"),
+        (["foo", "bar", "fu"], None, "foo, bar, and fu"),
+        (["foo", "bar", "fu"], "or", "foo, bar, or fu"),
+    ]
+)
+def test_make_conjoined_list(items, conjunction, expected):
+    """Test making readable, joined list of strings for error
+    reporting.
+    """
+    result = make_conjoined_list(items, conjunction=conjunction)
+    assert result == expected
 
 
 class TestAccessionRow:
