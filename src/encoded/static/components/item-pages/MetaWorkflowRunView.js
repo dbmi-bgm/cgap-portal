@@ -6,7 +6,7 @@ import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
 import memoize from 'memoize-one';
 
-import { console, object, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { console, object, navigate, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { requestAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 
 
@@ -86,12 +86,21 @@ export default class MetaWorkflowRunView extends DefaultItemView {
                 )
             }
         ];
-
-        return _.map(tabs.concat(this.getCommonTabs()), (tabObj) => // Common properties
+        const tabContents =  _.map(tabs.concat(this.getCommonTabs()), (tabObj) => // Common properties
             _.extend(tabObj, {
                 'style' : { 'minHeight' : Math.max((mounted && windowHeight && windowHeight - 300) || 0, 600) }
             })
         );
+
+        // Check if the user is an admin
+        if (_.contains(JWT.getUserDetails().groups, "admin")) {
+
+            // If so, show the details pane instead of the graph by default (ask from bioinfo/wranglers)
+            tabContents[1].isDefault = true;
+        }
+            
+        return tabContents;
+
     }
 
 }
