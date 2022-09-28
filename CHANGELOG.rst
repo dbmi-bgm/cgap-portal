@@ -7,6 +7,15 @@ Change Log
 ----------
 
 
+10.4.0
+======
+
+`PR 650: Pipeline deployment schema changes <https://github.com/dbmi-bgm/cgap-portal/pull/650>`_
+
+* Non-breaking schema changes to Workflow and Software items to facilitate pipeline
+  deployment
+
+
 10.3.7
 ======
 
