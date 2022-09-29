@@ -6,7 +6,6 @@
     "type": "object",
     "required": [
         "name",
-        "software_type",
         "project",
         "institution"
     ],
