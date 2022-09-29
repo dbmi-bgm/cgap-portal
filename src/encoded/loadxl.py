@@ -602,7 +602,7 @@ def load_deploy_data(app, overwrite=True, **kwargs):
 def load_cypress_data(app, overwrite=False):
     """
     Load master-inserts and cypress-test-inserts.
-    overwriting duplicate items in both directories, to match cypress-test-inserts
+    By default, does not overwrite duplicate items in both directories
 
     Returns:
         None if successful, otherwise Exception encountered
