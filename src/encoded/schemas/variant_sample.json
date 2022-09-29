@@ -387,10 +387,10 @@
         "samplegeno": {
             "title": "Sample Genotype",
             "type": "array",
-            "enable_nested": true,
             "items": {
                 "title": "Sample Genotype",
                 "type": "object",
+                "enable_nested": true,
                 "properties": {
                     "samplegeno_numgt": {
                         "title": "Sample Genotype (Numeric)",
