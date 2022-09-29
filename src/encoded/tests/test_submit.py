@@ -1779,6 +1779,7 @@ class TestSubmittedFilesParser:
         [
             ("", None, 0, [], [], 0),
             ("foo.bar", None, 1, [], [], 1),
+            ("foo .bar", None, 1, [], [], 2),
             (VCF_FILE_PATH, None, 0, [VCF_FILE_ITEM], [VCF_FILE_ALIAS], 0),
             (
                 "foo.bar, " + VCF_FILE_PATH,
@@ -1879,6 +1880,25 @@ class TestSubmittedFilesParser:
         """Test parsing submitted file names."""
         result = file_parser.parse_file_names(submitted_file_names)
         assert result == set(expected)
+
+    @pytest.mark.parametrize(
+        "file_name,expected",
+        [
+            ("", False),
+            (" ", False),
+            ("foo-bar", True),
+            ("foo-bar.txt", True),
+            ("foo_bar", True),
+            ("foo bar", False),
+            (" foo_bar.txt", False),
+            ("foo_bar.txt ", False),
+            ("foo_bar_19", True),
+        ]
+    )
+    def test_is_file_name_valid(self, file_parser, file_name, expected):
+        """Test validation of file names with regex."""
+        result = file_parser.is_file_name_valid(file_name)
+        assert result == expected
 
     @pytest.mark.parametrize(
         "accepted_file_formats,expected",

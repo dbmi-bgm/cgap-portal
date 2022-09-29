@@ -1189,6 +1189,7 @@ class SubmittedFilesParser:
     PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
     PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
     PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
+    FILE_NAME_REGEX = re.compile(r"^[\w+=,.@-]+$")
 
     def __init__(self, virtualapp, project_name):
         """Initialize class and set attributes.
@@ -1284,6 +1285,7 @@ class SubmittedFilesParser:
             to report for this row
         :rtype: tuple(dict, list, list)
         """
+        invalid_file_names = []
         file_names_to_items = {}
         file_aliases = []
         fastq_files = {}
@@ -1295,6 +1297,9 @@ class SubmittedFilesParser:
             file_path = PurePath(submitted_file_name)
             file_name = file_path.name
             file_suffixes = file_path.suffixes
+            file_name_valid = self.is_file_name_valid(file_name)
+            if not file_name_valid:
+                invalid_file_names.append(file_name)
             (
                 file_format_atid,
                 extra_file_format_atids,
@@ -1324,6 +1329,13 @@ class SubmittedFilesParser:
         )
         file_items = file_names_to_items.values()
         file_aliases = [item[self.ALIASES][0] for item in file_items]
+        if invalid_file_names:
+            msg = (
+                f"Row {row_index} - Invalid file name(s) found:"
+                f" {make_conjoined_list(invalid_file_names)}. File names can only"
+                " contain alphanumeric characters, underscores, dashes, and periods."
+            )
+            errors.append(msg)
         if fastq_files:
             invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(
                 fastq_files
@@ -1359,6 +1371,20 @@ class SubmittedFilesParser:
             )
             errors.append(msg)
         return file_items, file_aliases, errors
+
+    def is_file_name_valid(self, file_name):
+        """Validate file name to match schema expectations.
+
+        :param file_name: File name to validate
+        :type file_name: str
+        :returns: Whether file name is valid
+        :rtype: bool
+        """
+        result = False
+        regex_match = self.FILE_NAME_REGEX.match(file_name)
+        if regex_match:
+            result = True
+        return result
 
     def associate_extra_files(
         self, files_to_check_extra_files, file_names_to_items, files_without_file_format
