@@ -868,6 +868,7 @@ class SearchBuilder:
                     # do the below, except account for nested agg structure
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
+                        result.append(result_facet)
                         continue
 
                     def extract_buckets(path):
