@@ -7,6 +7,15 @@ Change Log
 ----------
 
 
+10.4.1
+======
+
+`PR 659: Submission bug fixes <https://github.com/dbmi-bgm/cgap-portal/pull/659>`_
+
+* Minor refactoring of case submission code to fix bugs failing submissions
+* Enforce file name conventions to match schema regex
+
+
 10.4.0
 ======
 
