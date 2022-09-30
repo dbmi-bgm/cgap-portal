@@ -1125,7 +1125,7 @@ def test_format_ontology_term_with_colon(term, result):
         (["foo", "bar"], "or", "foo or bar"),
         (["foo", "bar", "fu"], None, "foo, bar, and fu"),
         (["foo", "bar", "fu"], "or", "foo, bar, or fu"),
-    ]
+    ],
 )
 def test_make_conjoined_list(items, conjunction, expected):
     """Test making readable, joined list of strings for error
@@ -1893,7 +1893,7 @@ class TestSubmittedFilesParser:
             (" foo_bar.txt", False),
             ("foo_bar.txt ", False),
             ("foo_bar_19", True),
-        ]
+        ],
     )
     def test_is_file_name_valid(self, file_parser, file_name, expected):
         """Test validation of file names with regex."""

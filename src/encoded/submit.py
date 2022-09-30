@@ -693,7 +693,7 @@ class AccessionRow:
                 )
                 if self.ACCEPTED_GENOME_BUILDS:
                     accepted_genome_builds = make_conjoined_list(
-                        list(self.ACCEPTED_GENOME_BUILDS.keys()), conjunction="or",
+                        list(self.ACCEPTED_GENOME_BUILDS.keys()), conjunction="or"
                     )
                     msg += (
                         " Accepted genome builds include the following:"
