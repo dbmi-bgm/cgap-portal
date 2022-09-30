@@ -1116,7 +1116,7 @@ class TestNestedSearch(object):
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
         facets_that_should_show_all_options = es_testapp.get(
             '/search/?type=Variant&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json['facets']
-        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)  # still 3 options
+        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 2)  # 2 options
 
         # selecting two facets has the same behavior
         facets_that_should_show_all_options = es_testapp.get(
@@ -1127,7 +1127,8 @@ class TestNestedSearch(object):
         # selecting a different facet can affect the aggregation if it just so happens to eliminate
         # possibilities in other fields - this has always been the case
         facets_that_shows_limited_options = es_testapp.get(
-            '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
+            '/search/?type=Variant&hg19.hg19_pos=11780388'
+            '&additional_facet=hg19.hg19_hgvsg').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
 
         # rescue terms show up (7 terms + no value, see variant.json -> facets)
