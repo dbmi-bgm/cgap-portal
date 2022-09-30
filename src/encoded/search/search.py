@@ -530,9 +530,9 @@ class SearchBuilder:
             self.query['sort'] = [{'_score': {"order": "desc"}},
                                   {'embedded.date_created.raw': {'order': 'desc', 'unmapped_type': 'keyword'},
                                    'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
-                                  {'_uid': {'order': 'asc'}}
+                                  {'_Uid': {'order': 'asc'}}
                 ]
-                # 'embedded.uuid.raw' (instd of _uid) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
+                # 'embedded.uuid.raw' (instd of _id) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
 
             self.response['sort'] = result_sort = {'_score': {"order": "desc"}}
 
@@ -788,8 +788,7 @@ class SearchBuilder:
                 if bucket['key'] not in term_to_bucket:
                     term_to_bucket[bucket['key']] = bucket
 
-        result_facet['terms'] = sorted(list(term_to_bucket.values()),
-                                       key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
+        result_facet['terms'] = sorted(list(term_to_bucket.values()),key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
     def format_facets(self, es_results):
         """

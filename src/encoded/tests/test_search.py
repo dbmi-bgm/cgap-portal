@@ -1,5 +1,4 @@
 import json
-import mock
 import pytest
 import webtest
 
@@ -490,7 +489,7 @@ def test_search_with_no_value(workbook, es_testapp):
 
 def test_search_with_static_header(workbook, es_testapp, indexer_testapp):
     """ Performs a search which should be accompanied by a search header """
-    indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
+    #indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
 
     # No items, just checking header
     search = '/search/?type=Workflow'
@@ -596,7 +595,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         item_type = es_testapp.app.registry[COLLECTIONS][item_name].type_info.item_type
         namespaced_index = get_namespaced_index(es_testapp.app, item_type)
 
-        es_direct_count = es.count(index=namespaced_index, doc_type=item_type).get('count')
+        es_direct_count = es.count(index=namespaced_index).get('count')
         assert es_item_count == es_direct_count
 
         if es_item_count == 0:
@@ -607,8 +606,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         print("search_url=", search_url)
         items = ItemTypeChecker.get_all_items_of_type(client=es_testapp, item_type=item_type)
         for item_res in items:
-            index_view_res = es.get(index=namespaced_index, doc_type=item_type,
-                                    id=item_res['uuid'])['_source']
+            index_view_res = es.get(index=namespaced_index, id=item_res['uuid'])['_source']
             # make sure that the linked_uuids match the embedded data
             assert 'linked_uuids_embedded' in index_view_res
             assert 'embedded' in index_view_res
@@ -781,8 +779,14 @@ class TestNestedSearch(object):
         """ Checks that a given facet name has the correct number of terms """
         for facet in facets:
             if facet['field'] == name:
-                assert len(facet['terms']) == count
-                return
+                if 'terms' in facet:
+                    assert len(facet['terms']) == count
+                    return
+                else:
+                    for stats_field in ['min', 'max', 'avg', 'sum']:
+                        assert stats_field in facet
+                    return
+        raise AssertionError(f'Facet {name} never located')
 
     def test_search_on_single_nested_field(self, workbook, es_testapp):
         """ Two matches for variant with hg19.hg19_pos=12185955 """
@@ -832,7 +836,7 @@ class TestNestedSearch(object):
     def test_and_search_on_nested_field_that_matches_one(self, workbook, es_testapp):
         """ This has the correct 'hg19_chrom', so should match one """
         res = es_testapp.get('/search/?type=Variant'
-                             '&hg19.hg19_pos.to=12185955'
+                             '&hg19.hg19_pos.to=12185956'
                              '&hg19.hg19_chrom=chr2').json
         self.assert_length_is_expected(res, 1)
         assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
@@ -965,7 +969,7 @@ class TestNestedSearch(object):
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
                              '&hg19.hg19_chrom=chr1'
-                             '&hg19.hg19_pos.to=12185955'  # use range instead
+                             '&hg19.hg19_pos.to=12185956'  # use range instead
                              '&hg19.hg19_pos.from=11780388'
                              '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
                              '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
@@ -974,7 +978,7 @@ class TestNestedSearch(object):
         for variant in res['@graph']:
             assert variant['uuid'] in self.VARIANTS_WITH_HG19
 
-    def test_search_with_non_existant_combinations(self, workbook, es_testapp):
+    def test_search_with_non_existent_combinations(self, workbook, es_testapp):
         """ Test that swapping around fields that would match across different sub-embedded objects
             does not actually do so (ie: returns no results). """
         es_testapp.get('/search/?type=Variant'
@@ -986,6 +990,12 @@ class TestNestedSearch(object):
         es_testapp.get('/search/?type=Variant'
                        '&hg19.hg19_pos=11780388'
                        '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        # C4-934 regression test - using = for above range fields causes a terms query,
+        # the below will do a range query that will satisfy if part of the same
+        # nested block but will fail if a separate query
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_pos.from=11780387'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.2030666G>A', status=404)
 
     def test_nested_search_with_no_value(self, workbook, es_testapp):
         """ Tests searching on 'No value' alone on a nested field """
@@ -1096,9 +1106,12 @@ class TestNestedSearch(object):
             When examining the aggregations on a field we are not searching on, it possible/likely that
             the set of possible results has been reduced by the search.
         """
-        facets = es_testapp.get('/search/?type=Variant').json['facets']
-        self.verify_facet(facets, 'hg19.hg19_chrom', 1)  # 1 option for chrom
-        self.verify_facet(facets, 'hg19.hg19_pos', 3)  # 3 options for pos, hgvsg
+        facets = es_testapp.get('/search/?type=Variant&additional_facet=hg19.hg19_chrom'
+                                '&additional_facet=hg19.hg19_pos'
+                                '&additional_facet=hg19.hg19_hgvsg').json['facets']
+        import pdb; pdb.set_trace()
+        self.verify_facet(facets, 'hg19.hg19_chrom', 3)  # 1 option for chrom
+        self.verify_facet(facets, 'hg19.hg19_pos', 0)  # 3 options for pos, hgvsg
         self.verify_facet(facets, 'hg19.hg19_hgvsg', 3)
 
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
@@ -1365,8 +1378,8 @@ class TestSearchHiddenAndAdditionalFacets:
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
-        ('hg19.hg19_chrom', 1),
-        ('hg19.hg19_hgvsg', 3),
+        ('hg19.hg19_chrom', 3),
+        ('hg19.hg19_hgvsg', 5),
         ('REF', 4)
     ])
     def test_search_additional_facets_workbook(self, workbook, es_testapp, _facet, n_expected):
@@ -1384,8 +1397,8 @@ class TestSearchHiddenAndAdditionalFacets:
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
-        ('hg19.hg19_chrom', 1),
-        ('hg19.hg19_hgvsg', 3),
+        ('hg19.hg19_chrom', 3),
+        ('hg19.hg19_hgvsg', 5),
         ('REF', 4)
     ])
     def test_search_additional_facets_workbook_multiple(self, workbook, es_testapp, _facet, n_expected):
