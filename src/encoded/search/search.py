@@ -530,7 +530,7 @@ class SearchBuilder:
             self.query['sort'] = [{'_score': {"order": "desc"}},
                                   {'embedded.date_created.raw': {'order': 'desc', 'unmapped_type': 'keyword'},
                                    'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
-                                  {'_Uid': {'order': 'asc'}}
+                                  {'_uid': {'order': 'asc'}}
                 ]
                 # 'embedded.uuid.raw' (instd of _id) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
 
