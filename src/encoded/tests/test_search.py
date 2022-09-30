@@ -1109,10 +1109,9 @@ class TestNestedSearch(object):
         facets = es_testapp.get('/search/?type=Variant&additional_facet=hg19.hg19_chrom'
                                 '&additional_facet=hg19.hg19_pos'
                                 '&additional_facet=hg19.hg19_hgvsg').json['facets']
-        import pdb; pdb.set_trace()
-        self.verify_facet(facets, 'hg19.hg19_chrom', 3)  # 1 option for chrom
-        self.verify_facet(facets, 'hg19.hg19_pos', 0)  # 3 options for pos, hgvsg
-        self.verify_facet(facets, 'hg19.hg19_hgvsg', 3)
+        self.verify_facet(facets, 'hg19.hg19_chrom', 3)  # 3 options for chrom
+        self.verify_facet(facets, 'hg19.hg19_pos', 0)  # stats
+        self.verify_facet(facets, 'hg19.hg19_hgvsg', 5)
 
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
         facets_that_should_show_all_options = es_testapp.get(
