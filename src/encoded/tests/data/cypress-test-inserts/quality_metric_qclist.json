@@ -4,23 +4,6 @@
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
         "qc_list": [
             {
-                "value": "6d816021-b632-46a9-afa7-fa9b3571ee13",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "5adbb18e-5866-4e91-8fb2-e61525253e76",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "cc910b04-a079-4803-b4c3-bf18055db659"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
                 "value": "12e989c3-216f-47d3-bd49-68c33300e3b1",
                 "qc_type": "quality_metric_vcfcheck"
             },
@@ -35,26 +18,6 @@
             "8758e49c-6c86-44ac-bd89-921a503b7544"
         ],
         "uuid": "e0749896-14ee-45a9-a26f-5338fe364841"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
-                "value": "fc6136db-d756-4896-9546-dfd367197c3c",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "bc89bafe-231e-4c29-9ab7-fdd7a99c6b4c",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "60eb5168-b6c9-46ce-8c6a-e1fe54940e71"
-        ],
-        "uuid": "95dede75-4c42-4aee-89d5-6099e816479e"
     },
     {
         "status": "shared",
@@ -159,26 +122,6 @@
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
         "qc_list": [
             {
-                "value": "3b0bfae1-55ca-4330-b1d2-2aefbc026767",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "535b02f6-e5ff-4e1b-a4a4-20c2dc135a42",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "a77b8431-2936-4f87-8405-8aa43ee777c1"
-        ],
-        "uuid": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
                 "value": "e0304ea2-fe84-41d7-b039-c6623c117a7e",
                 "qc_type": "quality_metric_vcfcheck"
             },
@@ -193,26 +136,6 @@
             "d4ffa4f4-43ee-4e7f-bfeb-c939bf93615d"
         ],
         "uuid": "d86bd822-96f1-4385-b6e8-26bb828c96de"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
-                "value": "f676d775-398b-4278-8f80-e0f2fbceabac",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "698d3eff-2eb7-40ef-a962-ad548710b1b2",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "e3993170-dc06-4af9-b185-bc784d4fa662"
-        ],
-        "uuid": "b4f4ce8b-32a2-4b4c-80db-915a289d4cfc"
     },
     {
         "status": "shared",
@@ -280,23 +203,6 @@
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
         "qc_list": [
             {
-                "value": "463f4011-7ff9-49a5-916c-199509008cc6",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "762c129b-0852-4e5f-bf46-91f70692f339",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "1a976eb2-7e3e-44cc-9a8a-cc3af516dd00"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
                 "value": "f311e857-4518-4620-89ad-27dc5f2c3de9",
                 "qc_type": "quality_metric_vcfcheck"
             },
@@ -315,27 +221,6 @@
             "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
         ],
         "uuid": "62998125-97e8-448e-9eb5-32fb9813a041"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
-                "value": "91cf4dda-01c7-4d14-8eab-b821c7c231bd",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "aed45846-5c73-4301-bab8-a22586ac560e",
-                "qc_type": "quality_metric_peddyqc"
-            },
-            {
-                "value": "6fa47809-d473-431c-a866-ae411daf66b7",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "5405be9b-fe9c-43fc-8d04-abf387344f8c"
     },
     {
         "status": "shared",
@@ -362,26 +247,6 @@
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
         "qc_list": [
             {
-                "value": "f43c0742-c05e-43c1-bf1e-0506725b5fc6",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "d2fa04ed-c1f7-481b-806f-7df83bf81dd3",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "47d1781b-b1c5-4561-a7b5-bf40a70bf69c"
-        ],
-        "uuid": "c713f15d-f9ff-44a0-ad73-a1ebcbe6a1c7"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
                 "value": "c2f9e029-6214-4ded-826e-37e544af802f",
                 "qc_type": "quality_metric_vcfcheck"
             },
@@ -402,30 +267,6 @@
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
         "qc_list": [
             {
-                "value": "0dd71910-f11c-432d-b212-2678309630cc",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "df893eff-16df-46dd-8440-a9449a9ac40c",
-                "qc_type": "quality_metric_peddyqc"
-            },
-            {
-                "value": "6f1ea90b-6546-4514-b26d-7b5092b81139",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
-        ],
-        "uuid": "5e637484-4afa-4d91-97ce-050bf2a6bcd6"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
                 "value": "95c2ac4e-edee-4bd6-9558-9595f8ef7a8f",
                 "qc_type": "quality_metric_vcfcheck"
             },
@@ -440,26 +281,6 @@
             "742fee96-0c64-43ec-a075-b484b0dee273"
         ],
         "uuid": "2f1d16f9-36ba-42c0-a3db-a27df9edeff2"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "qc_list": [
-            {
-                "value": "cf2fd39d-052f-4ca7-bd07-4cda51199c47",
-                "qc_type": "quality_metric_vcfcheck"
-            },
-            {
-                "value": "726cfda9-cf5d-4f9c-9077-664b593e0e54",
-                "qc_type": "quality_metric_vcfqc"
-            }
-        ],
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
-        ],
-        "uuid": "37556964-08ce-4b3c-8848-074fb9d5a3d6"
     },
     {
         "status": "shared",

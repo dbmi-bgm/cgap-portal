@@ -171,28 +171,9 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "overall_quality_status": "PASS",
         "associated_meta_workflow_runs": [
-            "a77b8431-2936-4f87-8405-8aa43ee777c1"
-        ],
-        "uuid": "3b0bfae1-55ca-4330-b1d2-2aefbc026767"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
             "9d0b5f82-35fe-4d10-aa93-47de75042c7c"
         ],
         "uuid": "00a85e27-edec-472d-a11c-717854574c0e"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "463f4011-7ff9-49a5-916c-199509008cc6"
     },
     {
         "status": "shared",
@@ -212,22 +193,6 @@
             "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
         ],
         "uuid": "f02f4945-c6a6-4129-bb44-069c88a45a3c"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "91cf4dda-01c7-4d14-8eab-b821c7c231bd"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "6d816021-b632-46a9-afa7-fa9b3571ee13"
     },
     {
         "status": "shared",
@@ -255,17 +220,6 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "overall_quality_status": "PASS",
         "uuid": "672c359a-4103-497c-b653-3d8dbabae7e6"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "e3993170-dc06-4af9-b185-bc784d4fa662"
-        ],
-        "uuid": "f676d775-398b-4278-8f80-e0f2fbceabac"
     },
     {
         "status": "shared",
@@ -307,17 +261,6 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "overall_quality_status": "PASS",
         "associated_meta_workflow_runs": [
-            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
-        ],
-        "uuid": "0dd71910-f11c-432d-b212-2678309630cc"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
             "a77b8431-2936-4f87-8405-8aa43ee777c1"
         ],
         "uuid": "72c24ef7-49bf-4e0c-9667-0a62f9f0397d"
@@ -332,17 +275,6 @@
             "1f46227e-09a1-43ad-9cce-f7512802272e"
         ],
         "uuid": "ea0ead41-0681-4f52-af99-53560b5f3c33"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
-        ],
-        "uuid": "cf2fd39d-052f-4ca7-bd07-4cda51199c47"
     },
     {
         "status": "shared",
@@ -392,17 +324,6 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "overall_quality_status": "PASS",
         "associated_meta_workflow_runs": [
-            "47d1781b-b1c5-4561-a7b5-bf40a70bf69c"
-        ],
-        "uuid": "f43c0742-c05e-43c1-bf1e-0506725b5fc6"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
             "d4ffa4f4-43ee-4e7f-bfeb-c939bf93615d"
         ],
         "uuid": "e0304ea2-fe84-41d7-b039-c6623c117a7e"
@@ -414,16 +335,5 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "overall_quality_status": "PASS",
         "uuid": "2195e818-55e5-496e-a0cc-5db0a8c827cb"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "60eb5168-b6c9-46ce-8c6a-e1fe54940e71"
-        ],
-        "uuid": "fc6136db-d756-4896-9546-dfd367197c3c"
     }
 ]

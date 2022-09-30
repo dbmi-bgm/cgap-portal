@@ -1,35 +1,5 @@
 [
     {
-        "md5sum": "e846af8bbb10e56e51086cd9514f1e95",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIF6UY281",
-        "file_size": 4303845780,
-        "file_type": "vep-annotated VCF",
-        "description": "vep-annotated VCF file",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIF6UY281/@@download/GAPFIF6UY281.vcf.gz.tbi",
-                "uuid": "45f3b96b-e70a-4270-b96e-4de40e11ac03",
-                "md5sum": "c2964f938e12c98274485f4f4444cca5",
-                "status": "uploaded",
-                "filename": "GAPFIF6UY281",
-                "accession": "GAPFIF6UY281",
-                "file_size": 2350816,
-                "upload_key": "45f3b96b-e70a-4270-b96e-4de40e11ac03/GAPFIF6UY281.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SNV",
-        "quality_metric": "5405be9b-fe9c-43fc-8d04-abf387344f8c",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "file_classification": "processed file",
-        "uuid": "45f3b96b-e70a-4270-b96e-4de40e11ac03"
-    },
-    {
         "md5sum": "24b1aa0a7f5ec7eebcb6f5599a88c767",
         "status": "uploaded",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
@@ -60,106 +30,6 @@
         "s3_lifecycle_status": "standard",
         "file_ingestion_status": "Ingested",
         "uuid": "044b6eb2-a41c-473e-81f7-745e5b4126e6"
-    },
-    {
-        "md5sum": "8855cd3476d6b61c90e592e29a8cbd68",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIQHD6QAN",
-        "file_size": 78225,
-        "file_type": "full annotated VCF",
-        "description": "full annotated VCF file",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIQHD6QAN/@@download/GAPFIQHD6QAN.vcf.gz.tbi",
-                "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886",
-                "md5sum": "ef0e24074c6d5ac935a1be3eafbff59a",
-                "status": "uploaded",
-                "filename": "GAPFIQHD6QAN",
-                "accession": "GAPFIQHD6QAN",
-                "file_size": 4429,
-                "upload_key": "073b51e8-f9c7-46ae-809d-c7af517ec886/GAPFIQHD6QAN.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SV",
-        "quality_metric": "cc910b04-a079-4803-b4c3-bf18055db659",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "file_classification": "processed file",
-        "file_ingestion_status": "Ingested",
-        "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886"
-    },
-    {
-        "md5sum": "789368255463001ae4887e98158a1f4e",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIWBUEHT1",
-        "file_size": 2741564055,
-        "file_type": "vep-annotated vcf",
-        "description": "output from VEP in vcf format",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIWBUEHT1/@@download/GAPFIWBUEHT1.vcf.gz.tbi",
-                "uuid": "643217db-45b8-4c6f-8fb8-b5713710b0cf",
-                "md5sum": "aa317cf3733912028f0369e32e410771",
-                "status": "uploaded",
-                "filename": "GAPFIWBUEHT1",
-                "accession": "GAPFIWBUEHT1",
-                "file_size": 2303086,
-                "upload_key": "643217db-45b8-4c6f-8fb8-b5713710b0cf/GAPFIWBUEHT1.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SNV",
-        "quality_metric": "d5fed49f-815f-4ecc-9e5f-162e24daed5c",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "8758e49c-6c86-44ac-bd89-921a503b7544"
-        ],
-        "uuid": "643217db-45b8-4c6f-8fb8-b5713710b0cf"
-    },
-    {
-        "md5sum": "5d763de2f283fe5d5d1cc935cdbd1830",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIHNS8TBL",
-        "file_size": 139629,
-        "file_type": "full annotated VCF",
-        "description": "full annotated VCF file",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIHNS8TBL/@@download/GAPFIHNS8TBL.vcf.gz.tbi",
-                "uuid": "01f81e5b-c32f-4c27-9af8-dc1424054335",
-                "md5sum": "9655b0aa89a6dd368b9ffae4a572a2f2",
-                "status": "uploaded",
-                "filename": "GAPFIHNS8TBL",
-                "accession": "GAPFIHNS8TBL",
-                "file_size": 4761,
-                "upload_key": "01f81e5b-c32f-4c27-9af8-dc1424054335/GAPFIHNS8TBL.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SV",
-        "quality_metric": "1a976eb2-7e3e-44cc-9a8a-cc3af516dd00",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "file_ingestion_status": "Ingested",
-        "uuid": "01f81e5b-c32f-4c27-9af8-dc1424054335"
     },
     {
         "md5sum": "9a99df6d891f05b6d280e95f95f7cd70",
@@ -198,44 +68,6 @@
             "1f46227e-09a1-43ad-9cce-f7512802272e"
         ],
         "uuid": "ea55d9db-9c7b-45c4-a7eb-0443bc8d878c"
-    },
-    {
-        "md5sum": "97985926f313f6963908673ef2344228",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIE97ET2J",
-        "file_size": 30372,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIE97ET2J/@@download/GAPFIE97ET2J.vcf.gz.tbi",
-                "uuid": "e808413f-cc7f-44f8-bcbb-2580d958b5b4",
-                "md5sum": "93e9b35b55243cfd3e1a761eb001a9f0",
-                "status": "uploaded",
-                "filename": "GAPFIE97ET2J",
-                "accession": "GAPFIE97ET2J",
-                "file_size": 4306,
-                "upload_key": "e808413f-cc7f-44f8-bcbb-2580d958b5b4/GAPFIE97ET2J.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "higlass_file": true,
-        "variant_type": "SV",
-        "quality_metric": "b4f4ce8b-32a2-4b4c-80db-915a289d4cfc",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "e3993170-dc06-4af9-b185-bc784d4fa662"
-        ],
-        "uuid": "e808413f-cc7f-44f8-bcbb-2580d958b5b4"
     },
     {
         "md5sum": "c13f08c316dd8712f62a4170287c75a4",
@@ -304,44 +136,6 @@
             "0c6c2fbd-f0b4-472a-aac6-4870e5ec1b15"
         ],
         "uuid": "4700a121-32d8-47ef-ad7c-4335322fa524"
-    },
-    {
-        "md5sum": "477c2e70010a4ea054e7d8498e44eea3",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIE28F9XP",
-        "file_size": 30543,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIE28F9XP/@@download/GAPFIE28F9XP.vcf.gz.tbi",
-                "uuid": "854e2046-5329-4550-8671-578bd106a291",
-                "md5sum": "445cd248303e5cf058e0e1bb7673603b",
-                "status": "uploaded",
-                "filename": "GAPFIE28F9XP",
-                "accession": "GAPFIE28F9XP",
-                "file_size": 4327,
-                "upload_key": "854e2046-5329-4550-8671-578bd106a291/GAPFIE28F9XP.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "higlass_file": true,
-        "variant_type": "SV",
-        "quality_metric": "c713f15d-f9ff-44a0-ad73-a1ebcbe6a1c7",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "47d1781b-b1c5-4561-a7b5-bf40a70bf69c"
-        ],
-        "uuid": "854e2046-5329-4550-8671-578bd106a291"
     },
     {
         "md5sum": "73bb89ded6fe3ed69dc03e5b7083b69f",
@@ -442,44 +236,6 @@
         "uuid": "88e778d4-c1a2-4ab8-8e68-8946df597f5d"
     },
     {
-        "md5sum": "b9d074cab0618b2c040d95beefecb78f",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIHUEEH2N",
-        "file_size": 25353,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIHUEEH2N/@@download/GAPFIHUEEH2N.vcf.gz.tbi",
-                "uuid": "213f3a3b-ff2f-4e8c-a193-2149a00b3809",
-                "md5sum": "8baafff87de10004e659892672248a41",
-                "status": "uploaded",
-                "filename": "GAPFIHUEEH2N",
-                "accession": "GAPFIHUEEH2N",
-                "file_size": 3329,
-                "upload_key": "213f3a3b-ff2f-4e8c-a193-2149a00b3809/GAPFIHUEEH2N.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "higlass_file": true,
-        "variant_type": "CNV",
-        "quality_metric": "014dee00-a0e2-4e25-a540-f755aca78305",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "9a6bd8fb-3194-4ca9-8dfc-ef10e70210e7"
-        ],
-        "uuid": "213f3a3b-ff2f-4e8c-a193-2149a00b3809"
-    },
-    {
         "md5sum": "82ff55749c67443ac1fc0ee028bc009b",
         "status": "uploaded",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
@@ -518,45 +274,6 @@
         "uuid": "c7b2ede9-e681-4ab1-b136-72c1c21e278d"
     },
     {
-        "md5sum": "5361c636430fb270fe389a82906338cb",
-        "status": "archived",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIS1LPW7Q",
-        "file_size": 30270,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIS1LPW7Q/@@download/GAPFIS1LPW7Q.vcf.gz.tbi",
-                "uuid": "fc0431f1-d82b-40f4-8c30-b1e54607756a",
-                "md5sum": "4442df29ceeaba5f597efacdfb9179f8",
-                "status": "uploaded",
-                "filename": "GAPFIS1LPW7Q",
-                "accession": "GAPFIS1LPW7Q",
-                "file_size": 4340,
-                "upload_key": "fc0431f1-d82b-40f4-8c30-b1e54607756a/GAPFIS1LPW7Q.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SV",
-        "quality_metric": "d86bd822-96f1-4385-b6e8-26bb828c96de",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "deep archive",
-        "s3_lifecycle_category": "long_term_archive",
-        "s3_lifecycle_last_checked": "2022-06-10",
-        "associated_meta_workflow_runs": [
-            "d4ffa4f4-43ee-4e7f-bfeb-c939bf93615d"
-        ],
-        "uuid": "fc0431f1-d82b-40f4-8c30-b1e54607756a"
-    },
-    {
         "md5sum": "147d18b17b7a1bc4be1d0c856e8a0281",
         "status": "uploaded",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
@@ -593,43 +310,6 @@
             "76af584b-7e11-47a2-b00a-e49dd9c0030d"
         ],
         "uuid": "4149f63a-97f7-4722-aca4-66267debd2cf"
-    },
-    {
-        "md5sum": "811df3cdd04629ddebb75202c905a0e6",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFISLM7MDF",
-        "file_size": 2734258028,
-        "file_type": "vep-annotated vcf",
-        "description": "output from VEP in vcf format",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFISLM7MDF/@@download/GAPFISLM7MDF.vcf.gz.tbi",
-                "uuid": "ac441d90-eb42-41b8-ba43-6e381268211a",
-                "md5sum": "ee3312f85b2ae810874799a50c2ed062",
-                "status": "uploaded",
-                "filename": "GAPFISLM7MDF",
-                "accession": "GAPFISLM7MDF",
-                "file_size": 2302508,
-                "upload_key": "ac441d90-eb42-41b8-ba43-6e381268211a/GAPFISLM7MDF.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SNV",
-        "quality_metric": "5e637484-4afa-4d91-97ce-050bf2a6bcd6",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
-        ],
-        "uuid": "ac441d90-eb42-41b8-ba43-6e381268211a"
     },
     {
         "md5sum": "d14d33142c3f0dfb8789a8b03c0a119f",
@@ -708,43 +388,6 @@
         "uuid": "c0d09ac9-53d9-4eb5-baff-c6ed479b97bd"
     },
     {
-        "md5sum": "c9e7db5aed4c8b1a8b9a310499e5eee7",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFI6J5MLR9",
-        "file_size": 449938897,
-        "file_type": "raw vcf",
-        "description": "output from GenotypeGVCF in vcf format",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFI6J5MLR9/@@download/GAPFI6J5MLR9.vcf.gz.tbi",
-                "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
-                "md5sum": "58d90a7ec0ffe6f7658b53153cb06ee3",
-                "status": "uploaded",
-                "filename": "GAPFI6J5MLR9",
-                "accession": "GAPFI6J5MLR9",
-                "file_size": 1721838,
-                "upload_key": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88/GAPFI6J5MLR9.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SNV",
-        "quality_metric": "ede965e7-0c0f-4f7b-b7f8-2d47c2dbe36b",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "a77b8431-2936-4f87-8405-8aa43ee777c1"
-        ],
-        "uuid": "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88"
-    },
-    {
         "md5sum": "a829a7a096d81e61eb0fb3dec8125440",
         "status": "uploaded",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
@@ -812,43 +455,6 @@
         "uuid": "70732d59-6c5f-49bf-aa2f-5245e2de443c"
     },
     {
-        "md5sum": "b78bb2e77b7bf0b7a92c3b3c60f8ebd6",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIM5QAQ5T",
-        "file_size": 447219987,
-        "file_type": "raw vcf",
-        "description": "output from GenotypeGVCF in vcf format",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIM5QAQ5T/@@download/GAPFIM5QAQ5T.vcf.gz.tbi",
-                "uuid": "cba230ce-e321-48fd-a4e0-a702c4f0221e",
-                "md5sum": "6f4ea476b93f54c75f0dc0094d8686bc",
-                "status": "uploaded",
-                "filename": "GAPFIM5QAQ5T",
-                "accession": "GAPFIM5QAQ5T",
-                "file_size": 1724840,
-                "upload_key": "cba230ce-e321-48fd-a4e0-a702c4f0221e/GAPFIM5QAQ5T.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "variant_type": "SNV",
-        "quality_metric": "37556964-08ce-4b3c-8848-074fb9d5a3d6",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
-        ],
-        "uuid": "cba230ce-e321-48fd-a4e0-a702c4f0221e"
-    },
-    {
         "md5sum": "4917927f47b6dfcf6c6e40c0432f447b",
         "status": "uploaded",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
@@ -885,44 +491,6 @@
             "8854427b-6ad1-4201-9fc5-64b92721e421"
         ],
         "uuid": "162236d2-b0cb-4417-984b-6e08deba8935"
-    },
-    {
-        "md5sum": "9344271761f477e13d0b567bde47fdc7",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIG4SSFP7",
-        "file_size": 25494,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIG4SSFP7/@@download/GAPFIG4SSFP7.vcf.gz.tbi",
-                "uuid": "b4fc62d2-e6b0-43cf-ba27-97762683b9f5",
-                "md5sum": "5a2a5f1d581ce7b9524586a36603c6b8",
-                "status": "uploaded",
-                "filename": "GAPFIG4SSFP7",
-                "accession": "GAPFIG4SSFP7",
-                "file_size": 3336,
-                "upload_key": "b4fc62d2-e6b0-43cf-ba27-97762683b9f5/GAPFIG4SSFP7.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "higlass_file": true,
-        "variant_type": "CNV",
-        "quality_metric": "5eff3fb3-3925-4777-a8f5-a8fba224cea4",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "c86c26ab-97b9-4f45-84f7-b643a2690adf"
-        ],
-        "uuid": "b4fc62d2-e6b0-43cf-ba27-97762683b9f5"
     },
     {
         "md5sum": "d2cbe2cd38df24d9aaf75a2f47bc3300",
@@ -962,44 +530,6 @@
         "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246"
     },
     {
-        "md5sum": "66933636fd57f1232f2f5d06fda9e0d2",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFIWRA3UX6",
-        "file_size": 25407,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFIWRA3UX6/@@download/GAPFIWRA3UX6.vcf.gz.tbi",
-                "uuid": "4131b9bb-d7b5-4f8b-b94c-efad3c22ba46",
-                "md5sum": "c2db50ab93207991124bc297092dc4ed",
-                "status": "uploaded",
-                "filename": "GAPFIWRA3UX6",
-                "accession": "GAPFIWRA3UX6",
-                "file_size": 3336,
-                "upload_key": "4131b9bb-d7b5-4f8b-b94c-efad3c22ba46/GAPFIWRA3UX6.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "higlass_file": true,
-        "variant_type": "CNV",
-        "quality_metric": "29ee0ff1-e2a5-497e-a79b-1ceec3f0ddd5",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "7f93d218-8e8c-44c9-84df-04200f3e6c4f"
-        ],
-        "uuid": "4131b9bb-d7b5-4f8b-b94c-efad3c22ba46"
-    },
-    {
         "md5sum": "7b22ba1e0ada33482d432845772a3ee7",
         "status": "uploaded",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
@@ -1036,44 +566,6 @@
             "9d0b5f82-35fe-4d10-aa93-47de75042c7c"
         ],
         "uuid": "6f3480d6-0b34-4886-a75e-1e6beafbed73"
-    },
-    {
-        "md5sum": "f70ede0dbadabe621768245d9ad7014e",
-        "status": "uploaded",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "accession": "GAPFI7DMNPEQ",
-        "file_size": 30546,
-        "file_type": "HiGlass vcf",
-        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
-        "extra_files": [
-            {
-                "href": "/files-processed/GAPFI7DMNPEQ/@@download/GAPFI7DMNPEQ.vcf.gz.tbi",
-                "uuid": "09af5d2c-e51d-4919-a294-d9fce8401219",
-                "md5sum": "323d3cd371de4b9695d3f5f9ec06a3dc",
-                "status": "uploaded",
-                "filename": "GAPFI7DMNPEQ",
-                "accession": "GAPFI7DMNPEQ",
-                "file_size": 4326,
-                "upload_key": "09af5d2c-e51d-4919-a294-d9fce8401219/GAPFI7DMNPEQ.vcf.gz.tbi",
-                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
-            }
-        ],
-        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "higlass_file": true,
-        "variant_type": "SV",
-        "quality_metric": "95dede75-4c42-4aee-89d5-6099e816479e",
-        "source_samples": [],
-        "genome_assembly": "GRCh38",
-        "linkto_location": [
-            "SampleProcessing"
-        ],
-        "file_classification": "processed file",
-        "s3_lifecycle_status": "standard",
-        "associated_meta_workflow_runs": [
-            "60eb5168-b6c9-46ce-8c6a-e1fe54940e71"
-        ],
-        "uuid": "09af5d2c-e51d-4919-a294-d9fce8401219"
     },
     {
         "md5sum": "db32336d5ec0cc9c66c93817918561ec",

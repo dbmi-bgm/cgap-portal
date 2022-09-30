@@ -16,21 +16,13 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "analysis_type": "WGS-Trio",
         "processed_files": [
-            "45f3b96b-e70a-4270-b96e-4de40e11ac03",
             "88e778d4-c1a2-4ab8-8e68-8946df597f5d",
-            "073b51e8-f9c7-46ae-809d-c7af517ec886",
             "70732d59-6c5f-49bf-aa2f-5245e2de443c",
-            "fc0431f1-d82b-40f4-8c30-b1e54607756a",
             "162236d2-b0cb-4417-984b-6e08deba8935",
-            "cba230ce-e321-48fd-a4e0-a702c4f0221e",
             "a4470a32-574c-4eb4-a453-cf120a22a7ed",
-            "a6c9f1f0-e52a-4c3b-bc91-047462bf4d88",
             "a7809e79-b980-4b7f-9e43-1c2a60959246",
-            "e808413f-cc7f-44f8-bcbb-2580d958b5b4",
             "ea55d9db-9c7b-45c4-a7eb-0443bc8d878c",
-            "09af5d2c-e51d-4919-a294-d9fce8401219",
-            "4149f63a-97f7-4722-aca4-66267debd2cf",
-            "854e2046-5329-4550-8671-578bd106a291"
+            "4149f63a-97f7-4722-aca4-66267debd2cf"
         ],
         "completed_processes": [
             "WGS Trio v27",
@@ -55,23 +47,14 @@
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "analysis_type": "WGS-Trio",
         "processed_files": [
-            "ca460b8d-fe8b-40e1-99a8-3c3010b914a3",
             "044b6eb2-a41c-473e-81f7-745e5b4126e6",
-            "01f81e5b-c32f-4c27-9af8-dc1424054335",
             "7ed7e996-7d8a-4be6-bf02-48e9ca755b4b",
-            "18dde7ee-eb67-4223-93c9-860061c4b88f",
             "80aae2aa-b688-48be-8ee4-19fcde1af6d2",
-            "6f3480d6-0b34-4886-a75e-1e6beafbed73",
             "136ff96c-b81c-48d4-86c8-e02da6b2dc19",
-            "643217db-45b8-4c6f-8fb8-b5713710b0cf",
             "0ab1d2e8-ab93-4e14-9e61-ce2032123cc5",
-            "ac441d90-eb42-41b8-ba43-6e381268211a",
             "c0d09ac9-53d9-4eb5-baff-c6ed479b97bd",
-            "213f3a3b-ff2f-4e8c-a193-2149a00b3809",
             "c7b2ede9-e681-4ab1-b136-72c1c21e278d",
-            "4131b9bb-d7b5-4f8b-b94c-efad3c22ba46",
-            "4700a121-32d8-47ef-ad7c-4335322fa524",
-            "b4fc62d2-e6b0-43cf-ba27-97762683b9f5"
+            "4700a121-32d8-47ef-ad7c-4335322fa524"
         ],
         "completed_processes": [
             "SV Germline v3"
