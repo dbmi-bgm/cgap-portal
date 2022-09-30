@@ -170,17 +170,6 @@
         "quickcheck": "OK",
         "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
         "overall_quality_status": "PASS",
-        "associated_meta_workflow_runs": [
-            "9d0b5f82-35fe-4d10-aa93-47de75042c7c"
-        ],
-        "uuid": "00a85e27-edec-472d-a11c-717854574c0e"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
         "uuid": "b599c38a-35ad-4c4f-a4bf-80b398bff4b2"
     },
     {
@@ -327,13 +316,5 @@
             "d4ffa4f4-43ee-4e7f-bfeb-c939bf93615d"
         ],
         "uuid": "e0304ea2-fe84-41d7-b039-c6623c117a7e"
-    },
-    {
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "quickcheck": "OK",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "uuid": "2195e818-55e5-496e-a0cc-5db0a8c827cb"
     }
 ]

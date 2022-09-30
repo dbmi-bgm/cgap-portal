@@ -56,31 +56,6 @@
         "uuid": "6561d7cf-a5c1-4ada-9eab-9e1ba62b3699"
     },
     {
-        "url": "https://s3.amazonaws.com/cgap-biotest-main-application-cgap-wolf-wfoutput/GAPFIKXN2XVZ/qc_report.html",
-        "status": "shared",
-        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
-        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
-        "overall_quality_status": "PASS",
-        "ancestry and sex prediction": [
-            {
-                "name": "NA24143_sample-WGS",
-                "predicted sex": "female",
-                "predicted ancestry": "EUR"
-            },
-            {
-                "name": "NA24149_sample-WGS",
-                "predicted sex": "male",
-                "predicted ancestry": "EUR"
-            },
-            {
-                "name": "NA24385_sample-WGS",
-                "predicted sex": "male",
-                "predicted ancestry": "EUR"
-            }
-        ],
-        "uuid": "6cbc38ee-2ec8-4900-971d-13bfe7fce708"
-    },
-    {
         "url": "https://s3.amazonaws.com/cgap-biotest-main-application-cgap-wolf-wfoutput/GAPFIWBUEHT1/qc_report.html",
         "status": "shared",
         "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
