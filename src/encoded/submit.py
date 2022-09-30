@@ -696,7 +696,7 @@ class AccessionRow:
                         list(self.ACCEPTED_GENOME_BUILDS.keys()), conjunction="or",
                     )
                     msg += (
-                        "Consider replacing with one of the following:"
+                        " Accepted genome builds include the following:"
                         f" {accepted_genome_builds}."
                     )
                 self.errors.append(msg)
