@@ -41,7 +41,7 @@ export default function FeedbackButton(props) {
     return (
         <Dropdown className={dropCls}>
             <Dropdown.Toggle variant={variant} className={toggleCls} id="feedback-btn-drop">
-                <i className="icon icon-question-circle fas mr-04" />
+                <i className="icon icon-question-circle fas mr-1" />
                 Feedback or Issues?
             </Dropdown.Toggle>
 
