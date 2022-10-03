@@ -759,14 +759,8 @@
             "grouping": "Complex Relationship Analysis"
         },
         "samplegeno.samplegeno_sampleid": {
-            "title": "Sample Genotype Sample ID",
+            "title": "Sample ID",
             "order": 9,
-            "grouping": "Complex Relationship Analysis"
-        },
-        "samplegeno.samplegeno_ac": {
-            "title": "Sample Genotype Alt Allele Count",
-            "order": 9,
-            "aggregation_type": "stats",
             "grouping": "Complex Relationship Analysis"
         },
         "AD_ALT": {
