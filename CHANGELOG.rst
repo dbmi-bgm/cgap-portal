@@ -7,6 +7,24 @@ Change Log
 ----------
 
 
+10.4.1
+======
+
+`PR 659: Submission bug fixes <https://github.com/dbmi-bgm/cgap-portal/pull/659>`_
+
+* Minor refactoring of case submission code to fix bugs failing submissions
+* Enforce file name conventions to match schema regex
+
+
+10.4.0
+======
+
+`PR 650: Pipeline deployment schema changes <https://github.com/dbmi-bgm/cgap-portal/pull/650>`_
+
+* Non-breaking schema changes to Workflow and Software items to facilitate pipeline
+  deployment
+
+
 10.3.7
 ======
 
