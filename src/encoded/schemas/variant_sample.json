@@ -743,6 +743,21 @@
             "order": 8,
             "grouping": "Variant Quality"
         },
+        "samplegeno.samplegeno_numgt": {
+            "title": "Sample Genotype (Numeric)",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_gt": {
+            "title": "Sample Genotype (Nucleotide)",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_role": {
+            "title": "Sample Genotype Relationship",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
         "samplegeno.samplegeno_sampleid": {
             "title": "Sample Genotype Sample ID",
             "order": 9,
@@ -752,11 +767,6 @@
             "title": "Sample Genotype Alt Allele Count",
             "order": 9,
             "aggregation_type": "stats",
-            "grouping": "Complex Relationship Analysis"
-        },
-        "samplegeno.samplegeno_gt": {
-            "title": "Sample Genotype",
-            "order": 9,
             "grouping": "Complex Relationship Analysis"
         },
         "AD_ALT": {
