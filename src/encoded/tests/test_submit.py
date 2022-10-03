@@ -20,6 +20,7 @@ from ..submit import (
     digest_xlsx,
     format_ontology_term_with_colon,
     get_column_name,
+    make_conjoined_list,
     map_fields,
     parse_exception,
     post_and_patch_all_items,
@@ -1116,6 +1117,24 @@ def test_format_ontology_term_with_colon(term, result):
     assert format_ontology_term_with_colon(term) == result
 
 
+@pytest.mark.parametrize(
+    "items,conjunction,expected",
+    [
+        ([], None, " "),
+        (["foo", "bar"], None, "foo and bar"),
+        (["foo", "bar"], "or", "foo or bar"),
+        (["foo", "bar", "fu"], None, "foo, bar, and fu"),
+        (["foo", "bar", "fu"], "or", "foo, bar, or fu"),
+    ],
+)
+def test_make_conjoined_list(items, conjunction, expected):
+    """Test making readable, joined list of strings for error
+    reporting.
+    """
+    result = make_conjoined_list(items, conjunction=conjunction)
+    assert result == expected
+
+
 class TestAccessionRow:
     @pytest.mark.parametrize(
         "col, val, sample_alias",
@@ -1760,6 +1779,7 @@ class TestSubmittedFilesParser:
         [
             ("", None, 0, [], [], 0),
             ("foo.bar", None, 1, [], [], 1),
+            ("foo .bar", None, 1, [], [], 2),
             (VCF_FILE_PATH, None, 0, [VCF_FILE_ITEM], [VCF_FILE_ALIAS], 0),
             (
                 "foo.bar, " + VCF_FILE_PATH,
@@ -1860,6 +1880,25 @@ class TestSubmittedFilesParser:
         """Test parsing submitted file names."""
         result = file_parser.parse_file_names(submitted_file_names)
         assert result == set(expected)
+
+    @pytest.mark.parametrize(
+        "file_name,expected",
+        [
+            ("", False),
+            (" ", False),
+            ("foo-bar", True),
+            ("foo-bar.txt", True),
+            ("foo_bar", True),
+            ("foo bar", False),
+            (" foo_bar.txt", False),
+            ("foo_bar.txt ", False),
+            ("foo_bar_19", True),
+        ],
+    )
+    def test_is_file_name_valid(self, file_parser, file_name, expected):
+        """Test validation of file names with regex."""
+        result = file_parser.is_file_name_valid(file_name)
+        assert result == expected
 
     @pytest.mark.parametrize(
         "accepted_file_formats,expected",

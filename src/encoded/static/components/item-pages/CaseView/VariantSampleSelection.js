@@ -541,7 +541,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                             </label>
                             <button type="button" onClick={onClickLinkNavigateChildWindow}
                                 data-href={vsID + '?showInterpretation=True&annotationTab=1&interpretationTab=1' + (caseAccession ? '&caseSource=' + caseAccession : '')}
-                                data-child-window={vsUUID} className="btn btn-link p-0">
+                                data-child-window={vsUUID} className="btn btn-link p-0 mw-100">
                                 <GenesMostSevereHGVSCColumn gene={firstGene} align="left" />
                             </button>
                         </div>
