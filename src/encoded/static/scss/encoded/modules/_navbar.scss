@@ -319,7 +319,8 @@ div#top-nav.navbar-fixed-top {
 
             > .navbar-nav {
                 
-                > a {
+                > a,
+                > button {
                     @include navbar-link-button-item;
                 }
 
