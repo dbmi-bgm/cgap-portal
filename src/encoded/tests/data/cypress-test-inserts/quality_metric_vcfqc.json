@@ -60973,5 +60973,59 @@
         },
         "total unique variants in vcf": "8615",
         "uuid": "13c31319-1dfe-4b1b-8058-4519c353bfbb"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "total variants": [
+            {
+                "DEL": 39,
+                "DUP": 21,
+                "name": "NA12879_sample-WGS",
+                "total": 60
+            },
+            {
+                "DEL": 39,
+                "DUP": 17,
+                "name": "NA12878_sample-WGS",
+                "total": 56
+            },
+            {
+                "DEL": 31,
+                "DUP": 17,
+                "name": "NA12877_sample-WGS",
+                "total": 48
+            }
+        ],
+        "overall_quality_status": "PASS",
+        "uuid": "5adbb18e-5866-4e91-8fb2-e61525253e76"
+    },
+    {
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "total variants": [
+            {
+                "DEL": 49,
+                "DUP": 32,
+                "name": "NA24385_sample-WGS",
+                "total": 81
+            },
+            {
+                "DEL": 46,
+                "DUP": 33,
+                "name": "NA24143_sample-WGS",
+                "total": 79
+            },
+            {
+                "DEL": 44,
+                "DUP": 32,
+                "name": "NA24149_sample-WGS",
+                "total": 76
+            }
+        ],
+        "overall_quality_status": "PASS",
+        "uuid": "762c129b-0852-4e5f-bf46-91f70692f339"
     }
 ]

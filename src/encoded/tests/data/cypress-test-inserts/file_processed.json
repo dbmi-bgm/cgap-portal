@@ -1141,5 +1141,68 @@
             "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
         ],
         "uuid": "fcfe6082-1a9d-4a8c-8c29-9f52cb034726"
+    },
+    {
+        "md5sum": "5d763de2f283fe5d5d1cc935cdbd1830",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIHNS8TBL",
+        "file_size": 139629,
+        "file_type": "full annotated VCF",
+        "description": "full annotated VCF file",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIHNS8TBL/@@download/GAPFIHNS8TBL.vcf.gz.tbi",
+                "uuid": "01f81e5b-c32f-4c27-9af8-dc1424054335",
+                "md5sum": "9655b0aa89a6dd368b9ffae4a572a2f2",
+                "status": "uploaded",
+                "filename": "GAPFIHNS8TBL",
+                "accession": "GAPFIHNS8TBL",
+                "file_size": 4761,
+                "upload_key": "01f81e5b-c32f-4c27-9af8-dc1424054335/GAPFIHNS8TBL.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SV",
+        "quality_metric": "1a976eb2-7e3e-44cc-9a8a-cc3af516dd00",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "file_ingestion_status": "Ingested",
+        "uuid": "01f81e5b-c32f-4c27-9af8-dc1424054335"
+    },
+    {
+        "md5sum": "8855cd3476d6b61c90e592e29a8cbd68",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIQHD6QAN",
+        "file_size": 78225,
+        "file_type": "full annotated VCF",
+        "description": "full annotated VCF file",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIQHD6QAN/@@download/GAPFIQHD6QAN.vcf.gz.tbi",
+                "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886",
+                "md5sum": "ef0e24074c6d5ac935a1be3eafbff59a",
+                "status": "uploaded",
+                "filename": "GAPFIQHD6QAN",
+                "accession": "GAPFIQHD6QAN",
+                "file_size": 4429,
+                "upload_key": "073b51e8-f9c7-46ae-809d-c7af517ec886/GAPFIQHD6QAN.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SV",
+        "quality_metric": "cc910b04-a079-4803-b4c3-bf18055db659",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "file_ingestion_status": "Ingested",
+        "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886"
     }
 ]
