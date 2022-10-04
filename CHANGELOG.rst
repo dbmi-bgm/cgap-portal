@@ -6,7 +6,6 @@ cgap-portal
 Change Log
 ----------
 
-
 11.0.0
 ======
 
@@ -16,6 +15,23 @@ Change Log
 * Upgrader for Cohort v1 --> v2
 * Creation of CohortAnalysis item
 * Inserts updates for existing Cohort + addition of CohortAnalysis insert
+
+
+10.5.0
+======
+`PR 628: In portal feedback UI <https://github.com/dbmi-bgm/cgap-portal/pull/628/>`_
+
+* Adds a button to the navbar that opens up a mailto link with some useful information pre-populated
+  for submitting jira tickets.
+
+
+10.4.1
+======
+
+`PR 659: Submission bug fixes <https://github.com/dbmi-bgm/cgap-portal/pull/659>`_
+
+* Minor refactoring of case submission code to fix bugs failing submissions
+* Enforce file name conventions to match schema regex
 
 
 10.4.0
