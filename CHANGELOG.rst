@@ -6,6 +6,17 @@ cgap-portal
 Change Log
 ----------
 
+11.0.0
+======
+
+`PR 654: Cohort data model <https://github.com/dbmi-bgm/cgap-portal/pull/654>`_
+
+* Breaking schema changes to Cohort item to use for case vs. control analysis
+* Upgrader for Cohort v1 --> v2
+* Creation of CohortAnalysis item
+* Inserts updates for existing Cohort + addition of CohortAnalysis insert
+
+
 10.5.0
 ======
 `PR 628: In portal feedback UI <https://github.com/dbmi-bgm/cgap-portal/pull/628/>`_

@@ -164,7 +164,6 @@
             ],
             "linkTo": "Institution",
             "serverDefault": "userinstitution"
-
         },
         "project": {
             "title": "Project",
@@ -510,6 +509,18 @@
                 "title": "MetaWorkflowRun",
                 "type": "string",
                 "linkTo": "MetaWorkflowRun"
+            }
+        }
+    },
+    "processed_files": {
+        "processed_files": {
+            "title": "Processed Files",
+            "description": "Processed files from bioinformatics pipelines",
+            "type": "array",
+            "items": {
+                "title": "Processed File",
+                "type": "string",
+                "linkTo": "FileProcessed"
             }
         }
     }

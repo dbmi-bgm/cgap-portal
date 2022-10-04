@@ -1,0 +1,90 @@
+{
+    "title": "Cohort Analysis",
+    "description": "Analysis object used on cohort samples",
+    "id": "/profiles/cohort_analysis.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "accession"
+    ],
+    "additionalProperties": false,
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/submitted_files"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/processed_files"
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession": {
+            "accessionType": "CA"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Title for the analysis",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the analysis",
+            "type": "string"
+        },
+        "control_samples": {
+            "title": "Control Samples",
+            "description": "Control samples used in a cohort analysis",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        },
+        "case_samples": {
+            "title": "Case Samples",
+            "description": "Case samples used in a cohort analysis",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        }
+    }
+}
