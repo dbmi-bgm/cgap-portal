@@ -5805,5 +5805,1018 @@
             323
         ],
         "uuid": "cb788180-68ad-4a54-86c1-5f19765b4992"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:9d73511a-ef43-4912-8af2-e320cf8a3ac5:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 5.78265e-13,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "9d73511a-ef43-4912-8af2-e320cf8a3ac5",
+        "bicseq2_expected_reads": 3435.8,
+        "bicseq2_observed_reads": 2585,
+        "bicseq2_log2_copy_ratio": -0.414749077120103,
+        "uuid": "55ae8dee-c85d-4744-a7f8-832c0bab09b3"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:b9c76a94-8349-40d2-9e67-5d11137be0db:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 9.95163e-44,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "b9c76a94-8349-40d2-9e67-5d11137be0db",
+        "bicseq2_expected_reads": 1521.92,
+        "bicseq2_observed_reads": 859,
+        "bicseq2_log2_copy_ratio": -0.82942978766094,
+        "uuid": "d9bb3922-f752-4500-94f2-d2ead3129e45"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:b8609b79-e3a3-4fc0-a6a6-e824aa487345:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 6.87556e-56,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "b8609b79-e3a3-4fc0-a6a6-e824aa487345",
+        "bicseq2_expected_reads": 4295.88,
+        "bicseq2_observed_reads": 2246,
+        "bicseq2_log2_copy_ratio": -0.939863065085949,
+        "uuid": "c0247a25-1ddc-4250-983a-a99a55a1aa70"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:7bcb4f31-007d-4c96-a048-9584d89cbdf6:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 0.000132022,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "7bcb4f31-007d-4c96-a048-9584d89cbdf6",
+        "bicseq2_expected_reads": 25340.0,
+        "bicseq2_observed_reads": 21803,
+        "bicseq2_log2_copy_ratio": -0.221157166037607,
+        "uuid": "6014a877-557d-42c0-857a-12839ecee0c0"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:03fbde89-f258-4c7c-bb58-05b38165f88e:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.25317e-42,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "03fbde89-f258-4c7c-bb58-05b38165f88e",
+        "bicseq2_expected_reads": 853.293,
+        "bicseq2_observed_reads": 466,
+        "bicseq2_log2_copy_ratio": -0.876978556837472,
+        "uuid": "8bd73a23-5087-433c-a85c-8438f49c4066"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:d3b8facb-8500-45f2-9518-f3c5e05892ca:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 2.45279e-45,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "d3b8facb-8500-45f2-9518-f3c5e05892ca",
+        "bicseq2_expected_reads": 22340.2,
+        "bicseq2_observed_reads": 12528,
+        "bicseq2_log2_copy_ratio": -0.838753282650257,
+        "uuid": "cb37e6b2-2de3-45a2-89b5-bcfd50839cc1"
+    },
+    {
+        "GT": "1/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:adf4536f-09a0-479b-96b9-09980d846a93:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 2.96575e-70,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "adf4536f-09a0-479b-96b9-09980d846a93",
+        "bicseq2_expected_reads": 131.766,
+        "bicseq2_observed_reads": 10,
+        "bicseq2_log2_copy_ratio": -3.72417354724708,
+        "uuid": "41f41bba-cd18-48d6-b2eb-e01014489850"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:eae7e7a1-8ecf-4c93-b691-7df5bb978972:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.64125e-54,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "eae7e7a1-8ecf-4c93-b691-7df5bb978972",
+        "bicseq2_expected_reads": 617.994,
+        "bicseq2_observed_reads": 318,
+        "bicseq2_log2_copy_ratio": -0.962833364607765,
+        "uuid": "b6f0c795-167b-4cb6-8680-98affd5f66ce"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:765db811-3c59-4832-9abb-0b9f5cafc0a9:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 6.00288e-62,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "765db811-3c59-4832-9abb-0b9f5cafc0a9",
+        "bicseq2_expected_reads": 1687.37,
+        "bicseq2_observed_reads": 849,
+        "bicseq2_log2_copy_ratio": -0.995207196837361,
+        "uuid": "ddf5c887-abdb-4735-8996-93c24f8905ba"
+    },
+    {
+        "GT": "1/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:180e76f1-2602-4218-be14-82658717b7b4:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 0.0,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "180e76f1-2602-4218-be14-82658717b7b4",
+        "bicseq2_expected_reads": 1307.34,
+        "bicseq2_observed_reads": 4,
+        "bicseq2_log2_copy_ratio": -8.35668592831944,
+        "uuid": "ff3bf151-a1a0-4d7e-b504-07e6c66ce3de"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:640a5c26-d71a-4db8-84f9-e9aadfa2307c:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 6.17844e-220,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "640a5c26-d71a-4db8-84f9-e9aadfa2307c",
+        "bicseq2_expected_reads": 796.401,
+        "bicseq2_observed_reads": 169,
+        "bicseq2_log2_copy_ratio": -2.24073908447468,
+        "uuid": "313e76a6-8944-44a9-a3d9-2e639ec0c1ae"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:da6ad04a-34d7-4fe0-8cee-c7339bb675f3:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.16226e-81,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "da6ad04a-34d7-4fe0-8cee-c7339bb675f3",
+        "bicseq2_expected_reads": 315.902,
+        "bicseq2_observed_reads": 59,
+        "bicseq2_log2_copy_ratio": -2.42495750965211,
+        "uuid": "f3f6c6d0-be38-4af6-896e-3b6660c248d2"
+    },
+    {
+        "GT": "1/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2",
+            "Manta"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:e14ce83d-9cb8-4bf9-b632-c425b8422ac9:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 0.0,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "e14ce83d-9cb8-4bf9-b632-c425b8422ac9",
+        "bicseq2_expected_reads": 10312.7,
+        "bicseq2_observed_reads": 0,
+        "bicseq2_log2_copy_ratio": -33.2235482479577,
+        "uuid": "02b19fab-e5e3-4c18-8e65-ba5bd09d4c93"
+    },
+    {
+        "GT": "1/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:a39c7202-6bb6-40bf-a148-878ad604e3cf:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.11063e-281,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "a39c7202-6bb6-40bf-a148-878ad604e3cf",
+        "bicseq2_expected_reads": 504.811,
+        "bicseq2_observed_reads": 16,
+        "bicseq2_log2_copy_ratio": -4.98386683177593,
+        "uuid": "ed2ed1de-3334-4424-9ac3-5fb7330c6eed"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:4ac14ce0-c621-4e17-a11d-597972b3357c:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 6.97386e-68,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "4ac14ce0-c621-4e17-a11d-597972b3357c",
+        "bicseq2_expected_reads": 5064.61,
+        "bicseq2_observed_reads": 2456,
+        "bicseq2_log2_copy_ratio": -1.04840791673395,
+        "uuid": "afeab1ef-7fa9-4f63-b3ec-d731556c58c8"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:b507c995-291c-4dff-87b2-c497deae2e5d:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.67539e-49,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "b507c995-291c-4dff-87b2-c497deae2e5d",
+        "bicseq2_expected_reads": 13215.4,
+        "bicseq2_observed_reads": 7206,
+        "bicseq2_log2_copy_ratio": -0.879216834669112,
+        "uuid": "12482603-d2f8-41fc-8d0b-8f4dffb46c69"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:0d14fb8e-bf12-4842-bf75-187513656a19:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 2.92878e-20,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "HIGH",
+        "inheritance_modes": [],
+        "structural_variant": "0d14fb8e-bf12-4842-bf75-187513656a19",
+        "bicseq2_expected_reads": 13665.98,
+        "bicseq2_observed_reads": 19889,
+        "bicseq2_log2_copy_ratio": 0.537114521116335,
+        "uuid": "83e30150-a10b-48e2-ad8b-651700384586"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:b3266c86-2fd9-48ce-93a9-cd59bf6fa592:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 5.23017e-66,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "b3266c86-2fd9-48ce-93a9-cd59bf6fa592",
+        "bicseq2_expected_reads": 1569.33,
+        "bicseq2_observed_reads": 768,
+        "bicseq2_log2_copy_ratio": -1.03523783803415,
+        "uuid": "88e4dc27-32e4-42cd-8b27-e32183bac5b6"
+    },
+    {
+        "GT": "1/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:771240fa-05e2-4f90-a40b-4fb5171ad636:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.66488e-58,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "771240fa-05e2-4f90-a40b-4fb5171ad636",
+        "bicseq2_expected_reads": 172.852,
+        "bicseq2_observed_reads": 16,
+        "bicseq2_log2_copy_ratio": -3.43766078383307,
+        "uuid": "c6281b03-6f7c-432f-a918-2a13fe692e02"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:519e664a-536d-4f3d-ad99-f9284110b2ea:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.2281e-39,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "519e664a-536d-4f3d-ad99-f9284110b2ea",
+        "bicseq2_expected_reads": 3779.86,
+        "bicseq2_observed_reads": 6494,
+        "bicseq2_log2_copy_ratio": 0.776507285316736,
+        "uuid": "796188af-e5f6-4988-a7eb-2ce5bc8da564"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:16b3e63a-c8c0-4408-b99f-0b2b94032997:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 8.90701e-21,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "16b3e63a-c8c0-4408-b99f-0b2b94032997",
+        "bicseq2_expected_reads": 6420.54,
+        "bicseq2_observed_reads": 9376,
+        "bicseq2_log2_copy_ratio": 0.542010630349429,
+        "uuid": "18255473-90ec-428f-8861-5766e7fb4bd7"
+    },
+    {
+        "GT": "1/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "1/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:5d2b5dd4-2805-4221-a2e1-b4b9b499aead:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 6.8243e-50,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Homozygous alternate"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "5d2b5dd4-2805-4221-a2e1-b4b9b499aead",
+        "bicseq2_expected_reads": 100.891,
+        "bicseq2_observed_reads": 10,
+        "bicseq2_log2_copy_ratio": -3.33899287682654,
+        "uuid": "28c6f002-6ad5-42f3-b736-fcbfc4ba1af3"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:c5a81889-1869-4ff6-9c79-4caae23426e4:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 1.41356e-24,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "c5a81889-1869-4ff6-9c79-4caae23426e4",
+        "bicseq2_expected_reads": 1647.38,
+        "bicseq2_observed_reads": 2498,
+        "bicseq2_log2_copy_ratio": 0.596332799042369,
+        "uuid": "a22a0f64-d3e6-4116-a3f9-4317180e4621"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:01a9b3aa-bc23-4e10-afb0-6a7e17a67847:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 4.59622e-43,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "01a9b3aa-bc23-4e10-afb0-6a7e17a67847",
+        "bicseq2_expected_reads": 514.032,
+        "bicseq2_observed_reads": 255,
+        "bicseq2_log2_copy_ratio": -1.01562822592261,
+        "uuid": "4502587f-b6f1-4ae5-9b93-e8ff1a0cb100"
+    },
+    {
+        "GT": "0/1",
+        "file": "GAPFIJU4WHXX",
+        "status": "in review",
+        "callers": [
+            "BIC-seq2"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "CALL_INFO": "NA24385_sample-WGS",
+        "samplegeno": [
+            {
+                "samplegeno_sex": "M",
+                "samplegeno_role": "proband",
+                "samplegeno_numgt": "0/1",
+                "samplegeno_sampleid": "NA24385_sample-WGS"
+            }
+        ],
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "caller_types": [
+            "CNV"
+        ],
+        "annotation_id": "NA24385_sample-WGS:04e02038-bd72-40c1-bc3a-bd2f7f0037a0:GAPFIJU4WHXX",
+        "bicseq2_pvalue": 4.99095e-05,
+        "genotype_labels": [
+            {
+                "role": "proband",
+                "labels": [
+                    "Heterozygous"
+                ],
+                "sample_id": "NA24385_sample-WGS"
+            }
+        ],
+        "confidence_class": "LOW",
+        "inheritance_modes": [],
+        "structural_variant": "04e02038-bd72-40c1-bc3a-bd2f7f0037a0",
+        "bicseq2_expected_reads": 7284.0,
+        "bicseq2_observed_reads": 6227,
+        "bicseq2_log2_copy_ratio": -0.230460942014887,
+        "uuid": "00310a46-79ab-4a28-a7f2-919c9207eecb"
     }
 ]

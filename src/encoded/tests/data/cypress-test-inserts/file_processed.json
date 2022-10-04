@@ -1204,5 +1204,44 @@
         "file_classification": "processed file",
         "file_ingestion_status": "Ingested",
         "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886"
+    },
+    {
+        "md5sum": "68eac24f43bbcecb93439a993e26fc8f",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIJU4WHXX",
+        "file_size": 36442,
+        "file_type": "full-annotated vcf",
+        "description": "fully annotated output in vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIJU4WHXX/@@download/GAPFIJU4WHXX.vcf.gz.tbi",
+                "uuid": "0068a1d1-d7ff-4a87-9eac-e4e30b5961f1",
+                "md5sum": "b58e1b38b3e8a887672e1f8e463ea126",
+                "status": "uploaded",
+                "filename": "GAPFIJU4WHXX",
+                "accession": "GAPFIJU4WHXX",
+                "file_size": 3366,
+                "upload_key": "0068a1d1-d7ff-4a87-9eac-e4e30b5961f1/GAPFIJU4WHXX.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "CNV",
+        "vcf_to_ingest": true,
+        "quality_metric": "ed7d3b9b-3645-41a0-9cc6-88556f2c3eef",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "file_ingestion_status": "Ingested",
+        "associated_meta_workflow_runs": [
+            "c86c26ab-97b9-4f45-84f7-b643a2690adf"
+        ],
+        "uuid": "0068a1d1-d7ff-4a87-9eac-e4e30b5961f1"
     }
 ]

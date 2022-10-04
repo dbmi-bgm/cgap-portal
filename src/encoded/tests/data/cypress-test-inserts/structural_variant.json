@@ -32258,5 +32258,2637 @@
         "cytoband_start": "q13.42",
         "unrelated_count": 0,
         "uuid": "6baca939-cfcb-430c-a835-e9a8dbc4e13e"
+    },
+    {
+        "END": 1580645,
+        "CHROM": "20",
+        "START": 1571451,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "20",
+        "hg19_end": 1561291,
+        "hg19_start": 1552097,
+        "transcript": [
+            {
+                "csq_exon": "2/4",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1-2/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000262929",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "2/4",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1-2/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381603",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "2-3/6",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1-3/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381605",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "2/3",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1-2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000563840",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "2/3",
+                "csq_gene": "17b10dd1-f80a-4909-a722-e72f8638822d",
+                "csq_intron": "1-2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000564763",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1/2",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1/1",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000565076",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "17b10dd1-f80a-4909-a722-e72f8638822d",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000566961",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "2/3",
+                "csq_gene": "17b10dd1-f80a-4909-a722-e72f8638822d",
+                "csq_intron": "1-2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000567028",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000569629",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p13",
+        "annotation_id": "DEL_chr20:1571451-1580645",
+        "cytoband_start": "p13",
+        "unrelated_count": 0,
+        "uuid": "eae7e7a1-8ecf-4c93-b691-7df5bb978972"
+    },
+    {
+        "END": 54828679,
+        "CHROM": "19",
+        "START": 54769997,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 55340134,
+        "hg19_start": 55281449,
+        "transcript": [
+            {
+                "csq_exon": "2-9/9",
+                "csq_gene": "bce6ffe8-05c2-49ca-8cf5-1ea8bc560069",
+                "csq_intron": "1-8/8",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000291633",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-5/8",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "1-5/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000326542",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "2-8/8",
+                "csq_gene": "bce6ffe8-05c2-49ca-8cf5-1ea8bc560069",
+                "csq_intron": "1-7/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000336077",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000339924",
+                "csq_distance": "3997",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000345540",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000346587",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000357494",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1-5/8",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "1-5/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000358178",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000359085",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1-6/9",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "1-6/8",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000391728",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000391729",
+                "csq_distance": "4086",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000396284",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000396289",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000396293",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.42",
+        "annotation_id": "DUP_chr19:54769997-54828679",
+        "cytoband_start": "q13.42",
+        "unrelated_count": 0,
+        "uuid": "16b3e63a-c8c0-4408-b99f-0b2b94032997"
+    },
+    {
+        "END": 22904235,
+        "CHROM": "22",
+        "START": 22758587,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "22",
+        "hg19_end": 23246415,
+        "hg19_start": 23101076,
+        "transcript": [
+            {
+                "csq_gene": "0779e12e-2ff0-4fe4-bfc0-00dc5ebcdeb5",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000385101",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "4f207299-3734-4a58-88e6-52ced0cf2ee7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000526893",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "4f207299-3734-4a58-88e6-52ced0cf2ee7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000531372",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "4f207299-3734-4a58-88e6-52ced0cf2ee7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000532223",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "1346998d-dd6a-48f5-a80e-85e081381cb9",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000577998",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q11.22",
+        "annotation_id": "DEL_chr22:22758587-22904235",
+        "cytoband_start": "q11.22",
+        "unrelated_count": 0,
+        "uuid": "d3b8facb-8500-45f2-9518-f3c5e05892ca"
+    },
+    {
+        "END": 4955841,
+        "CHROM": "11",
+        "START": 4947010,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "11",
+        "hg19_end": 4977071,
+        "hg19_start": 4968240,
+        "transcript": [
+            {
+                "csq_gene": "0d16f9f1-5a77-40d3-8782-a891e2f97e19",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000380371",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/1",
+                "csq_gene": "e3fa7859-3684-469c-8c29-6c7593789168",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000380373",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_cds_position": "?-90",
+                "csq_cdna_position": "?-116",
+                "csq_protein_position": "?-30",
+                "csq_variant_3_prime_location": "Exonic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "c4bcf118-8744-4613-91d7-df23a0f8ecc9",
+                "csq_intron": "1/6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000380390",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-2/2",
+                "csq_gene": "e3fa7859-3684-469c-8c29-6c7593789168",
+                "csq_intron": "1/1",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000641898",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "?-90",
+                "csq_cdna_position": "?-213",
+                "csq_protein_position": "?-30",
+                "csq_variant_3_prime_location": "Exonic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p15.4",
+        "annotation_id": "DEL_chr11:4947010-4955841",
+        "cytoband_start": "p15.4",
+        "unrelated_count": 0,
+        "uuid": "b9c76a94-8349-40d2-9e67-5d11137be0db"
+    },
+    {
+        "END": 53049039,
+        "CHROM": "19",
+        "START": 53015977,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 53552292,
+        "hg19_start": 53519230,
+        "transcript": [
+            {
+                "csq_exon": "1-2/2",
+                "csq_gene": "36c5907b-eaf0-43d7-97e6-60a58a272043",
+                "csq_intron": "1/1",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000601417",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "?-392",
+                "csq_variant_3_prime_location": "5_prime_UTR",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/1",
+                "csq_gene": "0002fb5c-c3d2-46ac-ac5b-179e4d425a9f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000602168",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "2058-?",
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "3_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.41",
+        "annotation_id": "DEL_chr19:53015977-53049039",
+        "cytoband_start": "q13.41",
+        "unrelated_count": 0,
+        "uuid": "4ac14ce0-c621-4e17-a11d-597972b3357c"
+    },
+    {
+        "END": 7035942,
+        "CHROM": "19",
+        "START": 7030786,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 7035953,
+        "hg19_start": 7030797,
+        "transcript": [
+            {
+                "csq_exon": "2/2",
+                "csq_gene": "f3e0079c-c2b9-49a4-91f7-dd0c3f26db19",
+                "csq_intron": "1/1",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000329753",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "73604c41-57a9-4e26-bb55-2a0d3040b017",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381394",
+                "csq_distance": "1806",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Downstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p13.2",
+        "annotation_id": "DEL_chr19:7030786-7035942",
+        "cytoband_start": "p13.2",
+        "unrelated_count": 0,
+        "uuid": "771240fa-05e2-4f90-a40b-4fb5171ad636"
+    },
+    {
+        "END": 133080174,
+        "CHROM": "9",
+        "START": 133067321,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "9",
+        "hg19_end": 135955561,
+        "hg19_start": 135942708,
+        "transcript": [
+            {
+                "csq_exon": "8-11/11",
+                "csq_gene": "1e313424-a542-452f-9210-ca1abdf597b3",
+                "csq_intron": "7-10/10",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000372080",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "8-11/11",
+                "csq_gene": "1e313424-a542-452f-9210-ca1abdf597b3",
+                "csq_intron": "7-10/10",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000673714",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q34.13",
+        "annotation_id": "DUP_chr9:133067321-133080174",
+        "cytoband_start": "q34.13",
+        "unrelated_count": 0,
+        "uuid": "c5a81889-1869-4ff6-9c79-4caae23426e4"
+    },
+    {
+        "END": 35373285,
+        "CHROM": "19",
+        "START": 35361156,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 35864187,
+        "hg19_start": 35852058,
+        "transcript": [
+            {
+                "csq_gene": "dc224b05-81cf-46bc-a1f4-58fb194f8a10",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000327809",
+                "csq_distance": "668",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Downstream"
+            },
+            {
+                "csq_gene": "dbafb8a1-9349-482c-9198-040cc2c07588",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000454971",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "dc224b05-81cf-46bc-a1f4-58fb194f8a10",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000594310",
+                "csq_distance": "1155",
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Downstream"
+            },
+            {
+                "csq_gene": "dbafb8a1-9349-482c-9198-040cc2c07588",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000597214",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.12",
+        "annotation_id": "DEL_chr19:35361156-35373285",
+        "cytoband_start": "q13.12",
+        "unrelated_count": 0,
+        "uuid": "b3266c86-2fd9-48ce-93a9-cd59bf6fa592"
+    },
+    {
+        "END": 105859018,
+        "CHROM": "14",
+        "START": 105774213,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "14",
+        "hg19_end": 106325187,
+        "hg19_start": 106240550,
+        "transcript": [
+            {
+                "csq_gene": "533a3423-5644-435f-bb35-5b8563420135",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000579784",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "faa08eab-4157-45f8-863b-cc607563da5e",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000581070",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "eb3d9ab7-14b5-4183-ac22-d6b63c5a5d1b",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000581377",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "a81dbc50-a18c-4968-b3db-c2cb7baa0dc4",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000581717",
+                "csq_distance": "466",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Downstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q32.33",
+        "annotation_id": "DEL_chr14:105774213-105859018",
+        "cytoband_start": "q32.33",
+        "unrelated_count": 0,
+        "uuid": "b507c995-291c-4dff-87b2-c497deae2e5d"
+    },
+    {
+        "END": 110227308,
+        "CHROM": "10",
+        "START": 110226410,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "10",
+        "hg19_end": 111987066,
+        "hg19_start": 111986168,
+        "transcript": [
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000239007",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332674",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361248",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000369612",
+                "csq_distance": "371",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000393134",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000442296",
+                "csq_distance": "233",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/3",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000453116",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000650644",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000650696",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000650810",
+                "csq_distance": "32",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000650843",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000650952",
+                "csq_distance": "38",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651004",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651167",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651467",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651495",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651516",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651613",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651811",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651848",
+                "csq_distance": "202",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000651866",
+                "csq_distance": "170",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000652028",
+                "csq_distance": "105",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000652463",
+                "csq_distance": "10",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/6",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000652506",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/5",
+                "csq_gene": "96af2705-9e24-4b5c-8379-475f11579bda",
+                "csq_intron": "1/4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000652604",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q25.2",
+        "annotation_id": "DEL_chr10:110226410-110227308",
+        "cytoband_start": "q25.2",
+        "unrelated_count": 0,
+        "uuid": "adf4536f-09a0-479b-96b9-09980d846a93"
+    },
+    {
+        "END": 11098108,
+        "CHROM": "12",
+        "START": 11086535,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "12",
+        "hg19_end": 11250707,
+        "hg19_start": 11239134,
+        "transcript": [
+            {
+                "csq_gene": "196a679b-5e51-4424-ab74-792082a8c397",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000531678",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "2faba266-59f6-42d7-819d-3a40e89b246f",
+                "csq_intron": "1/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000535024",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p13.2",
+        "annotation_id": "DEL_chr12:11086535-11098108",
+        "cytoband_start": "p13.2",
+        "unrelated_count": 1,
+        "uuid": "180e76f1-2602-4218-be14-82658717b7b4"
+    },
+    {
+        "END": 7062606,
+        "CHROM": "19",
+        "START": 7053792,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 7062617,
+        "hg19_start": 7053803,
+        "transcript": [
+            {
+                "csq_gene": "d792096e-c3d9-4fd7-ba3b-1513d62d5540",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000333843",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "273f714e-46ca-442d-a425-3fa4e38c19b7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381393",
+                "csq_distance": "2058",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Downstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p13.2",
+        "annotation_id": "DEL_chr19:7053792-7062606",
+        "cytoband_start": "p13.2",
+        "unrelated_count": 0,
+        "uuid": "da6ad04a-34d7-4fe0-8cee-c7339bb675f3"
+    },
+    {
+        "END": 10566926,
+        "CHROM": "21",
+        "START": 10510456,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "21",
+        "hg19_end": 10945531,
+        "hg19_start": 11002001,
+        "transcript": [
+            {
+                "csq_exon": "1-8/22",
+                "csq_gene": "aca71f07-5ec8-410e-812b-884e309897e5",
+                "csq_intron": "1-8/21",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000427445",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1-5/19",
+                "csq_gene": "aca71f07-5ec8-410e-812b-884e309897e5",
+                "csq_intron": "1-5/18",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000612746",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1-9/10",
+                "csq_gene": "aca71f07-5ec8-410e-812b-884e309897e5",
+                "csq_intron": "1-9/9",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000612957",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1-10/24",
+                "csq_gene": "aca71f07-5ec8-410e-812b-884e309897e5",
+                "csq_intron": "1-10/23",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000618007",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1-9/23",
+                "csq_gene": "aca71f07-5ec8-410e-812b-884e309897e5",
+                "csq_intron": "1-9/22",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000622113",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p11.2",
+        "annotation_id": "DUP_chr21:10510456-10566926",
+        "cytoband_start": "p11.2",
+        "unrelated_count": 0,
+        "uuid": "519e664a-536d-4f3d-ad99-f9284110b2ea"
+    },
+    {
+        "END": 54843399,
+        "CHROM": "19",
+        "START": 54837187,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 55354854,
+        "hg19_start": 55348642,
+        "transcript": [
+            {
+                "csq_exon": "3-5/8",
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_intron": "2-5/7",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000339924",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "3-4/5",
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_intron": "2-4/4",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000391729",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.42",
+        "annotation_id": "DEL_chr19:54837187-54843399",
+        "cytoband_start": "q13.42",
+        "unrelated_count": 0,
+        "uuid": "a39c7202-6bb6-40bf-a148-878ad604e3cf"
+    },
+    {
+        "END": 41275965,
+        "CHROM": "17",
+        "START": 41265363,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "17",
+        "hg19_end": 39432217,
+        "hg19_start": 39421615,
+        "transcript": [
+            {
+                "csq_exon": "1/1",
+                "csq_gene": "2ee3bf86-ef77-4edc-bf11-c5b2459d2ccc",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000391354",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_cds_position": "?-268",
+                "csq_cdna_position": "?-307",
+                "csq_protein_position": "?-90",
+                "csq_variant_3_prime_location": "Exonic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/1",
+                "csq_gene": "dc7a83f6-f353-41d7-910a-1c5dc011149b",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000391355",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_cdna_position": "26-?",
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q21.2",
+        "annotation_id": "DEL_chr17:41265363-41275965",
+        "cytoband_start": "q21.2",
+        "unrelated_count": 0,
+        "uuid": "765db811-3c59-4832-9abb-0b9f5cafc0a9"
+    },
+    {
+        "END": 1613322,
+        "CHROM": "20",
+        "START": 1607528,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "20",
+        "hg19_end": 1593968,
+        "hg19_start": 1588174,
+        "transcript": [
+            {
+                "csq_exon": "2/6",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1-2/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000279477",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381603",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381605",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000562014",
+                "csq_distance": "2523",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "17b10dd1-f80a-4909-a722-e72f8638822d",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000564763",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000565087",
+                "csq_distance": "3599",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000566055",
+                "csq_distance": "3599",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/3",
+                "csq_gene": "17b10dd1-f80a-4909-a722-e72f8638822d",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000566961",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "2/6",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1-2/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000568365",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000569387",
+                "csq_distance": "3599",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/3",
+                "csq_gene": "df4c5f94-740f-46ef-82c4-fb427fca745d",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000569629",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p13",
+        "annotation_id": "DEL_chr20:1607528-1613322",
+        "cytoband_start": "p13",
+        "unrelated_count": 1,
+        "uuid": "01a9b3aa-bc23-4e10-afb0-6a7e17a67847"
+    },
+    {
+        "END": 31376056,
+        "CHROM": "11",
+        "START": 31371558,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "11",
+        "hg19_end": 31397603,
+        "hg19_start": 31393105,
+        "transcript": [
+            {
+                "csq_gene": "a94eb0ba-710f-43e8-a9b2-54ab591412d1",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000452803",
+                "csq_distance": "1785",
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Upstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "8f6e40a9-6acd-4ee2-a120-7936653032f4",
+                "csq_intron": "2/4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000465995",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Intronic"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p13",
+        "annotation_id": "DEL_chr11:31371558-31376056",
+        "cytoband_start": "p13",
+        "unrelated_count": 0,
+        "uuid": "03fbde89-f258-4c7c-bb58-05b38165f88e"
+    },
+    {
+        "END": 54769995,
+        "CHROM": "19",
+        "START": 54723075,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 55281447,
+        "hg19_start": 55234574,
+        "transcript": [
+            {
+                "csq_exon": "1/9",
+                "csq_gene": "bce6ffe8-05c2-49ca-8cf5-1ea8bc560069",
+                "csq_intron": "1/8",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000291633",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "1823ac9a-a7a8-424e-be72-16bf784f19d1",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000291860",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1/8",
+                "csq_gene": "bce6ffe8-05c2-49ca-8cf5-1ea8bc560069",
+                "csq_intron": "1/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000336077",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "65babc28-85f3-459d-9828-1d0df81ae530",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000342376",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.42",
+        "annotation_id": "DEL_chr19:54723075-54769995",
+        "cytoband_start": "q13.42",
+        "unrelated_count": 0,
+        "uuid": "9d73511a-ef43-4912-8af2-e320cf8a3ac5"
+    },
+    {
+        "END": 21273046,
+        "CHROM": "15",
+        "START": 17009401,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "15",
+        "hg19_end": 21915956,
+        "transcript": [
+            {
+                "csq_gene": "8aa5837e-45f3-4d7f-a202-619981b8b528",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000454856",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "9f74d572-acf2-4015-a206-953e1da9a3ef",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000584700",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "374b6e86-6d3e-4f06-8f53-abd2808b7d4a",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000585138",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "496dd4ff-4216-4433-a9e9-308bd98bf7a8",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000619213",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q11.2",
+        "annotation_id": "DUP_chr15:17009401-21273046",
+        "cytoband_start": "p11.2",
+        "unrelated_count": 0,
+        "uuid": "0d14fb8e-bf12-4842-bf75-187513656a19"
+    },
+    {
+        "END": 43260589,
+        "CHROM": "19",
+        "START": 43196348,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 43764741,
+        "hg19_start": 43700500,
+        "transcript": [
+            {
+                "csq_exon": "4/4",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "3/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000244293",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-3/5",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1-3/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000244295",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "4-6/6",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "3-5/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000270077",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "3-4/4",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "2-3/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000291752",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-3/6",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1-3/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000405312",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "3-5/5",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "2-4/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000418820",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-2/5",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1-2/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000433626",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "3-5/5",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "2-4/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000443718",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000451895",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "4-5/5",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "3-4/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000593948",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "3/3",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000596730",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-2/4",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1-2/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000596907",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/4",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1/3",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000597374",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000599371",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1-2/3",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1-2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000599391",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/3",
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000599746",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "70f64582-e19c-4f94-879e-420614b71edc",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000600572",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "4-6/6",
+                "csq_gene": "5245f751-dccf-43d5-9391-3ba9d132d1eb",
+                "csq_intron": "3-5/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000621109",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.31",
+        "annotation_id": "DEL_chr19:43196348-43260589",
+        "cytoband_start": "q13.31",
+        "unrelated_count": 0,
+        "uuid": "b8609b79-e3a3-4fc0-a6a6-e824aa487345"
+    },
+    {
+        "END": 54837185,
+        "CHROM": "19",
+        "START": 54828681,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 55348640,
+        "hg19_start": 55340136,
+        "transcript": [
+            {
+                "csq_exon": "6-8/8",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "5-7/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000326542",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-2/8",
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_intron": "1-2/7",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000339924",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "6-8/8",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "5-7/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000358178",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "7-9/9",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "6-8/8",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000391728",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "3_prime_UTR_or_Downstream",
+                "csq_variant_5_prime_location": "Intronic"
+            },
+            {
+                "csq_exon": "1-2/5",
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_intron": "1-2/4",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000391729",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.42",
+        "annotation_id": "DEL_chr19:54828681-54837185",
+        "cytoband_start": "q13.42",
+        "unrelated_count": 0,
+        "uuid": "640a5c26-d71a-4db8-84f9-e9aadfa2307c"
+    },
+    {
+        "END": 18845353,
+        "CHROM": "17",
+        "START": 18687391,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "17",
+        "hg19_end": 18748666,
+        "hg19_start": 18590704,
+        "transcript": [
+            {
+                "csq_gene": "acee7837-e3ec-4515-bf7d-496b890cd1dd",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000301938",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "83ee39ab-6695-49ff-90d4-44ddf85f0fc6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000307767",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "acee7837-e3ec-4515-bf7d-496b890cd1dd",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000308799",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "acee7837-e3ec-4515-bf7d-496b890cd1dd",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000395665",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "b5e3acdb-d783-4abd-bc48-49bac4d9be56",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000395671",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1-2/7",
+                "csq_gene": "5c5d8129-b796-4153-a6a4-2f2a58dfa196",
+                "csq_intron": "1-2/6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000441887",
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "83ee39ab-6695-49ff-90d4-44ddf85f0fc6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000476139",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "83ee39ab-6695-49ff-90d4-44ddf85f0fc6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000574226",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "83ee39ab-6695-49ff-90d4-44ddf85f0fc6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000575261",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "83ee39ab-6695-49ff-90d4-44ddf85f0fc6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000581733",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p11.2",
+        "annotation_id": "DEL_chr17:18687391-18845353",
+        "cytoband_start": "p11.2",
+        "unrelated_count": 1,
+        "uuid": "04e02038-bd72-40c1-bc3a-bd2f7f0037a0"
+    },
+    {
+        "END": 32720672,
+        "CHROM": "19",
+        "START": 32719974,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "19",
+        "hg19_end": 33211578,
+        "hg19_start": 33210880,
+        "transcript": [
+            {
+                "csq_exon": "1/13",
+                "csq_gene": "453c4041-68c8-4714-8749-a0b9f5f7aacb",
+                "csq_intron": "1/12",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000421545",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/28",
+                "csq_gene": "453c4041-68c8-4714-8749-a0b9f5f7aacb",
+                "csq_intron": "1/27",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000444215",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_cdna_position": "223-?",
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1/33",
+                "csq_gene": "453c4041-68c8-4714-8749-a0b9f5f7aacb",
+                "csq_intron": "1/32",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000647536",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "q13.11",
+        "annotation_id": "DEL_chr19:32719974-32720672",
+        "cytoband_start": "q13.11",
+        "unrelated_count": 0,
+        "uuid": "5d2b5dd4-2805-4221-a2e1-b4b9b499aead"
+    },
+    {
+        "END": 14662104,
+        "CHROM": "18",
+        "START": 14115677,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "18",
+        "hg19_end": 14662103,
+        "hg19_start": 14115676,
+        "transcript": [
+            {
+                "csq_gene": "7835d932-bd53-426b-87c5-f86d0a1b5edb",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000358970",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_exon": "1-2/3",
+                "csq_gene": "975076c1-39c2-4735-90ae-5c555e0d7e50",
+                "csq_intron": "1-2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000589498",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_exon": "1-2/3",
+                "csq_gene": "975076c1-39c2-4735-90ae-5c555e0d7e50",
+                "csq_intron": "1-2/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000590202",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Intronic",
+                "csq_variant_5_prime_location": "Upstream_or_5_prime_UTR"
+            },
+            {
+                "csq_gene": "7835d932-bd53-426b-87c5-f86d0a1b5edb",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000620346",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p11.21",
+        "annotation_id": "DEL_chr18:14115677-14662104",
+        "cytoband_start": "p11.21",
+        "unrelated_count": 0,
+        "uuid": "7bcb4f31-007d-4c96-a048-9584d89cbdf6"
+    },
+    {
+        "END": 2019008,
+        "CHROM": "11",
+        "START": 1944758,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "hg19_chr": "11",
+        "hg19_end": 2040238,
+        "hg19_start": 1965988,
+        "transcript": [
+            {
+                "csq_gene": "2c6b3733-4530-418e-8444-5fc5fce90e73",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381514",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "2c6b3733-4530-418e-8444-5fc5fce90e73",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381519",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "a9f36c9a-c34f-421a-8b8a-7de81c86e66b",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000390168",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "2c6b3733-4530-418e-8444-5fc5fce90e73",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000397294",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "2c6b3733-4530-418e-8444-5fc5fce90e73",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000397297",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            },
+            {
+                "csq_gene": "2c6b3733-4530-418e-8444-5fc5fce90e73",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000397298",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ],
+                "csq_most_severe": true,
+                "csq_variant_3_prime_location": "Downstream",
+                "csq_variant_5_prime_location": "Upstream"
+            }
+        ],
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "cytoband_end": "p15.5",
+        "annotation_id": "DEL_chr11:1944758-2019008",
+        "cytoband_start": "p15.5",
+        "unrelated_count": 0,
+        "uuid": "e14ce83d-9cb8-4bf9-b632-c425b8422ac9"
     }
 ]
