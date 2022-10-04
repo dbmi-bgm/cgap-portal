@@ -106,7 +106,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
 
     //this.vcfLocation = vcfLocation // CREATE PRESIGNED URL
     this.vcfLocation =
-      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log_2.vcf.gz";
+      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log_3.vcf.gz";
     this.tbiLocation = this.vcfLocation + ".tbi";
 
     this.vcfRecords = {};
