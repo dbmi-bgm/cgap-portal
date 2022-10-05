@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+11.1.0
+======
+
+`PR 660: File variant type submission <https://github.com/dbmi-bgm/cgap-portal/pull/660>`_
+
+* Allow variant type submission for files during case accessioning
+
+
 11.0.1
 ======
 
