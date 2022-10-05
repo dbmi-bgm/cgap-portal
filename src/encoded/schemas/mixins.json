@@ -523,5 +523,18 @@
                 "linkTo": "FileProcessed"
             }
         }
+    },
+    "variant_type": {
+        "variant_type": {
+            "title": "Variant Type",
+            "description": "The variant type associated with this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "string",
+            "enum": [
+                "SNV",
+                "SV",
+                "CNV"
+            ]
+        }
     }
 }

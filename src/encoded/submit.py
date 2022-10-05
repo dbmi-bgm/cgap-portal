@@ -374,6 +374,7 @@ class AccessionRow:
     GENOME_BUILD = "genome_build"
     FILES = "files"
     CASE_FILES = "case_files"
+    VARIANT_TYPE = "variant_type"
 
     # Class constants
     ACCEPTED_GENOME_BUILDS = {
@@ -578,6 +579,7 @@ class AccessionRow:
             self.FILES,
             self.CASE_FILES,
             self.GENOME_BUILD,
+            self.VARIANT_TYPE,
         ]
         info = map_fields(self.metadata, info, fields, "sample")
         # handle enum values
@@ -636,16 +638,22 @@ class AccessionRow:
         """
         submitted_genome_build = sample.pop(self.GENOME_BUILD, None)
         genome_build = self.validate_genome_build(submitted_genome_build)
+        submitted_variant_type = sample.pop(self.VARIANT_TYPE, None)
         submitted_sample_files = sample.pop(self.FILES, None)
         submitted_sample_processing_files = sample.pop(self.CASE_FILES, None)
         if submitted_sample_files:
-            self.update_item_files(sample, submitted_sample_files, genome_build)
+            self.update_item_files(
+                sample, submitted_sample_files, genome_build, submitted_variant_type
+            )
         if submitted_sample_processing_files:
             self.update_item_files(
-                sample_processing, submitted_sample_processing_files, genome_build
+                sample_processing,
+                submitted_sample_processing_files,
+                genome_build,
+                submitted_variant_type,
             )
 
-    def update_item_files(self, item, submitted_files, genome_build):
+    def update_item_files(self, item, submitted_files, genome_build, variant_type):
         """Attempt to build File items and update the given item's
         properties accordingly.
 
@@ -658,10 +666,15 @@ class AccessionRow:
         :type submitted_files: str or None
         :param genome_build: Validated genome assembly to set as
             property on all created File items
+        :param variant_type: Variant type for submitted files
+        :type variant_type: str
         :type genome_build: str or None
         """
         file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
-            submitted_files, genome_build=genome_build, row_index=self.row
+            submitted_files,
+            genome_build=genome_build,
+            row_index=self.row,
+            variant_type=variant_type,
         )
         for file_item in file_items:
             file_metadata_item = MetadataItem(file_item, self.row, self.FILE_SUBMITTED)
@@ -1178,6 +1191,7 @@ class SubmittedFilesParser:
     STANDARD_FILE_EXTENSION = "standard_file_extension"
     OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
     GENOME_ASSEMBLY = "genome_assembly"
+    VARIANT_TYPE = "variant_type"
     AT_ID = "@id"
 
     # Spreadsheet constants
@@ -1265,7 +1279,7 @@ class SubmittedFilesParser:
             self.errors.append(msg)
 
     def extract_file_metadata(
-        self, submitted_file_names, genome_build=None, row_index=None
+        self, submitted_file_names, genome_build=None, variant_type=None, row_index=None
     ):
         """Primary method for validating and creating Files from
         submitted information.
@@ -1279,6 +1293,8 @@ class SubmittedFilesParser:
         :type submitted_file_names: str or None
         :param genome_build: Validated genome assembly
         :type genome_build: str or None
+        :param variant_type: Variant type for files
+        :type variant_type: str or None
         :param row_index: Row index within spreadsheet
         :type row_index: int or None
         :returns: Validated File items, validated File aliases, errors
@@ -1321,6 +1337,8 @@ class SubmittedFilesParser:
             }
             if genome_build:
                 file_properties[self.GENOME_ASSEMBLY] = genome_build
+            if variant_type:
+                file_properties[self.VARIANT_TYPE] = variant_type
             file_names_to_items[file_name] = file_properties
             if file_format_atid == self.FILE_FORMAT_FASTQ_ATID:
                 fastq_files[file_name] = file_properties

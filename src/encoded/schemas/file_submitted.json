@@ -47,6 +47,9 @@
             "$ref": "mixins.json#/static_embeds"
         },
         {
+            "$ref": "mixins.json#/variant_type"
+        },
+        {
             "$ref": "file.json#/properties"
         }
     ],
