@@ -284,7 +284,8 @@ def get_es_mapping(es, es_index):
         return {}
     else:
         index = es.indices.get(es_index)
-        return index[es_index]['mappings']['item_type']['properties']
+        item_type = list(index[es_index]['mappings'].keys())[0]
+        return index[es_index]['mappings'][item_type]['properties']
 
 
 def get_search_fields(request, doc_types):
