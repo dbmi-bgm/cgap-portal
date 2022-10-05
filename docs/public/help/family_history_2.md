@@ -63,6 +63,9 @@ is desired, the Age Units column can also be filled out.
 **Age Units**: Only fill out if Age is present in the row. 
 Must be singular. Possible values are day, week, month, year.
 
+**Birth Year**: The year the individual was born. Must be in 
+format YYYY.
+
 **Clinic Notes**: Any additional notes to be associated with
  the individual.
 
