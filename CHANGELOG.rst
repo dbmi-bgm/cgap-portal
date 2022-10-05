@@ -6,12 +6,121 @@ cgap-portal
 Change Log
 ----------
 
+11.0.1
+======
+
+`PR 658: Enabled nested for samplegeno  <https://github.com/dbmi-bgm/cgap-portal/pull/658>`_
+
+* Turn on nested mappings for samplegeno fields
+* Add some facets for the associated fields
+
+
+11.0.0
+======
+
+`PR 654: Cohort data model <https://github.com/dbmi-bgm/cgap-portal/pull/654>`_
+
+* Breaking schema changes to Cohort item to use for case vs. control analysis
+* Upgrader for Cohort v1 --> v2
+* Creation of CohortAnalysis item
+* Inserts updates for existing Cohort + addition of CohortAnalysis insert
+
+
+10.5.0
+======
+`PR 628: In portal feedback UI <https://github.com/dbmi-bgm/cgap-portal/pull/628/>`_
+
+* Adds a button to the navbar that opens up a mailto link with some useful information pre-populated
+  for submitting jira tickets.
+
+
+10.4.1
+======
+
+`PR 659: Submission bug fixes <https://github.com/dbmi-bgm/cgap-portal/pull/659>`_
+
+* Minor refactoring of case submission code to fix bugs failing submissions
+* Enforce file name conventions to match schema regex
+
+
+10.4.0
+======
+
+`PR 650: Pipeline deployment schema changes <https://github.com/dbmi-bgm/cgap-portal/pull/650>`_
+
+* Non-breaking schema changes to Workflow and Software items to facilitate pipeline
+  deployment
+
+
+10.3.7
+======
+
+`PR 655: Small administrative fixes <https://github.com/dbmi-bgm/cgap-portal/pull/655>`_
+
+* Fix pyproject.toml to use released ``snovault ^6.0.8`` rather than a beta.
+* Update ``poetry.lock`` to match.
+* Adjust ``Makefile`` to still run static tests now that they're factored out.
+* Small changes to repair recent changelogs and versions.
+
+
+10.3.6
+======
+
+`PR 651: Add lifecycle_management_active to schema <https://github.com/dbmi-bgm/cgap-portal/pull/651>`_
+
+* Add ``lifecycle_management_active`` to ``project`` schema and embed it into the ``file`` type
+  so it can be searched for.
+
+
+10.3.5.1
+========
+
+`PR 653: GA Static checks sans db fixtures and EnvUtils setup <https://github.com/dbmi-bgm/cgap-portal/pull/653>`_
+
+A PR was merged at this point that had no actual version number bump. That PR did:
+
+* Implements ``USE_SAMPLE_ENVUTILS`` to cause ``EnvUtils`` to be initialized from the sample (Acme) configuration.
+
+* Uses ``USE_SAMPLE_ENVUTILS`` and (from ``snovault``) ``NO_SERVER_FIXTURES``
+  in the GA ``Static Checks`` script to not have to put in complicated credentials and setup.
+
+
+10.3.5
+======
+
+`PR 649: Adjustments to changelog handling <https://github.com/dbmi-bgm/cgap-portal/pull/649>`_
+
+* Raise an error if change log inconsistent.
+
+
+10.3.4
+======
+
+`PR 647: Small fixes 2022-09-16 <https://github.com/dbmi-bgm/cgap-portal/pull/647>`_
+
+* Fix a broken test (``test_test_port``
+  in ``src/encoded/tests/test_ingestion_listener.py``).
+
+* Update to require at least snovault 6.0.6 to pick up blob storage fix.
+  (Locked to include 6.0.7, but that upgrade's not required.)
+
+* Repair a missing changelog entry for 10.3.2.
+
+
 10.3.3
 ======
 
 `PR 634: Vs fix broken links <https://github.com/dbmi-bgm/cgap-portal/pull/634>`_
 
 * Fixed broken hyperlinks in static documentation pages, updating links as necessary
+
+
+10.3.2
+======
+
+`PR 631: SV Confidence Pop-overs <https://github.com/dbmi-bgm/cgap-portal/pull/631>`_
+
+* Add pop-over to SV confidence class facet with links to further documentation
 
 
 10.3.1

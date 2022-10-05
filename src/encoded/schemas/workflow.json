@@ -104,8 +104,7 @@
                     "feature calling",
                     "miscellaneous",
                     "provenance"
-                ],
-                "default": "processing"
+                ]
             }
         },
         "cwl_pointer": {
@@ -616,6 +615,18 @@
                         }
                     }
                 }
+            }
+        },
+        "software": {
+            "title": "Software",
+            "description": "List of software items used in the workflow",
+            "type": "array",
+            "uniqueItems": true,
+            "items": {
+                "type": "string",
+                "title": "Software",
+                "description": "Software used in the workflow",
+                "linkTo": "Software"
             }
         }
     },
