@@ -532,7 +532,7 @@ class SearchBuilder:
                                    'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
                                   {'_uid': {'order': 'asc'}}
                 ]
-                # 'embedded.uuid.raw' (instd of _uid) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
+                # 'embedded.uuid.raw' (instd of _id) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
 
             self.response['sort'] = result_sort = {'_score': {"order": "desc"}}
 
@@ -788,8 +788,7 @@ class SearchBuilder:
                 if bucket['key'] not in term_to_bucket:
                     term_to_bucket[bucket['key']] = bucket
 
-        result_facet['terms'] = sorted(list(term_to_bucket.values()),
-                                       key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
+        result_facet['terms'] = sorted(list(term_to_bucket.values()),key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
     def format_facets(self, es_results):
         """
@@ -868,6 +867,7 @@ class SearchBuilder:
                     # do the below, except account for nested agg structure
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
+                        result.append(result_facet)
                         continue
 
                     def extract_buckets(path):
