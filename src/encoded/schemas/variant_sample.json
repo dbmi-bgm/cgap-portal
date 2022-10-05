@@ -748,13 +748,8 @@
             "order": 9,
             "grouping": "Complex Relationship Analysis"
         },
-        "samplegeno.samplegeno_gt": {
-            "title": "Sample Genotype (Nucleotide)",
-            "order": 9,
-            "grouping": "Complex Relationship Analysis"
-        },
         "samplegeno.samplegeno_role": {
-            "title": "Sample Genotype Relationship",
+            "title": "Sample Relationship",
             "order": 9,
             "grouping": "Complex Relationship Analysis"
         },
