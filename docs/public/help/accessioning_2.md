@@ -126,6 +126,12 @@ and VCF files, fill in the FASTQ file names and submit with
 an empty **Genome Build** header, then remove those names, add
 the VCF file names, provide a genome build, and submit again.
 
+**Variant Type**: The variant type applicable to all submitted files present
+under the **Files** and **Case Files** headers for the submission. Optional,
+but should be provided for all VCF file submissions.
+
+- Valid options include: **SNV**, **SV**, and **CNV**.
+
 **BAM Sample ID**: The sample identifier used in the submitted file(s).
 Must be provided if submitting BAM or VCF files; optional otherwise.
 
