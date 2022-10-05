@@ -6,13 +6,41 @@ cgap-portal
 Change Log
 ----------
 
-10.4.1
+11.0.1
 ======
 
 `PR 658: Enabled nested for samplegeno  <https://github.com/dbmi-bgm/cgap-portal/pull/658>`_
 
 * Turn on nested mappings for samplegeno fields
 * Add some facets for the associated fields
+
+
+11.0.0
+======
+
+`PR 654: Cohort data model <https://github.com/dbmi-bgm/cgap-portal/pull/654>`_
+
+* Breaking schema changes to Cohort item to use for case vs. control analysis
+* Upgrader for Cohort v1 --> v2
+* Creation of CohortAnalysis item
+* Inserts updates for existing Cohort + addition of CohortAnalysis insert
+
+
+10.5.0
+======
+`PR 628: In portal feedback UI <https://github.com/dbmi-bgm/cgap-portal/pull/628/>`_
+
+* Adds a button to the navbar that opens up a mailto link with some useful information pre-populated
+  for submitting jira tickets.
+
+
+10.4.1
+======
+
+`PR 659: Submission bug fixes <https://github.com/dbmi-bgm/cgap-portal/pull/659>`_
+
+* Minor refactoring of case submission code to fix bugs failing submissions
+* Enforce file name conventions to match schema regex
 
 
 10.4.0
