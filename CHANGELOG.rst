@@ -6,7 +6,8 @@ cgap-portal
 Change Log
 ----------
 
-10.5.1
+
+11.0.1
 ======
 
 `PR 656: PEP8 fixes so that make test-static can use make lint <https://github.com/dbmi-bgm/cgap-portal/pull/656>`_
@@ -102,6 +103,17 @@ code could not have worked. More specifically...
   though in a few cases there were obviously better names).
 
 * Rewrote some ``== True/False`` as ``is True/False`` in testing.
+
+
+11.0.0
+======
+
+`PR 654: Cohort data model <https://github.com/dbmi-bgm/cgap-portal/pull/654>`_
+
+* Breaking schema changes to Cohort item to use for case vs. control analysis
+* Upgrader for Cohort v1 --> v2
+* Creation of CohortAnalysis item
+* Inserts updates for existing Cohort + addition of CohortAnalysis insert
 
 
 10.5.0
