@@ -14,15 +14,16 @@ It may also be helpful to read [the documentation](../../../../docs/inserts.md) 
 - **temp-local-inserts** are exclusively loaded for local (or with `load_local_data` load function) if data exists in the directory. This directory is ignored by git
 - **perf-testing** used with `pytest -m performance` tests. Currently not working
 - **workbook-inserts** used in a number of tests, including those leveraging ES
+- **cypress-test-inserts** used for Cypress UI tests (load function must be set to `load_cypress_data` if deploying locally)
 
 ### Updating inserts from the server
 
 You can use the `bin/update-inserts-from-server` command to update contents of any inserts directory using data from any Fourfront server. This can be used to keep important `master-inserts` up-to-date or pull in data to test locally, likely with the `inserts` or `temp-local-inserts` directory. Here are the arguments for the command:
-- **--env <FF>** environment name of Fourfront server to load from, such as `data` or `fourfront-webdev`. Default: `data`
-- **--dest <dir>**  inserts directory to write to. Default: `temp-local-inserts`
-- **--item-type <type>** item types to update. Corresponds to the name of the file in the inserts folder. Optional
-- **--ignore-field <field>** field to skip when updating items. Optional
-- **--from-search <query>** string query that is passed to `dcicutils.ff_utils.search_metdata` to find uuids to add to the target inserts directory
+- **--env \<FF>** environment name of Fourfront server to load from, such as `data` or `fourfront-webdev`. Default: `data`
+- **--dest \<dir>**  inserts directory to write to. Default: `temp-local-inserts`
+- **--item-type \<type>** item types to update. Corresponds to the name of the file in the inserts folder. Optional
+- **--ignore-field \<field>** field to skip when updating items. Optional
+- **--from-search \<query>** string query that is passed to `dcicutils.ff_utils.search_metdata` to find uuids to add to the target inserts directory
 
 There a few important to keep in mind when updating inserts:
 - Adding and committing items to `master-inserts` should be done with care, since they are loaded on all environments.
@@ -70,3 +71,17 @@ from .workbook_fixtures import workbook
 ```
 
 Never loaded into fourfront environments.
+
+### cypress-test-inserts
+
+Set of inserts used for automated Cypress integration tests, can be loaded locally using the `load_cypress_data` loading function. All inserts in this directory are linked to the `Cypress Main` project and institution, and there is an additional `Cypress Personas` project and institution, which does not have cases associated with it (can be used for future development).
+
+The Cypress tests will emulate users from the `Cypress Main` project/institution, and perform a variety of interactions that involve updating the test data, such as creating and saving filter-sets, applying technical reviews, and editing and applying interpretations.
+
+This directory features two cases:
+- `NA12879-WGS-Trio`: includes 50 SNVs and 50 SVs (with Manta as the caller)
+- `HG002`: includes 25 SNVs and 50 SNV/CVs (25 Manta caller, 12 BIC-Seq2 caller, 13 multiple caller - BIC-seq2 + Manta)
+
+This set of inserts does not include Note or FilterSet items, since these will be created by the tests through interaction with the UI.
+
+Scripts used to create these inserts can be found within the [`/cypress-test-inserts/creation-scripts/` directory](cypress-test-inserts/creation-scripts/).
