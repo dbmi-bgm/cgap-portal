@@ -68,14 +68,26 @@ class LuceneBuilder:
                     }
                 }
             if nested_path:
-                must_filters.append(('range', {  # NOT using the constant, since the 2nd part is the lucene sub-query
-                    NESTED: {
-                        PATH: nested_path,
-                        QUERY: range_query
+                # look for existing nested sub query - must add to it if it exists
+                found = False
+                for query_part in must_filters:
+                    nested_queries = query_part.get(BOOL, {}).get(MUST, {})
+                    for query in nested_queries:
+                        if NESTED in query and query[NESTED][PATH] == nested_path:
+                            query[NESTED][QUERY][BOOL][MUST].append(range_query)
+                            found = True
+                            break  # if we found a valid path, add it here and continue
+                # if we never found a path, this is the only nested query on that path, so just add it as is
+                if not found:
+                    new_nested_query = {
+                        NESTED: {
+                            PATH: nested_path,
+                            QUERY: range_query
+                        }
                     }
-                }))
+                    must_filters.append(new_nested_query)
             else:
-                must_filters.append(('range', range_query))
+                must_filters.append(range_query)
 
     @staticmethod
     def handle_should_query(field_name, options):
@@ -563,8 +575,6 @@ class LuceneBuilder:
         # construct queries
         must_filters, must_not_filters, \
         must_filters_nested, must_not_filters_nested = cls.build_sub_queries(field_filters, es_mapping)
-        # add range limits to filters if given
-        cls.apply_range_filters(range_filters, must_filters, es_mapping)
 
         # initialize filter hierarchy
         final_filters = {BOOL: {MUST: [f for _, f in must_filters], MUST_NOT: [f for _, f in must_not_filters]}}
@@ -572,6 +582,9 @@ class LuceneBuilder:
         # Build nested queries
         final_nested_query = cls.handle_nested_filters_v2(must_filters_nested, must_not_filters_nested, es_mapping)
         final_filters[BOOL][MUST].append(final_nested_query)
+
+        # add range filters after (so nested ranges can be applied with existing nested queries)
+        cls.apply_range_filters(range_filters, final_filters[BOOL][MUST], es_mapping)
 
         # at this point, final_filters is valid lucene and can be dropped into the query directly
         query[QUERY][BOOL][FILTER] = final_filters

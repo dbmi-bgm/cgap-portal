@@ -7,7 +7,7 @@ Change Log
 ----------
 
 
-11.0.1
+11.0.2
 ======
 
 `PR 656: PEP8 fixes so that make test-static can use make lint <https://github.com/dbmi-bgm/cgap-portal/pull/656>`_
@@ -103,6 +103,15 @@ code could not have worked. More specifically...
   though in a few cases there were obviously better names).
 
 * Rewrote some ``== True/False`` as ``is True/False`` in testing.
+
+
+11.0.1
+======
+
+`PR 658: Enabled nested for samplegeno  <https://github.com/dbmi-bgm/cgap-portal/pull/658>`_
+
+* Turn on nested mappings for samplegeno fields
+* Add some facets for the associated fields
 
 
 11.0.0
