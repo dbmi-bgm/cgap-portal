@@ -6,6 +6,26 @@ cgap-portal
 Change Log
 ----------
 
+11.0.1
+======
+
+`PR 658: Enabled nested for samplegeno  <https://github.com/dbmi-bgm/cgap-portal/pull/658>`_
+
+* Turn on nested mappings for samplegeno fields
+* Add some facets for the associated fields
+
+
+11.0.0
+======
+
+`PR 654: Cohort data model <https://github.com/dbmi-bgm/cgap-portal/pull/654>`_
+
+* Breaking schema changes to Cohort item to use for case vs. control analysis
+* Upgrader for Cohort v1 --> v2
+* Creation of CohortAnalysis item
+* Inserts updates for existing Cohort + addition of CohortAnalysis insert
+
+
 10.5.0
 ======
 `PR 628: In portal feedback UI <https://github.com/dbmi-bgm/cgap-portal/pull/628/>`_

@@ -46,6 +46,9 @@
         },
         {
             "$ref": "mixins.json#/meta_workflow_runs"
+        },
+        {
+            "$ref": "mixins.json#/processed_files"
         }
     ],
     "properties": {
@@ -74,7 +77,7 @@
         },
         "samples": {
             "title": "Samples",
-            "description": "Samples used in the analysis",
+            "description": "Samples used in a case analysis",
             "type": "array",
             "items": {
                 "title": "Sample",
@@ -117,16 +120,6 @@
                         }
                     }
                 }
-            }
-        },
-        "processed_files": {
-            "title": "Processed Files",
-            "description": "Processed files that are combined results for the sample analysis.",
-            "type": "array",
-            "items": {
-                "title": "Processed File",
-                "type": "string",
-                "linkTo": "FileProcessed"
             }
         },
         "completed_processes": {
