@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-11.0.0
+12.0.0
 ======
 
 * ElasticSearch 7 support
