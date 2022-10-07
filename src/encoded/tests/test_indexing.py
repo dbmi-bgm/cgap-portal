@@ -140,7 +140,6 @@ def test_indexing_simple(app, setup_and_teardown, testapp, indexer_testapp):
     assert testing_ppp_settings['settings']['index']['number_of_shards'] == '1'
 
 
-#@pytest.mark.skip
 @pytest.mark.flaky
 def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, elasticsearch):
     """
