@@ -11,6 +11,7 @@ import re
 import time
 import transaction
 import uuid
+from psycopg2.errors import QueryCanceled
 
 from snovault import DBSESSION, TYPES
 from snovault.storage import Base
@@ -86,9 +87,17 @@ def setup_and_teardown(app):
     meta = MetaData(bind=session.connection())
     meta.reflect()
     # sqlalchemy 1.4 - use TRUNCATE instead of DELETE
-    connection.execute('TRUNCATE {} RESTART IDENTITY;'.format(
-        ','.join(table.name
-                 for table in reversed(Base.metadata.sorted_tables))))
+    while True:
+        try:
+            connection.execute('TRUNCATE {} RESTART IDENTITY;'.format(
+                ','.join(table.name
+                         for table in reversed(Base.metadata.sorted_tables))))
+            break
+        except QueryCanceled as e:
+            if 'statement timeout' in e:
+                continue
+            else:
+                raise
     session.flush()
     mark_changed(session())
     transaction.commit()

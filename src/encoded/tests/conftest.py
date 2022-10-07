@@ -9,7 +9,8 @@ import os
 import pkg_resources
 import pytest
 import webtest
-
+from psycopg2.errors import InvalidSavepointSpecification
+from dcicutils.ff_mocks import NO_SERVER_FIXTURES
 
 from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
@@ -30,6 +31,28 @@ README:
     * There are "app" based fixtures that rely only on postgres, "es_app" fixtures that 
       use both postgres and ES (for search/ES related testing)
 """
+
+
+@pytest.yield_fixture
+def external_tx(request, conn):
+    # in cgap-portal
+    if NO_SERVER_FIXTURES:
+        yield 'NO_SERVER_FIXTURES'
+        return
+
+    notice_pytest_fixtures(request)
+    # print('BEGIN external_tx')
+    try:
+        tx = conn.begin_nested()
+        yield tx
+        tx.rollback()
+    except InvalidSavepointSpecification as e:
+        print(e)
+
+# conn does not implement .rollback()
+    # # The database should be empty unless a data fixture was loaded
+    # for table in Base.metadata.sorted_tables:
+    #     assert conn.execute(table.count()).scalar() == 0
 
 
 @pytest.fixture(autouse=True)
