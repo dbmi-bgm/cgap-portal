@@ -47,7 +47,7 @@ def external_tx(request, conn):
         yield tx
         tx.rollback()
     except exc.InternalError as e:
-        if 'savepoint' in e and 'does not exist' in e:
+        if 'savepoint' in str(e) and 'does not exist' in str(e):
             print(e)
         else:
             raise

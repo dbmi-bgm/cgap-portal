@@ -93,7 +93,7 @@ def setup_and_teardown(app):
                          for table in reversed(Base.metadata.sorted_tables))))
             break
         except exc.OperationalError as e:
-            if 'statement timeout' in e:
+            if 'statement timeout' in str(e):
                 continue
             else:
                 raise
