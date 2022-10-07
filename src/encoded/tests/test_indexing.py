@@ -11,7 +11,6 @@ import re
 import time
 import transaction
 import uuid
-from psycopg2.errors import QueryCanceled
 
 from snovault import DBSESSION, TYPES
 from snovault.storage import Base
@@ -24,7 +23,7 @@ from snovault.elasticsearch.create_mapping import (
 )
 from snovault.elasticsearch.indexer_utils import get_namespaced_index, compute_invalidation_scope
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
-from sqlalchemy import MetaData, func
+from sqlalchemy import MetaData, func, exc
 from timeit import default_timer as timer
 from unittest import mock
 from zope.sqlalchemy import mark_changed
@@ -93,7 +92,7 @@ def setup_and_teardown(app):
                 ','.join(table.name
                          for table in reversed(Base.metadata.sorted_tables))))
             break
-        except QueryCanceled as e:
+        except exc.OperationalError as e:
             if 'statement timeout' in e:
                 continue
             else:

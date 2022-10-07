@@ -9,7 +9,7 @@ import os
 import pkg_resources
 import pytest
 import webtest
-from psycopg2.errors import InvalidSavepointSpecification
+from sqlalchemy import exc
 from dcicutils.ff_mocks import NO_SERVER_FIXTURES
 
 from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
@@ -46,8 +46,11 @@ def external_tx(request, conn):
         tx = conn.begin_nested()
         yield tx
         tx.rollback()
-    except InvalidSavepointSpecification as e:
-        print(e)
+    except exc.InternalError as e:
+        if 'savepoint' in e and 'does not exist' in e:
+            print(e)
+        else:
+            raise
 
 # conn does not implement .rollback()
     # # The database should be empty unless a data fixture was loaded
