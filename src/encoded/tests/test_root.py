@@ -1,7 +1,6 @@
 import glob
 import io
 import os
-import pkg_resources
 import pytest
 
 from dcicutils import lang_utils
@@ -12,7 +11,7 @@ from ..appdefs import ITEM_INDEX_ORDER
 from ..root import SettingsKey, uptime_info
 from ..util import PROJECT_DIR
 
-pytestmark = [pytest.mark.setone, pytest.mark.working]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.indexing]
 
 
 def test_type_metadata(anontestapp):
