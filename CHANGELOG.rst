@@ -13,6 +13,8 @@ Change Log
 * SQLAlchemy 1.4 support
 * Cascading library updates to support the above
 * B-Tree index on sid column to optimize indexing
+* Fixes to test segmentation to improve overall test runtime and reliability
+* Remove support for Python 3.7
 
 
 11.0.1
