@@ -1,9 +1,14 @@
 import pytest
 
-from encoded.custom_embed import ATID_PATTERN, MINIMAL_EMBEDS, FORBIDDEN_MSG
-from encoded.tests.test_permissions import (
-    deleted_user, deleted_user_testapp, bwh_institution
-)
+from dcicutils.qa_utils import notice_pytest_fixtures
+
+from ..custom_embed import ATID_PATTERN, MINIMAL_EMBEDS, FORBIDDEN_MSG
+
+from .test_permissions import bwh_institution, deleted_user, deleted_user_testapp
+
+
+notice_pytest_fixtures(bwh_institution, deleted_user, deleted_user_testapp)
+
 
 pytestmark = [pytest.mark.working]
 
