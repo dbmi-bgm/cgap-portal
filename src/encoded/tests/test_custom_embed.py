@@ -10,7 +10,7 @@ from .test_permissions import bwh_institution, deleted_user, deleted_user_testap
 notice_pytest_fixtures(bwh_institution, deleted_user, deleted_user_testapp)
 
 
-pytestmark = [pytest.mark.working]
+pytestmark = [pytest.mark.working, pytest.mark.indexing]
 
 EMBED_URL = "/embed"
 KEYS_NOT_INCLUDED = ["@context", "actions", "aggregated-items", "validation-errors"]
