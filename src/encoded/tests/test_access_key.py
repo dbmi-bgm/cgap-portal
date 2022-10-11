@@ -6,7 +6,7 @@ from snovault import COLLECTIONS
 from ..edw_hash import EDWHash
 
 
-pytestmark = [pytest.mark.working, pytest.mark.setone]
+pytestmark = [pytest.mark.working, pytest.mark.setone, pytest.mark.indexing]
 
 
 def basic_auth(username, password):
