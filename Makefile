@@ -179,6 +179,7 @@ test-integrated:
 
 test-static:
 	poetry run python -m pytest -vv -m static
+	make lint
 
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
 	make remote-test-unit
@@ -250,7 +251,8 @@ tag-and-push-docker-production:
 	date
 
 lint:
-	@echo "simulated flake8 for now. we're not ready for a real one"
+	@flake8 deploy/ || echo "flake8 failed for deploy/"
+	@flake8 src/encoded/ || echo "flake8 failed for src/encoded"
 
 help:
 	@make info

@@ -15,6 +15,7 @@ import shutil
 import subprocess
 import sys
 
+from dcicutils.misc_utils import PRINT
 from pkg_resources import resource_filename
 from pyramid.paster import get_app, get_appsettings
 from pyramid.path import DottedNameResolver
@@ -44,7 +45,7 @@ def nginx_server_process(prefix='', echo=False):
         process.stdout.close()
 
     if echo:
-        print('Started: http://localhost:8000')
+        PRINT('Started: http://localhost:8000')
 
     return process
 
@@ -67,7 +68,7 @@ def ingestion_listener_process(config_uri, app_name, echo=True):
     )
 
     if echo:
-        print('Starting Ingestion Listener...')
+        PRINT('Starting Ingestion Listener...')
 
     return process
 
@@ -141,7 +142,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
         raise Exception("It looks like are connecting to remote elasticsearch.server but no indexer.namespace is defined.")
     elif not config.get("elasticsearch.aws_auth", False):
         # TODO detect if connecting to AWS or not before raising an Exception.
-        print("WARNING - elasticsearch.aws_auth is set to false. Connection will fail if connecting to remote ES cluster on AWS.")
+        PRINT("WARNING - elasticsearch.aws_auth is set to false. Connection will fail if connecting to remote ES cluster on AWS.")
 
     nginx = nginx_server_process(echo=True)
     processes.append(nginx)
@@ -170,7 +171,7 @@ def run(app_name, config_uri, datadir, clear=False, init=False, load=False, inge
         # now clear the queues and queue items for indexing
         create_mapping.run(app, check_first=True, strict=True, purge_queue=False)
 
-    print('Started. ^C to exit.')
+    PRINT('Started. ^C to exit.')
 
     stdouts = [p.stdout for p in processes]
 

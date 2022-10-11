@@ -138,7 +138,7 @@ def get_item_or_none(request, value, itype=None, frame='object'):
     return item
 
 
-def set_namekey_from_title(properties):
+def set_namekey_from_title(properties):  # TODO: I'm not sure this is used anywhere. -kmp 25-Sep-2022
     name = None
     if properties.get('title'):
         exclude = set(string.punctuation.replace('-', ''))

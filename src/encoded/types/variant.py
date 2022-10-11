@@ -1,43 +1,34 @@
+# import boto3
+# import csv
 import datetime
 import io
 import json
-import os
-import csv
-from math import inf
-from urllib.parse import parse_qs, urlparse
-from pyramid.httpexceptions import (
-    HTTPBadRequest,
-    HTTPServerError,
-    HTTPNotModified
-)
-from pyramid.traversal import find_resource
-from pyramid.request import Request
-from pyramid.response import Response
-
-import boto3
 import negspy.coordinates as nc
+import os
 import pytz
 import structlog
-from pyramid.httpexceptions import HTTPTemporaryRedirect
-from pyramid.settings import asbool
-from pyramid.view import view_config
-from snovault import calculated_property, collection, load_schema, TYPES
-from snovault.calculated import calculate_properties
-from snovault.util import simple_path_ids, debug_log, IndexSettings
-from snovault.embed import make_subrequest
 
-from ..batch_download_utils import (
-    stream_tsv_output,
-    convert_item_to_sheet_dict
-)
+from dcicutils.misc_utils import ignorable, ignored
+from math import inf
+from pyramid.httpexceptions import HTTPBadRequest, HTTPNotModified, HTTPServerError, HTTPTemporaryRedirect
+# from pyramid.request import Request
+from pyramid.response import Response
+from pyramid.settings import asbool
+from pyramid.traversal import find_resource
+from pyramid.view import view_config
+from snovault import calculated_property, collection, load_schema  # , TYPES
+from snovault.calculated import calculate_properties
+from snovault.embed import make_subrequest
+from snovault.util import simple_path_ids, debug_log, IndexSettings
+from urllib.parse import parse_qs, urlparse
+
+from ..batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..util import (
-    resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
-)
-from ..types.base import Item, get_item_or_none
 from ..search.search import get_iterable_search_results
+from ..types.base import Item, get_item_or_none
+from ..util import resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
 
 
 log = structlog.getLogger(__name__)
@@ -127,8 +118,8 @@ SHARED_VARIANT_SAMPLE_EMBEDS = [
     "technical_review.note_text",
     "technical_review.last_text_edited.date_text_edited",
     "technical_review.last_text_edited.text_edited_by",
-    #"technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
-    #"technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
+    # "technical_review.review.date_reviewed",   # <- Will be used later, after UX for this is defined.
+    # "technical_review.review.reviewed_by",     # <- Will be used later, after UX for this is defined.
     "technical_review.approved_by.display_title",
     "technical_review.date_approved",
     "technical_review.last_modified.date_modified",
@@ -180,7 +171,7 @@ def build_variant_embedded_list():
         :returns: list of variant embeds
     """
     embedded_list = SHARED_VARIANT_EMBEDS + [
-        "genes.genes_most_severe_gene.gene_notes.@id", # `genes` not present on StructuralVariant
+        "genes.genes_most_severe_gene.gene_notes.@id",  # `genes` not present on StructuralVariant
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant')
@@ -251,7 +242,7 @@ def load_extended_descriptions_in_schemas(schema_object, depth=0):
                                               "../../..",
                                               field_schema["extended_description"])
                 with io.open(html_file_path) as open_file:
-                    field_schema["extended_description"] = "".join([ l.strip() for l in open_file.readlines() ])
+                    field_schema["extended_description"] = "".join([line.strip() for line in open_file.readlines()])
 
         # Applicable only to "properties" of Item schema, not columns or facets:
         if "type" in field_schema:
@@ -964,8 +955,8 @@ def update_project_notes_process(context, request):
 
             # Compare UUID submitted vs UUID present on VS Item
             if uuid_to_process != context.properties[vs_field_name]:
-                raise HTTPBadRequest("Not all submitted Item UUIDs are present on [Structural]VariantSample. " + \
-                    "Check 'save_to_project_notes." + vs_field_name + "'.")
+                raise HTTPBadRequest(f"Not all submitted Item UUIDs are present on [Structural]VariantSample."
+                                     f" Check 'save_to_project_notes.{vs_field_name}'.")
 
         elif vs_field_name in remove_from_project_notes:
             uuid_to_process = remove_from_project_notes[vs_field_name]
@@ -977,8 +968,8 @@ def update_project_notes_process(context, request):
         loaded_item = request.embed("/" + uuid_to_process, "@@object", as_user=True)
         item_resource = find_resource(request.root, loaded_item["@id"])
         if not request.has_permission("edit", item_resource):
-            raise HTTPBadRequest("No edit permission for at least one submitted Item UUID. " + \
-                "Check 'save_to_project_notes." + vs_field_name + "'.")
+            raise HTTPBadRequest(f"No edit permission for at least one submitted Item UUID."
+                                 f" Check 'save_to_project_notes.{vs_field_name}'.")
         else:
             loaded_notes[vs_field_name] = loaded_item
 
@@ -1097,7 +1088,7 @@ def update_project_notes_process(context, request):
 
         payload[vg_field_name] = item_ids
 
-        if existing_item_from_project_idx != None:
+        if existing_item_from_project_idx is not None:
             existing_item_from_project_at_id = vg_item[vg_field_name][existing_item_from_project_idx]["@id"]
             # Set existing note's status to "obsolete", and populate previous/superseding field if applicable
             notes_patch_payloads[existing_item_from_project_at_id] = notes_patch_payloads.get(existing_item_from_project_at_id, {})
@@ -1116,7 +1107,7 @@ def update_project_notes_process(context, request):
     ## Handle Saves -
     for note_field in save_to_project_notes:
         item_field_mapping = vs_to_item_mappings[note_field]
-        if loaded_notes[note_field]["is_saved_to_project"] != True:
+        if loaded_notes[note_field]["is_saved_to_project"] is not True:
             create_note_patch_payload(loaded_notes[note_field])
         if "Variant" in item_field_mapping:     # Add to Variant
             add_or_replace_note_for_project_on_variant_or_gene_item(note_field, variant, variant_patch_payload)
@@ -1129,7 +1120,7 @@ def update_project_notes_process(context, request):
 
     for note_field in remove_from_project_notes:
         item_field_mapping = vs_to_item_mappings[note_field]
-        if loaded_notes[note_field]["is_saved_to_project"] == True:
+        if loaded_notes[note_field]["is_saved_to_project"] is True:
             create_note_patch_payload(loaded_notes[note_field], remove=True)
         if "Variant" in item_field_mapping: # Remove from Variant
             add_or_replace_note_for_project_on_variant_or_gene_item(note_field, variant, variant_patch_payload, remove=True)
@@ -1155,6 +1146,7 @@ def update_project_notes_process(context, request):
     variant_patch_count = 0
     if variant_fields_needed:
         variant_response = perform_request_as_admin(request, variant["@id"], variant_patch_payload, request_method="PATCH")
+        ignorable(variant_response)
         variant_patch_count += 1
         # print('\n\n\nVARIANT RESPONSE', json.dumps(variant_response, indent=4))
 
@@ -1292,6 +1284,7 @@ def add_selections(context, request):
         return HTTPNotModified("Nothing submitted")
 
     patch_result = perform_request_as_admin(request, context.jsonld_id(request), patch_payload, request_method="PATCH")
+    ignored(patch_result)  # TODO: Is that the right thing?
 
     return {
         "status": "success",

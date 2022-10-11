@@ -1,17 +1,20 @@
 import json
+# import os
 import urllib.parse
-from pyramid.view import view_config
-from pyramid.request import Request
+
 from pyramid.httpexceptions import HTTPBadRequest
+# from pyramid.request import Request
+from pyramid.view import view_config
 from snovault import TYPES
+# from snovault.embed import make_subrequest
 from snovault.util import debug_log
-from snovault.embed import make_subrequest
+
 from ..types.base import get_item_or_none
-from .search import SearchBuilder, search as single_query_search
-from .lucene_builder import LuceneBuilder
-from .search_utils import execute_search, build_sort_dicts, make_search_subreq
 from ..types.filter_set import FLAGS, FILTER_BLOCKS
-import os
+
+from .lucene_builder import LuceneBuilder
+from .search import SearchBuilder, search as single_query_search
+from .search_utils import execute_search, build_sort_dicts, make_search_subreq
 
 
 def includeme(config):
