@@ -97,6 +97,11 @@ def setup_and_teardown(app):
                 continue
             else:
                 raise
+        except exc.InternalError as e:
+            if 'current transaction is aborted' in str(e):
+                break
+            else:
+                raise
     session.flush()
     mark_changed(session())
     transaction.commit()
