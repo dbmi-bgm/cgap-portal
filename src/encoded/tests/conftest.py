@@ -35,7 +35,7 @@ README:
 
 @pytest.yield_fixture
 def external_tx(request, conn):
-    # in cgap-portal
+    # overridden from snovault to detect and continue from savepoint error
     if NO_SERVER_FIXTURES:
         yield 'NO_SERVER_FIXTURES'
         return
