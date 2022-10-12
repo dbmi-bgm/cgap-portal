@@ -16,7 +16,7 @@ from snovault.validation import ValidationFailure
 from .base import (
     Item,
     get_item_or_none,
-    set_namekey_from_title,
+    # set_namekey_from_title,
     # ALLOW_OWNER_EDIT,
     # ALLOW_CURRENT,
     DELETED_ACL,

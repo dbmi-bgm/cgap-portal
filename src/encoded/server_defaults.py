@@ -6,11 +6,8 @@ from jsonschema_serialize_fork import NO_DEFAULT
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_request
 from snovault.schema_utils import server_default
-from string import digits, ascii_uppercase
-from snovault import (
-    ROOT,
-    COLLECTIONS
-)
+from snovault import COLLECTIONS  # , ROOT
+from string import digits  # , ascii_uppercase
 
 
 ACCESSION_FACTORY = __name__ + ':accession_factory'

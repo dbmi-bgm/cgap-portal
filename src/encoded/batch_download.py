@@ -1,30 +1,18 @@
-import json
 import datetime
+import json
 import pytz
 import structlog
-from pyramid.httpexceptions import (
-    HTTPBadRequest,
-    HTTPMovedPermanently,
-    HTTPServerError,
-    HTTPTemporaryRedirect
-)
+
+from pyramid.httpexceptions import HTTPBadRequest  # , HTTPMovedPermanently, HTTPServerError, HTTPTemporaryRedirect,
 from pyramid.view import view_config
 from pyramid.response import Response
-from pyramid.traversal import find_resource
-from snovault.util import simple_path_ids, debug_log
+# from pyramid.traversal import find_resource
 from snovault.embed import make_subrequest
+from snovault.util import simple_path_ids, debug_log
 
-from encoded.types.variant import (
-    get_spreadsheet_mappings
-)
-from .batch_download_utils import (
-    stream_tsv_output,
-    convert_item_to_sheet_dict,
-    human_readable_filter_block_queries
-)
+from .batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict, human_readable_filter_block_queries
 from .search.compound_search import CompoundSearchBuilder
-
-
+from .types.variant import get_spreadsheet_mappings
 
 
 log = structlog.getLogger(__name__)
@@ -53,7 +41,7 @@ def variant_sample_search_spreadsheet(context, request):
     try:
         # This is what we should be receiving
         request_body = request.POST
-    except:
+    except Exception:
         # TODO: Consider accepting JSON body for unit test purposes only
         pass
 

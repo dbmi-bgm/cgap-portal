@@ -1,8 +1,8 @@
 import pytest
-import mimetypes
-import os
-import magic
-from base64 import b64encode
+# import mimetypes
+# import os
+# import magic
+# from base64 import b64encode
 # from ..types.gene_list import (
 #     get_genes,
 #     )

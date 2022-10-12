@@ -161,18 +161,18 @@ class MockedSearchBuilder:
             return []
         else:
             # TODO Add "total": 0 and other properties to response.
-            return { "@graph": [] }
+            return {"@graph": []}
 
 @mock.patch("encoded.search.search.SearchBuilder", new=MockedSearchBuilder)
 def test_variant_sample_patch_notes_process_success(
     testapp,
     bgm_user,
     bgm_user_testapp,
-    bgm_test_variant_sample2, # This VS is from BGM project and has no "genes" on it initially.
+    bgm_test_variant_sample2,  # This VS is from BGM project and has no "genes" on it initially.
     bgm_note_for_patch_process,
     bgm_note_for_patch_process2,
     bgm_techreview_note_for_patch_process,
-    gene, # These 2 Gene are from ENCODED project (not BGM)
+    gene,  # These 2 Gene are from ENCODED project (not BGM)
     gene_2
 ):
 
@@ -219,7 +219,7 @@ def test_variant_sample_patch_notes_process_success(
         "variant_notes": [ note_pre_existing["@id"] ],
         "genes": [ {"genes_most_severe_gene": gene["@id"] }, {"genes_most_severe_gene": gene_2["@id"] } ]
     }
-    variant_loaded = testapp.patch_json(variant_sample["variant"], variant_payload_for_initial_state, status=200).json['@graph'][0]
+    testapp.patch_json(variant_sample["variant"], variant_payload_for_initial_state, status=200)
 
     # Test /@@update-project-notes/ endpoint
     save_patch_process_payload = {
@@ -240,8 +240,8 @@ def test_variant_sample_patch_notes_process_success(
 
     note1_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
     note3_reloaded = bgm_user_testapp.get(note1["@id"] + "?datastore=database&frame=object", status=200).json
-    assert note1_reloaded["is_saved_to_project"] == True
-    assert note3_reloaded["is_saved_to_project"] == True
+    assert note1_reloaded["is_saved_to_project"] is True
+    assert note3_reloaded["is_saved_to_project"] is True
 
     # NOTE: Approval is auto-set only for interpretation, gene_notes, variant_notes... might be removed later from those also.
     assert note1_reloaded["approved_by"] == bgm_user["@id"] # Ensure this is set for us
@@ -286,7 +286,7 @@ def test_variant_sample_patch_notes_process_success(
 
     resp = bgm_user_testapp.patch_json(variant_sample['@id'] + "/@@update-project-notes/", remove_patch_process_payload, status=200).json
     techreview_note_reloaded = bgm_user_testapp.get(techreview_note["@id"] + "?datastore=database&frame=object", status=200).json
-    assert techreview_note_reloaded["is_saved_to_project"] == False
+    assert techreview_note_reloaded["is_saved_to_project"] is False
     variant_reloaded_2 = bgm_user_testapp.get(variant_sample["variant"] + "?datastore=database", status=200).json
     assert techreview_note["@id"] not in [ note["@id"] for note in variant_reloaded_2["technical_reviews"] ]
 
@@ -340,8 +340,8 @@ def test_variant_sample_list_patch_success(bgm_user, bgm_user_testapp, variant_s
 
     assert resp['variant_samples'][0]["variant_sample_item"] == vs1['@id']
     assert resp['variant_samples'][1]["variant_sample_item"] == vs2['@id']
-    assert len(resp['variant_samples'][1]["date_selected"]) > 10 # Check that datetime is auto-populated
-    assert resp['variant_samples'][1]["selected_by"] == bgm_user["@id"] # Check that userid is auto-populated
+    assert len(resp['variant_samples'][1]["date_selected"]) > 10  # Check that datetime is auto-populated
+    assert resp['variant_samples'][1]["selected_by"] == bgm_user["@id"]  # Check that userid is auto-populated
 
 
 def test_variant_sample_list_patch_fail(bgm_variant, bgm_user_testapp, variant_sample_list1):
