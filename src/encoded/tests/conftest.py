@@ -59,13 +59,10 @@ def external_tx(request, conn):
     # print('BEGIN external_tx')
     try:
         tx = conn.begin_nested()
-    except exc.InternalError as e:
+    except exc.PendingRollbackError as e:
         if 'inactive savepoint transaction' in str(e):
             conn._nested_transaction.rollback()
             tx = conn.begin_nested()
-            yield tx
-            tx.rollback()
-            return
         else:
             raise
     try:
