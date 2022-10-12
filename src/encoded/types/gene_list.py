@@ -3,11 +3,11 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    display_title_schema
+    # CONNECTION,
+    # display_title_schema
 )
 
-from .base import Item, get_item_or_none
+from .base import Item  # , get_item_or_none
 from ..util import convert_integer_to_comma_string
 
 

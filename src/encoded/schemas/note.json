@@ -65,7 +65,9 @@
         },
         "last_text_edited": {
             "title": "Text Last Edited",
-            "exclude_from": ["FFedit-create"],
+            "exclude_from": [
+                "FFedit-create"
+            ],
             "type": "object",
             "additionalProperties": false,
             "lookup": 900,
@@ -75,8 +77,12 @@
                     "description": "Do not submit, value is assigned by the server. The date that note_text field is modified.",
                     "type": "string",
                     "anyOf": [
-                        {"format": "date-time"},
-                        {"format": "date"}
+                        {
+                            "format": "date-time"
+                        },
+                        {
+                            "format": "date"
+                        }
                     ],
                     "permission": "restricted_fields"
                 },

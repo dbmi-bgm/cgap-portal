@@ -1,16 +1,16 @@
 import boto3
 import botocore.exceptions
 import contextlib
-import datetime as datetime_module
+# import datetime as datetime_module
 import json
 import os
 import pytest
-import pytz
+# import pytz
 import webtest
 
 from dcicutils import qa_utils
 from dcicutils.misc_utils import constantly, file_contents, ignored
-from dcicutils.qa_utils import ControlledTime, MockBotoS3Client
+from dcicutils.qa_utils import MockBotoS3Client  # , ControlledTime
 from dcicutils.s3_utils import HealthPageKey
 from unittest import mock
 from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
