@@ -41,26 +41,39 @@ def external_tx(request, conn):
         return
 
     notice_pytest_fixtures(request)
-    # print('BEGIN external_tx')
-    try:
-        tx = conn.begin_nested()
-    except exc.InternalError as e:
-        if 'inactive savepoint transaction' in str(e):
-            conn._nested_transaction.rollback()
-            tx = conn.begin_nested()
-            yield tx
-            tx.rollback()
-            return
-        else:
-            raise
-    try:
+    with conn.begin_nested() as tx:
         yield tx
-        tx.rollback()
-    except exc.InternalError as e:
-        if 'savepoint' in str(e) and 'does not exist' in str(e):
-            pass
-        else:
-            raise
+
+
+# hacked version
+# @pytest.yield_fixture
+# def external_tx(request, conn):
+#     # overridden from snovault to detect and continue from savepoint error
+#     if NO_SERVER_FIXTURES:
+#         yield 'NO_SERVER_FIXTURES'
+#         return
+#
+#     notice_pytest_fixtures(request)
+#     # print('BEGIN external_tx')
+#     try:
+#         tx = conn.begin_nested()
+#     except exc.InternalError as e:
+#         if 'inactive savepoint transaction' in str(e):
+#             conn._nested_transaction.rollback()
+#             tx = conn.begin_nested()
+#             yield tx
+#             tx.rollback()
+#             return
+#         else:
+#             raise
+#     try:
+#         yield tx
+#         tx.rollback()
+#     except exc.InternalError as e:
+#         if 'savepoint' in str(e) and 'does not exist' in str(e):
+#             pass
+#         else:
+#             raise
 
 # conn does not implement .rollback()
     # # The database should be empty unless a data fixture was loaded
