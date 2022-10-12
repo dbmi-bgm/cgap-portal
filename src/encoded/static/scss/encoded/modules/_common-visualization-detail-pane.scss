@@ -78,9 +78,7 @@
                     white-space: nowrap;
                     overflow: hidden;
                     text-overflow: ellipsis;
-                    a {
-                        color: $body-color;
-                    }
+                    color: $body-color;
                 }
 
                 /** A couple different options for layouting out **/
