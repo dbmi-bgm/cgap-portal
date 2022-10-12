@@ -83,5 +83,3 @@ This directory features two cases:
 - `HG002`: includes 25 SNVs and 50 SNV/CVs (25 Manta caller, 12 BIC-Seq2 caller, 13 multiple caller - BIC-seq2 + Manta)
 
 This set of inserts does not include Note or FilterSet items, since these will be created by the tests through interaction with the UI.
-
-Scripts used to create these inserts can be found within the [`/cypress-test-inserts/creation-scripts/` directory](cypress-test-inserts/creation-scripts/).
