@@ -222,7 +222,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
         graphData,
         showOrderBasedName,
         windowWidth, windowHeight,
-        selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease
+        selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease, showAsDiseases
         /// "visibleDiseaseIdxMap": selectedDiseaseIdxMap
     };
 

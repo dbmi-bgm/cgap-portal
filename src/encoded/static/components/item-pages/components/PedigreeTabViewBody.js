@@ -142,10 +142,10 @@ export class PedigreeTabViewBody extends React.PureComponent {
     renderDetailPane(pedigreeVizProps){
         const {
             session, href, context, schemas,
-            PedigreeVizLibrary,
+            PedigreeVizLibrary, showAsDiseases,
             availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease
         } = this.props;
-        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease };
+        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, showAsDiseases };
         return <PedigreeDetailPane {...pedigreeVizProps} {...passedDownProps} />;
     }
 
