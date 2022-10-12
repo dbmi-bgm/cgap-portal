@@ -27,6 +27,9 @@
                 width: 320px;
                 flex: 0 0 320px;
                 border-left: 1px solid transparent;
+                box-shadow: 0px 2px 5px 0px rgba(112, 112, 112, 0.56);
+                -webkit-box-shadow: 0px 2px 5px 0px rgba(112, 112, 112, 0.56);
+                -moz-box-shadow: 0px 2px 5px 0px rgba(112, 112, 112, 0.56);
                 .detail-pane-inner {
                     opacity: 1;
                 }
@@ -45,6 +48,9 @@
             &[data-is-open="true"] {
                 width: 400px;
                 flex: 0 0 400px;
+                box-shadow: 0px 2px 5px 0px rgba(112, 112, 112, 0.56);
+                -webkit-box-shadow: 0px 2px 5px 0px rgba(112, 112, 112, 0.56);
+                -moz-box-shadow: 0px 2px 5px 0px rgba(112, 112, 112, 0.56);
             }
         }
     }
