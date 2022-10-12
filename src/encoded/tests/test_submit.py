@@ -1350,7 +1350,7 @@ class TestAccessionRow:
                 file_aliases,
                 file_errors,
             )
-            accession_row.update_item_files(item, "some_file_names", None)
+            accession_row.update_item_files(item, "some_file_names", None, None)
             assert len(accession_row.files) == len(file_items)
             for index, file_item in enumerate(accession_row.files):
                 assert isinstance(file_item, MetadataItem)
