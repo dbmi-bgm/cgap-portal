@@ -18,7 +18,7 @@ def auth_header(access_key):
 
 
 @pytest.fixture
-def no_login_submitter(testapp, institution, project):
+def no_login_submitter(external_tx, testapp, institution, project):
     item = {
         'first_name': 'ENCODE',
         'last_name': 'Submitter',
@@ -31,7 +31,7 @@ def no_login_submitter(testapp, institution, project):
 
 
 @pytest.fixture
-def no_login_access_key(testapp, no_login_submitter):
+def no_login_access_key(external_tx, testapp, no_login_submitter):
     description = 'My programmatic key'
     item = {
         'user': no_login_submitter['@id'],
