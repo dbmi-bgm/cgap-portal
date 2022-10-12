@@ -44,11 +44,21 @@ def external_tx(request, conn):
     # print('BEGIN external_tx')
     try:
         tx = conn.begin_nested()
+    except exc.InternalError as e:
+        if 'inactive savepoint transaction' in str(e):
+            conn._nested_transaction.rollback()
+            tx = conn.begin_nested()
+            yield tx
+            tx.rollback()
+            return
+        else:
+            raise
+    try:
         yield tx
         tx.rollback()
     except exc.InternalError as e:
         if 'savepoint' in str(e) and 'does not exist' in str(e):
-            print(e)
+            pass
         else:
             raise
 
