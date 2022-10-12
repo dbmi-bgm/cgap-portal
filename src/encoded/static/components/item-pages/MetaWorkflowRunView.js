@@ -213,7 +213,7 @@ export function transformMetaWorkflowRunToSteps (metaWorkflowRunItem) {
             if (filesLen > 0) {
                 isReferenceFileInput = _.every(filesForThisInput, function(fileObject){
                     const { value: fileItem } = fileObject;
-                    const { "@type": fileAtType } = fileItem || {};
+                    const { "@type": fileAtType = [] } = fileItem || {};
                     return fileAtType.indexOf("FileReference") > -1;
                 });
             }
