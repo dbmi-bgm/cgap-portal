@@ -9,6 +9,7 @@ import sys
 from base64 import b64encode
 from collections import Counter
 from datetime import datetime
+from dcicutils.command_utils import y_or_n
 from dcicutils.ff_utils import get_authentication_with_server, search_metadata, post_metadata
 from uuid import uuid4
 from ..commands.load_items import load_items
@@ -676,20 +677,17 @@ def post_report_document_to_portal(connection, itype, logfile):
 
 def prompt_check_for_output_options(load, outfile, itype, server, logger=None):
     if load:
-        choice1 = str(input("load is True - are you sure you want to directly load the output to {} (y/n)?: "
-                            .format(server)))
-        if choice1.lower() == 'y':
-            logger.info('Will load output directly to {}'.format(server))
+        if y_or_n(f"load is True. Are you sure you want to directly load the output to {server}?"):
+            logger.info(f"Will load output directly to {server}")
             if not outfile:
-                choice2 = str(input("No outfile provided! - you OK with no saved json (y/n)?: ".format(server)))
-                if choice2.lower() == 'y':
-                    logger.info('No intermediate json file will be generated')
+                if y_or_n("No outfile provided! There will be no saved .json file. OK?"):
+                    logger.info("No intermediate json file will be generated")
                     return None, load
         else:
             load = None
     if not outfile:
         outfile = itype + '.json'
-    logger.info('Will store output to {}'.format(outfile))
+    logger.info(f"Will store output to {outfile}")
     return outfile, load
 
 

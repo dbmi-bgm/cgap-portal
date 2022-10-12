@@ -1,44 +1,32 @@
 import base64
-import os
-from operator import itemgetter
-import jwt
 import datetime
+import jwt
+import os
+import requests
 import structlog
 
+from dateutil.parser import isoparse
+from dcicutils.lang_utils import conjoined_list
+from dcicutils.misc_utils import remove_element, ignorable, ignored
+from operator import itemgetter
 from passlib.context import CryptContext
-from urllib.parse import urlencode
 from pyramid.authentication import (
     BasicAuthAuthenticationPolicy as _BasicAuthAuthenticationPolicy,
     CallbackAuthenticationPolicy
 )
-import requests
-from pyramid.path import (
-    DottedNameResolver,
-    caller_package,
-)
-from pyramid.security import (
-    NO_PERMISSION_REQUIRED,
-)
-from pyramid.httpexceptions import (
-    HTTPForbidden,
-    HTTPUnauthorized,
-)
-from pyramid.view import (
-    view_config,
-)
-from snovault import (
-    ROOT,
-    COLLECTIONS
-)
-from dateutil.parser import isoparse
-from dcicutils.misc_utils import remove_element
-from dcicutils.lang_utils import conjoined_list
-from snovault.validation import ValidationFailure
+from pyramid.httpexceptions import HTTPForbidden, HTTPUnauthorized
+from pyramid.path import DottedNameResolver, caller_package
+from pyramid.security import NO_PERMISSION_REQUIRED
+from pyramid.view import view_config
+from snovault import ROOT, COLLECTIONS
 from snovault.calculated import calculate_properties
-from snovault.validators import no_validate_item_content_post
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.schema_utils import validate_request
 from snovault.util import debug_log
+from snovault.validation import ValidationFailure
+from snovault.validators import no_validate_item_content_post
+from urllib.parse import urlencode
+
 from .ingestion.common import CGAP_TRAINING_PROJECT
 
 
@@ -135,6 +123,7 @@ class NamespacedAuthenticationPolicy(object):
         return super(NamespacedAuthenticationPolicy, klass).__new__(klass)
 
     def __init__(self, namespace, base, *args, **kw):
+        ignored(namespace, base)  # TODO: SHOULD this be ignored?
         super().__init__(*args, **kw)
 
     def unauthenticated_userid(self, request):
@@ -156,11 +145,14 @@ class NamespacedAuthenticationPolicy(object):
 
             # Allow access basic user credentials from request obj after authenticating & saving request
             def get_user_info(request):
-                user_props = request.embed('/session-properties', as_user=userid) # Performs an authentication against DB for user.
+                user_props = request.embed('/session-properties', as_user=userid)  # Performs an authentication against DB for user.
                 if not user_props.get('details'):
                     raise HTTPUnauthorized(
                         title="Could not find user info for {}".format(userid),
-                        headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
+                        headers={
+                            'WWW-Authenticate':
+                                "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain)
+                        }
                     )
                 return user_props
 
@@ -203,10 +195,10 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
     method = 'POST'
 
     def unauthenticated_userid(self, request):
-        '''
+        """
         So basically this is used to do a login, instead of the actual
         login view... not sure why, but yeah..
-        '''
+        """
 
         # we will cache it for the life of this request, cause pyramids does traversal
         cached = getattr(request, '_auth0_authenticated', _fake_user)
@@ -237,7 +229,7 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
         """
         Checks that the given JWT payload belongs to a partners email.
         """
-        for identity in payload.get('identities', []): # if auth0 decoded
+        for identity in payload.get('identities', []):  # if auth0 decoded
             if identity.get('connection', '') in ['partners', 'hms-it']:
                 return True
 
@@ -253,10 +245,10 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
 
     @staticmethod
     def get_token_info(token, request):
-        '''
+        """
         Given a jwt get token info from auth0, handle retrying and whatnot.
         This is only called if we receive a Bearer token in Authorization header.
-        '''
+        """
         try:
             # lets see if we have an auth0 token or our own
             registry = request.registry
@@ -275,15 +267,19 @@ class Auth0AuthenticationPolicy(CallbackAuthenticationPolicy):
                 warn_msg = "No Auth0 keys present - falling back to making outbound network request to have Auth0 validate for us"
                 log.warning(warn_msg)
                 user_url = "https://{domain}/tokeninfo".format(domain='hms-dbmi.auth0.com')
-                resp = requests.post(user_url, {'id_token':token})
+                resp = requests.post(user_url, {'id_token': token})
                 payload = resp.json()
                 if 'email' in payload and Auth0AuthenticationPolicy.email_is_partners_or_hms(payload):
                     request.set_property(lambda r: False, 'auth0_expired')
                     return payload
 
         except jwt.exceptions.ExpiredSignatureError as e:
+            ignorable(e)
             # Normal/expected expiration.
-            request.set_property(lambda r: True, 'auth0_expired')  # Allow us to return 403 code &or unset cookie in renderers.py
+
+            # Allow us to return 403 code &or unset cookie in renderers.py
+            request.set_property(lambda r: True, 'auth0_expired')
+
             return None
 
         except (ValueError, jwt.exceptions.InvalidTokenError, jwt.exceptions.InvalidKeyError) as e:
@@ -308,7 +304,7 @@ def get_jwt_from_auth_header(request):
             # https://tools.ietf.org/html/rfc7617 is base64 encoded and looks like:
             #   Authorization: Basic QWxhZGRpbjpvcGVuIHNlc2FtZQ==
             # See also https://jwt.io/introduction/ for other info specific to JWT.
-            [ auth_type, auth_data ] = request.headers['Authorization'].strip().split(' ', 1)
+            [auth_type, auth_data] = request.headers['Authorization'].strip().split(' ', 1)
             if auth_type.lower() == 'bearer':
                 return auth_data.strip()  # The spec says exactly one space, but then a token, so spaces don't matter
         except Exception:
@@ -331,9 +327,10 @@ def get_jwt(request):
 @view_config(route_name='login', request_method='POST', permission=NO_PERMISSION_REQUIRED)
 @debug_log
 def login(context, request):
-    '''
+    """
     Save JWT as httpOnly cookie
-    '''
+    """
+    ignored(context)
 
     # Allow providing token thru Authorization header as well as POST request body.
     # Should be about equally secure if using HTTPS.
@@ -354,7 +351,7 @@ def login(context, request):
         secure=is_https
     )
 
-    return { "saved_cookie" : True }
+    return {"saved_cookie": True}
 
 
 @view_config(route_name='logout',
@@ -371,6 +368,7 @@ def logout(context, request):
     The front-end handles logging out by discarding the locally-held JWT from
     browser cookies and re-requesting the current 4DN URL.
     """
+    ignored(context)
 
     # Deletes the cookie
     request.response.set_cookie(
@@ -388,7 +386,7 @@ def logout(context, request):
         .format(request.domain, request.domain)
     )
 
-    return { "deleted_cookie" : True }
+    return {"deleted_cookie": True}
 
     # TODO: NEED DO THIS CLIENTSIDE SO IT UNSETS USER'S COOKIE - MUST BE THRU REDIRECT NOT AJAX
     # (we don't do this - i.e. we don't bother to log user out of all of Auth0 session, just out of
@@ -409,7 +407,8 @@ def logout(context, request):
 @view_config(route_name='me', request_method='GET', permission=NO_PERMISSION_REQUIRED)
 @debug_log
 def me(context, request):
-    '''Alias /users/<uuid-of-current-user>'''
+    """Alias /users/<uuid-of-current-user>"""
+    ignored(context)
     for principal in request.effective_principals:
         if principal.startswith('userid.'):
             break
@@ -420,7 +419,7 @@ def me(context, request):
 
     # return { "uuid" : userid } # Uncomment and delete below code to just grab UUID.
 
-    request.response.status_code = 307 # Prevent from creating 301 redirects which are then cached permanently by browser
+    request.response.status_code = 307  # Prevent from creating 301 redirects that get cached permanently by browser
     properties = request.embed('/users/' + userid, as_user=userid)
     return properties
 
@@ -434,9 +433,9 @@ def get_basic_properties_for_user(request, userid):
     user_actions = calculate_properties(user, request, category='user_action')
 
     properties = {
-        #'user': request.embed(request.resource_path(user)),
-        'details' : { p:v for p, v in user_dict.items() if p in include_detail_fields },
-        'user_actions' : [ v for k, v in sorted(user_actions.items(), key=itemgetter(0)) ]
+        # 'user': request.embed(request.resource_path(user)),
+        'details': {p: v for p, v in user_dict.items() if p in include_detail_fields},
+        'user_actions': [v for k, v in sorted(user_actions.items(), key=itemgetter(0))]
     }
 
     # add uuid to user details
@@ -449,6 +448,7 @@ def get_basic_properties_for_user(request, userid):
              permission=NO_PERMISSION_REQUIRED)
 @debug_log
 def session_properties(context, request):
+    ignored(context)
     for principal in request.effective_principals:
         if principal.startswith('userid.'):
             break
@@ -458,8 +458,8 @@ def session_properties(context, request):
     namespace, userid = principal.split('.', 1)
     properties = get_basic_properties_for_user(request, userid)
 
-    #if 'auth.userid' in request.session:
-    #    properties['auth.userid'] = request.session['auth.userid']
+    # if 'auth.userid' in request.session:
+    #     properties['auth.userid'] = request.session['auth.userid']
 
     return properties
 
@@ -503,6 +503,7 @@ def basic_auth_check(username, password, request):
 @debug_log
 def impersonate_user(context, request):
     """As an admin, impersonate a different user."""
+    ignored(context)
 
     userid = request.validated['userid']
     users = request.registry[COLLECTIONS]['user']
@@ -522,7 +523,7 @@ def impersonate_user(context, request):
     registry = request.registry
     auth0_client = registry.settings.get('auth0.client')
     auth0_secret = registry.settings.get('auth0.secret')
-    if not(auth0_client and auth0_secret):
+    if not (auth0_client and auth0_secret):
         raise HTTPForbidden(title="No keys to impersonate user")
 
     jwt_contents = {
@@ -535,7 +536,7 @@ def impersonate_user(context, request):
         jwt_contents,
         auth0_secret,
         algorithm=JWT_ENCODING_ALGORITHM
-	)
+    )
 
     is_https = request.scheme == "https"
 
@@ -591,6 +592,7 @@ def create_unauthorized_user(context, request):
     are successful, POST a new user and login
 
     Args:
+        context: (ignored)
         request: Request object
 
     Returns:
@@ -599,6 +601,7 @@ def create_unauthorized_user(context, request):
     Raises:
         LoginDenied, HTTPForbidden, or ValidationFailure
     """
+    ignored(context)
     # env check
     env_name = request.registry.settings.get('env.name')
     if env_name not in AUTO_REGISTRATION_ENVS:
@@ -615,7 +618,9 @@ def create_unauthorized_user(context, request):
     if user_props_email != email:
         raise HTTPUnauthorized(
             title="Provided email {} not validated with Auth0. Try logging in again.".format(user_props_email),
-            headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
+            headers={
+                'WWW-Authenticate':
+                    "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain)}
         )
 
     # set user insert props
@@ -656,5 +661,7 @@ def create_unauthorized_user(context, request):
         # error with re-captcha
         raise HTTPUnauthorized(
             title="Invalid reCAPTCHA. Try logging in again.",
-            headers={'WWW-Authenticate': "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain) }
+            headers={
+                'WWW-Authenticate':
+                    "Bearer realm=\"{}\"; Basic realm=\"{}\"".format(request.domain, request.domain)}
         )

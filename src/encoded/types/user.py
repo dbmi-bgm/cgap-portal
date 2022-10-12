@@ -8,11 +8,11 @@ from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.security import Allow, Deny, Everyone
 from pyramid.view import view_config
 from snovault import (
-    CONNECTION,
+    # CONNECTION,
     calculated_property,
     collection,
     load_schema,
-    display_title_schema
+    # display_title_schema,
 )
 from snovault.crud_views import collection_add
 from snovault.resource_views import item_view_page

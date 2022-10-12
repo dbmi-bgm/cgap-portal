@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 import argparse
-import json
 import logging
 import logging.config
 import os
@@ -11,10 +10,10 @@ import sys
 
 from datetime import datetime
 from dcicutils.ff_utils import (
-    get_authentication_with_server,
-    get_metadata,
-    patch_metadata,
-    post_metadata,
+    # get_authentication_with_server,
+    # get_metadata,
+    # patch_metadata,
+    # post_metadata,
     search_metadata,
 )
 from uuid import uuid4
@@ -146,8 +145,8 @@ def get_input_gen(input):
                 if r.encoding is None:
                     r.encoding = 'utf-8'
                 res = r.text
-                for l in res.split('\n'):
-                    yield l
+                for line in res.split('\n'):
+                    yield line
         except Exception as e:
             print(e)
             return []

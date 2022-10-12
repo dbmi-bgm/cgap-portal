@@ -51,8 +51,8 @@ def test_keys_conflict(testapp):
     initial = testapp.get(url).json['@graph']
     testapp.post_json(url, item, status=201)
     posted = testapp.get(url).json['@graph']
-    assert(len(initial)+1 == len(posted))
+    assert len(initial)+1 == len(posted)
     conflict = testapp.post_json(url, item, status=409)
-    assert(conflict.status_code == 409)
+    assert conflict.status_code == 409
     conflicted = testapp.get(url).json['@graph']
-    assert(len(posted) == len(conflicted))
+    assert len(posted) == len(conflicted)

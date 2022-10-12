@@ -255,7 +255,7 @@
                 "infrequent access",
                 "glacier",
                 "deep archive",
-                "deleted"                
+                "deleted"
             ]
         },
         "s3_lifecycle_last_checked": {

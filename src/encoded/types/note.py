@@ -1,16 +1,9 @@
-import datetime
-from snovault.util import debug_log
-from snovault import (
-    abstract_collection,
-    calculated_property,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item
-)
+# import datetime
+# from snovault.util import debug_log
+from dcicutils.misc_utils import ignorable
+from snovault import abstract_collection, calculated_property, collection, load_schema
+from .base import Item
 from ..server_defaults import add_last_modified
-
 
 
 @abstract_collection(
@@ -34,7 +27,9 @@ class Note(Item):
             # We may not have a self.properties yet if this is a new item (e.g. from POST request)
             # (getattr(self, properties) doesn't work here, throws exception)
             old_note_text = self.properties.get("note_text", None)
-        except KeyError as e: # str(e) === "''"; not sure why.
+        except KeyError as e:
+            ignorable(e)
+            # str(e) === "''"; not sure why.
             pass
         if new_note_text != old_note_text:
             # Add/update last_text_edited: { text_edited_by, date_text_edited }
@@ -55,7 +50,6 @@ class Note(Item):
             return self.uuid
 
 
-
 @collection(
     name='notes-standard',
     properties={
@@ -71,7 +65,6 @@ class NoteStandard(Note):
         'last_modified.date_modified',
         'last_modified.modified_by.display_title'
     ]
-
 
 
 @collection(
@@ -121,7 +114,6 @@ class NoteInterpretation(Note):
         return rules_display
 
 
-
 @collection(
     name='notes-discovery',
     properties={
@@ -146,7 +138,6 @@ class NoteDiscovery(Note):
         # last resort, use uuid
         except Exception:
             return self.uuid
-
 
 
 @collection(
@@ -176,13 +167,13 @@ class NoteTechnicalReview(Note):
         call = assessment.get("call")
         classification = assessment.get("classification")
 
-        title_part_1 = None
+        # title_part_1 = None
         if call is not None and classification is not None:
-            title_part_1 = "(" + ("" if call == True else "No ") + "Call) " + classification
+            title_part_1 = "(" + ("" if call is True else "No ") + "Call) " + classification
         else:
             title_part_1 = "No Saved Classification"
 
-        title_part_2 = None
+        # title_part_2 = None
         try:
             title_part_2 = " from " + date_created[:10]
         except Exception:

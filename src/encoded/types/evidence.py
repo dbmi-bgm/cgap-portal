@@ -1,14 +1,8 @@
 """Collection for Phenotypes objects."""
-from snovault import (
-    calculated_property,
-    abstract_collection,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item,
-    get_item_or_none,
-)
+
+from snovault import calculated_property, abstract_collection, collection, load_schema
+
+from .base import Item  # , get_item_or_none
 
 
 @abstract_collection(
@@ -35,7 +29,7 @@ class Evidence(Item):
             st = [s for s in subject_item.split('/') if s][-1]
             ot = [s for s in object_item.split('/') if s][-1]
             return st + ' -- ' + ot + ' evidence'
-        except Exception as e:
+        except Exception:
             return Item.display_title(self)
 
 

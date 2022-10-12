@@ -1,0 +1,20 @@
+[
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "2e84737a-a988-48b8-ab0a-73ca68a83580",
+        "aliases": [
+            "hms-dbmi:green-thumb-cohort-analysis"
+        ],
+        "title": "Analysis of the green thumb family",
+        "description": "Search for rare variants shared in individuals with green thumbs vs. those without the phenotype",
+        "control_samples": [
+            "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+            "283f6047-61cd-4ddb-8881-ec1c87082569"
+        ],
+        "case_samples": [
+            "f4bbc709-40fe-48a4-afde-8e886b571903",
+            "a4b98709-25fe-48a4-afde-8f886b57abc9"
+        ]
+    }
+]
