@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-10.5.0
+11.0.3
 ======
 
 `PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`
