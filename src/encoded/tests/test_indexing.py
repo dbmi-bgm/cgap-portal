@@ -88,9 +88,8 @@ def setup_and_teardown(app):
     # sqlalchemy 1.4 - use TRUNCATE instead of DELETE
     while True:
         try:
-            connection.execute('TRUNCATE {} RESTART IDENTITY;'.format(
-                ','.join(table.name
-                         for table in reversed(Base.metadata.sorted_tables))))
+            table_names = ','.join(table.name for table in reversed(Base.metadata.sorted_tables))
+            connection.execute('TRUNCATE {} RESTART IDENTITY;')
             break
         except exc.OperationalError as e:
             if 'statement timeout' in str(e):

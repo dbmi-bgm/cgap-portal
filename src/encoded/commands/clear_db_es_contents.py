@@ -39,9 +39,8 @@ def clear_db_tables(app):
     connection = session.connection().connect()
     try:
         # truncate tables by only deleting contents (sqlalchemy 1.4+ compliant)
-        connection.execute('TRUNCATE {} RESTART IDENTITY;'.format(
-            ','.join(table.name
-                     for table in reversed(Base.metadata.sorted_tables))))
+        table_names = ','.join(table.name for table in reversed(Base.metadata.sorted_tables))
+        connection.execute(f'TRUNCATE {table_names} RESTART IDENTITY;')
     except Exception as e:
         log.error(f"clear_db_es_contents: Error on DB drop_all/create_all. {type(e)}: {e}")
         transaction.abort()

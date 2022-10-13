@@ -51,6 +51,7 @@ def test_get_help_page_in_review(workbook, anon_html_es_testapp, html_es_testapp
 
 
 @pytest.mark.skip
+@pytest.mark.broken
 def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, static_help_page_deleted):
     help_page_url = '/' + static_help_page_deleted['name']
     anon_html_es_testapp.get(help_page_url, status=403)
@@ -61,6 +62,7 @@ def test_get_help_page_deleted(workbook, anon_html_es_testapp, html_es_testapp, 
 
 
 @pytest.mark.skip
+@pytest.mark.broken
 def test_get_help_page_no_access(workbook, anon_es_testapp, es_testapp, anon_html_es_testapp, html_es_testapp,
                                  static_help_page_default, static_help_page_in_review, static_help_page_deleted):
     notice_pytest_fixtures(workbook)

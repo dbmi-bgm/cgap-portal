@@ -74,8 +74,9 @@ def external_tx(request, conn):
         else:
             raise
 
-# conn does not implement .rollback()
-    # # The database should be empty unless a data fixture was loaded
+    # conn does not implement .rollback()
+
+    # The database should be empty unless a data fixture was loaded
     # for table in Base.metadata.sorted_tables:
     #     assert conn.execute(table.count()).scalar() == 0
 
