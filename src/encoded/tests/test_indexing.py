@@ -103,7 +103,7 @@ def setup_and_teardown(app):
             else:
                 raise
     session.flush()
-    mark_changed(session())
+    mark_changed(session())  # Has it always changed? -kmp 12-Oct-2022
     transaction.commit()
 
 
