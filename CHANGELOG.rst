@@ -6,13 +6,12 @@ cgap-portal
 Change Log
 ----------
 
-11.1.2
+11.0.3
 ======
 
-`PR 633: Vs cypress test inserts  <https://github.com/dbmi-bgm/cgap-portal/pull/633>`_
+`PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`
 
-* Adds set of inserts for automated Cypress integration tests for UI
-* Includes folder of Python scripts used to create these inserts
+* Add UI/workflow visualization support for MetaWorkflowRun items
 
 11.0.2
 ======
