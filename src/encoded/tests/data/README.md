@@ -77,9 +77,3 @@ Never loaded into fourfront environments.
 Set of inserts used for automated Cypress integration tests, can be loaded locally using the `load_cypress_data` loading function. All inserts in this directory are linked to the `Cypress Main` project and institution, and there is an additional `Cypress Personas` project and institution, which does not have cases associated with it (can be used for future development).
 
 The Cypress tests will emulate users from the `Cypress Main` project/institution, and perform a variety of interactions that involve updating the test data, such as creating and saving filter-sets, applying technical reviews, and editing and applying interpretations.
-
-This directory features two cases:
-- `NA12879-WGS-Trio`: includes 50 SNVs and 50 SVs (with Manta as the caller)
-- `HG002`: includes 25 SNVs and 50 SNV/CVs (25 Manta caller, 12 BIC-Seq2 caller, 13 multiple caller - BIC-seq2 + Manta)
-
-This set of inserts does not include Note or FilterSet items, since these will be created by the tests through interaction with the UI.
