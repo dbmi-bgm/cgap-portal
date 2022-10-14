@@ -271,16 +271,6 @@ const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox(
     );
 });
 
-/** No longer in use for UX reasons; keeping it around temporarily in case people want it back */
-const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
-    return (
-        <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
-            <DropdownItem active={showAsDiseases === "Phenotypic Features"} eventKey="Phenotypic Features">Phenotypic Features</DropdownItem>
-            <DropdownItem active={showAsDiseases === "Disorders"} eventKey="Disorders">Disorders</DropdownItem>
-        </DropdownButton>
-    );
-});
-
 const ShowAsDiseasesToggle = React.memo(function ShowAsDiseasesToggle({ showAsDiseases, onSelect }) {
 
     const onClickDisorders = useCallback(function(e){
@@ -353,3 +343,14 @@ const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(prop
 //         </Checkbox>
 //     );
 // });
+
+/** No longer in use for UX reasons; keeping it around temporarily in case people want it back */
+const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
+    return (
+        <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
+            <DropdownItem active={showAsDiseases === "Phenotypic Features"} eventKey="Phenotypic Features">Phenotypic Features</DropdownItem>
+            <DropdownItem active={showAsDiseases === "Disorders"} eventKey="Disorders">Disorders</DropdownItem>
+        </DropdownButton>
+    );
+});
+
