@@ -14,6 +14,7 @@ import { CollapsibleItemViewButtonToolbar } from './../components/CollapsibleIte
 
 import { PedigreeTabViewBody, PedigreeFullScreenBtn } from '../components/PedigreeTabViewBody';
 import { gatherDiseaseItems, getPhenotypicFeatureStrings } from './family-parsing';
+import { InnerTabToggle } from './FilteringTab';
 
 /**
  * Hooks for PedigreeTabView & related.
@@ -234,8 +235,8 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                     <CollapsibleItemViewButtonToolbar windowWidth={windowWidth}>
                         {/* <ColorAllDiseasesCheckbox checked={showAllDiseases} onChange={this.handleToggleCheckbox} /> */}
                         <UniqueIdentifiersCheckbox checked={!showOrderBasedName} onChange={onTogglePedigreeOptionCheckbox} />
-                        {/* <SelectDiseasesDropdown {...{ selectedDiseaseIdxMap, availableDiseases, onToggleSelectedDisease }} /> */}
-                        <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  />
+                        {/* <ShowAsDiseasesDropdown onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  /> */}
+                        <ShowAsDiseasesToggle onSelect={setShowAsDiseases} showAsDiseases={showAsDiseases}  />
                         <FamilySelectionDropdown {...{ familiesWithViewPermission, pedigreeFamiliesIdx }} onSelect={onFamilySelect} />
                         <PedigreeFullScreenBtn />
                     </CollapsibleItemViewButtonToolbar>
@@ -270,13 +271,48 @@ const UniqueIdentifiersCheckbox = React.memo(function UniqueIdentifiersCheckbox(
     );
 });
 
-
+/** No longer in use for UX reasons; keeping it around temporarily in case people want it back */
 const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
     return (
         <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
             <DropdownItem active={showAsDiseases === "Phenotypic Features"} eventKey="Phenotypic Features">Phenotypic Features</DropdownItem>
             <DropdownItem active={showAsDiseases === "Disorders"} eventKey="Disorders">Disorders</DropdownItem>
         </DropdownButton>
+    );
+});
+
+const ShowAsDiseasesToggle = React.memo(function ShowAsDiseasesToggle({ showAsDiseases, onSelect }) {
+
+    const onClickDisorders = useCallback(function(e){
+        onSelect("Disorders");
+    });
+
+    const onClickPhenotypicFeatures = useCallback(function(e){
+        onSelect("Phenotypic Features");
+    });
+
+    const options = useMemo(function(){
+        return [
+            {
+                "onClick": onClickDisorders,
+                "diseaseType": "Disorders",
+                "title": <span>Disorders</span>
+            },
+            {
+                "onClick": onClickPhenotypicFeatures,
+                "diseaseType": "Phenotypic Features",
+                "title": <span>Phenotypic Features</span>
+            }
+        ];
+    });
+
+    let currIdx;
+    options.forEach((opt, idx) => { if (opt.diseaseType === showAsDiseases) { currIdx = idx; } });
+
+    return (
+        <InnerTabToggle options={options} activeIdx={currIdx}
+            cardCls=" p-1 d-flex d-md-inline-flex flex-row"
+            btnCls=" px-md-4 px-lg-5 btn-xs"/>
     );
 });
 
