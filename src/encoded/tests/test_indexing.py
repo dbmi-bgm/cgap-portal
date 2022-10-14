@@ -89,7 +89,7 @@ def setup_and_teardown(app):
     while True:
         try:
             table_names = ','.join(table.name for table in reversed(Base.metadata.sorted_tables))
-            connection.execute('TRUNCATE {} RESTART IDENTITY;')
+            connection.execute(f'TRUNCATE {table_names} RESTART IDENTITY;')
             break
         except exc.OperationalError as e:
             if 'statement timeout' in str(e):
