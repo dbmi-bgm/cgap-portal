@@ -10,6 +10,12 @@ import { WorkflowNodeElement } from './WorkflowNodeElement';
 import { WorkflowDetailPane } from './WorkflowDetailPane';
 
 
+
+/**
+ * @module
+ * @deprecated - Remove or re-implement, use MetaWorkflowRunView. Provenance graph on-the-fly tracing is deprecated.
+ */
+
 export function getNodesInfo(steps){
     const { nodes } = parseAnalysisSteps(steps, { 'showReferenceFiles' : true, 'showIndirectFiles' : true });
     const anyReferenceFileNodes = _.any(nodes, function(n){
