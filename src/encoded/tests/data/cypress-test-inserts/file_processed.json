@@ -1,0 +1,1247 @@
+[
+    {
+        "md5sum": "24b1aa0a7f5ec7eebcb6f5599a88c767",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFI3HP7Y9J",
+        "file_size": 5776868,
+        "file_type": "full annotated VCF",
+        "description": "full annotated VCF file",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFI3HP7Y9J/@@download/GAPFI3HP7Y9J.vcf.gz.tbi",
+                "uuid": "044b6eb2-a41c-473e-81f7-745e5b4126e6",
+                "md5sum": "59d09e0cc78196d38905a80b518e134c",
+                "status": "uploaded",
+                "filename": "GAPFI3HP7Y9J",
+                "accession": "GAPFI3HP7Y9J",
+                "file_size": 77947,
+                "upload_key": "044b6eb2-a41c-473e-81f7-745e5b4126e6/GAPFI3HP7Y9J.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "quality_metric": "090eb6b5-7af1-4a64-9fd3-bc9e62955660",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "file_ingestion_status": "Ingested",
+        "uuid": "044b6eb2-a41c-473e-81f7-745e5b4126e6"
+    },
+    {
+        "md5sum": "9a99df6d891f05b6d280e95f95f7cd70",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIQ9RYLFI",
+        "file_size": 30544,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIQ9RYLFI/@@download/GAPFIQ9RYLFI.vcf.gz.tbi",
+                "uuid": "ea55d9db-9c7b-45c4-a7eb-0443bc8d878c",
+                "md5sum": "41d847551173cd401462ea54379df72a",
+                "status": "uploaded",
+                "filename": "GAPFIQ9RYLFI",
+                "accession": "GAPFIQ9RYLFI",
+                "file_size": 4328,
+                "upload_key": "ea55d9db-9c7b-45c4-a7eb-0443bc8d878c/GAPFIQ9RYLFI.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "SV",
+        "quality_metric": "b14006b3-63d4-466d-be57-a9edefc0b933",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "1f46227e-09a1-43ad-9cce-f7512802272e"
+        ],
+        "uuid": "ea55d9db-9c7b-45c4-a7eb-0443bc8d878c"
+    },
+    {
+        "md5sum": "5f1f8d048b835dbfb3a9411e56a97989",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIUITITXJ",
+        "file_size": 25495,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIUITITXJ/@@download/GAPFIUITITXJ.vcf.gz.tbi",
+                "uuid": "4700a121-32d8-47ef-ad7c-4335322fa524",
+                "md5sum": "e7edde041e852aacc11c9c9bd7bdad12",
+                "status": "uploaded",
+                "filename": "GAPFIUITITXJ",
+                "accession": "GAPFIUITITXJ",
+                "file_size": 3336,
+                "upload_key": "4700a121-32d8-47ef-ad7c-4335322fa524/GAPFIUITITXJ.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "CNV",
+        "quality_metric": "01381731-750e-4e01-b71f-5f8626cf9379",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "0c6c2fbd-f0b4-472a-aac6-4870e5ec1b15"
+        ],
+        "uuid": "4700a121-32d8-47ef-ad7c-4335322fa524"
+    },
+    {
+        "md5sum": "73bb89ded6fe3ed69dc03e5b7083b69f",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIC4VL8IV",
+        "file_size": 438829756,
+        "file_type": "raw vcf",
+        "description": "output from GenotypeGVCF in vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIC4VL8IV/@@download/GAPFIC4VL8IV.vcf.gz.tbi",
+                "uuid": "0ab1d2e8-ab93-4e14-9e61-ce2032123cc5",
+                "md5sum": "913dae524ae7cbe05c45653c308f9bdc",
+                "status": "uploaded",
+                "filename": "GAPFIC4VL8IV",
+                "accession": "GAPFIC4VL8IV",
+                "file_size": 1726186,
+                "upload_key": "0ab1d2e8-ab93-4e14-9e61-ce2032123cc5/GAPFIC4VL8IV.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "quality_metric": "aee6c203-3eb4-48b4-9b39-73c858de2af6",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "0ab1d2e8-ab93-4e14-9e61-ce2032123cc5"
+    },
+    {
+        "md5sum": "d37cb30f6e902c79167161c6684ef36f",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIPLTHN8S",
+        "file_size": 35535,
+        "file_type": "Higlass SV VCF",
+        "description": "reformatted full annotated SV VCF with reduced annotation for improved viewing",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIPLTHN8S/@@download/GAPFIPLTHN8S.vcf.gz.tbi",
+                "uuid": "7ed7e996-7d8a-4be6-bf02-48e9ca755b4b",
+                "md5sum": "9ba6cb1c39c5aa6f8b98b721e4373971",
+                "status": "uploaded",
+                "filename": "GAPFIPLTHN8S",
+                "accession": "GAPFIPLTHN8S",
+                "file_size": 4645,
+                "upload_key": "7ed7e996-7d8a-4be6-bf02-48e9ca755b4b/GAPFIPLTHN8S.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SV",
+        "quality_metric": "8ebec863-9f1c-4984-8876-b161adb8dde5",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "7ed7e996-7d8a-4be6-bf02-48e9ca755b4b"
+    },
+    {
+        "md5sum": "19aac661213b949299f18f81d86da862",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIPD2CSFH",
+        "file_size": 5738763,
+        "file_type": "full annotated VCF",
+        "description": "full annotated VCF file",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIPD2CSFH/@@download/GAPFIPD2CSFH.vcf.gz.tbi",
+                "uuid": "88e778d4-c1a2-4ab8-8e68-8946df597f5d",
+                "md5sum": "c22a04bb7527a6b272f8998a411aabfc",
+                "status": "uploaded",
+                "filename": "GAPFIPD2CSFH",
+                "accession": "GAPFIPD2CSFH",
+                "file_size": 76214,
+                "upload_key": "88e778d4-c1a2-4ab8-8e68-8946df597f5d/GAPFIPD2CSFH.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "quality_metric": "4958d415-8b82-49e9-ad09-ce8e062e40bf",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "file_ingestion_status": "Ingested",
+        "uuid": "88e778d4-c1a2-4ab8-8e68-8946df597f5d"
+    },
+    {
+        "md5sum": "82ff55749c67443ac1fc0ee028bc009b",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFI85IYP6R",
+        "file_size": 25399,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFI85IYP6R/@@download/GAPFI85IYP6R.vcf.gz.tbi",
+                "uuid": "c7b2ede9-e681-4ab1-b136-72c1c21e278d",
+                "md5sum": "b068a0a9c1fa1b60a66266f0d21dd395",
+                "status": "uploaded",
+                "filename": "GAPFI85IYP6R",
+                "accession": "GAPFI85IYP6R",
+                "file_size": 3339,
+                "upload_key": "c7b2ede9-e681-4ab1-b136-72c1c21e278d/GAPFI85IYP6R.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "CNV",
+        "quality_metric": "1c126bb1-a925-4335-ab5c-29e4fa4c5262",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "9817e4d2-f402-460e-8e83-adc4d508fde2"
+        ],
+        "uuid": "c7b2ede9-e681-4ab1-b136-72c1c21e278d"
+    },
+    {
+        "md5sum": "147d18b17b7a1bc4be1d0c856e8a0281",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIOTFE4SO",
+        "file_size": 30541,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIOTFE4SO/@@download/GAPFIOTFE4SO.vcf.gz.tbi",
+                "uuid": "4149f63a-97f7-4722-aca4-66267debd2cf",
+                "md5sum": "5c2b5b3e5d0bf7d580989df94dcb0fa3",
+                "status": "uploaded",
+                "filename": "GAPFIOTFE4SO",
+                "accession": "GAPFIOTFE4SO",
+                "file_size": 4328,
+                "upload_key": "4149f63a-97f7-4722-aca4-66267debd2cf/GAPFIOTFE4SO.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "SV",
+        "quality_metric": "5c190205-f2cd-4fb0-97d0-93e1aa7b0954",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "76af584b-7e11-47a2-b00a-e49dd9c0030d"
+        ],
+        "uuid": "4149f63a-97f7-4722-aca4-66267debd2cf"
+    },
+    {
+        "md5sum": "d14d33142c3f0dfb8789a8b03c0a119f",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIJZ5UH7B",
+        "file_size": 25323,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIJZ5UH7B/@@download/GAPFIJZ5UH7B.vcf.gz.tbi",
+                "uuid": "80aae2aa-b688-48be-8ee4-19fcde1af6d2",
+                "md5sum": "5ec75dacdc600116de0650793cbc15e9",
+                "status": "uploaded",
+                "filename": "GAPFIJZ5UH7B",
+                "accession": "GAPFIJZ5UH7B",
+                "file_size": 3338,
+                "upload_key": "80aae2aa-b688-48be-8ee4-19fcde1af6d2/GAPFIJZ5UH7B.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "CNV",
+        "quality_metric": "82d45e79-e745-41ae-a924-e04889175f41",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "9042b7f1-4357-4636-a85d-8652f2475f57"
+        ],
+        "uuid": "80aae2aa-b688-48be-8ee4-19fcde1af6d2"
+    },
+    {
+        "md5sum": "94011b6c115cda0db147539fed6c33eb",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIJAVK4DK",
+        "file_size": 33557,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIJAVK4DK/@@download/GAPFIJAVK4DK.vcf.gz.tbi",
+                "uuid": "c0d09ac9-53d9-4eb5-baff-c6ed479b97bd",
+                "md5sum": "221e42c9bbcdc296ed79bf62f6303e82",
+                "status": "uploaded",
+                "filename": "GAPFIJAVK4DK",
+                "accession": "GAPFIJAVK4DK",
+                "file_size": 4877,
+                "upload_key": "c0d09ac9-53d9-4eb5-baff-c6ed479b97bd/GAPFIJAVK4DK.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "SV",
+        "quality_metric": "2f1d16f9-36ba-42c0-a3db-a27df9edeff2",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "742fee96-0c64-43ec-a075-b484b0dee273"
+        ],
+        "uuid": "c0d09ac9-53d9-4eb5-baff-c6ed479b97bd"
+    },
+    {
+        "md5sum": "36ad4ec25b2e5854556188618b558c72",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIDEA34LD",
+        "file_size": 31902,
+        "file_type": "Higlass SV VCF",
+        "description": "reformatted full annotated SV VCF with reduced annotation for improved viewing",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIDEA34LD/@@download/GAPFIDEA34LD.vcf.gz.tbi",
+                "uuid": "70732d59-6c5f-49bf-aa2f-5245e2de443c",
+                "md5sum": "582228f511191b927deaa8e5ad607e49",
+                "status": "uploaded",
+                "filename": "GAPFIDEA34LD",
+                "accession": "GAPFIDEA34LD",
+                "file_size": 4325,
+                "upload_key": "70732d59-6c5f-49bf-aa2f-5245e2de443c/GAPFIDEA34LD.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SV",
+        "quality_metric": "434d4041-91af-4697-b6cd-f1a05f68f4ea",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "70732d59-6c5f-49bf-aa2f-5245e2de443c"
+    },
+    {
+        "md5sum": "4917927f47b6dfcf6c6e40c0432f447b",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFITORX6HX",
+        "file_size": 30270,
+        "file_type": "HiGlass vcf",
+        "description": "fully annotated output in vcf format with reduced annotation for HiGlass",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFITORX6HX/@@download/GAPFITORX6HX.vcf.gz.tbi",
+                "uuid": "162236d2-b0cb-4417-984b-6e08deba8935",
+                "md5sum": "bdae8720f09fee39de039b56c1894938",
+                "status": "uploaded",
+                "filename": "GAPFITORX6HX",
+                "accession": "GAPFITORX6HX",
+                "file_size": 4340,
+                "upload_key": "162236d2-b0cb-4417-984b-6e08deba8935/GAPFITORX6HX.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "higlass_file": true,
+        "variant_type": "SV",
+        "quality_metric": "48448a59-8af1-4fc0-8c02-41afe14a581c",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "8854427b-6ad1-4201-9fc5-64b92721e421"
+        ],
+        "uuid": "162236d2-b0cb-4417-984b-6e08deba8935"
+    },
+    {
+        "md5sum": "d2cbe2cd38df24d9aaf75a2f47bc3300",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIACVY8U8",
+        "file_size": 2727278155,
+        "file_type": "vep-annotated vcf",
+        "description": "output from VEP in vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIACVY8U8/@@download/GAPFIACVY8U8.vcf.gz.tbi",
+                "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246",
+                "md5sum": "936fe75368b29c27612c62c57e46bb56",
+                "status": "uploaded",
+                "filename": "GAPFIACVY8U8",
+                "accession": "GAPFIACVY8U8",
+                "file_size": 2290378,
+                "upload_key": "a7809e79-b980-4b7f-9e43-1c2a60959246/GAPFIACVY8U8.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "quality_metric": "c9df0265-50c5-4706-9327-86d9f18f8130",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "a7809e79-b980-4b7f-9e43-1c2a60959246"
+    },
+    {
+        "md5sum": "db32336d5ec0cc9c66c93817918561ec",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIU6WRB6Q",
+        "file_size": 2746366847,
+        "file_type": "vep-annotated vcf",
+        "description": "output from VEP in vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIU6WRB6Q/@@download/GAPFIU6WRB6Q.vcf.gz.tbi",
+                "uuid": "a4470a32-574c-4eb4-a453-cf120a22a7ed",
+                "md5sum": "ec62d9c7eaa322644e8af78e232cffff",
+                "status": "uploaded",
+                "filename": "GAPFIU6WRB6Q",
+                "accession": "GAPFIU6WRB6Q",
+                "file_size": 2297668,
+                "upload_key": "a4470a32-574c-4eb4-a453-cf120a22a7ed/GAPFIU6WRB6Q.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "quality_metric": "62998125-97e8-448e-9eb5-32fb9813a041",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "a7ec8f9b-fc8a-410b-a2c4-12ccdec7148d"
+        ],
+        "uuid": "a4470a32-574c-4eb4-a453-cf120a22a7ed"
+    },
+    {
+        "md5sum": "1f4af9a0479baf0da843ac10c3d95d24",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIFQZCBPT",
+        "file_size": 430413121,
+        "file_type": "raw vcf",
+        "description": "output from GenotypeGVCF in vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIFQZCBPT/@@download/GAPFIFQZCBPT.vcf.gz.tbi",
+                "uuid": "136ff96c-b81c-48d4-86c8-e02da6b2dc19",
+                "md5sum": "3379bee555f7c36ec3df397f90b49181",
+                "status": "uploaded",
+                "filename": "GAPFIFQZCBPT",
+                "accession": "GAPFIFQZCBPT",
+                "file_size": 1726002,
+                "upload_key": "136ff96c-b81c-48d4-86c8-e02da6b2dc19/GAPFIFQZCBPT.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "quality_metric": "e0749896-14ee-45a9-a26f-5338fe364841",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "8758e49c-6c86-44ac-bd89-921a503b7544"
+        ],
+        "uuid": "136ff96c-b81c-48d4-86c8-e02da6b2dc19"
+    },
+    {
+        "md5sum": "a1529ee5f7c555dcd2170d5251e20c9e",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFICEE9LEN",
+        "file_size": 104992897560,
+        "file_type": "analysis-ready bam",
+        "description": "analysis-ready aligned reads in bam format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFICEE9LEN/@@download/GAPFICEE9LEN.bam.bai",
+                "uuid": "6d199319-3719-4a42-8883-365072bc13b3",
+                "md5sum": "7622ae34803d17afdbff3fc0df7419b0",
+                "status": "uploaded",
+                "filename": "GAPFICEE9LEN",
+                "accession": "GAPFICEE9LEN",
+                "file_size": 9329440,
+                "upload_key": "6d199319-3719-4a42-8883-365072bc13b3/GAPFICEE9LEN.bam.bai",
+                "file_format": "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+            }
+        ],
+        "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "quality_metric": "23408f2f-13ca-49d6-b8bf-162623795dd6",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "0a3ed83e-2293-4f1d-a491-f92c8aa80ab4"
+        ],
+        "uuid": "6d199319-3719-4a42-8883-365072bc13b3"
+    },
+    {
+        "md5sum": "c03db821d6ab9bf6db419756cfc75082",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIKTY1YH3",
+        "file_size": 2238015743,
+        "file_type": "gVCF",
+        "description": "processed output from cgap upstream pipeline",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIKTY1YH3/@@download/GAPFIKTY1YH3.gvcf.gz.tbi",
+                "uuid": "a0d44910-3907-4f6d-8128-97f8fe92e358",
+                "md5sum": "3050f019a14afe7853cc669e56c4cb75",
+                "status": "uploaded",
+                "filename": "GAPFIKTY1YH3",
+                "accession": "GAPFIKTY1YH3",
+                "file_size": 1164632,
+                "upload_key": "a0d44910-3907-4f6d-8128-97f8fe92e358/GAPFIKTY1YH3.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "a0d44910-3907-4f6d-8128-97f8fe92e358"
+    },
+    {
+        "md5sum": "3101efa038b2e05213db01c4ad2d9900",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFINHTTKUZ",
+        "file_size": 2250854837,
+        "file_type": "HaplotypeCaller g.vcf",
+        "description": "output from HaplotypeCaller in g.vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFINHTTKUZ/@@download/GAPFINHTTKUZ.gvcf.gz.tbi",
+                "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed",
+                "md5sum": "56717ac074e7b31b353ca597517bac80",
+                "status": "uploaded",
+                "filename": "GAPFINHTTKUZ",
+                "accession": "GAPFINHTTKUZ",
+                "file_size": 1087587,
+                "upload_key": "ed25677e-f2d6-4429-b9d2-300a36cff6ed/GAPFINHTTKUZ.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "ed25677e-f2d6-4429-b9d2-300a36cff6ed"
+    },
+    {
+        "md5sum": "4416f3b2626d6cf284f4ed7c162df607",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIWNZ9DYI",
+        "file_size": 2250636037,
+        "file_type": "gVCF",
+        "description": "processed output from cgap upstream pipeline",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIWNZ9DYI/@@download/GAPFIWNZ9DYI.gvcf.gz.tbi",
+                "uuid": "e945d610-aee8-4b4f-9c98-abc6f184ffd9",
+                "md5sum": "75988cf71d76993babf8e95e728a7afb",
+                "status": "uploaded",
+                "filename": "GAPFIWNZ9DYI",
+                "accession": "GAPFIWNZ9DYI",
+                "file_size": 1092156,
+                "upload_key": "e945d610-aee8-4b4f-9c98-abc6f184ffd9/GAPFIWNZ9DYI.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "e945d610-aee8-4b4f-9c98-abc6f184ffd9"
+    },
+    {
+        "md5sum": "bd26c6c26135c5eac238fbf74fc76eab",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFI1GOV7V6",
+        "file_size": 7199828256,
+        "file_type": "HaplotypeCaller g.vcf",
+        "description": "output from HaplotypeCaller in g.vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFI1GOV7V6/@@download/GAPFI1GOV7V6.gvcf.gz.tbi",
+                "uuid": "d880b018-2ac1-4e3b-8c8b-f8fe03f1d50f",
+                "md5sum": "afef7b0bb7667680acd214c0830ad977",
+                "status": "uploaded",
+                "filename": "GAPFI1GOV7V6",
+                "accession": "GAPFI1GOV7V6",
+                "file_size": 1353870,
+                "upload_key": "d880b018-2ac1-4e3b-8c8b-f8fe03f1d50f/GAPFI1GOV7V6.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "d880b018-2ac1-4e3b-8c8b-f8fe03f1d50f"
+    },
+    {
+        "md5sum": "1e6db0c57b6fce1c262814c5f1033ab8",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIDC84DK7",
+        "file_size": 65575909681,
+        "file_type": "analysis-ready bam",
+        "description": "analysis-ready aligned reads in bam format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIDC84DK7/@@download/GAPFIDC84DK7.bam.bai",
+                "uuid": "4c9d4e89-3c78-46ee-afa6-41c3076a0abe",
+                "md5sum": "3fb1508c0201d0abe95639a8a967e024",
+                "status": "uploaded",
+                "filename": "GAPFIDC84DK7",
+                "accession": "GAPFIDC84DK7",
+                "file_size": 9366528,
+                "upload_key": "4c9d4e89-3c78-46ee-afa6-41c3076a0abe/GAPFIDC84DK7.bam.bai",
+                "file_format": "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+            }
+        ],
+        "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "quality_metric": "51a15b0f-2761-4675-9e6a-382a90099f5f",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "927ff391-854c-4ebc-ac36-abcb60f7c396"
+        ],
+        "uuid": "4c9d4e89-3c78-46ee-afa6-41c3076a0abe"
+    },
+    {
+        "md5sum": "e10920e4c894f01176b6de73d9cce510",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIMIARUOB",
+        "file_size": 106616301305,
+        "file_type": "analysis-ready bam",
+        "description": "analysis-ready aligned reads in bam format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIMIARUOB/@@download/GAPFIMIARUOB.bam.bai",
+                "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e",
+                "md5sum": "5badb9c191755b057b449151b6df44ce",
+                "status": "uploaded",
+                "filename": "GAPFIMIARUOB",
+                "accession": "GAPFIMIARUOB",
+                "file_size": 9319744,
+                "upload_key": "676dd0c1-82c4-41be-9ae7-619ce47e158e/GAPFIMIARUOB.bam.bai",
+                "file_format": "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+            }
+        ],
+        "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "quality_metric": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "0a3ed83e-2293-4f1d-a491-f92c8aa80ab4"
+        ],
+        "uuid": "676dd0c1-82c4-41be-9ae7-619ce47e158e"
+    },
+    {
+        "md5sum": "efaaa5257de4a536f4c0c45792a48ff7",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIHRCQ6Q4",
+        "file_size": 7310931690,
+        "file_type": "gVCF",
+        "description": "processed output from cgap upstream pipeline",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIHRCQ6Q4/@@download/GAPFIHRCQ6Q4.gvcf.gz.tbi",
+                "uuid": "bdae6f80-aa26-4b6d-b7f1-583bfc079907",
+                "md5sum": "c489fea6813006f62f01cbd876377611",
+                "status": "uploaded",
+                "filename": "GAPFIHRCQ6Q4",
+                "accession": "GAPFIHRCQ6Q4",
+                "file_size": 1354108,
+                "upload_key": "bdae6f80-aa26-4b6d-b7f1-583bfc079907/GAPFIHRCQ6Q4.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "bdae6f80-aa26-4b6d-b7f1-583bfc079907"
+    },
+    {
+        "md5sum": "6b17643d8c68fc54b5f5e64e78c1c947",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFI3GH23R6",
+        "file_size": 6935736247,
+        "file_type": "HaplotypeCaller g.vcf",
+        "description": "output from HaplotypeCaller in g.vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFI3GH23R6/@@download/GAPFI3GH23R6.gvcf.gz.tbi",
+                "uuid": "ab154d09-977a-4781-b099-ea1fda3e0453",
+                "md5sum": "df516d74b22b4331f1b681b172cf34b7",
+                "status": "uploaded",
+                "filename": "GAPFI3GH23R6",
+                "accession": "GAPFI3GH23R6",
+                "file_size": 1340307,
+                "upload_key": "ab154d09-977a-4781-b099-ea1fda3e0453/GAPFI3GH23R6.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "ab154d09-977a-4781-b099-ea1fda3e0453"
+    },
+    {
+        "md5sum": "19f65ab42c5809ffb8e552413abe191a",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIXEYX9Q1",
+        "file_size": 2200279777,
+        "file_type": "HaplotypeCaller g.vcf",
+        "description": "output from HaplotypeCaller in g.vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIXEYX9Q1/@@download/GAPFIXEYX9Q1.gvcf.gz.tbi",
+                "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6",
+                "md5sum": "30fa4399d7d8dc07671cb9e8d04a2b36",
+                "status": "uploaded",
+                "filename": "GAPFIXEYX9Q1",
+                "accession": "GAPFIXEYX9Q1",
+                "file_size": 1175741,
+                "upload_key": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6/GAPFIXEYX9Q1.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "1bb89ec3-12cd-46de-bbd7-7ba95db3fec6"
+    },
+    {
+        "md5sum": "b1a7305092221d93a425fd93c03f71bd",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIMU5GZEN",
+        "file_size": 63421425441,
+        "file_type": "analysis-ready bam",
+        "description": "analysis-ready aligned reads in bam format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIMU5GZEN/@@download/GAPFIMU5GZEN.bam.bai",
+                "uuid": "4952eaba-5713-44b4-8676-8c7f9fd6110a",
+                "md5sum": "ec71baead0929110b98066c9923c12ef",
+                "status": "uploaded",
+                "filename": "GAPFIMU5GZEN",
+                "accession": "GAPFIMU5GZEN",
+                "file_size": 9350824,
+                "upload_key": "4952eaba-5713-44b4-8676-8c7f9fd6110a/GAPFIMU5GZEN.bam.bai",
+                "file_format": "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+            }
+        ],
+        "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "quality_metric": "abf404a9-8085-4594-9e42-bfa0da903588",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "927ff391-854c-4ebc-ac36-abcb60f7c396"
+        ],
+        "uuid": "4952eaba-5713-44b4-8676-8c7f9fd6110a"
+    },
+    {
+        "md5sum": "8eb8c65c73342cc23472455ba5f078bf",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFI8PXH5JH",
+        "file_size": 6553675977,
+        "file_type": "gVCF",
+        "description": "processed output from cgap upstream pipeline",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFI8PXH5JH/@@download/GAPFI8PXH5JH.gvcf.gz.tbi",
+                "uuid": "8d055f96-3894-40c7-9354-7bcf010df0be",
+                "md5sum": "8a46cc50784d7558f9c61e9b7bb7ac4d",
+                "status": "uploaded",
+                "filename": "GAPFI8PXH5JH",
+                "accession": "GAPFI8PXH5JH",
+                "file_size": 1331839,
+                "upload_key": "8d055f96-3894-40c7-9354-7bcf010df0be/GAPFI8PXH5JH.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "8d055f96-3894-40c7-9354-7bcf010df0be"
+    },
+    {
+        "md5sum": "5f985d0e2ebc3303393363f8a7d8a454",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFINESYILW",
+        "file_size": 59705555997,
+        "file_type": "analysis-ready bam",
+        "description": "analysis-ready aligned reads in bam format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFINESYILW/@@download/GAPFINESYILW.bam.bai",
+                "uuid": "04c202a5-91e8-40ea-ac71-69b6bab50c53",
+                "md5sum": "0655d43c7ec755c79f5b5be57ecc44b9",
+                "status": "uploaded",
+                "filename": "GAPFINESYILW",
+                "accession": "GAPFINESYILW",
+                "file_size": 9321016,
+                "upload_key": "04c202a5-91e8-40ea-ac71-69b6bab50c53/GAPFINESYILW.bam.bai",
+                "file_format": "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+            }
+        ],
+        "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "quality_metric": "3c7a4b34-e3f9-4ab3-ad3a-a9eb404447f5",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "927ff391-854c-4ebc-ac36-abcb60f7c396"
+        ],
+        "uuid": "04c202a5-91e8-40ea-ac71-69b6bab50c53"
+    },
+    {
+        "md5sum": "0c500712a6b5c38147a25e95daac01ae",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIH71G455",
+        "file_size": 2212472843,
+        "file_type": "HaplotypeCaller g.vcf",
+        "description": "output from HaplotypeCaller in g.vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIH71G455/@@download/GAPFIH71G455.gvcf.gz.tbi",
+                "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff",
+                "md5sum": "c08e05f87f4f0be4ec49e3fd213b7ea5",
+                "status": "uploaded",
+                "filename": "GAPFIH71G455",
+                "accession": "GAPFIH71G455",
+                "file_size": 1150527,
+                "upload_key": "1e51aea4-7fc1-4936-852a-83fbae9f34ff/GAPFIH71G455.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "a77b8431-2936-4f87-8405-8aa43ee777c1"
+        ],
+        "uuid": "1e51aea4-7fc1-4936-852a-83fbae9f34ff"
+    },
+    {
+        "md5sum": "c80187654644c49e35887eeeae0624e4",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIZCR9Z4E",
+        "file_size": 6795441591,
+        "file_type": "gVCF",
+        "description": "processed output from cgap upstream pipeline",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIZCR9Z4E/@@download/GAPFIZCR9Z4E.gvcf.gz.tbi",
+                "uuid": "a3ee9ffe-8f29-425c-b6ac-bc78d5350589",
+                "md5sum": "3767da5aa1da45a1907bd3b3f7f62d17",
+                "status": "uploaded",
+                "filename": "GAPFIZCR9Z4E",
+                "accession": "GAPFIZCR9Z4E",
+                "file_size": 1343971,
+                "upload_key": "a3ee9ffe-8f29-425c-b6ac-bc78d5350589/GAPFIZCR9Z4E.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "a3ee9ffe-8f29-425c-b6ac-bc78d5350589"
+    },
+    {
+        "md5sum": "77ce4236aa07c339f262d126bb5b0972",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIAB3XL64",
+        "file_size": 2213396916,
+        "file_type": "gVCF",
+        "description": "processed output from cgap upstream pipeline",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIAB3XL64/@@download/GAPFIAB3XL64.gvcf.gz.tbi",
+                "uuid": "aa8fe81d-2976-49f3-b156-a9f30752435d",
+                "md5sum": "f79c9b5e39f4c98a6838714d6fc534da",
+                "status": "uploaded",
+                "filename": "GAPFIAB3XL64",
+                "accession": "GAPFIAB3XL64",
+                "file_size": 1191720,
+                "upload_key": "aa8fe81d-2976-49f3-b156-a9f30752435d/GAPFIAB3XL64.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "uuid": "aa8fe81d-2976-49f3-b156-a9f30752435d"
+    },
+    {
+        "md5sum": "04fe4acc9e887533afab80516bf23d1f",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFITNHTOZI",
+        "file_size": 111610806810,
+        "file_type": "analysis-ready bam",
+        "description": "analysis-ready aligned reads in bam format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFITNHTOZI/@@download/GAPFITNHTOZI.bam.bai",
+                "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393",
+                "md5sum": "c468ba8da86d055a3bb6591f8d6808a7",
+                "status": "uploaded",
+                "filename": "GAPFITNHTOZI",
+                "accession": "GAPFITNHTOZI",
+                "file_size": 9336344,
+                "upload_key": "222ce0eb-22f8-40e3-87d5-f2708ad18393/GAPFITNHTOZI.bam.bai",
+                "file_format": "d13d06c1-218e-4f61-aaf0-91f226248b3c"
+            }
+        ],
+        "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "quality_metric": "5530ced5-5252-42f2-afde-0d14e30a669b",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "0a3ed83e-2293-4f1d-a491-f92c8aa80ab4"
+        ],
+        "uuid": "222ce0eb-22f8-40e3-87d5-f2708ad18393"
+    },
+    {
+        "md5sum": "0590c2e609b0da60e1b6db11d0ba8e6c",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFI4XSNM5X",
+        "file_size": 7757757547,
+        "file_type": "HaplotypeCaller g.vcf",
+        "description": "output from HaplotypeCaller in g.vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFI4XSNM5X/@@download/GAPFI4XSNM5X.gvcf.gz.tbi",
+                "uuid": "fcfe6082-1a9d-4a8c-8c29-9f52cb034726",
+                "md5sum": "6425b7a684f97632c6e521a4f3cee183",
+                "status": "uploaded",
+                "filename": "GAPFI4XSNM5X",
+                "accession": "GAPFI4XSNM5X",
+                "file_size": 1380568,
+                "upload_key": "fcfe6082-1a9d-4a8c-8c29-9f52cb034726/GAPFI4XSNM5X.gvcf.gz.tbi",
+                "file_format": "b01ee86e-b2c7-4725-81d7-798718674485"
+            }
+        ],
+        "file_format": "ad47d469-4561-4234-bce2-820f08f58e7c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SNV",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "Sample"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "associated_meta_workflow_runs": [
+            "3f670c08-b452-48ad-b79c-8c91e4d71ef2"
+        ],
+        "uuid": "fcfe6082-1a9d-4a8c-8c29-9f52cb034726"
+    },
+    {
+        "md5sum": "5d763de2f283fe5d5d1cc935cdbd1830",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIHNS8TBL",
+        "file_size": 139629,
+        "file_type": "full annotated VCF",
+        "description": "full annotated VCF file",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIHNS8TBL/@@download/GAPFIHNS8TBL.vcf.gz.tbi",
+                "uuid": "01f81e5b-c32f-4c27-9af8-dc1424054335",
+                "md5sum": "9655b0aa89a6dd368b9ffae4a572a2f2",
+                "status": "uploaded",
+                "filename": "GAPFIHNS8TBL",
+                "accession": "GAPFIHNS8TBL",
+                "file_size": 4761,
+                "upload_key": "01f81e5b-c32f-4c27-9af8-dc1424054335/GAPFIHNS8TBL.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SV",
+        "quality_metric": "1a976eb2-7e3e-44cc-9a8a-cc3af516dd00",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "file_ingestion_status": "Ingested",
+        "uuid": "01f81e5b-c32f-4c27-9af8-dc1424054335"
+    },
+    {
+        "md5sum": "8855cd3476d6b61c90e592e29a8cbd68",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIQHD6QAN",
+        "file_size": 78225,
+        "file_type": "full annotated VCF",
+        "description": "full annotated VCF file",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIQHD6QAN/@@download/GAPFIQHD6QAN.vcf.gz.tbi",
+                "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886",
+                "md5sum": "ef0e24074c6d5ac935a1be3eafbff59a",
+                "status": "uploaded",
+                "filename": "GAPFIQHD6QAN",
+                "accession": "GAPFIQHD6QAN",
+                "file_size": 4429,
+                "upload_key": "073b51e8-f9c7-46ae-809d-c7af517ec886/GAPFIQHD6QAN.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "SV",
+        "quality_metric": "cc910b04-a079-4803-b4c3-bf18055db659",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "file_classification": "processed file",
+        "file_ingestion_status": "Ingested",
+        "uuid": "073b51e8-f9c7-46ae-809d-c7af517ec886"
+    },
+    {
+        "md5sum": "68eac24f43bbcecb93439a993e26fc8f",
+        "status": "uploaded",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFIJU4WHXX",
+        "file_size": 36442,
+        "file_type": "full-annotated vcf",
+        "description": "fully annotated output in vcf format",
+        "extra_files": [
+            {
+                "href": "/files-processed/GAPFIJU4WHXX/@@download/GAPFIJU4WHXX.vcf.gz.tbi",
+                "uuid": "0068a1d1-d7ff-4a87-9eac-e4e30b5961f1",
+                "md5sum": "b58e1b38b3e8a887672e1f8e463ea126",
+                "status": "uploaded",
+                "filename": "GAPFIJU4WHXX",
+                "accession": "GAPFIJU4WHXX",
+                "file_size": 3366,
+                "upload_key": "0068a1d1-d7ff-4a87-9eac-e4e30b5961f1/GAPFIJU4WHXX.vcf.gz.tbi",
+                "file_format": "f84f1922-7f4e-4afc-922f-bec620969bf1"
+            }
+        ],
+        "file_format": "1b8f525f-aecb-4211-9ae5-a2c998b05599",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "variant_type": "CNV",
+        "vcf_to_ingest": true,
+        "quality_metric": "ed7d3b9b-3645-41a0-9cc6-88556f2c3eef",
+        "source_samples": [],
+        "genome_assembly": "GRCh38",
+        "linkto_location": [
+            "SampleProcessing"
+        ],
+        "file_classification": "processed file",
+        "s3_lifecycle_status": "standard",
+        "file_ingestion_status": "Ingested",
+        "associated_meta_workflow_runs": [
+            "c86c26ab-97b9-4f45-84f7-b643a2690adf"
+        ],
+        "uuid": "0068a1d1-d7ff-4a87-9eac-e4e30b5961f1"
+    }
+]

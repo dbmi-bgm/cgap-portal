@@ -17,6 +17,15 @@ Change Log
 * Remove support for Python 3.7
 
 
+11.1.0
+======
+
+`PR 633: Vs cypress test inserts  <https://github.com/dbmi-bgm/cgap-portal/pull/633>`_
+
+* Adds set of inserts for automated Cypress integration tests for UI
+* Includes folder of Python scripts used to create these inserts
+
+
 11.0.3
 ======
 

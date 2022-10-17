@@ -1,0 +1,116 @@
+[
+    {
+        "sample": "NA24385_sample-WGS",
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "coverage": "27.2X",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "mapping stats": {
+            "read length": 148,
+            "total reads": 268996648,
+            "one mate mapped": 1396099,
+            "both mates mapped": 267013781,
+            "neither mate mapped": 586768
+        },
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "927ff391-854c-4ebc-ac36-abcb60f7c396"
+        ],
+        "uuid": "abf404a9-8085-4594-9e42-bfa0da903588"
+    },
+    {
+        "sample": "NA24143_sample-WGS",
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "coverage": "26.5X",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "mapping stats": {
+            "read length": 148,
+            "total reads": 261543822,
+            "one mate mapped": 1398021,
+            "both mates mapped": 260135563,
+            "neither mate mapped": 10238
+        },
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "927ff391-854c-4ebc-ac36-abcb60f7c396"
+        ],
+        "uuid": "3c7a4b34-e3f9-4ab3-ad3a-a9eb404447f5"
+    },
+    {
+        "sample": "NA12879_sample-WGS",
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "coverage": "50.7X",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "mapping stats": {
+            "read length": 100,
+            "total reads": 739336586,
+            "one mate mapped": 2120204,
+            "both mates mapped": 736834474,
+            "neither mate mapped": 381908
+        },
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "0a3ed83e-2293-4f1d-a491-f92c8aa80ab4"
+        ],
+        "uuid": "b5978c20-271c-4ac4-8407-8b3fd3c0bb86"
+    },
+    {
+        "sample": "NA24149_sample-WGS",
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "coverage": "27.5X",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "mapping stats": {
+            "read length": 148,
+            "total reads": 272801939,
+            "one mate mapped": 2731851,
+            "both mates mapped": 269610010,
+            "neither mate mapped": 460078
+        },
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "927ff391-854c-4ebc-ac36-abcb60f7c396"
+        ],
+        "uuid": "51a15b0f-2761-4675-9e6a-382a90099f5f"
+    },
+    {
+        "sample": "NA12877_sample-WGS",
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "coverage": "51.8X",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "mapping stats": {
+            "read length": 100,
+            "total reads": 755031372,
+            "one mate mapped": 1570194,
+            "both mates mapped": 752970559,
+            "neither mate mapped": 490619
+        },
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "0a3ed83e-2293-4f1d-a491-f92c8aa80ab4"
+        ],
+        "uuid": "5530ced5-5252-42f2-afde-0d14e30a669b"
+    },
+    {
+        "sample": "NA12878_sample-WGS",
+        "status": "shared",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "coverage": "50.2X",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "mapping stats": {
+            "read length": 100,
+            "total reads": 733505715,
+            "one mate mapped": 2569119,
+            "both mates mapped": 730158224,
+            "neither mate mapped": 778372
+        },
+        "overall_quality_status": "PASS",
+        "associated_meta_workflow_runs": [
+            "0a3ed83e-2293-4f1d-a491-f92c8aa80ab4"
+        ],
+        "uuid": "23408f2f-13ca-49d6-b8bf-162623795dd6"
+    }
+]
