@@ -1,0 +1,36 @@
+[
+    {
+        "status": "shared",
+        "aliases": [
+            "cypress-main:family-NA12879"
+        ],
+        "members": [
+            "27200afa-2124-4e66-b99c-58a0ecd06e2f",
+            "9308eb7b-eb42-482e-b022-3f3051fbbf69",
+            "af208b30-2405-45b9-bdb8-a9e51741b7c8"
+        ],
+        "proband": "27200afa-2124-4e66-b99c-58a0ecd06e2f",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFAYUK8N3I",
+        "family_id": "Platinum",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "uuid": "cb388994-ccfd-4105-836b-b39950684923"
+    },
+    {
+        "status": "shared",
+        "aliases": [
+            "cypress-main:family-NA24385"
+        ],
+        "members": [
+            "97dd4897-6e3b-4a56-afe0-dfda92c9d958",
+            "529f846a-b12d-4814-b7d5-ca91cca3ff47",
+            "51bee3b6-2566-4af3-a53d-9c8afd45fb6a"
+        ],
+        "proband": "97dd4897-6e3b-4a56-afe0-dfda92c9d958",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPFAHS41UAD",
+        "family_id": "Ashkenazim",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "uuid": "5c181c19-6c8f-4c9a-8bcd-0879c050eb15"
+    }
+]
