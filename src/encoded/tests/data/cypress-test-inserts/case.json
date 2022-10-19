@@ -1,0 +1,39 @@
+[
+    {
+        "family": "cb388994-ccfd-4105-836b-b39950684923",
+        "report": "a082f33f-37db-4dde-aea2-0c518ad832ba",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:case-NA12879-WGS-Trio"
+        ],
+        "case_id": "NA12879-WGS-Trio",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPCA3OREJJQ",
+        "individual": "27200afa-2124-4e66-b99c-58a0ecd06e2f",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "ingestion_ids": [
+            "f73d9ef4-d224-493e-8d36-99a03b1d902b",
+            "d94e1241-2150-46df-81f9-069237d73348"
+        ],
+        "sample_processing": "e5f5c7f5-ec50-4841-adfd-6191a3e534c8",
+        "uuid": "fc6a1f19-d343-4b6d-b384-6a7ef1e2210e"
+    },
+    {
+        "family": "5c181c19-6c8f-4c9a-8bcd-0879c050eb15",
+        "report": "71118eb1-3e09-414d-8776-cd240fc095de",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:case-HG002"
+        ],
+        "case_id": "HG002",
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "accession": "GAPCAAX2X4D8",
+        "individual": "97dd4897-6e3b-4a56-afe0-dfda92c9d958",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "ingestion_ids": [
+            "20979ecf-67f0-4f07-8462-9c6148ec2bb1"
+        ],
+        "sample_processing": "1f8df385-50f6-436e-a24f-9153a94420cb",
+        "uuid": "9ab8b7e2-fd29-463e-907a-3fc9187ac268"
+    }
+]

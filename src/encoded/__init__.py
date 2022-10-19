@@ -3,7 +3,6 @@ import mimetypes
 import netaddr
 import os
 import pkg_resources
-import sys
 import sentry_sdk
 
 from dcicutils.beanstalk_utils import source_beanstalk_env_vars
@@ -22,12 +21,7 @@ from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
 from .appdefs import APP_VERSION_REGISTRY_KEY
-from .ingestion_listener import INGESTION_QUEUE
 from .loadxl import load_all
-
-
-if sys.version_info.major < 3:
-    raise EnvironmentError("The CGAP encoded library no longer supports Python 2.")
 
 
 # snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022

@@ -743,21 +743,6 @@
             "order": 8,
             "grouping": "Variant Quality"
         },
-        "samplegeno.samplegeno_numgt": {
-            "title": "Sample Genotype (Numeric)",
-            "order": 9,
-            "grouping": "Complex Relationship Analysis"
-        },
-        "samplegeno.samplegeno_role": {
-            "title": "Sample Relationship",
-            "order": 9,
-            "grouping": "Complex Relationship Analysis"
-        },
-        "samplegeno.samplegeno_sampleid": {
-            "title": "Sample ID",
-            "order": 9,
-            "grouping": "Complex Relationship Analysis"
-        },
         "AD_ALT": {
             "title": "AD (Alt)",
             "aggregation_type": "range",
@@ -816,6 +801,21 @@
             "number_step": 1,
             "order": 13,
             "grouping": "Variant Quality"
+        },
+        "samplegeno.samplegeno_numgt": {
+            "title": "Sample Genotype (Numeric)",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_role": {
+            "title": "Sample Relationship",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_sampleid": {
+            "title": "Sample ID",
+            "order": 9,
+            "grouping": "Complex Relationship Analysis"
         },
         "associated_genotype_labels.proband_genotype_label": {
             "title": "Proband Genotype",

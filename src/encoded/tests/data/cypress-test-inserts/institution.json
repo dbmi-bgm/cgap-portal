@@ -1,0 +1,30 @@
+[
+    {
+        "address2": "11 Shattuck Street",
+        "address1": "HMS Cypress Tester",
+        "city": "Boston",
+        "country": "USA",
+        "fax": "000-000-0000",
+        "name": "cypress-main-dbmi",
+        "status": "shared",
+        "phone1": "000-000-0000",
+        "phone2": "000-000-0000",
+        "pi": "cypress-main-director-admin@cypress.hms.harvard.edu",
+        "postal_code": "02115",
+        "state": "MA",
+        "title": "Cypress Main DBMI",
+        "uuid": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "contact_persons": [
+            "cypress-main-director-admin@cypress.hms.harvard.edu"
+        ]
+    },
+    {
+        "name": "cypress-personas-inst",
+        "title": "Cypress Personas Institution",
+        "status": "shared",
+        "uuid": "0b35c97e-4711-46ee-911e-5d14bf3459d7",
+        "contact_persons": [
+            "cypress-personas-director-admin@cypress.hms.harvard.edu"
+        ]
+    }
+]

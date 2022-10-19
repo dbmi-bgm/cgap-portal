@@ -6,15 +6,23 @@ import _ from 'underscore';
 import { console, layout } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import DefaultItemView from './DefaultItemView';
+import { PedigreeVizLoader } from './components/pedigree-viz-loader';
 import { PedigreeTabViewBody, PedigreeFullScreenBtn } from './components/PedigreeTabViewBody';
 
 
 
 export default class IndividualView extends DefaultItemView {
 
-    getTabViewContents(){
+    getControllers(){
+        return [
+            PedigreeVizLoader
+        ];
+    }
+
+    getTabViewContents(controllerProps = {}){
         const initTabs = [];
-        initTabs.push(PedigreeTabView.getTabObject(this.props));
+        const commonTabProps = { ...this.props, ...controllerProps };
+        initTabs.push(PedigreeTabView.getTabObject(commonTabProps));
         return this.getCommonTabs().concat(initTabs);
     }
 
@@ -22,7 +30,7 @@ export default class IndividualView extends DefaultItemView {
 
 // TODO: Create endpoint to trace family of individual?
 export const PedigreeTabView = React.memo(function PedigreeTabView(props){
-    const { context, windowWidth, windowHeight } = props;
+    const { context, PedigreeVizLibrary, windowWidth, windowHeight } = props;
     const family = [ context ];
     if (context.father){
         family.push(context.father);
@@ -41,7 +49,7 @@ export const PedigreeTabView = React.memo(function PedigreeTabView(props){
                 <PedigreeFullScreenBtn />
             </h3>
             <hr className="tab-section-title-horiz-divider"/>
-            <PedigreeTabViewBody {...{ windowWidth, windowHeight }} />
+            <PedigreeTabViewBody {...{ PedigreeVizLibrary, windowWidth, windowHeight }} />
         </div>
     );
 });

@@ -18,6 +18,39 @@ def _build_meta_workflow_run_embedded_list():
         # MetaWorkflow linkTo
         "meta_workflow.title",
         "meta_workflow.version",
+        "meta_workflow.workflows.input.argument_name",
+        "meta_workflow.workflows.input.source_argument_name",
+        "meta_workflow.workflows.input.argument_type",
+        "meta_workflow.workflows.input.value",
+        "meta_workflow.workflows.input.value_type",
+        "meta_workflow.workflows.name",
+        "meta_workflow.workflows.workflow.display_title",
+        "meta_workflow.workflows.workflow.status",
+        "meta_workflow.workflows.workflow.uuid",
+        # "workflow_runs.workflow_run.input_files.value.workflow_run_inputs.@id",
+
+        # When part of `input_files`, `value` is a File linkTo/embed
+        "workflow_runs.workflow_run.run_status",
+        "workflow_runs.workflow_run.input_files.value.workflow_run_outputs.@id",
+        "workflow_runs.workflow_run.input_files.value.quality_metric.overall_quality_status",
+        "workflow_runs.workflow_run.input_files.value.file_size",
+        "workflow_runs.workflow_run.input_files.value.file_format",
+        "workflow_runs.workflow_run.input_files.workflow_argument_name",
+        "workflow_runs.workflow_run.input_files.*",
+
+        # When part of `parameters`, `value` is a string (maybe number)
+        # Removed for now, until we maybe update ReactWorkflowViz to re-use param nodes. Not high priority.
+        # "workflow_runs.workflow_run.parameters.value",
+        # "workflow_runs.workflow_run.parameters.workflow_argument_name",
+        # "workflow_runs.workflow_run.parameters.*",
+
+        "workflow_runs.workflow_run.output_files.value.workflow_run_inputs.@id",
+        "workflow_runs.workflow_run.output_files.value.quality_metric.overall_quality_status",
+        "workflow_runs.workflow_run.output_files.value.file_size",
+        "workflow_runs.workflow_run.output_files.value.file_format",
+        "workflow_runs.workflow_run.output_files.workflow_argument_name",
+        "workflow_runs.workflow_run.output_files.*",
+        # "workflow_runs.workflow_run.output_files.value.workflow_run_outputs.@id"
     ]
 
 

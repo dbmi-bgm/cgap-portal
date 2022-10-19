@@ -25,7 +25,7 @@ from snovault.validators import (
 from urllib.parse import urlparse, urlencode
 from ..search.search import get_iterable_search_results
 from .base import Item, collection_add, item_edit
-from .user_content import StaticSection
+# from .user_content import StaticSection
 
 
 def get_pyramid_http_exception_for_redirect_code(code):
@@ -296,7 +296,7 @@ def static_page(request):
         uri_to_use = (parsed_redirect_uri.scheme and (parsed_redirect_uri.scheme + ':') or '') + '//' if parsed_redirect_uri.netloc else ''
         uri_to_use += parsed_redirect_uri.path
         uri_to_use += '?' + urlencode({ 'redirected_from' : '/' + context.properties.get('name', str(context.uuid)) }) + ((parsed_redirect_uri.query and ('&' + parsed_redirect_uri.query)) or '')
-         # Fallback to 307 as is 'safest' (response isn't cached by browsers)
+        # Fallback to 307 as is 'safest' (response isn't cached by browsers)
         return get_pyramid_http_exception_for_redirect_code(context.properties['redirect'].get('code', 307))(location=uri_to_use, detail="Redirected from " + page_name)
     item = item_view_page(context, request)
     cleanup_page_tree(item)

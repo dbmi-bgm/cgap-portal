@@ -2993,7 +2993,7 @@
             "scope": "variant",
             "schema_title": "Variant Type"
         },
-        "technical_reviews":{
+        "technical_reviews": {
             "title": "Technical Reviews",
             "description": "Technical Reviews connected to this item",
             "type": "array",

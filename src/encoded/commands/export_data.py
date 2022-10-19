@@ -4,6 +4,7 @@ import logging
 import requests
 import time
 
+from dcicutils.misc_utils import ignored
 from multiprocessing.pool import ThreadPool
 from pyramid import paster
 from simplejson.scanner import JSONDecodeError
@@ -64,6 +65,7 @@ def run(search_url, username='', password=''):
             try:
                 object_response = requests.get(item_uri, auth=auth_to_use, headers=common_headers)
             except (requests.exceptions.ConnectionError, gaierror) as e:
+                ignored(e)
                 logger.info('Encountered connection error during request to "' + item_uri + '"')
                 time.sleep(3 * attempt)
                 return perform_request(uri, attempt + 1)
