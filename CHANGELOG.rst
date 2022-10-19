@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+11.2.0
+======
+
+`PR 657: Pedigree diseases <https://github.com/dbmi-bgm/cgap-portal/pull/657>`_
+
+* Add support for disorders to the pedigree visualization
+
 11.1.0
 ======
 
@@ -17,7 +24,7 @@ Change Log
 11.0.3
 ======
 
-`PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`
+`PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`_
 
 * Add UI/workflow visualization support for MetaWorkflowRun items
 
