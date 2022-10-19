@@ -148,7 +148,8 @@
                             "title": "Dependency",
                             "description": "One of the dependencies",
                             "type": "string"
-                        }
+                        },
+                        "default": []
                     },
                     "duplication_flag": {
                         "title": "Duplication flag",
