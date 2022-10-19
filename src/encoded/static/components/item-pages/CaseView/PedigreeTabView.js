@@ -301,8 +301,8 @@ const ShowAsDiseasesToggle = React.memo(function ShowAsDiseasesToggle({ showAsDi
 
     return (
         <InnerTabToggle options={options} activeIdx={currIdx}
-            cardCls=" p-1 d-flex d-md-inline-flex flex-row"
-            btnCls=" px-md-4 px-lg-5 btn-xs"/>
+            cardCls="p-1 d-flex d-md-inline-flex flex-row"
+            btnCls="px-md-4 px-lg-5 btn-xs"/>
     );
 });
 
