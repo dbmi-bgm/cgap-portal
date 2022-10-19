@@ -82,7 +82,10 @@ export function createEdges(objectGraph, dims, graphHeight){
         const indv = q.shift();
         if (seen[indv.id]) continue;
         seen[indv.id] = true;
-        const { _maritalRelationships = [], _parentalRelationship : parentRelation } = indv;
+        const {
+            _maritalRelationships = [],
+            _parentalRelationship: parentRelation
+        } = indv;
 
         _maritalRelationships.forEach(function(mr){
             mr.partners.forEach(function(p){
