@@ -326,6 +326,25 @@ def format_ontology_term_with_colon(str_value):
     return str_value.upper().replace("_", ":")
 
 
+def make_conjoined_list(list_values, conjunction="and"):
+    """Make conjoined list with more sane defaults.
+
+    :param list_values: The strings to join
+    :type list_values: list
+    :param conjunction: Conjunction for joining strings
+    :type conjunction: str
+    :returns: Joined strings
+    :rtype: str
+    """
+    if conjunction:
+        result = conjoined_list(
+            list_values, oxford_comma=True, conjunction=conjunction, nothing=" "
+        )
+    else:
+        result = conjoined_list(list_values, oxford_comma=True, nothing=" ")
+    return result
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -670,10 +689,16 @@ class AccessionRow:
             if result is None:
                 msg = (
                     f"Row {self.row} - Invalid genome build provided:"
-                    f" {submitted_genome_build}. Consider replacing with one of the"
-                    f" following:"
-                    f" {conjoined_list(list(self.ACCEPTED_GENOME_BUILDS.keys()))}."
+                    f" {submitted_genome_build}."
                 )
+                if self.ACCEPTED_GENOME_BUILDS:
+                    accepted_genome_builds = make_conjoined_list(
+                        list(self.ACCEPTED_GENOME_BUILDS.keys()), conjunction="or"
+                    )
+                    msg += (
+                        " Accepted genome builds include the following:"
+                        f" {accepted_genome_builds}."
+                    )
                 self.errors.append(msg)
         return result
 
@@ -1164,6 +1189,7 @@ class SubmittedFilesParser:
     PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
     PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
     PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
+    FILE_NAME_REGEX = re.compile(r"^[\w+=,.@-]+$")
 
     def __init__(self, virtualapp, project_name):
         """Initialize class and set attributes.
@@ -1232,7 +1258,7 @@ class SubmittedFilesParser:
         if multiple_file_formats:
             msg = (
                 "Could not identify a unique file format for the following file"
-                f" extensions: {conjoined_list(list(multiple_file_formats.keys()))}."
+                f" extensions: {make_conjoined_list(list(multiple_file_formats.keys()))}."
                 f" Please report this error to the CGAP team for assistance:"
                 f" {multiple_file_formats}."
             )
@@ -1259,6 +1285,7 @@ class SubmittedFilesParser:
             to report for this row
         :rtype: tuple(dict, list, list)
         """
+        invalid_file_names = []
         file_names_to_items = {}
         file_aliases = []
         fastq_files = {}
@@ -1270,6 +1297,9 @@ class SubmittedFilesParser:
             file_path = PurePath(submitted_file_name)
             file_name = file_path.name
             file_suffixes = file_path.suffixes
+            file_name_valid = self.is_file_name_valid(file_name)
+            if not file_name_valid:
+                invalid_file_names.append(file_name)
             (
                 file_format_atid,
                 extra_file_format_atids,
@@ -1299,6 +1329,13 @@ class SubmittedFilesParser:
         )
         file_items = file_names_to_items.values()
         file_aliases = [item[self.ALIASES][0] for item in file_items]
+        if invalid_file_names:
+            msg = (
+                f"Row {row_index} - Invalid file name(s) found:"
+                f" {make_conjoined_list(invalid_file_names)}. File names can only"
+                " contain alphanumeric characters, underscores, dashes, and periods."
+            )
+            errors.append(msg)
         if fastq_files:
             invalid_fastq_names, unpaired_fastqs = self.validate_and_pair_fastqs(
                 fastq_files
@@ -1306,14 +1343,14 @@ class SubmittedFilesParser:
             if invalid_fastq_names:
                 msg = (
                     f"Row {row_index} - Invalid FASTQ file name(s) found:"
-                    f" {conjoined_list(invalid_fastq_names)}. FASTQ file names"
+                    f" {make_conjoined_list(invalid_fastq_names)}. FASTQ file names"
                     f" must contain read information; see documentation for details."
                 )
                 errors.append(msg)
             if unpaired_fastqs:
                 msg = (
                     f"Row {row_index} - No matched pair-end file found for FASTQ file"
-                    f" name(s): {conjoined_list(unpaired_fastqs)}."
+                    f" name(s): {make_conjoined_list(unpaired_fastqs)}."
                     f" Matched FASTQ file names must differ only in the read number."
                 )
                 errors.append(msg)
@@ -1321,19 +1358,33 @@ class SubmittedFilesParser:
             if self.unidentified_file_format is False:
                 accepted_file_extensions = self.get_accepted_file_extensions()
                 msg = (
-                    f"Unable to identify at least 1 file extension on this submission."
+                    "Unable to identify at least 1 file extension on this submission."
                     f" The following extensions are currently accepted:"
-                    f" {conjoined_list(accepted_file_extensions)}."
+                    f" {make_conjoined_list(accepted_file_extensions)}."
                 )
                 self.errors.append(msg)
                 self.unidentified_file_format = True
             msg = (
                 f"Row {row_index} - Invalid file extensions provided for the following"
                 f" file name(s):"
-                f" {conjoined_list(list(files_without_file_format.keys()))}."
+                f" {make_conjoined_list(list(files_without_file_format.keys()))}."
             )
             errors.append(msg)
         return file_items, file_aliases, errors
+
+    def is_file_name_valid(self, file_name):
+        """Validate file name to match schema expectations.
+
+        :param file_name: File name to validate
+        :type file_name: str
+        :returns: Whether file name is valid
+        :rtype: bool
+        """
+        result = False
+        regex_match = self.FILE_NAME_REGEX.match(file_name)
+        if regex_match:
+            result = True
+        return result
 
     def associate_extra_files(
         self, files_to_check_extra_files, file_names_to_items, files_without_file_format

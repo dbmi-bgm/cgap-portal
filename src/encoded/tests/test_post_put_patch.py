@@ -186,7 +186,7 @@ def test_put_object_editing_child_does_not_work(content_with_child, testapp):
     }
     # cannot submit 'reverse' calc property
     res = testapp.put_json(content_with_child['@id'], edit, status=422).json
-    assert len(res['errors']) ==1
+    assert len(res['errors']) == 1
     assert res['errors'][0]['description'] == 'submission of calculatedProperty disallowed'
     assert res['errors'][0]['name'] == 'Schema: reverse'
 

@@ -1,9 +1,9 @@
 import pytest
-import webtest
+# import webtest
 
-from datetime import date
-from urllib.parse import urlencode
-from ..types.institution import Institution
+# from datetime import date
+# from urllib.parse import urlencode
+# from ..types.institution import Institution
 from .datafixtures import remote_user_testapp
 
 

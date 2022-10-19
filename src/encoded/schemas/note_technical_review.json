@@ -73,18 +73,26 @@
                 },
                 "date_call_made": {
                     "title": "Date Call Made",
-                    "exclude_from": ["FFedit-create"],
+                    "exclude_from": [
+                        "FFedit-create"
+                    ],
                     "type": "string",
                     "anyOf": [
-                        {"format": "date-time"},
-                        {"format": "date"}
+                        {
+                            "format": "date-time"
+                        },
+                        {
+                            "format": "date"
+                        }
                     ],
                     "serverDefault": "now",
                     "permission": "restricted_fields"
                 },
                 "call_made_by": {
                     "title": "Call Made By",
-                    "exclude_from": ["FFedit-create"],
+                    "exclude_from": [
+                        "FFedit-create"
+                    ],
                     "type": "string",
                     "linkTo": "User",
                     "serverDefault": "userid",
@@ -99,18 +107,26 @@
             "properties": {
                 "date_reviewed": {
                     "title": "Date Reviewed",
-                    "exclude_from": ["FFedit-create"],
+                    "exclude_from": [
+                        "FFedit-create"
+                    ],
                     "type": "string",
                     "anyOf": [
-                        {"format": "date-time"},
-                        {"format": "date"}
+                        {
+                            "format": "date-time"
+                        },
+                        {
+                            "format": "date"
+                        }
                     ],
                     "serverDefault": "now",
                     "permission": "restricted_fields"
                 },
                 "reviewed_by": {
                     "title": "Reviewed By",
-                    "exclude_from": ["FFedit-create"],
+                    "exclude_from": [
+                        "FFedit-create"
+                    ],
                     "type": "string",
                     "linkTo": "User",
                     "serverDefault": "userid",
@@ -124,6 +140,5 @@
         "superseding_note": {
             "linkTo": "NoteTechnicalReview"
         }
-
     }
 }

@@ -727,7 +727,7 @@
             "min": 0,
             "max": 20
         },
-        "technical_reviews":{
+        "technical_reviews": {
             "title": "Technical Reviews",
             "description": "Technical Reviews connected to this item",
             "type": "array",

@@ -55,7 +55,7 @@ VARIOUS_MIME_TYPES_TO_TEST = ['*/*', 'text/html', 'application/json', 'applicati
 
 def test_best_mime_type():
 
-    the_constant_answer=MIME_TYPE_DEFAULT
+    the_constant_answer = MIME_TYPE_DEFAULT
 
     with filtered_warnings("ignore", category=DeprecationWarning):
         # Suppresses this warning:
