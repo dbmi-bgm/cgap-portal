@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+11.1.1
+======
+
+`PR 661: Vs cypress test inserts  <https://github.com/dbmi-bgm/cgap-portal/pull/661>`_
+
+* Gzip all Cypress test inserts 
+
 11.1.0
 ======
 
