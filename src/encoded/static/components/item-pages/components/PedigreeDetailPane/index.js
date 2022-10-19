@@ -41,18 +41,18 @@ export class PedigreeDetailPane extends React.PureComponent {
 
 
 function LegendBody(props) {
-    const { availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, showAsDiseases } = props;
+    const { availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, showAsDiseases = "" } = props;
     let body = null;
     if (!availableDiseases || availableDiseases.length === 0) {
         body = (
             <div className="detail-row text-secondary">
-                <em>No phenotypic features have yet been defined for any individuals in this pedigree.</em>
+                <em>No <span className="text-lowercase">{showAsDiseases}</span> have yet been defined for any individuals in this pedigree.</em>
             </div>
         );
     } else {
         body = (
             <React.Fragment>
-                <div className="detail-row small text-secondary">Toggle which features to color-code in the pedigree</div>
+                <div className="detail-row small text-secondary">Toggle which <span className="text-lowercase">{showAsDiseases}</span> to color-code in the pedigree</div>
                 <DiseasesLegend {...{ availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease }} />
             </React.Fragment>
         );
