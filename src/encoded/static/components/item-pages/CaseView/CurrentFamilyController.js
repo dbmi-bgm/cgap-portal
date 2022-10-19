@@ -193,7 +193,7 @@ export function FamilyItemParser(props){
     const { buildPedigreeGraphData = null, isRelationshipNode } = PedigreeVizLibrary || {};
 
     const graphData = useMemo(function(){
-        if (!buildPedigreeGraphData) return null;
+        if (!buildPedigreeGraphData || typeof buildPedigreeGraphData !== "function") return null;
         return buildPedigreeGraphData(
             parseFamilyIntoDataset(currPedigreeFamily, showAsDiseases)
         );
