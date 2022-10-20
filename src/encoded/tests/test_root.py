@@ -1,7 +1,6 @@
 import glob
 import io
 import os
-import pkg_resources
 import pytest
 
 from dcicutils import lang_utils

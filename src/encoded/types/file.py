@@ -190,7 +190,9 @@ def _build_file_embedded_list():
         # QC
         "quality_metric.@type",
         "quality_metric.qc_list.qc_type",
-        "quality_metric.qc_list.value.uuid"
+        "quality_metric.qc_list.value.uuid",
+
+        "project.lifecycle_management_active"
     ]
 
 
@@ -300,7 +302,7 @@ class File(Item):
             file_formats = []
             for xfile in extra_files:
                 # ensure a file_format (identifier for extra_file) is given and non-null
-                if not('file_format' in xfile and bool(xfile['file_format'])):
+                if not ('file_format' in xfile and bool(xfile['file_format'])):
                     continue
                 eformat = xfile['file_format']
                 if eformat.startswith('/file-formats/'):
@@ -735,7 +737,7 @@ def post_upload(context, request):
     properties = context.upgrade_properties()
     if properties['status'] not in ('uploading', 'to be uploaded by workflow', 'upload failed'):
         raise HTTPForbidden('status must be "uploading" to issue new credentials')
-    accession_or_external = properties.get('accession')
+    # accession_or_external = properties.get('accession')
     external = context.propsheets.get('external', None)
 
     if external is None:

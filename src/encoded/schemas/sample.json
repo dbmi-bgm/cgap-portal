@@ -52,6 +52,9 @@
             "$ref": "mixins.json#/submitted_files"
         },
         {
+            "$ref": "mixins.json#/processed_files"
+        },
+        {
             "$ref": "mixins.json#/meta_workflow_runs"
         }
     ],
@@ -476,19 +479,6 @@
                     "format": "date"
                 }
             ]
-        },
-        "processed_files": {
-            "title": "Processed Files",
-            "description": "Processed files that are derived from files in this sample.",
-            "type": "array",
-            "label": "test",
-            "lookup": 330,
-            "items": {
-                "title": "Processed File",
-                "description": "File metadata.",
-                "type": "string",
-                "linkTo": "FileProcessed"
-            }
         },
         "reference_files": {
             "title": "Reference Files",

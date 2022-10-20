@@ -21,6 +21,7 @@ export class PedigreeDetailPane extends React.PureComponent {
             unselectNode: onClose,
             hoveredNode, // Exclude from passProps - don't need to trigger update everytime hovered node change.
             PedigreeVizLibrary,
+            showAsDiseases,
             ...passProps // Includes `schemas`
         } = this.props;
         const { isRelationshipNode = null } = PedigreeVizLibrary || {};
@@ -28,7 +29,7 @@ export class PedigreeDetailPane extends React.PureComponent {
         // const isHovered = hoveredNode === selectedNode;
 
         if (!selectedNode || !isRelationshipNode){ // If no isRelationshipNode func, lib hasn't loaded yet (unlikely case).
-            return <LegendBody {...passProps} />;
+            return <LegendBody {...passProps} {...{ showAsDiseases }} />;
         } else if (isRelationshipNode(selectedNode)){
             return <RelationshipBody {...passProps} {...{ onClose }} />;
         } else {
@@ -40,18 +41,18 @@ export class PedigreeDetailPane extends React.PureComponent {
 
 
 function LegendBody(props) {
-    const { availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease } = props;
+    const { availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, showAsDiseases = "" } = props;
     let body = null;
     if (!availableDiseases || availableDiseases.length === 0) {
         body = (
             <div className="detail-row text-secondary">
-                <em>No phenotypic features have yet been defined for any individuals in this pedigree.</em>
+                <em>No <span className="text-lowercase">{showAsDiseases}</span> have yet been defined for any individuals in this pedigree.</em>
             </div>
         );
     } else {
         body = (
             <React.Fragment>
-                <div className="detail-row small text-secondary">Toggle which features to color-code in the pedigree</div>
+                <div className="detail-row small text-secondary">Toggle which <span className="text-lowercase">{showAsDiseases}</span> to color-code in the pedigree</div>
                 <DiseasesLegend {...{ availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease }} />
             </React.Fragment>
         );
@@ -60,7 +61,7 @@ function LegendBody(props) {
         <div className="detail-pane-inner">
             <div className="title-box">
                 <div className="label-row">
-                    <label>Phenotypic Features</label>
+                    <label>{showAsDiseases}</label>
                 </div>
                 <h3>Legend</h3>
             </div>

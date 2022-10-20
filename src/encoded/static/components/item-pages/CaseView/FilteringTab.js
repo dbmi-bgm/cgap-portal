@@ -137,20 +137,27 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
 });
 
 /** Pulled out into own component so can style/adjust-if-needed together w. Case Review Tab */
-export function InnerTabToggle ({ activeIdx = 0, options = [] }) {
+export function InnerTabToggle(props) {
+    const {
+        activeIdx = 0,
+        options = [],
+        cardCls = "py-2 px-1 d-flex d-md-inline-flex flex-row",
+        btnCls = "px-md-4 px-lg-5"
+    } = props;
+
     const renderedOptions = options.map(function(opt, optIdx){
         const { title, disabled, onClick, dataTip } = opt;
         return (
             <div className="px-1 flex-grow-1" data-tip={dataTip} key={optIdx}>
                 <button type="button" {...{ onClick, disabled }} aria-pressed={activeIdx === optIdx}
-                    className={"px-md-4 px-lg-5 btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link")}>
+                    className={"btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link") + " " + btnCls}>
                     { title }
                 </button>
             </div>
         );
     });
     return (
-        <div className="card py-2 px-1 d-flex d-md-inline-flex flex-row">
+        <div className={"card " + cardCls}>
             { renderedOptions }
         </div>
     );

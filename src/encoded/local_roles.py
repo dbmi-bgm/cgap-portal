@@ -1,5 +1,3 @@
-import json
-
 from dcicutils.misc_utils import environ_bool, PRINT
 from pyramid.authorization import ACLAuthorizationPolicy
 from pyramid.compat import is_nonstr_iter

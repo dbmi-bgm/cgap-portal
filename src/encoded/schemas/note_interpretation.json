@@ -65,7 +65,9 @@
             "items": {
                 "title": "ACMG Rule Invoked",
                 "type": "object",
-                "required": ["acmg_rule_name"],
+                "required": [
+                    "acmg_rule_name"
+                ],
                 "properties": {
                     "acmg_rule_name": {
                         "title": "ACMG Rule Name",

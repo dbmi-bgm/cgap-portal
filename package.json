@@ -31,7 +31,6 @@
     "babel-loader": "^8.2.3",
     "babel-plugin-minify-dead-code-elimination": "^0.5.1",
     "bootstrap": "^4.6.1",
-    "cypress": "^10.3.0",
     "empty-module": "0.0.2",
     "eslint": "^8.10.0",
     "eslint-plugin-cypress": "^2.12.1",
