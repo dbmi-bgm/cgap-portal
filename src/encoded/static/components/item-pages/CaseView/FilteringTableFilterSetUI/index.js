@@ -13,7 +13,7 @@ import { buildSchemaFacetDictionary } from './../../../util/Schemas';
 import { PatchItemsProgress } from './../../../util/PatchItemsProgress';
 import { AboveTableControlsBaseCGAP } from './../../../browse/AboveTableControlsBaseCGAP';
 import { SearchBar } from './../../../browse/SearchBar';
-import { AddToVariantSampleListButton } from './AddToVariantSampleListButton';
+import { AddToVariantSampleListButton, AddAllResultsToVariantSampleListButton } from './AddToVariantSampleListButton';
 import { SaveFilterSetButton, validateAllFilterSetBlockNames, savedVariantSampleListItemFilterBlockQueryDict } from './SaveFilterSetButton';
 import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 import { PresetFilterSetSelectionUI } from './PresetFilterSetSelectionUI';
@@ -203,10 +203,10 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             isFetchingInitialFilterSetItem = false,
 
             // From SelectedItemsController:
-            selectedVariantSamples, onResetSelectedVariantSamples,
+            selectedVariantSamples, onResetSelectedVariantSamples, onSelectVariantSample,
 
             // From VariantSampleListController (in index.js, wraps CaseInfoTabView)
-            variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem
+            variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, savedVariantSampleIDMap
         } = this.props;
         const { total: totalCount, facets = null } = searchContext || {};
         const { filter_blocks = [] } = filterSet || {};
@@ -280,9 +280,13 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                 <h5 className="text-600">Move to Interpretation</h5>
                             </div>
                             <div className="col-12 col-md-auto">
-                                <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
-                                    intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
-                                    isEditDisabled, haveCaseEditPermission }} width={200} />
+                                <div className="btn-group" role="group">
+                                    <AddToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, caseItem, filterSet, selectedFilterBlockIdxList, selectedFilterBlockIdxCount,
+                                        intersectFilterBlocks, variantSampleListItem, updateVariantSampleListID, fetchVariantSampleListItem, isLoadingVariantSampleListItem, searchType,
+                                        isEditDisabled, haveCaseEditPermission }} width={200} />
+                                    <AddAllResultsToVariantSampleListButton {...{ selectedVariantSamples, onResetSelectedVariantSamples, onSelectVariantSample,
+                                        totalCount, requestedCompoundFilterSet, savedVariantSampleIDMap }} />
+                                </div>
                             </div>
                         </div>
                         : null }

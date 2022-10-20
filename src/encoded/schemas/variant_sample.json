@@ -575,7 +575,7 @@
             "default_hidden": true
         },
         "associated_genotype_labels.proband_genotype_label": {
-            "title": "Genotype",
+            "title": "Genotype Label",
             "order": 35,
             "sort_fields": [
                 {

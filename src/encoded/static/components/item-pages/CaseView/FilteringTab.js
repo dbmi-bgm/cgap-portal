@@ -348,8 +348,10 @@ function FilteringTabBody(props) {
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem,
         selectedVariantSamples,
+        onSelectVariantSample,
         isActiveDotRouterTab,
         lastSavedTechnicalReview,
+        savedVariantSampleIDMap,
         // haveCaseEditPermission,
         // setIsSubmitting,
         // "caseItem": context
