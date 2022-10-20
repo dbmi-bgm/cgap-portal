@@ -15,6 +15,16 @@ Change Log
 * B-Tree index on sid column to optimize indexing
 * Fixes to test segmentation to improve overall test runtime and reliability
 * Remove support for Python 3.7
+* Upgrade workflow version 7 -> version 8, supporting array of strings for EC2 instance type
+* Provision custom inserts function, allowing admin users to be configured from initial load in the GAC
+
+
+11.2.0
+======
+
+`PR 657: Pedigree diseases <https://github.com/dbmi-bgm/cgap-portal/pull/657>`_
+
+* Add support for disorders to the pedigree visualization
 
 
 11.1.0
@@ -29,7 +39,7 @@ Change Log
 11.0.3
 ======
 
-`PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`
+`PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`_
 
 * Add UI/workflow visualization support for MetaWorkflowRun items
 

@@ -12,7 +12,7 @@
  * NPM library.
  */
 
-export function parseFamilyIntoDataset(family){
+export function parseFamilyIntoDataset(family, showAsDiseases = "Phenotypic Features"){
     const { members = [], proband, original_pedigree } = family;
     const probandID = (proband && (typeof proband === 'string' ? proband : proband['@id'])) || null;
     return members.map(function(individual){
@@ -27,7 +27,8 @@ export function parseFamilyIntoDataset(family){
             is_termination_of_pregnancy: isTerminatedPregnancy = false,
             is_spontaneous_abortion: isSpontaneousAbortion = false,
             is_still_birth: isStillBirth = false,
-            phenotypic_features = [],
+            phenotypic_features: itemPhenFeatures = [],
+            disorders: itemDisorders = [],
             age = null, age_units = null,
             age_at_death = null, age_at_death_units = null,
             ancestry = [],
@@ -44,16 +45,34 @@ export function parseFamilyIntoDataset(family){
         const carrierOfDiseases = []; // todo
         const asymptoticDiseases = []; // todo
 
-        phenotypic_features.forEach(function(featureWrapper){
-            const feature = (featureWrapper && featureWrapper.phenotypic_feature) || null;
-            const featureTitle = (
-                feature && (
-                    typeof feature === 'string' ? feature : feature.display_title || feature['@id']
-                )
-            ) || null;
-            if (!featureTitle) return;
-            diseases.push(featureTitle);
-        });
+        if (showAsDiseases === "Phenotypic Features") {
+            itemPhenFeatures.forEach(function(featureWrapper){
+                const feature = (featureWrapper && featureWrapper.phenotypic_feature) || null;
+                const featureTitle = (
+                    feature && (
+                        typeof feature === 'string' ? feature : feature.display_title || feature['@id']
+                    )
+                ) || null;
+                if (!featureTitle) return;
+                diseases.push(featureTitle);
+            });
+        } else if (showAsDiseases === "Disorders") {
+            itemDisorders.forEach(function(disorderWrapperObj){
+                const { disorder: { display_title: disorderTitle } = {} } = disorderWrapperObj || {};
+                if (!disorderTitle) return;
+                diseases.push(disorderTitle);
+            });
+        }
+
+        // const phenotypic_features = itemPhenFeatures.map(function(featureWrapper){
+        //     const { phenotypic_feature: { display_title } = {} } = featureWrapper;
+        //     return display_title;
+        // });
+
+        // const disorders = itemDisorders.map(function(featureWrapper){
+        //     const { disorder: { display_title } = {} } = featureWrapper;
+        //     return display_title;
+        // });
 
         function calcAgeNum(ageNum, units){
             if (units === 'months') {
@@ -116,7 +135,10 @@ export function parseFamilyIntoDataset(family){
             isTerminatedPregnancy,
             isSpontaneousAbortion,
             isStillBirth,
-            diseases,
+            diseases,   // <- Can be phenotypic_features or disorders, depending on dropdown
+            // If going to split diseases and show both, need to refactor to:
+            // phenotypic_features,
+            // disorders,
             "ancestry" : ancestry.slice().sort(),
             'ageString' : showAgeString || ageNumerical,
             'age' : ageNumerical,
@@ -137,7 +159,7 @@ export function parseFamilyIntoDataset(family){
  *
  * @param {{ members: { "@id": string }[], proband: { "@id" : string } }} family - Current Family
  */
-export function gatherPhenotypicFeatureItems(family){
+export function gatherDiseaseItems(family, diseaseType = "Phenotypic Features"){
     if (!family) return [];
     const {
         members = [],
@@ -148,18 +170,20 @@ export function gatherPhenotypicFeatureItems(family){
     const seenIDs = {};
 
     function addToDiseases(individual){
-        const { phenotypic_features = [] } = individual;
-        phenotypic_features.forEach(function(pfObj){
-            const { phenotypic_feature } = pfObj;
+        const useLinkToItemsFieldName = diseaseType === "Phenotypic Features" ? "phenotypic_features" : "disorders";
+        const { [useLinkToItemsFieldName]: useLinkToItems = [] } = individual;
+        useLinkToItems.forEach(function(linkedToDiseaseItemWrapperObject){
+            const useLinkToItemField = diseaseType === "Phenotypic Features" ? "phenotypic_feature" : "disorder";
+            const { [useLinkToItemField]: linkedToDiseaseItem } = linkedToDiseaseItemWrapperObject;
             const {
-                '@id': featureID,
-                display_title: featureTitle
-            } = phenotypic_feature;
-            if (!featureID || seenIDs[featureID]){
+                '@id': diseaseID,
+                display_title: diseaseTitle
+            } = linkedToDiseaseItem;
+            if (!diseaseID || seenIDs[diseaseID]){
                 return; // Skip, perhaps no view permission.
             }
-            seenIDs[featureID] = true;
-            diseases.push(phenotypic_feature);
+            seenIDs[diseaseID] = true;
+            diseases.push(linkedToDiseaseItem);
         });
     }
 
@@ -168,6 +192,7 @@ export function gatherPhenotypicFeatureItems(family){
     }
 
     members.forEach(addToDiseases);
+
     return [ ...diseases ];
 }
 
