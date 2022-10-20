@@ -11,7 +11,8 @@ import webtest
 import traceback
 
 from base64 import b64encode
-from dcicutils.misc_utils import ignored
+from dcicutils.misc_utils import ignored, override_environ
+from dcicutils.secrets_utils import assume_identity
 from PIL import Image
 from pkg_resources import resource_filename
 from pyramid.paster import get_app
@@ -270,7 +271,8 @@ LOAD_ERROR_MESSAGE = """#   ██▓     ▒█████   ▄▄▄      �
 #                                       ░                    """
 
 
-def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
+def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False,
+             skip_types=None):
     """
     Wrapper function for load_all_gen, which invokes the generator returned
     from that function. Takes all of the same args as load_all_gen, so
@@ -282,7 +284,7 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     with the functionality of load_all_gen.
     """
     gen = LoadGenWrapper(
-        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only, post_only)
+        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only, post_only, skip_types)
     )
     # run the generator; don't worry about the output
     for _ in gen:
@@ -295,7 +297,7 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
 
 
 def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False,
-                 patch_only=False, post_only=False):
+                 patch_only=False, post_only=False, skip_types=None):
     """
     Generator function that yields bytes information about each item POSTed/PATCHed.
     Is the base functionality of load_all function.
@@ -313,13 +315,13 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         patch_only (bool)  : if set to true will only do second round patch - no posts
         post_only (bool)   : if set to true posts full item no second round or lookup -
                              use with care - will not work if linkTos to items not in db yet
+        skip_types (list)  : if set to a list of item files the process will ignore these files
     Yields:
         Bytes with information on POSTed/PATCHed items
 
     Returns:
         None if successful, otherwise a bytes error message
     """
-    # TODO: deal with option of file to load (not directory struture)
     if docsdir is None:
         docsdir = []
     # Collect Items
@@ -331,7 +333,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         if os.path.isdir(inserts):  # we've specified a directory
             if not inserts.endswith('/'):
                 inserts += '/'
-            files = [i for i in os.listdir(inserts) if i.endswith('.json') or i.endswith('.json.gz')]
+            files = [i for i in os.listdir(inserts) if (i.endswith('.json') or i.endswith('.json.gz'))
+                     and (i not in skip_types if skip_types else True)]
         elif os.path.isfile(inserts):  # we've specified a single file
             files = [inserts]
             # use the item type if provided AND not a list
@@ -503,7 +506,7 @@ def get_json_file_content(filename):
 
 
 def load_data(app, indir='inserts', docsdir=None, overwrite=False,
-              use_master_inserts=True):
+              use_master_inserts=True, skip_types=None):
     """
     This function will take the inserts folder as input, and place them to the given environment.
     args:
@@ -519,7 +522,7 @@ def load_data(app, indir='inserts', docsdir=None, overwrite=False,
     # load master-inserts by default
     if indir != 'master-inserts' and use_master_inserts:
         master_inserts = resource_filename('encoded', 'tests/data/master-inserts/')
-        master_res = load_all(testapp, master_inserts, [])
+        master_res = load_all(testapp, master_inserts, [], skip_types=skip_types)
         if master_res:  # None if successful
             print(LOAD_ERROR_MESSAGE)
             logger.error('load_data: failed to load from %s' % master_inserts, error=master_res)
@@ -599,6 +602,52 @@ def load_deploy_data(app, overwrite=True, **kwargs):
         None if successful, otherwise Exception encountered
     """
     return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)
+
+
+def load_custom_data(app):
+    """
+    Load deploy-inserts and master-inserts, EXCEPT instead of loading the default user.json,
+    generate users (if they do not already exist) from the ENCODED_ADMIN_USERS setting in
+    the GAC. We assume it has structure consistent with what the template will build in 4dn-cloud-infra
+    ie:
+        [{"first_name": "John", "last_name": "Doe", "email": "john_doe@example.com"}]
+    """
+    res = load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True, skip_types=['user.json'])
+    if res:  # None if successful
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_custom_data: failed to load from deploy-inserts', error=res)
+        return res
+
+    # if we got to this point,
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'TEST',
+    }
+    testapp = webtest.TestApp(app, environ)
+    identity = assume_identity()
+    admin_users = identity.get('ENCODED_ADMIN_USERS', [])
+    if not admin_users:
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_custom_data: failed to load users as none were set - ensure GAC value'
+                     ' ENCODED_ADMIN_USERS is set and formatted correctly!')
+        return admin_users
+    for user in admin_users:
+        try:
+            first_name, last_name, email = user['first_name'], user['last_name'], user['email']
+        except KeyError:
+            print(LOAD_ERROR_MESSAGE)
+            logger.error('load_custom_data: failed to load users as they were malformed - ensure GAC value'
+                         ' ENCODED_ADMIN_USERS is set, has type array and consists of objects all containing keys'
+                         ' and values for first_name, last_name and email!')
+            return user
+        testapp.post_json('/User', {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'groups': ['admin']
+        }, status=201)
+    return None
+
 
 def load_cypress_data(app, overwrite=False):
     """
