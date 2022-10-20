@@ -8,5 +8,25 @@
         },
         "coverage": "30x",
         "sample": "NA12878_sample"
+    },
+    {
+        "uuid": "5016cee3-f3e6-402b-9530-bf98400d498d",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "mapping stats": {
+            "total reads": 123456789
+        },
+        "coverage": "40x",
+        "sample": "test001_sample"
+    },
+    {
+        "uuid": "45cd039e-fd67-4c60-97dd-270cda13cabd",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "mapping stats": {
+            "total reads": 987654321
+        },
+        "coverage": "20x",
+        "sample": "test002_sample"
     }
 ]

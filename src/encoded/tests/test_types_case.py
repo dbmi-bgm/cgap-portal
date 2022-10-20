@@ -1,5 +1,6 @@
 import pytest
 
+from ..types.case import Case
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
@@ -7,6 +8,13 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 VCF_FILE_TYPE_PATCH = {"file_type": "full annotated VCF", "vcf_to_ingest": False}
 VCF_PROPERTY_PATCH = {"file_type": "foo bar", "vcf_to_ingest": True}
 VCF_NOT_FOUND_PATCH = {"file_type": "foo bar", "vcf_to_ingest": False}
+SAMPLE_QC_ALL_PASS = {"fail": [], "warn": []}
+SAMPLE_QC_3_FAIL = {"fail": ["foo", "bar", "bu"], "warn": []}
+SAMPLE_QC_2_WARN = {"fail": [], "warn": ["foo", "bar"]}
+PASSING_QCS = [{}, SAMPLE_QC_ALL_PASS]
+FAIL_3_QCS = [SAMPLE_QC_ALL_PASS, SAMPLE_QC_3_FAIL]
+WARN_2_QCS = [SAMPLE_QC_ALL_PASS, SAMPLE_QC_2_WARN]
+WARN_2_FAIL_3_QCS = [SAMPLE_QC_2_WARN, SAMPLE_QC_ALL_PASS, SAMPLE_QC_3_FAIL]
 
 
 @pytest.fixture
@@ -308,3 +316,54 @@ def test_case_default_title_case_id(testapp, proband_case):
     proband_case_d_title = 'proband case from a family (GAPCAP4E4GMG)'
     assert proband['case_title'] == proband_case_title
     assert proband['display_title'] == proband_case_d_title
+
+
+def test_quality_control_flags(
+    testapp, child_case, sample_processing, sample_proc_fam
+):
+    """"""
+    child_case_id = child_case["@id"]
+
+    # SampleProcessing with many QCs
+    qc_flags = child_case.get("quality_control_flags")
+    assert qc_flags == {"flag": "fail", "warn": 2, "fail": 4}
+
+    # SampleProcessing with no QCs
+    patch_body = {"sample_processing": sample_proc_fam["@id"]}
+    response = testapp.patch_json(
+        child_case_id, patch_body, status=200
+    ).json["@graph"][0]
+    qc_flags = response.get("quality_control_flags")
+    assert qc_flags == {"flag": "pass", "warn": 0, "fail": 0}
+
+    # No SampleProcessing
+    case = testapp.get(child_case["@id"], params="frame=raw", status=200).json
+    del case["sample_processing"]
+    response = testapp.put_json(
+        child_case_id, case, status=200
+    ).json["@graph"][0]
+    qc_flags = response.get("quality_control_flags")
+    assert qc_flags is None
+
+
+def make_expected_flag_result(flag, warn_count=0, fail_count=0):
+    """"""
+    return {"flag": flag, "warn": warn_count, "fail": fail_count}
+
+
+@pytest.mark.parametrize(
+    "quality_control_metrics,expected",
+    [
+        ([], make_expected_flag_result("pass")),
+        (PASSING_QCS, make_expected_flag_result("pass")),
+        (FAIL_3_QCS, make_expected_flag_result("fail", fail_count=3)),
+        (WARN_2_QCS, make_expected_flag_result("warn", warn_count=2)),
+        (WARN_2_FAIL_3_QCS, make_expected_flag_result("fail", fail_count=3,
+            warn_count=2)),
+    ]
+)
+def test_get_flags(quality_control_metrics, expected):
+    """"""
+    sample_processing = {"quality_control_metrics": quality_control_metrics}
+    result = Case._get_flags(sample_processing)
+    assert result == expected

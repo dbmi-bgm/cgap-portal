@@ -105,7 +105,7 @@ def vcf_qc(testapp, institution, project):
                                "hom": {"miss": 27539, "total": 1466829, "errors": 21467}}}]
         },
         "transition-transversion ratio":  [
-            {"name": "NA12879_sample", "ratio": 1.96},
+            {"name": "NA12880_sample", "ratio": 1.96},
             {"name": "NA12878_sample", "ratio": 1.96},
             {"name": "NA12877_sample", "ratio": 1.96}],
         "uuid": "d918bc25-0888-4658-811b-53c20b944111"

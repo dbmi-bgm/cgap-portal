@@ -229,13 +229,15 @@ def _build_case_embedded_list():
         "sample.processed_files.quality_metric.quality_metric_summary.value",
         "sample.processed_files.quality_metric.quality_metric_summary.numberType",
 
+        # SampleProcessing QC calcprop
+        "sample_processing.quality_control_metrics",
+
         # Sample Processing linkTo
         "sample_processing.analysis_type",
         "sample_processing.analysis_version",
         "sample_processing.last_modified.*",
         "sample_processing.completed_processes",
         "sample_processing.samples_pedigree.*",
-
 
         # Sample Processing - Family[] linkTo
         *_build_family_embeds(base_path='sample_processing.families'),
@@ -611,3 +613,59 @@ class Case(Item):
         else:
             title = "{} {} - in {}".format(ind_id, analysis, pro_id)
         return title
+
+    @calculated_property(
+        schema={
+            "title": "",
+            "description": "",
+            "type": "object",
+            "properties": {
+                "flag": {
+                    "title": "",
+                    "description": "",
+                    "type": "string",
+                },
+                "warn": {
+                    "title": "",
+                    "description": "",
+                    "type": "integer",
+                },
+                "fail": {
+                    "title": "",
+                    "description": "",
+                    "type": "integer",
+                },
+            },
+        }
+    )
+    def quality_control_flags(self, request, sample_processing=None):
+        """"""
+        result = None
+        if sample_processing:
+            sample_processing_item = get_item_or_none(request, sample_processing)
+            if sample_processing_item:
+                result = self._get_flags(sample_processing_item)
+        return result
+
+    @staticmethod
+    def _get_flags(sample_processing):
+        """"""
+        fail_count = 0
+        warn_count = 0
+        qc_metrics = sample_processing.get("quality_control_metrics", [])
+        for sample_qc_metrics in qc_metrics:
+            fail_flags = sample_qc_metrics.get("fail", [])
+            fail_count += len(fail_flags)
+            warn_flags = sample_qc_metrics.get("warn", [])
+            warn_count += len(warn_flags)
+        overall_flag = "pass"
+        if fail_count:
+            overall_flag = "fail"
+        elif warn_count:
+            overall_flag = "warn"
+        result = {
+            "flag": overall_flag,
+            "warn": warn_count,
+            "fail": fail_count,
+        }
+        return result

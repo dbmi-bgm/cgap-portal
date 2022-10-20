@@ -6,6 +6,11 @@ import webtest
 from encoded.ingestion.common import CGAP_CORE_PROJECT
 
 
+PROBAND_SAMPLE_ID = "ext_id_006"
+PROBAND_SAMPLE_2_ID = "ext_id_006_2"
+MOTHER_SAMPLE_ID = "ext_id_003"
+
+
 class MockedLogger(object):
 
     def info(self, msg):  # noQA - for mock it doesn't matter it could be static
@@ -321,13 +326,41 @@ def grandpa_sample(testapp, project, institution):
 
 
 @pytest.fixture
-def mother_sample(testapp, project, institution):
+def mother_bam_qc(testapp, institution, project):
+    item = {
+        'institution': institution['@id'],
+        'project': project['@id'],
+        "status": "in review",
+        "coverage": "35x",
+        "mapping stats": {"total reads": 987654321},
+        "sample": MOTHER_SAMPLE_ID,
+        "overall_quality_status": "PASS",
+    }
+    return testapp.post_json('/quality_metric_bamqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def mother_bam_file(testapp, project, institution, file_formats, mother_bam_qc):
+    """Add a bam file to test the samples_pedigree"""
+    item = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'file_format': file_formats.get('bam').get('uuid'),
+        'filename': 'test_proband_file.bam',
+        "quality_metric": mother_bam_qc["@id"],
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+@pytest.fixture
+def mother_sample(testapp, project, institution, mother_bam_file):
     item = {
         "accession": "GAPSAMOTHER1",
         'project': project['@id'],
         'institution': institution['@id'],
-        "bam_sample_id": "ext_id_003",
-        "status": "shared"
+        "bam_sample_id": MOTHER_SAMPLE_ID,
+        "status": "shared",
+        "processed_files": [mother_bam_file["@id"]],
+        "workup_type": "WGS",
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
 
@@ -357,13 +390,55 @@ def uncle_sample(testapp, project, institution):
 
 
 @pytest.fixture
-def proband_processed_file(testapp, project, institution, file_formats):
+def proband_bam_qc(testapp, institution, project):
+    item = {
+        'institution': institution['@id'],
+        'project': project['@id'],
+        "status": "in review",
+        "coverage": "30x",
+        "mapping stats": {"total reads": 467863567},
+        "sample": PROBAND_SAMPLE_ID,
+        "overall_quality_status": "PASS",
+    }
+    return testapp.post_json('/quality_metric_bamqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def proband_processed_file(testapp, project, institution, file_formats, proband_bam_qc):
     """Add a bam file to test the samples_pedigree"""
     item = {
         'project': project['@id'],
         'institution': institution['@id'],
         'file_format': file_formats.get('bam').get('uuid'),
-        'filename': 'test_proband_file.bam'
+        'filename': 'test_proband_file.bam',
+        "quality_metric": proband_bam_qc["@id"],
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def proband_2_bam_qc(testapp, institution, project):
+    item = {
+        'institution': institution['@id'],
+        'project': project['@id'],
+        "status": "in review",
+        "coverage": "43x",
+        "mapping stats": {"total reads": 123456789},
+        "sample": PROBAND_SAMPLE_2_ID,
+        "overall_quality_status": "PASS",
+    }
+    return testapp.post_json('/quality_metric_bamqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def proband_2_bam(testapp, project, institution, file_formats, proband_2_bam_qc):
+    """BAM file for child_sample_2."""
+    item = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'file_format': file_formats.get('bam').get('uuid'),
+        'filename': 'test_proband_file_2.bam',
+        "quality_metric": proband_2_bam_qc["@id"],
     }
     return testapp.post_json('/file_processed', item).json['@graph'][0]
 
@@ -374,11 +449,27 @@ def child_sample(testapp, project, institution, proband_processed_file):
         "accession": "GAPSAPROBAND",
         'project': project['@id'],
         'institution': institution['@id'],
-        "bam_sample_id": "ext_id_006",
+        "bam_sample_id": PROBAND_SAMPLE_ID,
         "status": "shared",
-        "processed_files": [proband_processed_file['@id'], ]
+        "processed_files": [proband_processed_file['@id']],
+        "workup_type": "WGS",
     }
     return testapp.post_json('/sample', item).json['@graph'][0]
+
+
+@pytest.fixture
+def child_sample_2(testapp, project, institution, proband_2_bam):
+    """Add second sample for proband individual."""
+    item = {
+        "accession": "GAPSAPROBAND2",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        "bam_sample_id": PROBAND_SAMPLE_2_ID,
+        "status": "shared",
+        "processed_files": [proband_2_bam['@id']],
+        "workup_type": "WGS",
+    }   
+    return testapp.post_json("/sample", item).json["@graph"][0]
 
 
 @pytest.fixture
@@ -461,7 +552,9 @@ def mother(testapp, project, institution, grandpa, female_individual, mother_sam
         'institution': institution['@id'],
         "sex": "F",
         "father": grandpa['@id'],
-        "mother": female_individual['@id']
+        "mother": female_individual['@id'],
+        "individual_id": "mother_person",
+        "ancestry": ["jupiter"],
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
 
@@ -496,17 +589,19 @@ def uncle(testapp, project, institution, grandpa, uncle_sample):
 
 
 @pytest.fixture
-def child(testapp, project, institution, mother, father, child_sample):
+def child(testapp, project, institution, mother, father, child_sample, child_sample_2):
     item = {
         "accession": "GAPIDPROBAND",
-        "samples": [child_sample['@id']],
+        "samples": [child_sample['@id'], child_sample_2["@id"]],
         "age": 7,
         "age_units": "year",
         'project': project['@id'],
         'institution': institution['@id'],
         "sex": "M",
         "mother": mother['@id'],
-        "father": father['@id']
+        "father": father['@id'],
+        "individual_id": "proband_boy",
+        "ancestry": ["mars"],
     }
     return testapp.post_json('/individual', item).json['@graph'][0]
 
@@ -1490,3 +1585,362 @@ def bgm_structural_variant_sample(bgm_project, institution, structural_variant):
         "file": "some_bgm_vcf_file",
     }
     return item
+
+
+@pytest.fixture
+def qc_vcfcheck(testapp, project, institution):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "quickcheck": "OK",
+        "overall_quality_status": "PASS",
+    }
+    return testapp.post_json('/quality-metrics-vcfcheck', item).json['@graph'][0]
+
+
+@pytest.fixture
+def qc_sv_vcfqc(testapp, project, institution):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "total variants": [
+            {
+                "DEL": 52,
+                "DUP": 40,
+                "name": PROBAND_SAMPLE_ID,
+                "total": 92,
+            },
+            {
+                "DEL": 42,
+                "DUP": 50,
+                "name": PROBAND_SAMPLE_2_ID,
+                "total": 92,
+            },
+            {
+                "DEL": 62,
+                "DUP": 50,
+                "name": MOTHER_SAMPLE_ID,
+                "total": 112,
+            },
+        ],
+    }
+    return testapp.post_json('/quality-metrics-vcfqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_sv_vcfqc):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcf_check",
+                "value": qc_vcfcheck["@id"], 
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": qc_sv_vcfqc["@id"],
+            },
+        ],
+    }
+    return testapp.post_json('/quality-metrics-qclist', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sv_vcf_with_qcs(testapp, project, institution, file_formats, sv_vcf_qc_list):
+    """"""
+    item = {
+        'file_format': file_formats.get('vcf_gz').get('@id'),
+        'md5sum': 'd41d8cd9f00d504e9800998ecf84211',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',
+        "vcf_to_ingest": True,
+        "variant_type": "SV",
+        "quality_metric": sv_vcf_qc_list["@id"],
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def qc_snv_vcfqc(testapp, project, institution):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "filtering_condition": "(spliceAI>0.2) AND (foo<1)",
+        "total unique variants in vcf": "7200",
+        "total variants": [
+            {
+                "DEL": 50,
+                "INS": 50,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 1000,
+                "name": PROBAND_SAMPLE_ID,
+                "total": 1100,
+            },
+            {
+                "DEL": 40,
+                "INS": 40,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 1100,
+                "name": PROBAND_SAMPLE_2_ID,
+                "total": 1180,
+            },
+            {
+                "DEL": 60,
+                "INS": 60,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 1200,
+                "name": MOTHER_SAMPLE_ID,
+                "total": 1320,
+            },
+        ],
+    }
+    return testapp.post_json('/quality-metrics-vcfqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def snv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_snv_vcfqc):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcf_check",
+                "value": qc_vcfcheck["@id"], 
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": qc_snv_vcfqc["@id"],
+            },
+        ],
+    }
+    return testapp.post_json('/quality-metrics-qclist', item).json['@graph'][0]
+
+
+@pytest.fixture
+def snv_vcf_with_qcs(testapp, project, institution, file_formats, snv_vcf_qc_list):
+    """"""
+    item = {
+        'file_format': file_formats.get('vcf_gz').get('@id'),
+        'md5sum': 'd41e76d9f00b204e9800998ecf84211',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',
+        'file_type': 'full annotated VCF',
+        "variant_type": "SNV",
+        "quality_metric": snv_vcf_qc_list["@id"],
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def qc_peddyqc(testapp, project, institution):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "url": "https://foo.bar",
+        "ancestry and sex prediction": [
+            {
+                "name": PROBAND_SAMPLE_ID,
+                "predicted sex": "male",
+                "predicted ancestry": "EARTH",
+            },
+            {
+                "name": PROBAND_SAMPLE_2_ID,
+                "predicted sex": "male",
+                "predicted ancestry": "MARS",
+            },
+            {
+                "name": MOTHER_SAMPLE_ID,
+                "predicted sex": "female",
+                "predicted ancestry": "JUPITER",
+            },
+        ],
+        "uuid": "13d6312a-5b99-4da3-986b-c180b7aae936",
+    }
+    return testapp.post_json('/quality-metrics-peddyqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def qc_vep_vcfqc(testapp, project, institution):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "total unique variants in vcf": "900000",
+        "transition-transversion ratio": [
+            {
+                "name": PROBAND_SAMPLE_ID,
+                "ratio": 1.96,
+            },
+            {
+                "name": PROBAND_SAMPLE_2_ID,
+                "ratio": 2.5,
+            },
+            {
+                "name": MOTHER_SAMPLE_ID,
+                "ratio": 2.15,
+            },
+        ],
+        "heterozygosity ratio": {
+            "SNV": [
+                {
+                    "name": PROBAND_SAMPLE_ID,
+                    "ratio": 2.0,
+                },
+                {
+                    "name": PROBAND_SAMPLE_2_ID,
+                    "ratio": 3.0,
+                },
+                {
+                    "name": MOTHER_SAMPLE_ID,
+                    "ratio": 1.0,
+                },
+            ],
+        },
+        "mendelian errors in trio": {
+            "SNV": [
+                {
+                    "name": PROBAND_SAMPLE_ID,
+                    "counts": {
+                        "het": {
+                            "de_novo": 520,
+                            "total": 10000,
+                        },
+                    },
+                },
+            ],
+        },
+        "total variants": [
+            {
+                "DEL": 500,
+                "INS": 500,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 10000,
+                "name": PROBAND_SAMPLE_ID,
+                "total": 11000,
+            },
+            {
+                "DEL": 400,
+                "INS": 400,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 11000,
+                "name": PROBAND_SAMPLE_2_ID,
+                "total": 11800,
+            },
+            {
+                "DEL": 600,
+                "INS": 600,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 12000,
+                "name": MOTHER_SAMPLE_ID,
+                "total": 13200,
+            },
+        ],
+    }
+    return testapp.post_json('/quality-metrics-vcfqc', item).json['@graph'][0]
+
+
+@pytest.fixture
+def vep_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_peddyqc,
+        qc_vep_vcfqc):
+    """"""
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcf_check",
+                "value": qc_vcfcheck["@id"], 
+            },
+            {
+                "qc_type": "quality_metric_peddyqc",
+                "value": qc_peddyqc["@id"],
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": qc_vep_vcfqc["@id"],
+            },
+        ],
+    }
+    return testapp.post_json('/quality-metrics-qclist', item).json['@graph'][0]
+
+
+@pytest.fixture
+def vep_vcf_with_qcs(testapp, project, institution, vep_vcf_qc_list, file_formats):
+    """"""
+    item = {
+        'file_format': file_formats.get('vcf_gz').get('@id'),
+        'md5sum': 'd41d8cd9f00b204e9817898ecf84211',
+        'institution': institution['@id'],
+        'project': project['@id'],
+        'status': 'uploaded',
+        'file_type': 'VEP-annotated Vcf',
+        "variant_type": "SNV",
+        "quality_metric": vep_vcf_qc_list["@id"],
+    }
+    return testapp.post_json('/file_processed', item).json['@graph'][0]
+
+
+@pytest.fixture
+def sample_processing(
+    testapp, project, institution, fam, child_sample, child_sample_2, mother_sample,
+    vep_vcf_with_qcs, snv_vcf_with_qcs, sv_vcf_with_qcs,
+):
+    data = {
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'samples': [
+            child_sample["@id"],
+            child_sample_2["@id"],
+            mother_sample["@id"],
+        ],
+        'families': [fam['@id']],
+        "processed_files": [
+            vep_vcf_with_qcs["@id"], snv_vcf_with_qcs["@id"], sv_vcf_with_qcs["@id"]
+        ],
+    }
+    res = testapp.post_json('/sample_processing', data).json['@graph'][0]
+    return res
+
+
+@pytest.fixture
+def child_case(testapp, project, institution, fam, child, sample_processing):
+    data = {
+        "accession": "GAPCAP4E4DRR",
+        'project': project['@id'],
+        'institution': institution['@id'],
+        'family': fam['@id'],
+        'individual': child["accession"],
+        'sample_processing': sample_processing['@id']
+    }
+    res = testapp.post_json('/case', data).json['@graph'][0]
+    return res
