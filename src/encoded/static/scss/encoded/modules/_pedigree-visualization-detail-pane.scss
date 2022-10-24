@@ -86,9 +86,9 @@ div#pedigree-viz-container-cgap {
                             }
                         }
 
-                        &[data-describing="phenotypic_features"],
-                        &.phenotypic-features {
-                            > .detail-row-list-item.phenotypic-feature {
+                        &[data-describing="diseases"],
+                        &.diseases {
+                            > .detail-row-list-item.disease {
                                 display: flex;
                                 align-items: center;
                                 > .legend-patch {

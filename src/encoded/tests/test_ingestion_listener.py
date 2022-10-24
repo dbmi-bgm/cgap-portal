@@ -198,10 +198,14 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testa
 
 
 @pytest.mark.skip
-def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
+def test_ingestion_listener_run_0(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """
+    #
+    # NOTE: This (already-disabled) test had the same name as another test farther down in this file,
+    #       so "_0" was added to the test name to allow the two tests to be distinguished.
+    #
     uuid = 'cd679bdc-8691-4352-a25b-1c5f48407e9b'
     queue_manager = fresh_ingestion_queue_manager_for_testing
     queue_manager.add_uuids([uuid])
@@ -229,7 +233,7 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
 
 
 def test_test_port():
-    from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
+    from snovault.tests.postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
 
 

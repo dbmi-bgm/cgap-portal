@@ -599,6 +599,16 @@ def load_deploy_data(app, overwrite=True, **kwargs):
     """
     return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)
 
+def load_cypress_data(app, overwrite=False):
+    """
+    Load master-inserts and cypress-test-inserts.
+    By default, does not overwrite duplicate items in both directories
+
+    Returns:
+        None if successful, otherwise Exception encountered
+    """
+    return load_data(app, indir='cypress-test-inserts', overwrite=overwrite)
+
 
 def load_data_by_type(app, indir='master-inserts', overwrite=True, itype=None):
     """

@@ -10,10 +10,10 @@ import pyramid.request
 import re
 import structlog
 import tempfile
-from botocore.client import Config
 
-from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
+from botocore.client import Config
 from dcicutils.ecs_utils import ECSUtils
+from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity, PRINT
 from dcicutils.secrets_utils import assume_identity
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
@@ -22,6 +22,7 @@ from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
 from typing import Optional
+
 from .types.base import get_item_or_none
 
 
@@ -92,7 +93,7 @@ def debuglog(*args):
             nowstr = str(datetime.datetime.now())
             dateid = nowstr[:10].replace('-', '')
             with io.open(os.path.expanduser(os.path.join(DEBUGLOG, "DEBUGLOG-%s.txt" % dateid)), "a+") as fp:
-                print(nowstr, *args, file=fp)
+                PRINT(nowstr, *args, file=fp)
         except Exception:
             # There are many things that could go wrong, but none of them are important enough to fuss over.
             # Maybe it was a bad pathname? Out of disk space? Network error?
@@ -171,7 +172,7 @@ def s3_output_stream(s3_client, bucket: str, key: str, s3_encrypt_key_id: Option
     This context manager allows one to write:
 
         with s3_output_stream(s3_client, bucket, key) as fp:
-            print("foo", file=fp)
+            ... fp.write("foo") ...
 
     to do output to an s3 bucket.
 
