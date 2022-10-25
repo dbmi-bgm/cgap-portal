@@ -4,7 +4,9 @@ from unittest import mock
 import pytest
 
 from .datafixtures import (
-    PROBAND_SAMPLE_ID, PROBAND_SAMPLE_2_ID, MOTHER_SAMPLE_ID,
+    PROBAND_SAMPLE_ID,
+    PROBAND_SAMPLE_2_ID,
+    MOTHER_SAMPLE_ID,
 )
 from ..types import sample as sample_type_module
 
@@ -14,52 +16,45 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 @pytest.fixture
 def MIndividual(testapp, project, institution, sample_one):
-    ind = {
-        'project': 'encode-project',
-        'institution': 'encode-institution',
-        'sex': 'M'
-    }
-    return testapp.post_json('/individual', ind, status=201).json['@graph'][0]
+    ind = {"project": "encode-project", "institution": "encode-institution", "sex": "M"}
+    return testapp.post_json("/individual", ind, status=201).json["@graph"][0]
 
 
 @pytest.fixture
 def WIndividual(testapp, project, institution):
-    ind = {
-        'project': 'encode-project',
-        'institution': 'encode-institution',
-        'sex': 'F'
-    }
-    return testapp.post_json('/individual', ind, status=201).json['@graph'][0]
+    ind = {"project": "encode-project", "institution": "encode-institution", "sex": "F"}
+    return testapp.post_json("/individual", ind, status=201).json["@graph"][0]
 
 
 @pytest.fixture
 def sample_one(project, institution):
     return {
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'specimen_type': 'peripheral blood',
-        'date_received': '2018-12-1'
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "specimen_type": "peripheral blood",
+        "date_received": "2018-12-1",
     }
 
 
 @pytest.fixture
 def sample_two(project, institution):
     return {
-        'project': project['@id'],
-        'institution': institution['@id'],
-        'specimen_type': 'saliva',
-        'date_received': '2015-12-7'
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "specimen_type": "saliva",
+        "date_received": "2015-12-7",
     }
 
 
 @pytest.fixture
 def sample_no_project(institution, MIndividual):
     return {
-        'project': 'does not exist',
-        'institution': institution['@id'],
-        'specimen_type': 'tissue',
-        'date_received': '2015-12-7'
+        "project": "does not exist",
+        "institution": institution["@id"],
+        "specimen_type": "tissue",
+        "date_received": "2015-12-7",
     }
+
 
 @pytest.fixture
 def captured_log(capsys):
@@ -75,46 +70,55 @@ def captured_log(capsys):
 
 
 def test_post_valid_samples(testapp, sample_one, sample_two):
-    testapp.post_json('/sample', sample_one, status=201)
-    testapp.post_json('/sample', sample_two, status=201)
+    testapp.post_json("/sample", sample_one, status=201)
+    testapp.post_json("/sample", sample_two, status=201)
 
 
 def test_post_invalid_samples(testapp, sample_no_project):
-    testapp.post_json('/sample', sample_no_project, status=422)
+    testapp.post_json("/sample", sample_no_project, status=422)
 
 
 def test_post_valid_patch_error(testapp, sample_one):
-    res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
-    testapp.patch_json(res['@id'], {'date_received': '12-3-2003'}, status=422)
-    testapp.patch_json(res['@id'], {'project': 'does_not_exist'}, status=422)
+    res = testapp.post_json("/sample", sample_one, status=201).json["@graph"][0]
+    testapp.patch_json(res["@id"], {"date_received": "12-3-2003"}, status=422)
+    testapp.patch_json(res["@id"], {"project": "does_not_exist"}, status=422)
 
 
 def test_sample_individual_revlink(testapp, sample_one, MIndividual):
-    sample_res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
-    assert not sample_res.get('individual')
-    indiv_res = testapp.patch_json(MIndividual['@id'], {'samples': [sample_res['@id']]}, status=200).json['@graph'][0]
-    sample_indiv = testapp.get(sample_res['@id']).json.get('individual')
-    assert sample_indiv['@id'] == indiv_res['@id']
+    sample_res = testapp.post_json("/sample", sample_one, status=201).json["@graph"][0]
+    assert not sample_res.get("individual")
+    indiv_res = testapp.patch_json(
+        MIndividual["@id"], {"samples": [sample_res["@id"]]}, status=200
+    ).json["@graph"][0]
+    sample_indiv = testapp.get(sample_res["@id"]).json.get("individual")
+    assert sample_indiv["@id"] == indiv_res["@id"]
 
 
 def test_sample_requisition_completed_accepted(testapp, sample_one):
-    res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
-    assert not res.get('requisition_completed')
-    res2 = testapp.patch_json(res['@id'], {'specimen_accession_date': '2020-01-01'}, status=200).json['@graph'][0]
-    assert res2.get('requisition_completed') is False
-    res3 = testapp.patch_json(res['@id'], {'requisition_acceptance': {'accepted_rejected': 'Accepted'}},
-                              status=200).json['@graph'][0]
-    assert res3.get('requisition_completed') is True
+    res = testapp.post_json("/sample", sample_one, status=201).json["@graph"][0]
+    assert not res.get("requisition_completed")
+    res2 = testapp.patch_json(
+        res["@id"], {"specimen_accession_date": "2020-01-01"}, status=200
+    ).json["@graph"][0]
+    assert res2.get("requisition_completed") is False
+    res3 = testapp.patch_json(
+        res["@id"],
+        {"requisition_acceptance": {"accepted_rejected": "Accepted"}},
+        status=200,
+    ).json["@graph"][0]
+    assert res3.get("requisition_completed") is True
 
 
 def test_sample_requisition_completed_rejected(testapp, sample_one):
-    sample_one['requisition_acceptance'] = {'accepted_rejected': 'Rejected'}
-    res = testapp.post_json('/sample', sample_one, status=201).json['@graph'][0]
-    assert res.get('requisition_completed') is False
-    patch_info = res.get('requisition_acceptance')
-    patch_info['date_completed'] = '2020-03-01'
-    res2 = testapp.patch_json(res['@id'], {'requisition_acceptance': patch_info}, status=200).json['@graph'][0]
-    assert res2.get('requisition_completed') is True
+    sample_one["requisition_acceptance"] = {"accepted_rejected": "Rejected"}
+    res = testapp.post_json("/sample", sample_one, status=201).json["@graph"][0]
+    assert res.get("requisition_completed") is False
+    patch_info = res.get("requisition_acceptance")
+    patch_info["date_completed"] = "2020-03-01"
+    res2 = testapp.patch_json(
+        res["@id"], {"requisition_acceptance": patch_info}, status=200
+    ).json["@graph"][0]
+    assert res2.get("requisition_completed") is True
 
 
 # Sample Processing Tests
@@ -122,39 +126,92 @@ def test_sample_processing_pedigree(testapp, sample_proc_fam):
     """This is an end to end test for calculating relationships
     Test for roles"""
     expected_values = {
-        'GAPIDPROBAND': {'sample_accession': 'GAPSAPROBAND', 'sample_name': 'ext_id_006',
-                         'parents': ['GAPIDMOTHER1', 'GAPIDFATHER1'], 'relationship': 'proband', 'sex': 'M'},
-        'GAPIDFATHER1': {'sample_accession': 'GAPSAFATHER1', 'sample_name': 'ext_id_004',
-                         'parents': [], 'relationship': 'father', 'sex': 'M'},
-        'GAPIDMOTHER1': {'sample_accession': 'GAPSAMOTHER1', 'sample_name': 'ext_id_003',
-                         'parents': ['GAPIDGRANDMA', 'GAPIDGRANDPA'], 'relationship': 'mother', 'sex': 'F'},
-        'GAPIDBROTHER': {'sample_accession': 'GAPSABROTHER', 'sample_name': 'ext_id_009',
-                         'parents': ['GAPIDMOTHER1', 'GAPIDFATHER1'], 'relationship': 'brother', 'sex': 'M'},
-        'GAPIDGRANDPA': {'sample_accession': 'GAPSAGRANDPA', 'sample_name': 'ext_id_002',
-                         'parents': [], 'relationship': 'grandfather', 'sex': 'M', 'association': 'maternal'},
-        'GAPIDGRANDMA': {'sample_accession': 'GAPSAGRANDMA', 'sample_name': 'ext_id_001',
-                         'parents': [], 'relationship': 'grandmother', 'sex': 'F', 'association': 'maternal'},
-        'GAPIDHALFSIS': {'sample_accession': 'GAPSAHALFSIS', 'sample_name': 'ext_id_008',
-                         'parents': ['GAPIDMOTHER1'], 'relationship': 'half-sister', 'sex': 'F'},
-        'GAPIDUNCLE01': {'sample_accession': 'GAPSAUNCLE01', 'sample_name': 'ext_id_005',
-                         'parents': ['GAPIDGRANDPA'], 'relationship': 'uncle', 'sex': 'M', 'association': 'maternal'},
-        'GAPIDCOUSIN1': {'sample_accession': 'GAPSACOUSIN1', 'sample_name': 'ext_id_007',
-                         'parents': ['GAPIDUNCLE01'], 'relationship': 'cousin', 'sex': 'F', 'association': 'maternal'}
+        "GAPIDPROBAND": {
+            "sample_accession": "GAPSAPROBAND",
+            "sample_name": "ext_id_006",
+            "parents": ["GAPIDMOTHER1", "GAPIDFATHER1"],
+            "relationship": "proband",
+            "sex": "M",
+        },
+        "GAPIDFATHER1": {
+            "sample_accession": "GAPSAFATHER1",
+            "sample_name": "ext_id_004",
+            "parents": [],
+            "relationship": "father",
+            "sex": "M",
+        },
+        "GAPIDMOTHER1": {
+            "sample_accession": "GAPSAMOTHER1",
+            "sample_name": "ext_id_003",
+            "parents": ["GAPIDGRANDMA", "GAPIDGRANDPA"],
+            "relationship": "mother",
+            "sex": "F",
+        },
+        "GAPIDBROTHER": {
+            "sample_accession": "GAPSABROTHER",
+            "sample_name": "ext_id_009",
+            "parents": ["GAPIDMOTHER1", "GAPIDFATHER1"],
+            "relationship": "brother",
+            "sex": "M",
+        },
+        "GAPIDGRANDPA": {
+            "sample_accession": "GAPSAGRANDPA",
+            "sample_name": "ext_id_002",
+            "parents": [],
+            "relationship": "grandfather",
+            "sex": "M",
+            "association": "maternal",
+        },
+        "GAPIDGRANDMA": {
+            "sample_accession": "GAPSAGRANDMA",
+            "sample_name": "ext_id_001",
+            "parents": [],
+            "relationship": "grandmother",
+            "sex": "F",
+            "association": "maternal",
+        },
+        "GAPIDHALFSIS": {
+            "sample_accession": "GAPSAHALFSIS",
+            "sample_name": "ext_id_008",
+            "parents": ["GAPIDMOTHER1"],
+            "relationship": "half-sister",
+            "sex": "F",
+        },
+        "GAPIDUNCLE01": {
+            "sample_accession": "GAPSAUNCLE01",
+            "sample_name": "ext_id_005",
+            "parents": ["GAPIDGRANDPA"],
+            "relationship": "uncle",
+            "sex": "M",
+            "association": "maternal",
+        },
+        "GAPIDCOUSIN1": {
+            "sample_accession": "GAPSACOUSIN1",
+            "sample_name": "ext_id_007",
+            "parents": ["GAPIDUNCLE01"],
+            "relationship": "cousin",
+            "sex": "F",
+            "association": "maternal",
+        },
     }
-    calculated_values = sample_proc_fam['samples_pedigree']
+    calculated_values = sample_proc_fam["samples_pedigree"]
 
     for a_sample in calculated_values:
-        expected_value = expected_values[a_sample['individual']]
+        expected_value = expected_values[a_sample["individual"]]
         for a_key in expected_value:
             assert a_sample[a_key] == expected_value[a_key]
 
 
-def test_sample_processing_pedigree_bam_location(testapp, sample_proc_fam, proband_processed_file):
+def test_sample_processing_pedigree_bam_location(
+    testapp, sample_proc_fam, proband_processed_file
+):
     """This is an end to end test for calculating relationships Test for roles"""
-    bam_upload_key = proband_processed_file['upload_key']
-    calculated_values = sample_proc_fam['samples_pedigree']
-    proband_info = [i for i in calculated_values if i['individual'] == 'GAPIDPROBAND'][0]
-    assert proband_info['bam_location'] == bam_upload_key
+    bam_upload_key = proband_processed_file["upload_key"]
+    calculated_values = sample_proc_fam["samples_pedigree"]
+    proband_info = [i for i in calculated_values if i["individual"] == "GAPIDPROBAND"][
+        0
+    ]
+    assert proband_info["bam_location"] == bam_upload_key
 
 
 @pytest.fixture
@@ -244,8 +301,12 @@ class TestQualityMetricParser:
         "processed_files": SOME_FILE_ATIDS,
     }
     SOME_SEX = "some_sex"
-    SOME_ANCESTRY = "some_ancestry"
+    SOME_ANCESTRY = ["some_ancestry"]
     SOME_INDIVIDUAL = {"sex": SOME_SEX, "ancestry": SOME_ANCESTRY}
+    SOME_INDIVIDUAL_DATA = {
+        "sex": {"value": SOME_SEX},
+        "ancestry": {"value": SOME_ANCESTRY},
+    }
     ANOTHER_INDIVIDUAL = copy.copy(SOME_INDIVIDUAL)
     ANOTHER_INDIVIDUAL.update({"foo": "bar"})
 
@@ -281,10 +342,14 @@ class TestQualityMetricParser:
             ("not_an_atid", None, {}),
             (SOME_ATID, None, {}),
             (SOME_ATID, FILE_PROCESSED_NON_VCF, FILE_PROCESSED_NON_VCF),
-        ]
+        ],
     )
     def test_get_item(
-        self, captured_log, empty_quality_metric_parser, item_atid, get_item_or_none_result,
+        self,
+        captured_log,
+        empty_quality_metric_parser,
+        item_atid,
+        get_item_or_none_result,
         expected,
     ):
         """"""
@@ -310,15 +375,19 @@ class TestQualityMetricParser:
     @pytest.mark.parametrize(
         "samples,processed_files,final_vcf_found,expected",
         [
-            ([], [], False, None), 
+            ([], [], False, None),
             (SOME_SAMPLES, SOME_FILES, False, None),
             (SOME_SAMPLES, SOME_FILES, True, None),
             (SOME_SAMPLES, SOME_FILES, True, "foo"),
-        ]
+        ],
     )
     def test_get_qc_display_results(
-        self, empty_quality_metric_parser, samples, processed_files,
-        final_vcf_found, expected
+        self,
+        empty_quality_metric_parser,
+        samples,
+        processed_files,
+        final_vcf_found,
+        expected,
     ):
         """"""
         with mock.patch.object(
@@ -357,11 +426,14 @@ class TestQualityMetricParser:
             ([FILE_PROCESSED_SV_FINAL_VCF], 1, True),
             (PROCESSED_FILES_1, 3, True),
             (PROCESSED_FILES_2, 3, True),
-        ]
+        ],
     )
     def test_collect_sample_processing_processed_files_data(
-        self, empty_quality_metric_parser, processed_files,
-        expected_add_to_processed_files_calls, expected_result,
+        self,
+        empty_quality_metric_parser,
+        processed_files,
+        expected_add_to_processed_files_calls,
+        expected_result,
     ):
         """"""
         with mock.patch.object(
@@ -370,7 +442,8 @@ class TestQualityMetricParser:
             side_effect=self.return_input,
         ):
             with mock.patch.object(
-                sample_type_module.QualityMetricParser, "add_to_processed_files",
+                sample_type_module.QualityMetricParser,
+                "add_to_processed_files",
             ) as mocked_add_to_processed_files:
                 qc_parser = empty_quality_metric_parser
                 result = qc_parser.collect_sample_processing_processed_files_data(
@@ -385,7 +458,7 @@ class TestQualityMetricParser:
         [
             ({}, None, None),
             (FILE_PROCESSED_NON_VCF, {"foo": "bar"}, {"some_property": "some_link"}),
-        ]
+        ],
     )
     def test_add_to_processed_files(
         self, empty_quality_metric_parser, file_item, property_replacements, links
@@ -404,7 +477,7 @@ class TestQualityMetricParser:
             ([], None),
             (SOME_SAMPLES, None),
             (SOME_SAMPLES, {"foo": "bar"}),
-        ]
+        ],
     )
     def test_collect_and_process_samples_data(
         self, empty_quality_metric_parser, sample_identifiers, reformat_result
@@ -417,29 +490,29 @@ class TestQualityMetricParser:
                 sample_type_module.QualityMetricParser,
                 "associate_file_quality_metrics_with_samples",
             ) as mocked_associate_qcs_with_samples:
+                #                with mock.patch.object(
+                #                    sample_type_module.QualityMetricParser, "add_flags"
+                #                ) as mocked_add_flags:
                 with mock.patch.object(
-                    sample_type_module.QualityMetricParser, "add_flags"
-                ) as mocked_add_flags:
-                    with mock.patch.object(
-                        sample_type_module.QualityMetricParser,
-                        "reformat_sample_mapping_to_schema",
-                        return_value=reformat_result,
-                    ) as mocked_reformat_to_schema:
-                        qc_parser = empty_quality_metric_parser
-                        result = qc_parser.collect_and_process_samples_data(
-                            sample_identifiers
-                        )
-                        expected_collect_samples_calls = len(sample_identifiers)
-                        result_collect_samples_calls = len(
-                            mocked_collect_sample_data.call_args_list
-                        )
-                        assert (
-                            result_collect_samples_calls == expected_collect_samples_calls
-                        )
-                        mocked_associate_qcs_with_samples.assert_called_once()
-                        mocked_add_flags.assert_called_once()
-                        mocked_reformat_to_schema.assert_called_once()
-                        assert result == reformat_result
+                    sample_type_module.QualityMetricParser,
+                    "reformat_sample_mapping_to_schema",
+                    return_value=reformat_result,
+                ) as mocked_reformat_to_schema:
+                    qc_parser = empty_quality_metric_parser
+                    result = qc_parser.collect_and_process_samples_data(
+                        sample_identifiers
+                    )
+                    expected_collect_samples_calls = len(sample_identifiers)
+                    result_collect_samples_calls = len(
+                        mocked_collect_sample_data.call_args_list
+                    )
+                    assert (
+                        result_collect_samples_calls == expected_collect_samples_calls
+                    )
+                    mocked_associate_qcs_with_samples.assert_called_once()
+                    #                        mocked_add_flags.assert_called_once()
+                    mocked_reformat_to_schema.assert_called_once()
+                    assert result == reformat_result
 
     @pytest.mark.parametrize(
         "properties_to_get,item_to_get,item_to_update",
@@ -447,10 +520,13 @@ class TestQualityMetricParser:
             ([], {}, {}),
             (["foo"], WES_SAMPLE, {}),
             (["workup_type", "bam_sample_id"], WES_SAMPLE, {}),
-        ]
+        ],
     )
     def test_update_simple_properties(
-        self, empty_quality_metric_parser, properties_to_get, item_to_get,
+        self,
+        empty_quality_metric_parser,
+        properties_to_get,
+        item_to_get,
         item_to_update,
     ):
         """"""
@@ -462,11 +538,35 @@ class TestQualityMetricParser:
             assert property_value == item_to_update.get(property_to_get)
 
     @pytest.mark.parametrize(
+        "properties_to_get,item_to_get,item_to_update",
+        [
+            ([], {}, {}),
+            (["foo"], WES_SAMPLE, {}),
+            (["workup_type", "bam_sample_id"], WES_SAMPLE, {}),
+        ],
+    )
+    def test_update_display_properties(
+        self,
+        empty_quality_metric_parser,
+        properties_to_get,
+        item_to_get,
+        item_to_update,
+    ):
+        """"""
+        empty_quality_metric_parser.update_display_properties(
+            properties_to_get, item_to_get, item_to_update
+        )
+        for property_to_get in properties_to_get:
+            property_value = item_to_get.get(property_to_get)
+            updated_value = item_to_update.get(property_to_get, {}).get("value")
+            assert property_value == updated_value
+
+    @pytest.mark.parametrize(
         "sample_item,expected_sample_mapping",
         [
             (SAMPLE_WITHOUT_ID, {}),
             (SAMPLE, {SOME_BAM_SAMPLE_ID: {"bam_sample_id": SOME_BAM_SAMPLE_ID}}),
-        ]
+        ],
     )
     def test_collect_sample_data(
         self, empty_quality_metric_parser, sample_item, expected_sample_mapping
@@ -499,9 +599,9 @@ class TestQualityMetricParser:
         "individual_item,sample_info,expected",
         [
             ({}, {}, {}),
-            (SOME_INDIVIDUAL, {}, SOME_INDIVIDUAL),
-            (ANOTHER_INDIVIDUAL, {}, SOME_INDIVIDUAL),
-        ]
+            (SOME_INDIVIDUAL, {}, SOME_INDIVIDUAL_DATA),
+            (ANOTHER_INDIVIDUAL, {}, SOME_INDIVIDUAL_DATA),
+        ],
     )
     def test_collect_individual_data(
         self, empty_quality_metric_parser, individual_item, sample_info, expected
@@ -526,7 +626,7 @@ class TestQualityMetricParser:
             ([SOME_OTHER_FILE, SOME_BAM_FILE], 2, True),
             ([SOME_BAM_FILE, SOME_OTHER_FILE], 1, True),
             ([SOME_BAM_FILE, SOME_BAM_FILE], 1, True),
-        ]
+        ],
     )
     def test_collect_sample_processed_files_data(
         self,
@@ -566,17 +666,23 @@ class TestQualityMetricParser:
             ({"foo": "bar"}, 1, []),
             (QC_WITH_SUMMARY_1, 1, [QC_ITEM_SUMMARY_1]),
             (QC_WITH_SUMMARY_1_2, 1, [QC_ITEM_SUMMARY_1, QC_ITEM_SUMMARY_2]),
-        ]
+        ],
     )
     def test_collect_bam_quality_metric_values(
-        self, empty_quality_metric_parser, qc_item, expected_get_item_call,
+        self,
+        empty_quality_metric_parser,
+        qc_item,
+        expected_get_item_call,
         expected_add_qc_property_calls,
     ):
         """"""
         file_item = {"quality_metric": qc_item}
         sample_info = {"key": "value"}
         expected_add_qc_property_calls = [
-            mock.call(sample_info, item) for item in expected_add_qc_property_calls
+            mock.call(
+                sample_info, item, empty_quality_metric_parser.DISPLAY_BAM_PROPERTIES
+            )
+            for item in expected_add_qc_property_calls
         ]
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
@@ -615,12 +721,17 @@ class TestQualityMetricParser:
     EXISTING_SAMPLE_PROPERTIES = {"foo": {"fu": "bar"}}
     SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES = copy.deepcopy(SAMPLE_QC_SUMMARY)
     SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES.update(EXISTING_SAMPLE_PROPERTIES)
+    SAMPLE_QC_SUMMARY_PASS_FLAG = {
+        key: copy.deepcopy(value) for key, value in SAMPLE_QC_SUMMARY.items()
+    }
+    SAMPLE_QC_SUMMARY_PASS_FLAG[SOME_TITLE].update({"flag": "pass"})
     SAMPLE_QC_SUMMARY_FAIL_FLAG = {
         key: copy.deepcopy(value) for key, value in SAMPLE_QC_SUMMARY.items()
     }
     SAMPLE_QC_SUMMARY_FAIL_FLAG[SOME_TITLE].update({"flag": "fail"})
     SAMPLE_QC_SUMMARY_FAIL_FLAG["fail"] = set([SOME_TITLE])
     SOME_TITLE_WITH_LINK = "some_title_with_link"
+    SOME_PROPERTIES_TO_FIND = [SOME_TITLE, SOME_TITLE_WITH_LINK]
     QC_PROPERTY_NAMES_TO_LINKS = {SOME_TITLE_WITH_LINK: "some_link"}
     QC_SUMMARY_ITEM_WITH_LINK = {
         "title": "Some Title With Link",
@@ -651,14 +762,14 @@ class TestQualityMetricParser:
             result["tooltip"] = tooltip
         return result
 
-#    QC_PREDICTED_SEX_SAMPLE_1 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_1)
-#    QC_PREDICTED_SEX_SAMPLE_2 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_2)
-#    QC_PREDICTED_SEX_SAMPLE_3 = make_qc_summary_item("predicted_sex", "unknown_sample")
-#    QC_SUMMARY_ITEM = [
-#        QC_PREDICTED_SEX_SAMPLE_1, QC_PREDICTED_SEX_SAMPLE_2, QC_PREDICTED_SEX_SAMPLE_3
-#    ]
-#    QC_ITEM = {"quality_metric_summary": QC_SUMMARY_ITEM}
-#
+    #    QC_PREDICTED_SEX_SAMPLE_1 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_1)
+    #    QC_PREDICTED_SEX_SAMPLE_2 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_2)
+    #    QC_PREDICTED_SEX_SAMPLE_3 = make_qc_summary_item("predicted_sex", "unknown_sample")
+    #    QC_SUMMARY_ITEM = [
+    #        QC_PREDICTED_SEX_SAMPLE_1, QC_PREDICTED_SEX_SAMPLE_2, QC_PREDICTED_SEX_SAMPLE_3
+    #    ]
+    #    QC_ITEM = {"quality_metric_summary": QC_SUMMARY_ITEM}
+    #
     SAMPLE_MAPPING_1 = {
         "foo": {
             "qc_field_1": {},
@@ -696,40 +807,80 @@ class TestQualityMetricParser:
 
     @pytest.mark.parametrize(
         (
-            "sample_properties,qc_item,links,summary_title,flag_result,"
-            "expected_add_flag_called,expected_sample_properties"
+            "sample_properties,qc_item,properties_to_find,links,summary_title,"
+            "flag_result,expected_add_flag_called,expected_sample_properties"
         ),
         [
-            ({}, {}, None, "foo", None, False, {}),
-            ({}, QC_SUMMARY_ITEM, None, SOME_TITLE, None, True, SAMPLE_QC_SUMMARY),
-            ({}, QC_SUMMARY_ITEM, None, SOME_TITLE, "fail", True,
-                SAMPLE_QC_SUMMARY_FAIL_FLAG),
+            ({}, {}, SOME_PROPERTIES_TO_FIND, None, "foo", None, False, {}),
+            (
+                {},
+                QC_SUMMARY_ITEM,
+                SOME_PROPERTIES_TO_FIND,
+                None,
+                SOME_TITLE,
+                None,
+                True,
+                SAMPLE_QC_SUMMARY,
+            ),
+            ({}, QC_SUMMARY_ITEM, [], None, SOME_TITLE, None, False, {}),
+            (
+                {},
+                QC_SUMMARY_ITEM,
+                SOME_PROPERTIES_TO_FIND,
+                None,
+                SOME_TITLE,
+                "pass",
+                True,
+                SAMPLE_QC_SUMMARY_PASS_FLAG,
+            ),
+            (
+                {},
+                QC_SUMMARY_ITEM,
+                SOME_PROPERTIES_TO_FIND,
+                None,
+                SOME_TITLE,
+                "fail",
+                True,
+                SAMPLE_QC_SUMMARY_FAIL_FLAG,
+            ),
             (
                 EXISTING_SAMPLE_PROPERTIES,
                 QC_SUMMARY_ITEM,
+                SOME_PROPERTIES_TO_FIND,
                 None,
                 SOME_TITLE,
                 None,
                 True,
                 SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES,
             ),
-            ({}, QC_SUMMARY_ITEM_WITH_LINK, None, SOME_TITLE_WITH_LINK, None, True, SAMPLE_QC_SUMMARY_WITHOUT_LINK),
             (
                 {},
                 QC_SUMMARY_ITEM_WITH_LINK,
+                SOME_PROPERTIES_TO_FIND,
+                None,
+                SOME_TITLE_WITH_LINK,
+                None,
+                True,
+                SAMPLE_QC_SUMMARY_WITHOUT_LINK,
+            ),
+            (
+                {},
+                QC_SUMMARY_ITEM_WITH_LINK,
+                SOME_PROPERTIES_TO_FIND,
                 SOME_QC_LINK,
                 SOME_TITLE_WITH_LINK,
                 None,
                 True,
                 SAMPLE_QC_SUMMARY_WITH_LINK,
             ),
-        ]
+        ],
     )
     def test_add_qc_property_to_sample_info(
         self,
         empty_quality_metric_parser,
         sample_properties,
         qc_item,
+        properties_to_find,
         links,
         summary_title,
         flag_result,
@@ -746,35 +897,32 @@ class TestQualityMetricParser:
         ):
             with mock.patch.object(
                 sample_type_module.QualityMetricParser,
-                "QC_PROPERTIES_TO_KEEP",
-                new_callable=mock.PropertyMock,
-                return_value=self.SOME_QC_PROPERTIES,
-            ):
+                "get_qc_summary_title",
+                return_value=summary_title,
+            ) as mocked_get_qc_summary_title:
                 with mock.patch.object(
                     sample_type_module.QualityMetricParser,
-                    "get_qc_summary_title",
-                    return_value=summary_title,
-                ) as mocked_get_qc_summary_title:
-                    with mock.patch.object(
-                        sample_type_module.QualityMetricParser,
-                        "add_flags_for_qc_value",
-                        return_value=flag_result,
-                    ) as mocked_add_flags:
-                        empty_quality_metric_parser.add_qc_property_to_sample_info(
-                            sample_properties, qc_item, links=links,
-                            property_replacements=property_replacements,
+                    "add_flags_for_qc_value",
+                    return_value=flag_result,
+                ) as mocked_add_flags:
+                    empty_quality_metric_parser.add_qc_property_to_sample_info(
+                        sample_properties,
+                        qc_item,
+                        properties_to_find,
+                        links=links,
+                        property_replacements=property_replacements,
+                    )
+                    mocked_get_qc_summary_title.assert_called_once_with(
+                        qc_item, property_replacements
+                    )
+                    if expected_add_flag_called:
+                        qc_value = qc_item.get("value")
+                        mocked_add_flags.assert_called_once_with(
+                            sample_properties, summary_title, qc_value
                         )
-                        mocked_get_qc_summary_title.assert_called_once_with(
-                            qc_item, property_replacements
-                        )
-                        if expected_add_flag_called:
-                            qc_value = qc_item.get("value")
-                            mocked_add_flags.assert_called_once_with(
-                                sample_properties, summary_title, qc_value
-                            )
-                        else:
-                            mocked_add_flags.assert_not_called()
-                        assert sample_properties == expected_sample_properties
+                    else:
+                        mocked_add_flags.assert_not_called()
+                    assert sample_properties == expected_sample_properties
 
     @pytest.mark.parametrize(
         "qc_summary,property_replacements,expected",
@@ -783,10 +931,10 @@ class TestQualityMetricParser:
             (QC_SUMMARY_ITEM, None, SOME_TITLE),
             (QC_SUMMARY_ITEM, SOME_PROPERTY_REPLACEMENTS, SOME_TITLE_WITH_LINK),
             (QC_SUMMARY_ITEM, {SOME_TITLE_WITH_LINK: SOME_TITLE}, SOME_TITLE),
-        ]
+        ],
     )
-    def test_get_qc_summary_title(self, empty_quality_metric_parser, qc_summary,
-        property_replacements, expected
+    def test_get_qc_summary_title(
+        self, empty_quality_metric_parser, qc_summary, property_replacements, expected
     ):
         """"""
         result = empty_quality_metric_parser.get_qc_summary_title(
@@ -795,27 +943,45 @@ class TestQualityMetricParser:
         assert result == expected
 
     @pytest.mark.parametrize(
+        "flag_level,qc_title,sample_properties,expected_sample_properties", []
+    )
+    def test_update_flag_count(
+        self,
+        quality_metric_parser,
+        flag_level,
+        qc_title,
+        sample_properties,
+        expected_sample_properties,
+    ):
+        """"""
+        empty_quality_metric_parser.update_flag_count(
+            flag_level, qc_title, sample_properties
+        )
+        assert sample_properties == expected_sample_properties
+
+    @pytest.mark.parametrize(
         "processed_files_with_quality_metrics,expected_associate_quality_metric_calls",
         [
             ([], []),
-            ([({}, None, None)], []),
+            ([({}, [], None)], []),
             (
-                [({"quality_metric": "some_atid"}, None, None)],
-                [("some_atid", {"links": None, "property_replacements": None})]
+                [({"quality_metric": "some_atid"}, [], None)],
+                [("some_atid", [], {"property_replacements": None})],
             ),
             (
                 [
-                    ({}, None, None),
-                    ({"quality_metric": "some_atid"}, {"foo": "bar"}, "a_link")
+                    ({}, [], None),
+                    ({"quality_metric": "some_atid"}, ["foobar"], {"foo": "bar"}),
                 ],
                 [
                     (
                         "some_atid",
-                        {"links": "a_link", "property_replacements": {"foo": "bar"}},
+                        ["foobar"],
+                        {"property_replacements": {"foo": "bar"}},
                     )
                 ],
             ),
-        ]
+        ],
     )
     def test_associate_file_quality_metrics_with_samples(
         self,
@@ -839,31 +1005,64 @@ class TestQualityMetricParser:
                 mocked_associate_quality_metric_with_sample.assert_not_called()
             else:
                 assert len(result_calls) == len(expected_associate_quality_metric_calls)
-                for (arg, kwargs) in expected_associate_quality_metric_calls:
+                for (
+                    processed_file,
+                    properties_to_find,
+                    kwargs,
+                ) in expected_associate_quality_metric_calls:
                     mocked_associate_quality_metric_with_sample.assert_has_calls(
-                        [mock.call(arg, **kwargs)]
+                        [mock.call(processed_file, properties_to_find, **kwargs)]
                     )
 
     @pytest.mark.parametrize(
         (
-            "qc_item,links,property_replacements,sample_mapping,expected_log,"
+            "qc_item,properties_to_find,links,property_replacements,sample_mapping,expected_log,"
             "expected_add_qc_calls"
         ),
         [
-            ({}, None, None, {}, False, []),
-            (QC_WITH_SUMMARY_1, None, None, {}, True, []),
-            ({}, None, None, SAMPLE_MAPPING, False, []),
-            (QC_WITH_SUMMARY_1, None, None, SAMPLE_MAPPING, False,
-                [(SAMPLE_1_PROPERTIES, QC_ITEM_SUMMARY_1)]),
-            (QC_WITH_SUMMARY_1_2, None, None, SAMPLE_MAPPING, True,
-                [(SAMPLE_1_PROPERTIES, QC_ITEM_SUMMARY_1)]),
-            (QC_WITH_SUMMARY_1, SOME_QC_LINK, SOME_PROPERTY_REPLACEMENTS, SAMPLE_MAPPING, False,
-                [(SAMPLE_1_PROPERTIES, QC_ITEM_SUMMARY_1)]),
-        ]
+            ({}, [], None, None, {}, False, []),
+            (QC_WITH_SUMMARY_1, [], None, None, {}, True, []),
+            ({}, [], None, None, SAMPLE_MAPPING, False, []),
+            (
+                QC_WITH_SUMMARY_1,
+                [],
+                None,
+                None,
+                SAMPLE_MAPPING,
+                False,
+                [(SAMPLE_1_PROPERTIES, QC_ITEM_SUMMARY_1)],
+            ),
+            (
+                QC_WITH_SUMMARY_1_2,
+                [],
+                None,
+                None,
+                SAMPLE_MAPPING,
+                True,
+                [(SAMPLE_1_PROPERTIES, QC_ITEM_SUMMARY_1)],
+            ),
+            (
+                QC_WITH_SUMMARY_1,
+                [],
+                SOME_QC_LINK,
+                SOME_PROPERTY_REPLACEMENTS,
+                SAMPLE_MAPPING,
+                False,
+                [(SAMPLE_1_PROPERTIES, QC_ITEM_SUMMARY_1)],
+            ),
+        ],
     )
     def test_associate_quality_metric_with_sample(
-        self, captured_log, empty_quality_metric_parser, qc_item, links, property_replacements,
-        sample_mapping, expected_log, expected_add_qc_calls,
+        self,
+        captured_log,
+        empty_quality_metric_parser,
+        qc_item,
+        properties_to_find,
+        links,
+        property_replacements,
+        sample_mapping,
+        expected_log,
+        expected_add_qc_calls,
     ):
         """"""
         empty_quality_metric_parser.sample_mapping = sample_mapping
@@ -874,30 +1073,63 @@ class TestQualityMetricParser:
         ) as mocked_get_item:
             with mock.patch.object(
                 sample_type_module.QualityMetricParser,
-                "add_qc_property_to_sample_info",
-            ) as mocked_add_qc_property:
-                empty_quality_metric_parser.associate_quality_metric_with_sample(
-                    qc_item, links=links, property_replacements=property_replacements
-                )
-                mocked_get_item.assert_called_once()
-                if expected_add_qc_calls:
-                    kwargs = {
-                        "links": links, "property_replacements": property_replacements
-                    }
-                    for args in expected_add_qc_calls:
-                        mocked_add_qc_property.assert_has_calls(
-                            [mock.call(*args, **kwargs)]
-                        )
-                    assert len(expected_add_qc_calls) == len(
-                        mocked_add_qc_property.call_args_list
+                "get_qc_links",
+                return_value=links,
+            ) as mocked_get_peddy_link:
+                with mock.patch.object(
+                    sample_type_module.QualityMetricParser,
+                    "add_qc_property_to_sample_info",
+                ) as mocked_add_qc_property:
+                    empty_quality_metric_parser.associate_quality_metric_with_sample(
+                        qc_item,
+                        properties_to_find,
+                        property_replacements=property_replacements,
                     )
-                else:
-                    mocked_add_qc_property.assert_not_called()
-                log_calls = captured_log.get_calls()
-                if expected_log:
-                    assert log_calls
-                else:
-                    assert not log_calls
+                    mocked_get_item.assert_called_once()
+                    mocked_get_peddy_link.assert_called_once_with(qc_item)
+                    if expected_add_qc_calls:
+                        kwargs = {
+                            "links": links,
+                            "property_replacements": property_replacements,
+                        }
+                        for args in expected_add_qc_calls:
+                            mocked_add_qc_property.assert_has_calls(
+                                [mock.call(*args, properties_to_find, **kwargs)]
+                            )
+                        assert len(expected_add_qc_calls) == len(
+                            mocked_add_qc_property.call_args_list
+                        )
+                    else:
+                        mocked_add_qc_property.assert_not_called()
+                    log_calls = captured_log.get_calls()
+                    if expected_log:
+                        assert log_calls
+                    else:
+                        assert not log_calls
+
+    SOME_PEDDY_QC_ATID = "/peddy_qc/a_peddy_qc/"
+    SOME_PEDDY_LINK = {"peddyqc": SOME_PEDDY_QC_ATID + "@@download"}
+    SOME_NON_PEDDY_QC = {"qc_type": "some_other_quality_metric_type", "value": "foobar"}
+    QC_WITH_PEDDY_QC_LINK = {
+        "qc_list": [
+            SOME_NON_PEDDY_QC,
+            {"qc_type": "quality_metric_peddyqc", "value": SOME_PEDDY_QC_ATID},
+        ]
+    }
+    QC_WITH_NO_PEDDY_QC_LINK = {"qc_list": [SOME_NON_PEDDY_QC]}
+
+    @pytest.mark.parametrize(
+        "quality_metric,expected",
+        [
+            ({}, None),
+            (QC_WITH_NO_PEDDY_QC_LINK, None),
+            (QC_WITH_PEDDY_QC_LINK, SOME_PEDDY_LINK),
+        ],
+    )
+    def test_get_qc_links(self, empty_quality_metric_parser, quality_metric, expected):
+        """"""
+        result = empty_quality_metric_parser.get_qc_links(quality_metric)
+        assert result == expected
 
     @pytest.mark.parametrize(
         "evaluator_exists,evaluator_result,evaluator_error,expected",
@@ -905,11 +1137,15 @@ class TestQualityMetricParser:
             (False, None, False, None),
             (True, 5, False, 5),
             (True, "foo", True, None),
-        ]
+        ],
     )
     def test_add_flags_for_qc_value(
-        self, captured_log, empty_quality_metric_parser,
-        evaluator_exists, evaluator_result, evaluator_error,
+        self,
+        captured_log,
+        empty_quality_metric_parser,
+        evaluator_exists,
+        evaluator_result,
+        evaluator_error,
         expected,
     ):
         """"""
@@ -940,50 +1176,49 @@ class TestQualityMetricParser:
             assert not log_calls
         assert result == expected
 
-
-    @pytest.mark.parametrize(
-        "sample_mapping,expected_flags_for_samples, expected_overall_flag",
-        [
-            ({}, [], "pass"),
-            (SAMPLE_MAPPING_1, ["warn", "pass", "fail"], "fail"),
-            (SAMPLE_MAPPING_2, ["warn", None], "warn"),
-            (SAMPLE_MAPPING_3, ["warn"], "warn"),
-        ]
-    )
-    def test_add_flags(
-        self, empty_quality_metric_parser, sample_mapping, expected_flags_for_samples,
-        expected_overall_flag
-    ):
-        """"""
-        empty_quality_metric_parser.sample_mapping = sample_mapping
-        empty_quality_metric_parser.add_flags()
-        assert sample_mapping.get("flag") == expected_overall_flag
-        del sample_mapping["flag"]
-        assert len(sample_mapping.values()) == len(expected_flags_for_samples)
-        for idx, sample_info in enumerate(sample_mapping.values()):
-            assert sample_info.get("flag") == expected_flags_for_samples[idx]
-
-#    SAMPLE_MAPPING_4 = {"foo": {"flag": "warn"}}
-#    SAMPLE_MAPPING_5 = {"foo": {"flag": "warn"}, "bar": {"flag": "pass"}}
-#    SAMPLE_MAPPING_6 = {"foo": {"flag": "warn"}, "bar": {"flag": "fail"}}
-#
-#    @pytest.mark.parametrize(
-#        "sample_mapping,expected_flag",
-#        [
-#            ({}, None),
-#            (SAMPLE_MAPPING_3, None),
-#            (SAMPLE_MAPPING_4, "warn"),
-#            (SAMPLE_MAPPING_5, "warn"),
-#            (SAMPLE_MAPPING_6, "fail"),
-#        ]
-#    )
-#    def test_add_overall_flag(
-#        self, empty_quality_metric_parser, sample_mapping, expected_flag
-#    ):
-#        """"""
-#        empty_quality_metric_parser.sample_mapping = sample_mapping
-#        empty_quality_metric_parser.add_overall_flag()
-#        assert sample_mapping.get("flag") == expected_flag
+    #    @pytest.mark.parametrize(
+    #        "sample_mapping,expected_flags_for_samples",
+    #        [
+    #            ({}, [], "pass"),
+    #            (SAMPLE_MAPPING_1, ["warn", "pass", "fail"], "fail"),
+    #            (SAMPLE_MAPPING_2, ["warn", None], "warn"),
+    #            (SAMPLE_MAPPING_3, ["warn"], "warn"),
+    #        ]
+    #    )
+    #    def test_add_flags(
+    #        self, empty_quality_metric_parser, sample_mapping, expected_flags_for_samples,
+    #        expected_overall_flag
+    #    ):
+    #        """"""
+    #        empty_quality_metric_parser.sample_mapping = sample_mapping
+    #        empty_quality_metric_parser.add_flags()
+    #        assert sample_mapping.get("flag") == expected_overall_flag
+    #        del sample_mapping["flag"]
+    #        assert len(sample_mapping.values()) == len(expected_flags_for_samples)
+    #        for idx, sample_info in enumerate(sample_mapping.values()):
+    #            assert sample_info.get("flag") == expected_flags_for_samples[idx]
+    #
+    #    SAMPLE_MAPPING_4 = {"foo": {"flag": "warn"}}
+    #    SAMPLE_MAPPING_5 = {"foo": {"flag": "warn"}, "bar": {"flag": "pass"}}
+    #    SAMPLE_MAPPING_6 = {"foo": {"flag": "warn"}, "bar": {"flag": "fail"}}
+    #
+    #    @pytest.mark.parametrize(
+    #        "sample_mapping,expected_flag",
+    #        [
+    #            ({}, None),
+    #            (SAMPLE_MAPPING_3, None),
+    #            (SAMPLE_MAPPING_4, "warn"),
+    #            (SAMPLE_MAPPING_5, "warn"),
+    #            (SAMPLE_MAPPING_6, "fail"),
+    #        ]
+    #    )
+    #    def test_add_overall_flag(
+    #        self, empty_quality_metric_parser, sample_mapping, expected_flag
+    #    ):
+    #        """"""
+    #        empty_quality_metric_parser.sample_mapping = sample_mapping
+    #        empty_quality_metric_parser.add_overall_flag()
+    #        assert sample_mapping.get("flag") == expected_flag
 
     @pytest.mark.parametrize(
         "coverage,sample_properties,expected",
@@ -1002,7 +1237,7 @@ class TestQualityMetricParser:
             ("58.6X", {"workup_type": "WES"}, "warn"),
             ("40X", {"workup_type": "WES"}, "warn"),
             ("39X", {"workup_type": "WES"}, "fail"),
-        ]
+        ],
     )
     def test_flag_bam_coverage(
         self, empty_quality_metric_parser, coverage, sample_properties, expected
@@ -1019,14 +1254,14 @@ class TestQualityMetricParser:
             ("", {}, "warn"),
             ("foo", {}, "fail"),
             ("male", {}, None),
-            ("foo", {"sex": "M"}, "fail"),
-            ("male", {"sex": "M"}, "pass"),
-            ("male", {"sex": "F"}, "warn"),
-            ("male", {"sex": "U"}, "warn"),
-            ("female", {"sex": "M"}, "warn"),
-            ("female", {"sex": "F"}, "pass"),
-            ("female", {"sex": "U"}, "warn"),
-        ]
+            ("foo", {"sex": {"value": "M"}}, "fail"),
+            ("male", {"sex": {"value": "M"}}, "pass"),
+            ("male", {"sex": {"value": "F"}}, "warn"),
+            ("male", {"sex": {"value": "U"}}, "warn"),
+            ("female", {"sex": {"value": "M"}}, "warn"),
+            ("female", {"sex": {"value": "F"}}, "pass"),
+            ("female", {"sex": {"value": "U"}}, "warn"),
+        ],
     )
     def test_flag_sex_consistency(
         self, empty_quality_metric_parser, predicted_sex, sample_properties, expected
@@ -1045,7 +1280,7 @@ class TestQualityMetricParser:
             ("2", "pass"),
             ("1.4", "pass"),
             ("0.8", "warn"),
-        ]
+        ],
     )
     def test_flag_heterozygosity_ratio(
         self, empty_quality_metric_parser, heterozygosity_ratio, expected
@@ -1071,11 +1306,16 @@ class TestQualityMetricParser:
             ("3.0", {"workup_type": "WES"}, False, "pass"),
             ("2.2", {"workup_type": "WES"}, False, "warn"),
             ("1.5", {"workup_type": "WES"}, False, "fail"),
-        ]
+        ],
     )
     def test_flag_transition_transversion_ratio(
-        self, captured_log, empty_quality_metric_parser, transition_transversion_ratio,
-        sample_properties, expected_log, expected
+        self,
+        captured_log,
+        empty_quality_metric_parser,
+        transition_transversion_ratio,
+        sample_properties,
+        expected_log,
+        expected,
     ):
         """"""
         result = empty_quality_metric_parser.flag_transition_transversion_ratio(
@@ -1095,7 +1335,7 @@ class TestQualityMetricParser:
             ("5", "pass"),
             ("6.5", "fail"),
             ("4.3", "pass"),
-        ]
+        ],
     )
     def test_flag_de_novo_fraction(
         self, empty_quality_metric_parser, de_novo_fraction, expected
@@ -1109,8 +1349,12 @@ class TestQualityMetricParser:
         [
             ({}, [], []),
             (SAMPLE_MAPPING, ["foo", "fu"], [SAMPLE_1_PROPERTIES]),
-            (SAMPLE_MAPPING, ["foo", "fu", "baz"], [SAMPLE_1_PROPERTIES, SAMPLE_2_PROPERTIES]),
-        ]
+            (
+                SAMPLE_MAPPING,
+                ["foo", "fu", "baz"],
+                [SAMPLE_1_PROPERTIES, SAMPLE_2_PROPERTIES],
+            ),
+        ],
     )
     def test_reformat_sample_mapping_to_schema(
         self, empty_quality_metric_parser, sample_mapping, schema_properties, expected
@@ -1143,13 +1387,15 @@ class TestQualityMetricParser:
             ([], {}, {}),
             (SOME_FLAG_NAMES, {}, {}),
             ([], SAMPLE_PROPERTIES_WITH_FLAGS, SAMPLE_PROPERTIES_WITH_FLAGS),
-            (SOME_FLAG_NAMES, SAMPLE_PROPERTIES_WITH_FLAGS,
-                SAMPLE_PROPERTIES_WITH_FLAGS_LIST),
-        ]
+            (
+                SOME_FLAG_NAMES,
+                SAMPLE_PROPERTIES_WITH_FLAGS,
+                SAMPLE_PROPERTIES_WITH_FLAGS_LIST,
+            ),
+        ],
     )
     def test_convert_flag_sets_to_lists(
-        self, empty_quality_metric_parser, flags_to_capture, sample_properties,
-        expected
+        self, empty_quality_metric_parser, flags_to_capture, sample_properties, expected
     ):
         """"""
         with mock.patch.object(
@@ -1267,39 +1513,42 @@ def test_quality_control_metrics(
     # All samples + files
     quality_control_metrics = sample_processing.get("quality_control_metrics")
     assert quality_control_metrics == [
-        PROBAND_SAMPLE_QC_METRICS, PROBAND_SAMPLE_2_QC_METRICS, MOTHER_SAMPLE_QC_METRICS
+        PROBAND_SAMPLE_QC_METRICS,
+        PROBAND_SAMPLE_2_QC_METRICS,
+        MOTHER_SAMPLE_QC_METRICS,
     ]
 
     # No samples, all files
     patch_body = {"samples": []}
-    response = testapp.patch_json(
-        sample_processing_atid, patch_body, status=200
-    ).json["@graph"][0]
+    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
+        "@graph"
+    ][0]
     assert response.get("quality_control_metrics") is None
 
     # Partial samples, all files
     proband_samples = child.get("samples")
     patch_body = {"samples": proband_samples}
-    response = testapp.patch_json(
-        sample_processing_atid, patch_body, status=200
-    ).json["@graph"][0]
+    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
+        "@graph"
+    ][0]
     assert response.get("quality_control_metrics") == [
-        PROBAND_SAMPLE_QC_METRICS, PROBAND_SAMPLE_2_QC_METRICS
+        PROBAND_SAMPLE_QC_METRICS,
+        PROBAND_SAMPLE_2_QC_METRICS,
     ]
 
     # All samples, no files
     mother_sample = mother.get("samples")
     all_samples = proband_samples + mother_sample
     patch_body = {"samples": all_samples, "processed_files": []}
-    response = testapp.patch_json(
-        sample_processing_atid, patch_body, status=200
-    ).json["@graph"][0]
+    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
+        "@graph"
+    ][0]
     assert response.get("quality_control_metrics") is None
 
     # All samples, only VEP file
     vep_file_atid = vep_vcf_with_qcs["@id"]
     patch_body = {"processed_files": [vep_file_atid]}
-    response = testapp.patch_json(
-        sample_processing_atid, patch_body, status=200
-    ).json["@graph"][0]
+    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
+        "@graph"
+    ][0]
     assert response.get("quality_control_metrics") is None

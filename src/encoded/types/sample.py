@@ -16,58 +16,69 @@ def _build_sample_embedded_list():
         "files.status",
         "files.file_format.file_format",
         "files.accession",
-
         # File linkTo
         "processed_files.accession",
         "processed_files.file_format.file_format",
-        "processed_files.workflow_run_outputs.@id"
+        "processed_files.workflow_run_outputs.@id",
     ]
 
 
 @collection(
-    name='samples',
-    unique_key='accession',
+    name="samples",
+    unique_key="accession",
     properties={
-        'title': 'Samples',
-        'description': 'Listing of Samples',
-    })
+        "title": "Samples",
+        "description": "Listing of Samples",
+    },
+)
 class Sample(Item):
-    item_type = 'sample'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/sample.json')
-    rev = {'indiv': ('Individual', 'samples')}
+    item_type = "sample"
+    name_key = "accession"
+    schema = load_schema("encoded:schemas/sample.json")
+    rev = {"indiv": ("Individual", "samples")}
     embedded_list = _build_sample_embedded_list()
 
-    @calculated_property(schema={
-        "title": "Individual",
-        "description": "Individual the sample belongs to",
-        "type": "string",
-        "linkTo": "Individual"
-    })
+    @calculated_property(
+        schema={
+            "title": "Individual",
+            "description": "Individual the sample belongs to",
+            "type": "string",
+            "linkTo": "Individual",
+        }
+    )
     def individual(self, request):
         indivs = self.rev_link_atids(request, "indiv")
         if indivs:
             return indivs[0]
 
-    @calculated_property(schema={
-        "title": "Requisition Completed",
-        "description": "True when Requisition Acceptance fields are completed",
-        "type": "boolean"
-    })
+    @calculated_property(
+        schema={
+            "title": "Requisition Completed",
+            "description": "True when Requisition Acceptance fields are completed",
+            "type": "boolean",
+        }
+    )
     def requisition_completed(self, request):
         props = self.properties
-        req = props.get('requisition_acceptance', {})
+        req = props.get("requisition_acceptance", {})
         if req:
-            if req.get('accepted_rejected') == 'Accepted':
+            if req.get("accepted_rejected") == "Accepted":
                 return True
-            elif req.get('accepted_rejected') == 'Rejected' and req.get('date_completed'):
+            elif req.get("accepted_rejected") == "Rejected" and req.get(
+                "date_completed"
+            ):
                 return True
             else:
                 return False
-        elif any(props.get(item) for item in [
-            'specimen_accession_date', 'specimen_accession',
-            'date_requisition_received', 'accessioned_by'
-        ]):
+        elif any(
+            props.get(item)
+            for item in [
+                "specimen_accession_date",
+                "specimen_accession",
+                "date_requisition_received",
+                "accessioned_by",
+            ]
+        ):
             return False
 
 
@@ -80,7 +91,6 @@ def _build_sample_processing_embedded_list():
         "processed_files.file_type",
         "processed_files.upload_key",  # used by Higlass browsers
         "processed_files.higlass_file",  # used by Higlass browsers
-
         # Sample linkTo
         "samples.completed_processes",
         "samples.processed_files.uuid",
@@ -88,88 +98,60 @@ def _build_sample_processing_embedded_list():
 
 
 @collection(
-    name='sample-processings',
+    name="sample-processings",
     properties={
-        'title': 'SampleProcessings',
-        'description': 'Listing of Sample Processings',
-    })
+        "title": "SampleProcessings",
+        "description": "Listing of Sample Processings",
+    },
+)
 class SampleProcessing(Item):
-    item_type = 'sample_processing'
-    schema = load_schema('encoded:schemas/sample_processing.json')
+    item_type = "sample_processing"
+    schema = load_schema("encoded:schemas/sample_processing.json")
     embedded_list = _build_sample_processing_embedded_list()
-    rev = {'case': ('Case', 'sample_processing')}
+    rev = {"case": ("Case", "sample_processing")}
 
-    @calculated_property(schema={
-        "title": "Cases",
-        "description": "The case(s) this sample processing is for",
-        "type": "array",
-        "items": {
-            "title": "Case",
-            "type": "string",
-            "linkTo": "Case"
+    @calculated_property(
+        schema={
+            "title": "Cases",
+            "description": "The case(s) this sample processing is for",
+            "type": "array",
+            "items": {"title": "Case", "type": "string", "linkTo": "Case"},
         }
-    })
+    )
     def cases(self, request):
         rs = self.rev_link_atids(request, "case")
         if rs:
             return rs
 
-    @calculated_property(schema={
-        "title": "Samples Pedigree",
-        "description": "Relationships to proband for samples.",
-        "type": "array",
-        "items": {
-            "title": "Sample Pedigree",
-            "type": "object",
-            "properties": {
-                "individual": {
-                    "title": "Individual",
-                    "type": "string"
+    @calculated_property(
+        schema={
+            "title": "Samples Pedigree",
+            "description": "Relationships to proband for samples.",
+            "type": "array",
+            "items": {
+                "title": "Sample Pedigree",
+                "type": "object",
+                "properties": {
+                    "individual": {"title": "Individual", "type": "string"},
+                    "sample_accession": {"title": "Individual", "type": "string"},
+                    "sample_name": {"title": "Individual", "type": "string"},
+                    "parents": {
+                        "title": "Parents",
+                        "type": "array",
+                        "items": {"title": "Parent", "type": "string"},
+                    },
+                    "association": {
+                        "title": "Individual",
+                        "type": "string",
+                        "enum": ["paternal", "maternal"],
+                    },
+                    "sex": {"title": "Sex", "type": "string", "enum": ["F", "M", "U"]},
+                    "relationship": {"title": "Relationship", "type": "string"},
+                    "bam_location": {"title": "Bam File Location", "type": "string"},
                 },
-                "sample_accession": {
-                    "title": "Individual",
-                    "type": "string"
-                },
-                "sample_name": {
-                    "title": "Individual",
-                    "type": "string"
-                },
-                "parents": {
-                    "title": "Parents",
-                    "type": "array",
-                    "items": {
-                        "title": "Parent",
-                        "type": "string"
-                    }
-                },
-                "association": {
-                    "title": "Individual",
-                    "type": "string",
-                    "enum": [
-                        "paternal",
-                        "maternal"
-                    ]
-                },
-                "sex": {
-                    "title": "Sex",
-                    "type": "string",
-                    "enum": [
-                        "F",
-                        "M",
-                        "U"
-                    ]
-                },
-                "relationship": {
-                    "title": "Relationship",
-                    "type": "string"
-                },
-                "bam_location": {
-                    "title": "Bam File Location",
-                    "type": "string"
-                }
-                }
-            }
-        })
+            },
+        }
+    )
     def samples_pedigree(self, request, families=None, samples=None):
         """Filter Family Pedigree for samples to be used in QCs"""
         # If there are multiple families this will be problematic, return empty
@@ -183,21 +165,21 @@ class SampleProcessing(Item):
         family = families[0]
 
         # get relationship from family
-        fam_data = get_item_or_none(request, family, 'families')
+        fam_data = get_item_or_none(request, family, "families")
         if not fam_data:
             return samples_pedigree
-        proband = fam_data.get('proband', '')
-        members = fam_data.get('members', [])
+        proband = fam_data.get("proband", "")
+        members = fam_data.get("members", [])
         if not proband or not members:
             return samples_pedigree
-        family_id = fam_data['accession']
+        family_id = fam_data["accession"]
         # collect members properties
         all_props = []
         for a_member in members:
             # This might be a step to optimize if families get larger
             # TODO: make sure all mother fathers are in member list, if not fetch them too
             #  for complete connection tracing
-            props = get_item_or_none(request, a_member, 'individuals')
+            props = get_item_or_none(request, a_member, "individuals")
             all_props.append(props)
         relations = Family.calculate_relations(proband, all_props, family_id)
 
@@ -212,48 +194,50 @@ class SampleProcessing(Item):
                 # "bam_location": "" optional, add if exists
                 # "association": ""  optional, add if exists
             }
-            mem_infos = [i for i in all_props if a_sample in i.get('samples', [])]
+            mem_infos = [i for i in all_props if a_sample in i.get("samples", [])]
             if not mem_infos:
                 continue
             mem_info = mem_infos[0]
-            sample_info = get_item_or_none(request, a_sample, 'samples')
+            sample_info = get_item_or_none(request, a_sample, "samples")
 
             # find the bam file
-            sample_processed_files = sample_info.get('processed_files', [])
-            sample_bam_file = ''
+            sample_processed_files = sample_info.get("processed_files", [])
+            sample_bam_file = ""
             # no info about file formats on object frame of sample
             # cycle through files (starting at most recent) and check the format
             for a_file in sample_processed_files[::-1]:
-                file_info = get_item_or_none(request, a_file, 'files-processed')
+                file_info = get_item_or_none(request, a_file, "files-processed")
                 if not file_info:
                     continue
                 # if format is bam, record the upload key and exit loop
-                if file_info.get('file_format') == "/file-formats/bam/":
-                    sample_bam_file = file_info.get('upload_key', '')
+                if file_info.get("file_format") == "/file-formats/bam/":
+                    sample_bam_file = file_info.get("upload_key", "")
                     break
             # if bam file location was found, add it to temp
             if sample_bam_file:
-                temp['bam_location'] = sample_bam_file
+                temp["bam_location"] = sample_bam_file
 
             # fetch the calculated relation info
-            relation_infos = [i for i in relations if i['individual'] == mem_info['accession']]
+            relation_infos = [
+                i for i in relations if i["individual"] == mem_info["accession"]
+            ]
             # fill in temp dict
-            temp['individual'] = mem_info['accession']
-            temp['sex'] = mem_info.get('sex', 'U')
+            temp["individual"] = mem_info["accession"]
+            temp["sex"] = mem_info.get("sex", "U")
             parents = []
-            for a_parent in ['mother', 'father']:
+            for a_parent in ["mother", "father"]:
                 if mem_info.get(a_parent):
                     # extract accession from @id
-                    mem_acc = mem_info[a_parent].split('/')[2]
+                    mem_acc = mem_info[a_parent].split("/")[2]
                     parents.append(mem_acc)
-            temp['parents'] = parents
-            temp['sample_accession'] = sample_info['display_title']
-            temp['sample_name'] = sample_info.get('bam_sample_id', '')
+            temp["parents"] = parents
+            temp["sample_accession"] = sample_info["display_title"]
+            temp["sample_name"] = sample_info.get("bam_sample_id", "")
             if relation_infos:
                 relation_info = relation_infos[0]
-                temp['relationship'] = relation_info.get('relationship', '')
-                if relation_info.get('association', ''):
-                    temp['association'] = relation_info.get('association', '')
+                temp["relationship"] = relation_info.get("relationship", "")
+                if relation_info.get("association", ""):
+                    temp["association"] = relation_info.get("association", "")
             samples_pedigree.append(temp)
         return samples_pedigree
 
@@ -273,203 +257,203 @@ class SampleProcessing(Item):
         "type": "string",
     }
 
-    @calculated_property(schema={
-        "title": "Quality Control Metrics",
-        "description": "Select quality control metrics for associated samples",
-        "type": "array",
-        "items": {
-            "title": "",
-            "description": "",
-            "type": "object",
-            "additionalProperties": False,
-            "properties": {
-                "bam_sample_id": {
-                    "title": "",
-                    "description": "",
-                    "type": "string",
-                },
-                "individual_id": {
-                    "title": "",
-                    "description": "",
-                    "type": "string",
-                },
-                "sex": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                    },
-                },
-                "predicted_sex": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                        "link": QC_LINK_SCHEMA,
-                        "flag": QC_FLAG_SCHEMA,
-                    },
-                },
-                "ancestry": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "array",
-                            "items": {
-                                "type": "string"
-                            }
-                        },
-                    },
-                },
-                "predicted_ancestry": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                        "link": QC_LINK_SCHEMA,
-                    },
-                },
-                "total_reads": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                    },
-                },
-                "coverage": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                        "flag": QC_FLAG_SCHEMA,
-                    },
-                },
-                "heterozygosity_ratio": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                        "flag": QC_FLAG_SCHEMA,
-                    },
-                },
-                "transition_transversion_ratio": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                        "flag": QC_FLAG_SCHEMA,
-                    },
-                },
-                "de_novo_fraction": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                        "flag": QC_FLAG_SCHEMA,
-                    },
-                },
-                "total_variants_called": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                    },
-                },
-                "filtered_variants": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                    },
-                },
-                "filtered_structural_variants": {
-                    "title": "",
-                    "description": "",
-                    "type": "object",
-                    "properties": {
-                        "value": {
-                            "title": "",
-                            "description": "",
-                            "type": "str",
-                        },
-                    },
-                },
-                "warn": {
-                    "title": "",
-                    "description": "",
-                    "type": "array",
-                    "items": {
+    @calculated_property(
+        schema={
+            "title": "Quality Control Metrics",
+            "description": "Select quality control metrics for associated samples",
+            "type": "array",
+            "items": {
+                "title": "",
+                "description": "",
+                "type": "object",
+                "additionalProperties": False,
+                "properties": {
+                    "bam_sample_id": {
                         "title": "",
                         "description": "",
                         "type": "string",
                     },
-                },
-                "fail": {
-                    "title": "",
-                    "description": "",
-                    "type": "array",
-                    "items": {
+                    "individual_id": {
                         "title": "",
                         "description": "",
                         "type": "string",
+                    },
+                    "sex": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                        },
+                    },
+                    "predicted_sex": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                            "link": QC_LINK_SCHEMA,
+                            "flag": QC_FLAG_SCHEMA,
+                        },
+                    },
+                    "ancestry": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "array",
+                                "items": {"type": "string"},
+                            },
+                        },
+                    },
+                    "predicted_ancestry": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                            "link": QC_LINK_SCHEMA,
+                        },
+                    },
+                    "total_reads": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                        },
+                    },
+                    "coverage": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                            "flag": QC_FLAG_SCHEMA,
+                        },
+                    },
+                    "heterozygosity_ratio": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                            "flag": QC_FLAG_SCHEMA,
+                        },
+                    },
+                    "transition_transversion_ratio": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                            "flag": QC_FLAG_SCHEMA,
+                        },
+                    },
+                    "de_novo_fraction": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                            "flag": QC_FLAG_SCHEMA,
+                        },
+                    },
+                    "total_variants_called": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                        },
+                    },
+                    "filtered_variants": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                        },
+                    },
+                    "filtered_structural_variants": {
+                        "title": "",
+                        "description": "",
+                        "type": "object",
+                        "properties": {
+                            "value": {
+                                "title": "",
+                                "description": "",
+                                "type": "str",
+                            },
+                        },
+                    },
+                    "warn": {
+                        "title": "",
+                        "description": "",
+                        "type": "array",
+                        "items": {
+                            "title": "",
+                            "description": "",
+                            "type": "string",
+                        },
+                    },
+                    "fail": {
+                        "title": "",
+                        "description": "",
+                        "type": "array",
+                        "items": {
+                            "title": "",
+                            "description": "",
+                            "type": "string",
+                        },
                     },
                 },
             },
-        },
-    })
+        }
+    )
     def quality_control_metrics(self, request, samples=None, processed_files=None):
         """"""
         result = None
@@ -540,8 +524,12 @@ class QualityMetricParser:
     DISPLAY_SNV_FINAL_VCF_PROPERTIES = [FILTERED_VARIANTS]
     DISPLAY_SV_FINAL_VCF_PROPERTIES = [FILTERED_STRUCTURAL_VARIANTS]
     DISPLAY_SNV_VEP_VCF_PROPERTIES = [
-        TOTAL_VARIANTS_CALLED, HETEROZYGOSITY_RATIO, TRANSITION_TRANSVERSION_RATIO,
-        DE_NOVO_FRACTION, PREDICTED_SEX, PREDICTED_ANCESTRY,
+        TOTAL_VARIANTS_CALLED,
+        HETEROZYGOSITY_RATIO,
+        TRANSITION_TRANSVERSION_RATIO,
+        DE_NOVO_FRACTION,
+        PREDICTED_SEX,
+        PREDICTED_ANCESTRY,
     ]
     SIMPLE_QUALITY_METRIC_PROPERTIES = [VALUE]
     SAMPLE_PROPERTIES_TO_KEEP = set([BAM_SAMPLE_ID, SEX, ANCESTRY, INDIVIDUAL_ID])
@@ -559,8 +547,8 @@ class QualityMetricParser:
             DE_NOVO_FRACTION,
         ]
     )
-    SCHEMA_PROPERTIES = SAMPLE_PROPERTIES_TO_KEEP | QC_PROPERTIES_TO_KEEP | set(
-        [FLAG_WARN, FLAG_FAIL]
+    SCHEMA_PROPERTIES = (
+        SAMPLE_PROPERTIES_TO_KEEP | QC_PROPERTIES_TO_KEEP | set([FLAG_WARN, FLAG_FAIL])
     )
     ACCEPTED_PREDICTED_SEXES = set([MALE, FEMALE])
     BAM_FILE_FORMAT_ATID = "/file-formats/bam/"
@@ -628,8 +616,9 @@ class QualityMetricParser:
                     if snv_vcf_found:
                         continue
                     snv_vcf_found = True
-                    self.add_to_processed_files(file_item,
-                            self.DISPLAY_SNV_FINAL_VCF_PROPERTIES)
+                    self.add_to_processed_files(
+                        file_item, self.DISPLAY_SNV_FINAL_VCF_PROPERTIES
+                    )
                 elif file_variant_type == self.SV_VARIANT_TYPE:
                     if sv_vcf_found:
                         continue
@@ -638,7 +627,9 @@ class QualityMetricParser:
                         self.FILTERED_VARIANTS: self.FILTERED_STRUCTURAL_VARIANTS
                     }
                     self.add_to_processed_files(
-                        file_item, self.DISPLAY_SV_FINAL_VCF_PROPERTIES, property_replacements=property_replacements
+                        file_item,
+                        self.DISPLAY_SV_FINAL_VCF_PROPERTIES,
+                        property_replacements=property_replacements,
                     )
             elif (
                 not vep_vcf_found
@@ -646,8 +637,9 @@ class QualityMetricParser:
                 and self.VEP_ANNOTATED_STRING in file_type.lower()  # Pretty fragile
             ):
                 vep_vcf_found = True
-                self.add_to_processed_files(file_item,
-                        self.DISPLAY_SNV_VEP_VCF_PROPERTIES)
+                self.add_to_processed_files(
+                    file_item, self.DISPLAY_SNV_VEP_VCF_PROPERTIES
+                )
             if snv_vcf_found and sv_vcf_found and vep_vcf_found:
                 break
         if snv_vcf_found or sv_vcf_found:
@@ -667,7 +659,7 @@ class QualityMetricParser:
         for sample_identifier in sample_identifiers:
             self.collect_sample_data(sample_identifier)
         self.associate_file_quality_metrics_with_samples()
-        self.add_flags()
+        #        self.add_flags()
         result = self.reformat_sample_mapping_to_schema()
         return result
 
@@ -730,21 +722,28 @@ class QualityMetricParser:
             quality_metric_item = self.get_item(quality_metric_atid)
             summary = quality_metric_item.get(self.QUALITY_METRIC_SUMMARY, [])
             for item in summary:
-                self.add_qc_property_to_sample_info(sample_info, item,
-                        self.DISPLAY_BAM_PROPERTIES)
+                self.add_qc_property_to_sample_info(
+                    sample_info, item, self.DISPLAY_BAM_PROPERTIES
+                )
 
     def add_qc_property_to_sample_info(
-        self, sample_qc_properties, qc_summary_item, properties_to_find, links=None,
+        self,
+        sample_qc_properties,
+        qc_summary_item,
+        properties_to_find,
+        links=None,
         property_replacements=None,
     ):
         """"""
-        summary_title = self.get_qc_summary_title(qc_summary_item, property_replacements)
+        summary_title = self.get_qc_summary_title(
+            qc_summary_item, property_replacements
+        )
         if summary_title in properties_to_find:
             qc_title_properties = {}
             self.update_simple_properties(
                 self.SIMPLE_QUALITY_METRIC_PROPERTIES,
                 qc_summary_item,
-                qc_title_properties
+                qc_title_properties,
             )
             if links:
                 link_to_add = self.QC_PROPERTY_NAMES_TO_LINKS.get(summary_title)
@@ -781,7 +780,9 @@ class QualityMetricParser:
     def associate_file_quality_metrics_with_samples(self):
         """"""
         for (
-            processed_file, properties_to_find, property_replacements
+            processed_file,
+            properties_to_find,
+            property_replacements,
         ) in self.processed_files_with_quality_metrics:
             quality_metric_atid = processed_file.get(self.QUALITY_METRIC)
             if quality_metric_atid:
@@ -798,8 +799,7 @@ class QualityMetricParser:
         links = None
         quality_metric = self.get_item(quality_metric_atid)
         quality_metric_summary = quality_metric.get(self.QUALITY_METRIC_SUMMARY, [])
-        if properties_to_find == self.DISPLAY_SNV_VEP_VCF_PROPERTIES:
-            links = self.get_peddy_qc_link(quality_metric)
+        links = self.get_qc_links(quality_metric)
         for item in quality_metric_summary:
             item_sample = item.get(self.SAMPLE)
             sample_props = self.sample_mapping.get(item_sample)
@@ -817,7 +817,7 @@ class QualityMetricParser:
                 property_replacements=property_replacements,
             )
 
-    def get_peddy_qc_link(self, quality_metric):
+    def get_qc_links(self, quality_metric):
         """"""
         result = None
         peddy_qc_atid = None
@@ -842,41 +842,41 @@ class QualityMetricParser:
                 log.exception(f"Could not evaluate QC value: {qc_value}.")
         return result
 
-    def add_flags(self):
-        """"""
-#        overall_worst_flag = self.FLAG_PASS
-#        overall_worst_flag_rank = -1
-        for sample_info in self.sample_mapping.values():
-            worst_flag = None
-            worst_flag_rank = -1
-            for qc_field, qc_field_value in sample_info.items():
-                if not isinstance(qc_field_value, dict):
-                    continue
-                flag = qc_field_value.get(self.FLAG)
-                if flag is None:
-                    continue
-                flag_rank = self.RANKED_FLAGS.get(flag, -1)
-                if flag_rank > worst_flag_rank:
-                    worst_flag_rank = flag_rank
-                    worst_flag = flag
-            if worst_flag is not None:
-                sample_info[self.FLAG] = worst_flag
-#            if worst_flag_rank > overall_worst_flag_rank:
-#                overall_worst_flag = worst_flag
-#        self.overall_flag = overall_worst_flag
+    #    def add_flags(self):
+    #        """"""
+    #        overall_worst_flag = self.FLAG_PASS
+    #        overall_worst_flag_rank = -1
+    #        for sample_info in self.sample_mapping.values():
+    #            worst_flag = None
+    #            worst_flag_rank = -1
+    #            for qc_field, qc_field_value in sample_info.items():
+    #                if not isinstance(qc_field_value, dict):
+    #                    continue
+    #                flag = qc_field_value.get(self.FLAG)
+    #                if flag is None:
+    #                    continue
+    #                flag_rank = self.RANKED_FLAGS.get(flag, -1)
+    #                if flag_rank > worst_flag_rank:
+    #                    worst_flag_rank = flag_rank
+    #                    worst_flag = flag
+    #            if worst_flag is not None:
+    #                sample_info[self.FLAG] = worst_flag
+    #            if worst_flag_rank > overall_worst_flag_rank:
+    #                overall_worst_flag = worst_flag
+    #        self.overall_flag = overall_worst_flag
 
-#    def add_overall_flag(self):
-#        """"""
-#        worst_flag = None
-#        worst_flag_rank = -1
-#        for sample_info in self.sample_mapping.values():
-#            sample_flag = sample_info.get(self.FLAG)
-#            sample_flag_rank = self.RANKED_FLAGS.get(sample_flag, -1)
-#            if sample_flag_rank > worst_flag_rank:
-#                worst_flag_rank = sample_flag_rank
-#                worst_flag = sample_flag
-#        if worst_flag is not None:
-#            self.sample_mapping[self.FLAG] = worst_flag
+    #    def add_overall_flag(self):
+    #        """"""
+    #        worst_flag = None
+    #        worst_flag_rank = -1
+    #        for sample_info in self.sample_mapping.values():
+    #            sample_flag = sample_info.get(self.FLAG)
+    #            sample_flag_rank = self.RANKED_FLAGS.get(sample_flag, -1)
+    #            if sample_flag_rank > worst_flag_rank:
+    #                worst_flag_rank = sample_flag_rank
+    #                worst_flag = sample_flag
+    #        if worst_flag is not None:
+    #            self.sample_mapping[self.FLAG] = worst_flag
 
     def flag_bam_coverage(self, coverage_string, sample_properties, *args, **kwargs):
         """"""
