@@ -170,9 +170,13 @@
             "grouping": "Individual",
             "order": 4
         },
+        "quality_control_flags.flag": {
+            "title": "QC Flag",
+            "order": 5
+        },
         "status": {
             "title": "Status",
-            "order": 5
+            "order": 6
         }
     },
     "columns": {
