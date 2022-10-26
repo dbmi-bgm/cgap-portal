@@ -4,7 +4,7 @@ import React, { useRef, useEffect } from "react";
 import _ from "underscore";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 import { HiGlassAjaxLoadContainer } from "./HiGlassAjaxLoadContainer";
-import { getGeneLists } from "../CohortStatisticalAnalysisTableUtils";
+import { getGeneLists } from "../utils/cohort-statistical-analysis-table-utils";
 import { Checkbox } from "@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox";
 
 function GeneListFilter({ geneLists, onChange }) {

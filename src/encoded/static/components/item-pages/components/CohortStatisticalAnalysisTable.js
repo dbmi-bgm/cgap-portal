@@ -3,19 +3,17 @@
 import React, { useCallback, useMemo } from "react";
 import PropTypes from "prop-types";
 import _ from "underscore";
-import url from "url";
 
 import { console } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
-import { DetailPaneStateCache } from "@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/DetailPaneStateCache";
 import { TabixIndexedFile } from "@gmod/tabix";
 import VCF from "@gmod/vcf";
 import { RemoteFile } from "generic-filehandle";
 import {
-  CHROMS,
   parseVcfRecord,
   parseLocation,
   getGeneLists,
-} from "./CohortStatisticalAnalysisTableUtils";
+} from "./utils/cohort-statistical-analysis-table-utils";
+import { CHROMS } from "./utils/chrom-utils";
 import { format } from "d3-format";
 import { Checkbox } from "@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox";
 
@@ -66,7 +64,7 @@ function GeneListFilter({ geneLists, onChange }) {
       >
         <option value="NONE">Non selected</option>
         {Object.keys(geneLists).map((gl) => (
-          <option value={gl}>{gl}</option>
+          <option value={gl} key={gl}>{gl}</option>
         ))}
       </select>
     </div>
@@ -104,9 +102,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       filter: {},
     };
 
-    //this.vcfLocation = vcfLocation // CREATE PRESIGNED URL
-    this.vcfLocation =
-      "https://aveit.s3.amazonaws.com/msa/cohort_gene_info_log_3.vcf.gz";
+    this.vcfLocation = vcfLocation 
     this.tbiLocation = this.vcfLocation + ".tbi";
 
     this.vcfRecords = {};
@@ -118,19 +114,20 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     this.showMore = this.showMore.bind(this);
     this.filterChange = this.filterChange.bind(this);
     this.changeActiveTests = this.changeActiveTests.bind(this);
-    this.processLoadedGeneList = this.processLoadedGeneList.bind(this);
+    this.setLoadedGeneList = this.setLoadedGeneList.bind(this);
     this.applyGeneListFilter = this.applyGeneListFilter.bind(this);
     this.loadData();
   }
 
-  processLoadedGeneList(geneLists) {
+  setLoadedGeneList(geneLists) {
     this.setState((prevState) => ({
       geneLists: geneLists,
     }));
   }
 
   loadData() {
-    getGeneLists(this.processLoadedGeneList);
+    getGeneLists(this.setLoadedGeneList);
+
     const vcfFile = new TabixIndexedFile({
       filehandle: new RemoteFile(this.vcfLocation),
       tbiFilehandle: new RemoteFile(this.tbiLocation),
@@ -383,6 +380,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
           <div className="mt-2">Statistical tests</div>
           {this.statTests.map((test) => (
             <StatTestCheckbox
+              key={test}
               label={test}
               checked={this.state.activeTests.includes(test)}
               onChange={this.changeActiveTests}
