@@ -17,6 +17,7 @@ pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 PROBAND_SAMPLE_QC_METRICS = {
     "bam_sample_id": PROBAND_SAMPLE_ID,
     "individual_id": "proband_boy",
+    "individual_accession": "GAPIDPROBAND",
     "sex": {"value": "M"},
     "predicted_sex": {
         "value": "male",
@@ -47,6 +48,7 @@ PROBAND_SAMPLE_QC_METRICS = {
 PROBAND_SAMPLE_2_QC_METRICS = {
     "bam_sample_id": PROBAND_SAMPLE_2_ID,
     "individual_id": "proband_boy",
+    "individual_accession": "GAPIDPROBAND",
     "sex": {"value": "M"},
     "predicted_sex": {
         "value": "male",
@@ -77,6 +79,7 @@ PROBAND_SAMPLE_2_QC_METRICS = {
 MOTHER_SAMPLE_QC_METRICS = {
     "bam_sample_id": MOTHER_SAMPLE_ID,
     "individual_id": "mother_person",
+    "individual_accession": "GAPIDMOTHER1",
     "sex": {"value": "F"},
     "predicted_sex": {
         "value": "female",
@@ -101,7 +104,7 @@ MOTHER_SAMPLE_QC_METRICS = {
     "total_variants_called": {"value": "13200"},
     "filtered_variants": {"value": "1320"},
     "filtered_structural_variants": {"value": "112"},
-    "warn": ["heterozygosity_ratio", "transition_transversion_ratio"],
+    "warn": ["transition_transversion_ratio", "heterozygosity_ratio"],
 }
 
 
@@ -393,10 +396,16 @@ class TestQualityMetricParser:
     }
     SOME_SEX = "some_sex"
     SOME_ANCESTRY = ["some_ancestry"]
-    SOME_INDIVIDUAL = {"sex": SOME_SEX, "ancestry": SOME_ANCESTRY}
+    SOME_ACCESSION = "GAPFIFOO"
+    SOME_INDIVIDUAL = {
+        "sex": SOME_SEX,
+        "ancestry": SOME_ANCESTRY,
+        "accession": SOME_ACCESSION,
+    }
     SOME_INDIVIDUAL_DATA = {
         "sex": {"value": SOME_SEX},
         "ancestry": {"value": SOME_ANCESTRY},
+        "individual_accession": SOME_ACCESSION,
     }
     ANOTHER_INDIVIDUAL = copy.copy(SOME_INDIVIDUAL)
     ANOTHER_INDIVIDUAL.update({"foo": "bar"})
@@ -708,11 +717,18 @@ class TestQualityMetricParser:
                     assert result == reformat_result
 
     @pytest.mark.parametrize(
-        "properties_to_get,item_to_get,item_to_update",
+        "properties_to_get,item_to_get,item_to_update,property_replacements,expected",
         [
-            ([], {}, {}),
-            (["foo"], WES_SAMPLE, {}),
-            (["workup_type", "bam_sample_id"], WES_SAMPLE, {}),
+            ([], {}, {}, None, {}),
+            (["foo"], WES_SAMPLE, {}, None, {}),
+            (["workup_type"], WES_SAMPLE, {}, None, {"workup_type": "WES"}),
+            (
+                ["workup_type"],
+                WES_SAMPLE,
+                {},
+                {"workup_type": "type_workup"},
+                {"type_workup": "WES"},
+            ),
         ],
     )
     def test_update_simple_properties(
@@ -721,23 +737,45 @@ class TestQualityMetricParser:
         properties_to_get,
         item_to_get,
         item_to_update,
+        property_replacements,
+        expected,
     ):
         """Unit test transfer of key, value pairs from one dict to
         another.
         """
         empty_quality_metric_parser.update_simple_properties(
-            properties_to_get, item_to_get, item_to_update
+            properties_to_get,
+            item_to_get,
+            item_to_update,
+            property_replacements=property_replacements,
         )
-        for property_to_get in properties_to_get:
-            property_value = item_to_get.get(property_to_get)
-            assert property_value == item_to_update.get(property_to_get)
+        assert item_to_update == expected
 
     @pytest.mark.parametrize(
-        "properties_to_get,item_to_get,item_to_update",
+        "properties_to_get,item_to_get,item_to_update,property_replacements,expected",
         [
-            ([], {}, {}),
-            (["foo"], WES_SAMPLE, {}),
-            (["workup_type", "bam_sample_id"], WES_SAMPLE, {}),
+            ([], {}, {}, None, {}),
+            (["foo"], WES_SAMPLE, {}, None, {}),
+            (
+                ["workup_type", "bam_sample_id"],
+                WES_SAMPLE,
+                {},
+                None,
+                {
+                    "workup_type": {"value": "WES"},
+                    "bam_sample_id": {"value": SOME_BAM_SAMPLE_ID},
+                },
+            ),
+            (
+                ["workup_type", "bam_sample_id"],
+                WES_SAMPLE,
+                {},
+                {"bam_sample_id": "sample_bam_id"},
+                {
+                    "workup_type": {"value": "WES"},
+                    "sample_bam_id": {"value": SOME_BAM_SAMPLE_ID},
+                },
+            ),
         ],
     )
     def test_update_display_properties(
@@ -746,17 +784,40 @@ class TestQualityMetricParser:
         properties_to_get,
         item_to_get,
         item_to_update,
+        property_replacements,
+        expected,
     ):
         """Unit test transfer of key, value pairs from one dict to
         another with reformatting of value.
         """
         empty_quality_metric_parser.update_display_properties(
-            properties_to_get, item_to_get, item_to_update
+            properties_to_get,
+            item_to_get,
+            item_to_update,
+            property_replacements=property_replacements,
         )
-        for property_to_get in properties_to_get:
-            property_value = item_to_get.get(property_to_get)
-            updated_value = item_to_update.get(property_to_get, {}).get("value")
-            assert property_value == updated_value
+        assert item_to_update == expected
+
+    @pytest.mark.parametrize(
+        "property_name,property_replacements,expected",
+        [
+            ("foo", {}, "foo"),
+            ("foo", {"fu": "foo"}, "foo"),
+            ("foo", {"foo": "fu"}, "fu"),
+        ],
+    )
+    def test_update_property_name(
+        self,
+        empty_quality_metric_parser,
+        property_name,
+        property_replacements,
+        expected,
+    ):
+        """Unit test replacement or maintenance of property name."""
+        result = empty_quality_metric_parser.update_property_name(
+            property_name, property_replacements
+        )
+        assert result == expected
 
     @pytest.mark.parametrize(
         "sample_item,expected_sample_mapping",

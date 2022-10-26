@@ -124,6 +124,7 @@ class QualityMetricParser:
     FEMALE = "female"
     ANCESTRY = "ancestry"
     SEX = "sex"
+    ACCESSION = "accession"
 
     # Class constants
     PREDICTED_SEX = "predicted_sex"
@@ -147,9 +148,14 @@ class QualityMetricParser:
     VCF_FILE_FORMAT_ATID = "/file-formats/vcf_gz/"
     VEP_ANNOTATED_STRING = "vep-annotated"
     PEDDY_QC_STRING = "peddyqc"
+    INDIVIDUAL_ACCESSION = "individual_accession"
 
+    INDIVIDUAL_PROPERTY_REPLACEMENTS = {ACCESSION: INDIVIDUAL_ACCESSION}
+    SV_FINAL_VCF_PROPERTY_REPLACEMENTS = {
+        FILTERED_VARIANTS: FILTERED_STRUCTURAL_VARIANTS
+    }
     SIMPLE_SAMPLE_PROPERTIES = [BAM_SAMPLE_ID, WORKUP_TYPE]
-    SIMPLE_INDIVIDUAL_PROPERTIES = [INDIVIDUAL_ID]
+    SIMPLE_INDIVIDUAL_PROPERTIES = [INDIVIDUAL_ID, ACCESSION]
     DISPLAY_INDIVIDUAL_PROPERTIES = [SEX, ANCESTRY]
     DISPLAY_BAM_PROPERTIES = [COVERAGE, TOTAL_READS]
     DISPLAY_SNV_FINAL_VCF_PROPERTIES = [FILTERED_VARIANTS]
@@ -163,7 +169,9 @@ class QualityMetricParser:
         PREDICTED_ANCESTRY,
     ]
     SIMPLE_QUALITY_METRIC_PROPERTIES = [VALUE]
-    SAMPLE_PROPERTIES_TO_KEEP = set([BAM_SAMPLE_ID, SEX, ANCESTRY, INDIVIDUAL_ID])
+    SAMPLE_PROPERTIES_TO_KEEP = set(
+        [BAM_SAMPLE_ID, SEX, ANCESTRY, INDIVIDUAL_ID, INDIVIDUAL_ACCESSION]
+    )
     QC_PROPERTIES_TO_KEEP = set(
         [
             PREDICTED_SEX,
@@ -285,13 +293,10 @@ class QualityMetricParser:
                     if sv_vcf_found:
                         continue
                     sv_vcf_found = True
-                    property_replacements = {
-                        self.FILTERED_VARIANTS: self.FILTERED_STRUCTURAL_VARIANTS
-                    }
                     self.add_to_processed_files(
                         file_item,
                         self.DISPLAY_SV_FINAL_VCF_PROPERTIES,
-                        property_replacements=property_replacements,
+                        property_replacements=self.SV_FINAL_VCF_PROPERTY_REPLACEMENTS,
                     )
             elif (
                 not vep_vcf_found
@@ -342,7 +347,9 @@ class QualityMetricParser:
         result = self.reformat_sample_mapping_to_schema()
         return result
 
-    def update_simple_properties(self, properties_to_get, item_to_get, item_to_update):
+    def update_simple_properties(
+        self, properties_to_get, item_to_get, item_to_update, property_replacements=None
+    ):
         """Helper function to add key, value pair from one dict to
         another if exists in original.
 
@@ -353,13 +360,22 @@ class QualityMetricParser:
         :type item_to_get: dict
         :param item_to_update: Dictionary to update with key, value
             pair
+        :param property_replacements: Mapping of QC property names
+            to replacement names
+        :type property_replacements: dict or None
         """
         for property_to_get in properties_to_get:
             property_value = item_to_get.get(property_to_get)
             if property_value is not None:
+                if property_replacements:
+                    property_to_get = self.update_property_name(
+                        property_to_get, property_replacements
+                    )
                 item_to_update[property_to_get] = property_value
 
-    def update_display_properties(self, properties_to_get, item_to_get, item_to_update):
+    def update_display_properties(
+        self, properties_to_get, item_to_get, item_to_update, property_replacements=None
+    ):
         """Helper function to add key, value pair from one dict to
         another (if exists) in formatting expected of calc prop.
 
@@ -370,11 +386,36 @@ class QualityMetricParser:
         :type item_to_get: dict
         :param item_to_update: Dictionary to update with key, value
             pair
+        :param property_replacements: Mapping of QC property names
+            to replacement names
+        :type property_replacements: dict or None
         """
         for property_to_get in properties_to_get:
             property_value = item_to_get.get(property_to_get)
             if property_value is not None:
+                if property_replacements:
+                    property_to_get = self.update_property_name(
+                        property_to_get, property_replacements
+                    )
                 item_to_update[property_to_get] = {self.VALUE: property_value}
+
+    def update_property_name(self, property_name, property_replacements):
+        """Update property name if replacement exists; otherwise,
+        return original name.
+
+        :param property_name: Property to potentially update
+        :type property_name: str
+        :param property_replacements: Mapping of QC property names
+            to replacement names
+        :type property_replacements: dict or None
+        :return: Property name to use
+        :rtype: str
+        """
+        result = property_name
+        updated_property_name = property_replacements.get(property_name)
+        if updated_property_name:
+            result = updated_property_name
+        return result
 
     def collect_sample_data(self, sample_identifier):
         """Gather Sample item data required for QC metrics.
@@ -412,10 +453,16 @@ class QualityMetricParser:
         """
         individual_item = self.get_item(individual_atid)
         self.update_simple_properties(
-            self.SIMPLE_INDIVIDUAL_PROPERTIES, individual_item, sample_info
+            self.SIMPLE_INDIVIDUAL_PROPERTIES,
+            individual_item,
+            sample_info,
+            property_replacements=self.INDIVIDUAL_PROPERTY_REPLACEMENTS,
         )
         self.update_display_properties(
-            self.DISPLAY_INDIVIDUAL_PROPERTIES, individual_item, sample_info
+            self.DISPLAY_INDIVIDUAL_PROPERTIES,
+            individual_item,
+            sample_info,
+            property_replacements=self.INDIVIDUAL_PROPERTY_REPLACEMENTS,
         )
 
     def collect_sample_processed_files_data(self, processed_file_atids, sample_info):
@@ -513,9 +560,9 @@ class QualityMetricParser:
         title = qc_summary_item.get(self.TITLE, "")
         schema_title = title_to_snake_case(title)
         if property_replacements:
-            updated_schema_title = property_replacements.get(schema_title)
-            if updated_schema_title:
-                schema_title = updated_schema_title
+            schema_title = self.update_property_name(
+                schema_title, property_replacements
+            )
         return schema_title
 
     def update_flag_count(self, flag_level, qc_title, sample_qc_properties):
@@ -982,6 +1029,11 @@ class SampleProcessing(Item):
                     QualityMetricParser.INDIVIDUAL_ID: {
                         "title": "Individual Identifier",
                         "description": "Individual identifier submitted related to sample",
+                        "type": "string",
+                    },
+                    QualityMetricParser.INDIVIDUAL_ACCESSION: {
+                        "title": "Individual Accession",
+                        "description": "Individual accession related to sample",
                         "type": "string",
                     },
                     QualityMetricParser.SEX: {
