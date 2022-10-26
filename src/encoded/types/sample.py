@@ -858,6 +858,27 @@ class SampleProcessing(Item):
     embedded_list = _build_sample_processing_embedded_list()
     rev = {"case": ("Case", "sample_processing")}
 
+    QC_VALUE_SCHEMA = {
+        "title": "Value",
+        "description": "Value for this QC metric",
+        "type": "string",
+    }
+    QC_FLAG_SCHEMA = {
+        "title": "QC Flag",
+        "description": "Flag for this QC value",
+        "type": "string",
+        "enum": [
+            "pass",
+            "warn",
+            "fail",
+        ],
+    }
+    QC_LINK_SCHEMA = {
+        "title": "QC Link",
+        "description": "Link for this QC metric",
+        "type": "string",
+    }
+
     @calculated_property(
         schema={
             "title": "Cases",
@@ -988,27 +1009,6 @@ class SampleProcessing(Item):
                     temp["association"] = relation_info.get("association", "")
             samples_pedigree.append(temp)
         return samples_pedigree
-
-    QC_VALUE_SCHEMA = {
-        "title": "Value",
-        "description": "Value for this QC metric",
-        "type": "string",
-    }
-    QC_FLAG_SCHEMA = {
-        "title": "QC Flag",
-        "description": "Flag for this QC value",
-        "type": "string",
-        "enum": [
-            "pass",
-            "warn",
-            "fail",
-        ],
-    }
-    QC_LINK_SCHEMA = {
-        "title": "QC Link",
-        "description": "Link for this QC metric",
-        "type": "string",
-    }
 
     @calculated_property(
         schema={

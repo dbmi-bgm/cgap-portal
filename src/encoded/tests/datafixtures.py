@@ -1589,7 +1589,6 @@ def bgm_structural_variant_sample(bgm_project, institution, structural_variant):
 
 @pytest.fixture
 def qc_vcfcheck(testapp, project, institution):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1602,7 +1601,6 @@ def qc_vcfcheck(testapp, project, institution):
 
 @pytest.fixture
 def qc_sv_vcfqc(testapp, project, institution):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1634,7 +1632,6 @@ def qc_sv_vcfqc(testapp, project, institution):
 
 @pytest.fixture
 def sv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_sv_vcfqc):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1656,7 +1653,6 @@ def sv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_sv_vcfqc):
 
 @pytest.fixture
 def sv_vcf_with_qcs(testapp, project, institution, file_formats, sv_vcf_qc_list):
-    """"""
     item = {
         'file_format': file_formats.get('vcf_gz').get('@id'),
         'md5sum': 'd41d8cd9f00d504e9800998ecf84211',
@@ -1672,7 +1668,6 @@ def sv_vcf_with_qcs(testapp, project, institution, file_formats, sv_vcf_qc_list)
 
 @pytest.fixture
 def qc_snv_vcfqc(testapp, project, institution):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1715,7 +1710,6 @@ def qc_snv_vcfqc(testapp, project, institution):
 
 @pytest.fixture
 def snv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_snv_vcfqc):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1737,7 +1731,6 @@ def snv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_snv_vcfqc):
 
 @pytest.fixture
 def snv_vcf_with_qcs(testapp, project, institution, file_formats, snv_vcf_qc_list):
-    """"""
     item = {
         'file_format': file_formats.get('vcf_gz').get('@id'),
         'md5sum': 'd41e76d9f00b204e9800998ecf84211',
@@ -1753,7 +1746,6 @@ def snv_vcf_with_qcs(testapp, project, institution, file_formats, snv_vcf_qc_lis
 
 @pytest.fixture
 def qc_peddyqc(testapp, project, institution):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1784,7 +1776,6 @@ def qc_peddyqc(testapp, project, institution):
 
 @pytest.fixture
 def qc_vep_vcfqc(testapp, project, institution):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1870,7 +1861,6 @@ def qc_vep_vcfqc(testapp, project, institution):
 @pytest.fixture
 def vep_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_peddyqc,
         qc_vep_vcfqc):
-    """"""
     item = {
         "project": project["@id"],
         "institution": institution["@id"],
@@ -1896,7 +1886,6 @@ def vep_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_peddyqc,
 
 @pytest.fixture
 def vep_vcf_with_qcs(testapp, project, institution, vep_vcf_qc_list, file_formats):
-    """"""
     item = {
         'file_format': file_formats.get('vcf_gz').get('@id'),
         'md5sum': 'd41d8cd9f00b204e9817898ecf84211',
