@@ -331,6 +331,6 @@ def test_convert_integer_to_comma_string(value, expected):
     ]
 )
 def test_title_to_snake_case(value, expected):
-    """"""
+    """Test conversion of string to snake case."""
     result = title_to_snake_case(value)
     assert result == expected
