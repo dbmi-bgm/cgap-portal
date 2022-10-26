@@ -616,30 +616,30 @@ class Case(Item):
 
     @calculated_property(
         schema={
-            "title": "",
-            "description": "",
+            "title": "QC Flags",
+            "description": "Quality control flags",
             "type": "object",
             "properties": {
                 "flag": {
-                    "title": "",
-                    "description": "",
+                    "title": "Overall Flag",
+                    "description": "Overall QC flag",
                     "type": "string",
                 },
                 "warn": {
-                    "title": "",
-                    "description": "",
+                    "title": "Warn Flags",
+                    "description": "Number of warn flags",
                     "type": "integer",
                 },
                 "fail": {
-                    "title": "",
-                    "description": "",
+                    "title": "Fail Flags",
+                    "description": "Number of fail flags",
                     "type": "integer",
                 },
             },
         }
     )
     def quality_control_flags(self, request, sample_processing=None):
-        """"""
+        """Gather and count QC flags from SampleProcessing."""
         result = None
         if sample_processing:
             sample_processing_item = get_item_or_none(request, sample_processing)
@@ -649,23 +649,25 @@ class Case(Item):
 
     @staticmethod
     def _get_flags(sample_processing):
-        """"""
+        """Gather and count QC flags from SampleProcessing."""
+        result = None
         fail_count = 0
         warn_count = 0
-        qc_metrics = sample_processing.get("quality_control_metrics", [])
-        for sample_qc_metrics in qc_metrics:
-            fail_flags = sample_qc_metrics.get("fail", [])
-            fail_count += len(fail_flags)
-            warn_flags = sample_qc_metrics.get("warn", [])
-            warn_count += len(warn_flags)
-        overall_flag = "pass"
-        if fail_count:
-            overall_flag = "fail"
-        elif warn_count:
-            overall_flag = "warn"
-        result = {
-            "flag": overall_flag,
-            "warn": warn_count,
-            "fail": fail_count,
-        }
+        qc_metrics = sample_processing.get("quality_control_metrics")
+        if qc_metrics is not None:
+            for sample_qc_metrics in qc_metrics:
+                fail_flags = sample_qc_metrics.get("fail", [])
+                fail_count += len(fail_flags)
+                warn_flags = sample_qc_metrics.get("warn", [])
+                warn_count += len(warn_flags)
+            overall_flag = "pass"
+            if fail_count:
+                overall_flag = "fail"
+            elif warn_count:
+                overall_flag = "warn"
+            result = {
+                "flag": overall_flag,
+                "warn": warn_count,
+                "fail": fail_count,
+            }
         return result

@@ -34,15 +34,15 @@ def second_fam(testapp, project, institution, mother, father, sister):
 
 
 def test_case_case_title(testapp, proband_case, mother_case):
-    proband_title = 'GAPIDPROBAND WGS-Group'
-    mother_title = 'GAPIDMOTHER1 WGS-Group - in GAPIDPROBANDp'
+    proband_title = 'proband_boy WGS-Group'
+    mother_title = 'mother_person WGS-Group - in proband_boyp'
     assert proband_title == proband_case['case_title']
     assert mother_title == mother_case['case_title']
 
 
 def test_case_display_title(testapp, proband_case, mother_case):
-    proband_title = 'GAPIDPROBAND WGS-Group (GAPCAP4E4GMG)'
-    mother_title = 'GAPIDMOTHER1 WGS-Group - in GAPIDPROBANDp (GAPCAU1K3F5A)'
+    proband_title = 'proband_boy WGS-Group (GAPCAP4E4GMG)'
+    mother_title = 'mother_person WGS-Group - in proband_boyp (GAPCAU1K3F5A)'
     assert proband_title == proband_case['display_title']
     assert mother_title == mother_case['display_title']
 
@@ -321,12 +321,12 @@ def test_case_default_title_case_id(testapp, proband_case):
 def test_quality_control_flags(
     testapp, child_case, sample_processing, sample_proc_fam
 ):
-    """"""
+    """Integrated test of calcprop."""
     child_case_id = child_case["@id"]
 
     # SampleProcessing with many QCs
     qc_flags = child_case.get("quality_control_flags")
-    assert qc_flags == {"flag": "fail", "warn": 2, "fail": 4}
+    assert qc_flags == {"flag": "fail", "warn": 3, "fail": 2}
 
     # SampleProcessing with no QCs
     patch_body = {"sample_processing": sample_proc_fam["@id"]}
@@ -334,7 +334,7 @@ def test_quality_control_flags(
         child_case_id, patch_body, status=200
     ).json["@graph"][0]
     qc_flags = response.get("quality_control_flags")
-    assert qc_flags == {"flag": "pass", "warn": 0, "fail": 0}
+    assert qc_flags is None
 
     # No SampleProcessing
     case = testapp.get(child_case["@id"], params="frame=raw", status=200).json
@@ -347,13 +347,14 @@ def test_quality_control_flags(
 
 
 def make_expected_flag_result(flag, warn_count=0, fail_count=0):
-    """"""
+    """Helper for making test parameters."""
     return {"flag": flag, "warn": warn_count, "fail": fail_count}
 
 
 @pytest.mark.parametrize(
     "quality_control_metrics,expected",
     [
+        (None, None),
         ([], make_expected_flag_result("pass")),
         (PASSING_QCS, make_expected_flag_result("pass")),
         (FAIL_3_QCS, make_expected_flag_result("fail", fail_count=3)),
@@ -363,7 +364,9 @@ def make_expected_flag_result(flag, warn_count=0, fail_count=0):
     ]
 )
 def test_get_flags(quality_control_metrics, expected):
-    """"""
+    """Unit test for collecting and counting flags from
+    SampleProcessing.
+    """
     sample_processing = {"quality_control_metrics": quality_control_metrics}
     result = Case._get_flags(sample_processing)
     assert result == expected
