@@ -627,43 +627,7 @@ class QualityMetricParser:
                 log.exception(f"Could not evaluate QC value: {qc_value}.")
         return result
 
-    #    def add_flags(self):
-    #        """"""
-    #        overall_worst_flag = self.FLAG_PASS
-    #        overall_worst_flag_rank = -1
-    #        for sample_info in self.sample_mapping.values():
-    #            worst_flag = None
-    #            worst_flag_rank = -1
-    #            for qc_field, qc_field_value in sample_info.items():
-    #                if not isinstance(qc_field_value, dict):
-    #                    continue
-    #                flag = qc_field_value.get(self.FLAG)
-    #                if flag is None:
-    #                    continue
-    #                flag_rank = self.RANKED_FLAGS.get(flag, -1)
-    #                if flag_rank > worst_flag_rank:
-    #                    worst_flag_rank = flag_rank
-    #                    worst_flag = flag
-    #            if worst_flag is not None:
-    #                sample_info[self.FLAG] = worst_flag
-    #            if worst_flag_rank > overall_worst_flag_rank:
-    #                overall_worst_flag = worst_flag
-    #        self.overall_flag = overall_worst_flag
-
-    #    def add_overall_flag(self):
-    #        """"""
-    #        worst_flag = None
-    #        worst_flag_rank = -1
-    #        for sample_info in self.sample_mapping.values():
-    #            sample_flag = sample_info.get(self.FLAG)
-    #            sample_flag_rank = self.RANKED_FLAGS.get(sample_flag, -1)
-    #            if sample_flag_rank > worst_flag_rank:
-    #                worst_flag_rank = sample_flag_rank
-    #                worst_flag = sample_flag
-    #        if worst_flag is not None:
-    #            self.sample_mapping[self.FLAG] = worst_flag
-
-    def flag_bam_coverage(self, coverage, sample_properties, *args, **kwargs):
+        def flag_bam_coverage(self, coverage, sample_properties, *args, **kwargs):
         """Evaluate BAM coverage for flag.
 
         :param coverage: BAM coverage from QC item
