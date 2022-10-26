@@ -216,7 +216,7 @@ def test_sample_processing_pedigree_bam_location(
 
 @pytest.fixture
 def empty_quality_metric_parser():
-    """"""
+    """An empty class for testing."""
     return sample_type_module.QualityMetricParser(None)
 
 
@@ -352,7 +352,7 @@ class TestQualityMetricParser:
         get_item_or_none_result,
         expected,
     ):
-        """"""
+        """Unit test item retrieval with mocked get_item_or_none."""
         with mock.patch.object(
             sample_type_module,
             "get_item_or_none",
@@ -389,7 +389,9 @@ class TestQualityMetricParser:
         final_vcf_found,
         expected,
     ):
-        """"""
+        """Unit test collection and processing of data to create QC
+        display.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "collect_sample_processing_processed_files_data",
@@ -435,7 +437,9 @@ class TestQualityMetricParser:
         expected_add_to_processed_files_calls,
         expected_result,
     ):
-        """"""
+        """Unit test collecting appropriate FilesProcessed off of a
+        SampleProcessing.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "get_item",
@@ -463,7 +467,7 @@ class TestQualityMetricParser:
     def test_add_to_processed_files(
         self, empty_quality_metric_parser, file_item, property_replacements, links
     ):
-        """"""
+        """Unit test updating attribute with FileProcessed data."""
         empty_quality_metric_parser.add_to_processed_files(
             file_item, property_replacements, links
         )
@@ -482,7 +486,9 @@ class TestQualityMetricParser:
     def test_collect_and_process_samples_data(
         self, empty_quality_metric_parser, sample_identifiers, reformat_result
     ):
-        """"""
+        """Unit test processing Sample item to gather associated data,
+        create mapping to QC data, and reformatting result.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser, "collect_sample_data"
         ) as mocked_collect_sample_data:
@@ -490,9 +496,6 @@ class TestQualityMetricParser:
                 sample_type_module.QualityMetricParser,
                 "associate_file_quality_metrics_with_samples",
             ) as mocked_associate_qcs_with_samples:
-                #                with mock.patch.object(
-                #                    sample_type_module.QualityMetricParser, "add_flags"
-                #                ) as mocked_add_flags:
                 with mock.patch.object(
                     sample_type_module.QualityMetricParser,
                     "reformat_sample_mapping_to_schema",
@@ -529,7 +532,9 @@ class TestQualityMetricParser:
         item_to_get,
         item_to_update,
     ):
-        """"""
+        """Unit test transfer of key, value pairs from one dict to
+        another.
+        """
         empty_quality_metric_parser.update_simple_properties(
             properties_to_get, item_to_get, item_to_update
         )
@@ -552,7 +557,9 @@ class TestQualityMetricParser:
         item_to_get,
         item_to_update,
     ):
-        """"""
+        """Unit test transfer of key, value pairs from one dict to
+        another with reformatting of value.
+        """
         empty_quality_metric_parser.update_display_properties(
             properties_to_get, item_to_get, item_to_update
         )
@@ -571,7 +578,9 @@ class TestQualityMetricParser:
     def test_collect_sample_data(
         self, empty_quality_metric_parser, sample_item, expected_sample_mapping
     ):
-        """"""
+        """Unit test getting Sample item and collecting associated
+        data.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "get_item",
@@ -606,7 +615,7 @@ class TestQualityMetricParser:
     def test_collect_individual_data(
         self, empty_quality_metric_parser, individual_item, sample_info, expected
     ):
-        """"""
+        """Unit test collecting Individual data."""
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "get_item",
@@ -635,7 +644,9 @@ class TestQualityMetricParser:
         expected_get_item_call_count,
         expected_collect_bam_call,
     ):
-        """"""
+        """Unit test collection of FileProcessed items off of a Sample
+        item.
+        """
         sample_info = {"key": "value"}
         processed_file_atids = [item.get("@id") for item in processed_file_items]
         with mock.patch.object(
@@ -675,7 +686,7 @@ class TestQualityMetricParser:
         expected_get_item_call,
         expected_add_qc_property_calls,
     ):
-        """"""
+        """Unit test collection of BAM file QC items."""
         file_item = {"quality_metric": qc_item}
         sample_info = {"key": "value"}
         expected_add_qc_property_calls = [
@@ -753,14 +764,14 @@ class TestQualityMetricParser:
     SOME_QC_PROPERTIES = [SOME_TITLE, SOME_TITLE_WITH_LINK]
     SOME_PROPERTY_REPLACEMENTS = {SOME_TITLE: SOME_TITLE_WITH_LINK}
 
-    def make_qc_summary_item(title, sample, value=None, number_type=None, tooltip=None):
-        """"""
-        result = {"title": title, "sample": sample}
-        result["value"] = value or "foo"
-        result["numberType"] = number_type or "float"
-        if tooltip:
-            result["tooltip"] = tooltip
-        return result
+    #    def make_qc_summary_item(title, sample, value=None, number_type=None, tooltip=None):
+    #        """Helper function to make test fixtures."""
+    #        result = {"title": title, "sample": sample}
+    #        result["value"] = value or "foo"
+    #        result["numberType"] = number_type or "float"
+    #        if tooltip:
+    #            result["tooltip"] = tooltip
+    #        return result
 
     #    QC_PREDICTED_SEX_SAMPLE_1 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_1)
     #    QC_PREDICTED_SEX_SAMPLE_2 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_2)
@@ -887,7 +898,7 @@ class TestQualityMetricParser:
         expected_add_flag_called,
         expected_sample_properties,
     ):
-        """"""
+        """Unit test addition of QC item to sample QC properties."""
         property_replacements = {"foo": "bar"}
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
@@ -936,24 +947,32 @@ class TestQualityMetricParser:
     def test_get_qc_summary_title(
         self, empty_quality_metric_parser, qc_summary, property_replacements, expected
     ):
-        """"""
+        """Unit test reformatting and possible replacing QC item title
+        to expected title.
+        """
         result = empty_quality_metric_parser.get_qc_summary_title(
             qc_summary, property_replacements
         )
         assert result == expected
 
     @pytest.mark.parametrize(
-        "flag_level,qc_title,sample_properties,expected_sample_properties", []
+        "flag_level,qc_title,sample_properties,expected_sample_properties",
+        [
+            ("foo", "bar", {}, {"foo": set(["bar"])}),
+            ("foo", "bar", {"foo": set(["bar"])}, {"foo": set(["bar"])}),
+            ("foo", "bar", {"foo": set(["bur"])}, {"foo": set(["bar", "bur"])}),
+        ],
     )
     def test_update_flag_count(
         self,
-        quality_metric_parser,
+        empty_quality_metric_parser,
         flag_level,
         qc_title,
         sample_properties,
         expected_sample_properties,
     ):
-        """"""
+        """Unit test adding QC title to flag property in sample
+        properties."""
         empty_quality_metric_parser.update_flag_count(
             flag_level, qc_title, sample_properties
         )
@@ -989,7 +1008,9 @@ class TestQualityMetricParser:
         processed_files_with_quality_metrics,
         expected_associate_quality_metric_calls,
     ):
-        """"""
+        """Unit test associating QualitMetrics from SampleProcessing's
+        FilesProcessed with sample-specific QC data.
+        """
         setattr(
             empty_quality_metric_parser,
             "processed_files_with_quality_metrics",
@@ -1064,7 +1085,9 @@ class TestQualityMetricParser:
         expected_log,
         expected_add_qc_calls,
     ):
-        """"""
+        """Unit test associating one QualityMetric's QC items with
+        samples' data.
+        """
         empty_quality_metric_parser.sample_mapping = sample_mapping
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
@@ -1127,7 +1150,7 @@ class TestQualityMetricParser:
         ],
     )
     def test_get_qc_links(self, empty_quality_metric_parser, quality_metric, expected):
-        """"""
+        """Unit test collection of QC links for display."""
         result = empty_quality_metric_parser.get_qc_links(quality_metric)
         assert result == expected
 
@@ -1148,7 +1171,7 @@ class TestQualityMetricParser:
         evaluator_error,
         expected,
     ):
-        """"""
+        """Unit test flagging QC values."""
         sample_qc_properties = {"foo": "bar"}
         qc_title = "some_title"
         qc_value = "some_value"
@@ -1242,7 +1265,7 @@ class TestQualityMetricParser:
     def test_flag_bam_coverage(
         self, empty_quality_metric_parser, coverage, sample_properties, expected
     ):
-        """"""
+        """Unit test flagging BAM coverage."""
         result = empty_quality_metric_parser.flag_bam_coverage(
             coverage, sample_properties
         )
@@ -1266,7 +1289,7 @@ class TestQualityMetricParser:
     def test_flag_sex_consistency(
         self, empty_quality_metric_parser, predicted_sex, sample_properties, expected
     ):
-        """"""
+        """Unit test flagging sex consistency."""
         result = empty_quality_metric_parser.flag_sex_consistency(
             predicted_sex, sample_properties
         )
@@ -1285,7 +1308,7 @@ class TestQualityMetricParser:
     def test_flag_heterozygosity_ratio(
         self, empty_quality_metric_parser, heterozygosity_ratio, expected
     ):
-        """"""
+        """Unit test flagging SNV heterozygosity ratio."""
         result = empty_quality_metric_parser.flag_heterozygosity_ratio(
             heterozygosity_ratio
         )
@@ -1317,7 +1340,7 @@ class TestQualityMetricParser:
         expected_log,
         expected,
     ):
-        """"""
+        """Unit test flagging SNV Ts/Tv ratio."""
         result = empty_quality_metric_parser.flag_transition_transversion_ratio(
             transition_transversion_ratio, sample_properties
         )
@@ -1340,7 +1363,7 @@ class TestQualityMetricParser:
     def test_flag_de_novo_fraction(
         self, empty_quality_metric_parser, de_novo_fraction, expected
     ):
-        """"""
+        """Unit test flagging de novo fraction."""
         result = empty_quality_metric_parser.flag_de_novo_fraction(de_novo_fraction)
         assert result == expected
 
@@ -1359,7 +1382,9 @@ class TestQualityMetricParser:
     def test_reformat_sample_mapping_to_schema(
         self, empty_quality_metric_parser, sample_mapping, schema_properties, expected
     ):
-        """"""
+        """Unit test conversion of sample mapping --> sample-specific
+        data to desired output for calcprop.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "convert_flag_sets_to_lists",
@@ -1397,7 +1422,7 @@ class TestQualityMetricParser:
     def test_convert_flag_sets_to_lists(
         self, empty_quality_metric_parser, flags_to_capture, sample_properties, expected
     ):
-        """"""
+        """Unit test conversion of flag properties from lists to sets."""
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "FLAGS_TO_CAPTURE",
