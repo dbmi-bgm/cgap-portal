@@ -14,6 +14,97 @@ from ..types import sample as sample_type_module
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
 
 
+PROBAND_SAMPLE_QC_METRICS = {
+    "bam_sample_id": PROBAND_SAMPLE_ID,
+    "individual_id": "proband_boy",
+    "sex": {"value": "M"},
+    "predicted_sex": {
+        "value": "male",
+        "link": (
+            "/quality-metrics-peddyqc/"
+            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
+        ),
+        "flag": "pass",
+    },
+    "ancestry": {"value": ["mars"]},
+    "predicted_ancestry": {
+        "value": "EARTH",
+        "link": (
+            "/quality-metrics-peddyqc/"
+            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
+        ),
+    },
+    "total_reads": {"value": "467863567"},
+    "coverage": {"value": "30x", "flag": "pass"},
+    "heterozygosity_ratio": {"value": "2.0", "flag": "pass"},
+    "transition_transversion_ratio": {"value": "1.96", "flag": "pass"},
+    "de_novo_fraction": {"value": "5.2", "flag": "fail"},
+    "total_variants_called": {"value": "11000"},
+    "filtered_variants": {"value": "1100"},
+    "filtered_structural_variants": {"value": "92"},
+    "fail": ["de_novo_fraction"],
+}
+PROBAND_SAMPLE_2_QC_METRICS = {
+    "bam_sample_id": PROBAND_SAMPLE_2_ID,
+    "individual_id": "proband_boy",
+    "sex": {"value": "M"},
+    "predicted_sex": {
+        "value": "male",
+        "link": (
+            "/quality-metrics-peddyqc/"
+            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
+        ),
+        "flag": "pass",
+    },
+    "ancestry": {"value": ["mars"]},
+    "predicted_ancestry": {
+        "value": "MARS",
+        "link": (
+            "/quality-metrics-peddyqc/"
+            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
+        ),
+    },
+    "total_reads": {"value": "123456789"},
+    "coverage": {"value": "43x", "flag": "pass"},
+    "heterozygosity_ratio": {"value": "3.0", "flag": "warn"},
+    "transition_transversion_ratio": {"value": "2.5", "flag": "fail"},
+    "total_variants_called": {"value": "11800"},
+    "filtered_variants": {"value": "1180"},
+    "filtered_structural_variants": {"value": "92"},
+    "warn": ["heterozygosity_ratio"],
+    "fail": ["transition_transversion_ratio"],
+}
+MOTHER_SAMPLE_QC_METRICS = {
+    "bam_sample_id": MOTHER_SAMPLE_ID,
+    "individual_id": "mother_person",
+    "sex": {"value": "F"},
+    "predicted_sex": {
+        "value": "female",
+        "link": (
+            "/quality-metrics-peddyqc/"
+            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
+        ),
+        "flag": "pass",
+    },
+    "ancestry": {"value": ["jupiter"]},
+    "predicted_ancestry": {
+        "value": "JUPITER",
+        "link": (
+            "/quality-metrics-peddyqc/"
+            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
+        ),
+    },
+    "total_reads": {"value": "987654321"},
+    "coverage": {"value": "35x", "flag": "pass"},
+    "heterozygosity_ratio": {"value": "1.0", "flag": "warn"},
+    "transition_transversion_ratio": {"value": "2.15", "flag": "warn"},
+    "total_variants_called": {"value": "13200"},
+    "filtered_variants": {"value": "1320"},
+    "filtered_structural_variants": {"value": "112"},
+    "warn": ["heterozygosity_ratio", "transition_transversion_ratio"],
+}
+
+
 @pytest.fixture
 def MIndividual(testapp, project, institution, sample_one):
     ind = {"project": "encode-project", "institution": "encode-institution", "sex": "M"}
@@ -335,6 +426,106 @@ class TestQualityMetricParser:
         SAMPLE_2: SAMPLE_2_PROPERTIES,
     }
 
+    SOME_TITLE = "some_title"
+    INCOMPLETE_QC_SUMMARY_ITEM = {
+        "title": "Some title",
+        "value": "some_value",
+    }
+    QC_SUMMARY_ITEM = {
+        "title": "Some Title",
+        "value": "some_value",
+        "numberType": "some_number_type",
+    }
+    SAMPLE_QC_SUMMARY = {
+        SOME_TITLE: {
+            "value": "some_value",
+        }
+    }
+    EXISTING_SAMPLE_PROPERTIES = {"foo": {"fu": "bar"}}
+    SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES = copy.deepcopy(SAMPLE_QC_SUMMARY)
+    SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES.update(EXISTING_SAMPLE_PROPERTIES)
+    SAMPLE_QC_SUMMARY_PASS_FLAG = {
+        key: copy.deepcopy(value) for key, value in SAMPLE_QC_SUMMARY.items()
+    }
+    SAMPLE_QC_SUMMARY_PASS_FLAG[SOME_TITLE].update({"flag": "pass"})
+    SAMPLE_QC_SUMMARY_FAIL_FLAG = {
+        key: copy.deepcopy(value) for key, value in SAMPLE_QC_SUMMARY.items()
+    }
+    SAMPLE_QC_SUMMARY_FAIL_FLAG[SOME_TITLE].update({"flag": "fail"})
+    SAMPLE_QC_SUMMARY_FAIL_FLAG["fail"] = set([SOME_TITLE])
+    SOME_TITLE_WITH_LINK = "some_title_with_link"
+    SOME_PROPERTIES_TO_FIND = [SOME_TITLE, SOME_TITLE_WITH_LINK]
+    QC_PROPERTY_NAMES_TO_LINKS = {SOME_TITLE_WITH_LINK: "some_link"}
+    QC_SUMMARY_ITEM_WITH_LINK = {
+        "title": "Some Title With Link",
+        "value": "some_value",
+        "numberType": "some_number_type",
+    }
+    SAMPLE_QC_SUMMARY_WITHOUT_LINK = {
+        SOME_TITLE_WITH_LINK: {
+            "value": "some_value",
+        }
+    }
+    SAMPLE_QC_SUMMARY_WITH_LINK = {
+        SOME_TITLE_WITH_LINK: {
+            "value": "some_value",
+            "link": "an_actual_link",
+        }
+    }
+    SOME_QC_LINK = {"some_link": "an_actual_link"}
+    SOME_QC_PROPERTIES = [SOME_TITLE, SOME_TITLE_WITH_LINK]
+    SOME_PROPERTY_REPLACEMENTS = {SOME_TITLE: SOME_TITLE_WITH_LINK}
+
+    SAMPLE_MAPPING_1 = {
+        "foo": {
+            "qc_field_1": {},
+            "qc_field_2": {"flag": "warn"},
+            "qc_field_3": {"flag": "pass"},
+        },
+        "bar": {
+            "qc_field_1": {},
+            "qc_field_2": {},
+            "qc_field_3": {"flag": "pass"},
+        },
+        "fu": {
+            "qc_field_1": {"flag": "warn"},
+            "qc_field_2": {"flag": "fail"},
+            "qc_field_3": {"flag": "pass"},
+        },
+    }
+    SAMPLE_MAPPING_2 = {
+        "foo": {
+            "qc_field_1": {"flag": "warn"},
+            "qc_field_2": {"flag": "fu"},
+        },
+        "bar": {
+            "qc_field_1": {},
+            "qc_field_2": {},
+        },
+    }
+    SAMPLE_MAPPING_3 = {
+        "foo": {
+            "non_qc_field_1": {"value": "fu"},
+            "qc_field_1": {"flag": "warn"},
+            "non_qc_field_2": {"value": "3000"},
+        },
+    }
+
+    SOME_PEDDY_QC_ATID = "/peddy_qc/a_peddy_qc/"
+    SOME_PEDDY_LINK = {"peddyqc": SOME_PEDDY_QC_ATID + "@@download"}
+    SOME_NON_PEDDY_QC = {"qc_type": "some_other_quality_metric_type", "value": "foobar"}
+    QC_WITH_PEDDY_QC_LINK = {
+        "qc_list": [
+            SOME_NON_PEDDY_QC,
+            {"qc_type": "quality_metric_peddyqc", "value": SOME_PEDDY_QC_ATID},
+        ]
+    }
+    QC_WITH_NO_PEDDY_QC_LINK = {"qc_list": [SOME_NON_PEDDY_QC]}
+
+    SOME_FLAG_NAMES = ["foo", "bar", "foobar"]
+    SAMPLE_PROPERTIES_WITH_FLAGS = {"foo": set(SOME_FLAG_NAMES), "fu": set(["bur"])}
+    SAMPLE_PROPERTIES_WITH_FLAGS_LIST = {"foo": SOME_FLAG_NAMES, "fu": set(["bur"])}
+
     @pytest.mark.parametrize(
         "item_atid,get_item_or_none_result,expected",
         [
@@ -513,7 +704,6 @@ class TestQualityMetricParser:
                         result_collect_samples_calls == expected_collect_samples_calls
                     )
                     mocked_associate_qcs_with_samples.assert_called_once()
-                    #                        mocked_add_flags.assert_called_once()
                     mocked_reformat_to_schema.assert_called_once()
                     assert result == reformat_result
 
@@ -713,108 +903,6 @@ class TestQualityMetricParser:
                     mocked_get_item.assert_not_called()
                 mocked_add_qc_property_calls = mocked_add_qc_property.call_args_list
                 assert mocked_add_qc_property_calls == expected_add_qc_property_calls
-
-    SOME_TITLE = "some_title"
-    INCOMPLETE_QC_SUMMARY_ITEM = {
-        "title": "Some title",
-        "value": "some_value",
-    }
-    QC_SUMMARY_ITEM = {
-        "title": "Some Title",
-        "value": "some_value",
-        "numberType": "some_number_type",
-    }
-    SAMPLE_QC_SUMMARY = {
-        SOME_TITLE: {
-            "value": "some_value",
-        }
-    }
-    EXISTING_SAMPLE_PROPERTIES = {"foo": {"fu": "bar"}}
-    SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES = copy.deepcopy(SAMPLE_QC_SUMMARY)
-    SAMPLE_QC_SUMMARY_WITH_EXISTING_PROPERTIES.update(EXISTING_SAMPLE_PROPERTIES)
-    SAMPLE_QC_SUMMARY_PASS_FLAG = {
-        key: copy.deepcopy(value) for key, value in SAMPLE_QC_SUMMARY.items()
-    }
-    SAMPLE_QC_SUMMARY_PASS_FLAG[SOME_TITLE].update({"flag": "pass"})
-    SAMPLE_QC_SUMMARY_FAIL_FLAG = {
-        key: copy.deepcopy(value) for key, value in SAMPLE_QC_SUMMARY.items()
-    }
-    SAMPLE_QC_SUMMARY_FAIL_FLAG[SOME_TITLE].update({"flag": "fail"})
-    SAMPLE_QC_SUMMARY_FAIL_FLAG["fail"] = set([SOME_TITLE])
-    SOME_TITLE_WITH_LINK = "some_title_with_link"
-    SOME_PROPERTIES_TO_FIND = [SOME_TITLE, SOME_TITLE_WITH_LINK]
-    QC_PROPERTY_NAMES_TO_LINKS = {SOME_TITLE_WITH_LINK: "some_link"}
-    QC_SUMMARY_ITEM_WITH_LINK = {
-        "title": "Some Title With Link",
-        "value": "some_value",
-        "numberType": "some_number_type",
-    }
-    SAMPLE_QC_SUMMARY_WITHOUT_LINK = {
-        SOME_TITLE_WITH_LINK: {
-            "value": "some_value",
-        }
-    }
-    SAMPLE_QC_SUMMARY_WITH_LINK = {
-        SOME_TITLE_WITH_LINK: {
-            "value": "some_value",
-            "link": "an_actual_link",
-        }
-    }
-    SOME_QC_LINK = {"some_link": "an_actual_link"}
-    SOME_QC_PROPERTIES = [SOME_TITLE, SOME_TITLE_WITH_LINK]
-    SOME_PROPERTY_REPLACEMENTS = {SOME_TITLE: SOME_TITLE_WITH_LINK}
-
-    #    def make_qc_summary_item(title, sample, value=None, number_type=None, tooltip=None):
-    #        """Helper function to make test fixtures."""
-    #        result = {"title": title, "sample": sample}
-    #        result["value"] = value or "foo"
-    #        result["numberType"] = number_type or "float"
-    #        if tooltip:
-    #            result["tooltip"] = tooltip
-    #        return result
-
-    #    QC_PREDICTED_SEX_SAMPLE_1 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_1)
-    #    QC_PREDICTED_SEX_SAMPLE_2 = make_qc_summary_item("predicted_sex", SOME_SAMPLE_2)
-    #    QC_PREDICTED_SEX_SAMPLE_3 = make_qc_summary_item("predicted_sex", "unknown_sample")
-    #    QC_SUMMARY_ITEM = [
-    #        QC_PREDICTED_SEX_SAMPLE_1, QC_PREDICTED_SEX_SAMPLE_2, QC_PREDICTED_SEX_SAMPLE_3
-    #    ]
-    #    QC_ITEM = {"quality_metric_summary": QC_SUMMARY_ITEM}
-    #
-    SAMPLE_MAPPING_1 = {
-        "foo": {
-            "qc_field_1": {},
-            "qc_field_2": {"flag": "warn"},
-            "qc_field_3": {"flag": "pass"},
-        },
-        "bar": {
-            "qc_field_1": {},
-            "qc_field_2": {},
-            "qc_field_3": {"flag": "pass"},
-        },
-        "fu": {
-            "qc_field_1": {"flag": "warn"},
-            "qc_field_2": {"flag": "fail"},
-            "qc_field_3": {"flag": "pass"},
-        },
-    }
-    SAMPLE_MAPPING_2 = {
-        "foo": {
-            "qc_field_1": {"flag": "warn"},
-            "qc_field_2": {"flag": "fu"},
-        },
-        "bar": {
-            "qc_field_1": {},
-            "qc_field_2": {},
-        },
-    }
-    SAMPLE_MAPPING_3 = {
-        "foo": {
-            "non_qc_field_1": {"value": "fu"},
-            "qc_field_1": {"flag": "warn"},
-            "non_qc_field_2": {"value": "3000"},
-        },
-    }
 
     @pytest.mark.parametrize(
         (
@@ -1130,17 +1218,6 @@ class TestQualityMetricParser:
                     else:
                         assert not log_calls
 
-    SOME_PEDDY_QC_ATID = "/peddy_qc/a_peddy_qc/"
-    SOME_PEDDY_LINK = {"peddyqc": SOME_PEDDY_QC_ATID + "@@download"}
-    SOME_NON_PEDDY_QC = {"qc_type": "some_other_quality_metric_type", "value": "foobar"}
-    QC_WITH_PEDDY_QC_LINK = {
-        "qc_list": [
-            SOME_NON_PEDDY_QC,
-            {"qc_type": "quality_metric_peddyqc", "value": SOME_PEDDY_QC_ATID},
-        ]
-    }
-    QC_WITH_NO_PEDDY_QC_LINK = {"qc_list": [SOME_NON_PEDDY_QC]}
-
     @pytest.mark.parametrize(
         "quality_metric,expected",
         [
@@ -1198,50 +1275,6 @@ class TestQualityMetricParser:
         else:
             assert not log_calls
         assert result == expected
-
-    #    @pytest.mark.parametrize(
-    #        "sample_mapping,expected_flags_for_samples",
-    #        [
-    #            ({}, [], "pass"),
-    #            (SAMPLE_MAPPING_1, ["warn", "pass", "fail"], "fail"),
-    #            (SAMPLE_MAPPING_2, ["warn", None], "warn"),
-    #            (SAMPLE_MAPPING_3, ["warn"], "warn"),
-    #        ]
-    #    )
-    #    def test_add_flags(
-    #        self, empty_quality_metric_parser, sample_mapping, expected_flags_for_samples,
-    #        expected_overall_flag
-    #    ):
-    #        """"""
-    #        empty_quality_metric_parser.sample_mapping = sample_mapping
-    #        empty_quality_metric_parser.add_flags()
-    #        assert sample_mapping.get("flag") == expected_overall_flag
-    #        del sample_mapping["flag"]
-    #        assert len(sample_mapping.values()) == len(expected_flags_for_samples)
-    #        for idx, sample_info in enumerate(sample_mapping.values()):
-    #            assert sample_info.get("flag") == expected_flags_for_samples[idx]
-    #
-    #    SAMPLE_MAPPING_4 = {"foo": {"flag": "warn"}}
-    #    SAMPLE_MAPPING_5 = {"foo": {"flag": "warn"}, "bar": {"flag": "pass"}}
-    #    SAMPLE_MAPPING_6 = {"foo": {"flag": "warn"}, "bar": {"flag": "fail"}}
-    #
-    #    @pytest.mark.parametrize(
-    #        "sample_mapping,expected_flag",
-    #        [
-    #            ({}, None),
-    #            (SAMPLE_MAPPING_3, None),
-    #            (SAMPLE_MAPPING_4, "warn"),
-    #            (SAMPLE_MAPPING_5, "warn"),
-    #            (SAMPLE_MAPPING_6, "fail"),
-    #        ]
-    #    )
-    #    def test_add_overall_flag(
-    #        self, empty_quality_metric_parser, sample_mapping, expected_flag
-    #    ):
-    #        """"""
-    #        empty_quality_metric_parser.sample_mapping = sample_mapping
-    #        empty_quality_metric_parser.add_overall_flag()
-    #        assert sample_mapping.get("flag") == expected_flag
 
     @pytest.mark.parametrize(
         "coverage,sample_properties,expected",
@@ -1402,10 +1435,6 @@ class TestQualityMetricParser:
                     mocked_convert_flags.assert_any_call(item)
                 assert result == expected
 
-    SOME_FLAG_NAMES = ["foo", "bar", "foobar"]
-    SAMPLE_PROPERTIES_WITH_FLAGS = {"foo": set(SOME_FLAG_NAMES), "fu": set(["bur"])}
-    SAMPLE_PROPERTIES_WITH_FLAGS_LIST = {"foo": SOME_FLAG_NAMES, "fu": set(["bur"])}
-
     @pytest.mark.parametrize(
         "flags_to_capture,sample_properties,expected",
         [
@@ -1436,97 +1465,6 @@ class TestQualityMetricParser:
                 assert len(value) == len(expected_value)
                 for item in expected_value:
                     assert item in value
-
-
-PROBAND_SAMPLE_QC_METRICS = {
-    "bam_sample_id": PROBAND_SAMPLE_ID,
-    "individual_id": "proband_boy",
-    "sex": {"value": "M"},
-    "predicted_sex": {
-        "value": "male",
-        "link": (
-            "/quality-metrics-peddyqc/"
-            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
-        ),
-        "flag": "pass",
-    },
-    "ancestry": {"value": ["mars"]},
-    "predicted_ancestry": {
-        "value": "EARTH",
-        "link": (
-            "/quality-metrics-peddyqc/"
-            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
-        ),
-    },
-    "total_reads": {"value": "467863567"},
-    "coverage": {"value": "30x", "flag": "pass"},
-    "heterozygosity_ratio": {"value": "2.0", "flag": "pass"},
-    "transition_transversion_ratio": {"value": "1.96", "flag": "pass"},
-    "de_novo_fraction": {"value": "5.2", "flag": "fail"},
-    "total_variants_called": {"value": "11000"},
-    "filtered_variants": {"value": "1100"},
-    "filtered_structural_variants": {"value": "92"},
-    "fail": ["de_novo_fraction"],
-}
-PROBAND_SAMPLE_2_QC_METRICS = {
-    "bam_sample_id": PROBAND_SAMPLE_2_ID,
-    "individual_id": "proband_boy",
-    "sex": {"value": "M"},
-    "predicted_sex": {
-        "value": "male",
-        "link": (
-            "/quality-metrics-peddyqc/"
-            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
-        ),
-        "flag": "pass",
-    },
-    "ancestry": {"value": ["mars"]},
-    "predicted_ancestry": {
-        "value": "MARS",
-        "link": (
-            "/quality-metrics-peddyqc/"
-            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
-        ),
-    },
-    "total_reads": {"value": "123456789"},
-    "coverage": {"value": "43x", "flag": "pass"},
-    "heterozygosity_ratio": {"value": "3.0", "flag": "warn"},
-    "transition_transversion_ratio": {"value": "2.5", "flag": "fail"},
-    "total_variants_called": {"value": "11800"},
-    "filtered_variants": {"value": "1180"},
-    "filtered_structural_variants": {"value": "92"},
-    "warn": ["heterozygosity_ratio"],
-    "fail": ["transition_transversion_ratio"],
-}
-MOTHER_SAMPLE_QC_METRICS = {
-    "bam_sample_id": MOTHER_SAMPLE_ID,
-    "individual_id": "mother_person",
-    "sex": {"value": "F"},
-    "predicted_sex": {
-        "value": "female",
-        "link": (
-            "/quality-metrics-peddyqc/"
-            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
-        ),
-        "flag": "pass",
-    },
-    "ancestry": {"value": ["jupiter"]},
-    "predicted_ancestry": {
-        "value": "JUPITER",
-        "link": (
-            "/quality-metrics-peddyqc/"
-            "13d6312a-5b99-4da3-986b-c180b7aae936/@@download"
-        ),
-    },
-    "total_reads": {"value": "987654321"},
-    "coverage": {"value": "35x", "flag": "pass"},
-    "heterozygosity_ratio": {"value": "1.0", "flag": "warn"},
-    "transition_transversion_ratio": {"value": "2.15", "flag": "warn"},
-    "total_variants_called": {"value": "13200"},
-    "filtered_variants": {"value": "1320"},
-    "filtered_structural_variants": {"value": "112"},
-    "warn": ["heterozygosity_ratio", "transition_transversion_ratio"],
-}
 
 
 def test_quality_control_metrics(

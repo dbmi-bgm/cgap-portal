@@ -188,7 +188,6 @@ class QualityMetricParser:
     }
     FLAGS_TO_CAPTURE = set([FLAG_WARN, FLAG_FAIL])
 
-
     def __init__(self, request):
         """Initialize class and set attributes.
 
@@ -627,7 +626,7 @@ class QualityMetricParser:
                 log.exception(f"Could not evaluate QC value: {qc_value}.")
         return result
 
-        def flag_bam_coverage(self, coverage, sample_properties, *args, **kwargs):
+    def flag_bam_coverage(self, coverage, sample_properties, *args, **kwargs):
         """Evaluate BAM coverage for flag.
 
         :param coverage: BAM coverage from QC item
