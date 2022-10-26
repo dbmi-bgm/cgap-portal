@@ -99,17 +99,6 @@ def _build_sample_processing_embedded_list():
 
 class QualityMetricParser:
 
-    FLAG = "flag"
-    FLAG_PASS = "pass"
-    FLAG_WARN = "warn"
-    FLAG_FAIL = "fail"
-    RANKED_FLAGS = {
-        FLAG_PASS: 0,
-        FLAG_WARN: 1,
-        FLAG_FAIL: 2,
-    }
-    FLAGS_TO_CAPTURE = set([FLAG_WARN, FLAG_FAIL])
-
     # Schema constants
     FILE_FORMAT = "file_format"
     FILE_TYPE = "file_type"
@@ -129,16 +118,15 @@ class QualityMetricParser:
     QUALITY_METRIC = "quality_metric"
     QUALITY_METRIC_SUMMARY = "quality_metric_summary"
     TITLE = "title"
-    NUMBER_TYPE = "numberType"
-    TOOLTIP = "tooltip"
     SAMPLE = "sample"
     INDIVIDUAL_ID = "individual_id"
     MALE = "male"
     FEMALE = "female"
-
-    SEX = "sex"
-    PREDICTED_SEX = "predicted_sex"
     ANCESTRY = "ancestry"
+    SEX = "sex"
+
+    # Class constants
+    PREDICTED_SEX = "predicted_sex"
     PREDICTED_ANCESTRY = "predicted_ancestry"
     TOTAL_READS = "total_reads"
     COVERAGE = "coverage"
@@ -148,8 +136,17 @@ class QualityMetricParser:
     HETEROZYGOSITY_RATIO = "heterozygosity_ratio"
     TRANSITION_TRANSVERSION_RATIO = "transition_transversion_ratio"
     DE_NOVO_FRACTION = "de_novo_fraction"
-
     LINK = "link"
+    DOWNLOAD_ADD_ON = "@@download"
+    FINAL_VCF_FILE_TYPE = "full annotated VCF"
+    FLAG = "flag"
+    FLAG_PASS = "pass"
+    FLAG_WARN = "warn"
+    FLAG_FAIL = "fail"
+    BAM_FILE_FORMAT_ATID = "/file-formats/bam/"
+    VCF_FILE_FORMAT_ATID = "/file-formats/vcf_gz/"
+    VEP_ANNOTATED_STRING = "vep-annotated"
+    PEDDY_QC_STRING = "peddyqc"
 
     SIMPLE_SAMPLE_PROPERTIES = [BAM_SAMPLE_ID, WORKUP_TYPE]
     SIMPLE_INDIVIDUAL_PROPERTIES = [INDIVIDUAL_ID]
@@ -185,16 +182,12 @@ class QualityMetricParser:
         SAMPLE_PROPERTIES_TO_KEEP | QC_PROPERTIES_TO_KEEP | set([FLAG_WARN, FLAG_FAIL])
     )
     ACCEPTED_PREDICTED_SEXES = set([MALE, FEMALE])
-    BAM_FILE_FORMAT_ATID = "/file-formats/bam/"
-    VCF_FILE_FORMAT_ATID = "/file-formats/vcf_gz/"
-    VEP_ANNOTATED_STRING = "vep-annotated"
-    PEDDY_QC_STRING = "peddyqc"
     QC_PROPERTY_NAMES_TO_LINKS = {
         PREDICTED_SEX: PEDDY_QC_STRING,
         PREDICTED_ANCESTRY: PEDDY_QC_STRING,
     }
-    DOWNLOAD_ADD_ON = "@@download"
-    FINAL_VCF_FILE_TYPE = "full annotated VCF"
+    FLAGS_TO_CAPTURE = set([FLAG_WARN, FLAG_FAIL])
+
 
     def __init__(self, request):
         """Initialize class and set attributes.
