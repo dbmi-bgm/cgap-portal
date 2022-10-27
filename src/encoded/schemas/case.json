@@ -296,6 +296,23 @@
                 }
             ]
         },
+        "quality_control_flags.flag": {
+            "title": "QC",
+            "sort_fields": [
+                {
+                    "field": "quality_control_flags.flag",
+                    "title": "Overall QC Status"
+                },
+                {
+                    "field": "quality_control_flags.warn",
+                    "title": "Number of QCs with Warnings"
+                },
+                {
+                    "field": "quality_control_flags.fail",
+                    "title": "Number of Failed QCs"
+                }
+            ]
+        },
         "report": {
             "title": "Report",
             "sort_fields": [
