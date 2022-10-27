@@ -864,9 +864,9 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                <div className="card-body p-0">
-                    <BioinfoStats {...{ caseSample, canonicalFamily, sampleProcessing, submittedAncestry, submittedSex, idToGraphIdentifier, relationshipMapping }} />
-                </div>
+                {/* <div className="card-body p-0"> */}
+                <BioinfoStats {...{ caseSample, canonicalFamily, sampleProcessing, submittedAncestry, submittedSex, idToGraphIdentifier, relationshipMapping }} />
+                {/* </div> */}
             </div>
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
@@ -975,7 +975,7 @@ function TestAccordion(props) {
 }
 
 function AccordionDrawer(props) {
-    const { idToGraphIdentifier, individual, qualityControlMetrics } = props || {};
+    const { idToGraphIdentifier, individuals, qualityControlMetrics } = props || {};
     const { atID, role, individual_id, individual_accession, warn = [], fail = [] } = qualityControlMetrics || {};
 
     const warnFlags = warn.map((flag) => <FlagBadge key={flag} type="warn" title={flag} />);
@@ -998,6 +998,7 @@ function AccordionDrawer(props) {
             <Accordion.Collapse eventKey={atID}>
                 <>
                     <div className="card-body d-flex align-items-center py-1 px-5" style={{
+                        /** @TODO: Move these styles to SCSS */
                         backgroundColor: "#f4f4f4",
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
@@ -1006,9 +1007,7 @@ function AccordionDrawer(props) {
                         <span className="gen-identifier text-600 text-serif text-small pt-03">{ idToGraphIdentifier[atID] }</span>&nbsp;
                     </div>
                     <div className="card-body px-5">
-                        <div className="">
-                            <BioinfoStatTable {...{ qualityControlMetrics }} />
-                        </div>
+                        <BioinfoStatTable {...{ qualityControlMetrics }} />
                     </div>
                 </>
             </Accordion.Collapse>
@@ -1020,7 +1019,7 @@ function FlagBadge({ type, title }) {
     const alertClass = type === "warn" ? "warning" : "danger";
 
     return (
-        <div className={`alert alert-${alertClass} p-1 m-0 ml-1 text-small`} role="alert">
+        <div className={`alert alert-${alertClass} py-1 px-3 m-0 ml-1 text-small border-0`} role="alert">
             <span className=".d-sm-none .d-md-block">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
