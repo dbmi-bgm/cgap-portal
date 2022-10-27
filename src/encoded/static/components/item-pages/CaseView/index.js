@@ -1021,7 +1021,7 @@ function FlagBadge({ type, title }) {
 
     return (
         <div className={`alert alert-${alertClass} p-1 m-0 ml-1 text-small`} role="alert">
-            {qcmFieldNameToDisplay(title)}
+            <span className=".d-sm-none .d-md-block">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
     );
