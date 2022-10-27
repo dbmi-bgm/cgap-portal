@@ -935,7 +935,7 @@ function TestAccordion(props) {
     } = sampleProcessing;
 
     console.log("canonical Family", canonicalFamily);
-
+    /** @TODO Group multiple samples by Individual */
 
     const sortedQCMs = quality_control_metrics.sort((a, b) => {
         const { individual_accession: aAccession } = a;
@@ -968,44 +968,44 @@ function TestAccordion(props) {
     console.log("sortedQCMs", sortedQCMs);
 
     return (
-        // "Accordion will go here"
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
-
-            {/* {individuals.map((individual) => <AccordionDrawer key={individual.uuid} {...{ idToGraphIdentifier, individual, relationshipMapping }} />)} */}
             { sortedQCMs.map((qcm) => <AccordionDrawer key={qcm.individual_accession} {...{ idToGraphIdentifier, relationshipMapping }} qualityControlMetrics={qcm} />)}
         </Accordion>
     );
 }
 
 function AccordionDrawer(props) {
-    const { idToGraphIdentifier, individual, relationshipMapping, qualityControlMetrics } = props || {};
-    const { atID, role, individual_id, individual_accession } = qualityControlMetrics || {};
+    const { idToGraphIdentifier, individual, qualityControlMetrics } = props || {};
+    const { atID, role, individual_id, individual_accession, warn = [], fail = [] } = qualityControlMetrics || {};
 
-    // const { "@id": atId, uuid, individual_id, display_title, accession } = individual || {};
-
-    // Assign roles to the individual
-    // const infoObj = relationshipMapping[accession] || relationshipMapping[display_title];
-    // const role = infoObj["relationship"] || null;
+    const warnFlags = warn.map((flag) => <FlagBadge key={flag} type="warn" title={flag} />);
+    const failFlags = fail.map((flag) => <FlagBadge key={flag} type="fail" title={flag} />);
 
     return (
         <div className="card" key={atID}>
-            <Accordion.Toggle eventKey={atID} className="card-header d-flex btn align-items-center justify-items-center">
-                <i className="icon icon-plus fas mr-1" />
-                <div className="text-600 text-capitalize text-larger">
-                    {role}
+            <Accordion.Toggle eventKey={atID} className="card-header btn d-flex justify-content-between justify-items-center">
+                <div className="d-flex align-items-center justify-items-center">
+                    <i className="icon icon-plus fas mr-1" />
+                    <div className="text-600 text-capitalize text-larger pl-03">
+                        {role}
+                    </div>
+                </div>
+                <div className="d-flex align-items-center justify-items-center">
+                    { failFlags }
+                    { warnFlags }
                 </div>
             </Accordion.Toggle>
             <Accordion.Collapse eventKey={atID}>
                 <>
-                    <div className="card-body d-flex align-items-center py-1" style={{
+                    <div className="card-body d-flex align-items-center py-1 px-5" style={{
                         backgroundColor: "#f4f4f4",
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
                     }}>
-                        <span className="gen-identifier text-serif text-small mr-02 pt-02">{ idToGraphIdentifier[atID] }</span>&nbsp;
-                        <a href={atID} className="accession d-block text-small">{ individual_id || individual_accession }</a>
+                        <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{ individual_id || individual_accession }</a>
+                        <span className="gen-identifier text-600 text-serif text-small pt-03">{ idToGraphIdentifier[atID] }</span>&nbsp;
                     </div>
-                    <div className="card-body">
+                    <div className="card-body px-5">
                         <div className="">
                             <BioinfoStatTable {...{ qualityControlMetrics }} />
                         </div>
@@ -1014,4 +1014,28 @@ function AccordionDrawer(props) {
             </Accordion.Collapse>
         </div>
     );
+}
+
+function FlagBadge({ type, title }) {
+    const alertClass = type === "warn" ? "warning" : "danger";
+
+    return (
+        <div className={`alert alert-${alertClass} p-1 m-0 ml-1 text-small`} role="alert">
+            {qcmFieldNameToDisplay(title)}
+            <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
+        </div>
+    );
+}
+
+function qcmFieldNameToDisplay(field) {
+    switch(field) {
+        case "transition_transversion_ratio":
+            return "Transition-Transversion";
+        case "heterozygosity_ratio":
+            return "Heterozygosity";
+        case "predicted_sex":
+            return "Predicted Sex";
+        default:
+            return "";
+    }
 }
