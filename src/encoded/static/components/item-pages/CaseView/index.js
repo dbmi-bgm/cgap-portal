@@ -31,6 +31,7 @@ import { CaseReviewTab } from './CaseReviewTab';
 import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
+import { Accordion } from 'react-bootstrap';
 
 
 
@@ -701,248 +702,76 @@ const bioinfoPopoverContent = {
     )
 };
 
-const mapLongFormSexToLetter = (sex) => {
-    switch (sex) {
-        case "male":
-            return "M";
-        case "female":
-            return "F";
-        case "unknown":
-        case "undetermined":
-            return "U";
+const flagToBootstrapClass = (flag) => {
+    switch (flag) {
+        case "pass":
+            return "success";
+        case "fail":
+            return "danger";
+        case "warn":
+            return "warning";
         default:
-            // unexpected value... render as-is
-            return sex;
-    }
-};
-
-const validateHeterozygosity = (hetVal) => {
-    // pass if in the range of 1.4-2.5, warn otherwise
-    if (hetVal >= 1.4 && hetVal <= 2.5) {
-        return "success"; // no flag necessary
-    } else if (hetVal < 1.4 && hetVal > 1.2) {
-        return "warning";
-    } else {
-        return "danger";
-    }
-};
-
-const validateTransTrans = (transTransVal, analysisType) => {
-    switch (analysisType) {
-        case "WGS":
-        case "WGS-Trio":
-        case "WGS-Group":
-        case "WGS-Upstream only":
-            if (transTransVal >= 1.8 && transTransVal <= 2.1) {
-                return "success";
-            } else if (
-                (transTransVal >= 1.6 && transTransVal < 1.8) ||
-                (transTransVal > 2.1 && transTransVal <= 2.3)
-            ) {
-                return "warning";
-            } else {
-                return "danger";
-            }
-        case "WES":
-        case "WES-Trio":
-        case "WES-Group":
-            if (transTransVal >= 2.3 && transTransVal <= 3.3) {
-                return "success";
-            } else if (
-                (transTransVal >= 2.1 && transTransVal < 2.3) ||
-                (transTransVal > 3.3 && transTransVal <= 3.5)
-            ) {
-                return "warning";
-            } else {
-                return "danger";
-            }
-        default: // "custom option
-            return null; // can't do validation, so don't want to show a flag
-    }
-};
-
-const validatePredictedSex = (submittedSex, predictedSex) => {
-    if (!submittedSex) {
-        return null; // nothing to compare to, no flag
-    } else if (!predictedSex) {
-        return "warning"; // should be a prediction; if not, warn.
-    } else if (!(predictedSex === "M" || predictedSex === "F")) {
-        return "danger"; // predicted sex is unknown, indicates a potential problem with peddy QC
-    } else if (predictedSex !== submittedSex) {
-        return "warning"; // predicted sex is opposite from expected, may indicate an issue with submitted
-    } else {
-        return "success"; // should match
+            return "";
     }
 };
 
 const BioinfoStats = React.memo(function BioinfoStats(props) {
-    // Note: Can probably clean up the render method of this a little bit by breaking each row
-    // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
-    // may also be necessary to add to/edit rows individually in the future.
-    const { caseSample = null, sampleProcessing = null, submittedSex = null, submittedAncestry = [] } = props;
+    const { canonicalFamily, caseSample = null, sampleProcessing = null, idToGraphIdentifier, relationshipMapping } = props;
+    console.log("BioinfoStats this sample processing", sampleProcessing, canonicalFamily );
 
+    return (<TestAccordion {...{ sampleProcessing, canonicalFamily, relationshipMapping, idToGraphIdentifier }} />);
+});
+
+function BioinfoStatTable({ qualityControlMetrics }) {
     const {
-        bam_sample_id: caseSampleId = null,
-        processed_files: caseProcFiles = []
-    } = caseSample || {};
-    const {
-        processed_files: msaProcFiles = [],
-        analysis_type: analysisType
-    } = sampleProcessing || {};
-
-    const msaStats = useMemo(function(){
-        const msaStats = {};
-
-        function transformValueType(numberType, value){
-            const useFunc = { // Probably can just use `parseFloat` for any number but what the heck.
-                "integer": parseInt,
-                "float": parseFloat,
-                "percent": parseFloat
-            }[numberType];
-            if (useFunc) {
-                const transformedValue = useFunc(value);
-                if (!isNaN(transformedValue)) return transformedValue;
-            }
-            return value;
-        }
-
-        // Pull coverage and reads values from this case's sample's bam file
-        caseProcFiles.forEach(function(procFile){
-            const {
-                quality_metric: {
-                    "@type": [ qmType ]=[],
-                    quality_metric_summary: qmSummaries = []
-                } = {}
-            } = procFile;
-            // Only continue if qclist (bamQC should only exist if there is also bamcheck)
-            if (qmType === "QualityMetricQclist") {
-                // Coverage and total reads should only be present in BAM, update if found
-                qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, numberType = "string" } = qmSummary;
-                    if (title === "Coverage") {
-                        msaStats.coverage = { value: transformValueType(numberType, value) };
-                    } else if (title === "Total Reads") {
-                        msaStats.reads = { value: transformValueType(numberType, value) };
-                    }
-                });
-            }
-        });
-
-        // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
-        msaProcFiles.forEach(function(procFile){
-            const {
-                variant_type: variantType = "SNV", // SVs are always labelled, SNVs may or may not be (ask bioinfo team for details)
-                quality_metric: {
-                    "@type": [ qmType ]=[],
-                    quality_metric_summary: qmSummaries = [],
-                    qc_list = []
-                }={}
-            } = procFile;
-
-            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck; peddyQC also requires qcList)
-            if (qmType === "QualityMetricQclist") {
-                // SNV fields are unique from SV ones; so ensure the correct ones are added to msaStats for each
-                if (variantType === "SV") {
-                    // Stats should only be present in combined VCF, update if found
-                    qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
-                        if (sample && sample === caseSampleId) {
-                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
-                                case "Filtered Variants":
-                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value) };
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    });
-                } else { // SNV may be labelled or not
-                    // Most stats should only be present in combined VCF, update if found
-                    qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
-                        if (sample && sample === caseSampleId) {
-                            switch (title) {
-                                case "De Novo Fraction":
-                                    msaStats.deNovo = { value: transformValueType(numberType, value) };
-                                    break;
-                                case "Heterozygosity Ratio":
-                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), validationStatus: validateHeterozygosity(value) };
-                                    break;
-                                case "Transition-Transversion Ratio":
-                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), validationStatus: validateTransTrans(value, analysisType) };
-                                    break;
-                                case "Total Variants Called":
-                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value) };
-                                    break;
-                                case "Filtered Variants":
-                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value) };
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    });
-
-                    // Predicted Sex and Ancestry found in qclist
-                    // TODO: At some point see if URL can be moved to qmsummary - if so, move this into above block
-                    qc_list.forEach(function(qc) {
-                        const { value: { "@id": qmId, "ancestry and sex prediction": predictions = [] } = {}, qc_type } = qc;
-                        const qmUrl = qmId + '/@@download';
-                        if (qc_type === "quality_metric_peddyqc") {
-                            predictions.forEach(function(prediction) {
-                                const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
-                                const shortFormPredictedSex = mapLongFormSexToLetter(predictedSex);
-
-                                if (name === caseSampleId) { // double check that it's the prediction for the current case
-                                    msaStats.predictedSex = { value: shortFormPredictedSex, url: qmUrl, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
-                                    msaStats.predictedAncestry = { value: predictedAncestry, url: qmUrl };
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-        });
-
-        return msaStats;
-    }, [ caseProcFiles, msaProcFiles ]);
-
-    const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTransRatio = {}, heterozygosity = {}, deNovo = {},
-        filteredSNVIndelVariants = {}, filteredSVVariants = {}, predictedSex = {}, predictedAncestry = {} } = msaStats;
+        total_reads: reads = {},
+        coverage = {},
+        total_variants_called: totalSNVIndelVars = {},
+        transition_transversion_ratio: transTransRatio = {},
+        heterozygosity_ratio: heterozygosity = {},
+        de_novo_fraction: deNovo = {},
+        filtered_variants: filteredSNVIndelVariants = {},
+        filtered_structural_variants: filteredSVVariants = {},
+        predicted_sex: predictedSex = {},
+        predicted_ancestry: predictedAncestry = {},
+        sex: submittedSex = {},
+        ancestry: { value: submittedAncestry = [] } = {}
+    } = qualityControlMetrics;
 
     const fallbackElem = "-";
+    console.log("submittedAncestry", submittedAncestry);
 
     return (
         <React.Fragment>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Total Number of Reads">
-                    { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
+                    { reads.value ? decorateNumberWithCommas(+reads.value) : fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage">
                     { coverage.value || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
-                    { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): fallbackElem }
+                    { totalSNVIndelVars.value ? decorateNumberWithCommas(+totalSNVIndelVars.value): fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
-                    { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : fallbackElem }
-                    { (transTransRatio.value && transTransRatio.validationStatus) && <i className={`icon icon-flag fas text-${transTransRatio.validationStatus} ml-05`} />}
+                    { transTransRatio.value || fallbackElem }
+                    { (transTransRatio.value && transTransRatio.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(transTransRatio.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Submitted Sex" >
-                    { submittedSex || fallbackElem }
+                    { submittedSex.value || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedSex.value || fallbackElem }&nbsp;
-                    { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
-                    { predictedSex.validationStatus && <i className={`icon icon-flag fas text-${predictedSex.validationStatus} ml-02`} />}
+                    { !!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    { predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
-                    { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
+                    { filteredSNVIndelVariants.value ? decorateNumberWithCommas(+filteredSNVIndelVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
-                    { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : fallbackElem }
+                    { filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
@@ -951,19 +780,19 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedAncestry.value || fallbackElem }&nbsp;
-                    { !!predictedAncestry.url && <a href={predictedAncestry.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    { !!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
-                    { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
-                    { (heterozygosity.value && heterozygosity.validationStatus) && <i className={`icon icon-flag fas text-${heterozygosity.validationStatus} ml-05`}/>}
+                    { heterozygosity.value || fallbackElem }
+                    { (heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`}/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="De novo Fraction">
-                    { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
+                    { deNovo.value || fallbackElem }
                 </BioinfoStatsEntry>
             </div>
         </React.Fragment>
     );
-});
+}
 
 function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
     return (
@@ -999,7 +828,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     const {
         // original_pedigree: { display_title: pedFileName } = {},
-        display_title: familyDisplayTitle
+        display_title: familyDisplayTitle,
+        relationships = []
     } = canonicalFamily;
 
     const title = (
@@ -1015,6 +845,16 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         </h4>
     );
 
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = {};
+    relationships.forEach((item) => {
+        const { relationship = null, sex = null, individual = null } = item;
+        relationshipMapping[individual] = { sex, relationship };
+    });
+    console.log("relationshipMapping", relationshipMapping);
+    console.log("idToGraphIdentifier", idToGraphIdentifier);
+    console.log("bioinfoTab canonicalFam", canonicalFamily);
+
     return (
         <React.Fragment>
             <h1><span className="text-300">Bioinformatics Analysis</span></h1>
@@ -1024,17 +864,154 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                <div className="card-body py-3">
-                    <BioinfoStats {...{ caseSample, sampleProcessing, submittedAncestry, submittedSex }} />
+                <div className="card-body p-0">
+                    <BioinfoStats {...{ caseSample, canonicalFamily, sampleProcessing, submittedAncestry, submittedSex, idToGraphIdentifier, relationshipMapping }} />
                 </div>
             </div>
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
-                    <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                    <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier, relationshipMapping }} />
                 </div>
             </div>
         </React.Fragment>
     );
 });
+
+
+
+function ContextAwareToggle({ children, eventKey, callback }) {
+    const { activeEventKey } = useContext(AccordionContext);
+
+    const decoratedOnClick = useAccordionButton(
+        eventKey,
+        () => callback && callback(eventKey),
+    );
+
+    const isCurrentEventKey = activeEventKey === eventKey;
+
+    return (
+        <button
+            type="button"
+            style={{ backgroundColor: isCurrentEventKey ? 'pink' : 'lavender' }}
+            onClick={decoratedOnClick}
+        >
+            {children}
+        </button>
+    );
+}
+
+
+// function CustomToggle({ children, eventKey }) {
+//     const decoratedOnClick = useAccordionToggle(eventKey, () =>
+//         console.log('totally custom!'),
+//     );
+
+//     return (
+//         <button
+//             type="button"
+//             style={{ backgroundColor: 'pink' }}
+//             onClick={decoratedOnClick}
+//         >
+//             {children}
+//         </button>
+//     );
+// }
+
+
+
+function TestAccordion(props) {
+    const {
+        canonicalFamily = {},
+        sampleProcessing = {},
+        idToGraphIdentifier,
+        relationshipMapping = {}
+    } = props || {};
+
+    const {
+        quality_control_metrics = [],
+
+    } = sampleProcessing;
+
+    console.log("canonical Family", canonicalFamily);
+
+
+    const sortedQCMs = quality_control_metrics.sort((a, b) => {
+        const { individual_accession: aAccession } = a;
+        const { individual_accession: bAccession } = b;
+
+        const atIDA = `/individuals/${aAccession}/`;
+        const atIDB = `/individuals/${bAccession}/`;
+
+        // Find relationships
+        const relationA = relationshipMapping[aAccession]?.relationship;
+        const relationB = relationshipMapping[bAccession]?.relationship;
+
+        // Add props to QCMS for future use
+        a.atID = atIDA;
+        b.atID = atIDB;
+        a.role = relationA;
+        b.role = relationB;
+
+        // Sort by proband first, then by mother and father
+        if (relationA === "proband") {
+            return -1;
+        } else if (relationA === "mother" && relationB !== "proband") {
+            return -1;
+        } else if (relationA === "father" && relationB !== "proband" && relationB !== "mother") {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
+    console.log("sortedQCMs", sortedQCMs);
+
+    return (
+        // "Accordion will go here"
+        <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
+
+            {/* {individuals.map((individual) => <AccordionDrawer key={individual.uuid} {...{ idToGraphIdentifier, individual, relationshipMapping }} />)} */}
+            { sortedQCMs.map((qcm) => <AccordionDrawer key={qcm.individual_accession} {...{ idToGraphIdentifier, relationshipMapping }} qualityControlMetrics={qcm} />)}
+        </Accordion>
+    );
+}
+
+function AccordionDrawer(props) {
+    const { idToGraphIdentifier, individual, relationshipMapping, qualityControlMetrics } = props || {};
+    const { atID, role, individual_id, individual_accession } = qualityControlMetrics || {};
+
+    // const { "@id": atId, uuid, individual_id, display_title, accession } = individual || {};
+
+    // Assign roles to the individual
+    // const infoObj = relationshipMapping[accession] || relationshipMapping[display_title];
+    // const role = infoObj["relationship"] || null;
+
+    return (
+        <div className="card" key={atID}>
+            <Accordion.Toggle eventKey={atID} className="card-header d-flex btn align-items-center justify-items-center">
+                <i className="icon icon-plus fas mr-1" />
+                <div className="text-600 text-capitalize text-larger">
+                    {role}
+                </div>
+            </Accordion.Toggle>
+            <Accordion.Collapse eventKey={atID}>
+                <>
+                    <div className="card-body d-flex align-items-center py-1" style={{
+                        backgroundColor: "#f4f4f4",
+                        borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+                        borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
+                    }}>
+                        <span className="gen-identifier text-serif text-small mr-02 pt-02">{ idToGraphIdentifier[atID] }</span>&nbsp;
+                        <a href={atID} className="accession d-block text-small">{ individual_id || individual_accession }</a>
+                    </div>
+                    <div className="card-body">
+                        <div className="">
+                            <BioinfoStatTable {...{ qualityControlMetrics }} />
+                        </div>
+                    </div>
+                </>
+            </Accordion.Collapse>
+        </div>
+    );
+}
