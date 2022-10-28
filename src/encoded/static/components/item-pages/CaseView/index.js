@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
@@ -31,7 +31,7 @@ import { CaseReviewTab } from './CaseReviewTab';
 import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
-import { Accordion } from 'react-bootstrap';
+import { Accordion, AccordionContext, Card, useAccordionToggle } from 'react-bootstrap';
 
 
 
@@ -719,7 +719,7 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
     const { canonicalFamily, caseSample = null, sampleProcessing = null, idToGraphIdentifier, relationshipMapping } = props;
     console.log("BioinfoStats this sample processing", sampleProcessing, canonicalFamily );
 
-    return (<TestAccordion {...{ sampleProcessing, canonicalFamily, relationshipMapping, idToGraphIdentifier }} />);
+    return (<QCMAccordion {...{ sampleProcessing, canonicalFamily, relationshipMapping, idToGraphIdentifier }} />);
 });
 
 function BioinfoStatTable({ qualityControlMetrics }) {
@@ -881,47 +881,33 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
 
 
-function ContextAwareToggle({ children, eventKey, callback }) {
-    const { activeEventKey } = useContext(AccordionContext);
+function QCMAccordionToggle({ children, eventKey, callback, role }) {
+    const activeEventKey = useContext(AccordionContext);
 
-    const decoratedOnClick = useAccordionButton(
+    const decoratedOnClick = useAccordionToggle(
         eventKey,
         () => callback && callback(eventKey),
     );
 
     const isCurrentEventKey = activeEventKey === eventKey;
 
+    const icon = isCurrentEventKey ? "minus" : "plus";
+
     return (
-        <button
-            type="button"
-            style={{ backgroundColor: isCurrentEventKey ? 'pink' : 'lavender' }}
-            onClick={decoratedOnClick}
-        >
-            {children}
-        </button>
+        <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center">
+            <div className="d-flex align-items-center justify-items-center">
+                <i className={`icon icon-${icon} fas mr-1`} />
+                <div className="text-600 text-capitalize text-larger pl-03">
+                    {role}
+                </div>
+            </div>
+            { children }
+        </div>
     );
 }
 
 
-// function CustomToggle({ children, eventKey }) {
-//     const decoratedOnClick = useAccordionToggle(eventKey, () =>
-//         console.log('totally custom!'),
-//     );
-
-//     return (
-//         <button
-//             type="button"
-//             style={{ backgroundColor: 'pink' }}
-//             onClick={decoratedOnClick}
-//         >
-//             {children}
-//         </button>
-//     );
-// }
-
-
-
-function TestAccordion(props) {
+function QCMAccordion(props) {
     const {
         canonicalFamily = {},
         sampleProcessing = {},
@@ -971,12 +957,12 @@ function TestAccordion(props) {
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
-            { sortedQCMs.map((qcm) => <AccordionDrawer key={qcm.individual_accession} {...{ idToGraphIdentifier, relationshipMapping }} qualityControlMetrics={qcm} />)}
+            { sortedQCMs.map((qcm) => <QCMAccordionDrawer key={qcm.individual_accession} {...{ idToGraphIdentifier, relationshipMapping }} qualityControlMetrics={qcm} />)}
         </Accordion>
     );
 }
 
-function AccordionDrawer(props) {
+function QCMAccordionDrawer(props) {
     const { idToGraphIdentifier, individuals, qualityControlMetrics } = props || {};
     const { atID, role, individual_id, individual_accession, warn = [], fail = [] } = qualityControlMetrics || {};
 
@@ -985,18 +971,12 @@ function AccordionDrawer(props) {
 
     return (
         <div className="card" key={atID}>
-            <Accordion.Toggle eventKey={atID} className="card-header btn d-flex justify-content-between justify-items-center">
-                <div className="d-flex align-items-center justify-items-center">
-                    <i className="icon icon-plus fas mr-1" />
-                    <div className="text-600 text-capitalize text-larger pl-03">
-                        {role}
-                    </div>
-                </div>
+            <QCMAccordionToggle eventKey={atID} {...{ role }}>
                 <div className="d-flex align-items-center justify-items-center">
                     { failFlags }
                     { warnFlags }
                 </div>
-            </Accordion.Toggle>
+            </QCMAccordionToggle>
             <Accordion.Collapse eventKey={atID}>
                 <>
                     <div className="card-body d-flex align-items-center py-1 px-5" style={{
