@@ -22,7 +22,9 @@ function GeneListFilter({ geneLists, onChange }) {
       >
         <option value="NONE">Non selected</option>
         {Object.keys(geneLists).map((gl) => (
-          <option value={gl} key={gl}>{gl}</option>
+          <option value={gl} key={gl}>
+            {gl}
+          </option>
         ))}
       </select>
     </div>
@@ -79,14 +81,16 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     super(props);
 
     const {
-      cohortVcfLocation,
-      cohortDensityBwLocation,
+      cohortVariantTestResults,
+      cohortGeneTestResults,
+      cohortVariantDensity,
       higlassContainerCohort,
       higlassContainerAnnotation,
       availableAssociationTests,
     } = props;
-    this.cohortVcfLocation = cohortVcfLocation;
-    this.cohortDensityBwLocation = cohortDensityBwLocation;
+    this.cohortVariantTestResults = cohortVariantTestResults;
+    this.cohortGeneTestResults = cohortGeneTestResults;
+    this.cohortVariantDensity = cohortVariantDensity;
     this.higlassContainerCohort = higlassContainerCohort;
     this.higlassContainerAnnotation = higlassContainerAnnotation;
     this.availableAssociationTests = availableAssociationTests;
@@ -358,12 +362,22 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                   <div className="row">
                     <div className="col-sm-6">
                       <div class="form-group">
-                        <input type="text" class="form-control form-control-sm" placeholder="Min" disabled />
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          placeholder="Min"
+                          disabled
+                        />
                       </div>
                     </div>
                     <div className="col-sm-6">
                       <div class="form-group">
-                        <input type="text" class="form-control form-control-sm" placeholder="Max" disabled />
+                        <input
+                          type="text"
+                          class="form-control form-control-sm"
+                          placeholder="Max"
+                          disabled
+                        />
                       </div>
                     </div>
                   </div>
@@ -397,8 +411,9 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
               </div>
               <div className="col-sm-9">
                 <HiGlassAjaxLoadContainer
-                  cohortVcfLocation={this.cohortVcfLocation}
-                  cohortDensityBwLocation={this.cohortDensityBwLocation}
+                  cohortVariantTestResults={this.cohortVariantTestResults}
+                  cohortGeneTestResults={this.cohortGeneTestResults}
+                  cohortVariantDensity={this.cohortVariantDensity}
                   ref={this.higlassContainerCohort}
                   requestingTab="cohort"
                 />
@@ -432,14 +447,20 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
 export const EmbeddedCohortBrowser = React.memo(function EmbeddedCohortBrowser(
   props
 ) {
-  const { cohortVcfLocation, cohortDensityBwLocation, availableAssociationTests } = props;
+  const {
+    cohortVariantTestResults,
+    cohortGeneTestResults,
+    cohortVariantDensity,
+    availableAssociationTests,
+  } = props;
   const higlassContainerCohort = useRef(null);
   const higlassContainerAnnotation = useRef(null);
 
   return (
     <EmbeddedCohortBrowserComponent
-      cohortVcfLocation={cohortVcfLocation}
-      cohortDensityBwLocation={cohortDensityBwLocation}
+      cohortVariantTestResults={cohortVariantTestResults}
+      cohortGeneTestResults={cohortGeneTestResults}
+      cohortVariantDensity={cohortVariantDensity}
       availableAssociationTests={availableAssociationTests}
       higlassContainerCohort={higlassContainerCohort}
       higlassContainerAnnotation={higlassContainerAnnotation}

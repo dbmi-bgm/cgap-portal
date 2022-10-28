@@ -4,7 +4,6 @@ import React, { useRef, useEffect } from "react";
 import _ from "underscore";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 
-
 export class GeneSearchBox extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -207,5 +206,3 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
     </div>
   );
 });
-
-

@@ -378,8 +378,9 @@ def get_higlass_cohort_viewconf(context, request):
     """ Get the Higlass cohort viewconf, given the file locations on S3
     Args:
         request(obj): Http request object. Assumes request's request is JSON and contains these keys:
-            cohort_vcf_location(str) : location of the VCF file on S3
-            cohort_density_bw_location(str) : location of the density bigwig file on S3
+            cohort_variant_test_results(str) : location of the variant VCF file on S3
+            cohort_gene_test_results(str) : location of the gene VCF file on S3
+            cohort_density(str) : location of the density bigwig file on S3
 
     Returns:
         A dictionary.
@@ -400,10 +401,11 @@ def get_higlass_cohort_viewconf(context, request):
             "viewconfig": None
         }
 
-    cohort_vcf_location = request.json_body.get('cohort_vcf_location', None)
-    cohort_density_bw_location = request.json_body.get('cohort_density_bw_location', None)
+    cohort_variant_test_results = request.json_body.get('cohort_variant_test_results', None)
+    cohort_gene_test_results = request.json_body.get('cohort_gene_test_results', None)
+    cohort_density = request.json_body.get('cohort_density', None)
 
-    if not cohort_vcf_location or not cohort_density_bw_location:
+    if not cohort_variant_test_results or not cohort_density or not cohort_gene_test_results:
         return {
             "success": False,
             "errors": "Some data files have not been specified.",
@@ -415,10 +417,13 @@ def get_higlass_cohort_viewconf(context, request):
         top_tracks = view['tracks']['top']
         for track in top_tracks:
             if track['uid'] == "cohort_track":
-                track['data']['vcfUrl'] = cohort_vcf_location
-                track['data']['tbiUrl'] = cohort_vcf_location + ".tbi"
+                track['data']['vcfUrl'] = cohort_variant_test_results
+                track['data']['tbiUrl'] = cohort_variant_test_results + ".tbi"
+            elif track['uid'] == "gene_result_track":
+                track['data']['vcfUrl'] = cohort_gene_test_results
+                track['data']['tbiUrl'] = cohort_gene_test_results + ".tbi"
             elif track['uid'] == "density_track":
-                track['data']['url'] = cohort_density_bw_location
+                track['data']['url'] = cohort_density
 
     return {
         "success": True,
