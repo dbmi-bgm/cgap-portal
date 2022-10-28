@@ -130,7 +130,7 @@ the VCF file names, provide a genome build, and submit again.
 under the **Files** and **Case Files** headers for the submission. Optional,
 but should be provided for all VCF file submissions.
 
-- Valid options include: **SNV**, **SV**, and **CNV**.
+- Valid options include: **SNV**, **SV**, or **CNV**.
 
 **BAM Sample ID**: The sample identifier used in the submitted file(s).
 Must be provided if submitting BAM or VCF files; optional otherwise.

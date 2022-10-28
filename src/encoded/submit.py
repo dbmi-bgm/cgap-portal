@@ -70,7 +70,6 @@ ABBREVS = {
     "fth": "father",
     "sf": "sibling",
 }
-
 YES_VALS = ["y", "yes"]
 
 # SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
@@ -345,6 +344,45 @@ def make_conjoined_list(list_values, conjunction="and"):
     return result
 
 
+def update_value_capitalization(properties, to_upper=None, to_lower=None):
+    """Update capitalization of key values in dictionary.
+
+    Given keys, check if values are strings and then format them
+    appropriately.
+
+    :param properties: Dictionary to update
+    :type properties: dict
+    :param to_upper: Keys whose values should be capitalized
+    :type to_upper: list(str) or None
+    :param to_lower: Keys whose values should be lower-case
+    :type to_lower: list(str) or None
+    """
+    if to_upper:
+        apply_capitalization(properties, to_upper, str.upper)
+    if to_lower:
+        apply_capitalization(properties, to_lower, str.lower)
+
+
+def apply_capitalization(properties, property_names_to_change, string_method):
+    """Apply given capitalization method to designated strings.
+
+    Helper function for update_value_capitalization. Updates dictionary
+    values in place.
+
+    :param properties: Dictionary to update
+    :type properties: dict
+    :param property_names_to_change: Dictionary keys whose values
+        will have string method applied
+    :type property_names_to_change: set[str]
+    :param string_method: Method to apply to string values
+    :type string_method: class:`str` method
+    """
+    for property_name in property_names_to_change:
+        property_value = properties.get(property_name)
+        if isinstance(property_value, str):
+            properties[property_name] = string_method(property_value)
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -369,6 +407,7 @@ class AccessionRow:
     SAMPLES = "samples"
     FAMILIES = "families"
     SUBMITTED_FILES = "files"
+    WORKUP_TYPE = "workup_type"
 
     # Spreadsheet constants
     GENOME_BUILD = "genome_build"
@@ -383,6 +422,7 @@ class AccessionRow:
         "GRCh38": ["38", "hg38", "grch38"],
     }
     FILE_SUBMITTED = "file_submitted"
+    PROPERTY_VALUES_TO_UPPER = set([VARIANT_TYPE, SS_SEX, WORKUP_TYPE])
 
     def __init__(
         self, vapp, metadata, idx, family_alias, project, institution, file_parser=None
@@ -443,7 +483,7 @@ class AccessionRow:
                     metadata[
                         get_column_name(metadata, ["workup type", "test requested"])
                     ]
-                ),
+                ).upper(),
             )
             if self.metadata.get("test number"):
                 self.sample_alias = (
@@ -484,6 +524,7 @@ class AccessionRow:
             ["individual_id", "sex", "age", "birth_year"],
             "individual",
         )
+        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
         other_id_col = get_column_name(
             self.metadata, ["other id", "other individual id"]
         )
@@ -582,6 +623,7 @@ class AccessionRow:
             self.VARIANT_TYPE,
         ]
         info = map_fields(self.metadata, info, fields, "sample")
+        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
         # handle enum values
         replace_cell_contents(info, "specimen_accepted", y="Yes", n="No")
         # handle bam sample ID
@@ -638,19 +680,19 @@ class AccessionRow:
         """
         submitted_genome_build = sample.pop(self.GENOME_BUILD, None)
         genome_build = self.validate_genome_build(submitted_genome_build)
-        submitted_variant_type = sample.pop(self.VARIANT_TYPE, None)
+        variant_type = sample.pop(self.VARIANT_TYPE, None)
         submitted_sample_files = sample.pop(self.FILES, None)
         submitted_sample_processing_files = sample.pop(self.CASE_FILES, None)
         if submitted_sample_files:
             self.update_item_files(
-                sample, submitted_sample_files, genome_build, submitted_variant_type
+                sample, submitted_sample_files, genome_build, variant_type
             )
         if submitted_sample_processing_files:
             self.update_item_files(
                 sample_processing,
                 submitted_sample_processing_files,
                 genome_build,
-                submitted_variant_type,
+                variant_type,
             )
 
     def update_item_files(self, item, submitted_files, genome_build, variant_type):
@@ -666,9 +708,9 @@ class AccessionRow:
         :type submitted_files: str or None
         :param genome_build: Validated genome assembly to set as
             property on all created File items
-        :param variant_type: Variant type for submitted files
-        :type variant_type: str
         :type genome_build: str or None
+        :param variant_type: Variant type for submitted files
+        :type variant_type: str or None
         """
         file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
             submitted_files,
@@ -1901,6 +1943,9 @@ class PedigreeRow:
     HPO_TERMS = "hpo_terms"
     MONDO_TERMS = "mondo_terms"
 
+    # Class constants
+    PROPERTY_VALUES_TO_UPPER = set([SS_SEX])
+
     def __init__(self, metadata, idx, project, institution):
         """
         :param dict metadata: dictionary of form {column heading1: row value1, ...}, for the given row
@@ -2200,6 +2245,7 @@ class PedigreeRow:
             "diagnostic_confidence",
         ]
         info = map_fields(self.metadata, info, simple_fields, "individual")
+        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
         for field in info:
             if field.startswith("is_"):
                 info[field] = is_yes_value(info[field])

@@ -25,6 +25,7 @@ from ..submit import (
     parse_exception,
     post_and_patch_all_items,
     row_generator,
+    update_value_capitalization,
     validate_all_items,
     validate_item,
     xls_to_json,
@@ -1136,6 +1137,24 @@ def test_make_conjoined_list(items, conjunction, expected):
     """
     result = make_conjoined_list(items, conjunction=conjunction)
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "properties,to_upper,to_lower,expected",
+    [
+        ({}, [], [], {}),
+        ({"foo": 9}, ["foo"], ["foo"], {"foo": 9}),
+        ({"foo": None}, ["foo"], ["foo"], {"foo": None}),
+        ({"foo": "bAr"}, ["fu"], ["fu"], {"foo": "bAr"}),
+        ({"foo": "bAr"}, ["fu"], ["foo"], {"foo": "bar"}),
+        ({"foo": "bAr"}, ["foo"], ["fu"], {"foo": "BAR"}),
+        ({"foo": "bAr"}, ["foo"], ["foo"], {"foo": "bar"}),
+    ],
+)
+def test_update_value_capitalization(properties, to_upper, to_lower, expected):
+    """Test changing field value case as indicated if value is string."""
+    update_value_capitalization(properties, to_upper, to_lower)
+    assert properties == expected
 
 
 class TestAccessionRow:
