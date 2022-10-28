@@ -966,8 +966,8 @@ function QCMAccordionDrawer(props) {
     const { idToGraphIdentifier, individuals, qualityControlMetrics } = props || {};
     const { atID, role, individual_id, individual_accession, warn = [], fail = [] } = qualityControlMetrics || {};
 
-    const warnFlags = warn.map((flag) => <FlagBadge key={flag} type="warn" title={flag} />);
-    const failFlags = fail.map((flag) => <FlagBadge key={flag} type="fail" title={flag} />);
+    const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
+    const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
 
     return (
         <div className="card" key={atID}>
@@ -997,11 +997,11 @@ function QCMAccordionDrawer(props) {
     );
 }
 
-function FlagBadge({ type, title }) {
+function QCMFlag({ type, title }) {
     const alertClass = type === "warn" ? "warning" : "danger";
 
     return (
-        <div className={`alert alert-${alertClass} py-1 px-3 m-0 ml-1 text-small border-0`} role="alert">
+        <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 m-0 ml-1 text-small border-0`} role="alert">
             <span className=".d-sm-none .d-md-block">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
