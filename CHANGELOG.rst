@@ -6,12 +6,22 @@ cgap-portal
 Change Log
 ----------
 
+11.3.0
+======
+
+`PR 660: File variant type submission
+<https://github.com/dbmi-bgm/cgap-portal/pull/660>`_
+
+* Allow variant type submission for files during case accessioning
+
+
 11.2.0
 ======
 
 `PR 657: Pedigree diseases <https://github.com/dbmi-bgm/cgap-portal/pull/657>`_
 
 * Add support for disorders to the pedigree visualization
+
 
 11.1.0
 ======
@@ -21,12 +31,14 @@ Change Log
 * Adds set of inserts for automated Cypress integration tests for UI
 * Includes folder of Python scripts used to create these inserts
 
+
 11.0.3
 ======
 
 `PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`_
 
 * Add UI/workflow visualization support for MetaWorkflowRun items
+
 
 11.0.2
 ======
