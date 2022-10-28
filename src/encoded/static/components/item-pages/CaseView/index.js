@@ -931,10 +931,12 @@ function TestAccordion(props) {
 
     const {
         quality_control_metrics = [],
-
     } = sampleProcessing;
 
-    console.log("canonical Family", canonicalFamily);
+    if (quality_control_metrics.length === 0) {
+        return <div className="m-4">No Quality Control Metrics Available</div>;
+    }
+
     /** @TODO Group multiple samples by Individual */
 
     const sortedQCMs = quality_control_metrics.sort((a, b) => {
