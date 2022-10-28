@@ -1,0 +1,314 @@
+[
+    {
+        "md5sum": "f820d51b0d8cedefc4cae95d11c3c50c",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI9FZPWSX.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI9FZPWSX.fastq.gz",
+        "accession": "GAPFIDVOP17S",
+        "file_size": 35766794213,
+        "file_type": "reads",
+        "paired_end": "1",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "9660e3c7-8bc8-4033-a7d8-70fdc100f6be",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "88f2fc895de6f47e99d637097427f34b",
+        "quality_metric": "d32ccae4-28ea-4485-9673-53c4f3135f02",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "1b2a6e57-bdba-46dc-86eb-b6c74f2348c4"
+    },
+    {
+        "md5sum": "762a7580d2858af4bd52febebe6bf425",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFIUCATWEO.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFIUCATWEO.fastq.gz",
+        "accession": "GAPFIIFN66Z6",
+        "file_size": 44503273316,
+        "file_type": "reads",
+        "paired_end": "2",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "93dc0908-8180-4a2e-915d-19c567695d2d",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "f8a85522512cdcd2f8c22c3fd263356c",
+        "quality_metric": "0f841c8d-9af7-448a-876d-8170949ce96c",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "f473c1e6-532a-46f5-9e4b-c6b143f67dbe"
+    },
+    {
+        "md5sum": "ce3e825c3891b8e7d6978e2a304770f5",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFIB4MJASV.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFIB4MJASV.fastq.gz",
+        "accession": "GAPFIS6MIWFT",
+        "file_size": 45138691714,
+        "file_type": "reads",
+        "paired_end": "2",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "7ae9f1ae-4063-4c92-9781-7ba3090470e2",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "e8b75d5bade6634be07b06517435e4d2",
+        "quality_metric": "ab21fdcd-6f2a-4333-9ee6-551bb630cb46",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "51ef3ccf-9608-4f22-949d-6e4132cb3672"
+    },
+    {
+        "md5sum": "586fcf879a9432a7297bb892ea104ca2",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI367BFRE.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI367BFRE.fastq.gz",
+        "accession": "GAPFI62JBOCZ",
+        "file_size": 34406846905,
+        "file_type": "reads",
+        "paired_end": "1",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "a129a973-f9e0-442a-bf65-0e4150b00f40",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "427b1f852e94d82a8adf0bbc2faee262",
+        "quality_metric": "9ff89bf1-9cdc-4cad-bec9-076f1f5b94cb",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "88afad3d-9bba-413d-9dc9-d9924bf04791"
+    },
+    {
+        "md5sum": "c5a03ae6a6b60ccd5484bf01674b7dc1",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI9QV1Z8Q.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI9QV1Z8Q.fastq.gz",
+        "accession": "GAPFI4Y2UD8K",
+        "file_size": 35314368821,
+        "file_type": "reads",
+        "paired_end": "2",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "931b8548-d6c1-411a-b1cd-9e5302e3c100",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "45e4f3b397503fe93540d8861c5b7393",
+        "quality_metric": "116c4560-4c1e-4536-8079-a2049dfb1793",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "49a86a63-4028-4a7c-b48a-3208817f02cc"
+    },
+    {
+        "md5sum": "be8aeaa9878978d647f4a0c93f5418b7",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI4ELFNSI.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI4ELFNSI.fastq.gz",
+        "accession": "GAPFITSU2YFK",
+        "file_size": 32874648302,
+        "file_type": "reads",
+        "paired_end": "1",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "49a86a63-4028-4a7c-b48a-3208817f02cc",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "08897e51614ccbdc2d46fa2636c7199b",
+        "quality_metric": "40bcb47e-d73b-45e1-aef6-8b23811c060e",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "931b8548-d6c1-411a-b1cd-9e5302e3c100"
+    },
+    {
+        "md5sum": "97e829b432f05c31bce266dd848f479a",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI2V6XRYN.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI2V6XRYN.fastq.gz",
+        "accession": "GAPFIL4I9M7W",
+        "file_size": 38185282179,
+        "file_type": "reads",
+        "paired_end": "2",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "1b2a6e57-bdba-46dc-86eb-b6c74f2348c4",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "7de29eb1b86fd16791acc9907f2215ff",
+        "quality_metric": "b7d3aba8-76a6-4ab2-ac87-e2de50025cc9",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "9660e3c7-8bc8-4033-a7d8-70fdc100f6be"
+    },
+    {
+        "md5sum": "9a56e823d677181e9d44afd6fbd67dc3",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFIOFWFYZE.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFIOFWFYZE.fastq.gz",
+        "accession": "GAPFIKNE82KJ",
+        "file_size": 47509687993,
+        "file_type": "reads",
+        "paired_end": "2",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "00c127ea-8cdd-4e67-976a-b2cc18a60e41",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "0d734c42724e82eb78acf888259df1d0",
+        "quality_metric": "a9241938-b628-43f9-98b1-157b5c353452",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "b3d47f5c-95f9-413a-9d58-806b51419712"
+    },
+    {
+        "md5sum": "4e1bc057d2f4b15105c6b447061deb1e",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI1HVXJ5F.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI1HVXJ5F.fastq.gz",
+        "accession": "GAPFII2MQYAJ",
+        "file_size": 46907663075,
+        "file_type": "reads",
+        "paired_end": "1",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "b3d47f5c-95f9-413a-9d58-806b51419712",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "b28cb5742eb08c729ea50b54342958eb",
+        "quality_metric": "ffa9e590-19fd-4011-b5b9-413682a773f8",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "00c127ea-8cdd-4e67-976a-b2cc18a60e41"
+    },
+    {
+        "md5sum": "6b759c2f261d04eee7b002a7b66b4390",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFIK2ZO8UI.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFIK2ZO8UI.fastq.gz",
+        "accession": "GAPFINKD9XJ3",
+        "file_size": 43277321158,
+        "file_type": "reads",
+        "paired_end": "1",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "f473c1e6-532a-46f5-9e4b-c6b143f67dbe",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "30be0ee15c7cb5e95e055984e4bae6d3",
+        "quality_metric": "500cf8c0-2360-468e-be81-cabbfe5657a1",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "93dc0908-8180-4a2e-915d-19c567695d2d"
+    },
+    {
+        "md5sum": "8570baaa20acf6b5769de7f61cc2853c",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFIHVO2FZQ.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFIHVO2FZQ.fastq.gz",
+        "accession": "GAPFI26GRSE7",
+        "file_size": 44848574211,
+        "file_type": "reads",
+        "paired_end": "1",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "51ef3ccf-9608-4f22-949d-6e4132cb3672",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "6e0231d8962817de72b02a2655a7fa2b",
+        "quality_metric": "54c2a576-da41-44f0-9bcb-4203143e8f89",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "7ae9f1ae-4063-4c92-9781-7ba3090470e2"
+    },
+    {
+        "md5sum": "33caa8b22038088a2533e80745eed9c6",
+        "status": "shared",
+        "aliases": [
+            "cypress-main:GAPFI1UBTPZG.fastq.gz"
+        ],
+        "project": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "filename": "GAPFI1UBTPZG.fastq.gz",
+        "accession": "GAPFIKO5XP6Z",
+        "file_size": 36841501223,
+        "file_type": "reads",
+        "paired_end": "2",
+        "file_format": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
+        "institution": "9f4daa37-c5b5-4e19-89bc-fdcd4638f12d",
+        "related_files": [
+            {
+                "file": "88afad3d-9bba-413d-9dc9-d9924bf04791",
+                "relationship_type": "paired with"
+            }
+        ],
+        "content_md5sum": "65e5477ebce50cb97695bccf4d309376",
+        "quality_metric": "b7a1b0f5-75f1-4bd6-a2c4-9019d9cc0f9b",
+        "file_classification": "raw file",
+        "s3_lifecycle_status": "standard",
+        "uuid": "a129a973-f9e0-442a-bf65-0e4150b00f40"
+    }
+]

@@ -1,0 +1,18 @@
+[
+    {
+        "title": "Cypress Main",
+        "uuid": "1aa36a0b-9e6e-43ec-95d7-cd00e22589f3",
+        "description": "Main project for Cypress testing, general use",
+        "name": "cypress-main",
+        "status": "shared",
+        "date_created": "2022-07-28T09:42:45.163924+00:00"
+    },
+    {
+        "title": "Cypress Personas",
+        "uuid": "a7be3873-8e25-41a6-9d19-dfe47c738f0d",
+        "description": "Project reserved for use of Cypress testing using personas",
+        "name": "cypress-personas",
+        "status": "shared",
+        "date_created": "2022-07-28T09:44:05.047955+00:00"
+    }
+]

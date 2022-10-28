@@ -4,6 +4,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import { object, layout, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { Legend } from './Legend';
 import { ItemFileAttachment } from './../ItemFileAttachment';
 import { isNodeFile, isNodeGroup, isNodeParameter, isNodeQCMetric } from './WorkflowNodeElement';
 
@@ -37,6 +38,7 @@ export const WorkflowDetailPane = React.memo(function WorkflowDetailPane(props){
         </div>
     );
 });
+WorkflowDetailPane.Legend = Legend;
 
 function FileDetailBody(props){
     const { node, deselectNode, context, schemas } = props;
@@ -109,3 +111,5 @@ function StepDetailBody(props){
         </React.Fragment>
     );
 }
+
+

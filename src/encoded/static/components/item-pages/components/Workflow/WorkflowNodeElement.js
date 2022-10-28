@@ -125,7 +125,7 @@ export class WorkflowNodeElement extends React.PureComponent {
                 if (isNodeQCMetric(node)) {
                     iconClass = 'check-square far';
                 } else if (isNodeParameter(node) || ioType.indexOf('int') > -1 || ioType.indexOf('string') > -1){
-                    iconClass = 'wrench';
+                    iconClass = 'wrench fas';
                 } else if (isNodeFile(node)){
                     iconClass = 'file-alt fas';
                 } else {

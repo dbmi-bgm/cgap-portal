@@ -1,9 +1,9 @@
 import mock
 import pytest
-from dcicutils.misc_utils import VirtualApp
+# from dcicutils.misc_utils import VirtualApp
 
 from ..ingestion.variant_utils import StructuralVariantBuilder, VariantBuilder
-from ..ingestion.vcf_utils import StructuralVariantVCFParser, VCFParser
+from ..ingestion.vcf_utils import StructuralVariantVCFParser  # , VCFParser
 from .test_vcf_utils import SV_SAMPLE_SCHEMA, SV_SCHEMA, TEST_SV_VCF
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]

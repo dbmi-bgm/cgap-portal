@@ -32,7 +32,7 @@ export function DiseasesLegend (props) {
         const checked = !!(diseaseIndex);
 
         return (
-            <div className="detail-row disease-option" key={id}>
+            <div className="detail-row disease-option text-capitalize" key={id}>
                 <Checkbox checked={checked}
                     onChange={onToggleSelectedDisease} name={title}
                     labelClassName="text-400 mb-0">

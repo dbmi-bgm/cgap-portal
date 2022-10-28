@@ -7,12 +7,12 @@ from urllib.parse import urlencode
 from snovault import TYPES
 from snovault.elasticsearch.create_mapping import determine_if_is_date_field
 from .search_utils import (
-    find_nested_path, convert_search_to_dictionary,
+    find_nested_path,  # convert_search_to_dictionary,
     QueryConstructionException,
     COMMON_EXCLUDED_URI_PARAMS, QUERY, FILTER, MUST, MUST_NOT, BOOL, MATCH, SHOULD,
-    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS, REVERSE_NESTED, STATS,
+    EXISTS, FIELD, NESTED, PATH, TERMS, RANGE, AGGS,  # REVERSE_NESTED,
+    STATS,
     schema_for_field, get_query_field, search_log, MAX_FACET_COUNTS,
-
 )
 
 
@@ -157,12 +157,14 @@ class LuceneBuilder:
                     should_arr = [must_not_terms] if must_not_terms else []
                     should_arr.append({BOOL: {MUST: {EXISTS: {FIELD: query_field}}}})  # field=value OR field DNE
                     must_not_filters_nested.append((query_field, should_arr))
-                    if must_terms: must_filters_nested.append((query_field, must_terms))
+                    if must_terms:
+                        must_filters_nested.append((query_field, must_terms))
                 else:  # when not searching on 'No Value'
                     should_arr = [must_terms] if must_terms else []
                     should_arr.append({EXISTS: {FIELD: query_field}})   # field=value OR field EXISTS
                     must_filters_nested.append((query_field, should_arr))
-                    if must_not_terms: must_not_filters_nested.append((query_field, must_not_terms))
+                    if must_not_terms:
+                        must_not_filters_nested.append((query_field, must_not_terms))
 
             # if we are not nested, handle this with 'terms' query like usual
             else:
@@ -1097,7 +1099,7 @@ class LuceneBuilder:
         This method depends on the query structure defined in 'build_filters'.
 
         :param request: the current request
-        :param search: search object to inspect
+        :param query: search query object to inspect
         :raises: HTTPBadRequest if permissions not present
         """
         effective_principals_on_query = None
