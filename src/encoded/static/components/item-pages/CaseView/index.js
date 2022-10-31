@@ -919,7 +919,9 @@ function QCMAccordion(props) {
         quality_control_metrics = [],
     } = sampleProcessing;
 
-    if (quality_control_metrics.length === 0) {
+    const qcmLen = quality_control_metrics.length;
+
+    if (qcmLen === 0) {
         return <div className="m-4">No Quality Control Metrics Available</div>;
     }
 
@@ -953,24 +955,23 @@ function QCMAccordion(props) {
             return 1;
         }
     });
-    console.log("sortedQCMs", sortedQCMs);
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
-            { sortedQCMs.map((qcm) => <QCMAccordionDrawer key={qcm.individual_accession} {...{ idToGraphIdentifier, relationshipMapping }} qualityControlMetrics={qcm} />)}
+            { sortedQCMs.map((qcm, i) => <QCMAccordionDrawer key={qcm.individual_accession} idx={i} {...{ idToGraphIdentifier, relationshipMapping, qcmLen }} qualityControlMetrics={qcm} />)}
         </Accordion>
     );
 }
 
 function QCMAccordionDrawer(props) {
-    const { idToGraphIdentifier, individuals, qualityControlMetrics } = props || {};
+    const { idToGraphIdentifier, individuals, qualityControlMetrics, idx, qcmLen } = props || {};
     const { atID, role, individual_id, individual_accession, warn = [], fail = [] } = qualityControlMetrics || {};
 
     const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
 
     return (
-        <div className="card" key={atID}>
+        <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0": ""} ${idx === (qcmLen - 1) ? "border-bottom-0": ""}`} key={atID}>
             <QCMAccordionToggle eventKey={atID} {...{ role }}>
                 <div className="d-flex align-items-center justify-items-center">
                     { failFlags }
