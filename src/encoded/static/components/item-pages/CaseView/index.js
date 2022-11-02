@@ -767,11 +767,12 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                     { !!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                     { predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
                 </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
+                    { heterozygosity.value || fallbackElem }
+                    { (heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`}/>}
+                </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     { filteredSNVIndelVariants.value ? decorateNumberWithCommas(+filteredSNVIndelVariants.value) : fallbackElem }
-                </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
-                    { filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
@@ -782,12 +783,11 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                     { predictedAncestry.value || fallbackElem }&nbsp;
                     { !!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
-                    { heterozygosity.value || fallbackElem }
-                    { (heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`}/>}
-                </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="De novo Fraction">
+                <BioinfoStatsEntry label="SNV/Indel De novo Fraction">
                     { deNovo.value || fallbackElem }
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
+                    { filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
         </React.Fragment>
