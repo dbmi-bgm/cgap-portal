@@ -3,7 +3,7 @@ from snovault import calculated_property, collection, load_schema
 
 from .base import Item, get_item_or_none
 from .family import Family
-from ..util import title_to_snake_case
+from ..util import get_item, title_to_snake_case
 
 
 log = structlog.getLogger(__name__)
@@ -223,21 +223,6 @@ class QualityMetricParser:
             self.DE_NOVO_FRACTION: self.flag_de_novo_fraction,
         }
 
-    def get_item(self, item_atid):
-        """Get item from database.
-
-        :param item_atid: Item identifier (usually @id)
-        :type item_atid: str
-        :return: Item in object view
-        :rtype: dict
-        """
-        item_collection = item_atid.split("/")[0]
-        result = get_item_or_none(self.request, item_atid, item_collection)
-        if result is None:
-            log.exception(f"Could not find expected item for identifer: {item_atid}.")
-            result = {}
-        return result
-
     def get_qc_display_results(self, samples, processed_files):
         """Gather and process all data to make calcprop.
 
@@ -252,7 +237,7 @@ class QualityMetricParser:
         :rtype: list
         """
         result = None
-        final_vcf_found = self.collect_sample_processing_processed_files_data(
+        snc_vcf_found, sv_vcf_found = self.collect_sample_processing_processed_files_data(
             processed_files
         )
         if final_vcf_found and samples:
@@ -272,9 +257,8 @@ class QualityMetricParser:
         snv_vcf_found = False
         vep_vcf_found = False
         sv_vcf_found = False
-        final_vcf_found = False
         for processed_file_atid in processed_files[::-1]:  # Most recent files last
-            file_item = self.get_item(processed_file_atid)
+            file_item = get_item(self.request, processed_file_atid)
             file_format_atid = file_item.get(self.FILE_FORMAT)
             if file_format_atid != self.VCF_FILE_FORMAT_ATID:
                 continue
@@ -309,9 +293,7 @@ class QualityMetricParser:
                 )
             if snv_vcf_found and sv_vcf_found and vep_vcf_found:
                 break
-        if snv_vcf_found or sv_vcf_found:
-            final_vcf_found = True
-        return final_vcf_found
+        return snv_vcf_found, sv_vcf_found
 
     def add_to_processed_files(
         self, file_item, properties_to_find, property_replacements=None
@@ -427,7 +409,7 @@ class QualityMetricParser:
         :type sample_identifier: str
         """
         sample_qc_properties = {}
-        sample_item = self.get_item(sample_identifier)
+        sample_item = get_item(self.request, sample_identifier)
         self.update_simple_properties(
             self.SIMPLE_SAMPLE_PROPERTIES, sample_item, sample_qc_properties
         )
@@ -451,7 +433,7 @@ class QualityMetricParser:
         :param sample_info: Sample-specific data to update
         :type sample_info: dict
         """
-        individual_item = self.get_item(individual_atid)
+        individual_item = get_item(self.request, individual_atid)
         self.update_simple_properties(
             self.SIMPLE_INDIVIDUAL_PROPERTIES,
             individual_item,
@@ -474,7 +456,7 @@ class QualityMetricParser:
         :type sample_info: dict
         """
         for processed_file_atid in processed_file_atids[::-1]:  # Most recent last
-            file_item = self.get_item(processed_file_atid)
+            file_item = get_item(self.request, processed_file_atid)
             file_format = file_item.get(self.FILE_FORMAT)
             if file_format == self.BAM_FILE_FORMAT_ATID:
                 self.collect_bam_quality_metric_values(file_item, sample_info)
@@ -490,7 +472,7 @@ class QualityMetricParser:
         """
         quality_metric_atid = file_item.get(self.QUALITY_METRIC)
         if quality_metric_atid:
-            quality_metric_item = self.get_item(quality_metric_atid)
+            quality_metric_item = get_item(self.request, quality_metric_atid)
             summary = quality_metric_item.get(self.QUALITY_METRIC_SUMMARY, [])
             for item in summary:
                 self.add_qc_property_to_sample_info(
@@ -612,7 +594,7 @@ class QualityMetricParser:
         :type property_replacements: dict or None
         """
         links = None
-        quality_metric = self.get_item(quality_metric_atid)
+        quality_metric = get_item(self.request, quality_metric_atid)
         quality_metric_summary = quality_metric.get(self.QUALITY_METRIC_SUMMARY, [])
         links = self.get_qc_links(quality_metric)
         for item in quality_metric_summary:

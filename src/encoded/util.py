@@ -524,9 +524,33 @@ SPACE_PATTERN = re.compile(r"[ ]+")
 
 
 def title_to_snake_case(input_string):
-    """Convert string title case (e.g. "Some Title") to snake case."""
+    """Convert string title case (e.g. "Some Title") to snake case.
+
+    TODO: Move to dcicutils
+    """
     lower_string = input_string.lower()
     no_dash_string = lower_string.replace("-", " ").replace("_", " ")
     no_space_string = re.sub(SPACE_PATTERN, "_", no_dash_string)
     result = no_space_string.strip("_")
+    return result
+
+
+def get_item(request, item_atid):
+    """Get item from database via its @id.
+
+    If not found, log and return empty dict for consistency with item
+    result when found.
+
+    :param request: App request
+    :type request: pyramid.request.Request
+    :param item_atid: Item @id
+    :type item_atid: str
+    :return: Item in object view
+    :rtype: dict
+    """
+    item_collection = item_atid.split("/")[0]
+    result = get_item_or_none(request, item_atid, item_collection)
+    if result is None:
+        log.exception(f"Could not find expected item for identifer: {item_atid}.")
+        result = {}
     return result
