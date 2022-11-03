@@ -13,6 +13,7 @@ import { basicColumnExtensionMap,
 import { Schemas, typedefs } from './../util';
 
 import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
+import QuickPopover from '../item-pages/components/QuickPopover';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
@@ -40,6 +41,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         mainTitle = null,
         dateTitle = "Created:",
         date,
+        datePlaceholder = "N/A",
         titleTip = null,
         titleTipDelayShow = null,
         "data-html": tooltipEnableHtml
@@ -58,7 +60,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
             </h4>
             <div className="col-date text-smaller text-secondary">
                 <span className="mr-04">{ dateTitle }</span>
-                { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : "N/A" }
+                { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : datePlaceholder }
             </div>
         </div>
     );
@@ -347,26 +349,7 @@ export const columnExtensionMap = {
     /** "QC" column title */
     'quality_control_flags.flag' : {
         'render': function(result, props) {
-            const {  sample_processing = {}, quality_control_flags = {}, '@id': resultHrefPath } = result;
-            const {
-                last_modified: { date_modified: date = null } = {}
-            } = sample_processing;
-
-            const { flag, warn = 0, fail = 0 } = quality_control_flags;
-
-            let qcFlags = "No Flags";
-            if (warn !== 0 || fail !== 0) {
-                qcFlags = (
-                    <div>
-                        <span className="mr-05">{fail} <i className={`icon icon-flag fas text-danger ml-05`} /></span>
-                        <span className="ml-05">{warn} <i className={`icon icon-flag fas text-warning ml-05`} /></span>
-                    </div>
-                );
-            }
-
-            return (
-                <MultiLevelColumn {...{ date }} dateTitle="Last Modified:" mainTitle={qcFlags}/>
-            );
+            return <QCMultilevelColumn {...{ result }} />;
         }
     },
     'date_published' : {
@@ -500,5 +483,38 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
                     { analysis_type }
                 </a>
             }/>
+    );
+});
+
+
+const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
+    const {  sample_processing = {}, quality_control_flags = {}, '@id': resultHrefPath } = result;
+    const {
+        last_modified: { date_modified: date = null } = {}
+    } = sample_processing;
+
+    console.log("result", result);
+
+    const { flag, warn = 0, fail = 0 } = quality_control_flags;
+
+    // title = null, children = [], className, popID, tooltip, placement, htmlContent
+
+    let qcFlags = "No Flags";
+    if (warn !== 0 || fail !== 0) {
+        qcFlags = (
+            <div>
+                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                    <span className="mr-05">{fail} <i className={`icon icon-flag fas text-danger ml-05`} /></span>
+                    <span className="ml-05">{warn} <i className={`icon icon-flag fas text-warning ml-05`} /></span>
+                </a>
+                <QuickPopover className="ml-05 mb-03 p-0" tooltip="Click this">
+                    <div>This is stuff</div>
+                </QuickPopover>
+            </div>
+        );
+    }
+
+    return (
+        <MultiLevelColumn datePlaceholder="" dateTitle="" mainTitle={qcFlags}/>
     );
 });
