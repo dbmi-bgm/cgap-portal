@@ -23,7 +23,7 @@ export default function QuickPopover(props) {
     );
     const cls = "btn btn-link text-decoration-none" + (className ? " " + className : "");
     return (
-        <OverlayTrigger trigger="focus" overlay={popover} {...{ placement }}>
+        <OverlayTrigger trigger="click" overlay={popover} rootClose rootCloseEvent="click" {...{ placement }}>
             { function({ ref, ...triggerHandlers }){
                 return (
                     <button type="button" ref={ref} { ...triggerHandlers } className={cls} data-tip={tooltip || "Click for more information"}>
