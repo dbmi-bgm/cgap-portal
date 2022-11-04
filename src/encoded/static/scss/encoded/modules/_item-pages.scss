@@ -1415,17 +1415,6 @@ i.status-indicator-dot {
 				}
 			}
 
-			/* Bioinformatics Tab Specific styles */
-			&#case-info\.bioinformatics {
-				.qcm-flag[data-flag="fail"] {
-					color: rgb(178, 67, 66);
-				}
-
-				.qcm-flag[data-flag="warn"] {
-					color: rgb(229, 149, 69);
-				}
-			}
-
 			/* Interpretation styles*/
 			&#case-info\.interpretation {
 				.card-header.section-header {
@@ -2914,4 +2903,13 @@ div.user-profile-page {
 
 	}
 
+}
+
+
+.qcm-flag[data-flag="fail"] {
+	color: rgb(178, 67, 66);
+}
+
+.qcm-flag[data-flag="warn"] {
+	color: rgb(229, 149, 69);
 }

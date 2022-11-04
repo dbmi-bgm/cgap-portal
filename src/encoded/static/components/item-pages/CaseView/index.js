@@ -962,12 +962,12 @@ function QCMAccordionDrawer(props) {
     );
 }
 
-export function QCMFlag({ type, title }) {
+export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
     const alertClass = type === "warn" ? "warning" : "danger";
 
     return (
-        <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 m-0 ml-1 text-small border-0`} role="alert">
-            <span className=".d-sm-none .d-md-block">{qcmFieldNameToDisplay(title)}</span>
+        <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 ${cls}`} role="alert">
+            <span className="d-sm-none d-md-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
     );

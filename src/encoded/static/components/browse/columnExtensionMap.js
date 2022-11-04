@@ -543,20 +543,23 @@ const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relatio
     if (qualityControlMetrics.length === 0) { return "No Quality Control Metrics Available"; }
 
     const sortedQCMS = sortQCMs(qualityControlMetrics, relationshipMapping);
+    const flagClasses = "mb-02 d-flex align-items-center justify-content-between";
+
     return (
-        <div>
-            <table className="table">
+        <div className="p-2">
+            <table className="table table-sm table-borderless">
                 <tbody>
-                    { sortedQCMS.map((qcm) => {
-                        const { atID, role, individual_id, bam_sample_id, individual_accession, warn = [], fail = [] } = qcm;
-                        const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
-                        const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
+                    { sortedQCMS.map((qcm, i) => {
+                        const { atID, role, individual_id, bam_sample_id, warn = [], fail = [] } = qcm;
+
+                        const warnFlags = warn.map((flag) => <QCMFlag key={flag} cls={flagClasses} type="warn" title={flag} />);
+                        const failFlags = fail.map((flag) => <QCMFlag key={flag} cls={flagClasses} type="fail" title={flag} />);
 
                         return (
-                            <tr key={atID + bam_sample_id }>
-                                <th scope="row">{role} { individual_id }</th>
-                                <td className="accession">{ individual_accession }</td>
-                                <td>{ warnFlags } { failFlags }</td>
+                            <tr key={atID + bam_sample_id } className={`${ i !== sortedQCMS.length - 1 && "border-bottom"}`}>
+                                <td className="text-left text-600 text-capitalize text-larger pl-03 align-top align-left p-2">{role}</td>
+                                <td className="text-uppercase text-600 text-small align-top align-left py-2 px-5">{ individual_id }</td>
+                                <td className="p-2">{ warnFlags } { failFlags } { warnFlags.length == 0 && failFlags.length == 0 && "No Flags"}</td>
                             </tr>
                         );
                     })}
