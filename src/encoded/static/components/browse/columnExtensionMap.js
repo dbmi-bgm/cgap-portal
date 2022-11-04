@@ -525,7 +525,7 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
                     <span className="mr-05">{fail} <i className={`icon icon-flag fas text-danger ml-05`} /></span>
                     <span className="ml-05">{warn} <i className={`icon icon-flag fas text-warning ml-05`} /></span>
                 </a>
-                <QuickPopover className="ml-05 mb-03 p-0" tooltip="Click this">
+                <QuickPopover className="ml-05 mb-03 p-0" tooltip="Click for QC Summary">
                     <QCPopover {...{ qualityControlMetrics, relationshipMapping }} />
                 </QuickPopover>
             </div>
