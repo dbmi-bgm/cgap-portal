@@ -795,18 +795,19 @@ function BioinfoStatTable({ qualityControlMetrics }) {
 }
 
 function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
+    const id = "biostatsentry_" + label.split(" ").join("_");
     return (
         <div className="col-12 col-md-6 col-lg-3 col-xl-3 py-2">
             <div className="qc-summary">
-                <label className="d-block mb-0">
+                <label className="d-inline-block mb-0" htmlFor={id}>
                     { label }:
                     { !popoverContent && tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={tooltip} data-place="right"/>
                         : null }
-                    { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
                 </label>
-                <div>{ children }</div>
+                { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
+                <div {...{ id }}>{ children }</div>
             </div>
         </div>
     );
@@ -966,7 +967,7 @@ export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
     const alertClass = type === "warn" ? "warning" : "danger";
 
     return (
-        <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 ${cls}`} role="alert">
+        <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 d-flex align-items-center justify-items-center ${cls}`} role="alert">
             <span className="d-sm-none d-md-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
