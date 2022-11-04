@@ -846,14 +846,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     );
 
     // Create a mapping of individuals to relationship and sex
-    const relationshipMapping = {};
-    relationships.forEach((item) => {
-        const { relationship = null, sex = null, individual = null } = item;
-        relationshipMapping[individual] = { sex, relationship };
-    });
-    console.log("relationshipMapping", relationshipMapping);
-    console.log("idToGraphIdentifier", idToGraphIdentifier);
-    console.log("bioinfoTab canonicalFam", canonicalFamily);
+    const relationshipMapping = generateRelationshipMapping(relationships);
 
     return (
         <React.Fragment>
@@ -925,36 +918,7 @@ function QCMAccordion(props) {
         return <div className="m-4">No Quality Control Metrics Available</div>;
     }
 
-    /** @TODO Group multiple samples by Individual */
-
-    const sortedQCMs = quality_control_metrics.sort((a, b) => {
-        const { individual_accession: aAccession } = a;
-        const { individual_accession: bAccession } = b;
-
-        const atIDA = `/individuals/${aAccession}/`;
-        const atIDB = `/individuals/${bAccession}/`;
-
-        // Find relationships
-        const relationA = relationshipMapping[aAccession]?.relationship;
-        const relationB = relationshipMapping[bAccession]?.relationship;
-
-        // Add props to QCMS for future use
-        a.atID = atIDA;
-        b.atID = atIDB;
-        a.role = relationA;
-        b.role = relationB;
-
-        // Sort by proband first, then by mother and father
-        if (relationA === "proband") {
-            return -1;
-        } else if (relationA === "mother" && relationB !== "proband") {
-            return -1;
-        } else if (relationA === "father" && relationB !== "proband" && relationB !== "mother") {
-            return -1;
-        } else {
-            return 1;
-        }
-    });
+    const sortedQCMs = sortQCMs(quality_control_metrics, relationshipMapping);
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
@@ -1020,4 +984,48 @@ function qcmFieldNameToDisplay(field) {
         default:
             return "";
     }
+}
+
+/** @TODO Group multiple samples by Individual */
+export function sortQCMs(qcms, relationshipMapping) {
+    return qcms.sort((a, b) => {
+        const { individual_accession: aAccession } = a;
+        const { individual_accession: bAccession } = b;
+
+        const atIDA = `/individuals/${aAccession}/`;
+        const atIDB = `/individuals/${bAccession}/`;
+
+        // Find relationships
+        const relationA = relationshipMapping[aAccession]?.relationship;
+        const relationB = relationshipMapping[bAccession]?.relationship;
+
+        // Add props to QCMS for future use
+        a.atID = atIDA;
+        b.atID = atIDB;
+        a.role = relationA;
+        b.role = relationB;
+
+        // Sort by proband first, then by mother and father
+        if (relationA === "proband") {
+            return -1;
+        } else if (relationA === "mother" && relationB !== "proband") {
+            return -1;
+        } else if (relationA === "father" && relationB !== "proband" && relationB !== "mother") {
+            return -1;
+        } else {
+            return 1;
+        }
+    });
+}
+
+export function generateRelationshipMapping(relationshipsFromCanonicalFamily) {
+
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = {};
+    relationshipsFromCanonicalFamily.forEach((item) => {
+        const { relationship = null, sex = null, individual = null } = item;
+        relationshipMapping[individual] = { sex, relationship };
+    });
+
+    return relationshipMapping;
 }
