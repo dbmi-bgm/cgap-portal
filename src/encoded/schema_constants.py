@@ -220,7 +220,9 @@ class DocumentConstants:
     TYPE = "type"
     TYPE_APPLICATION_MSWORD = "application/msword"
     TYPE_APPLICATION_VND_MS_EXCEL = "application/vnd.ms-excel"
-    TYPE_APPLICATION_VND_OPENXMLFORMATS_OFFICEDOCUMENT_SPREADSHEETML_SHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    TYPE_APPLICATION_VND_OPENXMLFORMATS_OFFICEDOCUMENT_SPREADSHEETML_SHEET = (
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
     TYPE_APPLICATION_PDF = "application/pdf"
     TYPE_APPLICATION_ZIP = "application/zip"
     TYPE_APPLICATION_PROBAND_XML = "application/proband+xml"
@@ -1109,7 +1111,9 @@ class GeneConstants:
     GENE_BIOTYPE_TEC = "TEC"
     GENE_BIOTYPE_TRANSCRIBED_PROCESSED_PSEUDOGENE = "transcribed_processed_pseudogene"
     GENE_BIOTYPE_TRANSCRIBED_UNITARY_PSEUDOGENE = "transcribed_unitary_pseudogene"
-    GENE_BIOTYPE_TRANSCRIBED_UNPROCESSED_PSEUDOGENE = "transcribed_unprocessed_pseudogene"
+    GENE_BIOTYPE_TRANSCRIBED_UNPROCESSED_PSEUDOGENE = (
+        "transcribed_unprocessed_pseudogene"
+    )
     GENE_BIOTYPE_TRANSLATED_PROCESSED_PSEUDOGENE = "translated_processed_pseudogene"
     GENE_BIOTYPE_TRANSLATED_UNPROCESSED_PSEUDOGENE = "translated_unprocessed_pseudogene"
     GENE_BIOTYPE_TR_C_GENE = "TR_C_gene"
@@ -1243,7 +1247,9 @@ class ImageConstants:
     TYPE = "type"
     TYPE_APPLICATION_MSWORD = "application/msword"
     TYPE_APPLICATION_VND_MS_EXCEL = "application/vnd.ms-excel"
-    TYPE_APPLICATION_VND_OPENXMLFORMATS_OFFICEDOCUMENT_SPREADSHEETML_SHEET = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    TYPE_APPLICATION_VND_OPENXMLFORMATS_OFFICEDOCUMENT_SPREADSHEETML_SHEET = (
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
     TYPE_APPLICATION_PDF = "application/pdf"
     TYPE_APPLICATION_ZIP = "application/zip"
     TYPE_APPLICATION_PROBAND_XML = "application/proband+xml"
@@ -3795,7 +3801,9 @@ class VariantSampleListConstants:
     SELECTED_BY = "selected_by"
     DATE_SELECTED = "date_selected"
     STRUCTURAL_VARIANT_SAMPLES = "structural_variant_samples"
-    FILTER_BLOCKS_REQUEST_AT_TIME_OF_SELECTION = "filter_blocks_request_at_time_of_selection"
+    FILTER_BLOCKS_REQUEST_AT_TIME_OF_SELECTION = (
+        "filter_blocks_request_at_time_of_selection"
+    )
     CREATED_FOR_CASE = "created_for_case"
 
 
