@@ -14,6 +14,8 @@ import { Schemas, typedefs } from './../util';
 
 import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
 import QuickPopover from '../item-pages/components/QuickPopover';
+import { generateRelationshipMapping, sortQCMs } from '../item-pages/CaseView';
+import { CurrentFamilyController, findCanonicalFamilyIndex } from '../item-pages/CaseView/CurrentFamilyController';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
@@ -488,12 +490,28 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
 
 
 const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
-    const {  sample_processing = {}, quality_control_flags = {}, '@id': resultHrefPath } = result;
     const {
-        last_modified: { date_modified: date = null } = {}
+        family: canonicalFamilyPartialEmbed = {},
+        sample_processing = {},
+        quality_control_flags = {},
+        '@id': resultHrefPath
+    } = result;
+    const {
+        last_modified: { date_modified: date = null } = {},
+        quality_control_metrics: qualityControlMetrics = [],
+        families: spFamilies = []
     } = sample_processing;
 
-    console.log("result", result);
+    // Find full canonical family for this case
+    const familiesWithViewPermission = CurrentFamilyController.filterFamiliesWithViewPermission(spFamilies);
+    const canonicalFamilyIdx = findCanonicalFamilyIndex(familiesWithViewPermission, canonicalFamilyPartialEmbed);
+
+    const {
+        relationships = []
+    } = spFamilies[canonicalFamilyIdx] || {};
+
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = generateRelationshipMapping(relationships);
 
     const { flag, warn = 0, fail = 0 } = quality_control_flags;
 
@@ -508,7 +526,7 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
                     <span className="ml-05">{warn} <i className={`icon icon-flag fas text-warning ml-05`} /></span>
                 </a>
                 <QuickPopover className="ml-05 mb-03 p-0" tooltip="Click this">
-                    <div>This is stuff</div>
+                    <QCPopover {...{ qualityControlMetrics, relationshipMapping }} />
                 </QuickPopover>
             </div>
         );
@@ -516,5 +534,32 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
 
     return (
         <MultiLevelColumn datePlaceholder="" dateTitle="" mainTitle={qcFlags}/>
+    );
+});
+
+
+const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relationshipMapping }) {
+
+    if (qualityControlMetrics.length === 0) { return "No Quality Control Metrics Available"; }
+
+    const sortedQCMS = sortQCMs(qualityControlMetrics, relationshipMapping);
+    return (
+        <div>
+            <table className="table">
+                <tbody>
+                    { sortedQCMS.map((qcm) => {
+                        const { atID, role, individual_id, bam_sample_id, individual_accession, warn = [], fail = [] } = qcm;
+                        return (
+                            <tr key={atID + bam_sample_id }>
+                                <th scope="row">{role} { individual_id }</th>
+                                <td className="accession">{ individual_accession }</td>
+                                <td>{ warn }</td>
+                                <td>{ fail }</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
     );
 });
