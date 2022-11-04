@@ -14,7 +14,7 @@ import { Schemas, typedefs } from './../util';
 
 import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
 import QuickPopover from '../item-pages/components/QuickPopover';
-import { generateRelationshipMapping, sortQCMs } from '../item-pages/CaseView';
+import { generateRelationshipMapping, QCMFlag, sortQCMs } from '../item-pages/CaseView';
 import { CurrentFamilyController, findCanonicalFamilyIndex } from '../item-pages/CaseView/CurrentFamilyController';
 
 // eslint-disable-next-line no-unused-vars
@@ -549,12 +549,14 @@ const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relatio
                 <tbody>
                     { sortedQCMS.map((qcm) => {
                         const { atID, role, individual_id, bam_sample_id, individual_accession, warn = [], fail = [] } = qcm;
+                        const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
+                        const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
+
                         return (
                             <tr key={atID + bam_sample_id }>
                                 <th scope="row">{role} { individual_id }</th>
                                 <td className="accession">{ individual_accession }</td>
-                                <td>{ warn }</td>
-                                <td>{ fail }</td>
+                                <td>{ warnFlags } { failFlags }</td>
                             </tr>
                         );
                     })}

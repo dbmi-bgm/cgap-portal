@@ -962,7 +962,7 @@ function QCMAccordionDrawer(props) {
     );
 }
 
-function QCMFlag({ type, title }) {
+export function QCMFlag({ type, title }) {
     const alertClass = type === "warn" ? "warning" : "danger";
 
     return (
