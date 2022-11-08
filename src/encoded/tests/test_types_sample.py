@@ -44,6 +44,7 @@ PROBAND_SAMPLE_QC_METRICS = {
     "filtered_variants": {"value": "1100"},
     "filtered_structural_variants": {"value": "92"},
     "fail": ["de_novo_fraction"],
+    "completed_qcs": ["BAM", "SNV", "SV"],
 }
 PROBAND_SAMPLE_2_QC_METRICS = {
     "bam_sample_id": PROBAND_SAMPLE_2_ID,
@@ -75,6 +76,7 @@ PROBAND_SAMPLE_2_QC_METRICS = {
     "filtered_structural_variants": {"value": "92"},
     "warn": ["heterozygosity_ratio"],
     "fail": ["transition_transversion_ratio"],
+    "completed_qcs": ["BAM", "SNV", "SV"],
 }
 MOTHER_SAMPLE_QC_METRICS = {
     "bam_sample_id": MOTHER_SAMPLE_ID,
@@ -104,7 +106,8 @@ MOTHER_SAMPLE_QC_METRICS = {
     "total_variants_called": {"value": "13200"},
     "filtered_variants": {"value": "1320"},
     "filtered_structural_variants": {"value": "112"},
-    "warn": ["transition_transversion_ratio", "heterozygosity_ratio"],
+    "warn": ["heterozygosity_ratio", "transition_transversion_ratio"],
+    "completed_qcs": ["BAM", "SNV", "SV"],
 }
 
 

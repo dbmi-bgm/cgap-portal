@@ -554,3 +554,13 @@ def get_item(request, item_atid):
         log.exception(f"Could not find expected item for identifer: {item_atid}.")
         result = {}
     return result
+
+
+def transfer_properties(source, target, properties, property_replacements=None):
+    """"""
+    for property_name in properties:
+        property_value = source.get(property_name)
+        if property_value is not None:
+            if property_replacements:
+                property_name = property_replacements.get(property_name, property_name)
+            target[property_name] = property_value
