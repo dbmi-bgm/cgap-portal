@@ -677,6 +677,8 @@ class QualityMetricParser:
         """
         result = None
         if samples:
+            if processed_files is None:
+                processed_files = []
             self.collect_sample_processing_processed_files_data(processed_files)
             self.collect_samples_data(samples)
             self.associate_quality_metrics_with_samples()
