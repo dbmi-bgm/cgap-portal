@@ -6,6 +6,7 @@
         "uuid": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
         "bam_sample_id": "test001_sample",
         "workup_type": "WGS",
+        "specimen_type": "peripheral blood",
         "processed_files": [
             "10002377-49e5-4c33-afab-9ec90d65faf3"
         ]
@@ -17,6 +18,7 @@
         "uuid": "283f6047-61cd-4ddb-8881-ec1c87082569",
         "workup_type": "WGS",
         "bam_sample_id": "test002_sample",
+        "specimen_type": "peripheral blood",
         "processed_files": [
             "10002377-49e5-4c33-afab-9ec90d65faa1"
         ]
