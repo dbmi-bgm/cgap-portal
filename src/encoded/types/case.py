@@ -644,15 +644,16 @@ class Case(Item):
         if sample_processing:
             sample_processing_item = get_item_or_none(request, sample_processing)
             if sample_processing_item:
-                result = self._get_flags(sample_processing_item)
+                result = self._get_flags_and_completed_steps(sample_processing_item)
         return result
 
     @staticmethod
-    def _get_flags(sample_processing):
+    def _get_flags_and_completed_steps(sample_processing):
         """Gather and count QC flags from SampleProcessing."""
         result = None
         fail_count = 0
         warn_count = 0
+        sample_completed_steps = []
         qc_metrics = sample_processing.get("quality_control_metrics")
         if qc_metrics is not None:
             for sample_qc_metrics in qc_metrics:
@@ -660,6 +661,9 @@ class Case(Item):
                 fail_count += len(fail_flags)
                 warn_flags = sample_qc_metrics.get("warn", [])
                 warn_count += len(warn_flags)
+                sample_completed_steps.append(
+                    set(sample_qc_metrics.get("completed_qcs", []))
+                )
             overall_flag = "pass"
             if fail_count:
                 overall_flag = "fail"
@@ -670,4 +674,10 @@ class Case(Item):
                 "warn": warn_count,
                 "fail": fail_count,
             }
+            if sample_completed_steps:
+                all_sample_completed_steps = sample_completed_steps.pop(0)
+                for completed_steps in sample_completed_steps:
+                    all_sample_completed_steps = all_sample_completed_steps & completed_steps
+                if all_sample_completed_steps:
+                    result["completed_qcs"] = sorted(list(all_sample_completed_steps))
         return result

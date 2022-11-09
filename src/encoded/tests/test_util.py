@@ -19,6 +19,7 @@ from ..util import (
     vapp_for_email,
     convert_integer_to_comma_string,
     title_to_snake_case,
+    get_item,
 )
 from .. import util as util_module
 
@@ -334,3 +335,35 @@ def test_title_to_snake_case(value, expected):
     """Test conversion of string to snake case."""
     result = title_to_snake_case(value)
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item_atid,get_item_or_none_result,expected",
+    [
+        ("", None, {}),
+        ("not_an_atid", None, {}),
+        ("/genes/ENSG00000198727/", None, {}),
+        ("/genes/ENSG00000198727/", {"foo": "bar"}, {"foo": "bar"}),
+    ],
+)
+def test_get_item(item_atid, get_item_or_none_result, expected):
+    """Unit test item retrieval with mocked get_item_or_none."""
+    request = "foo"
+    with mock.patch.object(
+        util_module,
+        "get_item_or_none",
+        return_value=get_item_or_none_result,
+    ) as mocked_get_item_or_none:
+        with mock.patch.object(util_module, "log") as mocked_log:
+            result = get_item(request, item_atid)
+            expected_call = [
+                request,
+                item_atid,
+                item_atid.split("/")[0],
+            ]
+            assert mocked_get_item_or_none.called_once_with(expected_call)
+            if get_item_or_none_result is None:
+                mocked_log.exception.assert_called_once()
+            else:
+                assert not mocked_log.exception.called
+            assert result == expected
