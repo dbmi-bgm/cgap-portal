@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 
 import { EmbeddedItemSearchTable, SearchTableTitle } from './../../item-pages/components/EmbeddedItemSearchTable';
+import { CohortStatisticalAnalysisTable } from './../../item-pages/components/CohortStatisticalAnalysisTable';
 import { EmbeddedCohortBrowser } from './../../item-pages/components/HiGlass/EmbeddedCohortBrowser';
 
 
@@ -13,7 +14,7 @@ import { EmbeddedCohortBrowser } from './../../item-pages/components/HiGlass/Emb
  * Any placeholder(s) used in a StaticSection _must_ get imported here
  * and be available here.
  */
-const placeholders = { EmbeddedItemSearchTable, SearchTableTitle, EmbeddedCohortBrowser };
+const placeholders = { EmbeddedItemSearchTable, SearchTableTitle, EmbeddedCohortBrowser, CohortStatisticalAnalysisTable };
 
 export const replaceString = memoize(function(placeholderString, props){
 

@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+11.3.0
+======
+
+`PR 663: Cohort browser <https://github.com/dbmi-bgm/cgap-portal/pull/663>`_
+
+* Add cohort browser and statistical analysis table
+
 11.2.0
 ======
 
