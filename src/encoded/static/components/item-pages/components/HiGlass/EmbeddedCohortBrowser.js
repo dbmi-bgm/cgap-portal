@@ -20,7 +20,7 @@ function GeneListFilter({ geneLists, onChange }) {
         onChange={onChange}
         defaultValue={"NONE"}
       >
-        <option value="NONE">Non selected</option>
+        <option value="NONE">None selected</option>
         {Object.keys(geneLists).map((gl) => (
           <option value={gl} key={gl}>
             {gl}

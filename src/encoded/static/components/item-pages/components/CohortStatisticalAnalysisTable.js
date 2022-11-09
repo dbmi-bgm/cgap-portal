@@ -62,7 +62,7 @@ function GeneListFilter({ geneLists, onChange }) {
         onChange={onChange}
         defaultValue={"NONE"}
       >
-        <option value="NONE">Non selected</option>
+        <option value="NONE">None selected</option>
         {Object.keys(geneLists).map((gl) => (
           <option value={gl} key={gl}>{gl}</option>
         ))}
@@ -164,7 +164,14 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
           this.geneListFilteredVcfRecords,
           firstTest
         );
+      })
+      .catch(error => {
+        console.error("Error loading data from VCF file: ", error);
       });
+
+    })
+    .catch(error => {
+      console.error("Error loading VCF file: ", error);
     });
   }
 
@@ -316,7 +323,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     this.state.activeTests.forEach((test) => {
       let icon = "icon icon-sort-amount-down pl-1 fas";
       if (test !== this.state.sortedBy) {
-        icon += " text-muted";
+        icon += " text-primary";
       }
 
       headerCols.push(

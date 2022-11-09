@@ -23,8 +23,6 @@ export class GeneSearchBox extends React.PureComponent {
     this.handleResultClick = this.handleResultClick.bind(this);
   }
 
-  componentDidUpdate(pastProps, pastState) {}
-
   updateCurrentSearchTerm(evt) {
     const val = evt.target.value;
     this.setState(
@@ -167,15 +165,15 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
 
   if (error) {
     return (
-      <div>
-        <i className="icon icon-exclamation-triangle fas text-warning ml-1 mr-1"></i>
+      <div className="text-smaller">
+        <i className="icon icon-exclamation-triangle fas text-warning ml-05 mr-05"></i>
         {error}
       </div>
     );
   } else if (info) {
     return (
-      <div>
-        <i className="icon icon-info-circle fas text-info ml-1 mr-1"></i>
+      <div className="text-smaller">
+        <i className="icon icon-info-circle fas text-secondary ml-05 mr-05"></i>
         {info}
       </div>
     );
