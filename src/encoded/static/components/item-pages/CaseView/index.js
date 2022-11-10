@@ -1026,7 +1026,8 @@ export function sortQCMs(qcms, relationshipMapping) {
         } else if (relationA === "father" && relationB !== "proband" && relationB !== "mother") {
             return -1;
         } else {
-            return 1;
+            // Sort leftovers alphabetically
+            return relationA.localeCompare(relationB);
         }
     });
 }
