@@ -43,7 +43,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         mainTitle = null,
         dateTitle = "Created:",
         date,
-        datePlaceholder = "N/A",
+        datePlaceholder = "N/A",    // @TODO: Update date fieldnames to be more generic, since they are being used for more than just dates now (post-QC update)
         titleTip = null,
         titleTipDelayShow = null,
         "data-html": tooltipEnableHtml
@@ -61,7 +61,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 <span>{ mainTitle || "-" }</span>
             </h4>
             <div className="col-date text-smaller text-secondary">
-                <span className="mr-04">{ dateTitle }</span>
+                { dateTitle && <span className="mr-04">{ dateTitle }</span>}
                 { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : datePlaceholder }
             </div>
         </div>
@@ -292,21 +292,6 @@ export const columnExtensionMap = {
                 status = "incomplete";
             }
 
-            /** @DEPRECATED as of 9/16/20 -- keeping here until confirmation new tips will stay.
-            let status, statusTip;
-            if (complProcLen > 0){
-                status = "released";
-                if (complProcLen === 1) {
-                    statusTip = `Process <span class="text-600">${completed_processes[0]}</span> has completed`;
-                } else {
-                    statusTip = `This sample/case has <strong>${complProcLen}</strong> completed processes`;
-                }
-            } else {
-                status = "uploading";
-                statusTip = "This sample/case has no completed processes yet";
-            }
-            */
-
             return (
                 <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Sequence Date:"
                     mainTitle={<a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">{ workup_type }</a>}/>
@@ -513,7 +498,7 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
     // Create a mapping of individuals to relationship and sex
     const relationshipMapping = generateRelationshipMapping(relationships);
 
-    const { flag, warn = 0, fail = 0 } = quality_control_flags;
+    const { completed_qcs = [], warn = 0, fail = 0 } = quality_control_flags;
 
     // title = null, children = [], className, popID, tooltip, placement, htmlContent
 
@@ -533,7 +518,8 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
     }
 
     return (
-        <MultiLevelColumn datePlaceholder="" dateTitle="" mainTitle={qcFlags}/>
+        <MultiLevelColumn datePlaceholder={completed_qcs.length && <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>}
+            dateTitle="" mainTitle={qcFlags}/>
     );
 });
 
