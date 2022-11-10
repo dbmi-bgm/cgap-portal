@@ -875,7 +875,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
 
 
-function QCMAccordionToggle({ children, eventKey, callback, role }) {
+function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType, sampleID }) {
     const activeEventKey = useContext(AccordionContext);
 
     const decoratedOnClick = useAccordionToggle(
@@ -892,7 +892,9 @@ function QCMAccordionToggle({ children, eventKey, callback, role }) {
             <div className="d-flex align-items-center justify-items-center">
                 <i className={`icon icon-${icon} fas mr-1`} />
                 <div className="text-600 text-capitalize text-larger pl-03">
-                    {role}
+                    {role}:
+                    <span className="ml-05 mr-05 text-400">{sequencingType}</span>
+                    <span className="text-400 text-muted">({sampleID})</span>
                 </div>
             </div>
             { children }
@@ -929,15 +931,24 @@ function QCMAccordion(props) {
 }
 
 function QCMAccordionDrawer(props) {
-    const { idToGraphIdentifier, individuals, qualityControlMetrics, idx, qcmLen } = props || {};
-    const { atID, role, individual_id, individual_accession, warn = [], fail = [] } = qualityControlMetrics || {};
+    const { idToGraphIdentifier, qualityControlMetrics, idx, qcmLen } = props || {};
+    const {
+        atID,
+        role,
+        individual_id,
+        individual_accession,
+        warn = [],
+        fail = [],
+        sequencing_type: sequencingType,
+        bam_sample_id: sampleID
+    } = qualityControlMetrics || {};
 
     const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
 
     return (
         <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0": ""} ${idx === (qcmLen - 1) ? "border-bottom-0": ""}`} key={atID}>
-            <QCMAccordionToggle eventKey={atID} {...{ role }}>
+            <QCMAccordionToggle eventKey={atID} {...{ role, sequencingType, sampleID }}>
                 <div className="d-flex align-items-center justify-items-center">
                     { failFlags }
                     { warnFlags }
