@@ -550,15 +550,17 @@ const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relatio
             <table className="table table-sm table-borderless">
                 <tbody>
                     { sortedQCMS.map((qcm, i) => {
-                        const { atID, role, individual_id, bam_sample_id, warn = [], fail = [] } = qcm;
+                        const { atID, role, sequencing_type, bam_sample_id, warn = [], fail = [] } = qcm;
 
                         const warnFlags = warn.map((flag) => <QCMFlag key={flag} cls={flagClasses} type="warn" title={flag} />);
                         const failFlags = fail.map((flag) => <QCMFlag key={flag} cls={flagClasses} type="fail" title={flag} />);
 
                         return (
                             <tr key={atID + bam_sample_id } className={`${ i !== sortedQCMS.length - 1 && "border-bottom"}`}>
-                                <td className="text-left text-600 text-capitalize text-larger pl-03 align-top align-left p-2">{role}</td>
-                                <td className="text-uppercase text-600 text-small align-top align-left py-2 px-5">{ individual_id }</td>
+                                <td className="text-left text-600 text-capitalize text-larger pl-03 align-top align-left p-2">
+                                    {role}:
+                                </td>
+                                <td className="text-left align-top text-larger align-left p-2">{sequencing_type}</td>
                                 <td className="p-2">{ warnFlags } { failFlags } { warnFlags.length == 0 && failFlags.length == 0 && "No Flags"}</td>
                             </tr>
                         );

@@ -852,15 +852,14 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
     return (
         <React.Fragment>
             <h1><span className="text-300">Bioinformatics Analysis</span></h1>
-            {/* <div className="tab-inner-container clearfix font-italic qc-status">
+            {/* TODO: See if there's any desire to include QC statuses here (BAM, SNV, SV, etc.)
+            <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                {/* <div className="card-body p-0"> */}
                 <BioinfoStats {...{ caseSample, canonicalFamily, sampleProcessing, submittedAncestry, submittedSex, idToGraphIdentifier, relationshipMapping }} />
-                {/* </div> */}
             </div>
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
