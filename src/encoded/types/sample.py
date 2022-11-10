@@ -109,6 +109,7 @@ class QcConstants:
     INDIVIDUAL_ID = "individual_id"
     INDIVIDUAL_ACCESSION = "individual_accession"
     SEQUENCING_TYPE = "sequencing_type"
+    SPECIMEN_TYPE = "specimen_type"
     COVERAGE = "coverage"
     PREDICTED_SEX = "predicted_sex"
     PREDICTED_ANCESTRY = "predicted_ancestry"
@@ -627,6 +628,7 @@ class QualityMetricParser:
             QcConstants.INDIVIDUAL_ID,
             QcConstants.INDIVIDUAL_ACCESSION,
             QcConstants.SEQUENCING_TYPE,
+            QcConstants.SPECIMEN_TYPE,
             QcConstants.PREDICTED_SEX,
             QcConstants.PREDICTED_ANCESTRY,
             QcConstants.TOTAL_READS,
