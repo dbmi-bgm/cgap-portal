@@ -1000,7 +1000,7 @@ export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
 
     return (
         <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 d-flex align-items-center justify-items-center ${cls}`} role="alert">
-            <span className="d-sm-none d-md-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
+            <span className="d-none d-md-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
     );
