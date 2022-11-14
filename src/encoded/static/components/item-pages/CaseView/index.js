@@ -910,11 +910,10 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
         <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center">
             <div className="d-flex align-items-center justify-items-center">
                 <i className={`icon icon-${icon} fas mr-1`} />
-                <div className="text-left text-truncate text-600 text-capitalize text-larger pl-03">
+                <div className="d-flex justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
                     {role}:
-                    <span className="ml-05 mr-05 text-400 text-capitalize">{specimenType}</span>
-                    <span className="ml-05 mr-05 text-400 text-capitalize">- {sequencingType}</span>
-                    <span className="text-400 text-muted">({sampleID})</span>
+                    <div className="ml-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">{specimenType} - {sequencingType}</div>
+                    <div className="text-400 text-muted text-truncate d-inline-block">({sampleID})</div>
                 </div>
             </div>
             { children }
