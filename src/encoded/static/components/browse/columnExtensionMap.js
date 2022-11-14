@@ -502,7 +502,7 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
 
     // title = null, children = [], className, popID, tooltip, placement, htmlContent
 
-    let qcFlags = "No Flags";
+    let qcFlags = <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">No Flags</a>;
     if (warn !== 0 || fail !== 0) {
         qcFlags = (
             <div>
@@ -517,9 +517,10 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
         );
     }
 
+    const datePlaceholder = completed_qcs.length !== 0 ? <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>: null;
+
     return (
-        <MultiLevelColumn datePlaceholder={completed_qcs.length && <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>}
-            dateTitle="" mainTitle={qcFlags}/>
+        <MultiLevelColumn {...{ datePlaceholder }} dateTitle="" mainTitle={qcFlags}/>
     );
 });
 
