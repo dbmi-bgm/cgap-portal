@@ -42,12 +42,29 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         statusTip = null,
         mainTitle = null,
         dateTitle = "Created:",
+        bottom = null,
+        showBottomAsDate = true,
         date,
-        datePlaceholder = "N/A",    // @TODO: Update date fieldnames to be more generic, since they are being used for more than just dates now (post-QC update)
+        datePlaceholder = "N/A",
         titleTip = null,
         titleTipDelayShow = null,
         "data-html": tooltipEnableHtml
     } = props;
+
+    let bottomSection = null;
+
+    if (showBottomAsDate) {
+        bottomSection = (
+            <div className="col-date text-smaller text-secondary">
+                { dateTitle && <span className="mr-04">{ dateTitle }</span>}
+                { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : datePlaceholder }
+            </div>);
+    } else {
+        bottomSection = (
+            <div className="col-date text-smaller text-secondary">
+                { bottom || <br/> }
+            </div>);
+    }
 
     return (
         <div className="multi-field-cell">
@@ -60,10 +77,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
             <h4 className="col-main" data-tip={titleTip} data-delay-show={titleTipDelayShow} data-html={tooltipEnableHtml}>
                 <span>{ mainTitle || "-" }</span>
             </h4>
-            <div className="col-date text-smaller text-secondary">
-                { dateTitle && <span className="mr-04">{ dateTitle }</span>}
-                { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : datePlaceholder }
-            </div>
+            { bottomSection }
         </div>
     );
 }, function(){ return false; });
@@ -517,10 +531,10 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
         );
     }
 
-    const datePlaceholder = completed_qcs.length !== 0 ? <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>: null;
+    const bottom = completed_qcs.length !== 0 ? <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>: null;
 
     return (
-        <MultiLevelColumn {...{ datePlaceholder }} dateTitle="" mainTitle={qcFlags}/>
+        <MultiLevelColumn {...{ bottom }} showBottomAsDate={false} mainTitle={qcFlags}/>
     );
 });
 
