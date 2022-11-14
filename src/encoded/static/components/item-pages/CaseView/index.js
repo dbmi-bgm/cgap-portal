@@ -819,7 +819,7 @@ function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
     return (
         <div className="col-12 col-md-6 col-lg-3 col-xl-3 py-2">
             <div className="qc-summary">
-                <label className="d-inline-block mb-0" htmlFor={id}>
+                <label className="d-inline mb-0" htmlFor={id}>
                     { label }:
                     { !popoverContent && tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
