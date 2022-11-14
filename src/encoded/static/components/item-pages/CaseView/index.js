@@ -702,6 +702,26 @@ const bioinfoPopoverContent = {
     )
 };
 
+const mapLongFormSexToLetter = (sex) => {
+    if (!sex) { return; }
+
+    // Ensure it's lowercase
+    const sexLower = sex.toLowerCase();
+
+    switch (sexLower) {
+        case "male":
+            return "M";
+        case "female":
+            return "F";
+        case "unknown":
+        case "undetermined":
+            return "U";
+        default:
+            // unexpected value... render as-is
+            return sex;
+    }
+};
+
 const flagToBootstrapClass = (flag) => {
     switch (flag) {
         case "pass":
@@ -763,7 +783,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                     { submittedSex.value || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
-                    { predictedSex.value || fallbackElem }&nbsp;
+                    { mapLongFormSexToLetter(predictedSex.value) || fallbackElem }&nbsp;
                     { !!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                     { predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
                 </BioinfoStatsEntry>
@@ -890,7 +910,7 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
         <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center">
             <div className="d-flex align-items-center justify-items-center">
                 <i className={`icon icon-${icon} fas mr-1`} />
-                <div className="text-600 text-capitalize text-larger pl-03">
+                <div className="text-left text-truncate text-600 text-capitalize text-larger pl-03">
                     {role}:
                     <span className="ml-05 mr-05 text-400 text-capitalize">{specimenType}</span>
                     <span className="ml-05 mr-05 text-400 text-capitalize">- {sequencingType}</span>
