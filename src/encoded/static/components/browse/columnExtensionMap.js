@@ -531,7 +531,9 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
         );
     }
 
-    const bottom = completed_qcs.length !== 0 ? <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>: null;
+    const bottom = completed_qcs.length !== 0 ?
+        <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>:
+        <div>No QCs Completed</div>;
 
     return (
         <MultiLevelColumn {...{ bottom }} showBottomAsDate={false} mainTitle={qcFlags}/>
