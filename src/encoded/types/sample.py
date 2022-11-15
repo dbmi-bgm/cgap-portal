@@ -704,6 +704,7 @@ class QualityMetricParser:
         sv_vcf_found = False
         for processed_file_atid in processed_files[::-1]:  # Most recent files last
             file_item = FileForQc(processed_file_atid, self.request)
+            quality_metric_atid = file_item.quality_metric_atid
             if not file_item.is_vcf():
                 continue
             if file_item.is_final_vcf():
@@ -711,29 +712,32 @@ class QualityMetricParser:
                     if snv_vcf_found:
                         continue
                     snv_vcf_found = True
-                    self.file_quality_metrics.append(
-                        SnvFinalVcfQc(file_item.quality_metric_atid, self.request)
-                    )
+                    if quality_metric_atid:
+                        self.file_quality_metrics.append(
+                            SnvFinalVcfQc(quality_metric_atid, self.request)
+                        )
                 elif file_item.is_sv_file():
                     if sv_vcf_found:
                         continue
                     sv_vcf_found = True
-                    self.file_quality_metrics.append(
-                        SvFinalVcfQc(
-                            file_item.quality_metric_atid, self.request
+                    if quality_metric_atid:
+                        self.file_quality_metrics.append(
+                            SvFinalVcfQc(
+                                quality_metric_atid, self.request
+                            )
                         )
-                    )
             elif (
                 not vep_vcf_found
                 and file_item.is_snv_file()
                 and file_item.is_vep_vcf()
             ):
                 vep_vcf_found = True
-                self.file_quality_metrics.append(
-                    SnvVepVcfQc(
-                        file_item.quality_metric_atid, self.request
+                if quality_metric_atid:
+                    self.file_quality_metrics.append(
+                        SnvVepVcfQc(
+                            quality_metric_atid, self.request
+                        )
                     )
-                )
             if snv_vcf_found and sv_vcf_found and vep_vcf_found:
                 break
 
