@@ -14,7 +14,7 @@ import { Schemas, typedefs } from './../util';
 
 import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
 import QuickPopover from '../item-pages/components/QuickPopover';
-import { generateRelationshipMapping, QCMFlag, sortQCMs } from '../item-pages/CaseView';
+import { generateRelationshipMapping, QCMFlag, sortAndAddRolePropsToQCMs } from '../item-pages/CaseView';
 import { CurrentFamilyController, findCanonicalFamilyIndex } from '../item-pages/CaseView/CurrentFamilyController';
 
 // eslint-disable-next-line no-unused-vars
@@ -545,7 +545,7 @@ const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relatio
 
     if (qualityControlMetrics.length === 0) { return "No Quality Control Metrics Available"; }
 
-    const sortedQCMS = sortQCMs(qualityControlMetrics, relationshipMapping);
+    const sortedQCMS = sortAndAddRolePropsToQCMs(qualityControlMetrics, relationshipMapping);
     const flagClasses = "mb-02 d-flex align-items-center justify-content-between";
 
     return (

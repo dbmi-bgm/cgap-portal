@@ -940,7 +940,10 @@ function QCMAccordion(props) {
         return <div className="m-4">No Quality Control Metrics Available</div>;
     }
 
-    const sortedQCMs = sortQCMs(quality_control_metrics, relationshipMapping);
+    const sortedQCMs = sortAndAddRolePropsToQCMs(quality_control_metrics, relationshipMapping);
+
+    console.log("QCMAccordion", sortedQCMs);
+    console.log("QCMAccordion relationshipMapping", relationshipMapping);
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
@@ -962,6 +965,8 @@ function QCMAccordionDrawer(props) {
         bam_sample_id: sampleID,
         specimen_type: specimenType
     } = qualityControlMetrics || {};
+
+    console.log("QCMAccordionDrawer props", props);
 
     const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
@@ -1019,8 +1024,24 @@ function qcmFieldNameToDisplay(field) {
 }
 
 /** @TODO Group multiple samples by Individual */
-export function sortQCMs(qcms, relationshipMapping) {
+export function sortAndAddRolePropsToQCMs(qcms = [], relationshipMapping) {
+    // Add the new properties to the item without sorting
+    if (qcms.length === 1) {
+        const { 0: { individual_accession: thisAccession } = {} } = qcms;
+
+        const atID = `/individuals/${thisAccession}/`;
+        const relation = relationshipMapping[thisAccession]?.relationship;
+
+        qcms[0].atID = atID;
+        qcms[0].role = relation;
+
+        return qcms;
+    }
+
+    // Otherwise do sort
+    console.log("QCM sorting: ", qcms, relationshipMapping);
     return qcms.sort((a, b) => {
+        console.log("QCM does this run if there's only one item?", a, b);
         const { individual_accession: aAccession } = a;
         const { individual_accession: bAccession } = b;
 
