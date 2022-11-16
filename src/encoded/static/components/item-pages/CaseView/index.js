@@ -8,7 +8,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
-import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+import { capitalize, decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 
 import { responsiveGridState } from './../../util/layout';
@@ -1000,6 +1000,8 @@ function QCMAccordionDrawer(props) {
 }
 
 export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
+    if (!title || !type) return null;
+
     const alertClass = type === "warn" ? "warning" : "danger";
 
     return (
@@ -1010,16 +1012,25 @@ export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
     );
 }
 
-function qcmFieldNameToDisplay(field) {
+function qcmFieldNameToDisplay(field = "") {
     switch(field) {
+        // Special cases
+        case "de_novo_fraction":
+            return "De novo Fraction";
         case "transition_transversion_ratio":
             return "Transition-Transversion";
         case "heterozygosity_ratio":
             return "Heterozygosity";
-        case "predicted_sex":
-            return "Predicted Sex";
+        // Should suffice for most other cases... just split and capitalize each word
+        // case "total_reads":
+        // case "total_variants_called":
+        // case "filtered_variants":
+        // case "filtered_structural_variants":
+        // case "coverage":
+        // case "predicted_sex":
+        // case "predicted_ancestry":
         default:
-            return "";
+            return field.split("_").map((word) => capitalize(word)).join(" ");
     }
 }
 
