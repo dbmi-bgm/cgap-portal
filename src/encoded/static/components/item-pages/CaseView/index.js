@@ -907,12 +907,12 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
     const icon = isCurrentEventKey ? "minus" : "plus";
 
     return (
-        <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center">
+        <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center flex-column flex-sm-row">
             <div className="d-flex align-items-center justify-items-center">
                 <i className={`icon icon-${icon} fas mr-1`} />
-                <div className="d-flex justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
+                <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
                     {role}:
-                    <div className="ml-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">{specimenType} - {sequencingType}</div>
+                    <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">{specimenType} - {sequencingType}</div>
                     <div className="text-400 text-muted text-truncate d-inline-block">({sampleID})</div>
                 </div>
             </div>
@@ -942,8 +942,8 @@ function QCMAccordion(props) {
 
     const sortedQCMs = sortAndAddRolePropsToQCMs(quality_control_metrics, relationshipMapping);
 
-    console.log("QCMAccordion", sortedQCMs);
-    console.log("QCMAccordion relationshipMapping", relationshipMapping);
+    // console.log("QCMAccordion", sortedQCMs);
+    // console.log("QCMAccordion relationshipMapping", relationshipMapping);
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
@@ -974,7 +974,7 @@ function QCMAccordionDrawer(props) {
     return (
         <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0": ""} ${idx === (qcmLen - 1) ? "border-bottom-0": ""}`} key={atID}>
             <QCMAccordionToggle eventKey={atID} {...{ role, sequencingType, sampleID, specimenType }}>
-                <div className="d-flex align-items-center justify-items-center">
+                <div className="d-flex align-items-center justify-items-center ml-2 ml-sm-0">
                     { failFlags }
                     { warnFlags }
                 </div>
@@ -1004,7 +1004,7 @@ export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
 
     return (
         <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 d-flex align-items-center justify-items-center ${cls}`} role="alert">
-            <span className="d-none d-md-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
+            <span className="d-none d-lg-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
             <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
         </div>
     );
