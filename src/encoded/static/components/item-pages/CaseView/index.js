@@ -759,7 +759,6 @@ function BioinfoStatTable({ qualityControlMetrics }) {
     } = qualityControlMetrics;
 
     const fallbackElem = "-";
-    console.log("submittedAncestry", submittedAncestry);
 
     return (
         <React.Fragment>
@@ -769,6 +768,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage">
                     { coverage.value || fallbackElem }
+                    { (coverage.value && coverage.flag && coverage.flag !== "pass") && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
                     { totalSNVIndelVars.value ? decorateNumberWithCommas(+totalSNVIndelVars.value): fallbackElem }
@@ -805,6 +805,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNV/Indel De novo Fraction">
                     { deNovo.value || fallbackElem }
+                    { (deNovo.value && deNovo.flag && deNovo.flag !== "pass") && <i className={`icon icon-flag fas text-${flagToBootstrapClass(deNovo.flag)} ml-05`}/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
                     { filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem }
