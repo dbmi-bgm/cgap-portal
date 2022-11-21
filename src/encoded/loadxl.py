@@ -644,7 +644,7 @@ def load_custom_data(app, overwrite=False):
     }
     testapp = webtest.TestApp(app, environ)
     identity = assume_identity()
-    admin_users = identity.get('ENCODED_ADMIN_USERS', [])
+    admin_users = json.loads(identity.get('ENCODED_ADMIN_USERS', '{}'))
     if not admin_users:  # we assume you must have set one of these
         print(LOAD_ERROR_MESSAGE)
         logger.error('load_custom_data: failed to load users as none were set - ensure GAC value'
@@ -652,7 +652,7 @@ def load_custom_data(app, overwrite=False):
         return admin_users
 
     # post all users
-    for user in admin_users + REQUIRED_USER_CONFIG:
+    for user in (admin_users + REQUIRED_USER_CONFIG):
         try:
             first_name, last_name, email = user['first_name'], user['last_name'], user['email']
         except KeyError:
