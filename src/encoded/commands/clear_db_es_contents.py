@@ -56,7 +56,8 @@ def clear_db_tables(app):
 SKIPPING_CLEAR_ATTEMPT = 'Skipping the attempt to clear DB.'
 
 
-def run_clear_db_es(app, only_envs: Optional[List[str]] = None, skip_es: bool = False) -> bool:
+def run_clear_db_es(app, only_envs: Optional[List[str]] = None, skip_es: bool = False,
+                    allow_prod: bool = False) -> bool:
     """
     This function actually clears DB/ES. Takes a Pyramid app as well as two flags. _Use with care!_
 
@@ -71,13 +72,15 @@ def run_clear_db_es(app, only_envs: Optional[List[str]] = None, skip_es: bool = 
         app: Pyramid application
         only_envs (list): a list of env names that are the only envs where this action will run
         skip_es (bool): if True, do not run create_mapping after DB clear
+        allow_prod (bool): if True, allows running on envs that are set to the staging or prod
+                           env in the GLOBAL_ENV_BUCKET (main.ecosystem)
 
     Returns:
         bool: True if DB was cleared (regardless of ES)
     """
     current_env = app.registry.settings.get('env.name', 'local')
 
-    if is_stg_or_prd_env(current_env):
+    if is_stg_or_prd_env(current_env) and not allow_prod:
         log.error(f"clear_db_es_contents: This action cannot be performed on env {current_env}"
                   f" because it is a production-class (stg or prd) environment."
                   f" {SKIPPING_CLEAR_ATTEMPT}")
@@ -127,6 +130,8 @@ def main(simulated_args=None):
                         help="Specify --no-confirm to suppress interactive confirmation.")
     parser.add_argument('--skip-es', action='store_true', default=False,
                         help='If set, do not run create_mapping after DB drop')
+    parser.add_argument('--allow-prod', action='store_true', default=False,
+                        help='DANGER: If set, will allow running this command on an env that is staging or prod')
     args = parser.parse_args(simulated_args)
 
     confirm = args.confirm
@@ -134,6 +139,7 @@ def main(simulated_args=None):
     config_uri = args.config_uri
     only_envs = args.only_envs
     skip_es = args.skip_es
+    allow_prod = args.allow_prod
 
     if confirm is None:
         confirm = not only_envs  # If only_envs is supplied, we have better protection so don't need to confirm
@@ -155,7 +161,7 @@ def main(simulated_args=None):
             return
 
     # actually run. split this out for easy testing
-    run_clear_db_es(app=app, only_envs=only_envs, skip_es=skip_es)
+    run_clear_db_es(app=app, only_envs=only_envs, skip_es=skip_es, allow_prod=allow_prod)
 
 
 if __name__ == '__main__':

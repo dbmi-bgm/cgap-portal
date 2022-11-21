@@ -8,8 +8,9 @@ poetry run python -m assume_identity
 
 # Clear db/es on cgap-devtest if we run an "initial" deploy
 # Do nothing on other environments
+# TEMP: add --allow-prod
 if [ -n "${INITIAL_DEPLOYMENT}" ]; then
-  poetry run clear-db-es-contents production.ini --app-name app --only-if-env cgap-supertest
+  poetry run clear-db-es-contents production.ini --app-name app --only-if-env cgap-supertest --allow-prod
 fi
 
 # Create mapping
