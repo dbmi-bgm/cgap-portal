@@ -604,7 +604,7 @@ def load_deploy_data(app, overwrite=True, **kwargs):
     return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)
 
 
-def load_custom_data(app):
+def load_custom_data(app, overwrite=False):
     """
     Load deploy-inserts and master-inserts, EXCEPT instead of loading the default user.json,
     generate users (if they do not already exist) from the ENCODED_ADMIN_USERS setting in
@@ -612,7 +612,7 @@ def load_custom_data(app):
     ie:
         [{"first_name": "John", "last_name": "Doe", "email": "john_doe@example.com"}]
     """
-    res = load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True, skip_types=['user.json'])
+    res = load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=overwrite, skip_types=['user.json'])
     if res:  # None if successful
         print(LOAD_ERROR_MESSAGE)
         logger.error('load_custom_data: failed to load from deploy-inserts', error=res)
