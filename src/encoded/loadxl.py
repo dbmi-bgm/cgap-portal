@@ -660,7 +660,7 @@ def load_custom_data(app, overwrite=False):
     for user in (admin_users + REQUIRED_USER_CONFIG):
         try:
             first_name, last_name, email, _uuid = (user['first_name'], user['last_name'], user['email'],
-                                                   user.get('uuid', uuid.uuid4()))
+                                                   user.get('uuid', str(uuid.uuid4())))
         except KeyError:
             print(LOAD_ERROR_MESSAGE)
             logger.error('load_custom_data: failed to load users as they were malformed - ensure GAC value'
