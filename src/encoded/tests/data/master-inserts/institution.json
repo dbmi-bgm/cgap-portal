@@ -13,10 +13,7 @@
         "postal_code": "02115",
         "state": "MA",
         "title": "HMS DBMI",
-        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "contact_persons" : [
-            "dvuzman@research.bwh.harvard.edu"
-        ]
+        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
         "name": "cgap-personas",
