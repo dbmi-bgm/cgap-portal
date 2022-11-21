@@ -9,6 +9,7 @@ import os
 import structlog
 import webtest
 import traceback
+import uuid
 
 from base64 import b64encode
 from dcicutils.misc_utils import ignored, override_environ
@@ -609,22 +610,26 @@ REQUIRED_USER_CONFIG = [
     {
         'email': 'loadxl@hms.harvard.edu',
         'first_name': 'loadxl',
-        'last_name': 'loadxl'
+        'last_name': 'loadxl',
+        'uuid': '3202fd57-44d2-44fb-a131-afb1e43d8ae5'
     },
     {
         'email': 'cgap.platform@gmail.com',
         'first_name': 'Platform',
-        'last_name': 'Admin'
+        'last_name': 'Admin',
+        'uuid': 'b5f738b6-455a-42e5-bc1c-77fbfd9b15d2'
     },
     {
         'email': 'foursight.app@gmail.com',
         'first_name': 'Foursight',
-        'last_name': 'App'
+        'last_name': 'App',
+        'uuid': '7677f8a8-79d2-4cff-ab0a-a967a2a68e39'
     },
     {
         'email': 'tibanna.app@gmail.com',
         'first_name': 'Tibanna',
-        'last_name': 'App'
+        'last_name': 'App',
+        'uuid': 'b041dba8-e2b2-4e54-a621-97edb508a0c4'
     },
 ]
 
@@ -654,19 +659,22 @@ def load_custom_data(app, overwrite=False):
     # post all users
     for user in (admin_users + REQUIRED_USER_CONFIG):
         try:
-            first_name, last_name, email = user['first_name'], user['last_name'], user['email']
+            first_name, last_name, email, _uuid = (user['first_name'], user['last_name'], user['email'],
+                                                   user.get('uuid', uuid.uuid4()))
         except KeyError:
             print(LOAD_ERROR_MESSAGE)
             logger.error('load_custom_data: failed to load users as they were malformed - ensure GAC value'
                          ' ENCODED_ADMIN_USERS is set, has type array and consists of objects all containing keys'
                          ' and values for first_name, last_name and email!')
             return user
-        testapp.post_json('/User', {
+        item = {
             'first_name': first_name,
             'last_name': last_name,
             'email': email,
-            'groups': ['admin']
-        }, status=201)
+            'groups': ['admin'],
+            'uuid': _uuid
+        }
+        testapp.post_json('/User', item, status=201)
 
     res = load_data(app, docsdir='documents', indir='deploy-inserts', overwrite=overwrite, skip_types=['user.json'])
     if res:  # None if successful
