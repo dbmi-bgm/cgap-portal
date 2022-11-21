@@ -604,6 +604,31 @@ def load_deploy_data(app, overwrite=True, **kwargs):
     return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)
 
 
+# Set of emails required by the application to function
+REQUIRED_USER_CONFIG = [
+    {
+        'email': 'loadxl@hms.harvard.edu',
+        'first_name': 'loadxl',
+        'last_name': 'loadxl'
+    },
+    {
+        'email': 'cgap.platform@gmail.com',
+        'first_name': 'Platform',
+        'last_name': 'Admin'
+    },
+    {
+        'email': 'foursight.app@gmail.com',
+        'first_name': 'Foursight',
+        'last_name': 'App'
+    },
+    {
+        'email': 'tibanna.app@gmail.com',
+        'first_name': 'Tibanna',
+        'last_name': 'App'
+    },
+]
+
+
 def load_custom_data(app, overwrite=False):
     """
     Load deploy-inserts and master-inserts, EXCEPT instead of loading the default user.json,
@@ -612,13 +637,7 @@ def load_custom_data(app, overwrite=False):
     ie:
         [{"first_name": "John", "last_name": "Doe", "email": "john_doe@example.com"}]
     """
-    res = load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=overwrite, skip_types=['user.json'])
-    if res:  # None if successful
-        print(LOAD_ERROR_MESSAGE)
-        logger.error('load_custom_data: failed to load from deploy-inserts', error=res)
-        return res
-
-    # if we got to this point,
+    # start with the users
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -626,12 +645,14 @@ def load_custom_data(app, overwrite=False):
     testapp = webtest.TestApp(app, environ)
     identity = assume_identity()
     admin_users = identity.get('ENCODED_ADMIN_USERS', [])
-    if not admin_users:
+    if not admin_users:  # we assume you must have set one of these
         print(LOAD_ERROR_MESSAGE)
         logger.error('load_custom_data: failed to load users as none were set - ensure GAC value'
                      ' ENCODED_ADMIN_USERS is set and formatted correctly!')
         return admin_users
-    for user in admin_users:
+
+    # post all users
+    for user in admin_users + REQUIRED_USER_CONFIG:
         try:
             first_name, last_name, email = user['first_name'], user['last_name'], user['email']
         except KeyError:
@@ -646,6 +667,13 @@ def load_custom_data(app, overwrite=False):
             'email': email,
             'groups': ['admin']
         }, status=201)
+
+    res = load_data(app, docsdir='documents', indir='deploy-inserts', overwrite=overwrite, skip_types=['user.json'])
+    if res:  # None if successful
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_custom_data: failed to load from deploy-inserts', error=res)
+        return res
+
     return None
 
 
