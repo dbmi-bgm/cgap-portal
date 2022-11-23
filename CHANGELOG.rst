@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+11.3.1
+======
+
+`PR 669: File Paired-end <https://github.com/dbmi-bgm/cgap-portal/pull/669>`_
+
+* Place paired-end property on abstract File item so available on all child classes
+
 11.3.0
 ======
 
