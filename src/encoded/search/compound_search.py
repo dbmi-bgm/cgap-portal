@@ -249,7 +249,7 @@ class CompoundSearchBuilder:
                                                             from_=from_, to=to)
                 sub_query = request.invoke_subrequest(subreq).json[cls.QUERY]
                 # See https://www.elastic.co/guide/en/elasticsearch/reference/7.17/query-dsl-bool-query.html#named-queries
-                sub_query["bool"]["_name"] = block.get("name", str(block_index))  # note in ES7 numbers here must be cast to string
+                sub_query["bool"]["_name"] = str(block.get("name", block_index))  # note in ES7 numbers here must be cast to string
                 sub_queries.append(sub_query)
 
 
