@@ -122,7 +122,7 @@ class CompoundSearchBuilder:
         return {
             # "@id": "/compound_search", # Removed - presense of @id on UI is inferred to mean that there is 1 filter block in request.
             # "@type": ["SearchResults"], # Not necessary from UI atm but can consider adding for semantics
-            "total": es_results['hits'].get("total", 0),
+            "total": es_results['hits'].get("total", {}).get("value", 0),
             "@graph": result_list,
             "columns": columns,
             "sort": result_sort
