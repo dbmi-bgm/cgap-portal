@@ -12,7 +12,7 @@ import traceback
 import uuid
 
 from base64 import b64encode
-from dcicutils.misc_utils import ignored, override_environ
+from dcicutils.misc_utils import ignored
 from dcicutils.secrets_utils import assume_identity
 from PIL import Image
 from pkg_resources import resource_filename
