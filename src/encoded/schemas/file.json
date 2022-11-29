@@ -354,6 +354,15 @@
                 "GRCh38"
             ]
         },
+        "paired_end": {
+            "title": "Paired End Identifier",
+            "description": "Which pair the file belongs to (if paired end library)",
+            "type": "string",
+            "enum": [
+                "1",
+                "2"
+            ]
+        },
         "override_lab_name": {
             "description": "The lab that did the experiment if not the attributed Lab from whence this file",
             "type": "string",

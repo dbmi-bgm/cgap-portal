@@ -47,9 +47,6 @@
             "$ref": "mixins.json#/tags"
         },
         {
-            "$ref": "mixins.json#/paired_end"
-        },
-        {
             "$ref": "file.json#/properties"
         }
     ],
