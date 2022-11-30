@@ -737,7 +737,6 @@ const flagToBootstrapClass = (flag) => {
 
 const BioinfoStats = React.memo(function BioinfoStats(props) {
     const { canonicalFamily, caseSample = null, sampleProcessing = null, idToGraphIdentifier, relationshipMapping } = props;
-    console.log("BioinfoStats this sample processing", sampleProcessing, canonicalFamily );
 
     return (<QCMAccordion {...{ sampleProcessing, canonicalFamily, relationshipMapping, idToGraphIdentifier }} />);
 });
@@ -943,9 +942,6 @@ function QCMAccordion(props) {
 
     const sortedQCMs = sortAndAddRolePropsToQCMs(quality_control_metrics, relationshipMapping);
 
-    // console.log("QCMAccordion", sortedQCMs);
-    // console.log("QCMAccordion relationshipMapping", relationshipMapping);
-
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
             { sortedQCMs.map((qcm, i) => <QCMAccordionDrawer key={qcm.individual_accession} idx={i} {...{ idToGraphIdentifier, relationshipMapping, qcmLen }} qualityControlMetrics={qcm} />)}
@@ -966,8 +962,6 @@ function QCMAccordionDrawer(props) {
         bam_sample_id: sampleID,
         specimen_type: specimenType
     } = qualityControlMetrics || {};
-
-    console.log("QCMAccordionDrawer props", props);
 
     const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
@@ -1051,9 +1045,7 @@ export function sortAndAddRolePropsToQCMs(qcms = [], relationshipMapping) {
     }
 
     // Otherwise do sort
-    console.log("QCM sorting: ", qcms, relationshipMapping);
     return qcms.sort((a, b) => {
-        console.log("QCM does this run if there's only one item?", a, b);
         const { individual_accession: aAccession } = a;
         const { individual_accession: bAccession } = b;
 
