@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+11.3.3
+======
+
+`PR 672: Embedded Youtube videos <https://github.com/dbmi-bgm/cgap-portal/pull/672>`_
+
+* Embedded YouTube tutorial videos to static help pages
+
 11.3.2
 ======
 
