@@ -5,7 +5,7 @@ import Popover  from 'react-bootstrap/esm/Popover';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
 
 export default function QuickPopover(props) {
-    const { title = null, children = [], className, popID, tooltip, placement, htmlContent } = props || {};
+    const { title = null, children = [], className, popID, tooltip, placement = "auto", htmlContent } = props || {};
 
     const popoverContent = children.length === 0 ?
         // HTML content is NOT santized; do not use with user-submitted input.
