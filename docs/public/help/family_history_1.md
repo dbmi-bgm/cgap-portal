@@ -4,7 +4,9 @@ a family history in .xlsx format can be uploaded either
  or via the SubmitCGAP command line tool. Example files are
 linked below, and the subsequent section contains details
 about the spreadsheet format and each individual column. The
-last 2 sections describe how to upload the file.
+next section describes how to upload the file, and the final
+section includes tutorial videos for family history spreadsheet 
+formatting and submission.
 
 **Note**: For most analyses, we recommend [submitting accessioning information](/help/submission/accessioning)
 before the family history. However, if you are submitting a case that involves
