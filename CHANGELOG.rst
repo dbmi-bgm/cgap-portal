@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+11.3.2
+======
+
+`PR 671: FASTQ submission paired end <https://github.com/dbmi-bgm/cgap-portal/pull/671>`_
+
+* Add FASTQ paired-end property during file submission
+
+
 11.3.1
 ======
 
