@@ -19,7 +19,7 @@ laAAAAAElFTkSuQmCC"""
 
 
 @pytest.fixture
-def testing_download(testapp):
+def testing_download(external_tx, testapp):
     url = '/testing-downloads/'
     item = {
         'attachment': {

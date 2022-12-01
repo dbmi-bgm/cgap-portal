@@ -9,7 +9,8 @@ import logging
 import pkg_resources
 import pytest
 import webtest
-
+from sqlalchemy import exc
+from dcicutils.ff_mocks import NO_SERVER_FIXTURES
 
 from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
@@ -30,6 +31,54 @@ README:
     * There are "app" based fixtures that rely only on postgres, "es_app" fixtures that 
       use both postgres and ES (for search/ES related testing)
 """
+
+
+# This should work but does not seem to... various issues related to rollbacks occurring or not
+# occurring when they should/shouldn't, probably related to zsa_savepoints
+# @pytest.yield_fixture
+# def external_tx(request, conn):
+#     # overridden from snovault to detect and continue from savepoint error
+#     if NO_SERVER_FIXTURES:
+#         yield 'NO_SERVER_FIXTURES'
+#         return
+#
+#     notice_pytest_fixtures(request)
+#     with conn.begin_nested() as tx:
+#         yield tx
+
+
+# hacked version
+@pytest.yield_fixture
+def external_tx(request, conn):
+    # overridden from snovault to detect and continue from savepoint error
+    if NO_SERVER_FIXTURES:
+        yield 'NO_SERVER_FIXTURES'
+        return
+
+    notice_pytest_fixtures(request)
+    # print('BEGIN external_tx')
+    try:
+        tx = conn.begin_nested()
+    except exc.PendingRollbackError as e:
+        if 'inactive savepoint transaction' in str(e):
+            conn._nested_transaction.rollback()
+            tx = conn.begin_nested()
+        else:
+            raise
+    try:
+        yield tx
+        tx.rollback()
+    except exc.InternalError as e:
+        if 'savepoint' in str(e) and 'does not exist' in str(e):
+            pass
+        else:
+            raise
+
+    # conn does not implement .rollback()
+
+    # The database should be empty unless a data fixture was loaded
+    # for table in Base.metadata.sorted_tables:
+    #     assert conn.execute(table.count()).scalar() == 0
 
 
 @pytest.fixture(autouse=True)

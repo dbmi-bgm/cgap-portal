@@ -6,7 +6,7 @@ from snovault.util import add_default_embeds, crawl_schemas_by_embeds
 from ..types.base import get_item_or_none
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.indexing]
 
 
 targets = [
@@ -31,7 +31,7 @@ sources = [
 
 
 @pytest.fixture
-def content(testapp):
+def content(external_tx, testapp):
     url = '/testing-link-targets/'
     for item in targets:
         testapp.post_json(url, item, status=201)

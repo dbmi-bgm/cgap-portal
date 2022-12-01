@@ -1,6 +1,6 @@
 import io
 import json
-import mock
+from unittest import mock
 import pytest
 
 from dcicutils.diff_utils import DiffManager

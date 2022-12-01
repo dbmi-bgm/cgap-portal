@@ -1,7 +1,7 @@
 import datetime
 import gzip
 import json
-import mock
+from unittest import mock
 import pytest
 import time
 
@@ -306,7 +306,7 @@ def test_ingestion_listener_run(
 ):
     """
     Test successful SV VCF recognition, read, and hand-off to ingestion
-    within the endpoint, while SV VCF ingestion tested elsewhere. 
+    within the endpoint, while SV VCF ingestion tested elsewhere.
 
     Mocks a simple gzipped VCF for reading by vcf.Reader as well as
     ingestion results to prompt patch of file indicating VCF was

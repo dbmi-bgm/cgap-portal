@@ -33,13 +33,20 @@ virtualenv using one of these versions before proceeding to the following steps.
    $ brew install freetype libjpeg libtiff littlecms webp  # Required by Pillow
    $ brew cask install homebrew/cask-versions/adoptopenjdk8
    $ brew tap homebrew/versions
-   $ brew install elasticsearch@6.8 node@10
+   $ brew install opensearch node@16
 
 
-You may need to link the brew-installed elasticsearch::
+You may need to link the brew-installed opensearch::
 
-   $ brew link --force elasticsearch@6.8
+   $ brew link --force opensearch
 
+
+If you are migrating from elasticsearch@6 to opensearch::
+
+    $ brew uninstall elasticsearch@6
+    $ brew install opensearch
+
+Note that this may bring in a new JDK.
 
 If you need to update dependencies::
 
