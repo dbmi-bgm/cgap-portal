@@ -19,6 +19,22 @@ Change Log
 * Provision custom inserts function, allowing admin users to be configured from initial load in the GAC
 
 
+11.3.3
+======
+
+`PR 672: Embedded Youtube videos <https://github.com/dbmi-bgm/cgap-portal/pull/672>`_
+
+* Embedded YouTube tutorial videos to static help pages
+
+
+11.3.2
+======
+
+`PR 671: FASTQ submission paired end <https://github.com/dbmi-bgm/cgap-portal/pull/671>`_
+
+* Add FASTQ paired-end property during file submission
+
+
 11.3.1
 ======
 
