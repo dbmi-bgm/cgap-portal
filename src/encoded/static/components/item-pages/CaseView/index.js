@@ -1044,6 +1044,7 @@ export function sortAndAddRolePropsToQCMs(qcms = [], relationshipMapping) {
         return qcms;
     }
 
+    // Specify which order to put roles in
     const exceptions = {
         "proband": 1,
         "mother": 2,
