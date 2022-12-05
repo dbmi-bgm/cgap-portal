@@ -1044,6 +1044,12 @@ export function sortAndAddRolePropsToQCMs(qcms = [], relationshipMapping) {
         return qcms;
     }
 
+    const exceptions = {
+        "proband": 1,
+        "mother": 2,
+        "father": 3
+    };
+
     // Otherwise do sort
     return qcms.sort((a, b) => {
         const { individual_accession: aAccession } = a;
@@ -1063,11 +1069,11 @@ export function sortAndAddRolePropsToQCMs(qcms = [], relationshipMapping) {
         b.role = relationB;
 
         // Sort by proband first, then by mother and father
-        if (relationA === "proband") {
+        if (exceptions[relationA] && exceptions[relationB]) {
+            return exceptions[relationA] - exceptions[relationB];
+        } else if (exceptions[relationA]) {
             return -1;
-        } else if (relationA === "mother" && relationB !== "proband") {
-            return -1;
-        } else if (relationA === "father" && relationB !== "proband" && relationB !== "mother") {
+        } else if (exceptions[relationB]) {
             return -1;
         } else {
             // Sort leftovers alphabetically
