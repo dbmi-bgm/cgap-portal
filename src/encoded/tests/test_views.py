@@ -11,7 +11,7 @@ from dcicutils.misc_utils import TestApp
 from .conftest_settings import ORDER
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
 def _type_length():
@@ -119,18 +119,17 @@ def test_html_collections(htmltestapp, item_type):
     assert res.body.startswith(b'<!DOCTYPE html>')
 
 
-@pytest.mark.slow
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k not in ['user', 'access_key']])
-def test_html_server_pages(item_type, wsgi_app):
-    res = wsgi_app.get(
-        '/%s?limit=1' % item_type,
+def test_html_server_pages(item_type, htmltestapp):
+    res = htmltestapp.get(
+        '/%s/?limit=1' % item_type,
         headers={'Accept': 'application/json'},
     ).follow(
         status=200,
         headers={'Accept': 'application/json'},
     )
     for item in res.json['@graph']:
-        res = wsgi_app.get(item['@id'], headers={'Accept': 'text/html'}, status=200)
+        res = htmltestapp.get(item['@id'], headers={'Accept': 'text/html'}, status=200)
         assert res.body.startswith(b'<!DOCTYPE html>')
         assert b'Internal Server Error' not in res.body
 
@@ -204,9 +203,9 @@ def test_collection_post_missing_content_type(testapp):
     testapp.post('/user', item, status=415)
 
 
-def test_collection_post_bad_(anontestapp):
+def test_collection_post_bad_variant(anontestapp):
     value = "Authorization: Basic %s" % ascii_native_(b64encode(b'nobody:pass'))
-    anontestapp.post_json('/organism', {}, headers={'Authorization': value}, status=401)
+    anontestapp.post_json('/variant', {}, headers={'Authorization': value}, status=401)
 
 
 def test_item_actions_filtered_by_permission(testapp, authenticated_testapp, disorder):

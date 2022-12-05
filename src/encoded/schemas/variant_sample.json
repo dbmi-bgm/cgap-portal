@@ -95,7 +95,7 @@
             "vcf_field": "AF",
             "source_name": "VCF",
             "source_version": "VCFv4.2",
-            "description": "Variant allele fraction",
+            "description": "Variant Allele Fraction",
             "scope": "sample_variant",
             "schema_title": "VAF",
             "min": 0,
@@ -772,7 +772,7 @@
             ]
         },
         "AF": {
-            "title": "VAF",
+            "title": "Variant Allele Fraction",
             "aggregation_type": "stats",
             "number_step": "any",
             "order": 11,

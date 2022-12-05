@@ -574,7 +574,13 @@ class IngestionListener:
                         'outputfile': formatted.name,
                         'verbose': False
                     }
-                    reformat_vcf(reformat_args)
+                    try:
+                        reformat_vcf(reformat_args)
+                    except Exception as e:
+                        log.error(f'Exception encountered in reformat script {e} - input VCF may be malformed')
+                        self.set_status(uuid, STATUS_ERROR)
+                        discard(message)
+                        continue
 
                     # Add altcounts by gene
                     # Note: you cannot pass this file object to vcf.Reader if it's in rb mode
@@ -584,7 +590,13 @@ class IngestionListener:
                         'inputfile': formatted.name,
                         'outputfile': formatted_with_alt_counts.name
                     }
-                    add_altcounts(alt_counts_args)
+                    try:
+                        add_altcounts(alt_counts_args)
+                    except Exception as e:
+                        log.error(f'Exception encountered in altcounts script {e} - input VCF may be malformed')
+                        self.set_status(uuid, STATUS_ERROR)
+                        discard(message)
+                        continue
                     parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                        reader=Reader(formatted_with_alt_counts))
                     variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],

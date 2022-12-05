@@ -7,6 +7,7 @@ from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.lang_utils import disjoined_list
 from pyramid.paster import get_app
 from snovault import DBSESSION
+from snovault.storage import Base
 from snovault.elasticsearch.create_mapping import run as run_create_mapping
 from sqlalchemy import MetaData
 from typing import Optional, List
@@ -22,7 +23,7 @@ EPILOG = __doc__
 
 def clear_db_tables(app):
     """
-    Given a pyramids app that has a configuted DB session, will clear the
+    Given a pyramids app that has a configured DB session, will clear the
     contents of all DB tables
 
     Args:
@@ -37,9 +38,10 @@ def clear_db_tables(app):
     meta.reflect()
     connection = session.connection().connect()
     try:
-        # truncate tables by only deleting contents
-        for table in meta.sorted_tables:
-            connection.execute(table.delete())
+        # truncate tables by only deleting contents (sqlalchemy 1.4+ compliant)
+        table_names = ','.join(table.name for table in reversed(Base.metadata.sorted_tables))
+        connection.execute('SET statement_timeout = 300000;')  # give 5 mins for DB clear
+        connection.execute(f'TRUNCATE {table_names} RESTART IDENTITY;')
     except Exception as e:
         log.error(f"clear_db_es_contents: Error on DB drop_all/create_all. {type(e)}: {e}")
         transaction.abort()
@@ -55,7 +57,8 @@ def clear_db_tables(app):
 SKIPPING_CLEAR_ATTEMPT = 'Skipping the attempt to clear DB.'
 
 
-def run_clear_db_es(app, only_envs: Optional[List[str]] = None, skip_es: bool = False) -> bool:
+def run_clear_db_es(app, only_envs: Optional[List[str]] = None, skip_es: bool = False,
+                    allow_prod: bool = False) -> bool:
     """
     This function actually clears DB/ES. Takes a Pyramid app as well as two flags. _Use with care!_
 
@@ -70,13 +73,15 @@ def run_clear_db_es(app, only_envs: Optional[List[str]] = None, skip_es: bool = 
         app: Pyramid application
         only_envs (list): a list of env names that are the only envs where this action will run
         skip_es (bool): if True, do not run create_mapping after DB clear
+        allow_prod (bool): if True, allows running on envs that are set to the staging or prod
+                           env in the GLOBAL_ENV_BUCKET (main.ecosystem)
 
     Returns:
         bool: True if DB was cleared (regardless of ES)
     """
     current_env = app.registry.settings.get('env.name', 'local')
 
-    if is_stg_or_prd_env(current_env):
+    if is_stg_or_prd_env(current_env) and not allow_prod:
         log.error(f"clear_db_es_contents: This action cannot be performed on env {current_env}"
                   f" because it is a production-class (stg or prd) environment."
                   f" {SKIPPING_CLEAR_ATTEMPT}")
@@ -126,6 +131,8 @@ def main(simulated_args=None):
                         help="Specify --no-confirm to suppress interactive confirmation.")
     parser.add_argument('--skip-es', action='store_true', default=False,
                         help='If set, do not run create_mapping after DB drop')
+    parser.add_argument('--allow-prod', action='store_true', default=False,
+                        help='DANGER: If set, will allow running this command on an env that is staging or prod')
     args = parser.parse_args(simulated_args)
 
     confirm = args.confirm
@@ -133,6 +140,7 @@ def main(simulated_args=None):
     config_uri = args.config_uri
     only_envs = args.only_envs
     skip_es = args.skip_es
+    allow_prod = args.allow_prod
 
     if confirm is None:
         confirm = not only_envs  # If only_envs is supplied, we have better protection so don't need to confirm
@@ -154,7 +162,7 @@ def main(simulated_args=None):
             return
 
     # actually run. split this out for easy testing
-    run_clear_db_es(app=app, only_envs=only_envs, skip_es=skip_es)
+    run_clear_db_es(app=app, only_envs=only_envs, skip_es=skip_es, allow_prod=allow_prod)
 
 
 if __name__ == '__main__':
