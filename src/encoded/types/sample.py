@@ -139,9 +139,39 @@ class QcFlagger:
     WORKUP_TYPE_WES = "WES"
 
     ACCEPTED_PREDICTED_SEXES = set(["male", "female"])
+    BAM_COVERAGE_WGS_WARN_LOWER = 25
+    BAM_COVERAGE_WGS_FAIL_LOWER = 10
+    BAM_COVERAGE_WES_WARN_LOWER = 70
+    BAM_COVERAGE_WES_FAIL_LOWER = 40
+    HETEROZYGOSITY_WARN_UPPER = 2.5
+    HETEROZYGOSITY_WARN_LOWER = 1.4
+    TRANSITION_TRANSVERSION_WGS_FAIL_UPPER = 2.3
+    TRANSITION_TRANSVERSION_WGS_WARN_UPPER = 2.1
+    TRANSITION_TRANSVERSION_WGS_WARN_LOWER = 1.8
+    TRANSITION_TRANSVERSION_WGS_FAIL_LOWER = 1.6
+    TRANSITION_TRANSVERSION_WES_FAIL_UPPER = 3.5
+    TRANSITION_TRANSVERSION_WES_WARN_UPPER = 3.3
+    TRANSITION_TRANSVERSION_WES_WARN_LOWER = 2.3
+    TRANSITION_TRANSVERSION_WES_FAIL_LOWER = 2.1
 
     @classmethod
-    def flag_bam_coverage(cls, coverage, sample_properties, *args, **kwargs):
+    def assign_flag(
+        cls, value, fail_upper=None, fail_lower=None, warn_upper=None, warn_lower=None,
+        default=QcConstants.FLAG_PASS
+    ):
+        result = default
+        if fail_upper and value > fail_upper:
+            result = QcConstants.FLAG_FAIL
+        elif warn_upper and value > warn_upper:
+            result = QcConstants.FLAG_WARN
+        elif fail_lower and value < fail_lower:
+            result = QcConstants.FLAG_FAIL
+        elif warn_lower and value < warn_lower:
+            result = QcConstants.FLAG_WARN
+        return result
+        
+    @classmethod
+    def flag_bam_coverage(cls, coverage, sample=None, **kwargs):
         """Evaluate BAM coverage for flag.
 
         :param coverage: BAM coverage from QC item
@@ -152,30 +182,28 @@ class QcFlagger:
         :rtype: str or None
         """
         result = None
-        sequencing_type = sample_properties.get(cls.WORKUP_TYPE)
         coverage_number_string = coverage.lower().rstrip("x")
         coverage = float(coverage_number_string)
-        if coverage is not None:
-            if sequencing_type == cls.WORKUP_TYPE_WGS:
-                warn_limit = 20
-                fail_limit = 10
-            elif sequencing_type == cls.WORKUP_TYPE_WES:
-                warn_limit = 60
-                fail_limit = 40
-            else:
-                warn_limit = 0
-                fail_limit = 0
-            if coverage >= warn_limit:
-                result = QcConstants.FLAG_PASS
-            elif coverage < fail_limit:
-                result = QcConstants.FLAG_FAIL
-            else:
-                result = QcConstants.FLAG_WARN
+        if sample.is_wgs():
+            result = cls.assign_flag(
+                coverage, warn_lower=cls.BAM_COVERAGE_WGS_WARN_LOWER,
+                fail_lower=cls.BAM_COVERAGE_WGS_FAIL_LOWER
+            )
+        elif sample.is_wes():
+            result = cls.assign_flag(
+                coverage, warn_lower=cls.BAM_COVERAGE_WES_WARN_LOWER,
+                fail_lower=cls.BAM_COVERAGE_WES_FAIL_LOWER
+            )
+        else:
+            log.warning(
+                f"Encountered unexpected sequencing type ({sample.workup_type}) while"
+                f" evaluating QC metrics for sample: {sample.properties}."
+            )
         return result
 
     @classmethod
     def flag_sex_consistency(
-        cls, predicted_sex, sample_properties, individual_properties, *args, **kwargs
+        cls, predicted_sex, individual=None, **kwargs
     ):
         """Evaluate sex consistency for flag.
 
@@ -187,10 +215,8 @@ class QcFlagger:
         :rtype: str or None
         """
         result = None
-        if not predicted_sex:
-            result = QcConstants.FLAG_WARN
-        else:
-            submitted_sex = individual_properties.get(cls.SEX)
+        if predicted_sex:
+            submitted_sex = individual.sex
             predicted_sex_lower = predicted_sex.lower()
             predicted_sex_short_form = predicted_sex.upper()[0]
             if predicted_sex_lower not in cls.ACCEPTED_PREDICTED_SEXES:
@@ -203,7 +229,7 @@ class QcFlagger:
         return result
 
     @classmethod
-    def flag_heterozygosity_ratio(cls, heterozygosity_ratio, *args, **kwargs):
+    def flag_heterozygosity_ratio(cls, heterozygosity_ratio, **kwargs):
         """Evaluate heterozygosity ratio for flag.
 
         :param heterozygosity_ratio: Sample SNV heterozygosity ratio
@@ -211,21 +237,16 @@ class QcFlagger:
         :return: Flag name
         :rtype: str or None
         """
-        result = None
         heterozygosity_ratio = float(heterozygosity_ratio)
-        upper_limit = 2.5
-        lower_limit = 1.4
-        if heterozygosity_ratio > upper_limit:
-            result = QcConstants.FLAG_WARN
-        elif heterozygosity_ratio < lower_limit:
-            result = QcConstants.FLAG_WARN
-        else:
-            result = QcConstants.FLAG_PASS
+        result = cls.assign_flag(
+            heterozygosity_ratio, warn_upper=cls.HETEROZYGOSITY_WARN_UPPER,
+            warn_lower=cls.HETEROZYGOSITY_WARN_LOWER
+        )
         return result
 
     @classmethod
     def flag_transition_transversion_ratio(
-        cls, transition_transversion_ratio, sample_properties, *args, **kwargs
+        cls, transition_transversion_ratio, sample=None, **kwargs
     ):
         """Evaluate transition-transversion ratio for flag.
 
@@ -238,60 +259,35 @@ class QcFlagger:
         """
         result = None
         transition_transversion_float = float(transition_transversion_ratio)
-        known_sequencing_type = True
-        sequencing_type = sample_properties.get(cls.WORKUP_TYPE)
-        if sequencing_type:
-            if sequencing_type == cls.WORKUP_TYPE_WGS:
-                fail_upper_limit = 2.3
-                warn_upper_limit = 2.1
-                warn_lower_limit = 1.8
-                fail_lower_limit = 1.6
-            elif sequencing_type == cls.WORKUP_TYPE_WES:
-                fail_upper_limit = 3.5
-                warn_upper_limit = 3.3
-                warn_lower_limit = 2.3
-                fail_lower_limit = 2.1
-            else:
-                known_sequencing_type = False
-                log.warning(
-                    f"Encountered unknown sequencing type ({sequencing_type}) while"
-                    " evaluating QC metrics."
-                )
-            if known_sequencing_type:
-                if transition_transversion_float > fail_upper_limit:
-                    result = QcConstants.FLAG_FAIL
-                elif transition_transversion_float > warn_upper_limit:
-                    result = QcConstants.FLAG_WARN
-                elif transition_transversion_float > warn_lower_limit:
-                    result = QcConstants.FLAG_PASS
-                elif transition_transversion_float > fail_lower_limit:
-                    result = QcConstants.FLAG_WARN
-                else:
-                    result = QcConstants.FLAG_FAIL
-        return result
-
-    @classmethod
-    def flag_de_novo_fraction(cls, de_novo_fraction, *args, **kwargs):
-        """Evaluate de novo fraction for flag.
-
-        :param de_novo_fraction: SNV de novo fraction
-        :type de_novo_fraction: str
-        :return: Flag name
-        :rtype: str or None
-        """
-        """"""
-        result = QcConstants.FLAG_PASS
-        de_novo_fraction = float(de_novo_fraction)
-        upper_limit = 5
-        if de_novo_fraction > upper_limit:
-            result = QcConstants.FLAG_FAIL
+        if sample.is_wgs():
+            result = cls.assign_flag(
+                transition_transversion_float,
+                fail_upper=cls.TRANSITION_TRANSVERSION_WGS_FAIL_UPPER,
+                warn_upper=cls.TRANSITION_TRANSVERSION_WGS_WARN_UPPER,
+                warn_lower=cls.TRANSITION_TRANSVERSION_WGS_WARN_LOWER,
+                fail_lower=cls.TRANSITION_TRANSVERSION_WGS_FAIL_LOWER,
+            )
+        elif sample.is_wes():
+            result = cls.assign_flag(
+                transition_transversion_float,
+                fail_upper=cls.TRANSITION_TRANSVERSION_WES_FAIL_UPPER,
+                warn_upper=cls.TRANSITION_TRANSVERSION_WES_WARN_UPPER,
+                warn_lower=cls.TRANSITION_TRANSVERSION_WES_WARN_LOWER,
+                fail_lower=cls.TRANSITION_TRANSVERSION_WES_FAIL_LOWER,
+            )
+        else:
+            log.warning(
+                f"Encountered unexpected sequencing type ({sample.workup_type}) while"
+                f" evaluating QC metrics for sample: {sample.properties}."
+            )
         return result
 
 
-class QcSummaryItem:
+class QcSummary:
 
     # Schema constants
     SAMPLE = "sample"
+    TITLE = "title"
     VALUE = "value"
 
     QC_TITLE_TO_FLAG_EVALUATOR = {
@@ -299,25 +295,38 @@ class QcSummaryItem:
         QcConstants.PREDICTED_SEX: QcFlagger.flag_sex_consistency,
         QcConstants.HETEROZYGOSITY_RATIO: QcFlagger.flag_heterozygosity_ratio,
         QcConstants.TRANSITION_TRANSVERSION_RATIO: QcFlagger.flag_transition_transversion_ratio,
-        QcConstants.DE_NOVO_FRACTION: QcFlagger.flag_de_novo_fraction,
     }
 
-    
-    def __init__(self, title, properties, links=None):
-        self.title = title
-        self.flag = None
+    def __init__(self, properties, completed_process, links=None, title_replacements=None):
+        self.completed_process = completed_process
         self.value = properties.get(self.VALUE)
         self.sample = properties.get(self.SAMPLE)
+        self.title = self.get_qc_title(properties.get(self.TITLE, ""),
+                title_replacements)
+        self.flag = None
         self.link = None
         if links:
-            self.link = links.get(title)
+            self.link = links.get(self.title)
 
-    def set_flag(self, sample_properties, individual_properties):
+    def get_qc_title(self, title, title_replacements):
+        """Get QC display title.
+
+        :param qc_summary_item: QC item to evaluate
+        :type qc_summary_item: dict
+        :return: QC display title
+        :rtype: str
+        """
+        result = title_to_snake_case(title)
+        if title_replacements:
+            result = title_replacements.get(result, result)
+        return result
+
+    def set_flag(self, sample, individual):
         flag = None
         evaluator = self.QC_TITLE_TO_FLAG_EVALUATOR.get(self.title)
         if evaluator:
             try:
-                flag = evaluator(self.value, sample_properties, individual_properties)
+                flag = evaluator(self.value, sample=sample, individual=individual)
             except Exception:
                 log.exception(
                     f"Could not evaluate QC title {self.title}'s value {self.value}."
@@ -337,61 +346,52 @@ class QcSummaryItem:
         return result
 
 
-class QualityMetricForQc:
+class ItemProperties:
+
+    def __init__(self, item_atid, request):
+        self.request = request
+        self.properties = get_item(request, item_atid)
+
+
+class QualityMetricForQc(ItemProperties):
 
     # Schema constants
     QUALITY_METRIC_SUMMARY = "quality_metric_summary"
     TITLE = "title"
+    QC_LIST = "qc_list"
+    QC_TYPE = "qc_type"
+    VALUE = "value"
 
-    COMPLETED_PROCESS = None
-    PROPERTY_REPLACEMENTS = {}
+    COMPLETED_QC_PROCESS = None
+    QC_TITLE_REPLACEMENTS = None
 
     def __init__(self, quality_metric_atid, request):
-        self.quality_metric = get_item(request, quality_metric_atid)
-        self.quality_metric_summary = self.quality_metric.get(
+        super().__init__(quality_metric_atid, request)
+        self.quality_metric_summary = self.properties.get(
             self.QUALITY_METRIC_SUMMARY, []
         )
+        self.qc_list = self.properties.get(self.QC_LIST, [])
 
     def collect_qc_summaries(self):
         result = []
         qc_links = self.get_qc_links()
-        for item in self.quality_metric_summary:
-            qc_title = self.get_qc_summary_title(item)
+        for summary in self.quality_metric_summary:
             result.append(
-                QcSummaryItem(qc_title, item, links=qc_links)
+                QcSummary(summary, self.COMPLETED_QC_PROCESS, links=qc_links,
+                    title_replacements=self.QC_TITLE_REPLACEMENTS)
             )
         return result
 
     def get_qc_links(self):
         pass
 
-    def get_qc_summary_title(self, qc_summary_item):
-        """Get QC display title.
-
-        :param qc_summary_item: QC item to evaluate
-        :type qc_summary_item: dict
-        :return: QC display title
-        :rtype: str
-        """
-        title = title_to_snake_case(qc_summary_item.get(self.TITLE, ""))
-        qc_title = self.PROPERTY_REPLACEMENTS.get(title, title)
-        return qc_title
-
-    def get_completed_process(self):
-        return self.COMPLETED_PROCESS
-
 
 class SnvFinalVcfQc(QualityMetricForQc):
     
-    COMPLETED_PROCESS = "SNV"
+    COMPLETED_QC_PROCESS = "SNV"
 
 
 class SnvVepVcfQc(QualityMetricForQc):
-
-    # Schema constants
-    QC_LIST = "qc_list"
-    QC_TYPE = "qc_type"
-    VALUE = "value"
 
     PEDDY_QC_STRING = "peddyqc"
     DOWNLOAD_ADD_ON = "@@download"
@@ -406,11 +406,11 @@ class SnvVepVcfQc(QualityMetricForQc):
         """
         result = None
         peddy_qc_atid = None
-        qc_list = self.quality_metric.get(self.QC_LIST, [])
-        for item in qc_list:
+        for item in self.qc_list:
             qc_type = item.get(self.QC_TYPE)
             if self.PEDDY_QC_STRING in qc_type:
                 peddy_qc_atid = item.get(self.VALUE)
+                break
         if peddy_qc_atid:
             peddy_qc_download_url = peddy_qc_atid + self.DOWNLOAD_ADD_ON
             result = {
@@ -422,18 +422,18 @@ class SnvVepVcfQc(QualityMetricForQc):
 
 class SvFinalVcfQc(QualityMetricForQc):
 
-    COMPLETED_PROCESS = "SV"
-    PROPERTY_REPLACEMENTS = {
+    COMPLETED_QC_PROCESS = "SV"
+    QC_TITLE_REPLACEMENTS = {
         QcConstants.FILTERED_VARIANTS: QcConstants.FILTERED_STRUCTURAL_VARIANTS
     }
 
 
 class BamQc(QualityMetricForQc):
     
-    COMPLETED_PROCESS = "BAM"
+    COMPLETED_QC_PROCESS = "BAM"
 
 
-class FileForQc:
+class FileForQc(ItemProperties):
 
     # Schema constants
     FILE_FORMAT = "file_format"
@@ -450,12 +450,20 @@ class FileForQc:
     VEP_ANNOTATED_STRING = "vep-annotated"
 
     def __init__(self, file_atid, request):
-        self.properties = get_item(request, file_atid)
-        self.file_format = self.properties.get(self.FILE_FORMAT)
-        self.file_type = self.properties.get(self.FILE_TYPE)
+        super().__init__(file_atid, request)
+        self.file_format = self.properties.get(self.FILE_FORMAT, "")
+        self.file_type = self.properties.get(self.FILE_TYPE, "")
         self.vcf_to_ingest = self.properties.get(self.VCF_TO_INGEST, False)
         self.variant_type = self.properties.get(self.VARIANT_TYPE, self.VARIANT_TYPE_SNV)
-        self.quality_metric_atid = self.properties.get(self.QUALITY_METRIC)
+        self.quality_metric = self.properties.get(self.QUALITY_METRIC)
+        self._quality_metric_for_qc = None
+
+    @property
+    def quality_metric_for_qc(self):
+        if self._quality_metric_for_qc is None:
+            self._quality_metric_for_qc = QualityMetricForQc(self.quality_metric,
+                    self.request)
+        return self._quality_metric_for_qc
 
     def is_vcf(self):
         return self.file_format == self.VCF_FILE_FORMAT
@@ -464,28 +472,103 @@ class FileForQc:
         return self.file_format == self.BAM_FILE_FORMAT
 
     def is_final_vcf(self):
-        return (self.file_type == self.FINAL_VCF_FILE_TYPE or self.vcf_to_ingest)
+        return (
+            self.is_vcf()
+            and (self.file_type == self.FINAL_VCF_FILE_TYPE or self.vcf_to_ingest)
+        )
 
     def is_vep_vcf(self):
-        return self.VEP_ANNOTATED_STRING in self.file_type.lower()
+        return (self.is_vcf() and self.VEP_ANNOTATED_STRING in self.file_type.lower())
 
-    def is_snv_file(self):
-        return self.variant_type == self.VARIANT_TYPE_SNV
+    def is_snv_final_vcf(self):
+        return (
+            self.variant_type == self.VARIANT_TYPE_SNV
+            and self.is_final_vcf()
+        )
 
-    def is_sv_file(self):
-        return self.variant_type == self.VARIANT_TYPE_SV
+    def is_sv_final_vcf(self):
+        return (
+            self.variant_type == self.VARIANT_TYPE_SV
+            and self.is_final_vcf()
+        )
+
+    def get_quality_metric_type(self):
+        result = None
+        if self.is_bam():
+            result = BamQc
+        elif self.is_vep_vcf():
+            result = SnvVepVcfQc
+        elif self.is_snv_final_vcf():
+            result = SnvFinalVcfQc
+        elif self.is_sv_final_vcf():
+            result = SvFinalVcfQc
+        return result
+
+    def create_quality_metric_for_qc(self, quality_metric_type):
+        result = None
+        if quality_metric_type and self.quality_metric:
+            result = quality_metric_type(self.quality_metric, self.request)
+        return result
 
 
-class ItemWithQcProperties:
+class IndividualForQc(ItemProperties):
+
+    # Schema constants
+    ACCESSION = "accession"
+    INDIVIDUAL_ID = "individual_id"
+    SEX = "sex"
+    ANCESTRY = "ancestry"
+
+    def __init__(self, individual_atid, request):
+        super().__init__(individual_atid, request)
+        self.sex = self.properties.get(self.SEX)
+
+
+class SampleForQc(ItemProperties):
+
+    # Schema constants
+    BAM_SAMPLE_ID = "bam_sample_id"
+    INDIVIDUAL = "individual"
+    PROCESSED_FILES = "processed_files"
+    WORKUP_TYPE = "workup_type"
+    WORKUP_TYPE_WGS = "WGS"
+    WORKUP_TYPE_WES = "WES"
+    SPECIMEN_TYPE = "specimen_type"
+
+    def __init__(self, sample_atid, request):
+        super().__init__(sample_atid, request)
+        self.bam_sample_id = self.properties.get(self.BAM_SAMPLE_ID)
+        self.workup_type = self.properties.get(self.WORKUP_TYPE)
+        self.individual = self.properties.get(self.INDIVIDUAL)
+        self.processed_files = self.properties.get(self.PROCESSED_FILES, [])
+
+    def get_quality_metrics(self):
+        result = []
+        for processed_file_atid in self.processed_files[::-1]:  # Most recent last
+            processed_file = FileForQc(processed_file_atid, self.request)
+            if processed_file.is_bam():
+                result.append(processed_file.create_quality_metric_for_qc(BamQc))
+                break
+        return result
+
+    def is_wgs(self):
+        return self.workup_type == self.WORKUP_TYPE_WGS
+
+    def is_wes(self):
+        return self.workup_type == self.WORKUP_TYPE_WES
+
+
+class ItemQcProperties:
 
     QC_DISPLAY_PROPERTIES = set()  # Format for display similar to QC summaries
     QC_NON_DISPLAY_PROPERTIES = set()  # Not meant for display in QC table
     PROPERTY_REPLACEMENTS = {}
 
-    def __init__(self, item_atid, request):
-        self.request = request
-        self.properties = get_item(request, item_atid)
+    def __init__(self, item_with_properties):
+        self.item = item_with_properties
+        self.item_properties = item_with_properties.properties
         self.qc_properties = {}
+        self.update_qc_properties()
 
     def update_qc_properties(self):
         self.add_non_display_properties()
@@ -493,12 +576,12 @@ class ItemWithQcProperties:
 
     def add_non_display_properties(self):
         transfer_properties(
-            self.properties, self.qc_properties, self.QC_NON_DISPLAY_PROPERTIES,
+            self.item_properties, self.qc_properties, self.QC_NON_DISPLAY_PROPERTIES,
             property_replacements=self.PROPERTY_REPLACEMENTS
         )
 
     def add_display_properties(self):
-        properties = copy.deepcopy(self.properties)
+        properties = copy.deepcopy(self.item_properties)
         for property_name in self.QC_DISPLAY_PROPERTIES:
             property_value = properties.get(property_name)
             if property_value is not None:
@@ -508,117 +591,34 @@ class ItemWithQcProperties:
             property_replacements=self.PROPERTY_REPLACEMENTS
         )
         
-class IndividualWithQcProperties(ItemWithQcProperties):
 
-    # Schema constants
-    ACCESSION = "accession"
-    INDIVIDUAL_ID = "individual_id"
-    SEX = "sex"
-    ANCESTRY = "ancestry"
+class IndividualQcProperties(ItemQcProperties):
 
-    QC_DISPLAY_PROPERTIES = set([SEX, ANCESTRY])
-    QC_NON_DISPLAY_PROPERTIES = set([ACCESSION, INDIVIDUAL_ID])
-    PROPERTY_REPLACEMENTS = {ACCESSION: QcConstants.INDIVIDUAL_ACCESSION}
+    QC_DISPLAY_PROPERTIES = set([IndividualForQc.SEX, IndividualForQc.ANCESTRY])
+    QC_NON_DISPLAY_PROPERTIES = set(
+        [IndividualForQc.ACCESSION, IndividualForQc.INDIVIDUAL_ID]
+    )
+    PROPERTY_REPLACEMENTS = {IndividualForQc.ACCESSION: QcConstants.INDIVIDUAL_ACCESSION}
 
 
-class SampleWithQcProperties(ItemWithQcProperties):
+class SampleQcProperties(ItemQcProperties):
 
-    # Schema constants
-    BAM_SAMPLE_ID = "bam_sample_id"
-    INDIVIDUAL = "individual"
-    PROCESSED_FILES = "processed_files"
-    WORKUP_TYPE = "workup_type"
-    SPECIMEN_TYPE = "specimen_type"
+    QC_NON_DISPLAY_PROPERTIES = set(
+        [SampleForQc.BAM_SAMPLE_ID, SampleForQc.WORKUP_TYPE, SampleForQc.SPECIMEN_TYPE]
+    )
+    PROPERTY_REPLACEMENTS = {SampleForQc.WORKUP_TYPE: QcConstants.SEQUENCING_TYPE}
 
-    QC_NON_DISPLAY_PROPERTIES = set([BAM_SAMPLE_ID, WORKUP_TYPE, SPECIMEN_TYPE])
-    PROPERTY_REPLACEMENTS = {WORKUP_TYPE: QcConstants.SEQUENCING_TYPE}
-
-    def __init__(self, sample_atid, request):
-        super().__init__(sample_atid, request)
-        self.bam_sample_id = self.properties.get(self.BAM_SAMPLE_ID)
-        self.individual_properties = {}
-        self.quality_metrics = []
-        self.qc_summaries = []
-        self.flags = {}
-        self.completed_processes = set([])
-
-    def collect_qc_data(self):
-        self.collect_sample_data()
-        self.collect_individual_data()
-        self.collect_bam_file()
-
-    def collect_sample_data(self):
-        self.update_qc_properties()
-
-    def collect_individual_data(self):
-        individual_atid = self.properties.get(self.INDIVIDUAL)
-        individual = IndividualWithQcProperties(individual_atid, self.request)
-        self.individual_properties.update(individual.properties)
-        individual.update_qc_properties()
-        self.qc_properties.update(individual.qc_properties)
-
-    def collect_bam_file(self):
-        processed_file_atids = self.properties.get(self.PROCESSED_FILES, [])
-        for processed_file_atid in processed_file_atids[::-1]:  # Most recent last
-            file_item = FileForQc(processed_file_atid, self.request)
-            if file_item.is_bam():
-                if file_item.quality_metric_atid:
-                    self.quality_metrics.append(
-                        BamQc(file_item.quality_metric_atid, self.request)
-                    )
-                break
-
-    def add_qc_summary(self, qc_summary):
-        qc_summary.set_flag(self.properties, self.individual_properties)
-        self.qc_summaries.append(qc_summary)
-
-    def add_qc_to_flags(self, qc_summary):
-        flag_to_add = qc_summary.flag
-        existing_values = self.flags.get(flag_to_add)
-        if existing_values:
-            existing_values.add(qc_summary.title)
-        else:
-            self.flags[flag_to_add] = set([qc_summary.title])
-
-    def get_qc_display(self, properties_to_include, flags_to_capture):
-        self.prune_qc_properties(properties_to_include)
-        self.add_qc_summaries(properties_to_include, flags_to_capture)
-        self.add_completed_processes()
-        self.add_flag_summaries()
-        return self.qc_properties
-
-    def prune_qc_properties(self, properties_to_include):
-        keys_to_delete = []
-        for qc_property in self.qc_properties:
-            if qc_property not in properties_to_include:
-                keys_to_delete.append(qc_property)
-        for key_to_delete in keys_to_delete:
-            del self.qc_properties[key_to_delete]
-
-    def add_qc_summaries(self, properties_to_include, flags_to_capture):
-        for qc_summary in self.qc_summaries:
-            if qc_summary.title not in properties_to_include:
-                continue
-            self.qc_properties.update(qc_summary.get_qc_display())
-            if qc_summary.flag in flags_to_capture:
-                self.add_qc_to_flags(qc_summary)
-
-    def add_flag_summaries(self):
-        for flag, flagged_qc_titles in self.flags.items():
-            self.qc_properties[flag] = sorted(list(flagged_qc_titles))
-
-    def add_completed_processes(self):
-        if self.completed_processes:
-            self.qc_properties[QcConstants.COMPLETED_QCS] = sorted(
-                list(self.completed_processes)
-            )
-
-    def update_completed_processes(self, qc_step_name):
-        if qc_step_name:
-            self.completed_processes.add(qc_step_name)
+#    def __init__(self, sample_item):
+#        super().__init__(sample_item)
+#        self.individual = sample_item.individual
+#        self.individual_qc = IndividualQcProperties(self.individual)
+#
+#    def update_qc_properties(self):
+#        super().update_qc_properties()
+#        self.individual_qc.update_qc_properties()
 
 
-class QualityMetricParser:
+class SampleQcReport:
 
     QC_PROPERTIES_TO_KEEP = set(
         [
@@ -643,6 +643,75 @@ class QualityMetricParser:
     )
     FLAGS_TO_CAPTURE = set([QcConstants.FLAG_WARN, QcConstants.FLAG_FAIL])
 
+
+    def __init__(self, sample_atid, request):
+        self.request = request
+        self.sample = SampleForQc(sample_atid, request)
+        self.individual = IndividualForQc(self.sample.individual, request)
+        self.item_qc_properties = [
+            SampleQcProperties(self.sample), IndividualQcProperties(self.individual)
+        ]
+        self.qc_report = {}
+        self.qc_summaries = []
+        self.flags = {}
+        self.completed_processes = set([])
+
+    def add_qc_summary(self, qc_summary):
+        qc_summary.set_flag(self.sample, self.individual)
+        self.qc_summaries.append(qc_summary)
+
+    def get_qc_display(self):
+        self.record_item_qc_properties()
+        self.record_qc_summaries()
+        self.record_completed_processes()
+        self.record_flag_summaries()
+        self.prune_qc_report()
+        return self.qc_report
+
+    def record_item_qc_properties(self):
+        for item_qc_properties in self.item_qc_properties:
+            self.qc_report.update(item_qc_properties.qc_properties)
+
+    def record_qc_summaries(self):
+        for qc_summary in self.qc_summaries:
+            self.qc_report.update(qc_summary.get_qc_display())
+            self.update_flags(qc_summary)
+            self.update_completed_processes(qc_summary)
+
+    def update_flags(self, qc_summary):
+        flag_to_add = qc_summary.flag
+        if flag_to_add in self.FLAGS_TO_CAPTURE:
+            existing_values = self.flags.get(flag_to_add)
+            if existing_values:
+                existing_values.add(qc_summary.title)
+            else:
+                self.flags[flag_to_add] = set([qc_summary.title])
+
+    def update_completed_processes(self, qc_summary):
+        completed_process = qc_summary.completed_process
+        if completed_process:
+            self.completed_processes.add(completed_process)
+
+    def record_completed_processes(self):
+        self.qc_report[QcConstants.COMPLETED_QCS] = sorted(
+            list(self.completed_processes)
+        )
+
+    def record_flag_summaries(self):
+        for flag, flagged_qc_titles in self.flags.items():
+            self.qc_report[flag] = sorted(list(flagged_qc_titles))
+
+    def prune_qc_report(self):
+        keys_to_delete = []
+        for qc_property in self.qc_report:
+            if qc_property not in self.QC_PROPERTIES_TO_KEEP:
+                keys_to_delete.append(qc_property)
+        for key_to_delete in keys_to_delete:
+            del self.qc_report[key_to_delete]
+
+
+class QualityMetricParser:
+
     def __init__(self, request):
         """Initialize class and set attributes.
 
@@ -662,7 +731,6 @@ class QualityMetricParser:
         self.request = request
         self.file_quality_metrics = []
         self.sample_mapping = {}
-        self.qc_display = []
 
     def get_qc_display_results(self, samples, processed_files):
         """Gather and process all data to make calcprop.
@@ -679,14 +747,14 @@ class QualityMetricParser:
         """
         result = None
         if samples:
-            if processed_files is None:
-                processed_files = []
-            self.collect_sample_processing_processed_files_data(processed_files)
-            self.collect_samples_data(samples)
+            if processed_files:
+                self.collect_sample_processing_processed_files_data(processed_files)
+            for sample in samples:
+                self.collect_sample_data(sample)
             self.associate_quality_metrics_with_samples()
-            self.create_qc_display()
-            if self.qc_display:
-                result = self.qc_display
+            qc_display = self.create_qc_display()
+            if qc_display:
+                result = qc_display
         return result
 
     def collect_sample_processing_processed_files_data(self, processed_files):
@@ -704,44 +772,28 @@ class QualityMetricParser:
         sv_vcf_found = False
         for processed_file_atid in processed_files[::-1]:  # Most recent files last
             file_item = FileForQc(processed_file_atid, self.request)
-            quality_metric_atid = file_item.quality_metric_atid
-            if not file_item.is_vcf():
-                continue
-            if file_item.is_final_vcf():
-                if file_item.is_snv_file():
-                    if snv_vcf_found:
-                        continue
+            quality_metric_type = file_item.get_quality_metric_type()
+            if quality_metric_type is SnvFinalVcfQc:
+                if not snv_vcf_found:
                     snv_vcf_found = True
-                    if quality_metric_atid:
-                        self.file_quality_metrics.append(
-                            SnvFinalVcfQc(quality_metric_atid, self.request)
-                        )
-                elif file_item.is_sv_file():
-                    if sv_vcf_found:
-                        continue
+                    self.add_quality_metric(quality_metric_type, file_item)
+            elif quality_metric_type is SnvVepVcfQc:
+                if not vep_vcf_found:
+                    vep_vcf_found = True
+                    self.add_quality_metric(quality_metric_type, file_item)
+            elif quality_metric_type is SvFinalVcfQc:
+                if not sv_vcf_found:
                     sv_vcf_found = True
-                    if quality_metric_atid:
-                        self.file_quality_metrics.append(
-                            SvFinalVcfQc(
-                                quality_metric_atid, self.request
-                            )
-                        )
-            elif (
-                not vep_vcf_found
-                and file_item.is_snv_file()
-                and file_item.is_vep_vcf()
-            ):
-                vep_vcf_found = True
-                if quality_metric_atid:
-                    self.file_quality_metrics.append(
-                        SnvVepVcfQc(
-                            quality_metric_atid, self.request
-                        )
-                    )
-            if snv_vcf_found and sv_vcf_found and vep_vcf_found:
+                    self.add_quality_metric(quality_metric_type, file_item)
+            if snv_vcf_found and vep_vcf_found and sv_vcf_found:
                 break
 
-    def collect_samples_data(self, sample_identifiers):
+    def add_quality_metric(self, quality_metric_type, file_item):
+        quality_metric = file_item.create_quality_metric_for_qc(quality_metric_type)
+        if quality_metric:
+            self.file_quality_metrics.append(quality_metric)
+
+    def collect_sample_data(self, sample_identifier):
         """Gather sample data, associate QC metrics with samples, and
         format the results.
 
@@ -750,61 +802,36 @@ class QualityMetricParser:
         :return: Formatted QC metrics for display
         :rtype: list
         """
-        for sample_identifier in sample_identifiers:
-            sample_item = SampleWithQcProperties(sample_identifier, self.request)
-            sample_item.collect_qc_data()
-            self.file_quality_metrics += sample_item.quality_metrics
-            sample_id = sample_item.bam_sample_id
-            if sample_id:
-                self.sample_mapping[sample_id] = sample_item
+        sample_report = SampleQcReport(sample_identifier, self.request)
+        self.file_quality_metrics += sample_report.sample.get_quality_metrics()
+        sample_id = sample_report.sample.bam_sample_id
+        if sample_id:
+            self.sample_mapping[sample_id] = sample_report
 
     def associate_quality_metrics_with_samples(self):
         """For each FileProcessed off of the SampleProcessing, get its
         QualityMetric and update sample-specific data with QC metrics.
         """
         for quality_metric in self.file_quality_metrics:
-            qc_process = quality_metric.get_completed_process()
             qc_summaries = quality_metric.collect_qc_summaries()
             for qc_summary in qc_summaries:
-                sample = self.sample_mapping.get(qc_summary.sample)
-                if sample is None:
+                sample_qc_report = self.sample_mapping.get(qc_summary.sample)
+                if sample_qc_report is None:
                     log.warning(
                         "Unable to find properties for given sample identifier"
-                        f" ({qc_summary.sample}) on QualityMetric: {quality_metric}."
+                        f" ({qc_summary.sample}) on QualityMetric:"
+                        f" {quality_metric.properties}."
                     )
                     continue
-                sample.add_qc_summary(qc_summary)
-                sample.update_completed_processes(qc_process)
-
-#    def associate_quality_metric_with_samples(self, quality_metric):
-#        """Update sample-specific data with QualityMetric QC items.
-#
-#        :param quality_metric_atid: QualityMetric identifier
-#        :type quality_metric_atid: str
-#        :param properties_to_find: QC titles to find
-#        :type properties_to_find: list
-#        :param property_replacements: Mapping of QC property names
-#            to replacement names
-#        :type property_replacements: dict or None
-#        """
-#        qc_summaries = quality_metric.collect_qc_items()
-#        for qc_summary in qc_summaries:
-#            sample = self.sample_mapping.get(qc_summary.sample)
-#            if sample is None:
-#                log.warning(
-#                    "Unable to find properties for given sample identifier"
-#                    f" ({qc_summary.sample}) on QualityMetric: {quality_metric}."
-#                )
-#                continue
-#            sample.add_qc_summary(qc_summary)
+                sample_qc_report.add_qc_summary(qc_summary)
 
     def create_qc_display(self):
-        for sample in self.sample_mapping.values():
-            sample_qc_properties = sample.get_qc_display(
-                self.QC_PROPERTIES_TO_KEEP, self.FLAGS_TO_CAPTURE
-            )
-            if sample_qc_properties:
-                self.qc_display.append(sample_qc_properties)
+        result = []
+        for sample_qc_report in self.sample_mapping.values():
+            sample_qc_display = sample_qc_report.get_qc_display()
+            if sample_qc_display:
+                result.append(sample_qc_display)
+        return result
 
 
 @collection(

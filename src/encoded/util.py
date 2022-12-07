@@ -548,10 +548,13 @@ def get_item(request, item_atid):
     :return: Item in object view
     :rtype: dict
     """
-    item_collection = item_atid.split("/")[0]
-    result = get_item_or_none(request, item_atid, item_collection)
-    if result is None:
-        log.exception(f"Could not find expected item for identifer: {item_atid}.")
+    if item_atid:
+        item_collection = item_atid.split("/")[0]
+        result = get_item_or_none(request, item_atid, item_collection)
+        if result is None:
+            log.exception(f"Could not find expected item for identifer: {item_atid}.")
+            result = {}
+    else:
         result = {}
     return result
 
