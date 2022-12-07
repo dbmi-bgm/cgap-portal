@@ -1,0 +1,32 @@
+[
+    {
+        "institution": "hms-dbmi",
+        "project": "hms-dbmi",
+        "status": "in review",
+        "uuid": "06e0f90e-a328-406f-978c-18fb3503583a",
+        "aliases": [
+            "hms-dbmi:sample_1_bamqc"
+        ],
+        "coverage": "30x",
+        "mapping stats": {
+            "total reads": 123456789
+        },
+        "sample": "Sample_ID",
+        "overall_quality_status": "PASS"
+    },
+    {
+        "institution": "hms-dbmi",
+        "project": "hms-dbmi",
+        "status": "in review",
+        "uuid": "06e0f90e-a328-406f-978c-18fb3503583b",
+        "aliases": [
+            "hms-dbmi:sample_2_bamqc"
+        ],
+        "coverage": "50x",
+        "mapping stats": {
+            "total reads": 987654321
+        },
+        "sample": "Sample_ID",
+        "overall_quality_status": "PASS"
+    }
+]

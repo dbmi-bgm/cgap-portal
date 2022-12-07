@@ -43,11 +43,27 @@
             "FileProcessed"
         ],
         "standard_file_extension": "vcf.gz.tbi",
-        "other_allowed_extensions": ["vcf.gz.tbj"],
+        "other_allowed_extensions": [
+            "vcf.gz.tbj"
+        ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "file_format": "vcf_gz_tbi",
         "uuid": "f84f1922-7f4e-4afc-922f-bec620969bf1",
         "date_created": "2020-08-19T02:37:43.305689+00:00",
         "schema_version": "1"
+    },
+    {
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "description": "bam",
+        "valid_item_types": [
+            "FileReference",
+            "FileProcessed",
+            "FileSubmitted"
+        ],
+        "standard_file_extension": "bam",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "file_format": "bam",
+        "uuid": "d7de2905-bce0-4987-b082-8e8b33eca9d9"
     }
 ]

@@ -131,12 +131,7 @@ class QcConstants:
 
 
 class QcFlagger:
-
-    # Schema constants
-    SEX = "sex"
-    WORKUP_TYPE = "workup_type"
-    WORKUP_TYPE_WGS = "WGS"
-    WORKUP_TYPE_WES = "WES"
+    """Evaluate QC values for appropriate flags."""
 
     ACCEPTED_PREDICTED_SEXES = set(["male", "female"])
     BAM_COVERAGE_WGS_WARN_LOWER = 25
@@ -159,6 +154,25 @@ class QcFlagger:
         cls, value, fail_upper=None, fail_lower=None, warn_upper=None, warn_lower=None,
         default=QcConstants.FLAG_PASS
     ):
+        """Provide flag for value.
+
+        Note: all boundary values evaluated as strict inequalities.
+
+        :param value: Value to evaluate
+        :type value: float
+        :param fail_lower: Lower boundary for fail flag
+        :type fail_lower: float or None
+        :param fail_upper: Upper boundary for fail flag
+        :type fail_upper: float or None
+        :param warn_upper: Upper boundary for warn flag
+        :type warn_upper: float or None
+        :param warn_lower: Lower boundary for warn flag
+        :type warn_lower: float or None
+        :param default: Default flag
+        :type default: str
+        :return: Flag
+        :rtype: str
+        """
         result = default
         if fail_upper and value > fail_upper:
             result = QcConstants.FLAG_FAIL
@@ -176,8 +190,8 @@ class QcFlagger:
 
         :param coverage: BAM coverage from QC item
         :type coverage: str
-        :param sample_properties: Sample-specific data
-        :type sample_properties: dict
+        :param sample: Sample data
+        :type sample: class:`SampleForQc` or None
         :return: Flag name
         :rtype: str or None
         """
@@ -209,8 +223,8 @@ class QcFlagger:
 
         :param predicted_sex: Sex predicted by peddy
         :type predicted_sex: str
-        :param sample_properties: Sample-specific data
-        :type sample_properties: dict
+        :param individual: Individual data
+        :type individual: class:`IndividualForQc` or None
         :return: Flag name
         :rtype: str or None
         """
@@ -252,8 +266,8 @@ class QcFlagger:
 
         :param transition_transversion_ratio: SNV Ts-Tv ratio
         :type transition_transversion_ratio: str
-        :param sample_properties: Sample-specific data
-        :type sample_properties: dict
+        :param sample: Sample data
+        :type sample: class:`SampleForQc` or None
         :return: Flag name
         :rtype: str or None
         """
@@ -284,6 +298,7 @@ class QcFlagger:
 
 
 class QcSummary:
+    """Information on single QC value."""
 
     # Schema constants
     SAMPLE = "sample"
@@ -298,6 +313,19 @@ class QcSummary:
     }
 
     def __init__(self, properties, completed_process, links=None, title_replacements=None):
+        """Constructor method.
+
+        :param properties: QC summary properties
+        :type properties: dict
+        :param completed_process: QC process for the summary
+        :type completed_process: str
+        :param links: Potential URL links for summary. Mapping of QC
+            titles --> URLs
+        :type links: dict or None
+        :param title_replacements: Potential replacement titles for
+            summary. Mapping of titles --> replacements
+        :type title_replacements: dict or None
+        """
         self.completed_process = completed_process
         self.value = properties.get(self.VALUE)
         self.sample = properties.get(self.SAMPLE)
@@ -311,8 +339,11 @@ class QcSummary:
     def get_qc_title(self, title, title_replacements):
         """Get QC display title.
 
-        :param qc_summary_item: QC item to evaluate
-        :type qc_summary_item: dict
+        :param title: QC title from QualityMetric
+        :type title: str
+        :param title_replacements: Potential replacement titles for
+            summary. Mapping of titles --> replacements
+        :type title_replacements: dict or None
         :return: QC display title
         :rtype: str
         """
@@ -322,6 +353,15 @@ class QcSummary:
         return result
 
     def set_flag(self, sample, individual):
+        """Evaluate flag for summary if evaluator exists.
+
+        Updates flag attribute directly.
+
+        :param sample: Sample data
+        :type sample: class:`SampleForQc`
+        :param individual: Individual data
+        :type individual: class:`IndividualForQc`
+        """
         flag = None
         evaluator = self.QC_TITLE_TO_FLAG_EVALUATOR.get(self.title)
         if evaluator:
@@ -334,6 +374,11 @@ class QcSummary:
         self.flag = flag
 
     def get_qc_display(self):
+        """Make summary display for QC report.
+
+        :return: Summary display
+        :rtype: dict
+        """
         result = {}
         if self.value:
             properties = {}
@@ -347,13 +392,22 @@ class QcSummary:
 
 
 class ItemProperties:
+    """Abstract class to store properties and request."""
 
     def __init__(self, item_atid, request):
+        """Constructor method.
+
+        :param item_atid: Item @id identifier
+        :type item_atid: str
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
+        """
         self.request = request
         self.properties = get_item(request, item_atid)
 
 
 class QualityMetricForQc(ItemProperties):
+    """Abstract class for QualityMetric item data and methods."""
 
     # Schema constants
     QUALITY_METRIC_SUMMARY = "quality_metric_summary"
@@ -366,6 +420,13 @@ class QualityMetricForQc(ItemProperties):
     QC_TITLE_REPLACEMENTS = None
 
     def __init__(self, quality_metric_atid, request):
+        """Constructor method.
+
+        :param quality_metric_atid: Item @id identifier
+        :type quality_metric_atid: str
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
+        """
         super().__init__(quality_metric_atid, request)
         self.quality_metric_summary = self.properties.get(
             self.QUALITY_METRIC_SUMMARY, []
@@ -373,6 +434,11 @@ class QualityMetricForQc(ItemProperties):
         self.qc_list = self.properties.get(self.QC_LIST, [])
 
     def collect_qc_summaries(self):
+        """Gather all sample-specific QC summaries.
+
+        :return: QC summary objects
+        :rtype: list[:class:`QcSummary`]
+        """
         result = []
         qc_links = self.get_qc_links()
         for summary in self.quality_metric_summary:
@@ -397,11 +463,9 @@ class SnvVepVcfQc(QualityMetricForQc):
     DOWNLOAD_ADD_ON = "@@download"
 
     def get_qc_links(self):
-        """Collect QualityMetric links to include for display.
+        """Collect peddy QC links to include for display.
 
-        :param quality_metric: QualityMetric item
-        :type quality_metric: dict
-        :return: Link mapping
+        :return: Link mapping summary title --> QC URL
         :rtype: dict or None
         """
         result = None
@@ -434,6 +498,7 @@ class BamQc(QualityMetricForQc):
 
 
 class FileForQc(ItemProperties):
+    """File item properties and methods."""
 
     # Schema constants
     FILE_FORMAT = "file_format"
@@ -450,49 +515,88 @@ class FileForQc(ItemProperties):
     VEP_ANNOTATED_STRING = "vep-annotated"
 
     def __init__(self, file_atid, request):
+        """Constructor method.
+
+        :param file_atid: Item @id identifier
+        :type file_atid: str
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
+        """
         super().__init__(file_atid, request)
         self.file_format = self.properties.get(self.FILE_FORMAT, "")
         self.file_type = self.properties.get(self.FILE_TYPE, "")
         self.vcf_to_ingest = self.properties.get(self.VCF_TO_INGEST, False)
         self.variant_type = self.properties.get(self.VARIANT_TYPE, self.VARIANT_TYPE_SNV)
         self.quality_metric = self.properties.get(self.QUALITY_METRIC)
-        self._quality_metric_for_qc = None
-
-    @property
-    def quality_metric_for_qc(self):
-        if self._quality_metric_for_qc is None:
-            self._quality_metric_for_qc = QualityMetricForQc(self.quality_metric,
-                    self.request)
-        return self._quality_metric_for_qc
 
     def is_vcf(self):
+        """Whether file is a VCF.
+
+        :return: `True` if VCF, `False` otherwise
+        :rtype: bool
+        """
         return self.file_format == self.VCF_FILE_FORMAT
 
     def is_bam(self):
+        """Whether file is a BAM.
+
+        :return: `True` if BAM, `False` otherwise
+        :rtype: bool
+        """
         return self.file_format == self.BAM_FILE_FORMAT
 
     def is_final_vcf(self):
+        """Whether file is a final VCF (has variants to ingest).
+
+        :return: `True` if final VCF, `False` otherwise
+        :rtype: bool
+        """
         return (
             self.is_vcf()
             and (self.file_type == self.FINAL_VCF_FILE_TYPE or self.vcf_to_ingest)
         )
 
     def is_vep_vcf(self):
+        """Whether file is a VEP VCF.
+
+        Fragile since no proper metadata property.
+
+        :return: `True` if VEP VCF, `False` otherwise
+        :rtype: bool
+        """
         return (self.is_vcf() and self.VEP_ANNOTATED_STRING in self.file_type.lower())
 
     def is_snv_final_vcf(self):
+        """Whether file is a final SNV VCF.
+
+        :return: `True` if final SNV VCF, `False` otherwise
+        :rtype: bool
+        """
         return (
             self.variant_type == self.VARIANT_TYPE_SNV
             and self.is_final_vcf()
         )
 
     def is_sv_final_vcf(self):
+        """Whether file is a final SV VCF.
+
+        :return: `True` if final SV VCF, `False` otherwise
+        :rtype: bool
+        """
         return (
             self.variant_type == self.VARIANT_TYPE_SV
             and self.is_final_vcf()
         )
 
     def get_quality_metric_type(self):
+        """Determine appropriate class for associated QualityMetric.
+
+        Prevents unnecessary creation of QualityMetric classes and
+        associated sub-requests.
+
+        :return: QualityMetric class, if found
+        :rtype: class:`QualityMetricForQc` type or None
+        """
         result = None
         if self.is_bam():
             result = BamQc
@@ -505,6 +609,14 @@ class FileForQc(ItemProperties):
         return result
 
     def create_quality_metric_for_qc(self, quality_metric_type):
+        """Create QualityMetric class to get the item, if exists.
+
+        :param quality_metric_type: Class type to use for obtaining
+            QualityMetric data
+        :type quality_metric_type: class:`type`
+        :return: QualityMetric object
+        :rtype: class:`QualityMetricForQc` or None
+        """
         result = None
         if quality_metric_type and self.quality_metric:
             result = quality_metric_type(self.quality_metric, self.request)
@@ -512,6 +624,7 @@ class FileForQc(ItemProperties):
 
 
 class IndividualForQc(ItemProperties):
+    """Individual item properties and methods."""
 
     # Schema constants
     ACCESSION = "accession"
@@ -520,11 +633,19 @@ class IndividualForQc(ItemProperties):
     ANCESTRY = "ancestry"
 
     def __init__(self, individual_atid, request):
+        """Constructor method.
+
+        :param individual_atid: Item @id identifier
+        :type individual_atid: str
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
+        """
         super().__init__(individual_atid, request)
         self.sex = self.properties.get(self.SEX)
 
 
 class SampleForQc(ItemProperties):
+    """Sample item properties and methods."""
 
     # Schema constants
     BAM_SAMPLE_ID = "bam_sample_id"
@@ -536,6 +657,13 @@ class SampleForQc(ItemProperties):
     SPECIMEN_TYPE = "specimen_type"
 
     def __init__(self, sample_atid, request):
+        """Constructor method.
+
+        :param sample_atid: Item @id identifier
+        :type sample_atid: str
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
+        """
         super().__init__(sample_atid, request)
         self.bam_sample_id = self.properties.get(self.BAM_SAMPLE_ID)
         self.workup_type = self.properties.get(self.WORKUP_TYPE)
@@ -543,6 +671,13 @@ class SampleForQc(ItemProperties):
         self.processed_files = self.properties.get(self.PROCESSED_FILES, [])
 
     def get_quality_metrics(self):
+        """Get relevant QualityMetrics.
+
+        Currently, only looking for latest BAM info.
+
+        :return: QualityMetric data classes
+        :rtype: list[:class:`QualityMetricForQc`]
+        """
         result = []
         for processed_file_atid in self.processed_files[::-1]:  # Most recent last
             processed_file = FileForQc(processed_file_atid, self.request)
@@ -552,35 +687,62 @@ class SampleForQc(ItemProperties):
         return result
 
     def is_wgs(self):
+        """Whether sample contains WGS data.
+
+        :return: `True` if WGS, `False` otherwise
+        :rtype: bool
+        """
         return self.workup_type == self.WORKUP_TYPE_WGS
 
     def is_wes(self):
+        """Whether sample contains WES data.
+
+        :return: `True` if WES, `False` otherwise
+        :rtype: bool
+        """
         return self.workup_type == self.WORKUP_TYPE_WES
 
 
 class ItemQcProperties:
+    """Abstract class for creating QC report properties from an item.
+
+    'Display' properties here refers to those that will eventually be
+    used in the QC table on the front-end, so they're formatted
+    identically to the data from the QC summaries.
+
+    'Non-display' properties refers to those that are used by front-end
+    to create the display table but are not appearing in the table.
+    """
 
     QC_DISPLAY_PROPERTIES = set()  # Format for display similar to QC summaries
     QC_NON_DISPLAY_PROPERTIES = set()  # Not meant for display in QC table
     PROPERTY_REPLACEMENTS = {}
 
     def __init__(self, item_with_properties):
+        """Constructor method.
+
+        :param item_with_properties: Class for item properties
+        :type item_with_properties: class:`ItemWithProperties`
+        """
         self.item = item_with_properties
         self.item_properties = item_with_properties.properties
         self.qc_properties = {}
         self.update_qc_properties()
 
     def update_qc_properties(self):
+        """Orchestrate update of qc_properties attribute."""
         self.add_non_display_properties()
         self.add_display_properties()
 
     def add_non_display_properties(self):
+        """Move 'non-display' properties to qc_properties."""
         transfer_properties(
             self.item_properties, self.qc_properties, self.QC_NON_DISPLAY_PROPERTIES,
             property_replacements=self.PROPERTY_REPLACEMENTS
         )
 
     def add_display_properties(self):
+        """Format and move 'display' properties to qc_properties."""
         properties = copy.deepcopy(self.item_properties)
         for property_name in self.QC_DISPLAY_PROPERTIES:
             property_value = properties.get(property_name)
@@ -608,18 +770,11 @@ class SampleQcProperties(ItemQcProperties):
     )
     PROPERTY_REPLACEMENTS = {SampleForQc.WORKUP_TYPE: QcConstants.SEQUENCING_TYPE}
 
-#    def __init__(self, sample_item):
-#        super().__init__(sample_item)
-#        self.individual = sample_item.individual
-#        self.individual_qc = IndividualQcProperties(self.individual)
-#
-#    def update_qc_properties(self):
-#        super().update_qc_properties()
-#        self.individual_qc.update_qc_properties()
-
 
 class SampleQcReport:
+    """QC data for a single Sample."""
 
+    FLAGS_TO_CAPTURE = set([QcConstants.FLAG_WARN, QcConstants.FLAG_FAIL])
     QC_PROPERTIES_TO_KEEP = set(
         [
             QcConstants.SEX,
@@ -640,11 +795,16 @@ class SampleQcReport:
             QcConstants.TRANSITION_TRANSVERSION_RATIO,
             QcConstants.DE_NOVO_FRACTION,
         ]
-    )
-    FLAGS_TO_CAPTURE = set([QcConstants.FLAG_WARN, QcConstants.FLAG_FAIL])
-
+    ) | FLAGS_TO_CAPTURE  # Should be 1-to-1 with properties in calcprop
 
     def __init__(self, sample_atid, request):
+        """Constructor method.
+
+        :param sample_atid: Item @id identifier
+        :type sample_atid: str
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
+        """
         self.request = request
         self.sample = SampleForQc(sample_atid, request)
         self.individual = IndividualForQc(self.sample.individual, request)
@@ -657,10 +817,27 @@ class SampleQcReport:
         self.completed_processes = set([])
 
     def add_qc_summary(self, qc_summary):
+        """Set flag for QC summary item then add to attribute.
+
+        QC summary info will be added to the report for this sample,
+        so should be matched by sample identifier already.
+
+        :param qc_summary: Single QC summary from QualityMetric
+        :type qc_summary: class:`QcSummary`
+        """
         qc_summary.set_flag(self.sample, self.individual)
         self.qc_summaries.append(qc_summary)
 
     def get_qc_display(self):
+        """Orchestrate formation of sample's report.
+
+        Move all information to be displayed in final QC table + all
+        information required by front-end to create QC table to
+        attribute.
+
+        :return: Sample QC report for SampleProcessing calcprop
+        :rtype: dict
+        """
         self.record_item_qc_properties()
         self.record_qc_summaries()
         self.record_completed_processes()
@@ -669,16 +846,29 @@ class SampleQcReport:
         return self.qc_report
 
     def record_item_qc_properties(self):
+        """Move non-QC summary information to report."""
         for item_qc_properties in self.item_qc_properties:
             self.qc_report.update(item_qc_properties.qc_properties)
 
     def record_qc_summaries(self):
+        """Move QC summary information to report.
+
+        Update flags and completed processes to be moved to report
+        afterwards.
+        """
         for qc_summary in self.qc_summaries:
             self.qc_report.update(qc_summary.get_qc_display())
             self.update_flags(qc_summary)
             self.update_completed_processes(qc_summary)
 
     def update_flags(self, qc_summary):
+        """Update flags attribute with QC summary info, required.
+
+        Keep track of captured flags to simplify front-end display.
+
+        :param qc_summary: Single QC summary from QualityMetric
+        :type qc_summary: class:`QcSummary`
+        """
         flag_to_add = qc_summary.flag
         if flag_to_add in self.FLAGS_TO_CAPTURE:
             existing_values = self.flags.get(flag_to_add)
@@ -688,20 +878,33 @@ class SampleQcReport:
                 self.flags[flag_to_add] = set([qc_summary.title])
 
     def update_completed_processes(self, qc_summary):
+        """Update completed process with QC summary info, if exists.
+
+        :param qc_summary: Single QC summary from QualityMetric
+        :type qc_summary: class:`QcSummary`
+        """       
         completed_process = qc_summary.completed_process
         if completed_process:
             self.completed_processes.add(completed_process)
 
     def record_completed_processes(self):
+        """Format and move completed processes to report."""
         self.qc_report[QcConstants.COMPLETED_QCS] = sorted(
             list(self.completed_processes)
         )
 
     def record_flag_summaries(self):
+        """Format and move captured flags to report."""
         for flag, flagged_qc_titles in self.flags.items():
             self.qc_report[flag] = sorted(list(flagged_qc_titles))
 
     def prune_qc_report(self):
+        """Remove any unexpected properties in report.
+
+        Not strictly required if all set up properly elsewhere, but
+        checks to ensure only properties expected in the
+        SampleProcessing calcprop schema end up in report.
+        """
         keys_to_delete = []
         for qc_property in self.qc_report:
             if qc_property not in self.QC_PROPERTIES_TO_KEEP:
@@ -711,25 +914,16 @@ class SampleQcReport:
 
 
 class QualityMetricParser:
+    """Orchestrate creation of QC reports for all Samples."""
 
     def __init__(self, request):
-        """Initialize class and set attributes.
+        """Constructor method
 
-        :param request: Request
-        :type request: pyramid.request.Request instance
-        :var request: Request
-        :vartype request: pyramid.request.Request instance
-        :var processed_files_with_quality_metrics: FileProcessed items
-            from which to extract QC metrics
-        :vartype processed_files_with_quality_metrics: list
-        :var sample_mapping: Mapping bam_sample_id --> Sample items
-        :vartype sample_mapping: dict
-        :var qc_property_to_evaluator: Mapping QC property titles to
-            evaluators for flags
-        :vartype qc_property_to_evaluator: dict
+        :param request: Web request
+        :type request: class:`pyramid.request.Request`
         """
         self.request = request
-        self.file_quality_metrics = []
+        self.quality_metrics = []
         self.sample_mapping = {}
 
     def get_qc_display_results(self, samples, processed_files):
@@ -737,18 +931,19 @@ class QualityMetricParser:
 
         Top-level method of the class.
 
-        :param samples: Samples associated with a SampleProcessing
-        :type samples: list
-        :param processed_files: FilesProcessed associated with a
+        :param samples: Identifiers for Samples associated with
             SampleProcessing
-        :type processed_files: list
-        :return: QC metrics to display per sample
-        :rtype: list
+        :type samples: list[str]
+        :param processed_files: Identifiers for FileProcessed items
+            associated with SampleProcessing
+        :type processed_files: list[str]
+        :return: QC metrics for all Samples
+        :rtype: list[dict]
         """
         result = None
         if samples:
             if processed_files:
-                self.collect_sample_processing_processed_files_data(processed_files)
+                self.collect_quality_metrics(processed_files)
             for sample in samples:
                 self.collect_sample_data(sample)
             self.associate_quality_metrics_with_samples()
@@ -757,15 +952,15 @@ class QualityMetricParser:
                 result = qc_display
         return result
 
-    def collect_sample_processing_processed_files_data(self, processed_files):
-        """Collect processed files of interest from a SampleProcessing.
+    def collect_quality_metrics(self, processed_files):
+        """Collect QualityMetrics of interest from SampleProcessing.
 
-        :param processed_files: FilesProcessed associated with a
-            SampleProcessing
-        :type processed_files: list
-        :return: Whether a "final" VCF (i.e. one for ingestion) was
-            found
-        :rtype: bool
+        Updates `quality_metrics` attribute with `QualityMetricForQc`
+        objects.
+
+        :param processed_files: Identifiers for FileProcessed items
+            associated with SampleProcessing
+        :type processed_files: list[str]
         """
         snv_vcf_found = False
         vep_vcf_found = False
@@ -789,35 +984,51 @@ class QualityMetricParser:
                 break
 
     def add_quality_metric(self, quality_metric_type, file_item):
+        """Make QualityMetric object and add to attribute, if exists.
+
+        :param quality_metric_type: Class type to use for QualityMetric
+            on file
+        :type quality_metric_type: class:`type`
+        :param file_item: File from which to grab QualityMetric
+        :type file_item: class:`FileForQc:
+        """
         quality_metric = file_item.create_quality_metric_for_qc(quality_metric_type)
         if quality_metric:
-            self.file_quality_metrics.append(quality_metric)
+            self.quality_metrics.append(quality_metric)
 
     def collect_sample_data(self, sample_identifier):
-        """Gather sample data, associate QC metrics with samples, and
-        format the results.
+        """Get Sample QualityMetrics and add sample report to sample
+        mapping.
 
-        :param sample_identifiers: Sample item identifiers
-        :type sample_identifiers: list
+        QC summaries are associated with Samples via the bam_sample_id,
+        which should practically always exist, but we don't assume so
+        here.
+
+        :param sample_identifier: Sample item @id
+        :type sample_identifier: str
         :return: Formatted QC metrics for display
         :rtype: list
         """
         sample_report = SampleQcReport(sample_identifier, self.request)
-        self.file_quality_metrics += sample_report.sample.get_quality_metrics()
+        self.quality_metrics += sample_report.sample.get_quality_metrics()
         sample_id = sample_report.sample.bam_sample_id
         if sample_id:
             self.sample_mapping[sample_id] = sample_report
 
     def associate_quality_metrics_with_samples(self):
-        """For each FileProcessed off of the SampleProcessing, get its
-        QualityMetric and update sample-specific data with QC metrics.
+        """Match QC summaries from QualityMetrics with sample reports.
+
+        Log summaries that can't find matches, but not high alert since
+        there's no guarantee Files on SampleProcessing were derived
+        from the input Samples. Should be correct in majority of cases,
+        however.
         """
-        for quality_metric in self.file_quality_metrics:
+        for quality_metric in self.quality_metrics:
             qc_summaries = quality_metric.collect_qc_summaries()
             for qc_summary in qc_summaries:
                 sample_qc_report = self.sample_mapping.get(qc_summary.sample)
                 if sample_qc_report is None:
-                    log.warning(
+                    log.info(
                         "Unable to find properties for given sample identifier"
                         f" ({qc_summary.sample}) on QualityMetric:"
                         f" {quality_metric.properties}."
@@ -826,6 +1037,11 @@ class QualityMetricParser:
                 sample_qc_report.add_qc_summary(qc_summary)
 
     def create_qc_display(self):
+        """Generate final QC metrics for each sample for QC table.
+
+        :return: QC metrics for calcprop
+        :rtype: list[dict]
+        """
         result = []
         for sample_qc_report in self.sample_mapping.values():
             sample_qc_display = sample_qc_report.get_qc_display()
@@ -1023,6 +1239,16 @@ class SampleProcessing(Item):
                     QcConstants.INDIVIDUAL_ACCESSION: {
                         "title": "Individual Accession",
                         "description": "Individual accession related to sample",
+                        "type": "string",
+                    },
+                    QcConstants.SEQUENCING_TYPE: {
+                        "title": "Sequencing Type",
+                        "description": "Sequencing type for sample",
+                        "type": "string",
+                    },
+                    QcConstants.SPECIMEN_TYPE: {
+                        "title": "Specimen Type",
+                        "description": "Specimen type for the sample",
                         "type": "string",
                     },
                     QcConstants.SEX: {

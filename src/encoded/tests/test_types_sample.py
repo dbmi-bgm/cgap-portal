@@ -1106,7 +1106,7 @@ class TestQualityMetricParser:
         """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
-            "collect_sample_processing_processed_files_data",
+            "collect_quality_metrics",
         ) as mocked_collect_files_data:
             with mock.patch.object(
                 sample_type_module.QualityMetricParser,
@@ -1168,7 +1168,7 @@ class TestQualityMetricParser:
             ),
         ],
     )
-    def test_collect_sample_processing_processed_files_data(
+    def test_collect_quality_metrics(
         self,
         empty_quality_metric_parser,
         quality_metric_types,
@@ -1189,7 +1189,7 @@ class TestQualityMetricParser:
                 "add_quality_metric",
             ) as mocked_add_quality_metric:
                 qc_parser = empty_quality_metric_parser
-                qc_parser.collect_sample_processing_processed_files_data(
+                qc_parser.collect_quality_metrics(
                     processed_files
                 )
                 if not expected_add_quality_metric_call_types:
@@ -1220,7 +1220,7 @@ class TestQualityMetricParser:
             quality_metric_type, file_item
         )
         file_item.create_quality_metric_for_qc.assert_called_once_with(quality_metric_type)
-        assert empty_quality_metric_parser.file_quality_metrics == expected
+        assert empty_quality_metric_parser.quality_metrics == expected
 
     @pytest.mark.parametrize(
         "quality_metrics,bam_sample_id",
@@ -1250,7 +1250,7 @@ class TestQualityMetricParser:
             mocked_sample_qc_report.assert_called_once_with(
                 sample_identifier, empty_quality_metric_parser.request
             )
-            assert empty_quality_metric_parser.file_quality_metrics == quality_metrics
+            assert empty_quality_metric_parser.quality_metrics == quality_metrics
             sample_mapping = empty_quality_metric_parser.sample_mapping
             if bam_sample_id:
                 assert len(sample_mapping) == 1
@@ -1259,7 +1259,7 @@ class TestQualityMetricParser:
                 assert not empty_quality_metric_parser.sample_mapping
 
     @pytest.mark.parametrize(
-        "qc_summary_samples,expected_warnings,expected_summary_adds",
+        "qc_summary_samples,expected_log_info,expected_summary_adds",
         [
             ([], 0, []),
             ([SAMPLE_2], 1, []),
@@ -1268,7 +1268,7 @@ class TestQualityMetricParser:
         ]
     )
     def test_associate_quality_metrics_with_samples(
-        self, empty_quality_metric_parser, qc_summary_samples, expected_warnings,
+        self, empty_quality_metric_parser, qc_summary_samples, expected_log_info,
         expected_summary_adds
     ):
         mocked_sample_qc_report = mock.create_autospec(
@@ -1284,13 +1284,13 @@ class TestQualityMetricParser:
         )
         file_quality_metric.collect_qc_summaries.return_value = qc_summaries
         file_quality_metric.properties = "foo"
-        empty_quality_metric_parser.file_quality_metrics = [file_quality_metric]
+        empty_quality_metric_parser.quality_metrics = [file_quality_metric]
         with mock.patch.object(
             sample_type_module,
             "log",
         ) as mocked_log:
             empty_quality_metric_parser.associate_quality_metrics_with_samples()
-            assert len(mocked_log.warning.call_args_list) == expected_warnings
+            assert len(mocked_log.info.call_args_list) == expected_log_info
             add_qc_summary_calls = mocked_sample_qc_report.add_qc_summary.call_args_list
             assert len(add_qc_summary_calls) == len(expected_summary_adds)
             for call in add_qc_summary_calls:
@@ -1311,51 +1311,10 @@ class TestQualityMetricParser:
         assert result == [sample_qc_display_1]
 
 
+@pytest.mark.workbook
 def test_quality_control_metrics(
-    testapp, child, mother, sample_processing, vep_vcf_with_qcs
+    es_testapp, workbook
 ):
     """Integrated testing of calcprop with fixtures."""
-    sample_processing_atid = sample_processing["@id"]
-
-    # All samples + files
-    quality_control_metrics = sample_processing.get("quality_control_metrics")
-    assert quality_control_metrics == [
-        PROBAND_SAMPLE_QC_METRICS,
-        PROBAND_SAMPLE_2_QC_METRICS,
-        MOTHER_SAMPLE_QC_METRICS,
-    ]
-
-    # No samples, all files
-    patch_body = {"samples": []}
-    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
-        "@graph"
-    ][0]
-    assert response.get("quality_control_metrics") is None
-
-    # Partial samples, all files
-    proband_samples = child.get("samples")
-    patch_body = {"samples": proband_samples}
-    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
-        "@graph"
-    ][0]
-    assert response.get("quality_control_metrics") == [
-        PROBAND_SAMPLE_QC_METRICS,
-        PROBAND_SAMPLE_2_QC_METRICS,
-    ]
-
-    # All samples, no files
-    mother_sample = mother.get("samples")
-    all_samples = proband_samples + mother_sample
-    patch_body = {"samples": all_samples, "processed_files": []}
-    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
-        "@graph"
-    ][0]
-    assert response.get("quality_control_metrics") is None
-
-    # All samples, only VEP file
-    vep_file_atid = vep_vcf_with_qcs["@id"]
-    patch_body = {"processed_files": [vep_file_atid]}
-    response = testapp.patch_json(sample_processing_atid, patch_body, status=200).json[
-        "@graph"
-    ][0]
-    assert response.get("quality_control_metrics") is None
+    import pdb; pdb.set_trace()
+    sample_processings = es_testapp.get("/search/?type=SampleProcessing").json["@graph"]
