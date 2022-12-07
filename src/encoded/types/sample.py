@@ -151,8 +151,13 @@ class QcFlagger:
 
     @classmethod
     def assign_flag(
-        cls, value, fail_upper=None, fail_lower=None, warn_upper=None, warn_lower=None,
-        default=QcConstants.FLAG_PASS
+        cls,
+        value,
+        fail_upper=None,
+        fail_lower=None,
+        warn_upper=None,
+        warn_lower=None,
+        default=QcConstants.FLAG_PASS,
     ):
         """Provide flag for value.
 
@@ -183,7 +188,7 @@ class QcFlagger:
         elif warn_lower and value < warn_lower:
             result = QcConstants.FLAG_WARN
         return result
-        
+
     @classmethod
     def flag_bam_coverage(cls, coverage, sample=None, **kwargs):
         """Evaluate BAM coverage for flag.
@@ -200,13 +205,15 @@ class QcFlagger:
         coverage = float(coverage_number_string)
         if sample.is_wgs():
             result = cls.assign_flag(
-                coverage, warn_lower=cls.BAM_COVERAGE_WGS_WARN_LOWER,
-                fail_lower=cls.BAM_COVERAGE_WGS_FAIL_LOWER
+                coverage,
+                warn_lower=cls.BAM_COVERAGE_WGS_WARN_LOWER,
+                fail_lower=cls.BAM_COVERAGE_WGS_FAIL_LOWER,
             )
         elif sample.is_wes():
             result = cls.assign_flag(
-                coverage, warn_lower=cls.BAM_COVERAGE_WES_WARN_LOWER,
-                fail_lower=cls.BAM_COVERAGE_WES_FAIL_LOWER
+                coverage,
+                warn_lower=cls.BAM_COVERAGE_WES_WARN_LOWER,
+                fail_lower=cls.BAM_COVERAGE_WES_FAIL_LOWER,
             )
         else:
             log.warning(
@@ -216,9 +223,7 @@ class QcFlagger:
         return result
 
     @classmethod
-    def flag_sex_consistency(
-        cls, predicted_sex, individual=None, **kwargs
-    ):
+    def flag_sex_consistency(cls, predicted_sex, individual=None, **kwargs):
         """Evaluate sex consistency for flag.
 
         :param predicted_sex: Sex predicted by peddy
@@ -253,8 +258,9 @@ class QcFlagger:
         """
         heterozygosity_ratio = float(heterozygosity_ratio)
         result = cls.assign_flag(
-            heterozygosity_ratio, warn_upper=cls.HETEROZYGOSITY_WARN_UPPER,
-            warn_lower=cls.HETEROZYGOSITY_WARN_LOWER
+            heterozygosity_ratio,
+            warn_upper=cls.HETEROZYGOSITY_WARN_UPPER,
+            warn_lower=cls.HETEROZYGOSITY_WARN_LOWER,
         )
         return result
 
@@ -312,7 +318,9 @@ class QcSummary:
         QcConstants.TRANSITION_TRANSVERSION_RATIO: QcFlagger.flag_transition_transversion_ratio,
     }
 
-    def __init__(self, properties, completed_process, links=None, title_replacements=None):
+    def __init__(
+        self, properties, completed_process, links=None, title_replacements=None
+    ):
         """Constructor method.
 
         :param properties: QC summary properties
@@ -329,8 +337,9 @@ class QcSummary:
         self.completed_process = completed_process
         self.value = properties.get(self.VALUE)
         self.sample = properties.get(self.SAMPLE)
-        self.title = self.get_qc_title(properties.get(self.TITLE, ""),
-                title_replacements)
+        self.title = self.get_qc_title(
+            properties.get(self.TITLE, ""), title_replacements
+        )
         self.flag = None
         self.link = None
         if links:
@@ -443,8 +452,12 @@ class QualityMetricForQc(ItemProperties):
         qc_links = self.get_qc_links()
         for summary in self.quality_metric_summary:
             result.append(
-                QcSummary(summary, self.COMPLETED_QC_PROCESS, links=qc_links,
-                    title_replacements=self.QC_TITLE_REPLACEMENTS)
+                QcSummary(
+                    summary,
+                    self.COMPLETED_QC_PROCESS,
+                    links=qc_links,
+                    title_replacements=self.QC_TITLE_REPLACEMENTS,
+                )
             )
         return result
 
@@ -453,7 +466,7 @@ class QualityMetricForQc(ItemProperties):
 
 
 class SnvFinalVcfQc(QualityMetricForQc):
-    
+
     COMPLETED_QC_PROCESS = "SNV"
 
 
@@ -493,7 +506,7 @@ class SvFinalVcfQc(QualityMetricForQc):
 
 
 class BamQc(QualityMetricForQc):
-    
+
     COMPLETED_QC_PROCESS = "BAM"
 
 
@@ -526,7 +539,9 @@ class FileForQc(ItemProperties):
         self.file_format = self.properties.get(self.FILE_FORMAT, "")
         self.file_type = self.properties.get(self.FILE_TYPE, "")
         self.vcf_to_ingest = self.properties.get(self.VCF_TO_INGEST, False)
-        self.variant_type = self.properties.get(self.VARIANT_TYPE, self.VARIANT_TYPE_SNV)
+        self.variant_type = self.properties.get(
+            self.VARIANT_TYPE, self.VARIANT_TYPE_SNV
+        )
         self.quality_metric = self.properties.get(self.QUALITY_METRIC)
 
     def is_vcf(self):
@@ -551,9 +566,8 @@ class FileForQc(ItemProperties):
         :return: `True` if final VCF, `False` otherwise
         :rtype: bool
         """
-        return (
-            self.is_vcf()
-            and (self.file_type == self.FINAL_VCF_FILE_TYPE or self.vcf_to_ingest)
+        return self.is_vcf() and (
+            self.file_type == self.FINAL_VCF_FILE_TYPE or self.vcf_to_ingest
         )
 
     def is_vep_vcf(self):
@@ -564,7 +578,7 @@ class FileForQc(ItemProperties):
         :return: `True` if VEP VCF, `False` otherwise
         :rtype: bool
         """
-        return (self.is_vcf() and self.VEP_ANNOTATED_STRING in self.file_type.lower())
+        return self.is_vcf() and self.VEP_ANNOTATED_STRING in self.file_type.lower()
 
     def is_snv_final_vcf(self):
         """Whether file is a final SNV VCF.
@@ -572,10 +586,7 @@ class FileForQc(ItemProperties):
         :return: `True` if final SNV VCF, `False` otherwise
         :rtype: bool
         """
-        return (
-            self.variant_type == self.VARIANT_TYPE_SNV
-            and self.is_final_vcf()
-        )
+        return self.variant_type == self.VARIANT_TYPE_SNV and self.is_final_vcf()
 
     def is_sv_final_vcf(self):
         """Whether file is a final SV VCF.
@@ -583,10 +594,7 @@ class FileForQc(ItemProperties):
         :return: `True` if final SV VCF, `False` otherwise
         :rtype: bool
         """
-        return (
-            self.variant_type == self.VARIANT_TYPE_SV
-            and self.is_final_vcf()
-        )
+        return self.variant_type == self.VARIANT_TYPE_SV and self.is_final_vcf()
 
     def get_quality_metric_type(self):
         """Determine appropriate class for associated QualityMetric.
@@ -737,8 +745,10 @@ class ItemQcProperties:
     def add_non_display_properties(self):
         """Move 'non-display' properties to qc_properties."""
         transfer_properties(
-            self.item_properties, self.qc_properties, self.QC_NON_DISPLAY_PROPERTIES,
-            property_replacements=self.PROPERTY_REPLACEMENTS
+            self.item_properties,
+            self.qc_properties,
+            self.QC_NON_DISPLAY_PROPERTIES,
+            property_replacements=self.PROPERTY_REPLACEMENTS,
         )
 
     def add_display_properties(self):
@@ -749,10 +759,12 @@ class ItemQcProperties:
             if property_value is not None:
                 properties[property_name] = {QcConstants.VALUE: property_value}
         transfer_properties(
-            properties, self.qc_properties, self.QC_DISPLAY_PROPERTIES,
-            property_replacements=self.PROPERTY_REPLACEMENTS
+            properties,
+            self.qc_properties,
+            self.QC_DISPLAY_PROPERTIES,
+            property_replacements=self.PROPERTY_REPLACEMENTS,
         )
-        
+
 
 class IndividualQcProperties(ItemQcProperties):
 
@@ -760,7 +772,9 @@ class IndividualQcProperties(ItemQcProperties):
     QC_NON_DISPLAY_PROPERTIES = set(
         [IndividualForQc.ACCESSION, IndividualForQc.INDIVIDUAL_ID]
     )
-    PROPERTY_REPLACEMENTS = {IndividualForQc.ACCESSION: QcConstants.INDIVIDUAL_ACCESSION}
+    PROPERTY_REPLACEMENTS = {
+        IndividualForQc.ACCESSION: QcConstants.INDIVIDUAL_ACCESSION
+    }
 
 
 class SampleQcProperties(ItemQcProperties):
@@ -775,27 +789,30 @@ class SampleQcReport:
     """QC data for a single Sample."""
 
     FLAGS_TO_CAPTURE = set([QcConstants.FLAG_WARN, QcConstants.FLAG_FAIL])
-    QC_PROPERTIES_TO_KEEP = set(
-        [
-            QcConstants.SEX,
-            QcConstants.ANCESTRY,
-            QcConstants.BAM_SAMPLE_ID,
-            QcConstants.INDIVIDUAL_ID,
-            QcConstants.INDIVIDUAL_ACCESSION,
-            QcConstants.SEQUENCING_TYPE,
-            QcConstants.SPECIMEN_TYPE,
-            QcConstants.PREDICTED_SEX,
-            QcConstants.PREDICTED_ANCESTRY,
-            QcConstants.TOTAL_READS,
-            QcConstants.COVERAGE,
-            QcConstants.TOTAL_VARIANTS_CALLED,
-            QcConstants.FILTERED_VARIANTS,
-            QcConstants.FILTERED_STRUCTURAL_VARIANTS,
-            QcConstants.HETEROZYGOSITY_RATIO,
-            QcConstants.TRANSITION_TRANSVERSION_RATIO,
-            QcConstants.DE_NOVO_FRACTION,
-        ]
-    ) | FLAGS_TO_CAPTURE  # Should be 1-to-1 with properties in calcprop
+    QC_PROPERTIES_TO_KEEP = (
+        set(
+            [
+                QcConstants.SEX,
+                QcConstants.ANCESTRY,
+                QcConstants.BAM_SAMPLE_ID,
+                QcConstants.INDIVIDUAL_ID,
+                QcConstants.INDIVIDUAL_ACCESSION,
+                QcConstants.SEQUENCING_TYPE,
+                QcConstants.SPECIMEN_TYPE,
+                QcConstants.PREDICTED_SEX,
+                QcConstants.PREDICTED_ANCESTRY,
+                QcConstants.TOTAL_READS,
+                QcConstants.COVERAGE,
+                QcConstants.TOTAL_VARIANTS_CALLED,
+                QcConstants.FILTERED_VARIANTS,
+                QcConstants.FILTERED_STRUCTURAL_VARIANTS,
+                QcConstants.HETEROZYGOSITY_RATIO,
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                QcConstants.DE_NOVO_FRACTION,
+            ]
+        )
+        | FLAGS_TO_CAPTURE
+    )  # Should be 1-to-1 with properties in calcprop
 
     def __init__(self, sample_atid, request):
         """Constructor method.
@@ -809,7 +826,8 @@ class SampleQcReport:
         self.sample = SampleForQc(sample_atid, request)
         self.individual = IndividualForQc(self.sample.individual, request)
         self.item_qc_properties = [
-            SampleQcProperties(self.sample), IndividualQcProperties(self.individual)
+            SampleQcProperties(self.sample),
+            IndividualQcProperties(self.individual),
         ]
         self.qc_report = {}
         self.qc_summaries = []
@@ -882,7 +900,7 @@ class SampleQcReport:
 
         :param qc_summary: Single QC summary from QualityMetric
         :type qc_summary: class:`QcSummary`
-        """       
+        """
         completed_process = qc_summary.completed_process
         if completed_process:
             self.completed_processes.add(completed_process)
