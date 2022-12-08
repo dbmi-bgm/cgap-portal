@@ -110,8 +110,10 @@ export class YoutubeVideoEmbed extends React.Component {
 
         // Loading webp image, for speed and progressiveness of loading
         const posterURL = !isPlaylist ?
-            `${YT_IMG_URL}/vi/${embedID}/${posterSize}.webp`:
-            `${YT_IMG_URL}/vi/${playlistCoverID}/${posterSize}.webp`;
+            `${YT_IMG_URL}/vi_webp/${embedID}/${posterSize}.webp`:
+            `${YT_IMG_URL}/vi_webp/${playlistCoverID}/${posterSize}.webp`;
+
+        const aspectRatio = `${aspectHeight} / ${aspectWidth}`;
 
         return (
             <React.Fragment>
@@ -122,12 +124,14 @@ export class YoutubeVideoEmbed extends React.Component {
                 { preconnected && <link rel="preconnect" href={YOUTUBE_BASE_URL} />}
 
                 <div
+                    className="youtube-embed-lazyload-poster"
                     onPointerOver={this.preconnectToYoutube}
                     onClick={this.showIframe}
                     data-title={videoTitle}
                     style={{
                         backgroundImage: `url(${posterURL})`,
-                        '--aspect-ratio': `${(aspectHeight / aspectWidth) * 100}%`
+                        aspectRatio,
+                        '--aspect-ratio': aspectRatio
                     }}
                 >
                     {
