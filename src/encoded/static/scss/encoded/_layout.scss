@@ -312,13 +312,9 @@ body.is-full-screen {
 				}
 			}
 
-			a {
-				color : #b0b0b0;
-			}
-
-			a:hover, a:active {
+			>div>a:hover {
 				text-decoration: none !important;
-				color: #000000;
+				color:#ffffff;
 			}
 		}
 	}
