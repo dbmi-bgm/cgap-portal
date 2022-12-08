@@ -113,7 +113,7 @@ export class YoutubeVideoEmbed extends React.Component {
             `${YT_IMG_URL}/vi_webp/${embedID}/${posterSize}.webp`:
             `${YT_IMG_URL}/vi_webp/${playlistCoverID}/${posterSize}.webp`;
 
-        const aspectRatio = `${aspectHeight} / ${aspectWidth}`;
+        const aspectRatio = `${(aspectHeight / aspectWidth) * 100}%`;
 
         return (
             <React.Fragment>
@@ -130,10 +130,15 @@ export class YoutubeVideoEmbed extends React.Component {
                     data-title={videoTitle}
                     style={{
                         backgroundImage: `url(${posterURL})`,
-                        aspectRatio,
-                        '--aspect-ratio': aspectRatio
+                        '--aspect-ratio': aspectRatio,
+                        paddingBottom: aspectRatio
                     }}
                 >
+                    <button
+                        type="button"
+                        className="youtube-embed-fake-play-btn"
+                    >
+                    </button>
                     {
                         showVideo ? this.getIframeJSX(): null
                     }
