@@ -51,11 +51,15 @@ export class YoutubeVideoEmbed extends React.Component {
             shouldAutoplay,
         } = this.props;
 
+        const {
+            showVideo
+        } = this.state;
+
         // Be extra careful with this, since it's going raw into the iframe SRC
         const embedID = encodeURIComponent(videoID);
 
         // Lazy loading video as playlist or individual
-        const autoplay = shouldAutoplay ? "1" : "0";
+        const autoplay = shouldAutoplay || (!shouldAutoplay && showVideo) ? "1" : "0";
         const videoEmbedURL = isPlaylist ?
             `${YOUTUBE_BASE_URL}/embed/videoseries?autoplay=${autoplay}&list=${embedID}`:
             `${YOUTUBE_BASE_URL}/embed/${embedID}?autoplay=${autoplay}&state=1`;
@@ -66,9 +70,8 @@ export class YoutubeVideoEmbed extends React.Component {
             <iframe
                 src={videoEmbedURL}
                 title={videoTitle}
-                // iFrameClass={iFrameClass}
-                width="560"
-                height="315"
+                width="560" // not really in use
+                height="315" // not really in use
                 frameBorder="0"
                 allow={`accelerometer;${shouldAutoplay ? " autoplay;": ""} encrypted-media; gyroscope; picture-in-picture`}
                 allowFullScreen
@@ -138,6 +141,7 @@ export class YoutubeVideoEmbed extends React.Component {
                         type="button"
                         className="youtube-embed-fake-play-btn"
                     >
+                        <i className="icon icon-play fas"></i>
                     </button>
                     {
                         showVideo ? this.getIframeJSX(): null
