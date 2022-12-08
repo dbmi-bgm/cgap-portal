@@ -103,9 +103,21 @@ export class YoutubeVideoEmbed extends React.Component {
             return null;
         }
 
+        // Calculate aspect ratio
+        const aspectRatio = `${(aspectHeight / aspectWidth) * 100}%`;
+        const embedWrapperStyle = {
+            '--aspect-ratio': aspectRatio,
+            paddingBottom: aspectRatio
+        };
+
         if (shouldAutoplay) {
             // Just render the video in the iFrame immediately
-            return this.getIframeJSX();
+            return (
+                <div className="youtube-embed-lazyload-poster"
+                    style={embedWrapperStyle}>
+                    {this.getIframeJSX()}
+                </div>
+            );
         }
 
         // Ensure this fits in a URL
@@ -116,8 +128,7 @@ export class YoutubeVideoEmbed extends React.Component {
             `${YT_IMG_URL}/vi_webp/${embedID}/${posterSize}.webp`:
             `${YT_IMG_URL}/vi_webp/${playlistCoverID}/${posterSize}.webp`;
 
-        const aspectRatio = `${(aspectHeight / aspectWidth) * 100}%`;
-
+        embedWrapperStyle.backgroundImage = `url(${posterURL})`;
         return (
             <React.Fragment>
                 {/* Pre-loading the image URL */}
@@ -131,11 +142,7 @@ export class YoutubeVideoEmbed extends React.Component {
                     onPointerOver={this.preconnectToYoutube}
                     onClick={this.showIframe}
                     data-title={videoTitle}
-                    style={{
-                        backgroundImage: `url(${posterURL})`,
-                        '--aspect-ratio': aspectRatio,
-                        paddingBottom: aspectRatio
-                    }}
+                    style={embedWrapperStyle}
                 >
                     <button
                         type="button"
