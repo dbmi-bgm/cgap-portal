@@ -141,38 +141,21 @@
         "uuid": "76a1471a-a9cd-4192-a965-470e241308e3"
     },
     {
-        "file": "/docs/public/help/file_uploads_1.md",
-        "name": "help.submission.file_uploads.1",
+        "file": "/docs/public/help/file_uploads.html",
+        "name": "help.submission.file_uploads",
         "title": "Uploading Files",
         "status": "public",
         "aliases": [
             "cgap-core:file-submission-info-1"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": true,
             "default_open": true
         },
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "section_type": "Page Section",
         "uuid": "7402da3f-d178-4527-92f3-c22c7496ba7e"
-    },
-    {
-        "file": "/docs/public/help/file_uploads_2.md",
-        "name": "help.submission.file_uploads.2",
-        "title": "Tutorial Video: Uploading Local Files ",
-        "status": "public",
-        "aliases": [
-            "cgap-core:file-submission-info-2"
-        ],
-        "options": {
-            "filetype": "md",
-            "collapsible": true,
-            "default_open": true
-        },
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "section_type": "Page Section",
-        "uuid": "3118d658-e02b-43c4-acab-9380b176a31b"
     },
     {
         "file": "/docs/public/help/logging_in.md",

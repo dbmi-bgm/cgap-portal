@@ -7,11 +7,10 @@
             "cgap-core:file-upload-help-page"
         ],
         "content": [
-            "7402da3f-d178-4527-92f3-c22c7496ba7e",
-            "3118d658-e02b-43c4-acab-9380b176a31b"
+            "7402da3f-d178-4527-92f3-c22c7496ba7e"
         ],
         "table-of-contents": {
-            "enabled": true,
+            "enabled": false,
             "header-depth": 4
         },
         "uuid": "de46e080-b53b-40cd-9038-c174b72eacc2"
