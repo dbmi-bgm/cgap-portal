@@ -2,7 +2,7 @@
  * Much of this code was inspired by https://www.npmjs.com/package/react-lite-youtube-embed
  *
  * @TODO: Review the security policy update that to allows requests to Youtube, etc. and get this working.
- * @TODO: Complete styling for lazy loader... also WHY is it loading even though state has not told it to yet?
+ * @TODO: Add playlist support (currently probably? broken)
  */
 
 import { patchedConsoleInstance as console } from "@hms-dbmi-bgm/shared-portal-components/es/components/util/patched-console";
@@ -11,8 +11,8 @@ import PropTypes from "prop-types";
 import _ from "underscore";
 
 
-const YOUTUBE_BASE_URL = "https://www.youtube-nocookie.com"; // By default, using the URL that doesn't store cookies (sorry, Goog)
-const YT_IMG_URL = "https://i.ytimg.com"; // Youtube's thumbnail image server (probably does store cookies, but no alts)
+const YOUTUBE_BASE_URL = "https://www.youtube.com";
+const YT_IMG_URL = "https://i.ytimg.com";
 
 
 export class YoutubeVideoEmbed extends React.Component {
