@@ -1143,7 +1143,7 @@ export default class App extends React.PureComponent {
 
         const contentSecurityPolicyStr = [
             "default-src 'self'",
-            "img-src 'self' https://* data: https://i.ytimg.com",
+            "img-src 'self' https://* https://i.ytimg.com data:",
             "child-src blob:",
             // Allowing unsafe-eval temporarily re: 'box-intersect' dependency of some HiGlass tracks.
             "frame-src https://www.google.com/recaptcha/ https://www.youtube.com",
