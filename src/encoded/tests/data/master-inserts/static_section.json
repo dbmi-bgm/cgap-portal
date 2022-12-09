@@ -260,14 +260,14 @@
         "uuid": "3a66db99-f17a-4a63-b1d9-64e729339570"
     },
     {
-        "file": "/docs/public/help/genelist.md",
+        "file": "/docs/public/help/genelist.html",
         "name": "help.genelist_help",
         "status": "public",
         "aliases": [
             "hms-dbmi:genelist_help"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": false,
             "default_open": true
         },

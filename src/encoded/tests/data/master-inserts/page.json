@@ -63,7 +63,7 @@
             "1172b73d-deb4-476c-aaed-ee212ede9a10"
         ],
         "table-of-contents": {
-            "enabled": true,
+            "enabled": false,
             "skip-depth": 1,
             "header-depth": 4,
             "include-top-link": false
