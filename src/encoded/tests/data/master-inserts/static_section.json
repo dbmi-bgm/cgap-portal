@@ -1,24 +1,6 @@
 [
     {
-        "file": "/docs/public/help/family_history_4.md",
-        "name": "help.submission.family-history.4",
-        "title": "Tutorial Videos",
-        "status": "public",
-        "aliases": [
-            "cgap-core:family-history-help-4"
-        ],
-        "options": {
-            "filetype": "md",
-            "collapsible": true,
-            "default_open": true
-        },
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "section_type": "Page Section",
-        "uuid": "1d7f6774-2b68-4fce-af7c-73eb078ebaba"
-    },
-    {
-        "file": "/docs/public/help/family_history_3.md",
+        "file": "/docs/public/help/family_history_3.html",
         "name": "help.submission.family-history.3",
         "title": "Submitting the Family History Spreadsheet",
         "status": "public",
@@ -26,7 +8,7 @@
             "cgap-core:family-history-help-3"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": true,
             "default_open": true
         },
@@ -71,7 +53,7 @@
         "uuid": "d48a3bda-232b-425c-a46f-42816524f003"
     },
     {
-        "file": "/docs/public/help/family_history_2.md",
+        "file": "/docs/public/help/family_history_2.html",
         "name": "help.submission.family-history.2",
         "title": "Family History Spreadsheet Format",
         "status": "public",
@@ -79,7 +61,7 @@
             "cgap-core:family-history-help-2"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": true,
             "default_open": false
         },
@@ -89,25 +71,7 @@
         "uuid": "cdf07b95-eb9c-467d-8918-b45a34003ae0"
     },
     {
-        "file": "/docs/public/help/accessioning_4.md",
-        "name": "help.submission.accessioning.4",
-        "title": "Tutorial Videos",
-        "status": "public",
-        "aliases": [
-            "cgap-core:accessioning-info4"
-        ],
-        "options": {
-            "filetype": "md",
-            "collapsible": true,
-            "default_open": true
-        },
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "section_type": "Page Section",
-        "uuid": "75c64774-359b-4d6c-8e36-60cd885f0d23"
-    },
-    {
-        "file": "/docs/public/help/accessioning_3.md",
+        "file": "/docs/public/help/accessioning_3.html",
         "name": "help.submission.accessioning.3",
         "title": "Submitting the Spreadsheet",
         "status": "public",
@@ -115,7 +79,7 @@
             "cgap-core:accessioning-info3"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": true,
             "default_open": true
         },
@@ -143,7 +107,7 @@
         "uuid": "9333c5b8-de6f-49d9-ac08-1b53c848c92e"
     },
     {
-        "file": "/docs/public/help/family_history_1.md",
+        "file": "/docs/public/help/family_history_1.html",
         "name": "help.submission.family-history.1",
         "title": "Submitting Family History",
         "status": "public",
@@ -151,7 +115,7 @@
             "cgap-core:family-history-help"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": false,
             "default_open": true
         },
@@ -313,7 +277,7 @@
         "uuid": "1172b73d-deb4-476c-aaed-ee212ede9a10"
     },
     {
-        "file": "/docs/public/help/accessioning_2.md",
+        "file": "/docs/public/help/accessioning_2.html",
         "name": "help.submission.accessioning.2",
         "title": "Filling the Spreadsheet",
         "status": "public",
@@ -321,7 +285,7 @@
             "cgap-core:accessioning-info2"
         ],
         "options": {
-            "filetype": "md",
+            "filetype": "html",
             "collapsible": true,
             "default_open": false
         },
