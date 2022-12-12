@@ -235,7 +235,8 @@ def test_clear_db_es_contents_main():
                             clear_db_es_contents_main([config_uri])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, None),
                                                                     only_envs=[],
-                                                                    skip_es=False)
+                                                                    skip_es=False,
+                                                                    allow_prod=False)
 
                         with input_mocked(
                                 # No input prompting will occur because --no-confirm was supplied.
@@ -244,7 +245,8 @@ def test_clear_db_es_contents_main():
                             clear_db_es_contents_main([config_uri, "--no-confirm"])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, None),
                                                                     only_envs=[],
-                                                                    skip_es=False)
+                                                                    skip_es=False,
+                                                                    allow_prod=False)
 
                         with input_mocked(
                                 # We'll be prompted for the environment name to confirm.
@@ -254,7 +256,8 @@ def test_clear_db_es_contents_main():
                             clear_db_es_contents_main([config_uri, "--app-name", appname])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
                                                                     only_envs=[],
-                                                                    skip_es=False)
+                                                                    skip_es=False,
+                                                                    allow_prod=False)
 
                         with input_mocked(
                                 # We'll be prompted for the environment name to confirm.
@@ -264,7 +267,8 @@ def test_clear_db_es_contents_main():
                             clear_db_es_contents_main([config_uri, "--app-name", appname, '--skip-es'])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
                                                                     only_envs=[],
-                                                                    skip_es=True)
+                                                                    skip_es=True,
+                                                                    allow_prod=False)
 
                         with input_mocked(
                                 # No input prompting will occur because --only-if-env was supplied.
@@ -273,7 +277,8 @@ def test_clear_db_es_contents_main():
                             clear_db_es_contents_main([config_uri, "--app-name", appname, "--only-if-env", TEST_ENV])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
                                                                     only_envs=[TEST_ENV],
-                                                                    skip_es=False)
+                                                                    skip_es=False,
+                                                                    allow_prod=False)
 
                         with input_mocked(
                                 # We'll be prompted for the environment name to confirm.
@@ -284,7 +289,8 @@ def test_clear_db_es_contents_main():
                                                        "--confirm"])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
                                                                     only_envs=[TEST_ENV],
-                                                                    skip_es=False)
+                                                                    skip_es=False,
+                                                                    allow_prod=False)
 
                         with input_mocked(
                                 # No input prompting will occur because --only-if-env was supplied.
@@ -294,4 +300,5 @@ def test_clear_db_es_contents_main():
                                                        "--only-if-env", f"{TEST_ENV},{OTHER_ENV}"])
                             mock_run_clear_db_es.assert_called_with(app=mocked_get_app(config_uri, appname),
                                                                     only_envs=[TEST_ENV, OTHER_ENV],
-                                                                    skip_es=False)
+                                                                    skip_es=False,
+                                                                    allow_prod=False)

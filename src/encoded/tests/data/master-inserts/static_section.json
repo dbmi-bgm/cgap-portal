@@ -1,5 +1,23 @@
 [
     {
+        "file": "/docs/public/help/family_history_4.md",
+        "name": "help.submission.family-history.4",
+        "title": "Tutorial Videos",
+        "status": "public",
+        "aliases": [
+            "cgap-core:family-history-help-4"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "1d7f6774-2b68-4fce-af7c-73eb078ebaba"
+    },
+    {
         "file": "/docs/public/help/family_history_3.md",
         "name": "help.submission.family-history.3",
         "title": "Submitting the Family History Spreadsheet",
@@ -16,6 +34,24 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "section_type": "Page Section",
         "uuid": "f99fbe38-962d-4370-9107-a703544f15ad"
+    },
+    {
+        "file": "/docs/public/help/video_tutorials.md",
+        "name": "help.video-tutorials",
+        "title": "Link to CGAP Training Youtube Channel",
+        "status": "public",
+        "aliases": [
+            "cgap-core:video-tutorials"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "cbda91c1-d898-41b5-a5e9-8a8343398cfe"
     },
     {
         "file": "/docs/public/help/tutorials_1.html",
@@ -89,6 +125,24 @@
         "uuid": "cdf07b95-eb9c-467d-8918-b45a34003ae0"
     },
     {
+        "file": "/docs/public/help/accessioning_4.md",
+        "name": "help.submission.accessioning.4",
+        "title": "Tutorial Videos",
+        "status": "public",
+        "aliases": [
+            "cgap-core:accessioning-info4"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "75c64774-359b-4d6c-8e36-60cd885f0d23"
+    },
+    {
         "file": "/docs/public/help/accessioning_3.md",
         "name": "help.submission.accessioning.3",
         "title": "Submitting the Spreadsheet",
@@ -159,12 +213,12 @@
         "uuid": "76a1471a-a9cd-4192-a965-470e241308e3"
     },
     {
-        "file": "/docs/public/help/file_uploads.md",
-        "name": "help.submission.file_uploads",
+        "file": "/docs/public/help/file_uploads_1.md",
+        "name": "help.submission.file_uploads.1",
         "title": "Uploading Files",
         "status": "public",
         "aliases": [
-            "cgap-core:file-submission-info"
+            "cgap-core:file-submission-info-1"
         ],
         "options": {
             "filetype": "md",
@@ -174,6 +228,23 @@
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "section_type": "Page Section",
         "uuid": "7402da3f-d178-4527-92f3-c22c7496ba7e"
+    },
+    {
+        "file": "/docs/public/help/file_uploads_2.md",
+        "name": "help.submission.file_uploads.2",
+        "title": "Tutorial Video: Uploading Local Files ",
+        "status": "public",
+        "aliases": [
+            "cgap-core:file-submission-info-2"
+        ],
+        "options": {
+            "filetype": "md",
+            "collapsible": true,
+            "default_open": true
+        },
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "section_type": "Page Section",
+        "uuid": "3118d658-e02b-43c4-acab-9380b176a31b"
     },
     {
         "file": "/docs/public/help/logging_in.md",

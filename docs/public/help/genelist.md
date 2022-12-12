@@ -1,6 +1,6 @@
 ## Submission Methods
 Gene lists can be submitted directly on the CGAP
-website or with command line tools. 
+website or with command line tools.
 
 For the web interface, click on the ["Submit New 
 Gene List(s)"](/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene%20List)
@@ -11,7 +11,9 @@ with the SubmitCGAP package, which can be found
 [here](https://github.com/dbmi-bgm/SubmitCGAP)
 along with documentation on system requirements
 and appropriate commands. 
- 
+
+For a tutorial video on gene list creation and submission, refer to the last section on this page.
+All tutorial videos can be found on the [CGAP Training Youtube channel](https://www.youtube.com/@cgaptraining).
 
 ## File Formats
 Gene lists can be uploaded as either text (.txt)
@@ -120,3 +122,6 @@ be downloaded.
 This facilitates updating of existing gene lists by
 downloading the document, adding/removing genes as
 desired, and then resubmitting the document. 
+
+## Tutorial Video: Gene List Creation & Submission
+[<img src="https://github.com/dbmi-bgm/cgap-portal/raw/video_tutorial_section/docs/public/help/help_linked_docs/genelists.png" width="560" height="315"/>](https://www.youtube.com/watch?v=TKAOlqrki4s "Gene List Submission")

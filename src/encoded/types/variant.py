@@ -632,7 +632,7 @@ class VariantSample(Item):
 
     @calculated_property(schema={
         "title": "AF",
-        "description": "Allele Frequency",
+        "description": "Variant Allele Fraction",
         "type": "number"
     })
     def AF(self, AD=None):
@@ -960,7 +960,7 @@ def update_project_notes_process(context, request):
 
         elif vs_field_name in remove_from_project_notes:
             uuid_to_process = remove_from_project_notes[vs_field_name]
-        
+
         if uuid_to_process is None:
             return # skip
 
@@ -1093,7 +1093,7 @@ def update_project_notes_process(context, request):
             # Set existing note's status to "obsolete", and populate previous/superseding field if applicable
             notes_patch_payloads[existing_item_from_project_at_id] = notes_patch_payloads.get(existing_item_from_project_at_id, {})
             notes_patch_payloads[existing_item_from_project_at_id]["status"] = "obsolete"
-            # Link to existing Note from newly-shared Note            
+            # Link to existing Note from newly-shared Note
             notes_patch_payloads[newly_shared_item_at_id]["previous_note"] = existing_item_from_project_at_id
             # Link to newly-shared Note from existing note (adds new PATCH request)
             notes_patch_payloads[existing_item_from_project_at_id] = notes_patch_payloads.get(existing_item_from_project_at_id, {})
@@ -1179,7 +1179,7 @@ def update_project_notes_process(context, request):
     return {
         "status" : "success",
         "results": {
-            "Gene": { 
+            "Gene": {
                 "patched_count": gene_patch_count
             },
             "StructuralVariant" if is_structural_vs else "Variant": {
@@ -1191,7 +1191,7 @@ def update_project_notes_process(context, request):
             },
             "StructuralVariantSample" if is_structural_vs else "VariantSample": {
                 "queued_for_indexing": affected_variant_sample_uuids
-            }, 
+            },
         }
     }
 

@@ -489,17 +489,6 @@
             }
         }
     },
-    "paired_end": {
-        "paired_end": {
-            "title": "Paired End Identifier",
-            "description": "Which pair the file belongs to (if paired end library)",
-            "type": "string",
-            "enum": [
-                "1",
-                "2"
-            ]
-        }
-    },
     "meta_workflow_runs": {
         "meta_workflow_runs": {
             "title": "MetaWorkflowRuns",

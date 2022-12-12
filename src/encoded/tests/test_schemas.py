@@ -11,7 +11,7 @@ from ..commands.order_schema_columns_and_facets import order_schema_columns_and_
 from .util import pluralize
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
 SCHEMA_FILES = [

@@ -6,12 +6,58 @@ cgap-portal
 Change Log
 ----------
 
+12.0.0
+======
+
+* ElasticSearch 7 support
+* SQLAlchemy 1.4 support
+* Cascading library updates to support the above
+* B-Tree index on sid column to optimize indexing
+* Fixes to test segmentation to improve overall test runtime and reliability
+* Remove support for Python 3.7
+* Upgrade workflow version 7 -> version 8, supporting array of strings for EC2 instance type
+* Provision custom inserts function, allowing admin users to be configured from initial load in the GAC
+
+
+11.3.3
+======
+
+`PR 672: Embedded Youtube videos <https://github.com/dbmi-bgm/cgap-portal/pull/672>`_
+
+* Embedded YouTube tutorial videos to static help pages
+
+
+11.3.2
+======
+
+`PR 671: FASTQ submission paired end <https://github.com/dbmi-bgm/cgap-portal/pull/671>`_
+
+* Add FASTQ paired-end property during file submission
+
+
+11.3.1
+======
+
+`PR 669: File Paired-end <https://github.com/dbmi-bgm/cgap-portal/pull/669>`_
+
+* Place paired-end property on abstract File item so available on all child classes
+
+
+11.3.0
+======
+
+`PR 663: Cohort browser <https://github.com/dbmi-bgm/cgap-portal/pull/663>`_
+
+* Add cohort browser and statistical analysis table
+
+
 11.2.0
 ======
 
 `PR 657: Pedigree diseases <https://github.com/dbmi-bgm/cgap-portal/pull/657>`_
 
 * Add support for disorders to the pedigree visualization
+
 
 11.1.0
 ======
@@ -21,12 +67,14 @@ Change Log
 * Adds set of inserts for automated Cypress integration tests for UI
 * Includes folder of Python scripts used to create these inserts
 
+
 11.0.3
 ======
 
 `PR 638: MetaWorkflowRun - WorkflowViz <https://github.com/dbmi-bgm/cgap-portal/pull/638>`_
 
 * Add UI/workflow visualization support for MetaWorkflowRun items
+
 
 11.0.2
 ======
@@ -144,7 +192,6 @@ code could not have worked. More specifically...
 * Upgrader for Cohort v1 --> v2
 * Creation of CohortAnalysis item
 * Inserts updates for existing Cohort + addition of CohortAnalysis insert
-
 
 10.5.0
 ======

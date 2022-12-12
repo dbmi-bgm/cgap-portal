@@ -139,6 +139,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                       SvTrack,
                       GeneralVcfTrack,
                       CohortTrack,
+                      GeneListTrack,
                       BigwigDataFetcher
                     } = higlassDependencies;
 
@@ -191,6 +192,11 @@ export class HiGlassPlainContainer extends React.PureComponent {
                         name: 'CohortTrack',
                         track: CohortTrack,
                         config: CohortTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'GeneListTrack',
+                        track: GeneListTrack,
+                        config: GeneListTrack.config,
                     });
                     higlassRegister(
                       {
