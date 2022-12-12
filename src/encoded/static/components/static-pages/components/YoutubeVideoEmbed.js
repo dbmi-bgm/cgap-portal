@@ -49,20 +49,22 @@ export class YoutubeVideoEmbed extends React.Component {
             videoTitle,
             isPlaylist,
             shouldAutoplay,
+            params
         } = this.props;
 
         const {
             showVideo
         } = this.state;
 
-        // Be extra careful with this, since it's going raw into the iframe SRC
+        // Be extra careful with these, since they're going raw into the iframe SRC
         const embedID = encodeURIComponent(videoID);
+        const paramsEn = params ? "&" + encodeURIComponent(params): "";
 
         // Lazy loading video as playlist or individual
         const autoplay = shouldAutoplay || (!shouldAutoplay && showVideo) ? "1" : "0";
         const videoEmbedURL = isPlaylist ?
             `${YOUTUBE_BASE_URL}/embed/videoseries?autoplay=${autoplay}&list=${embedID}`:
-            `${YOUTUBE_BASE_URL}/embed/${embedID}?autoplay=${autoplay}&state=1`;
+            `${YOUTUBE_BASE_URL}/embed/${embedID}?autoplay=${autoplay}&state=1${paramsEn}`;
 
         return (
             <iframe
@@ -166,6 +168,7 @@ YoutubeVideoEmbed.defaultProps = {
     aspectWidth: 16,                    // Self-explanatory
     shouldAutoplay: false,              // Should the video autoplay by default?
     isPlaylist: false,                  // Is the youtube video's ID an embedded playlist?
+    params: ""                          // Used for time start strings, etc. Should be formatted 'key=value&key2=value2'
 };
 
 YoutubeVideoEmbed.propTypes = {
@@ -176,4 +179,5 @@ YoutubeVideoEmbed.propTypes = {
     aspectWidth: PropTypes.number,
     shouldAutoplay: PropTypes.bool,
     isPlaylist: PropTypes.bool,
+    params: PropTypes.string // @TODO: update this to be more specific to how params should be formatted
 };
