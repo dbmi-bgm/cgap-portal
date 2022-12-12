@@ -163,7 +163,7 @@
 
     <h2>Tutorial Video: Gene List Creation & Submission</h2>
 
-    {/* <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
+    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
         <div>
             <YoutubeVideoEmbed
                 shouldAutoplay={false}
@@ -171,5 +171,5 @@
                 videoTitle="Submitting Gene Lists"
             />
         </div>
-    </div> */}
+    </div>
 </div>

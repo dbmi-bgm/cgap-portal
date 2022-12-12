@@ -38,7 +38,7 @@
 
     <h4>Tutorial Video: Case Submission via CGAP Web UI</h4>
 
-    {/* <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
+    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
         <div>  
             <YoutubeVideoEmbed
                 shouldAutoplay={false}
@@ -46,7 +46,7 @@
                 videoTitle="Case Submission via CGAP Web UI"
             />
         </div>
-    </div> */}
+    </div>
 
     <h4>Option 2: Submission with the python package</h4>
 
@@ -78,7 +78,7 @@
 
     <h4>Tutorial Video: Case Submission using the SubmitCGAP Python Package</h4>
 
-    {/* <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
+    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
         <div>  
             <YoutubeVideoEmbed
                 shouldAutoplay={false}
@@ -87,5 +87,5 @@
                 params="start=151"
             />
         </div>
-    </div> */}
+    </div>
 </div>

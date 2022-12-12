@@ -205,7 +205,6 @@
 
     <h4>Tutorial Video: Filling the Family History Spreadsheet</h4>
 
-    {/*
     <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
         <div>  
             <YoutubeVideoEmbed
@@ -216,5 +215,4 @@
             />
         </div>
     </div>
-    */}
 </div>
