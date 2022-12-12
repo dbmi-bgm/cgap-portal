@@ -85,44 +85,38 @@
 		with the command:
 	</p>
 
-	<pre>
-		<code>
-			BUCKETS=&lt;S3 buckets to mount&gt; SUBMISSION_UUIDS=&lt;Ingestion Submission UUID(s) for submitted case(s)&gt; bash upload_files.sh
-		</code>
-	</pre>
+	<pre><code>BUCKETS=&lt;S3 buckets to mount&gt; SUBMISSION_UUIDS=&lt;Ingestion Submission UUID(s) for submitted case(s)&gt; bash upload_files.sh</code></pre>
 
 	<p>
 		will mount the indicated bucket(s) and upload the
 		appropriate files to CGAP if found within the buckets.
 	</p>
 
-	<pre>
-		<code>
-			#!/bin/bash
+	<pre><code>
+	#!/bin/bash
 
-			# Install s3fs-fuse for mounting S3 buckets
-			sudo amazon-linux-extras install epel -y
-			sudo yum install s3fs-fuse -y
+	# Install s3fs-fuse for mounting S3 buckets
+	sudo amazon-linux-extras install epel -y
+	sudo yum install s3fs-fuse -y
 
-			# Mount buckets to ~/upload_files directory
-			mkdir upload_files
-			for BUCKET in $BUCKETS
-			do
-				s3fs $BUCKET ~/upload_files/ -o iam_role
-			done
+	# Mount buckets to ~/upload_files directory
+	mkdir upload_files
+	for BUCKET in $BUCKETS
+	do
+		s3fs $BUCKET ~/upload_files/ -o iam_role
+	done
 
-			# Create virtual env for package installation
-			python3 -m venv ~/cgap_submission
-			source ~/cgap_submission/bin/activate
+	# Create virtual env for package installation
+	python3 -m venv ~/cgap_submission
+	source ~/cgap_submission/bin/activate
 
-			# Run SubmitCGAP with mounted files
-			pip install submit_cgap
-			for UUID in $SUBMISSION_UUIDS
-			do
-				resume-uploads $UUID -u ~/upload_files/ -nq -sf
-			done
-		</code>
-	</pre>
+	# Run SubmitCGAP with mounted files
+	pip install submit_cgap
+	for UUID in $SUBMISSION_UUIDS
+	do
+		resume-uploads $UUID -u ~/upload_files/ -nq -sf
+	done
+	</code></pre>
 
 
 	<p>

@@ -38,13 +38,11 @@
         and MYL2, a text submission would simply include: 
     </p>
 
-    <pre>
-        <code>
-            Title: Cardiomyopathy
-            MYH7
-            MYL2
-        </code>
-    </pre>
+    <pre><code>
+    Title: Cardiomyopathy
+    MYH7
+    MYL2
+    </code></pre>
 
     <p>
         A formatted Excel file that submits the same
@@ -137,14 +135,12 @@
         would look like:
     </p>
 
-    <pre>
-        <code>
-            Title: Cardiomyopathy
-            Cases: GAPCAFX11111, GAPCAFX11112
-            MYH7
-            MYL2
-        </code>
-    </pre>
+    <pre><code>
+    Title: Cardiomyopathy
+    Cases: GAPCAFX11111, GAPCAFX11112
+    MYH7
+    MYL2
+    </code></pre>
 
     <h2>Viewing or Editing a Gene List</h2>
     <p>

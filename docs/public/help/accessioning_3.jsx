@@ -61,22 +61,15 @@
         Briefly, the basic commands are as follows:
     </p>
 
-    <pre>
-        <code>
-            submit-metadata-bundle &lt;cases.xlsx&gt; -s &lt;CGAP_server_url&gt; -v
-        </code>
-    </pre>
+    <pre className="mt-2"><code>submit-metadata-bundle &lt;cases.xlsx&gt; -s &lt;CGAP_server_url&gt; -v</code></pre>
 
     <p>
         The above command will do a validate-only dry run of your submission, to ensure that there
         are no formatting errors. Once this passes, the following command can be run to submit
         all the case metadata:
     </p>
-    <pre>
-        <code>
-            submit-metadata-bundle &lt;cases.xlsx&gt; -s &lt;CGAP_server_url&gt;
-        </code>
-    </pre>
+
+    <pre className="mt-2"><code>submit-metadata-bundle &lt;cases.xlsx&gt; -s &lt;CGAP_server_url&gt;</code></pre>
 
     <p>
         For more information on the commands and their optional arguments, see the

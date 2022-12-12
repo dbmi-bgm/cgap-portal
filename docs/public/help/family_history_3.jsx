@@ -56,22 +56,14 @@
         with the added <code>-t</code> or <code>--ingestion_type</code> option:
     </p>
 
-    <pre>
-        <code>
-            submit-metadata-bundle &lt;pedigree.xlsx&gt; -s &lt;CGAP_server_url&gt; -t family_history -v
-        </code>
-    </pre>
+    <pre className="mt-2"><code>submit-metadata-bundle &lt;pedigree.xlsx&gt; -s &lt;CGAP_server_url&gt; -t family_history -v</code></pre>
 
     <p>
         As with submitting cases, the <code>-v</code> flag runs a validate-only dry run to check formatting of the spreadsheet.
         When that passes, the command can be run without that option:
     </p>
 
-    <pre>
-        <code>
-            submit-metadata-bundle &lt;pedigree.xlsx&gt; -s &lt;CGAP_server_url&gt; -t family_history
-        </code>
-    </pre>
+    <pre className="mt-2"><code>submit-metadata-bundle &lt;pedigree.xlsx&gt; -s &lt;CGAP_server_url&gt; -t family_history</code></pre>
 
     <h4>Tutorial Video: Family History Submission using the SubmitCGAP Python Package</h4>
 
