@@ -310,7 +310,6 @@ class QcTestConstants:
 
 
 class TestQcFlagger:
-
     def qc_flagger(self):
         return sample_type_module.QcFlagger
 
@@ -339,7 +338,6 @@ class TestQcFlagger:
         default,
         expected,
     ):
-        """Test flag assignment by value and warn/fail limits."""
         result = self.qc_flagger().assign_flag(
             value, fail_upper, fail_lower, warn_upper, warn_lower, default
         )
@@ -371,7 +369,6 @@ class TestQcFlagger:
         ],
     )
     def test_flag_bam_coverage(self, coverage, is_wgs, is_wes, expected_log, expected):
-        """Unit test flagging BAM coverage."""
         mocked_sample = self.make_mocked_sample(is_wgs=is_wgs, is_wes=is_wes)
         with mock.patch.object(sample_type_module, "log") as mocked_log:
             result = self.qc_flagger().flag_bam_coverage(coverage, sample=mocked_sample)
@@ -397,11 +394,6 @@ class TestQcFlagger:
         ],
     )
     def test_flag_sex_consistency(self, predicted_sex, individual_sex, expected):
-        """Unit test flagging sex consistency.
-
-        Sample properties are passed in but irrelevant to the flag, so
-        empty dictionary passed here.
-        """
         mocked_individual = QcTestConstants.mocked_individual_for_qc()
         mocked_individual.sex = individual_sex
         result = self.qc_flagger().flag_sex_consistency(
@@ -420,7 +412,6 @@ class TestQcFlagger:
         ],
     )
     def test_flag_heterozygosity_ratio(self, heterozygosity_ratio, expected):
-        """Unit test flagging SNV heterozygosity ratio."""
         result = self.qc_flagger().flag_heterozygosity_ratio(heterozygosity_ratio)
         assert result == expected
 
@@ -449,7 +440,6 @@ class TestQcFlagger:
         expected_log,
         expected,
     ):
-        """Unit test flagging SNV Ts/Tv ratio."""
         mocked_sample = self.make_mocked_sample(is_wgs=is_wgs, is_wes=is_wes)
         with mock.patch.object(sample_type_module, "log") as mocked_log:
             result = self.qc_flagger().flag_transition_transversion_ratio(
@@ -1088,9 +1078,6 @@ class TestQualityMetricParser:
         qc_display,
         expected,
     ):
-        """Unit test collection and processing of data to create QC
-        display.
-        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "collect_quality_metrics",
@@ -1161,9 +1148,6 @@ class TestQualityMetricParser:
         quality_metric_types,
         expected_add_quality_metric_call_types,
     ):
-        """Unit test collecting appropriate FilesProcessed off of a
-        SampleProcessing.
-        """
         processed_files = [QcTestConstants.RESULT for item in quality_metric_types]
         with mock.patch.object(
             sample_type_module,
@@ -1297,7 +1281,11 @@ class TestQualityMetricParser:
 
 @pytest.mark.workbook
 def test_quality_control_metrics(es_testapp, workbook):
-    """Integrated testing of calcprop with workbook items."""
+    """Integrated testing of calcprop with workbook items.
+
+    Tests calcprop on items below as they exist in inserts, then
+    manipulates one item to ensure corresponding changes in calcprop.
+    """
     sample_processing_without_samples_uuid = "589fee08-e054-4786-862d-f7250a435793"
     sample_processing_one_sample_uuid = "589fee08-e054-4786-862d-f7250a435794"
     sample_processing_two_samples_uuid = "8471a80f-81c6-4663-a182-c2955c21c6ce"
