@@ -26,7 +26,7 @@
         "mapping stats": {
             "total reads": 987654321
         },
-        "sample": "Sample_ID",
+        "sample": "Another_Sample_ID",
         "overall_quality_status": "PASS"
     }
 ]

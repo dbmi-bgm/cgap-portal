@@ -809,6 +809,7 @@ class SampleQcReport:
                 QcConstants.HETEROZYGOSITY_RATIO,
                 QcConstants.TRANSITION_TRANSVERSION_RATIO,
                 QcConstants.DE_NOVO_FRACTION,
+                QcConstants.COMPLETED_QCS,
             ]
         )
         | FLAGS_TO_CAPTURE
@@ -1394,6 +1395,16 @@ class SampleProcessing(Item):
                         "items": {
                             "title": "Fail Flag Property",
                             "description": "QC metric with fail flag",
+                            "type": "string",
+                        },
+                    },
+                    QcConstants.COMPLETED_QCS: {
+                        "title": "Completed QCs",
+                        "description": "Completed QC steps",
+                        "type": "array",
+                        "items": {
+                            "title": "Completed QC",
+                            "description": "Completed QC step",
                             "type": "string",
                         },
                     },

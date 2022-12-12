@@ -527,6 +527,11 @@ def title_to_snake_case(input_string):
     """Convert string title case (e.g. "Some Title") to snake case.
 
     TODO: Move to dcicutils
+    
+    :param input_string: String to convert
+    :type input_string: str
+    :return: String in snake case
+    :rtype: str
     """
     lower_string = input_string.lower()
     no_dash_string = lower_string.replace("-", " ").replace("_", " ")
@@ -538,17 +543,20 @@ def title_to_snake_case(input_string):
 def get_item(request, item_atid):
     """Get item from database via its @id.
 
-    If not found, log and return empty dict for consistency with item
-    result when found.
+    For @ids, essentially get_item_or_none that always returns dict
+    for consistency and does not require specifying collection. Useful
+    when working within calculated properties.
 
-    :param request: App request
-    :type request: pyramid.request.Request
+    NOTE: Only useful for @ids; other identifiers will NOT work as is.
+
+    :param request: Web request
+    :type request: class:`pyramid.request.Request`
     :param item_atid: Item @id
     :type item_atid: str
-    :return: Item in object view
+    :return: Item in object view, if found
     :rtype: dict
     """
-    if item_atid:
+    if isinstance(item_atid, str):
         item_collection = item_atid.split("/")[0]
         result = get_item_or_none(request, item_atid, item_collection)
         if result is None:
@@ -560,7 +568,20 @@ def get_item(request, item_atid):
 
 
 def transfer_properties(source, target, properties, property_replacements=None):
-    """"""
+    """Transfer dictionary properties, leaving source as is.
+
+    Also replace source keys if replacements provided.
+
+    :param source: Source with properties to transfer
+    :type source: dict
+    :param target: Target to receive properties
+    :type target: dict
+    :param properties: Keys of properties to transfer
+    :type properties: list[str]
+    :param property_replacements: Source property keys to replace,
+        mapping key --> replacement key
+    :type property_replacements: dict
+    """
     for property_name in properties:
         property_value = source.get(property_name)
         if property_value is not None:

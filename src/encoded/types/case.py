@@ -9,6 +9,8 @@ from .base import (
     Item,
     get_item_or_none
 )
+from .sample import QcConstants
+from ..util import get_item
 
 
 def _build_family_embeds(*, base_path):
@@ -620,20 +622,30 @@ class Case(Item):
             "description": "Quality control flags",
             "type": "object",
             "properties": {
-                "flag": {
+                QcConstants.FLAG: {
                     "title": "Overall Flag",
                     "description": "Overall QC flag",
                     "type": "string",
                 },
-                "warn": {
+                QcConstants.FLAG_WARN: {
                     "title": "Warn Flags",
                     "description": "Number of warn flags",
                     "type": "integer",
                 },
-                "fail": {
+                QcConstants.FLAG_FAIL: {
                     "title": "Fail Flags",
                     "description": "Number of fail flags",
                     "type": "integer",
+                },
+                QcConstants.COMPLETED_QCS: {
+                    "title": "Completed QCs",
+                    "description": "Completed QC steps",
+                    "type": "array",
+                    "items": {
+                        "title": "Completed QC",
+                        "description": "Completed QC step",
+                        "type": "string",
+                    },
                 },
             },
         }
@@ -642,42 +654,133 @@ class Case(Item):
         """Gather and count QC flags from SampleProcessing."""
         result = None
         if sample_processing:
-            sample_processing_item = get_item_or_none(request, sample_processing)
-            if sample_processing_item:
-                result = self._get_flags_and_completed_steps(sample_processing_item)
+            sample_processing_item = get_item(request, sample_processing)
+            quality_control_metrics = sample_processing_item.get("quality_control_metrics", [])
+            qc_metrics_collector = CaseQcMetricsCollector(quality_control_metrics)
+            result = qc_metrics_collector.get_quality_control_flags()
         return result
 
-    @staticmethod
-    def _get_flags_and_completed_steps(sample_processing):
-        """Gather and count QC flags from SampleProcessing."""
+
+class CaseQcMetricsCollector:
+    """Create QC metrics for a Case from those for its Samples."""
+
+    def __init__(self, quality_control_metrics):
+        """Constructor method.
+
+        :param quality_control_metrics: Sample QC metrics from
+            SampleProcessing
+        :type quality_control_metrics: list[dict]
+        """
+        self.quality_control_metrics = quality_control_metrics
+        self.overall_flag = None
+        self.pass_flag_present = False
+        self.fail_count = 0
+        self.warn_count = 0
+        self.sample_completed_steps = []
+        self.completed_steps = []
+        self.quality_control_flags = {}
+
+    def get_quality_control_flags(self):
+        """Create case QC metrics for calcprop.
+
+        Primary method to call for the class.
+
+        :return: Case QC metrics
+        :rtype: dict or None
+        """
         result = None
-        fail_count = 0
-        warn_count = 0
-        sample_completed_steps = []
-        qc_metrics = sample_processing.get("quality_control_metrics")
-        if qc_metrics is not None:
-            for sample_qc_metrics in qc_metrics:
-                fail_flags = sample_qc_metrics.get("fail", [])
-                fail_count += len(fail_flags)
-                warn_flags = sample_qc_metrics.get("warn", [])
-                warn_count += len(warn_flags)
-                sample_completed_steps.append(
-                    set(sample_qc_metrics.get("completed_qcs", []))
-                )
-            overall_flag = "pass"
-            if fail_count:
-                overall_flag = "fail"
-            elif warn_count:
-                overall_flag = "warn"
-            result = {
-                "flag": overall_flag,
-                "warn": warn_count,
-                "fail": fail_count,
-            }
-            if sample_completed_steps:
-                all_sample_completed_steps = sample_completed_steps.pop(0)
-                for completed_steps in sample_completed_steps:
-                    all_sample_completed_steps = all_sample_completed_steps & completed_steps
-                if all_sample_completed_steps:
-                    result["completed_qcs"] = sorted(list(all_sample_completed_steps))
+        self.collect_sample_qc_metric_data()
+        self.calculate_overall_flag()
+        self.calculate_completed_steps()
+        self.update_quality_control_flags()
+        if self.quality_control_flags:
+            result = self.quality_control_flags
         return result
+
+    def collect_sample_qc_metric_data(self):
+        """Loop through sample QC metrics once to collect data."""
+        for qc_metric in self.quality_control_metrics:
+            self.collect_flags(qc_metric)
+            self.collect_completed_steps(qc_metric)
+
+    def collect_flags(self, qc_metric):
+        """Update flag counts from sample's QC metrics.
+
+        Note: Pass flags not included in SampleProcessing calcprop, so
+        need to check for presence on any samples.
+
+        :param qc_metric: Sample QC metrics
+        :type qc_metric: dict
+        """
+        sample_fail_flags = qc_metric.get(QcConstants.FLAG_FAIL, [])
+        sample_warn_flags = qc_metric.get(QcConstants.FLAG_WARN, [])
+        if not self.pass_flag_present and not sample_fail_flags and not sample_warn_flags:
+            self.pass_flag_present = self.is_pass_flag_present(qc_metric)
+        self.fail_count += len(sample_fail_flags)
+        self.warn_count += len(sample_warn_flags)
+
+    def is_pass_flag_present(self, qc_metric):
+        """Identify if any pass flag present in sample's QC metrics.
+
+        :param qc_metric: Sample QC metrics
+        :type qc_metric: dict
+        :return: `True` if passing metric present, `False` otherwise
+        :rtype: bool
+        """
+        result = False
+        for qc_value in qc_metric.values():
+            if isinstance(qc_value, dict):
+                flag = qc_value.get(QcConstants.FLAG)
+                if flag == QcConstants.FLAG_PASS:
+                    result = True
+                    break
+        return result
+
+    def collect_completed_steps(self, qc_metric):
+        """Update attribute with sample's completed QC steps.
+
+        Store while looping through samples for later calculation.
+
+        :param qc_metric: Sample QC metrics
+        :type qc_metric: dict
+        """
+        sample_completed_steps = qc_metric.get(QcConstants.COMPLETED_QCS, [])
+        self.sample_completed_steps.append(sample_completed_steps)
+
+    def calculate_overall_flag(self):
+        """Update attribute with worst flag across samples."""
+        result = None
+        if self.fail_count:
+            result = QcConstants.FLAG_FAIL
+        elif self.warn_count:
+            result = QcConstants.FLAG_WARN
+        elif self.pass_flag_present:
+            result = QcConstants.FLAG_PASS
+        self.overall_flag = result
+
+    def calculate_completed_steps(self):
+        """Update attribute with completed steps across all samples.
+
+        For typical situations, all samples will have identical QC
+        steps, but we take intersection here as calculation.
+        """
+        case_completed_qcs = set()
+        for idx, sample_completed_steps in enumerate(self.sample_completed_steps):
+            if idx == 0:
+                case_completed_qcs |= set(sample_completed_steps)
+            else:
+                case_completed_qcs &= set(sample_completed_steps)
+        self.completed_steps = sorted(list(case_completed_qcs))
+
+    def update_quality_control_flags(self):
+        """Update attribute with properties to display in calcprop."""
+        if self.quality_control_metrics:
+            result = {
+                QcConstants.FLAG_FAIL: self.fail_count,
+                QcConstants.FLAG_WARN: self.warn_count
+            }
+            if self.overall_flag:
+                result[QcConstants.FLAG] = self.overall_flag
+            if self.completed_steps:
+                result[QcConstants.COMPLETED_QCS] = self.completed_steps
+            self.quality_control_flags = result
