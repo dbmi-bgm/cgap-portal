@@ -220,6 +220,7 @@
             shouldAutoplay={false}
             videoID="2VbYXQmS66s"
             videoTitle="Submitting Case Spreadsheets Youtube Video"
+            posterSize="maxresdefault"
         />
     </div>
 </div>
