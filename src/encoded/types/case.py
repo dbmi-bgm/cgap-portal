@@ -626,6 +626,11 @@ class Case(Item):
                     "title": "Overall Flag",
                     "description": "Overall QC flag",
                     "type": "string",
+                    "enum": [
+                        QcConstants.FLAG_PASS,
+                        QcConstants.FLAG_WARN,
+                        QcConstants.FLAG_FAIL,
+                    ],
                 },
                 QcConstants.FLAG_WARN: {
                     "title": "Warn Flags",
@@ -762,7 +767,7 @@ class CaseQcMetricsCollector:
         """Update attribute with completed steps across all samples.
 
         For typical situations, all samples will have identical QC
-        steps, but we take intersection here as calculation.
+        steps.
         """
         case_completed_qcs = set()
         for idx, sample_completed_steps in enumerate(self.sample_completed_steps):

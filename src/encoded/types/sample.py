@@ -346,7 +346,7 @@ class QcSummary:
             self.link = links.get(self.title)
 
     def get_qc_title(self, title, title_replacements):
-        """Get QC display title.
+        """Get snake case QC display title, replacing if indicated.
 
         :param title: QC title from QualityMetric
         :type title: str
@@ -445,6 +445,8 @@ class QualityMetricForQc(ItemProperties):
     def collect_qc_summaries(self):
         """Gather all sample-specific QC summaries.
 
+        Add type-specific links for summaries.
+
         :return: QC summary objects
         :rtype: list[:class:`QcSummary`]
         """
@@ -477,6 +479,9 @@ class SnvVepVcfQc(QualityMetricForQc):
 
     def get_qc_links(self):
         """Collect peddy QC links to include for display.
+
+        Identifying presence of peddy QC is fragile here since based
+        on string presence.
 
         :return: Link mapping summary title --> QC URL
         :rtype: dict or None
@@ -617,7 +622,11 @@ class FileForQc(ItemProperties):
         return result
 
     def create_quality_metric_for_qc(self, quality_metric_type):
-        """Create QualityMetric class to get the item, if exists.
+        """Create QualityMetric object for associated quality metric,
+        if it exists.
+
+        Pass in the class type instead of calculating since
+        get_quality_metric_type presumably already called.
 
         :param quality_metric_type: Class type to use for obtaining
             QualityMetric data
@@ -921,8 +930,8 @@ class SampleQcReport:
         """Remove any unexpected properties in report.
 
         Not strictly required if all set up properly elsewhere, but
-        checks to ensure only properties expected in the
-        SampleProcessing calcprop schema end up in report.
+        ensures only properties expected in the SampleProcessing
+        calcprop schema end up in report.
         """
         keys_to_delete = []
         for qc_property in self.qc_report:
