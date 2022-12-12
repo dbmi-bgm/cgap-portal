@@ -58,7 +58,7 @@ export class YoutubeVideoEmbed extends React.Component {
 
         // Be extra careful with these, since they're going raw into the iframe SRC
         const embedID = encodeURIComponent(videoID);
-        const paramsEn = params ? "&" + encodeURIComponent(params): "";
+        const paramsEn = params ? "&" + encodeURI(params): "";
 
         // Lazy loading video as playlist or individual
         const autoplay = shouldAutoplay || (!shouldAutoplay && showVideo) ? "1" : "0";
