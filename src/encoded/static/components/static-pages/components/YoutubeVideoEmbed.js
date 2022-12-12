@@ -64,8 +64,6 @@ export class YoutubeVideoEmbed extends React.Component {
             `${YOUTUBE_BASE_URL}/embed/videoseries?autoplay=${autoplay}&list=${embedID}`:
             `${YOUTUBE_BASE_URL}/embed/${embedID}?autoplay=${autoplay}&state=1`;
 
-        console.log("YoutubeVideoEmbed", videoEmbedURL);
-
         return (
             <iframe
                 src={videoEmbedURL}
@@ -91,8 +89,6 @@ export class YoutubeVideoEmbed extends React.Component {
             aspectWidth
         } = this.props;
 
-        console.log("YoutubeVideoEmbed does exist");
-
         const {
             showVideo,
             preconnected
@@ -100,6 +96,9 @@ export class YoutubeVideoEmbed extends React.Component {
 
         if (!videoID) {
             console.error("YoutubeVideoEmbed component must have an embedID.");
+            return null;
+        } else if (isPlaylist) {
+            console.error("YoutubeVideoEmbed component does not yet support playlists. Please use a single video.");
             return null;
         }
 
