@@ -488,6 +488,12 @@ class TestQcSummary:
         evaluator_result,
         expected_flag,
     ):
+        """Test retrieval and handling of flag evaluator.
+
+        Mock the evaluator to control its behavior (result returned or
+        exception raised), and mock the mapping of QC titles to
+        evaluators so independent of actual class constants.
+        """
         mocked_sample = QcTestConstants.mocked_sample_for_qc()
         mocked_individual = QcTestConstants.mocked_individual_for_qc()
         title_to_flag_evaluator = {}
@@ -581,6 +587,13 @@ class TestQualityMetricForQc:
         ],
     )
     def test_collect_qc_summaries(self, quality_metric, links, expected_summaries):
+        """Test creation and collection of QC summaries from a
+        QualityMetric.
+
+        Though a simple method, mock out the class constants and methods
+        used in creation of the QcSummary objects (since all return
+        None for this abstract class) to ensure created as intended.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricForQc, "get_qc_links", return_value=links
         ):
@@ -823,6 +836,13 @@ class TestSampleForQc:
         ],
     )
     def test_get_quality_metrics(self, is_bam_results):
+        """Test retrieval of relevant QualityMetric objects from
+        processed files on the Sample.
+
+        Since only looking for BAMs currently, mock out the processed
+        file objects on the Sample to return corresponding result of
+        whether file is a BAM and to ensure methods called correctly.
+        """
         processed_file_atids = [QcTestConstants.ATID for item in is_bam_results]
         with mock.patch.object(
             sample_type_module,
@@ -881,6 +901,11 @@ class TestItemQcProperties:
         property_replacements,
         expected,
     ):
+        """Test creation of QC display and non-display properties.
+
+        Testing on the abstract class here, so mock the corresponding
+        class constants as though a concrete class.
+        """
         with mock.patch.object(
             sample_type_module.ItemQcProperties,
             "QC_NON_DISPLAY_PROPERTIES",
@@ -1052,6 +1077,12 @@ class TestSampleQcReport:
 
 
 class TestQualityMetricParser:
+    """Note: Since this class is heavily dependent on many others,
+    tests employ much mocking to ensure objects called correctly and
+    'business logic' of orchestration makes sense. Integrated tests
+    with workbook inserts are essential to ensure the orchestration
+    actually works on real items.
+    """
 
     SAMPLE_1 = "sample_1"
     SAMPLE_2 = "sample_2"
@@ -1078,6 +1109,14 @@ class TestQualityMetricParser:
         qc_display,
         expected,
     ):
+        """Test orchestration of QC metric collection from samples and
+        processed files.
+
+        Mock out all the methods to ensure calls made correctly, but
+        challenging to test in integrated fashion given number of
+        objects indirectly called via sub-requests. Integrated tests
+        with workbook inserts test this more completely.
+        """
         with mock.patch.object(
             sample_type_module.QualityMetricParser,
             "collect_quality_metrics",
@@ -1148,6 +1187,11 @@ class TestQualityMetricParser:
         quality_metric_types,
         expected_add_quality_metric_call_types,
     ):
+        """Test collection of desired QualityMetrics off of processed
+        files on SampleProcessing.
+
+        Mock out processed files and relevant method results.
+        """
         processed_files = [QcTestConstants.RESULT for item in quality_metric_types]
         with mock.patch.object(
             sample_type_module,
@@ -1201,6 +1245,11 @@ class TestQualityMetricParser:
         ],
     )
     def test_collect_sample_data(self, quality_metrics, bam_sample_id):
+        """Test collection of Sample data required for QC metrics.
+
+        Mock out classes to facilitate testing, as difficult to provide
+        enough data to test in more integrated fashion.
+        """
         mocked_sample_for_qc = QcTestConstants.mocked_sample_for_qc()
         mocked_sample_for_qc.bam_sample_id = bam_sample_id
         mocked_sample_for_qc.get_quality_metrics.return_value = quality_metrics
@@ -1241,6 +1290,12 @@ class TestQualityMetricParser:
         expected_log_info,
         expected_summary_adds,
     ):
+        """Test adding QC summaries to matching sample objects.
+
+        Mock out the quality metric, QC summary, and sample objects to
+        facilitate testing here, as well as use a simple, fixed sample
+        mapping.
+        """
         quality_metric_parser = self.quality_metric_parser()
         mocked_sample_qc_report = QcTestConstants.mocked_sample_qc_report()
         sample_mapping = {self.SAMPLE_1: mocked_sample_qc_report}
