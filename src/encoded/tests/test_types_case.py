@@ -53,11 +53,41 @@ def test_case_case_title_with_institution_id(testapp, proband_case, mother_case)
     assert new_mother_d_title == updated_mother_case["display_title"]
 
 
-def test_case_sample(testapp, proband_case, mother_case):
+def test_case_sample(testapp, proband_case, mother_case, sample_proc_fam):
     proband_sample = "/samples/GAPSAPROBAND/"
     mother_sample = "/samples/GAPSAMOTHER1/"
     assert proband_sample == proband_case["sample"]
     assert mother_sample == mother_case["sample"]
+
+    # Remove mother sample from associated Individual
+    mother_individual = testapp.get(
+        mother_case["individual"], params="frame=object", status=200
+    ).json
+    mother_individual_samples = mother_individual["samples"]
+    samples_without_mother_sample = list(
+        set(mother_individual_samples).difference(set([mother_sample]))
+    )
+    patch_body = {"samples": samples_without_mother_sample}
+    testapp.patch_json(mother_individual["@id"], patch_body, status=200)
+    updated_mother_case = testapp.get(mother_case["@id"], status=200).json
+    assert updated_mother_case.get("sample") is None
+
+    # Add proband and mother samples to mother individual
+    # Since already on sample processing, intersection now > 1
+    patch_body = {"samples": [proband_sample, mother_sample]}
+    testapp.patch_json(mother_individual["@id"], patch_body, status=200)
+    updated_mother_case = testapp.get(mother_case["@id"], status=200).json
+    assert updated_mother_case.get("sample") is None
+
+    # Remove proband sample from shared SampleProcessing
+    all_samples = sample_proc_fam["samples"]
+    all_samples_except_proband = list(
+        set(all_samples).difference(set([proband_sample]))
+    )
+    patch_body = {"samples": all_samples_except_proband}
+    testapp.patch_json(sample_proc_fam["@id"], patch_body, status=200)
+    updated_proband_case = testapp.get(proband_case["@id"], {}, status=200).json
+    assert updated_proband_case.get("sample") is None
 
 
 def test_case_second_family(testapp, proband_case, mother_case, fam, second_fam):
