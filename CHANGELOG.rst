@@ -6,6 +6,18 @@ cgap-portal
 Change Log
 ----------
 
+12.1.0
+======
+`PR 674: Add social links + youtube embed component <https://github.com/dbmi-bgm/cgap-portal/pull/674>`_
+
+* Add new "Video Tutorials" external link to the help menu (goes to the YouTube channel)
+* Add GitHub and YouTube social icon links to the footer
+* Create a new component for embedding YouTube videos
+* Adjust content security policy (Will already approved these edits) to allow pulling videos and thumbnail images from YouTube directly
+* Add `YoutubeVideoEmbed` component as a "placeholder" for use in JSX static sections
+* Includes changes from [Victoria's PR] (https://github.com/dbmi-bgm/cgap-portal/pull/675) - Update static sections to use JSX, update master inserts to use new JSX files
+
+
 12.0.0
 ======
 
