@@ -1234,6 +1234,9 @@ class SubmittedFilesParser:
     OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
     GENOME_ASSEMBLY = "genome_assembly"
     VARIANT_TYPE = "variant_type"
+    PAIRED_END = "paired_end"
+    PAIRED_END_1 = "1"
+    PAIRED_END_2 = "2"
     AT_ID = "@id"
 
     # Spreadsheet constants
@@ -1836,8 +1839,10 @@ class SubmittedFilesParser:
         for file_name, file_item in fastq_files.items():
             paired_end = self.get_paired_end_from_name(file_name)
             if paired_end == 1:
+                file_item[self.PAIRED_END] = self.PAIRED_END_1
                 fastq_paired_end_1[file_name] = file_item
             elif paired_end == 2:
+                file_item[self.PAIRED_END] = self.PAIRED_END_2
                 fastq_paired_end_2[file_name] = file_item
             else:
                 fastq_unknown_paired_end.append(file_name)

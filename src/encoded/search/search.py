@@ -102,7 +102,7 @@ class SearchBuilder:
             item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
             mappings = self.request.registry[STORAGE].read.mappings.get()
             if get_namespaced_index(self.request, item_type_snake_case) == self.es_index and self.es_index in mappings:
-                return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
+                return mappings[self.es_index]['mappings']['properties']
             else:  # new item was added after last cache update, get directly via API
                 return get_es_mapping(self.es, self.es_index)
         return {}
@@ -530,7 +530,7 @@ class SearchBuilder:
             self.query['sort'] = [{'_score': {"order": "desc"}},
                                   {'embedded.date_created.raw': {'order': 'desc', 'unmapped_type': 'keyword'},
                                    'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
-                                  {'_uid': {'order': 'asc'}}
+                                  {'_id': {'order': 'asc'}}  # ES7 - _uid removed, now use _id
                 ]
                 # 'embedded.uuid.raw' (instd of _id) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
 
@@ -1088,7 +1088,7 @@ class SearchBuilder:
         es_result = execute_search(es=self.es, query=self.query, index=self.es_index, from_=0, size=size_increment,
                                    session_id=self.search_session_id)
 
-        total_results_expected = es_result['hits'].get('total', 0)
+        total_results_expected = es_result['hits'].get('total', {}).get('value', 0)
 
         # Decrease by 1 (first es_result already happened)
         extra_requests_needed_count = math.ceil(total_results_expected / size_increment) - 1
@@ -1123,7 +1123,7 @@ class SearchBuilder:
         """
         # Response formatting
         self.response['notification'] = 'Success'
-        self.response['total'] = es_results['hits']['total']
+        self.response['total'] = es_results['hits']['total']['value']
         self.response['facets'] = self.format_facets(es_results)
         self.response['aggregations'] = self.format_extra_aggregations(es_results)
         self.response['actions'] = self.get_collection_actions()

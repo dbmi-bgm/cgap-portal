@@ -109,11 +109,13 @@ FASTQ_FILE_ITEMS_NO_ERRORS = [
         "related_files": [
             {"relationship_type": "paired with", "file": FASTQ_FILE_NAME_1_R2_ALIAS},
         ],
+        "paired_end": "1",
     },
     {
         "aliases": [FASTQ_FILE_NAME_1_R2_ALIAS],
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_1_R2,
+        "paired_end": "2",
     },
 ]
 FASTQ_ALIASES_NO_ERRORS = [FASTQ_FILE_NAME_1_R1_ALIAS, FASTQ_FILE_NAME_1_R2_ALIAS]
@@ -122,6 +124,7 @@ FASTQ_FILE_ITEMS_ERRORS = FASTQ_FILE_ITEMS_NO_ERRORS + [
         "aliases": [FASTQ_FILE_NAME_UNMATCHED_ALIAS],
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_UNMATCHED,
+        "paired_end": "1",
     },
     {
         "aliases": [FASTQ_FILE_NAME_BAD_FORMAT_ALIAS],
@@ -2117,13 +2120,27 @@ class TestSubmittedFilesParser:
         return result
 
     @pytest.mark.parametrize(
-        "fastqs,expected_unknown_paired_end,expected_unpaired_fastqs",
+        (
+            "fastqs,expected_paired_ends,expected_unknown_paired_end,"
+            "expected_unpaired_fastqs"
+        ),
         [
-            (make_file_dicts_for_names(["foo.fastq.gz"]), ["foo.fastq.gz"], []),
-            (make_file_dicts_for_names(["foo_R1.fastq.gz"]), [], ["foo_R1.fastq.gz"]),
-            (make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_R2.fastq.gz"]), [], []),
+            (make_file_dicts_for_names(["foo.fastq.gz"]), [None], ["foo.fastq.gz"], []),
+            (
+                make_file_dicts_for_names(["foo_R1.fastq.gz"]),
+                ["1"],
+                [],
+                ["foo_R1.fastq.gz"],
+            ),
+            (
+                make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_R2.fastq.gz"]),
+                ["1", "2"],
+                [],
+                [],
+            ),
             (
                 make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_r2.fastq.gz"]),
+                ["1", "2"],
                 [],
                 ["foo_R1.fastq.gz", "foo_r2.fastq.gz"],
             ),
@@ -2131,13 +2148,19 @@ class TestSubmittedFilesParser:
                 make_file_dicts_for_names(
                     ["foo_R1.fastq.gz", "bar_R1.fastq.gz", "foo_R2.fastq.gz"]
                 ),
+                ["1", "1", "2"],
                 [],
                 ["bar_R1.fastq.gz"],
             ),
         ],
     )
     def test_validate_and_pair_fastqs(
-        self, file_parser, fastqs, expected_unknown_paired_end, expected_unpaired_fastqs
+        self,
+        file_parser,
+        fastqs,
+        expected_paired_ends,
+        expected_unknown_paired_end,
+        expected_unpaired_fastqs,
     ):
         """Test paired-end identification and subsequent file pairing
         of FASTQs.
@@ -2148,6 +2171,9 @@ class TestSubmittedFilesParser:
         ) = file_parser.validate_and_pair_fastqs(fastqs)
         assert result_unknown_paired_end == expected_unknown_paired_end
         assert result_unpaired_fastqs == expected_unpaired_fastqs
+        assert len(fastqs) == len(expected_paired_ends)
+        for idx, file_item in enumerate(fastqs.values()):
+            assert file_item.get("paired_end") == expected_paired_ends[idx]
 
     @pytest.mark.parametrize(
         "file_name,expected",

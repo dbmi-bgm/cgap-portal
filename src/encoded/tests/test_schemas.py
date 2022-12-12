@@ -9,7 +9,7 @@ from snovault.schema_utils import load_schema
 from ..commands.order_schema_columns_and_facets import order_schema_columns_and_facets
 
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
 SCHEMA_FILES = [

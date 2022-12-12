@@ -58,7 +58,7 @@
     ],
     "properties": {
         "schema_version": {
-            "default": "7"
+            "default": "8"
         },
         "accession": {
             "accessionType": "WF"
@@ -245,9 +245,14 @@
             "additionalProperties": false,
             "properties": {
                 "instance_type": {
-                    "title": "Instance type",
-                    "description": "Name of the type of the AWS EC2 instance",
-                    "type": "string"
+                    "title": "Instance types",
+                    "description": "List of possible AWS EC2 instance types for this workflow",
+                    "type": "array",
+                    "items": {
+                        "title": "Instance type",
+                        "name": "Name of a specific type of AWS EC2 instance",
+                        "type": "string"
+                    }
                 },
                 "ebs_size": {
                     "title": "EBS size",

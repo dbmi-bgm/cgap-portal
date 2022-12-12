@@ -47,12 +47,6 @@
             "$ref": "mixins.json#/tags"
         },
         {
-            "$ref": "mixins.json#/paired_end"
-        },
-        {
-            "$ref": "mixins.json#/variant_type"
-        },
-        {
             "$ref": "file.json#/properties"
         }
     ],

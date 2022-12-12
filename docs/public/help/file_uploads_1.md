@@ -1,12 +1,16 @@
 All file submissions to CGAP are made with
 SubmitCGAP, found [here](https://github.com/dbmi-bgm/SubmitCGAP)
-with documentation on installation and use. 
+with documentation on installation and use.
 
 SubmitCGAP will only upload files found on the
 local computer running the package. If your files
 are not stored locally and are instead in cloud
 storage or a local cluster, there are a few options
 for uploading such files. 
+
+A video tutorial for submitting files using SubmitCGAP can be 
+found in the final section on this page.
+All tutorial videos can be found on the [CGAP Training Youtube channel](https://www.youtube.com/@cgaptraining).
 
 #### Load the files locally
 

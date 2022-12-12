@@ -489,17 +489,6 @@
             }
         }
     },
-    "paired_end": {
-        "paired_end": {
-            "title": "Paired End Identifier",
-            "description": "Which pair the file belongs to (if paired end library)",
-            "type": "string",
-            "enum": [
-                "1",
-                "2"
-            ]
-        }
-    },
     "meta_workflow_runs": {
         "meta_workflow_runs": {
             "title": "MetaWorkflowRuns",
@@ -522,19 +511,6 @@
                 "type": "string",
                 "linkTo": "FileProcessed"
             }
-        }
-    },
-    "variant_type": {
-        "variant_type": {
-            "title": "Variant Type",
-            "description": "The variant type associated with this file",
-            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
-            "type": "string",
-            "enum": [
-                "SNV",
-                "SV",
-                "CNV"
-            ]
         }
     }
 }
