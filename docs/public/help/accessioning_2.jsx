@@ -214,13 +214,12 @@
 
     <h4>Tutorial Video: Filling the Spreadsheet</h4>
 
-    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
-        <div>  
-            <YoutubeVideoEmbed
-                shouldAutoplay={false}
-                videoID="2VbYXQmS66s"
-                videoTitle="Submitting Case Spreadsheets Youtube Video"
-            />
-        </div>
+    
+    <div className="w-100">  
+        <YoutubeVideoEmbed
+            shouldAutoplay={false}
+            videoID="2VbYXQmS66s"
+            videoTitle="Submitting Case Spreadsheets Youtube Video"
+        />
     </div>
 </div>

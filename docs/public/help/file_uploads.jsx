@@ -51,15 +51,14 @@
 
 	<h4>Tutorial Video: Uploading Local Files</h4>
 
-	<div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
-        <div>  
-            <YoutubeVideoEmbed
-                shouldAutoplay={false}
-                videoID="4Su3a7AE0HY"
-                videoTitle="Case Submission via CGAP Web UI"
-                params="start=117"
-            />
-        </div>
+	<div className="w-100">
+		<YoutubeVideoEmbed
+			shouldAutoplay={false}
+			videoID="4Su3a7AE0HY"
+			videoTitle="Case Submission via CGAP Web UI"
+			params="start=117"
+			posterSize="maxresdefault"
+		/>
     </div>
 
 	<h4>Run SubmitCGAP on remote instance</h4>

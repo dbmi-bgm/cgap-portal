@@ -28,15 +28,14 @@
 
     <h4>Tutorial Video: Family History Submission via CGAP Web UI</h4>
 
-    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
-        <div>  
-            <YoutubeVideoEmbed
-                shouldAutoplay={false}
-                videoID="dEiMlad4K2A"
-                videoTitle="Case Submission via CGAP Web UI"
-                params="start=151"
-            />
-        </div>
+    <div className="w-100">
+        <YoutubeVideoEmbed
+            shouldAutoplay={false}
+            videoID="dEiMlad4K2A"
+            videoTitle="Case Submission via CGAP Web UI"
+            params="start=151"
+            posterSize="maxresdefault"
+        />
     </div>
 
     <h4>Option 2: Submission with the python package</h4>
@@ -67,14 +66,13 @@
 
     <h4>Tutorial Video: Family History Submission using the SubmitCGAP Python Package</h4>
 
-    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
-        <div>  
-            <YoutubeVideoEmbed
-                shouldAutoplay={false}
-                videoID="4Su3a7AE0HY"
-                videoTitle="Case Submission via CLI"
-                params="start=332"
-            />
-        </div>
+    <div className="w-100">
+        <YoutubeVideoEmbed
+            shouldAutoplay={false}
+            videoID="4Su3a7AE0HY"
+            videoTitle="Case Submission via CLI"
+            params="start=332"
+            posterSize="maxresdefault"
+        />
     </div>
 </div>

@@ -163,13 +163,12 @@
 
     <h2>Tutorial Video: Gene List Creation & Submission</h2>
 
-    <div style={{ maxWidth: "500px"}} className="w-100 d-flex align-items-center justify-items-center">
-        <div>
-            <YoutubeVideoEmbed
-                shouldAutoplay={false}
-                videoID="TKAOlqrki4s"
-                videoTitle="Submitting Gene Lists"
-            />
-        </div>
+    <div className="w-100">
+        <YoutubeVideoEmbed
+            shouldAutoplay={false}
+            videoID="TKAOlqrki4s"
+            videoTitle="Submitting Gene Lists"
+            posterSize="maxresdefault"
+        />
     </div>
 </div>
