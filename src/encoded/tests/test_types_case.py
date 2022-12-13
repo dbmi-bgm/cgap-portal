@@ -90,14 +90,14 @@ def test_case_sample(testapp, proband_case, mother_case, sample_proc_fam):
     assert updated_proband_case.get("sample") is None
 
 
-def test_case_second_family(testapp, proband_case, mother_case, fam, second_fam):
+def test_case_secondary_families(testapp, proband_case, mother_case, fam, second_fam):
     fam1_id = fam["@id"]
     fam2_id = second_fam["@id"]
     proband = testapp.get(proband_case["@id"]).json
     mother = testapp.get(mother_case["@id"]).json
     # assert proband has single family
     assert proband["family"]["@id"] == fam1_id
-    assert proband["secondary_families"] == []
+    assert proband.get("secondary_families") is None
     # assert mother has a second family
     assert mother["family"]["@id"] == fam1_id
     assert len(mother["secondary_families"]) == 1
@@ -221,7 +221,11 @@ def test_case_cnv_vcf(
         assert mother.get("cnv_vcf_file") is None
 
 
-def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+def test_case_initial_search_href_filter_addon(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+    # No SNV VCF on SampleProcessing
+    assert proband_case.get("initial_search_href_filter_addon") is None
+    assert mother_case.get("initial_search_href_filter_addon") is None
+
     # add ann_vcf to sample_processing
     file_id = file_vcf["@id"]
     testapp.patch_json(sample_proc_fam["@id"], {"processed_files": [file_id]})
@@ -237,28 +241,114 @@ def test_case_flag(testapp, sample_proc_fam, file_vcf, proband_case, mother_case
         mother_sample_tag, file_acc
     )
 
+    # Remove individual from proband case
+    delete_individual_string = "?delete_fields=individual"
+    updated_proband_case = testapp.patch_json(
+        proband_case["@id"] + delete_individual_string, {}, status=200
+    ).json["@graph"][0]
+    assert updated_proband_case.get("individual") is None
+    assert updated_proband_case.get("initial_search_href_filter_addon") is None
 
-def test_case_sv_flag(
+    # Remove sample ID from mother sample
+    mother_sample_atid = mother_case["sample"]
+    delete_sample_id_string = "?delete_fields=bam_sample_id"
+    updated_sample = testapp.patch_json(
+        mother_sample_atid + delete_sample_id_string, {}, status=200
+    ).json["@graph"][0]
+    assert updated_sample.get("bam_sample_id") is None
+    updated_mother_case = testapp.get(mother_case["@id"], status=200).json
+    assert updated_mother_case.get("initial_search_href_filter_addon") is None
+
+    # Restore mother sample ID, then remove sample processing from case
+    patch_body = {"bam_sample_id": mother_sample_tag}
+    updated_sample = testapp.patch_json(
+        mother_sample_atid, patch_body, status=200
+    ).json["@graph"][0]
+    assert updated_sample.get("bam_sample_id") == mother_sample_tag
+    delete_sample_processing_string = "?delete_fields=sample_processing"
+    updated_mother_case = testapp.patch_json(
+        mother_case["@id"] + delete_sample_processing_string, {}, status=200
+    ).json["@graph"][0]
+    assert updated_mother_case.get("initial_search_href_filter_addon") is None
+
+
+def test_case_sv_initial_search_href_filter_addon(
     testapp, sample_proc_fam, file_vcf_sv, file_vcf_cnv, proband_case, mother_case
 ):
+    property_name = "sv_initial_search_href_filter_addon"
+    proband_sample_tag = "ext_id_006"
+    mother_sample_tag = "ext_id_003"
     sv_file_id = file_vcf_sv["@id"]
     sv_file_accession = file_vcf_sv["accession"]
     cnv_file_id = file_vcf_cnv["@id"]
     cnv_file_accession = file_vcf_cnv["accession"]
+
+    expected_proband_call_info = f"CALL_INFO={proband_sample_tag}"
+    expected_mother_call_info =  f"CALL_INFO={mother_sample_tag}"
+    expected_sv_file = f"&file={sv_file_accession}"
+    expected_cnv_file = f"&file={cnv_file_accession}"
+    expected_proband_sv_addon = expected_proband_call_info + expected_sv_file
+    expected_proband_cnv_addon = expected_proband_call_info + expected_cnv_file
+    expected_proband_sv_cnv_addon = expected_proband_sv_addon + expected_cnv_file
+    expected_mother_sv_cnv_addon = (
+        expected_mother_call_info + expected_sv_file + expected_cnv_file
+    )
+
+    # No VCFs on SampleProcessing originally
+    assert proband_case.get(property_name) is None
+    assert mother_case.get(property_name) is None
+
+    # Add SV VCF to SampleProcessing
+    patch_body = {"processed_files": [sv_file_id]}
+    testapp.patch_json(sample_proc_fam["@id"], patch_body, status=200)
+    proband_case = testapp.get(proband_case["@id"]).json
+    assert proband_case.get(property_name) == expected_proband_sv_addon
+
+    # Add CNV VCF to SampleProcessing
+    patch_body = {"processed_files": [cnv_file_id]}
+    testapp.patch_json(sample_proc_fam["@id"], patch_body, status=200)
+    proband_case = testapp.get(proband_case["@id"]).json
+    assert proband_case.get(property_name) == expected_proband_cnv_addon
+
+    # Add SV + CNV VCF to SampleProcessing
     patch_body = {"processed_files": [sv_file_id, cnv_file_id]}
     testapp.patch_json(sample_proc_fam["@id"], patch_body, status=200)
-    proband = testapp.get(proband_case["@id"]).json
-    mother = testapp.get(mother_case["@id"]).json
-    proband_sample_tag = "ext_id_006"
-    mother_sample_tag = "ext_id_003"
-    proband_flag = "CALL_INFO={}&file={}&file={}".format(
-        proband_sample_tag, sv_file_accession, cnv_file_accession
-    )
-    mother_flag = "CALL_INFO={}&file={}&file={}".format(
-        mother_sample_tag, sv_file_accession, cnv_file_accession
-    )
-    assert proband["sv_initial_search_href_filter_addon"] == proband_flag
-    assert mother["sv_initial_search_href_filter_addon"] == mother_flag
+    proband_case = testapp.get(proband_case["@id"]).json
+    mother_case = testapp.get(mother_case["@id"]).json
+    assert proband_case.get(property_name) == expected_proband_sv_cnv_addon
+
+    # Remove individual from proband case
+    delete_individual_string = "?delete_fields=individual"
+    proband_case = testapp.patch_json(
+        proband_case["@id"] + delete_individual_string, {}, status=200
+    ).json["@graph"][0]
+    assert proband_case.get("individual") is None
+    assert proband_case.get(property_name) is None
+
+    # Remove sample ID from mother sample
+    assert mother_case.get(property_name) == expected_mother_sv_cnv_addon
+    mother_sample_atid = mother_case["sample"]["@id"]
+    delete_sample_id_string = "?delete_fields=bam_sample_id"
+    updated_sample = testapp.patch_json(
+        mother_sample_atid + delete_sample_id_string, {}, status=200
+    ).json["@graph"][0]
+    assert updated_sample.get("bam_sample_id") is None
+    mother_case = testapp.get(mother_case["@id"], status=200).json
+    assert mother_case.get(property_name) is None
+
+    # Restore mother sample ID, then remove sample processing from case
+    patch_body = {"bam_sample_id": mother_sample_tag}
+    updated_sample = testapp.patch_json(
+        mother_sample_atid, patch_body, status=200
+    ).json["@graph"][0]
+    assert updated_sample.get("bam_sample_id") == mother_sample_tag
+    mother_case = testapp.get(mother_case["@id"], status=200).json
+    assert mother_case.get(property_name) == expected_mother_sv_cnv_addon
+    delete_sample_processing_string = "?delete_fields=sample_processing"
+    mother_case = testapp.patch_json(
+        mother_case["@id"] + delete_sample_processing_string, {}, status=200
+    ).json["@graph"][0]
+    assert mother_case.get(property_name) is None
 
 
 @pytest.fixture
@@ -288,6 +378,7 @@ def new_case(testapp, project, institution, fam, new_sample_processing):
 @pytest.mark.parametrize(
     "num_samples, analysis_type, proband_only",
     [
+        (1, None, True),
         (1, "WGS", True),  # proband only
         (2, "WGS-Group", False),  # proband and father
         (3, "WES-Trio", False),  # proband, father, mother
@@ -296,8 +387,6 @@ def new_case(testapp, project, institution, fam, new_sample_processing):
 )  # proband, father, mother, brother
 def test_case_additional_facets(
     testapp,
-    project,
-    institution,
     new_case,
     new_sample_processing,
     num_samples,
@@ -310,38 +399,42 @@ def test_case_additional_facets(
     genotype labels for quad.
     """
     genotype_relations = ["father", "mother", "brother", "sister"]
-    new_sample_processing["analysis_type"] = analysis_type
+    if analysis_type is not None:
+        new_sample_processing["analysis_type"] = analysis_type
     # limit samples to size of analysis we want to test
     new_sample_processing["samples"] = new_sample_processing["samples"][:num_samples]
-    sp = testapp.post_json("/sample_processing", new_sample_processing).json["@graph"][
-        0
-    ]
-    new_case["sample_processing"] = sp["@id"]
-    case = testapp.post_json("/case", new_case).json["@graph"][0]
-    for relation in genotype_relations:
-        if genotype_relations.index(relation) + 2 <= num_samples:
-            # genotype labels for this relation should be an additional facet in prop
-            assert (
-                f"associated_genotype_labels.{relation}_genotype_label"
-                in case["additional_variant_sample_facets"]
-            )
-        else:
-            # genotype labels for this relation should NOT be an additional facet in this prop
-            assert (
-                f"associated_genotype_labels.{relation}_genotype_label"
-                not in case["additional_variant_sample_facets"]
-            )
-    if proband_only:
-        assert (
-            "proband_only_inheritance_modes" in case["additional_variant_sample_facets"]
-        )
-        assert "inheritance_modes" not in case["additional_variant_sample_facets"]
+    sample_processing = testapp.post_json(
+        "/sample_processing", new_sample_processing, status=201
+    ).json["@graph"][0]
+    new_case["sample_processing"] = sample_processing["@id"]
+    case = testapp.post_json("/case", new_case, status=201).json["@graph"][0]
+    additional_vs_facets = case.get("additional_variant_sample_facets")
+    if analysis_type is None:
+        assert additional_vs_facets is None
     else:
-        assert (
-            "proband_only_inheritance_modes"
-            not in case["additional_variant_sample_facets"]
-        )
-        assert "inheritance_modes" in case["additional_variant_sample_facets"]
+        for relation in genotype_relations:
+            if genotype_relations.index(relation) + 2 <= num_samples:
+                # genotype labels for this relation should be an additional facet in prop
+                assert (
+                    f"associated_genotype_labels.{relation}_genotype_label"
+                    in additional_vs_facets
+                )
+            else:
+                # genotype labels for this relation should NOT be an additional facet in this prop
+                assert (
+                    f"associated_genotype_labels.{relation}_genotype_label"
+                    not in additional_vs_facets
+                )
+        if proband_only:
+            assert (
+                "proband_only_inheritance_modes" in additional_vs_facets
+            )
+            assert "inheritance_modes" not in additional_vs_facets
+        else:
+            assert (
+                "proband_only_inheritance_modes" not in additional_vs_facets
+            )
+            assert "inheritance_modes" in additional_vs_facets
 
 
 def test_case_proband_case(testapp, proband_case, mother_case):

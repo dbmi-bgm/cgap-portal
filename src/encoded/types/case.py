@@ -2,7 +2,6 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    # display_title_schema
 )
 from snovault.util import IndexSettings
 from .base import Item, get_item_or_none
@@ -340,14 +339,17 @@ class Case(Item):
     def secondary_families(self, request, individual=None, family=None):
         """Calculate secondary families for a given case
         family = @id of primary family"""
-        if not individual or not family:
-            return []
-        ind_data = get_item_or_none(request, individual, "individuals")
-        if not ind_data:
-            return []
-        individual_families = ind_data.get("families", [])
-        secondary_families = [i for i in individual_families if i != family]
-        return secondary_families
+        result = None
+        if individual and family:
+            individual_item = get_item(request, individual)
+            individual_families = individual_item.get("families", [])
+            secondary_families = [
+                individual_family for individual_family in individual_families
+                if individual_family != family
+            ]
+            if secondary_families:
+                result = secondary_families
+        return result
 
     @staticmethod
     def get_vcf_from_sample_processing(request, sample_processing_atid, variant_type):
@@ -445,21 +447,16 @@ class Case(Item):
         """
         Use vcf file and sample accessions to limit variant/variantsample to this case
         """
-        if not individual or not sample_processing:
-            return ""
-        sample = self.sample(request, individual, sample_processing)
-        if not sample:
-            return ""
-        vcf = self.vcf_file(request, sample_processing)
-        if not vcf:
-            return ""
-        sp_data = get_item_or_none(request, sample, "sample")
-        sample_read_group = sp_data.get("bam_sample_id", "")
-        if not sample_read_group:
-            return ""
-        vcf_acc = vcf.split("/")[2]
-        add_on = "CALL_INFO={}&file={}".format(sample_read_group, vcf_acc)
-        return add_on
+        result = None
+        if individual and sample_processing:
+            sample = self.sample(request, individual, sample_processing)
+            vcf = self.vcf_file(request, sample_processing)
+            sample_item = get_item(request, sample)
+            sample_id = sample_item.get("bam_sample_id")
+            if sample_id and vcf:
+                vcf_accession = vcf.split("/")[2]
+                result = f"CALL_INFO={sample_id}&file={vcf_accession}"
+        return result
 
     @calculated_property(
         schema={
@@ -478,27 +475,23 @@ class Case(Item):
         Use SV and CNV VCF files and sample accessions to limit
         structural variant samples to this case.
         """
-        if not individual or not sample_processing:
-            return ""
-        sample = self.sample(request, individual, sample_processing)
-        if not sample:
-            return ""
-        sv_vcf = self.structural_variant_vcf_file(request, sample_processing)
-        cnv_vcf = self.cnv_vcf_file(request, sample_processing)
-        if not sv_vcf and not cnv_vcf:
-            return ""
-        sp_data = get_item_or_none(request, sample, "sample")
-        sample_read_group = sp_data.get("bam_sample_id", "")
-        if not sample_read_group:
-            return ""
-        add_on = "CALL_INFO={}".format(sample_read_group)
-        if sv_vcf:
-            sv_vcf_accession = sv_vcf.split("/")[2]
-            add_on += "&file={}".format(sv_vcf_accession)
-        if cnv_vcf:
-            cnv_vcf_accession = cnv_vcf.split("/")[2]
-            add_on += "&file={}".format(cnv_vcf_accession)
-        return add_on
+        result = None
+        if individual and sample_processing:
+            sample = self.sample(request, individual, sample_processing)
+            sv_vcf = self.structural_variant_vcf_file(request, sample_processing)
+            cnv_vcf = self.cnv_vcf_file(request, sample_processing)
+            sample_item = get_item(request, sample)
+            sample_id = sample_item.get("bam_sample_id")
+            if sample_id and any([sv_vcf, cnv_vcf]):
+                search_addon = f"CALL_INFO={sample_id}"
+                if sv_vcf:
+                    sv_vcf_accession = sv_vcf.split("/")[2]
+                    search_addon += f"&file={sv_vcf_accession}"
+                if cnv_vcf:
+                    cnv_vcf_accession = cnv_vcf.split("/")[2]
+                    search_addon += f"&file={cnv_vcf_accession}"
+                result = search_addon
+        return result
 
     @calculated_property(
         schema={
@@ -509,47 +502,49 @@ class Case(Item):
         }
     )
     def additional_variant_sample_facets(
-        self, request, sample_processing=None, extra_variant_sample_facets=[]
+        self, request, sample_processing=None, extra_variant_sample_facets=None
     ):
-        if not sample_processing:
-            return ""
-        fields = [facet for facet in extra_variant_sample_facets]
-        sp_item = get_item_or_none(request, sample_processing, "sample_processing")
-        analysis_type = sp_item.get("analysis_type")
-        if analysis_type:
-            if analysis_type.endswith("-Trio") or analysis_type.endswith("-Group"):
-                fields.append("inheritance_modes")
-                included_relations = [
-                    item.get("relationship")
-                    for item in sp_item.get("samples_pedigree", [{}])
-                ]
-                for relation in [
-                    "mother",
-                    "father",
-                    "sister",
-                    "brother",
-                    "co-parent",
-                    "daughter",
-                    "son",
-                    "daughter II",
-                    "son II",
-                    "daughter III",
-                    "son III",
-                    "sister II",
-                    "sister III",
-                    "sister IV",
-                    "brother II",
-                    "brother III",
-                    "brother IV",
-                ]:
-                    if relation in included_relations:
-                        relation = relation.replace(" ", "_").replace("-", "_")
-                        fields.append(
-                            f"associated_genotype_labels.{relation}_genotype_label"
-                        )
-            elif analysis_type in ["WGS", "WES"]:  # proband-only analysis types
-                fields.append("proband_only_inheritance_modes")
-        return fields
+        result = None
+        if sample_processing:
+            fields = extra_variant_sample_facets or []
+            sp_item = get_item(request, sample_processing)
+            analysis_type = sp_item.get("analysis_type")
+            if analysis_type:
+                if analysis_type.endswith("-Trio") or analysis_type.endswith("-Group"):
+                    fields.append("inheritance_modes")
+                    included_relations = [
+                        item.get("relationship")
+                        for item in sp_item.get("samples_pedigree", [])
+                    ]
+                    for relation in [
+                        "mother",
+                        "father",
+                        "sister",
+                        "brother",
+                        "co-parent",
+                        "daughter",
+                        "son",
+                        "daughter II",
+                        "son II",
+                        "daughter III",
+                        "son III",
+                        "sister II",
+                        "sister III",
+                        "sister IV",
+                        "brother II",
+                        "brother III",
+                        "brother IV",
+                    ]:
+                        if relation in included_relations:
+                            relation = relation.replace(" ", "_").replace("-", "_")
+                            fields.append(
+                                f"associated_genotype_labels.{relation}_genotype_label"
+                            )
+                elif analysis_type in ["WGS", "WES"]:  # proband-only analysis types
+                    fields.append("proband_only_inheritance_modes")
+            if fields:
+                result = fields
+        return result
 
     @calculated_property(
         schema={
