@@ -608,7 +608,9 @@ def test_quality_control_flags(es_testapp, workbook):
         "completed_qcs": ["BAM", "SNV", "SV"],
     }
 
-    case_one_sample_no_vcfs = es_testapp.get(case_one_sample_no_vcfs_atid, status=200).json
+    case_one_sample_no_vcfs = es_testapp.get(
+        case_one_sample_no_vcfs_atid, status=200
+    ).json
     assert case_one_sample_no_vcfs.get("quality_control_flags") == {
         "flag": "fail",
         "fail": 1,
@@ -616,7 +618,9 @@ def test_quality_control_flags(es_testapp, workbook):
         "completed_qcs": ["BAM"],
     }
 
-    case_one_sample_no_files = es_testapp.get(case_one_sample_no_files_atid, status=200).json
+    case_one_sample_no_files = es_testapp.get(
+        case_one_sample_no_files_atid, status=200
+    ).json
     assert case_one_sample_no_files.get("quality_control_flags") == {
         "fail": 0,
         "warn": 0,

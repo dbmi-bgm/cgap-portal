@@ -106,9 +106,7 @@ class TestGeneListSubmission:
         assert genelist.errors
 
     @pytest.mark.workbook
-    def test_parse_empty_genelist_excel(
-        self, es_testapp, wb_project, wb_institution
-    ):
+    def test_parse_empty_genelist_excel(self, es_testapp, wb_project, wb_institution):
         """
         Tests for correct detection of no title and no genes provided when
         given an excel gene list.
