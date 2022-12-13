@@ -140,6 +140,10 @@ function StaticHelpLinks() {
                     General CGAP Info
                 </div>
             </div>
+            <a className="level-2-title text-small" href="https://www.youtube.com/@cgaptraining"
+                id="menutree-linkto-youtube_channel" target="_blank" rel="noopener noreferrer">
+                <span>Video Tutorials</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+            </a>
             <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/geneticseducation"
                 id="menutree-linkto-geneticseducation_page" target="_blank" rel="noopener noreferrer">
                 <span>Training Guide</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
