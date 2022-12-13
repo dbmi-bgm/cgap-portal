@@ -344,7 +344,8 @@ class Case(Item):
             individual_item = get_item(request, individual)
             individual_families = individual_item.get("families", [])
             secondary_families = [
-                individual_family for individual_family in individual_families
+                individual_family
+                for individual_family in individual_families
                 if individual_family != family
             ]
             if secondary_families:

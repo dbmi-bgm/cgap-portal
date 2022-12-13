@@ -221,7 +221,9 @@ def test_case_cnv_vcf(
         assert mother.get("cnv_vcf_file") is None
 
 
-def test_case_initial_search_href_filter_addon(testapp, sample_proc_fam, file_vcf, proband_case, mother_case):
+def test_case_initial_search_href_filter_addon(
+    testapp, sample_proc_fam, file_vcf, proband_case, mother_case
+):
     # No SNV VCF on SampleProcessing
     assert proband_case.get("initial_search_href_filter_addon") is None
     assert mother_case.get("initial_search_href_filter_addon") is None
@@ -284,7 +286,7 @@ def test_case_sv_initial_search_href_filter_addon(
     cnv_file_accession = file_vcf_cnv["accession"]
 
     expected_proband_call_info = f"CALL_INFO={proband_sample_tag}"
-    expected_mother_call_info =  f"CALL_INFO={mother_sample_tag}"
+    expected_mother_call_info = f"CALL_INFO={mother_sample_tag}"
     expected_sv_file = f"&file={sv_file_accession}"
     expected_cnv_file = f"&file={cnv_file_accession}"
     expected_proband_sv_addon = expected_proband_call_info + expected_sv_file
@@ -426,14 +428,10 @@ def test_case_additional_facets(
                     not in additional_vs_facets
                 )
         if proband_only:
-            assert (
-                "proband_only_inheritance_modes" in additional_vs_facets
-            )
+            assert "proband_only_inheritance_modes" in additional_vs_facets
             assert "inheritance_modes" not in additional_vs_facets
         else:
-            assert (
-                "proband_only_inheritance_modes" not in additional_vs_facets
-            )
+            assert "proband_only_inheritance_modes" not in additional_vs_facets
             assert "inheritance_modes" in additional_vs_facets
 
 
