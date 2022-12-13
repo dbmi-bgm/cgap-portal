@@ -28,6 +28,28 @@
         ]
     },
     {
+        "uuid": "d9a26951-9bfa-4a11-a014-35d5724bfbff",
+        "aliases": [
+            "hms-dbmi:one_sample_no_vcfs"
+        ],
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1"
+        ]
+    },
+    {
+        "uuid": "5cac1b7d-563d-4258-b93b-37b3a6f765d5",
+        "aliases": [
+            "hms-dbmi:one_sample_no_files"
+        ],
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1_no_files"
+        ]
+    },
+    {
         "uuid": "8471a80f-81c6-4663-a182-c2955c21c6ce",
         "aliases": [
             "hms-dbmi:two_samples"

@@ -39,7 +39,8 @@
         "mother": "GAPID6ZUDPO2",
         "father": "GAPIDRU2NWFO",
         "samples": [
-            "hms-dbmi:sample_1"
+            "hms-dbmi:sample_1",
+            "hms-dbmi:sample_1_no_files"
         ]
     },
     {

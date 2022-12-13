@@ -575,16 +575,23 @@ def test_quality_control_flags(es_testapp, workbook):
     """
 
     case_no_sample_processing_accession = "GAPFIH74RE9U"
-    case_no_samples_accession = "GAPFIO67BOS2"
+    case_no_samples_accession = "GAPFIO67BOS3"
     case_two_samples_accession = "GAPCAJQ1L99X"
+    case_one_sample_no_vcfs_accession = "GAPFIM83GOP9"
+    case_one_sample_no_files_accession = "GAPFIV50ST2Q"
 
     case_no_sample_processing_atid = make_atid(
         case_no_sample_processing_accession, item_type="case"
     )
     case_no_samples_atid = make_atid(case_no_samples_accession, item_type="case")
     case_two_samples_atid = make_atid(case_two_samples_accession, item_type="case")
+    case_one_sample_no_vcfs_atid = make_atid(
+        case_one_sample_no_vcfs_accession, item_type="case"
+    )
+    case_one_sample_no_files_atid = make_atid(
+        case_one_sample_no_files_accession, item_type="case"
+    )
 
-    # Workbook cases as they exist in inserts
     case_no_sample_processing = es_testapp.get(
         case_no_sample_processing_atid, status=200
     ).json
@@ -601,32 +608,16 @@ def test_quality_control_flags(es_testapp, workbook):
         "completed_qcs": ["BAM", "SNV", "SV"],
     }
 
-    # Remove VCFs from associated SampleProcessing
-    case_two_samples_sample_processing = case_two_samples["sample_processing"]
-    sample_processing = case_two_samples_sample_processing["@id"]
-    patch_body = {"processed_files": []}
-    es_testapp.patch_json(sample_processing, patch_body, status=200)
-    case_two_samples_without_vcfs = es_testapp.patch_json(  # Get updated calcprop
-        case_two_samples_atid, {}, status=200
-    ).json["@graph"][0]
-    assert case_two_samples_without_vcfs.get("quality_control_flags") == {
+    case_one_sample_no_vcfs = es_testapp.get(case_one_sample_no_vcfs_atid, status=200).json
+    assert case_one_sample_no_vcfs.get("quality_control_flags") == {
         "flag": "fail",
         "fail": 1,
         "warn": 0,
         "completed_qcs": ["BAM"],
     }
 
-    # Remove BAM from one associated Sample as well
-    case_two_samples_samples = case_two_samples_sample_processing["samples"]
-    sample_to_patch = case_two_samples_samples[0]["@id"]
-    es_testapp.patch_json(sample_to_patch, patch_body, status=200)
-    case_two_samples_without_vcfs_and_one_bam = (
-        es_testapp.patch_json(  # Get updated calcprop
-            case_two_samples_atid, {}, status=200
-        ).json["@graph"][0]
-    )
-    assert case_two_samples_without_vcfs_and_one_bam.get("quality_control_flags") == {
-        "flag": "pass",
+    case_one_sample_no_files = es_testapp.get(case_one_sample_no_files_atid, status=200).json
+    assert case_one_sample_no_files.get("quality_control_flags") == {
         "fail": 0,
         "warn": 0,
     }

@@ -917,9 +917,10 @@ class SampleQcReport:
 
     def record_completed_processes(self):
         """Format and move completed processes to report."""
-        self.qc_report[QcConstants.COMPLETED_QCS] = sorted(
-            list(self.completed_processes)
-        )
+        if self.completed_processes:
+            self.qc_report[QcConstants.COMPLETED_QCS] = sorted(
+                list(self.completed_processes)
+            )
 
     def record_flag_summaries(self):
         """Format and move captured flags to report."""

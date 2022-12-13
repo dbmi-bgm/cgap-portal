@@ -275,6 +275,13 @@ class QcTestConstants:
         "specimen_type": "peripheral_blood",
         "completed_qcs": ["BAM"],
     }
+    SAMPLE_1_NO_FILES_QC_METRICS = {
+        "individual_accession": "GAPID8J9B9CR",
+        "sex": {"value": "F"},
+        "sequencing_type": "WES",
+        "bam_sample_id": "Sample_ID_2",
+        "specimen_type": "peripheral_blood",
+    }
 
     @staticmethod
     def mocked_individual_for_qc():
@@ -1031,7 +1038,7 @@ class TestSampleQcReport:
     @pytest.mark.parametrize(
         "completed_processes,expected",
         [
-            ([], {"completed_qcs": []}),
+            ([], {}),
             (["foo", "bar"], {"completed_qcs": ["bar", "foo"]}),
         ],
     )
@@ -1344,10 +1351,14 @@ def test_quality_control_metrics(es_testapp, workbook):
     sample_processing_without_samples_uuid = "589fee08-e054-4786-862d-f7250a435793"
     sample_processing_one_sample_uuid = "589fee08-e054-4786-862d-f7250a435794"
     sample_processing_two_samples_uuid = "8471a80f-81c6-4663-a182-c2955c21c6ce"
+    sample_processing_one_sample_no_vcfs_uuid = "d9a26951-9bfa-4a11-a014-35d5724bfbff"
+    sample_processing_one_sample_no_files_uuid = "5cac1b7d-563d-4258-b93b-37b3a6f765d5"
 
     no_samples_atid = make_atid(sample_processing_without_samples_uuid)
     one_sample_atid = make_atid(sample_processing_one_sample_uuid)
     two_samples_atid = make_atid(sample_processing_two_samples_uuid)
+    one_sample_no_vcfs_atid = make_atid(sample_processing_one_sample_no_vcfs_uuid)
+    one_sample_no_files_atid = make_atid(sample_processing_one_sample_no_files_uuid)
 
     sample_processing_without_samples = es_testapp.get(no_samples_atid, status=200).json
     assert sample_processing_without_samples.get("quality_control_metrics") is None
@@ -1363,10 +1374,16 @@ def test_quality_control_metrics(es_testapp, workbook):
         QcTestConstants.SAMPLE_2_QC_METRICS,
     ]
 
-    patch_body = {"processed_files": []}
-    sample_processing_one_sample_no_files = es_testapp.patch_json(
-        one_sample_atid, patch_body, status=200
-    ).json["@graph"][0]
-    assert sample_processing_one_sample_no_files.get("quality_control_metrics") == [
+    sample_processing_one_sample_no_vcfs = es_testapp.get(
+        one_sample_no_vcfs_atid, status=200
+    ).json
+    assert sample_processing_one_sample_no_vcfs.get("quality_control_metrics") == [
         QcTestConstants.SAMPLE_1_BAM_ONLY_QC_METRICS
+    ]
+
+    sample_processing_one_sample_no_files = es_testapp.get(
+        one_sample_no_files_atid, status=200
+    ).json
+    assert sample_processing_one_sample_no_files.get("quality_control_metrics") == [
+        QcTestConstants.SAMPLE_1_NO_FILES_QC_METRICS
     ]

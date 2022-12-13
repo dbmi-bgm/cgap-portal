@@ -58,8 +58,7 @@
         "description": "bam",
         "valid_item_types": [
             "FileReference",
-            "FileProcessed",
-            "FileSubmitted"
+            "FileProcessed"
         ],
         "standard_file_extension": "bam",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
