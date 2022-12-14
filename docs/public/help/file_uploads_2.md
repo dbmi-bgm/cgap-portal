@@ -1,1 +1,0 @@
-[<img src="https://github.com/dbmi-bgm/cgap-portal/raw/master/docs/public/help/help_linked_docs/submit_cli.png" width="560" height="315"/>](https://www.youtube.com/watch?v=4Su3a7AE0HY&t=115s "CLI Submission")
