@@ -88,14 +88,18 @@ def _build_sample_processing_embedded_list():
     """Helper function to build embedded list for sample_processing."""
     return [
         # File linkTo
+        "files.quality_metric",  # to update QC calcprop
         "processed_files.accession",  # used to locate this file from annotated VCF via search
         "processed_files.variant_type",
         "processed_files.file_type",
         "processed_files.upload_key",  # used by Higlass browsers
         "processed_files.higlass_file",  # used by Higlass browsers
+        "processed_files.quality_metric",  # to update QC calcprop
         # Sample linkTo
         "samples.completed_processes",
+        "samples.files.quality_metric",  # to update QC calcprop
         "samples.processed_files.uuid",
+        "samples.processed_files.quality_metric",  # to update QC calcprop
     ]
 
 

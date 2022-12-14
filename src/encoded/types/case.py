@@ -198,7 +198,7 @@ def _build_case_embedded_list():
         "sample.processed_files.quality_metric.quality_metric_summary.value",
         "sample.processed_files.quality_metric.quality_metric_summary.numberType",
         # SampleProcessing QC calcprop
-        "sample_processing.quality_control_metrics",
+        "sample_processing.quality_control_metrics.*",
         # Sample Processing linkTo
         "sample_processing.analysis_type",
         "sample_processing.analysis_version",
