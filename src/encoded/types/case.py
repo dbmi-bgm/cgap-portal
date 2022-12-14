@@ -311,7 +311,12 @@ class Case(Item):
         }
     )
     def sample(self, request, individual=None, sample_processing=None):
-        result = None
+        """Identify case's sample of interest.
+
+        TODO: Change default from empty dict to None. Needs
+        coordination with front-end to prevent breaking display.
+        """
+        result = {}
         if individual and sample_processing:
             individual_item = get_item(request, individual)
             sample_processing_item = get_item(request, sample_processing)
@@ -337,9 +342,12 @@ class Case(Item):
         }
     )
     def secondary_families(self, request, individual=None, family=None):
-        """Calculate secondary families for a given case
-        family = @id of primary family"""
-        result = None
+        """Calculate secondary families for a given case.
+
+        TODO: Change default from empty list to None. May require
+        coordination with front-end.
+        """
+        result = []
         if individual and family:
             individual_item = get_item(request, individual)
             individual_families = individual_item.get("families", [])
@@ -438,7 +446,10 @@ class Case(Item):
     @calculated_property(
         schema={
             "title": "Search Query Filter String Add-On",
-            "description": "String to be appended to the initial search query to limit variant sample results to those related to this case.",
+            "description": (
+                "String to be appended to the initial search query to limit variant"
+                " sample results to those related to this case."
+            ),
             "type": "string",
         }
     )
@@ -446,9 +457,13 @@ class Case(Item):
         self, request, sample_processing=None, individual=None
     ):
         """
-        Use vcf file and sample accessions to limit variant/variantsample to this case
+        Use vcf file and sample accessions to limit VariantSamples to
+        this case.
+
+        TODO: Change default result from empty string to None. May
+        require coordination with front-end.
         """
-        result = None
+        result = ""
         if individual and sample_processing:
             sample = self.sample(request, individual, sample_processing)
             vcf = self.vcf_file(request, sample_processing)
@@ -475,8 +490,11 @@ class Case(Item):
         """
         Use SV and CNV VCF files and sample accessions to limit
         structural variant samples to this case.
+
+        TODO: Change default result from empty string to None. May
+        require coordination with front-end.
         """
-        result = None
+        result = ""
         if individual and sample_processing:
             sample = self.sample(request, individual, sample_processing)
             sv_vcf = self.structural_variant_vcf_file(request, sample_processing)
@@ -505,7 +523,12 @@ class Case(Item):
     def additional_variant_sample_facets(
         self, request, sample_processing=None, extra_variant_sample_facets=None
     ):
-        result = None
+        """Get additional facets for filtering space.
+
+        TODO: Change default result from empty list to None. May
+        require coordination with front-end.
+        """
+        result = []
         if sample_processing:
             fields = extra_variant_sample_facets or []
             sp_item = get_item(request, sample_processing)
