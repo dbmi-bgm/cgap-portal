@@ -118,7 +118,6 @@ class QcConstants:
     PREDICTED_SEX = "predicted_sex"
     PREDICTED_ANCESTRY = "predicted_ancestry"
     TOTAL_READS = "total_reads"
-    COVERAGE = "coverage"
     TOTAL_VARIANTS_CALLED = "total_variants_called"
     FILTERED_VARIANTS = "filtered_variants"
     FILTERED_STRUCTURAL_VARIANTS = "filtered_structural_variants"
