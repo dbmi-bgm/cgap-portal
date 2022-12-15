@@ -67,7 +67,8 @@ class TestGeneListSubmission:
         assert creation_response["status"] == "success"
         assert submission_response["success"]
 
-    def test_basic_genelist(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_basic_genelist(self, es_testapp, wb_project, wb_institution):
         """
         Tests for gene list functionality given gene list with all genes
         identifiable in the database and a title.
@@ -89,7 +90,8 @@ class TestGeneListSubmission:
         assert genelist.validation_output
         assert genelist.post_output
 
-    def test_parse_empty_genelist(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_parse_empty_genelist(self, es_testapp, wb_project, wb_institution):
         """
         Tests for detection of empty gene list and no title.
         """
@@ -103,9 +105,8 @@ class TestGeneListSubmission:
         assert not genelist.genes
         assert genelist.errors
 
-    def test_parse_empty_genelist_excel(
-        self, es_testapp, workbook, wb_project, wb_institution
-    ):
+    @pytest.mark.workbook
+    def test_parse_empty_genelist_excel(self, es_testapp, wb_project, wb_institution):
         """
         Tests for correct detection of no title and no genes provided when
         given an excel gene list.
@@ -120,7 +121,8 @@ class TestGeneListSubmission:
         assert not genelist.genes
         assert genelist.errors
 
-    def test_match_genes(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_match_genes(self, es_testapp, wb_project, wb_institution):
         """
         Tests for matching of genes given various ID types (correct gene
         symbol, previous symbol, OMIM ID, etc.) as well as removal of duplicate
@@ -135,7 +137,8 @@ class TestGeneListSubmission:
         )
         assert len(genelist.gene_ids) == 3
 
-    def test_no_match_genes(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_no_match_genes(self, es_testapp, wb_project, wb_institution):
         """
         Ensure genes that don't match any existing genes are identified and
         possible alternative genes are provided, if applicable. Also, no
@@ -151,7 +154,8 @@ class TestGeneListSubmission:
         assert genelist.errors
         assert not genelist.post_output
 
-    def test_gene_url_encoding(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_gene_url_encoding(self, es_testapp, wb_project, wb_institution):
         """Test search on provided genes with non-URL characters works
         as expected (redirects followed).
 
@@ -171,12 +175,13 @@ class TestGeneListSubmission:
         assert genelist.errors
         gene_in_error = False
         for gene in genelist.genes:
-            if any([gene in error for error in genelist.errors]):
+            if any(gene in error for error in genelist.errors):
                 gene_in_error = True
         assert gene_in_error
         assert not genelist.post_output
 
-    def test_validate_and_post(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_validate_and_post(self, es_testapp, wb_project, wb_institution):
         """
         Test for correct validation but no posting of document and gene list
         when some genes are not identified in the database.
@@ -190,7 +195,8 @@ class TestGeneListSubmission:
         assert genelist.validation_output
         assert not genelist.post_output
 
-    def test_existing_title(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_existing_title(self, es_testapp, wb_project, wb_institution):
         """
         Ensure gene list and document are patched if attempting to submit gene
         list with title identical to the title of a previously created gene
@@ -207,7 +213,8 @@ class TestGeneListSubmission:
         assert genelist.patch_document_uuid
         assert genelist.bam_sample_ids
 
-    def test_excel_format(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_excel_format(self, es_testapp, wb_project, wb_institution):
         """
         Test for correct parsing of excel-formatted gene list.
         """
@@ -220,6 +227,7 @@ class TestGeneListSubmission:
         assert len(genelist.gene_ids) == 2
         assert genelist.post_output
 
+    @pytest.mark.workbook
     def test_valid_case_accession(self, es_testapp, wb_project, wb_institution):
         """
         Test for successful gene list submission when a valid case accession is
@@ -236,6 +244,7 @@ class TestGeneListSubmission:
         assert genelist.post_output
         assert not genelist.errors
 
+    @pytest.mark.workbook
     def test_invalid_case_accession(self, es_testapp, wb_project, wb_institution):
         """
         Test for unsuccessful gene list submission when invalid case accession
@@ -252,6 +261,7 @@ class TestGeneListSubmission:
         assert genelist.errors
         assert not genelist.post_output
 
+    @pytest.mark.workbook
     def test_xlsx_case_parsing(self, es_testapp, wb_project, wb_institution):
         """
         Test that Excel (.xlsx) files including case accessions are appropriately
@@ -268,7 +278,8 @@ class TestGeneListSubmission:
 
 
 class TestVariantUpdateSubmission:
-    def test_variant_update(self, es_testapp, workbook, wb_project, wb_institution):
+    @pytest.mark.workbook
+    def test_variant_update(self, es_testapp, wb_project, wb_institution):
         """
         Ensure variant_update ingestion class parses file of input gene
         uuids and queues project-associated (structural) variant
@@ -286,6 +297,7 @@ class TestVariantUpdateSubmission:
         assert variant_update.post_output
         assert not variant_update.errors
 
+    @pytest.mark.workbook
     def test_variant_update_with_case(self, es_testapp, wb_project, wb_institution):
         """
         Test that submission with case information (BAM sample IDs) is
@@ -303,6 +315,7 @@ class TestVariantUpdateSubmission:
         assert len(variant_update.bam_sample_ids) == 1
         assert not variant_update.errors
 
+    @pytest.mark.workbook
     def test_core_variant_update(self, es_testapp, core_project, wb_institution):
         """
         Test that submission from CGAP_CORE_PROJECT will update all
@@ -373,6 +386,7 @@ class TestVariantUpdateSubmission:
         assert submission_response["success"]
 
 
+@pytest.mark.workbook
 def test_batch_search(es_testapp, wb_project, wb_institution):
     """
     Test batch search returns all search items rather than the default
@@ -392,6 +406,6 @@ def test_batch_search(es_testapp, wb_project, wb_institution):
         fields=fields,
     )
     assert len(response) > 25
-    for idx in range(len(response)):
-        assert "uuid" in response[idx]
-        assert response[idx]["project"]["@id"] == project
+    for item in response:
+        assert item["uuid"]
+        assert item["project"]["@id"] == project

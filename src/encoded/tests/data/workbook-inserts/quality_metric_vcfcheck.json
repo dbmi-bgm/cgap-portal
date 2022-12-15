@@ -1,0 +1,13 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "uuid": "8e570bc8-ffe5-426b-a564-9ecdd7e95baa",
+        "aliases": [
+            "hms-dbmi:vcf_check_qc"
+        ],
+        "status": "in review",
+        "quickcheck": "OK",
+        "overall_quality_status": "PASS"
+    }
+]

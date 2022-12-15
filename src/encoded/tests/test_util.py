@@ -1,3 +1,4 @@
+import copy
 import datetime
 import io
 import os
@@ -20,6 +21,7 @@ from ..util import (
     convert_integer_to_comma_string,
     title_to_snake_case,
     get_item,
+    transfer_properties,
 )
 from .. import util as util_module
 
@@ -338,16 +340,17 @@ def test_title_to_snake_case(value, expected):
 
 
 @pytest.mark.parametrize(
-    "item_atid,get_item_or_none_result,expected",
+    "item_atid,get_item_or_none_called,get_item_or_none_result,expected",
     [
-        ("", None, {}),
-        ("not_an_atid", None, {}),
-        ("/genes/ENSG00000198727/", None, {}),
-        ("/genes/ENSG00000198727/", {"foo": "bar"}, {"foo": "bar"}),
+        (None, False, None, {}),
+        ("", True, None, {}),
+        ("not_an_atid", True, None, {}),
+        ("/genes/ENSG00000198727/", True, None, {}),
+        ("/genes/ENSG00000198727/", True, {"foo": "bar"}, {"foo": "bar"}),
     ],
 )
-def test_get_item(item_atid, get_item_or_none_result, expected):
-    """Unit test item retrieval with mocked get_item_or_none."""
+def test_get_item(item_atid, get_item_or_none_called, get_item_or_none_result, expected):
+    """Test item retrieval with mocked get_item_or_none."""
     request = "foo"
     with mock.patch.object(
         util_module,
@@ -356,14 +359,44 @@ def test_get_item(item_atid, get_item_or_none_result, expected):
     ) as mocked_get_item_or_none:
         with mock.patch.object(util_module, "log") as mocked_log:
             result = get_item(request, item_atid)
-            expected_call = [
-                request,
-                item_atid,
-                item_atid.split("/")[0],
-            ]
-            assert mocked_get_item_or_none.called_once_with(expected_call)
-            if get_item_or_none_result is None:
-                mocked_log.exception.assert_called_once()
+            if get_item_or_none_called:
+                expected_call = [
+                    request,
+                    item_atid,
+                    item_atid.split("/")[0],
+                ]
+                assert mocked_get_item_or_none.called_once_with(expected_call)
+                if get_item_or_none_result is None:
+                    mocked_log.exception.assert_called_once()
+                else:
+                    assert not mocked_log.exception.called
             else:
-                assert not mocked_log.exception.called
+                mocked_get_item_or_none.assert_not_called()
             assert result == expected
+
+
+@pytest.mark.parametrize(
+    "source,target,properties,property_replacements,expected",
+    [
+        ({}, {}, [], {}, {}),
+        ({"foo": "bar"}, {}, [], {}, {}),
+        ({"foo": "bar"}, {}, ["foo"], {}, {"foo": "bar"}),
+        ({"foo": "bar"}, {"fu": "bur"}, ["foo"], {}, {"foo": "bar", "fu": "bur"}),
+        ({"foo": "bar"}, {}, ["fu"], {}, {}),
+        ({"foo": "bar"}, {}, ["foo"], {"foo": "fu"}, {"fu": "bar"}),
+        (
+            {"foo": "bar"},
+            {"foo": "bar"},
+            ["foo"],
+            {"foo": "fu"},
+            {"foo": "bar", "fu": "bar"},
+        ),
+    ]
+)
+def test_transfer_properties(
+    source, target, properties, property_replacements, expected
+):
+    original_source = copy.deepcopy(source)
+    transfer_properties(source, target, properties, property_replacements)
+    assert target == expected
+    assert source == original_source

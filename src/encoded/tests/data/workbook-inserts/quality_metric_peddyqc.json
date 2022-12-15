@@ -1,0 +1,23 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "aliases": ["hms-dbmi:peddyqc"],
+        "uuid": "feb921a1-064e-4aef-b8c0-b88f3faa548f",
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "url": "https://foo.bar",
+        "ancestry and sex prediction": [
+            {
+                "name": "Sample_ID",
+                "predicted sex": "male",
+                "predicted ancestry": "EARTH"
+            },
+            {
+                "name": "Another_Sample_ID",
+                "predicted sex": "male",
+                "predicted ancestry": "MARS"
+            }
+        ]
+    }
+]
