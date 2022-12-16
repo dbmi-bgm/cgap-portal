@@ -911,9 +911,14 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
             <div className="d-flex align-items-center justify-items-center">
                 <i className={`icon icon-${icon} fas mr-1`} />
                 <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
-                    {role}:
-                    <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">{specimenType} - {sequencingType}</div>
-                    <div className="text-400 text-muted text-truncate d-inline-block">({sampleID})</div>
+                    {role ? `${role}:`: ""}
+                    <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">
+                        {specimenType && sequencingType ? `${specimenType} - ${sequencingType}`:
+                            specimenType ? specimenType : sequencingType}
+                    </div>
+                    <div className="text-400 text-muted text-truncate d-inline-block">
+                        {sampleID ? `(${sampleID})` : ""}
+                    </div>
                 </div>
             </div>
             { children }
