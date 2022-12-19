@@ -90,6 +90,11 @@ export class CurrentFamilyController extends React.PureComponent {
         return buildFunc(dataset);
     }
 
+    static filterFamiliesWithViewPermission(spFamilies){
+        if (!Array.isArray(spFamilies)) return [];
+        return spFamilies.filter(CurrentFamilyController.haveFullViewPermissionForFamily);
+    }
+
     constructor(props) {
         super(props);
         const {
@@ -103,10 +108,7 @@ export class CurrentFamilyController extends React.PureComponent {
 
         this.memoized = {
             haveFullViewPermissionForFamily: memoize(CurrentFamilyController.haveFullViewPermissionForFamily),
-            filterFamiliesWithViewPermission: memoize(function(spFamilies){
-                if (!Array.isArray(spFamilies)) return [];
-                return spFamilies.filter(CurrentFamilyController.haveFullViewPermissionForFamily);
-            }),
+            filterFamiliesWithViewPermission: memoize(CurrentFamilyController.filterFamiliesWithViewPermission),
             buildGraphData: memoize(CurrentFamilyController.buildGraphData),
             parseFamilyIntoDataset: memoize(parseFamilyIntoDataset),
             calculateIdToGraphIdentifier: memoize(calculateIdToGraphIdentifier),

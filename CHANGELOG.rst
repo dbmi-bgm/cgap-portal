@@ -6,8 +6,20 @@ cgap-portal
 Change Log
 ----------
 
+12.2.0
+======
+
+`PR 666: Quality Control Updates <https://github.com/dbmi-bgm/cgap-portal/pull/666>`_
+
+* Add SampleProcessing calculated property to track QCs for each Sample
+* Add Case calculated property to record QC flag counts + overall flag
+* Update Bioinformatics tab QC table to display QCs for all Samples
+* Add Case column + facet to view and filter flag results
+
+
 12.1.0
 ======
+
 `PR 674: Add social links + youtube embed component <https://github.com/dbmi-bgm/cgap-portal/pull/674>`_
 
 * Add new "Video Tutorials" external link to the help menu (goes to the YouTube channel)
