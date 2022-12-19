@@ -6,7 +6,9 @@ from copy import deepcopy
 from pkg_resources import resource_listdir
 from snovault import COLLECTIONS, TYPES
 from snovault.schema_utils import load_schema
+
 from ..commands.order_schema_columns_and_facets import order_schema_columns_and_facets
+from .utils import pluralize
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
@@ -125,25 +127,6 @@ def compute_master_mixins():
 
 def camel_case(name):
     return ''.join(x for x in name.title() if not x == '_')
-
-
-def pluralize(name):
-    name = name.replace('_', '-')
-    # deal with a few special cases explicitly
-    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run', 'note']
-    for sp in specials:
-        if name.startswith(sp) and re.search('-(set|flag|format|type)', name) is None:
-            return name.replace(sp, sp + 's')
-        elif name.startswith(sp) and re.search('setting', name):
-            return name.replace(sp, sp + 's')
-    # otherwise just add 's/es/ies'
-    if name.endswith('ly'):
-        return name[:-1] + 'ies'
-    if name.endswith('sis'):
-        return name[:-2] + 'es'
-    if name.endswith('s'):
-        return name + 'es'
-    return name + 's'
 
 
 # XXX: Mismatch with image.json?

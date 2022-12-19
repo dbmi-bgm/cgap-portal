@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
@@ -8,7 +8,7 @@ import ReactTooltip from 'react-tooltip';
 
 import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
-import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
+import { capitalize, decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 
 import { responsiveGridState } from './../../util/layout';
@@ -31,6 +31,7 @@ import { CaseReviewTab } from './CaseReviewTab';
 import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
+import { Accordion, AccordionContext, Card, useAccordionToggle } from 'react-bootstrap';
 
 
 
@@ -702,7 +703,12 @@ const bioinfoPopoverContent = {
 };
 
 const mapLongFormSexToLetter = (sex) => {
-    switch (sex) {
+    if (!sex) { return; }
+
+    // Ensure it's lowercase
+    const sexLower = sex.toLowerCase();
+
+    switch (sexLower) {
         case "male":
             return "M";
         case "female":
@@ -716,199 +722,40 @@ const mapLongFormSexToLetter = (sex) => {
     }
 };
 
-const validateHeterozygosity = (hetVal) => {
-    // pass if in the range of 1.4-2.5, warn otherwise
-    if (hetVal >= 1.4 && hetVal <= 2.5) {
-        return "success"; // no flag necessary
-    } else if (hetVal < 1.4 && hetVal > 1.2) {
-        return "warning";
-    } else {
-        return "danger";
-    }
-};
-
-const validateTransTrans = (transTransVal, analysisType) => {
-    switch (analysisType) {
-        case "WGS":
-        case "WGS-Trio":
-        case "WGS-Group":
-        case "WGS-Upstream only":
-            if (transTransVal >= 1.8 && transTransVal <= 2.1) {
-                return "success";
-            } else if (
-                (transTransVal >= 1.6 && transTransVal < 1.8) ||
-                (transTransVal > 2.1 && transTransVal <= 2.3)
-            ) {
-                return "warning";
-            } else {
-                return "danger";
-            }
-        case "WES":
-        case "WES-Trio":
-        case "WES-Group":
-            if (transTransVal >= 2.3 && transTransVal <= 3.3) {
-                return "success";
-            } else if (
-                (transTransVal >= 2.1 && transTransVal < 2.3) ||
-                (transTransVal > 3.3 && transTransVal <= 3.5)
-            ) {
-                return "warning";
-            } else {
-                return "danger";
-            }
-        default: // "custom option
-            return null; // can't do validation, so don't want to show a flag
-    }
-};
-
-const validatePredictedSex = (submittedSex, predictedSex) => {
-    if (!submittedSex) {
-        return null; // nothing to compare to, no flag
-    } else if (!predictedSex) {
-        return "warning"; // should be a prediction; if not, warn.
-    } else if (!(predictedSex === "M" || predictedSex === "F")) {
-        return "danger"; // predicted sex is unknown, indicates a potential problem with peddy QC
-    } else if (predictedSex !== submittedSex) {
-        return "warning"; // predicted sex is opposite from expected, may indicate an issue with submitted
-    } else {
-        return "success"; // should match
+const flagToBootstrapClass = (flag) => {
+    switch (flag) {
+        case "pass":
+            return "success";
+        case "fail":
+            return "danger";
+        case "warn":
+            return "warning";
+        default:
+            return "";
     }
 };
 
 const BioinfoStats = React.memo(function BioinfoStats(props) {
-    // Note: Can probably clean up the render method of this a little bit by breaking each row
-    // into its own component. Not sure if worth it to do yet; is pretty long and repetitive, but
-    // may also be necessary to add to/edit rows individually in the future.
-    const { caseSample = null, sampleProcessing = null, submittedSex = null, submittedAncestry = [] } = props;
+    const { canonicalFamily, caseSample = null, sampleProcessing = null, idToGraphIdentifier, relationshipMapping } = props;
 
+    return (<QCMAccordion {...{ sampleProcessing, canonicalFamily, relationshipMapping, idToGraphIdentifier }} />);
+});
+
+function BioinfoStatTable({ qualityControlMetrics }) {
     const {
-        bam_sample_id: caseSampleId = null,
-        processed_files: caseProcFiles = []
-    } = caseSample || {};
-    const {
-        processed_files: msaProcFiles = [],
-        analysis_type: analysisType
-    } = sampleProcessing || {};
-
-    const msaStats = useMemo(function(){
-        const msaStats = {};
-
-        function transformValueType(numberType, value){
-            const useFunc = { // Probably can just use `parseFloat` for any number but what the heck.
-                "integer": parseInt,
-                "float": parseFloat,
-                "percent": parseFloat
-            }[numberType];
-            if (useFunc) {
-                const transformedValue = useFunc(value);
-                if (!isNaN(transformedValue)) return transformedValue;
-            }
-            return value;
-        }
-
-        // Pull coverage and reads values from this case's sample's bam file
-        caseProcFiles.forEach(function(procFile){
-            const {
-                quality_metric: {
-                    "@type": [ qmType ]=[],
-                    quality_metric_summary: qmSummaries = []
-                } = {}
-            } = procFile;
-            // Only continue if qclist (bamQC should only exist if there is also bamcheck)
-            if (qmType === "QualityMetricQclist") {
-                // Coverage and total reads should only be present in BAM, update if found
-                qmSummaries.forEach(function(qmSummary){
-                    const { title = null, value = null, numberType = "string" } = qmSummary;
-                    if (title === "Coverage") {
-                        msaStats.coverage = { value: transformValueType(numberType, value) };
-                    } else if (title === "Total Reads") {
-                        msaStats.reads = { value: transformValueType(numberType, value) };
-                    }
-                });
-            }
-        });
-
-        // Pull variant stats, T-T ratio, heterozygosity ratio, etc. from sample_processing
-        msaProcFiles.forEach(function(procFile){
-            const {
-                variant_type: variantType = "SNV", // SVs are always labelled, SNVs may or may not be (ask bioinfo team for details)
-                quality_metric: {
-                    "@type": [ qmType ]=[],
-                    quality_metric_summary: qmSummaries = [],
-                    qc_list = []
-                }={}
-            } = procFile;
-
-            // Only continue if qclist (vcfQC should only exist if there is also vcfcheck; peddyQC also requires qcList)
-            if (qmType === "QualityMetricQclist") {
-                // SNV fields are unique from SV ones; so ensure the correct ones are added to msaStats for each
-                if (variantType === "SV") {
-                    // Stats should only be present in combined VCF, update if found
-                    qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
-                        if (sample && sample === caseSampleId) {
-                            switch (title) { // Leaving this as switch case, since more fields may be added in future (may also be worth creating a function to encompass SV & SNV options as this grows)
-                                case "Filtered Variants":
-                                    msaStats.filteredSVVariants = { value: transformValueType(numberType, value) };
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    });
-                } else { // SNV may be labelled or not
-                    // Most stats should only be present in combined VCF, update if found
-                    qmSummaries.forEach(function(qmSummary){
-                        const { title = null, value = null, sample = null, numberType = "string" } = qmSummary;
-                        if (sample && sample === caseSampleId) {
-                            switch (title) {
-                                case "De Novo Fraction":
-                                    msaStats.deNovo = { value: transformValueType(numberType, value) };
-                                    break;
-                                case "Heterozygosity Ratio":
-                                    msaStats.heterozygosity = { value: transformValueType(numberType, value), validationStatus: validateHeterozygosity(value) };
-                                    break;
-                                case "Transition-Transversion Ratio":
-                                    msaStats.transTransRatio = { value: transformValueType(numberType, value), validationStatus: validateTransTrans(value, analysisType) };
-                                    break;
-                                case "Total Variants Called":
-                                    msaStats.totalSNVIndelVars = { value: transformValueType(numberType, value) };
-                                    break;
-                                case "Filtered Variants":
-                                    msaStats.filteredSNVIndelVariants = { value: transformValueType(numberType, value) };
-                                    break;
-                                default:
-                                    break;
-                            }
-                        }
-                    });
-
-                    // Predicted Sex and Ancestry found in qclist
-                    // TODO: At some point see if URL can be moved to qmsummary - if so, move this into above block
-                    qc_list.forEach(function(qc) {
-                        const { value: { "@id": qmId, "ancestry and sex prediction": predictions = [] } = {}, qc_type } = qc;
-                        const qmUrl = qmId + '/@@download';
-                        if (qc_type === "quality_metric_peddyqc") {
-                            predictions.forEach(function(prediction) {
-                                const { name, "predicted sex": predictedSex, "predicted ancestry": predictedAncestry } = prediction;
-                                const shortFormPredictedSex = mapLongFormSexToLetter(predictedSex);
-
-                                if (name === caseSampleId) { // double check that it's the prediction for the current case
-                                    msaStats.predictedSex = { value: shortFormPredictedSex, url: qmUrl, validationStatus: validatePredictedSex(submittedSex, shortFormPredictedSex) };
-                                    msaStats.predictedAncestry = { value: predictedAncestry, url: qmUrl };
-                                }
-                            });
-                        }
-                    });
-                }
-            }
-        });
-
-        return msaStats;
-    }, [ caseProcFiles, msaProcFiles ]);
-
-    const { reads = {}, coverage = {}, totalSNVIndelVars = {}, transTransRatio = {}, heterozygosity = {}, deNovo = {},
-        filteredSNVIndelVariants = {}, filteredSVVariants = {}, predictedSex = {}, predictedAncestry = {} } = msaStats;
+        total_reads: reads = {},
+        coverage = {},
+        total_variants_called: totalSNVIndelVars = {},
+        transition_transversion_ratio: transTransRatio = {},
+        heterozygosity_ratio: heterozygosity = {},
+        de_novo_fraction: deNovo = {},
+        filtered_variants: filteredSNVIndelVariants = {},
+        filtered_structural_variants: filteredSVVariants = {},
+        predicted_sex: predictedSex = {},
+        predicted_ancestry: predictedAncestry = {},
+        sex: submittedSex = {},
+        ancestry: { value: submittedAncestry = [] } = {}
+    } = qualityControlMetrics;
 
     const fallbackElem = "-";
 
@@ -916,33 +763,35 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
         <React.Fragment>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Total Number of Reads">
-                    { typeof reads.value === "number" ? decorateNumberWithCommas(reads.value) : fallbackElem }
+                    { reads.value ? decorateNumberWithCommas(+reads.value) : fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage">
                     { coverage.value || fallbackElem }
+                    { (coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
-                    { typeof totalSNVIndelVars.value === "number" ? decorateNumberWithCommas(totalSNVIndelVars.value): fallbackElem }
+                    { totalSNVIndelVars.value ? decorateNumberWithCommas(+totalSNVIndelVars.value): fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
-                    { typeof transTransRatio.value === "number" ? transTransRatio.value || "0.0" : fallbackElem }
-                    { (transTransRatio.value && transTransRatio.validationStatus) && <i className={`icon icon-flag fas text-${transTransRatio.validationStatus} ml-05`} />}
+                    { transTransRatio.value || fallbackElem }
+                    { (transTransRatio.value && transTransRatio.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(transTransRatio.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Submitted Sex" >
-                    { submittedSex || fallbackElem }
+                    { submittedSex.value || fallbackElem }
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
-                    { predictedSex.value || fallbackElem }&nbsp;
-                    { !!predictedSex.url && <a href={predictedSex.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
-                    { predictedSex.validationStatus && <i className={`icon icon-flag fas text-${predictedSex.validationStatus} ml-02`} />}
+                    { mapLongFormSexToLetter(predictedSex.value) || fallbackElem }&nbsp;
+                    { !!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    { predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
+                </BioinfoStatsEntry>
+                <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
+                    { heterozygosity.value || fallbackElem }
+                    { (heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`}/>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
-                    { typeof filteredSNVIndelVariants.value === "number" ? decorateNumberWithCommas(filteredSNVIndelVariants.value) : fallbackElem }
-                </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
-                    { typeof filteredSVVariants.value === "number" ? decorateNumberWithCommas(filteredSVVariants.value) : fallbackElem }
+                    { filteredSNVIndelVariants.value ? decorateNumberWithCommas(+filteredSNVIndelVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
@@ -951,33 +800,34 @@ const BioinfoStats = React.memo(function BioinfoStats(props) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     { predictedAncestry.value || fallbackElem }&nbsp;
-                    { !!predictedAncestry.url && <a href={predictedAncestry.url} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    { !!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
-                    { typeof heterozygosity.value === "number" ? heterozygosity.value || "0.0" : fallbackElem }
-                    { (heterozygosity.value && heterozygosity.validationStatus) && <i className={`icon icon-flag fas text-${heterozygosity.validationStatus} ml-05`}/>}
+                <BioinfoStatsEntry label="SNV/Indel De novo Fraction">
+                    { deNovo.value || fallbackElem }
+                    { (deNovo.value && deNovo.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(deNovo.flag)} ml-05`}/>}
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="De novo Fraction">
-                    { typeof deNovo.value === "number" ? deNovo.value + "%" : fallbackElem }
+                <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
+                    { filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem }
                 </BioinfoStatsEntry>
             </div>
         </React.Fragment>
     );
-});
+}
 
 function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
+    const id = "biostatsentry_" + label.split(" ").join("_");
     return (
         <div className="col-12 col-md-6 col-lg-3 col-xl-3 py-2">
             <div className="qc-summary">
-                <label className="d-block mb-0">
+                <label className="d-inline mb-0" htmlFor={id}>
                     { label }:
                     { !popoverContent && tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
                             data-tip={tooltip} data-place="right"/>
                         : null }
-                    { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
                 </label>
-                <div>{ children }</div>
+                { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
+                <div {...{ id }}>{ children }</div>
             </div>
         </div>
     );
@@ -999,7 +849,8 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     const {
         // original_pedigree: { display_title: pedFileName } = {},
-        display_title: familyDisplayTitle
+        display_title: familyDisplayTitle,
+        relationships = []
     } = canonicalFamily;
 
     const title = (
@@ -1015,26 +866,236 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         </h4>
     );
 
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = generateRelationshipMapping(relationships);
+
     return (
         <React.Fragment>
             <h1><span className="text-300">Bioinformatics Analysis</span></h1>
-            {/* <div className="tab-inner-container clearfix font-italic qc-status">
+            {/* TODO: See if there's any desire to include QC statuses here (BAM, SNV, SV, etc.)
+            <div className="tab-inner-container clearfix font-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div> */}
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Quality Control Metrics (QC)</h4>
-                <div className="card-body py-3">
-                    <BioinfoStats {...{ caseSample, sampleProcessing, submittedAncestry, submittedSex }} />
-                </div>
+                <BioinfoStats {...{ caseSample, canonicalFamily, sampleProcessing, submittedAncestry, submittedSex, idToGraphIdentifier, relationshipMapping }} />
             </div>
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
                     { title }
-                    <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier }} />
+                    <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier, relationshipMapping }} />
                 </div>
             </div>
         </React.Fragment>
     );
 });
+
+
+
+function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType, specimenType, sampleID }) {
+    const activeEventKey = useContext(AccordionContext);
+
+    const decoratedOnClick = useAccordionToggle(
+        eventKey,
+        () => callback && callback(eventKey),
+    );
+
+    const isCurrentEventKey = activeEventKey === eventKey;
+
+    const icon = isCurrentEventKey ? "minus" : "plus";
+
+    return (
+        <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center flex-column flex-sm-row">
+            <div className="d-flex align-items-center justify-items-center">
+                <i className={`icon icon-${icon} fas mr-1`} />
+                <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
+                    {role ? `${role}:`: ""}
+                    <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">
+                        {specimenType && sequencingType ? `${specimenType} - ${sequencingType}`:
+                            specimenType ? specimenType : sequencingType}
+                    </div>
+                    <div className="text-400 text-muted text-truncate d-inline-block">
+                        {sampleID ? `(${sampleID})` : ""}
+                    </div>
+                </div>
+            </div>
+            { children }
+        </div>
+    );
+}
+
+
+function QCMAccordion(props) {
+    const {
+        canonicalFamily = {},
+        sampleProcessing = {},
+        idToGraphIdentifier,
+        relationshipMapping = {}
+    } = props || {};
+
+    const {
+        quality_control_metrics = [],
+    } = sampleProcessing;
+
+    const qcmLen = quality_control_metrics.length;
+
+    if (qcmLen === 0) {
+        return <div className="m-4">No Quality Control Metrics Available</div>;
+    }
+
+    const sortedQCMs = sortAndAddRolePropsToQCMs(quality_control_metrics, relationshipMapping);
+
+    return (
+        <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
+            { sortedQCMs.map((qcm, i) => <QCMAccordionDrawer key={qcm.individual_accession} idx={i} {...{ idToGraphIdentifier, relationshipMapping, qcmLen }} qualityControlMetrics={qcm} />)}
+        </Accordion>
+    );
+}
+
+function QCMAccordionDrawer(props) {
+    const { idToGraphIdentifier, qualityControlMetrics, idx, qcmLen } = props || {};
+    const {
+        atID,
+        role,
+        individual_id,
+        individual_accession,
+        warn = [],
+        fail = [],
+        sequencing_type: sequencingType,
+        bam_sample_id: sampleID,
+        specimen_type: specimenType
+    } = qualityControlMetrics || {};
+
+    const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
+    const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
+
+    return (
+        <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0": ""} ${idx === (qcmLen - 1) ? "border-bottom-0": ""}`} key={atID}>
+            <QCMAccordionToggle eventKey={atID} {...{ role, sequencingType, sampleID, specimenType }}>
+                <div className="d-flex align-items-center justify-items-center ml-2 ml-sm-0">
+                    { failFlags }
+                    { warnFlags }
+                </div>
+            </QCMAccordionToggle>
+            <Accordion.Collapse eventKey={atID}>
+                <>
+                    <div className="card-body d-flex align-items-center py-1 px-5" style={{
+                        /** @TODO: Move these styles to SCSS */
+                        backgroundColor: "#f4f4f4",
+                        borderTop: "1px solid rgba(0, 0, 0, 0.08)",
+                        borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
+                    }}>
+                        <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{ individual_id || individual_accession }</a>
+                        <span className="gen-identifier text-600 text-serif text-small pt-03">{ idToGraphIdentifier[atID] }</span>&nbsp;
+                    </div>
+                    <div className="card-body px-5">
+                        <BioinfoStatTable {...{ qualityControlMetrics }} />
+                    </div>
+                </>
+            </Accordion.Collapse>
+        </div>
+    );
+}
+
+export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
+    if (!title || !type) return null;
+
+    const alertClass = type === "warn" ? "warning" : "danger";
+
+    return (
+        <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 d-flex align-items-center justify-items-center ${cls}`} role="alert">
+            <span className="d-none d-lg-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
+            <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
+        </div>
+    );
+}
+
+function qcmFieldNameToDisplay(field = "") {
+    switch(field) {
+        // Special cases
+        case "de_novo_fraction":
+            return "De novo Fraction";
+        case "transition_transversion_ratio":
+            return "Transition-Transversion";
+        case "heterozygosity_ratio":
+            return "Heterozygosity";
+        // Should suffice for most other cases... just split and capitalize each word
+        // case "total_reads":
+        // case "total_variants_called":
+        // case "filtered_variants":
+        // case "filtered_structural_variants":
+        // case "coverage":
+        // case "predicted_sex":
+        // case "predicted_ancestry":
+        default:
+            return field.split("_").map((word) => capitalize(word)).join(" ");
+    }
+}
+
+/** @TODO Group multiple samples by Individual */
+export function sortAndAddRolePropsToQCMs(qcms = [], relationshipMapping) {
+    // Add the new properties to the item without sorting
+    if (qcms.length === 1) {
+        const { 0: { individual_accession: thisAccession } = {} } = qcms;
+
+        const atID = `/individuals/${thisAccession}/`;
+        const relation = relationshipMapping[thisAccession]?.relationship;
+
+        qcms[0].atID = atID;
+        qcms[0].role = relation;
+
+        return qcms;
+    }
+
+    // Specify which order to put roles in
+    const exceptions = {
+        "proband": 1,
+        "mother": 2,
+        "father": 3
+    };
+
+    // Otherwise do sort
+    return qcms.sort((a, b) => {
+        const { individual_accession: aAccession } = a;
+        const { individual_accession: bAccession } = b;
+
+        const atIDA = `/individuals/${aAccession}/`;
+        const atIDB = `/individuals/${bAccession}/`;
+
+        // Find relationships
+        const relationA = relationshipMapping[aAccession]?.relationship;
+        const relationB = relationshipMapping[bAccession]?.relationship;
+
+        // Add props to QCMS for future use
+        a.atID = atIDA;
+        b.atID = atIDB;
+        a.role = relationA;
+        b.role = relationB;
+
+        // Sort by proband first, then by mother and father
+        if (exceptions[relationA] && exceptions[relationB]) {
+            return exceptions[relationA] - exceptions[relationB];
+        } else if (exceptions[relationA]) {
+            return -1;
+        } else if (exceptions[relationB]) {
+            return -1;
+        } else {
+            // Sort leftovers alphabetically
+            return relationA.localeCompare(relationB);
+        }
+    });
+}
+
+export function generateRelationshipMapping(relationshipsFromCanonicalFamily) {
+
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = {};
+    relationshipsFromCanonicalFamily.forEach((item) => {
+        const { relationship = null, sex = null, individual = null } = item;
+        relationshipMapping[individual] = { sex, relationship };
+    });
+
+    return relationshipMapping;
+}
