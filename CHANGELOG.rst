@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+12.4.0
+======
+
+`PR 677: Sample tag submission <https://github.com/dbmi-bgm/cgap-portal/pull/677>`_
+
+* Enable sample tag submission via accessioning spreadsheet
+
+
 12.3.0
 ======
 
