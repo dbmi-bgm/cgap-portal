@@ -467,7 +467,7 @@ def row_dict():
         "specimen type": "Peripheral_Blood",
         "test requested": "WGS",
         "test number": "2",
-        "tags": "foo,BAR, fu, "
+        "tags": "foo,BAR, fu, ",
     }
 
 
