@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+12.3.1
+======
+
+`PR 679: Fix video tutorial link <https://github.com/dbmi-bgm/cgap-portal/pull/679>`_
+
+* Update "Video Tutorials" link on portal sign in page to go to Youtube channel
+
+
 12.3.0
 ======
 
