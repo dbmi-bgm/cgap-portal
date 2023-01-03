@@ -1,0 +1,83 @@
+{
+    "title": "Somatic Analysis",
+    "description": "Somatic analysis of samples",
+    "id": "/profiles/somatic_analysis.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+	"accession"
+    ],
+    "additionalProperties": false,
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/submitted_files"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
+        },
+        {
+            "$ref": "mixins.json#/processed_files"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession": {
+            "accessionType": "SS"
+        },
+        "title": {
+            "title": "Title",
+            "description": "Title for the analysis",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the analysis",
+            "type": "string"
+        },
+        "samples": {
+            "title": "Samples",
+            "description": "Samples used in the analysis",
+            "type": "array",
+            "items": {
+                "title": "Sample",
+                "type": "string",
+                "linkTo": "Sample"
+            }
+        }
+    }
+}
