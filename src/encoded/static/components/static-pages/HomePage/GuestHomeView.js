@@ -59,7 +59,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     <div className="cgap-links text-primary text-small mt-2 mb-5 row">
                         <div className="text-600 pr-sm-1 col-12 col-sm-auto text-center"><a href="https://cgap.hms.harvard.edu">CGAP Homepage</a></div>
                         <div className="text-600 pl-sm-1 pr-sm-1 border-primary col-12 col-sm-auto text-center"><a href="https://cgap-training.hms.harvard.edu/help/logging-in#section1">Account Setup Guide</a></div>
-                        <div className="text-600 pl-sm-1 col-12 col-sm-auto text-center"><a href="https://cgap-training.hms.harvard.edu/help/tutorials">Video Tutorials</a></div>
+                        <div className="text-600 pl-sm-1 col-12 col-sm-auto text-center"><a href="https://www.youtube.com/@cgaptraining">Video Tutorials</a></div>
                     </div>
                 </div>
             </div>
