@@ -95,7 +95,7 @@ def main():
     parser.add_argument('--app-name', help="Pyramid app name in configfile")
     parser.add_argument('--wipe-es', help="Specify to wipe ES", action='store_true', default=False)
     parser.add_argument('--clear-queue', help="Specify to clear the SQS queue", action='store_true', default=False)
-    parser.add_argument('--staggered', default=False,
+    parser.add_argument('--staggered', default=False, action='store_true',
                         help='Pass to trigger staggered reindexing, a new mode that will go type-by-type')
 
     args = parser.parse_args()
