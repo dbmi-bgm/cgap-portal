@@ -4,6 +4,7 @@ import logging
 
 from pyramid.paster import get_app
 from snovault.elasticsearch.create_mapping import run as run_create_mapping
+from snovault.elasticsearch.create_mapping import reindex_by_type_staggered
 from dcicutils.log_utils import set_logging
 from ..appdefs import (
     ITEM_INDEX_ORDER, ENV_HOTSEAT, ENV_WEBDEV, ENV_WEBPROD,
@@ -94,6 +95,8 @@ def main():
     parser.add_argument('--app-name', help="Pyramid app name in configfile")
     parser.add_argument('--wipe-es', help="Specify to wipe ES", action='store_true', default=False)
     parser.add_argument('--clear-queue', help="Specify to clear the SQS queue", action='store_true', default=False)
+    parser.add_argument('--staggered', default=False,
+                        help='Pass to trigger staggered reindexing, a new mode that will go type-by-type')
 
     args = parser.parse_args()
     app = get_app(args.config_uri, args.app_name)
@@ -101,8 +104,10 @@ def main():
     set_logging(in_prod=app.registry.settings.get('production'), log_name=__name__, level=logging.DEBUG)
     # set_logging(app.registry.settings.get('elasticsearch.server'), app.registry.settings.get('production'),
     #             level=logging.DEBUG)
-
-    _run_create_mapping(app, args)
+    if not args.staggered:
+        _run_create_mapping(app, args)
+    else:
+        reindex_by_type_staggered(app)
     exit(0)
 
 
