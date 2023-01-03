@@ -611,7 +611,7 @@ python-versions = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "7.0.0"
+version = "7.0.9.0b0"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
@@ -904,10 +904,10 @@ six = ">=1.9"
 webencodings = "*"
 
 [package.extras]
-lxml = ["lxml"]
-genshi = ["genshi"]
+all = ["genshi", "chardet (>=2.2)", "lxml"]
 chardet = ["chardet (>=2.2)"]
-all = ["lxml", "chardet (>=2.2)", "genshi"]
+genshi = ["genshi"]
+lxml = ["lxml"]
 
 [[package]]
 name = "humanfriendly"
@@ -926,8 +926,8 @@ optional = false
 python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*"
 
 [package.extras]
-testing = ["mock", "pytest-cov", "pytest", "watchdog"]
-docs = ["pylons-sphinx-themes", "sphinx", "watchdog"]
+docs = ["watchdog", "sphinx", "pylons-sphinx-themes"]
+testing = ["watchdog", "pytest", "pytest-cov", "mock"]
 
 [[package]]
 name = "idna"
@@ -1250,8 +1250,8 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
-testing = ["pytest-benchmark", "pytest"]
-dev = ["tox", "pre-commit"]
+dev = ["pre-commit", "tox"]
+testing = ["pytest", "pytest-benchmark"]
 
 [[package]]
 name = "psutil"
@@ -1712,7 +1712,7 @@ python-versions = "*"
 WebOb = "*"
 
 [package.extras]
-testing = ["webtest", "coverage", "pytest-cov", "pytest"]
+testing = ["pytest", "pytest-cov", "coverage", "webtest"]
 
 [[package]]
 name = "s3transfer"
@@ -1983,8 +1983,8 @@ optional = false
 python-versions = "*"
 
 [package.extras]
-testing = ["pytest-cov", "coverage", "pytest"]
-docs = ["repoze.sphinx.autointerface", "sphinx"]
+docs = ["sphinx", "repoze.sphinx.autointerface"]
+testing = ["pytest", "coverage", "pytest-cov"]
 
 [[package]]
 name = "waitress"
@@ -2144,7 +2144,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.1,<3.9"
-content-hash = "ae8a1d19cd18db4f30fda4d565f7483aa52f5e366d286436feba367d2f276311"
+content-hash = "bec8a36920917cb3fd585ca65cef6388473a5457b78ea9cb2e3c5d502e742557"
 
 [metadata.files]
 apipkg = []
