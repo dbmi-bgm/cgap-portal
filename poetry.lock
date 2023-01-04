@@ -611,7 +611,7 @@ python-versions = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "7.0.9.0b2"
+version = "7.0.9.0b3"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
@@ -2144,7 +2144,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.1,<3.9"
-content-hash = "147e77918a35042eac883d1d58dd2aade1cfb8e3de754b7d4eaf679fb56b6bf6"
+content-hash = "5c4568c0496aecfa6dca4a495b578e3eda85017c763ff70a990640fb532a4919"
 
 [metadata.files]
 apipkg = []
