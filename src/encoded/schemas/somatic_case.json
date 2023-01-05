@@ -52,9 +52,9 @@
         "accession": {
             "accessionType": "SC"
         },
-        "case_id": {
+        "title": {
             "title": "Case ID",
-            "description": "An identifier for this case",
+            "description": "Title for the case",
             "type": "string"
         },
         "description": {
@@ -86,7 +86,7 @@
         },
         "status": {
             "title": "Status",
-            "order": 6
+            "order": 4
         }
     },
     "columns": {
