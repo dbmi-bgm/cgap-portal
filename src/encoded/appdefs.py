@@ -55,6 +55,8 @@ ITEM_INDEX_ORDER = [
     'SampleProcessing',
     'CohortAnalysis',
     'Cohort',
+    'SomaticAnalysis',
+    'SomaticCase',
     'StaticSection',
     'Page',
     'AnnotationField',
