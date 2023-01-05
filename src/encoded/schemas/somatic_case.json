@@ -67,6 +67,24 @@
             "description": "The individual who comprises the case",
             "type": "string",
             "linkTo": "Individual"
+        },
+        "analyses": {
+            "title": "Analyses",
+            "description": "Analyses performed on the case",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "linkTo": "SomaticAnalysis"
+            }
+        },
+        "samples": {
+            "title": "Samples",
+            "description": "Samples assigned to the case",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "linkTo": "Sample"
+            }
         }
     },
     "facets": {
@@ -117,7 +135,7 @@
         },
         "individual": {
             "title": "Individual ID",
-            "description": "Proband Individual of this Case",
+            "description": "Individual of this Case",
             "sort_fields": [
                 {
                     "field": "individual.individual_id",

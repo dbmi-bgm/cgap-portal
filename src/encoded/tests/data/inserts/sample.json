@@ -28,7 +28,16 @@
         "institution": "hms-dbmi",
         "status": "shared",
         "uuid": "f4bbc709-40fe-48a4-afde-8e886b571903",
-        "bam_sample_id": "test003_sample"
+        "bam_sample_id": "test003_sample",
+        "tissue_category": "tumor"
+    },
+    {
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "status": "shared",
+        "uuid": "f4bbc709-40fe-48a4-afde-8e886b571904",
+        "bam_sample_id": "test003_normal_sample",
+        "tissue_category": "normal"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",

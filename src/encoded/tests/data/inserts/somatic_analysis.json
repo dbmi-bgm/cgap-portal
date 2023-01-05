@@ -1,0 +1,29 @@
+[
+    {
+        "project": "hms-dbmi:BGM",
+        "institution": "hms-dbmi:bwh",
+        "uuid": "873fb161-5fa7-4897-94c0-dd120f985dec",
+        "aliases": [
+            "hms-dbmi:tumor_analysis_001"
+        ],
+        "title": "tumor_analysis_001",
+        "description": "Breast cancer tumor vs. normal",
+        "samples": [
+            "f4bbc709-40fe-48a4-afde-8e886b571903",
+            "f4bbc709-40fe-48a4-afde-8e886b571904"
+        ]
+    },
+    {
+        "project": "hms-dbmi:BGM",
+        "institution": "hms-dbmi:bwh",
+        "uuid": "f38086a6-4e55-4a3a-a4b3-8f2a7e897c0d",
+        "aliases": [
+            "hms-dbmi:normal_analysis_001"
+        ],
+        "title": "normal_analysis_001",
+        "description": "Normal tissue analysis",
+        "samples": [
+            "f4bbc709-40fe-48a4-afde-8e886b571904"
+        ]
+    }
+]
