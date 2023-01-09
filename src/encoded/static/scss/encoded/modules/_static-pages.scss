@@ -706,6 +706,56 @@
 }
 
 
+// For the youtube embeds (currently only used on static sections)
+.youtube-embed-lazyload-poster {
+	--aspect-ratio: 56.25%;
+	contain: content;
+	position: relative;
+	background-position: 50%;
+	background-size: cover;
+	cursor: pointer;
+	display: block;
 
+	> iframe {
+		width: 100%;
+		height: 100%;
+		position: absolute;
+		top: 0;
+		left: 0;
+	}
+
+	::after {
+		content: "";
+		display: block;
+	}
+
+	// Update hover color when hovering anywhere on poster
+	&:hover {
+		.youtube-embed-fake-play-btn {
+			background-color: red;
+			opacity: 1;
+
+			> i {
+				color: #ffffff;
+			}
+		}
+	}
+
+	.youtube-embed-fake-play-btn {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 70px;
+		height: 46px;
+		background-color: #212121;
+		opacity: .8;
+		border-radius: 14%;
+		transform: translate3d(-50%, -50%, 0);
+		border: none;
+		> i {
+			color: rgba(255,255,255,0.8)
+		}
+	}
+}
 
 

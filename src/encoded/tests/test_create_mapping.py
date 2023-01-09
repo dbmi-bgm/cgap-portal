@@ -85,6 +85,7 @@ def test_get_deployment_config_other():
     assert cfg['WIPE_ES'] is False
 
 
+@pytest.mark.workbook
 @patch("snovault.elasticsearch.indexer_queue.QueueManager.add_uuids")
 def test_run_create_mapping_with_upgrader(mock_add_uuids, es_testapp, workbook):
     """

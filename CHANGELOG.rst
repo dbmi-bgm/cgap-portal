@@ -6,6 +6,46 @@ cgap-portal
 Change Log
 ----------
 
+12.3.1
+======
+
+`PR 679: Fix video tutorial link <https://github.com/dbmi-bgm/cgap-portal/pull/679>`_
+
+* Update "Video Tutorials" link on portal sign in page to go to Youtube channel
+
+
+12.3.0
+======
+
+`PR 660: File variant type submission <https://github.com/dbmi-bgm/cgap-portal/pull/660>`_
+
+* Allow variant type submission for files during case accessioning
+
+
+12.2.0
+======
+
+`PR 666: Quality Control Updates <https://github.com/dbmi-bgm/cgap-portal/pull/666>`_
+
+* Add SampleProcessing calculated property to track QCs for each Sample
+* Add Case calculated property to record QC flag counts + overall flag
+* Update Bioinformatics tab QC table to display QCs for all Samples
+* Add Case column + facet to view and filter flag results
+
+
+12.1.0
+======
+
+`PR 674: Add social links + youtube embed component <https://github.com/dbmi-bgm/cgap-portal/pull/674>`_
+
+* Add new "Video Tutorials" external link to the help menu (goes to the YouTube channel)
+* Add GitHub and YouTube social icon links to the footer
+* Create a new component for embedding YouTube videos
+* Adjust content security policy (Will already approved these edits) to allow pulling videos and thumbnail images from YouTube directly
+* Add `YoutubeVideoEmbed` component as a "placeholder" for use in JSX static sections
+* Includes changes from [Victoria's PR] (https://github.com/dbmi-bgm/cgap-portal/pull/675) - Update static sections to use JSX, update master inserts to use new JSX files
+
+
 12.0.0
 ======
 
