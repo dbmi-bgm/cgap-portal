@@ -25,6 +25,7 @@ from ..submit import (
     parse_exception,
     post_and_patch_all_items,
     row_generator,
+    update_value_capitalization,
     validate_all_items,
     validate_item,
     xls_to_json,
@@ -47,6 +48,7 @@ TEST_PEDIGREE_WITH_ERRORS = (
 
 PROJECT_NAME = "hms-dbmi"  # Project name of wb_project fixture
 GENOME_BUILD = "GRCh38"
+VARIANT_TYPE_SNV = "SNV"
 FILE_NAME_NOT_ACCEPTED = "foo_bar.foo.bar"
 VCF_FILE_NAME = "foo_bar.vcf.gz"
 VCF_FILE_PATH = "/path/to/" + VCF_FILE_NAME
@@ -58,6 +60,8 @@ VCF_FILE_ITEM = {
 }
 VCF_FILE_ITEM_WITH_GENOME_BUILD = copy.copy(VCF_FILE_ITEM)
 VCF_FILE_ITEM_WITH_GENOME_BUILD.update({"genome_assembly": GENOME_BUILD})
+VCF_FILE_ITEM_WITH_VARIANT_TYPE = copy.copy(VCF_FILE_ITEM)
+VCF_FILE_ITEM_WITH_VARIANT_TYPE.update({"variant_type": VARIANT_TYPE_SNV})
 VCF_ALIAS_TO_FILE_ITEM = {VCF_FILE_ALIAS: VCF_FILE_ITEM}
 VCF_ALIAS_TO_FILE_ITEM_GENOME_BUILD = {VCF_FILE_ALIAS: VCF_FILE_ITEM_WITH_GENOME_BUILD}
 VCF_EXTRA_FILE_1 = "foo_bar.vcf.gz.tbi"
@@ -105,11 +109,13 @@ FASTQ_FILE_ITEMS_NO_ERRORS = [
         "related_files": [
             {"relationship_type": "paired with", "file": FASTQ_FILE_NAME_1_R2_ALIAS},
         ],
+        "paired_end": "1",
     },
     {
         "aliases": [FASTQ_FILE_NAME_1_R2_ALIAS],
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_1_R2,
+        "paired_end": "2",
     },
 ]
 FASTQ_ALIASES_NO_ERRORS = [FASTQ_FILE_NAME_1_R1_ALIAS, FASTQ_FILE_NAME_1_R2_ALIAS]
@@ -118,6 +124,7 @@ FASTQ_FILE_ITEMS_ERRORS = FASTQ_FILE_ITEMS_NO_ERRORS + [
         "aliases": [FASTQ_FILE_NAME_UNMATCHED_ALIAS],
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_UNMATCHED,
+        "paired_end": "1",
     },
     {
         "aliases": [FASTQ_FILE_NAME_BAD_FORMAT_ALIAS],
@@ -1135,6 +1142,24 @@ def test_make_conjoined_list(items, conjunction, expected):
     assert result == expected
 
 
+@pytest.mark.parametrize(
+    "properties,to_upper,to_lower,expected",
+    [
+        ({}, [], [], {}),
+        ({"foo": 9}, ["foo"], ["foo"], {"foo": 9}),
+        ({"foo": None}, ["foo"], ["foo"], {"foo": None}),
+        ({"foo": "bAr"}, ["fu"], ["fu"], {"foo": "bAr"}),
+        ({"foo": "bAr"}, ["fu"], ["foo"], {"foo": "bar"}),
+        ({"foo": "bAr"}, ["foo"], ["fu"], {"foo": "BAR"}),
+        ({"foo": "bAr"}, ["foo"], ["foo"], {"foo": "bar"}),
+    ],
+)
+def test_update_value_capitalization(properties, to_upper, to_lower, expected):
+    """Test changing field value case as indicated if value is string."""
+    update_value_capitalization(properties, to_upper, to_lower)
+    assert properties == expected
+
+
 class TestAccessionRow:
     @pytest.mark.parametrize(
         "col, val, sample_alias",
@@ -1302,6 +1327,7 @@ class TestAccessionRow:
             ({"genome_build": "", "files": "", "case_files": ""}, 0),
             ({"genome_build": "foo", "files": "", "case_files": ""}, 0),
             ({"genome_build": "foo", "files": "bar.vcf.gz", "case_files": ""}, 1),
+            ({"variant_type": "foo", "files": "bar.vcf.gz", "case_files": ""}, 1),
             (
                 {
                     "genome_build": "foo",
@@ -1317,7 +1343,7 @@ class TestAccessionRow:
         Sample/SampleProcessing updated based on fields present.
         """
         sample_processing = {}
-        expected_dropped_keys = ["genome_build", "files", "case_files"]
+        expected_dropped_keys = ["genome_build", "files", "case_files", "variant_type"]
         with mock.patch(
             "encoded.submit.AccessionRow.update_item_files"
         ) as mocked_update_item_files:
@@ -1346,7 +1372,7 @@ class TestAccessionRow:
                 file_aliases,
                 file_errors,
             )
-            accession_row.update_item_files(item, "some_file_names", None)
+            accession_row.update_item_files(item, "some_file_names", None, None)
             assert len(accession_row.files) == len(file_items)
             for index, file_item in enumerate(accession_row.files):
                 assert isinstance(file_item, MetadataItem)
@@ -1773,16 +1799,17 @@ class TestSubmittedFilesParser:
     @pytest.mark.workbook
     @pytest.mark.parametrize(
         (
-            "submitted_file_names,genome_build,expected_general_errors,expected_items,"
-            "expected_aliases,expected_row_errors"
+            "submitted_file_names,genome_build,variant_type,expected_general_errors,"
+            "expected_items,expected_aliases,expected_row_errors"
         ),
         [
-            ("", None, 0, [], [], 0),
-            ("foo.bar", None, 1, [], [], 1),
-            ("foo .bar", None, 1, [], [], 2),
-            (VCF_FILE_PATH, None, 0, [VCF_FILE_ITEM], [VCF_FILE_ALIAS], 0),
+            ("", None, None, 0, [], [], 0),
+            ("foo.bar", None, None, 1, [], [], 1),
+            ("foo .bar", None, None, 1, [], [], 2),
+            (VCF_FILE_PATH, None, None, 0, [VCF_FILE_ITEM], [VCF_FILE_ALIAS], 0),
             (
                 "foo.bar, " + VCF_FILE_PATH,
+                None,
                 None,
                 1,
                 [VCF_FILE_ITEM],
@@ -1792,13 +1819,24 @@ class TestSubmittedFilesParser:
             (
                 VCF_FILE_PATH,
                 GENOME_BUILD,
+                None,
                 0,
                 [VCF_FILE_ITEM_WITH_GENOME_BUILD],
                 [VCF_FILE_ALIAS],
                 0,
             ),
             (
+                VCF_FILE_PATH,
+                None,
+                VARIANT_TYPE_SNV,
+                0,
+                [VCF_FILE_ITEM_WITH_VARIANT_TYPE],
+                [VCF_FILE_ALIAS],
+                0,
+            ),
+            (
                 FASTQ_FILE_NAMES_NO_ERRORS,
+                None,
                 None,
                 0,
                 FASTQ_FILE_ITEMS_NO_ERRORS,
@@ -1808,6 +1846,7 @@ class TestSubmittedFilesParser:
             (
                 FASTQ_FILE_NAMES_ERRORS,
                 None,
+                None,
                 0,
                 FASTQ_FILE_ITEMS_ERRORS,
                 FASTQ_ALIASES_ERRORS,
@@ -1815,6 +1854,7 @@ class TestSubmittedFilesParser:
             ),
             (
                 ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_1]),
+                None,
                 None,
                 0,
                 [VCF_FILE_ITEM_WITH_EXTRA_FILE_1],
@@ -1824,6 +1864,7 @@ class TestSubmittedFilesParser:
             (
                 ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_2]),
                 None,
+                None,
                 0,
                 [VCF_FILE_ITEM_WITH_EXTRA_FILE_2],
                 [VCF_FILE_ALIAS],
@@ -1831,6 +1872,7 @@ class TestSubmittedFilesParser:
             ),
             (
                 ",".join([VCF_FILE_PATH, VCF_EXTRA_FILE_1, VCF_EXTRA_FILE_2]),
+                None,
                 None,
                 1,
                 [VCF_FILE_ITEM_WITH_EXTRA_FILE_1],
@@ -1844,6 +1886,7 @@ class TestSubmittedFilesParser:
         file_parser_with_search,
         submitted_file_names,
         genome_build,
+        variant_type,
         expected_general_errors,
         expected_items,
         expected_aliases,
@@ -1860,7 +1903,10 @@ class TestSubmittedFilesParser:
             result_aliases,
             result_row_errors,
         ) = file_parser_with_search.extract_file_metadata(
-            submitted_file_names, genome_build=genome_build, row_index=1
+            submitted_file_names,
+            genome_build=genome_build,
+            variant_type=variant_type,
+            row_index=1,
         )
         assert len(file_parser_with_search.errors) == expected_general_errors
         assert len(result_row_errors) == expected_row_errors
@@ -2074,13 +2120,27 @@ class TestSubmittedFilesParser:
         return result
 
     @pytest.mark.parametrize(
-        "fastqs,expected_unknown_paired_end,expected_unpaired_fastqs",
+        (
+            "fastqs,expected_paired_ends,expected_unknown_paired_end,"
+            "expected_unpaired_fastqs"
+        ),
         [
-            (make_file_dicts_for_names(["foo.fastq.gz"]), ["foo.fastq.gz"], []),
-            (make_file_dicts_for_names(["foo_R1.fastq.gz"]), [], ["foo_R1.fastq.gz"]),
-            (make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_R2.fastq.gz"]), [], []),
+            (make_file_dicts_for_names(["foo.fastq.gz"]), [None], ["foo.fastq.gz"], []),
+            (
+                make_file_dicts_for_names(["foo_R1.fastq.gz"]),
+                ["1"],
+                [],
+                ["foo_R1.fastq.gz"],
+            ),
+            (
+                make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_R2.fastq.gz"]),
+                ["1", "2"],
+                [],
+                [],
+            ),
             (
                 make_file_dicts_for_names(["foo_R1.fastq.gz", "foo_r2.fastq.gz"]),
+                ["1", "2"],
                 [],
                 ["foo_R1.fastq.gz", "foo_r2.fastq.gz"],
             ),
@@ -2088,13 +2148,19 @@ class TestSubmittedFilesParser:
                 make_file_dicts_for_names(
                     ["foo_R1.fastq.gz", "bar_R1.fastq.gz", "foo_R2.fastq.gz"]
                 ),
+                ["1", "1", "2"],
                 [],
                 ["bar_R1.fastq.gz"],
             ),
         ],
     )
     def test_validate_and_pair_fastqs(
-        self, file_parser, fastqs, expected_unknown_paired_end, expected_unpaired_fastqs
+        self,
+        file_parser,
+        fastqs,
+        expected_paired_ends,
+        expected_unknown_paired_end,
+        expected_unpaired_fastqs,
     ):
         """Test paired-end identification and subsequent file pairing
         of FASTQs.
@@ -2105,6 +2171,9 @@ class TestSubmittedFilesParser:
         ) = file_parser.validate_and_pair_fastqs(fastqs)
         assert result_unknown_paired_end == expected_unknown_paired_end
         assert result_unpaired_fastqs == expected_unpaired_fastqs
+        assert len(fastqs) == len(expected_paired_ends)
+        for idx, file_item in enumerate(fastqs.values()):
+            assert file_item.get("paired_end") == expected_paired_ends[idx]
 
     @pytest.mark.parametrize(
         "file_name,expected",

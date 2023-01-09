@@ -51,9 +51,9 @@ jobs:
           curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
           sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
           sudo apt-get update
-          sudo apt-get install postgresql-11 postgresql-client-11
-          echo "/usr/lib/postgresql/11/bin" >> $GITHUB_PATH
-          sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
+          sudo apt-get install postgresql-14 postgresql-client-14
+          echo "/usr/lib/postgresql/14/bin" >> $GITHUB_PATH
+          sudo ln -s /usr/lib/postgresql/14/bin/initdb /usr/local/bin/initdb
       - name: Install Deps
         if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' }}
         run: |
@@ -97,10 +97,10 @@ jobs:
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
-          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
-          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
-          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: QA (UNIT)
         if: ${{ matrix.test_type == 'UNIT' }}
@@ -126,10 +126,10 @@ jobs:
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
-          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
-          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
-          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-6-8-2p5zrlkmxif4bayh5y6kxzlvx4.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
         if: ${{ matrix.test_type == 'Docker' && matrix.node_version == '16' && matrix.python_version == '3.8' }}

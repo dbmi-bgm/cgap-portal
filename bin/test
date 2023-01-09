@@ -1,5 +1,4 @@
 do_npm_setup=no
-do_moto_setup=no
 
 while true; do
     if [ "$1" = "--help" ]; then
@@ -9,9 +8,6 @@ while true; do
        exit 1
     elif [ "$1" = "--setup-npm" ]; then
        do_npm_setup=yes
-       shift 1
-    elif [ "$1" = "--setup-moto" ]; then
-       do_moto_setup=yes
        shift 1
     else
        break
@@ -23,13 +19,6 @@ if [ "${do_npm_setup}" = 'yes' ]; then
 else
     echo "NOTE: For efficiency, we're skipping the 'make npm-setup' step."
     echo "      You may need '--setup-npm' if you get a lot of 500's."
-fi
-
-if [ "${do_moto_setup}" = 'yes' ]; then
-    make moto-setup
-else
-    echo "NOTE: For efficiency, we're skipping the 'make moto-setup' step."
-    echo "      You may need '--setup-moto' if moto server doesn't start."
 fi
 
 echo "TRAVIS_JOB_ID = ${TRAVIS_JOB_ID}"

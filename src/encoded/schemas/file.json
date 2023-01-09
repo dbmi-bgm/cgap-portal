@@ -354,6 +354,26 @@
                 "GRCh38"
             ]
         },
+        "paired_end": {
+            "title": "Paired End Identifier",
+            "description": "Which pair the file belongs to (if paired end library)",
+            "type": "string",
+            "enum": [
+                "1",
+                "2"
+            ]
+        },
+        "variant_type": {
+            "title": "Variant Type",
+            "description": "The variant type associated with this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "string",
+            "enum": [
+                "SNV",
+                "SV",
+                "CNV"
+            ]
+        },
         "override_lab_name": {
             "description": "The lab that did the experiment if not the attributed Lab from whence this file",
             "type": "string",

@@ -2904,3 +2904,12 @@ div.user-profile-page {
 	}
 
 }
+
+
+.qcm-flag[data-flag="fail"] {
+	color: rgb(178, 67, 66);
+}
+
+.qcm-flag[data-flag="warn"] {
+	color: rgb(229, 149, 69);
+}

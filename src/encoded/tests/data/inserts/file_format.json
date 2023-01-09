@@ -52,6 +52,7 @@
             "vcf"
         ],
         "valid_item_types": [
+            "FileSubmitted",
             "FileProcessed"
         ]
     },
