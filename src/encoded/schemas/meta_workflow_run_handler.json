@@ -78,7 +78,6 @@
                 "running",
                 "completed",
                 "failed",
-                "inactive",
                 "stopped"
             ]
         },
