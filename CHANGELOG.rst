@@ -6,6 +6,15 @@ cgap-portal
 Change Log
 ----------
 
+`PR 680: Staggered Indexing <https://github.com/dbmi-bgm/cgap-portal/pull/680>`_
+
+12.4.0
+======
+
+* Reindex by type support
+* Allow more utils versions
+
+
 12.3.1
 ======
 
