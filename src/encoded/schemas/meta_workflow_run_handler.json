@@ -104,8 +104,8 @@
                         "linkTo": "MetaWorkflowRun"
                     },
                     "name": {
-                        "title": "MetaWorkflow Run name",
-                        "description": "Name of the corresponding metaworkflow run",
+                        "title": "MetaWorkflow name",
+                        "description": "Name of the corresponding metaworkflow",
                         "type": "string"
                     },
                     "status": {
