@@ -104,10 +104,10 @@ def main():
     set_logging(in_prod=app.registry.settings.get('production'), log_name=__name__, level=logging.DEBUG)
     # set_logging(app.registry.settings.get('elasticsearch.server'), app.registry.settings.get('production'),
     #             level=logging.DEBUG)
-    if not args.staggered:
-        _run_create_mapping(app, args)
+    if args.staggered:
+        reindex_by_type_staggered(app)  # note that data flow from args is dropped, only 1 mode for staggered
     else:
-        reindex_by_type_staggered(app)
+        _run_create_mapping(app, args)
     exit(0)
 
 
