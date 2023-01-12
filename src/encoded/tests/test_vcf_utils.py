@@ -156,6 +156,7 @@ class TestIngestVCF:
         result = test_vcf.create_sample_variant_from_record(record)
         for sample in result:
             assert get_top_level_field(sample, 'GT') != '0/0'  # this VCF has one of these that should be dropped
+            assert get_top_level_field(sample, 'MQ') == 60.0
         assert result[0]['FS'] == 0.0
         assert result[0]['GT'] == '0/1'
 
@@ -165,7 +166,6 @@ class TestIngestVCF:
         assert get_top_level_field(result, 'GT') == '0/1'
         assert get_top_level_field(result, 'GQ') == 63
         assert get_top_level_field(result, 'PL') == '63,0,226'
-        assert get_top_level_field(result, 'MQ') == 60.0
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
         assert get_top_level_field(result, 'DP') == 37
