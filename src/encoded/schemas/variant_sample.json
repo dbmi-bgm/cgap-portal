@@ -814,6 +814,13 @@
             "order": 13,
             "grouping": "Variant Quality"
         },
+        "MQ": {
+            "title": "Mapping Quality",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 14,
+            "grouping": "Variant Quality"
+        },
         "samplegeno.samplegeno_numgt": {
             "title": "Sample Genotype (Numeric)",
             "order": 9,
