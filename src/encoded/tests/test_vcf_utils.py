@@ -13,7 +13,7 @@ from .variant_fixtures import (  # noqa
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 TEST_VCF = resolve_file_path(
-    "annotations/GAPFII76KW2T_v0.5.5.reformat.altcounts.vcf.subset"
+    "annotations/GAPFII76KW2T_v0.5.6.reformat.altcounts.vcf.subset"
 )
 EXPECTED_ANNOTATION_FIELDS = ['comHet', 'CSQ']
 VARIANT_SCHEMA = resolve_file_path("schemas/variant.json")
@@ -165,6 +165,7 @@ class TestIngestVCF:
         assert get_top_level_field(result, 'GT') == '0/1'
         assert get_top_level_field(result, 'GQ') == 63
         assert get_top_level_field(result, 'PL') == '63,0,226'
+        assert get_top_level_field(result, 'MQ') == 60.0
         record = test_vcf.read_next_record()
         result = test_vcf.create_sample_variant_from_record(record)[0]
         assert get_top_level_field(result, 'DP') == 37
