@@ -34,10 +34,10 @@ VEP_CONSEQUENCE_EMBEDS = ['transcript.vep_consequence.var_conseq_id', 'transcrip
                           'transcript.vep_consequence.coding_effect', 'transcript.vep_gene.display_title',
                           'transcript.vep_gene.gene_symbol', 'transcript.vep_gene.ensgid',
                           'transcript.vep_consequence.var_conseq_name']
-VARIANT_TABLE_VERSION = 'annV0.5.5'
-VARIANT_TABLE_DATE = '01.18.2022'
-NUMBER_ANNOTATION_FIELDS = 237
-SAMPLE_FIELDS_EXPECTED = 26
+VARIANT_TABLE_VERSION = 'annV0.5.6'
+VARIANT_TABLE_DATE = '01.12.2023'
+NUMBER_ANNOTATION_FIELDS = 238
+SAMPLE_FIELDS_EXPECTED = 27
 VARIANT_FIELDS_EXPECTED = 211
 TRANSCRIPT_FIELDS_EXPECTED = 30
 
