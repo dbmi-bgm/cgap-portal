@@ -2,23 +2,17 @@
 import re
 import snovault
 import string
+from requests import Request
+from typing import Any, List, Tuple, Union
 
-# from datetime import date
-# from functools import lru_cache
-# from jsonschema_serialize_fork import NO_DEFAULT
+from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.security import (
-    # ALL_PERMISSIONS,
     Allow,
     Authenticated,
     Deny,
-    # DENY_ALL,
     Everyone,
 )
-# from pyramid.traversal import find_root
-from pyramid.view import (
-    view_config,
-)
-# from pyramid.httpexceptions import HTTPUnprocessableEntity
+from pyramid.view import view_config
 from snovault.util import debug_log
 # import snovault default post / patch stuff so we can overwrite it in this file
 from snovault.validators import (
@@ -28,7 +22,7 @@ from snovault.validators import (
     validate_item_content_in_place,
     no_validate_item_content_post,
     no_validate_item_content_put,
-    no_validate_item_content_patch
+    no_validate_item_content_patch,
 )
 # We will extend the following functions with CGAP-specific actions
 from snovault.crud_views import (
@@ -36,8 +30,8 @@ from snovault.crud_views import (
     item_edit as sno_item_edit,
 )
 from snovault.interfaces import CONNECTION
-from typing import Any, List, Tuple, Union
-# from ..schema_formats import is_accession
+
+from .utils import display_pipelines
 from ..server_defaults import get_userid, add_last_modified
 
 
@@ -498,3 +492,21 @@ def item_edit(context, request, render=None):
     # This works
     # Probably don't need to extend re: institution + project since if editing, assuming these have previously existed.
     return sno_item_edit(context, request, render)
+
+
+def validate_item_pipelines_get(context: Item, request: Request) -> None:
+    display_pipelines = getattr(context, "display_pipelines", False)
+    if not display_pipelines:
+        raise HTTPMethodNotAllowed(detail="Item cannot display pipelines")
+
+
+@view_config(
+    context=Item,
+    permission="view",
+    name="pipelines",
+    request_method="GET",
+    validators=[validate_item_pipelines_get],
+)
+@debug_log
+def pipelines(context, request):
+    return display_pipelines(context, request)
