@@ -1,0 +1,124 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "status": "in review",
+        "uuid": "8e570bc8-ffe5-426b-a564-9ecdd7e95baa",
+        "aliases": [
+            "hms-dbmi:sv_vcfqc"
+        ],
+        "overall_quality_status": "PASS",
+        "total variants": [
+            {
+                "DEL": 52,
+                "DUP": 40,
+                "name": "Sample_ID",
+                "total": 92
+            },
+            {
+                "DEL": 42,
+                "DUP": 50,
+                "name": "Another_Sample_ID",
+                "total": 92
+            }
+        ]
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "status": "in review",
+        "uuid": "813e5288-18c9-444a-9aa2-bef2d6b0c5e9",
+        "aliases": [
+            "hms-dbmi:snv_vcfqc"
+        ],
+        "overall_quality_status": "PASS",
+        "filtering_condition": "(spliceAI>0.2) AND (foo<1)",
+        "total unique variants in vcf": "7200",
+        "total variants": [
+            {
+                "DEL": 50,
+                "INS": 50,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 1000,
+                "name": "Sample_ID",
+                "total": 1100
+            },
+            {
+                "DEL": 40,
+                "INS": 40,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 1100,
+                "name": "Another_Sample_ID",
+                "total": 1180
+            }
+        ]
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "status": "in review",
+        "uuid": "c9478bd4-d702-4ce6-9174-4a320d6d8fe7",
+        "aliases": [
+            "hms-dbmi:vep_vcfqc"
+        ],
+        "overall_quality_status": "PASS",
+        "total unique variants in vcf": "900000",
+        "transition-transversion ratio": [
+            {
+                "name": "Sample_ID",
+                "ratio": 1.96
+            },
+            {
+                "name": "Another_Sample_ID",
+                "ratio": 2.5
+            }
+        ],
+        "heterozygosity ratio": {
+            "SNV": [
+                {
+                    "name": "Sample_ID",
+                    "ratio": 2.0
+                },
+                {
+                    "name": "Another_Sample_ID",
+                    "ratio": 3.0
+                }
+            ]
+        },
+        "mendelian errors in trio": {
+            "SNV": [
+                {
+                    "name": "Sample_ID",
+                    "counts": {
+                        "het": {
+                            "de_novo": 520,
+                            "total": 10000
+                        }
+                    }
+                }
+            ]
+        },
+        "total variants": [
+            {
+                "DEL": 500,
+                "INS": 500,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 10000,
+                "name": "Sample_ID",
+                "total": 11000
+            },
+            {
+                "DEL": 400,
+                "INS": 400,
+                "MAV": 0,
+                "MNV": 0,
+                "SNV": 11000,
+                "name": "Another_Sample_ID",
+                "total": 11800
+            }
+        ]
+    }
+]

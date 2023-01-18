@@ -70,7 +70,6 @@ ABBREVS = {
     "fth": "father",
     "sf": "sibling",
 }
-
 YES_VALS = ["y", "yes"]
 
 # SS at end refers to spreadsheet, to distinguish from prop names in schema if we need
@@ -345,6 +344,45 @@ def make_conjoined_list(list_values, conjunction="and"):
     return result
 
 
+def update_value_capitalization(properties, to_upper=None, to_lower=None):
+    """Update capitalization of key values in dictionary.
+
+    Given keys, check if values are strings and then format them
+    appropriately.
+
+    :param properties: Dictionary to update
+    :type properties: dict
+    :param to_upper: Keys whose values should be capitalized
+    :type to_upper: list(str) or None
+    :param to_lower: Keys whose values should be lower-case
+    :type to_lower: list(str) or None
+    """
+    if to_upper:
+        apply_capitalization(properties, to_upper, str.upper)
+    if to_lower:
+        apply_capitalization(properties, to_lower, str.lower)
+
+
+def apply_capitalization(properties, property_names_to_change, string_method):
+    """Apply given capitalization method to designated strings.
+
+    Helper function for update_value_capitalization. Updates dictionary
+    values in place.
+
+    :param properties: Dictionary to update
+    :type properties: dict
+    :param property_names_to_change: Dictionary keys whose values
+        will have string method applied
+    :type property_names_to_change: set[str]
+    :param string_method: Method to apply to string values
+    :type string_method: class:`str` method
+    """
+    for property_name in property_names_to_change:
+        property_value = properties.get(property_name)
+        if isinstance(property_value, str):
+            properties[property_name] = string_method(property_value)
+
+
 class MetadataItem:
     """
     class for single DB-item-worth of json
@@ -369,11 +407,13 @@ class AccessionRow:
     SAMPLES = "samples"
     FAMILIES = "families"
     SUBMITTED_FILES = "files"
+    WORKUP_TYPE = "workup_type"
 
     # Spreadsheet constants
     GENOME_BUILD = "genome_build"
     FILES = "files"
     CASE_FILES = "case_files"
+    VARIANT_TYPE = "variant_type"
 
     # Class constants
     ACCEPTED_GENOME_BUILDS = {
@@ -382,6 +422,7 @@ class AccessionRow:
         "GRCh38": ["38", "hg38", "grch38"],
     }
     FILE_SUBMITTED = "file_submitted"
+    PROPERTY_VALUES_TO_UPPER = set([VARIANT_TYPE, SS_SEX, WORKUP_TYPE])
 
     def __init__(
         self, vapp, metadata, idx, family_alias, project, institution, file_parser=None
@@ -442,7 +483,7 @@ class AccessionRow:
                     metadata[
                         get_column_name(metadata, ["workup type", "test requested"])
                     ]
-                ),
+                ).upper(),
             )
             if self.metadata.get("test number"):
                 self.sample_alias = (
@@ -483,6 +524,7 @@ class AccessionRow:
             ["individual_id", "sex", "age", "birth_year"],
             "individual",
         )
+        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
         other_id_col = get_column_name(
             self.metadata, ["other id", "other individual id"]
         )
@@ -578,8 +620,10 @@ class AccessionRow:
             self.FILES,
             self.CASE_FILES,
             self.GENOME_BUILD,
+            self.VARIANT_TYPE,
         ]
         info = map_fields(self.metadata, info, fields, "sample")
+        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
         # handle enum values
         replace_cell_contents(info, "specimen_accepted", y="Yes", n="No")
         # handle bam sample ID
@@ -636,16 +680,22 @@ class AccessionRow:
         """
         submitted_genome_build = sample.pop(self.GENOME_BUILD, None)
         genome_build = self.validate_genome_build(submitted_genome_build)
+        variant_type = sample.pop(self.VARIANT_TYPE, None)
         submitted_sample_files = sample.pop(self.FILES, None)
         submitted_sample_processing_files = sample.pop(self.CASE_FILES, None)
         if submitted_sample_files:
-            self.update_item_files(sample, submitted_sample_files, genome_build)
+            self.update_item_files(
+                sample, submitted_sample_files, genome_build, variant_type
+            )
         if submitted_sample_processing_files:
             self.update_item_files(
-                sample_processing, submitted_sample_processing_files, genome_build
+                sample_processing,
+                submitted_sample_processing_files,
+                genome_build,
+                variant_type,
             )
 
-    def update_item_files(self, item, submitted_files, genome_build):
+    def update_item_files(self, item, submitted_files, genome_build, variant_type):
         """Attempt to build File items and update the given item's
         properties accordingly.
 
@@ -659,9 +709,14 @@ class AccessionRow:
         :param genome_build: Validated genome assembly to set as
             property on all created File items
         :type genome_build: str or None
+        :param variant_type: Variant type for submitted files
+        :type variant_type: str or None
         """
         file_items, file_aliases, file_errors = self.file_parser.extract_file_metadata(
-            submitted_files, genome_build=genome_build, row_index=self.row
+            submitted_files,
+            genome_build=genome_build,
+            row_index=self.row,
+            variant_type=variant_type,
         )
         for file_item in file_items:
             file_metadata_item = MetadataItem(file_item, self.row, self.FILE_SUBMITTED)
@@ -1178,6 +1233,7 @@ class SubmittedFilesParser:
     STANDARD_FILE_EXTENSION = "standard_file_extension"
     OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
     GENOME_ASSEMBLY = "genome_assembly"
+    VARIANT_TYPE = "variant_type"
     PAIRED_END = "paired_end"
     PAIRED_END_1 = "1"
     PAIRED_END_2 = "2"
@@ -1268,7 +1324,7 @@ class SubmittedFilesParser:
             self.errors.append(msg)
 
     def extract_file_metadata(
-        self, submitted_file_names, genome_build=None, row_index=None
+        self, submitted_file_names, genome_build=None, variant_type=None, row_index=None
     ):
         """Primary method for validating and creating Files from
         submitted information.
@@ -1282,6 +1338,8 @@ class SubmittedFilesParser:
         :type submitted_file_names: str or None
         :param genome_build: Validated genome assembly
         :type genome_build: str or None
+        :param variant_type: Variant type for files
+        :type variant_type: str or None
         :param row_index: Row index within spreadsheet
         :type row_index: int or None
         :returns: Validated File items, validated File aliases, errors
@@ -1324,6 +1382,8 @@ class SubmittedFilesParser:
             }
             if genome_build:
                 file_properties[self.GENOME_ASSEMBLY] = genome_build
+            if variant_type:
+                file_properties[self.VARIANT_TYPE] = variant_type
             file_names_to_items[file_name] = file_properties
             if file_format_atid == self.FILE_FORMAT_FASTQ_ATID:
                 fastq_files[file_name] = file_properties
@@ -1888,6 +1948,9 @@ class PedigreeRow:
     HPO_TERMS = "hpo_terms"
     MONDO_TERMS = "mondo_terms"
 
+    # Class constants
+    PROPERTY_VALUES_TO_UPPER = set([SS_SEX])
+
     def __init__(self, metadata, idx, project, institution):
         """
         :param dict metadata: dictionary of form {column heading1: row value1, ...}, for the given row
@@ -2187,6 +2250,7 @@ class PedigreeRow:
             "diagnostic_confidence",
         ]
         info = map_fields(self.metadata, info, simple_fields, "individual")
+        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
         for field in info:
             if field.startswith("is_"):
                 info[field] = is_yes_value(info[field])

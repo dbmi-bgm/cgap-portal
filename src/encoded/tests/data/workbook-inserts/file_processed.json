@@ -21,6 +21,9 @@
         "institution": "hms-dbmi",
         "file_ingestion_status": "N/A",
         "uuid": "cd679bdc-8691-4352-a25b-1c5f48407e9b",
+        "aliases": [
+            "hms-dbmi:some_vcf"
+        ],
         "filename": "GAPFIPYY5V7Y.vcf.gz",
         "accession": "GAPFIPYY5V7Y"
     },
@@ -33,5 +36,61 @@
         "uuid": "b153279a-7521-4f7d-a360-831aeba0a595",
         "filename": "GAPFIPYU3T9S.vcf.gz",
         "accession": "GAPFIPYU3T9S"
+    },
+    {
+        "file_format": "bam",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "b789f05b-927b-48c3-a301-98fe5dcf6354",
+        "aliases": [
+            "hms-dbmi:sample_1_bam"
+        ],
+        "quality_metric": "hms-dbmi:sample_1_bamqc"
+    },
+    {
+        "file_format": "bam",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "b789f05b-927b-48c3-a301-98fe5dcf6355",
+        "aliases": [
+            "hms-dbmi:sample_2_bam"
+        ],
+        "quality_metric": "hms-dbmi:sample_2_bamqc"
+    },
+    {
+        "file_format": "vcf_gz",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "b789f05b-927b-48c3-a301-98fe5dcf6356",
+        "aliases": [
+            "hms-dbmi:final_snv_vcf"
+        ],
+        "vcf_to_ingest": true,
+        "variant_type": "SNV",
+        "quality_metric": "hms-dbmi:snv_qclist"
+    },
+    {
+        "file_format": "vcf_gz",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "b789f05b-927b-48c3-a301-98fe5dcf6357",
+        "aliases": [
+            "hms-dbmi:final_sv_vcf"
+        ],
+        "variant_type": "SV",
+        "file_type": "full annotated VCF",
+        "quality_metric": "hms-dbmi:sv_qclist"
+    },
+    {
+        "file_format": "vcf_gz",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "uuid": "b789f05b-927b-48c3-a301-98fe5dcf6358",
+        "aliases": [
+            "hms-dbmi:vep_snv_vcf"
+        ],
+        "variant_type": "SNV",
+        "file_type": "VEP-annotated VCF",
+        "quality_metric": "hms-dbmi:vep_qclist"
     }
 ]

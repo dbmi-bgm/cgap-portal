@@ -1,3 +1,4 @@
+import copy
 import datetime
 import io
 import os
@@ -18,6 +19,9 @@ from ..util import (
     check_user_is_logged_in,
     vapp_for_email,
     convert_integer_to_comma_string,
+    title_to_snake_case,
+    get_item,
+    transfer_properties,
 )
 from .. import util as util_module
 
@@ -310,3 +314,89 @@ def test_convert_integer_to_comma_string(value, expected):
     """Test converting integer to comma-formatted string."""
     result = convert_integer_to_comma_string(value)
     assert result == expected
+
+
+@pytest.mark.parametrize(
+    "value,expected",
+    [
+        ("", ""),
+        (" ", ""),
+        ("A Title", "a_title"),
+        (" A Title ", "a_title"),
+        ("A     Title", "a_title"),
+        ("A Title With-Dash", "a_title_with_dash"),
+        ("A Title With--Dashes", "a_title_with_dashes"),
+        ("A Title With_Underscore", "a_title_with_underscore"),
+        ("A Title With__Underscores", "a_title_with_underscores"),
+        ("a title", "a_title"),
+        ("snake_case", "snake_case"),
+        ("camelCase", "camelcase"),
+    ]
+)
+def test_title_to_snake_case(value, expected):
+    """Test conversion of string to snake case."""
+    result = title_to_snake_case(value)
+    assert result == expected
+
+
+@pytest.mark.parametrize(
+    "item_atid,get_item_or_none_called,get_item_or_none_result,expected",
+    [
+        (None, False, None, {}),
+        ("", True, None, {}),
+        ("not_an_atid", True, None, {}),
+        ("/genes/ENSG00000198727/", True, None, {}),
+        ("/genes/ENSG00000198727/", True, {"foo": "bar"}, {"foo": "bar"}),
+    ],
+)
+def test_get_item(item_atid, get_item_or_none_called, get_item_or_none_result, expected):
+    """Test item retrieval with mocked get_item_or_none."""
+    request = "foo"
+    with mock.patch.object(
+        util_module,
+        "get_item_or_none",
+        return_value=get_item_or_none_result,
+    ) as mocked_get_item_or_none:
+        with mock.patch.object(util_module, "log") as mocked_log:
+            result = get_item(request, item_atid)
+            if get_item_or_none_called:
+                expected_call = [
+                    request,
+                    item_atid,
+                    item_atid.split("/")[0],
+                ]
+                assert mocked_get_item_or_none.called_once_with(expected_call)
+                if get_item_or_none_result is None:
+                    mocked_log.exception.assert_called_once()
+                else:
+                    assert not mocked_log.exception.called
+            else:
+                mocked_get_item_or_none.assert_not_called()
+            assert result == expected
+
+
+@pytest.mark.parametrize(
+    "source,target,properties,property_replacements,expected",
+    [
+        ({}, {}, [], {}, {}),
+        ({"foo": "bar"}, {}, [], {}, {}),
+        ({"foo": "bar"}, {}, ["foo"], {}, {"foo": "bar"}),
+        ({"foo": "bar"}, {"fu": "bur"}, ["foo"], {}, {"foo": "bar", "fu": "bur"}),
+        ({"foo": "bar"}, {}, ["fu"], {}, {}),
+        ({"foo": "bar"}, {}, ["foo"], {"foo": "fu"}, {"fu": "bar"}),
+        (
+            {"foo": "bar"},
+            {"foo": "bar"},
+            ["foo"],
+            {"foo": "fu"},
+            {"foo": "bar", "fu": "bar"},
+        ),
+    ]
+)
+def test_transfer_properties(
+    source, target, properties, property_replacements, expected
+):
+    original_source = copy.deepcopy(source)
+    transfer_properties(source, target, properties, property_replacements)
+    assert target == expected
+    assert source == original_source

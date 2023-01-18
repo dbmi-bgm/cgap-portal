@@ -170,9 +170,13 @@
             "grouping": "Individual",
             "order": 4
         },
+        "quality_control_flags.flag": {
+            "title": "QC Flag",
+            "order": 5
+        },
         "status": {
             "title": "Status",
-            "order": 5
+            "order": 6
         }
     },
     "columns": {
@@ -289,6 +293,23 @@
                 {
                     "field": "sample_processing.last_modified.date_modified",
                     "title": "Bioinformatics Last Modified Date"
+                }
+            ]
+        },
+        "quality_control_flags.flag": {
+            "title": "QC",
+            "sort_fields": [
+                {
+                    "field": "quality_control_flags.flag",
+                    "title": "Overall QC Status"
+                },
+                {
+                    "field": "quality_control_flags.warn",
+                    "title": "Number of QCs with Warnings"
+                },
+                {
+                    "field": "quality_control_flags.fail",
+                    "title": "Number of Failed QCs"
                 }
             ]
         },

@@ -65,38 +65,43 @@
     <h4>Optional Columns</h4>
 
     <p>
-        <strong>HPO Terms</strong>: Human Phenotype Ontology (HPO) Terms for the 
-        individual's phenotypes. The HPO Term IDs are preferred 
+        <strong>HPO Terms</strong>: Human Phenotype Ontology (HPO) Terms for the
+        individual's phenotypes. The HPO Term IDs are preferred
         (e.g. HP:0004330).
     </p>
 
     <p>
-        <strong>MONDO Terms</strong>: Monarch Disease Ontology (MONDO) Terms for 
-        disorders that the individual is diagnosed with. MONDO Term 
-        IDs are preferred (e.g. MONDO:0004330). If the individual 
+        <strong>MONDO Terms</strong>: Monarch Disease Ontology (MONDO) Terms for
+        disorders that the individual is diagnosed with. MONDO Term
+        IDs are preferred (e.g. MONDO:0004330). If the individual
         is part of a cohort, see Primary Diagnosis below.
     </p>
 
     <p>
-        <strong>Age</strong>: The age of the individual. Must be a number. By 
-        default refers to years, but when an age in weeks or months 
+        <strong>Age</strong>: The age of the individual. Must be a number. By
+        default refers to years, but when an age in weeks or months
         is desired, the Age Units column can also be filled out.
     </p>
 
     <p>
-        <strong>Age Units</strong>: Only fill out if Age is present in the row. 
+        <strong>Age Units</strong>: Only fill out if Age is present in the row.
         Must be singular. Possible values are day, week, month, year.
     </p>
 
     <p>
-        <strong>Clinic Notes</strong>: Any additional notes to be associated with 
+        <strong>Birth Year</strong>: The year the individual was born. Must be
+        in format YYYY.
+    </p>
+
+    <p>
+        <strong>Clinic Notes</strong>: Any additional notes to be associated with
         the individual.
     </p>
 
     <p>
-        <strong>Ancestry</strong>: The ancestry of the individual. Can be a 
-        country (e.g. Denmark) or an ethnicity (e.g. African-American). 
-        If multiple values need to be specified, they can be done so 
+        <strong>Ancestry</strong>: The ancestry of the individual. Can be a
+        country (e.g. Denmark) or an ethnicity (e.g. African-American).
+        If multiple values need to be specified, they can be done so
         in a comma-separated list (e.g. <i>African-American, Irish</i>).
     </p>
 
@@ -132,19 +137,19 @@
     </p>
 
     <p>
-        <strong>Life Status</strong>: Possible values are: alive and well, alive, 
+        <strong>Life Status</strong>: Possible values are: alive and well, alive,
         deceased, or unknown.
     </p>
 
     <p>
-        <strong>Deceased</strong>: Can be used to indicate if individual is 
+        <strong>Deceased</strong>: Can be used to indicate if individual is
         deceased. Possible values: Y or N.
     </p>
 
     <p>
-        <strong>Cause of Death</strong>: If the individual is deceased, an HPO 
-        term indicating the cause of death can be added here. As 
-        with the "HPO Terms" field described above, this should be 
+        <strong>Cause of Death</strong>: If the individual is deceased, an HPO
+        term indicating the cause of death can be added here. As
+        with the "HPO Terms" field described above, this should be
         an HPO Term ID (e.g. HP:0001546).
     </p>
 
