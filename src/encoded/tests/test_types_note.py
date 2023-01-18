@@ -72,21 +72,28 @@ def post_note(testapp, item, note_type='note_interpretation', expected_status=20
     return testapp.post_json('/' + note_type, item, status=expected_status)
 
 
+@pytest.mark.workbook
 def test_note_interpretation_note_link(workbook, es_testapp):
     """ test previous_note linkTo works on workbook insert notes """
     resp1 = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
     resp2 = es_testapp.get(f'/notes-interpretation/{note2_uuid}/', status=200).json
     assert resp1['previous_note']['@id'] == resp2['@id']
 
+
+@pytest.mark.workbook
 def test_add_note_interpretation_success(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item posts successfully """
     post_note(es_testapp, new_interpretation)
 
+
+@pytest.mark.workbook
 def test_add_note_interpretation_fail(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item fails to post when schema isn't followed """
     new_interpretation['classification'] = 'likely pathogenic'  # wrong case for enum
     post_note(es_testapp, new_interpretation, expected_status=422)
 
+
+@pytest.mark.workbook
 def test_patch_note_interpretation_success(workbook, es_testapp, new_interpretation):
     """ test NoteIntepretation item is patched successfully when associated_items SOEA is added """
     resp = post_note(es_testapp, new_interpretation).json['@graph'][0]
@@ -95,6 +102,8 @@ def test_patch_note_interpretation_success(workbook, es_testapp, new_interpretat
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
 
+
+@pytest.mark.workbook
 def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation):
     """ test NoteInterpretation item fails to patch with incorrectly formatted prop """
     resp = post_note(es_testapp, new_interpretation).json['@graph'][0]
@@ -103,6 +112,8 @@ def test_patch_note_interpretation_fail(workbook, es_testapp, new_interpretation
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
+
+@pytest.mark.workbook
 def test_note_interpretation_acmg_rules_modified(workbook, es_testapp, new_interpretation):
     """
     Tests the acmg_rules_with_modifier calculated property.
@@ -115,15 +126,21 @@ def test_note_interpretation_acmg_rules_modified(workbook, es_testapp, new_inter
     assert rules_with_strength
     assert sorted(rules_with_strength) == ["PM3_Strong", "PM6", "PP1_Moderate", "PP2"]
 
+
+@pytest.mark.workbook
 def test_add_note_discovery_success(workbook, es_testapp, new_discovery_note):
     """ test NoteDiscovery item posts successfully """
     post_note(es_testapp, new_discovery_note, note_type='note_discovery')
 
+
+@pytest.mark.workbook
 def test_add_note_discovery_fail(workbook, es_testapp, new_discovery_note):
     """ test NoteDiscovery item fails to post when schema isn't followed """
     new_discovery_note['gene_candidacy'] = 'Tier 1'  # wrong value for enum
     post_note(es_testapp, new_discovery_note, note_type='note_discovery', expected_status=422)
 
+
+@pytest.mark.workbook
 def test_patch_note_discovery_success(workbook, es_testapp, new_discovery_note):
     """ test NoteDiscovery item is patched successfully when associated_items SOEA is added """
     resp = post_note(es_testapp, new_discovery_note, note_type='note_discovery').json['@graph'][0]
@@ -132,6 +149,8 @@ def test_patch_note_discovery_success(workbook, es_testapp, new_discovery_note):
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
 
+
+@pytest.mark.workbook
 def test_patch_note_discovery_fail(workbook, es_testapp, new_discovery_note):
     """ test NoteDiscovery item fails to patch with incorrectly formatted prop """
     resp = post_note(es_testapp, new_discovery_note, note_type='note_discovery').json['@graph'][0]
@@ -140,21 +159,29 @@ def test_patch_note_discovery_fail(workbook, es_testapp, new_discovery_note):
     }
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=422)
 
+
+@pytest.mark.workbook
 def test_add_standard_note_success(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item posts successfully """
     post_note(es_testapp, new_standard_note, note_type='note_standard')
 
+
+@pytest.mark.workbook
 def test_add_standard_note_fail(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item post fails when extra prop added """
     new_standard_note['classification'] = 'benign'  # not a standard note property
     post_note(es_testapp, new_standard_note, note_type='note_standard', expected_status=422)
 
+
+@pytest.mark.workbook
 def test_patch_standard_note_success(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item patches successfully """
     resp = post_note(es_testapp, new_standard_note, note_type='note_standard').json['@graph'][0]
     patch_info = {"note_text": "Some different text"}
     es_testapp.patch_json('/' + resp['@id'], patch_info, status=200)
 
+
+@pytest.mark.workbook
 def test_patch_standard_note_fail(workbook, es_testapp, new_standard_note):
     """ test NoteStandard item patch fails with extra property """
     resp = post_note(es_testapp, new_standard_note, note_type='note_standard').json['@graph'][0]
@@ -169,6 +196,8 @@ def test_patch_standard_note_fail(workbook, es_testapp, new_standard_note):
 #     resp = es_testapp.patch_json('/' + test_report['@id'], patch, status=200).json['@graph'][0]
 #     assert resp['extra_notes'] == [note['@id']]
 
+
+@pytest.mark.workbook
 def test_add_note_to_gene(workbook, es_testapp, gene1_es):
     """ test linking note to gene """
     note_info = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json
@@ -176,6 +205,8 @@ def test_add_note_to_gene(workbook, es_testapp, gene1_es):
     resp = es_testapp.patch_json('/' + gene1_es['@id'], patch, status=200).json['@graph'][0]
     assert resp['interpretations'] == [note_info['@id']]
 
+
+@pytest.mark.workbook
 def test_add_note_to_variant_sample(workbook, es_testapp, test_variant_sample):
     """ test linking note to variant sample item """
     note_info = es_testapp.get(f'/notes-interpretation/{note1_uuid}/', status=200).json

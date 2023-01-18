@@ -201,6 +201,19 @@
     </ul>
 
     <p>
+        <strong>Variant Type</strong>:The variant type applicable to all submitted
+        files present under the <strong>Files</strong> and <strong>Case Files</strong>
+        headers for the submission. Optional, but should be provided for all VCF file
+        submissions.
+    </p>
+
+    <ul>
+        <li>
+            Valid options include: <strong>SNV, SV, CNV</strong>.
+        </li>
+    </ul>
+
+    <p>
         <strong>BAM Sample ID</strong>: The sample identifier used in the submitted file(s).
         Must be provided if submitting BAM or VCF files; optional otherwise.
     </p>
