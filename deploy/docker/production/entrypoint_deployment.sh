@@ -15,7 +15,7 @@ fi
 
 # Create mapping
 # Force wipe of ES
-poetry run create-mapping-on-deploy production.ini --app-name app --wipe-es
+poetry run create-mapping-on-deploy production.ini --app-name app --staggered
 
 # Load Data (based on development.ini, for now just master-inserts)
 # Not necessary after first deploy
