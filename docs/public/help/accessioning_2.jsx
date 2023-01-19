@@ -136,7 +136,8 @@
     </p>
 
     <p>
-        <strong>Tags</strong>: Comma-separated tags to apply to the sample.
+        <strong>Tags</strong>: Comma-separated tags to apply to the sample. Acceptable
+        characters include letters, numbers, underscores, dashes, and spaces.
     </p>
 
     <p>
