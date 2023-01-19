@@ -424,7 +424,6 @@ class AccessionRow:
     }
     FILE_SUBMITTED = "file_submitted"
     PROPERTY_VALUES_TO_UPPER = set([VARIANT_TYPE, SS_SEX, WORKUP_TYPE])
-    PROPERTY_VALUES_TO_LOWER = set([TAGS])
 
     def __init__(
         self, vapp, metadata, idx, family_alias, project, institution, file_parser=None
@@ -629,7 +628,6 @@ class AccessionRow:
         update_value_capitalization(
             info,
             to_upper=self.PROPERTY_VALUES_TO_UPPER,
-            to_lower=self.PROPERTY_VALUES_TO_LOWER,
         )
         # handle enum values
         replace_cell_contents(info, "specimen_accepted", y="Yes", n="No")
