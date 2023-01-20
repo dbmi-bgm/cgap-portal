@@ -6,10 +6,16 @@ cgap-portal
 Change Log
 ----------
 
-`PR 680: Staggered Indexing <https://github.com/dbmi-bgm/cgap-portal/pull/680>`_
+12.5.0
+======
+
+* Allow configuration of Auth0Domain and Auth0AllowedConnections
+
 
 12.4.0
 ======
+
+`PR 680: Staggered Indexing <https://github.com/dbmi-bgm/cgap-portal/pull/680>`_
 
 * Reindex by type support
 * Allow more utils versions
