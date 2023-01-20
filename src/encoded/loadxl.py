@@ -1,15 +1,19 @@
 # -*- coding: utf-8 -*-
 """Load collections and determine the order."""
 
+import gzip
 import json
 import magic
 import mimetypes
 import os
 import structlog
 import webtest
+import traceback
+import uuid
 
 from base64 import b64encode
-from past.builtins import basestring
+from dcicutils.misc_utils import ignored
+from dcicutils.secrets_utils import assume_identity
 from PIL import Image
 from pkg_resources import resource_filename
 from pyramid.paster import get_app
@@ -36,7 +40,12 @@ ORDER = [
     'user',
     'file_format',
     'workflow',
+    'meta_workflow',
+    'workflow_run',
+    'meta_workflow_run',
     'variant',
+    'structural_variant',
+    'structural_variant_sample',
     'higlass_view_config'
 ]
 
@@ -78,7 +87,7 @@ class LoadGenWrapper(object):
 @view_config(route_name='load_data', request_method='POST', permission='add')
 @debug_log
 def load_data_view(context, request):
-    '''
+    """
     expected input data
 
     {'local_path': path to a directory or file in file system
@@ -94,7 +103,8 @@ def load_data_view(context, request):
        itype can be optionally used to specify type of items loaded from files
     2) store in form of {'item_type': [items], 'item_type2': [items]}
        item_type should be same as insert file names i.e. file_fastq
-    '''
+    """
+    ignored(context)
     # this is a bit wierd but want to reuse load_data functionality so I'm rolling with it
     config_uri = request.json.get('config_uri', 'production.ini')
     patch_only = request.json.get('patch_only', False)
@@ -153,7 +163,7 @@ def trim(value):
         return {k: trim(v) for k, v in value.items()}
     if isinstance(value, list):
         return [trim(v) for v in value]
-    if isinstance(value, basestring) and len(value) > 160:
+    if isinstance(value, str) and len(value) > 160:
         return value[:77] + '...' + value[-80:]
     return value
 
@@ -262,7 +272,8 @@ LOAD_ERROR_MESSAGE = """#   ██▓     ▒█████   ▄▄▄      �
 #                                       ░                    """
 
 
-def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
+def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False,
+             skip_types=None):
     """
     Wrapper function for load_all_gen, which invokes the generator returned
     from that function. Takes all of the same args as load_all_gen, so
@@ -274,7 +285,7 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
     with the functionality of load_all_gen.
     """
     gen = LoadGenWrapper(
-        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only, post_only)
+        load_all_gen(testapp, inserts, docsdir, overwrite, itype, from_json, patch_only, post_only, skip_types)
     )
     # run the generator; don't worry about the output
     for _ in gen:
@@ -286,7 +297,8 @@ def load_all(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=Fa
         return Exception(gen.caught)
 
 
-def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False, patch_only=False, post_only=False):
+def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_json=False,
+                 patch_only=False, post_only=False, skip_types=None):
     """
     Generator function that yields bytes information about each item POSTed/PATCHed.
     Is the base functionality of load_all function.
@@ -302,14 +314,15 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         itype (list or str): limit selection to certain type/types
         from_json (bool)   : if set to true, inserts should be dict instead of folder name
         patch_only (bool)  : if set to true will only do second round patch - no posts
-        post_only (bool)   : if set to true posts full item no second round or lookup - use with care - will not work if linkTos to items not in db yet
+        post_only (bool)   : if set to true posts full item no second round or lookup -
+                             use with care - will not work if linkTos to items not in db yet
+        skip_types (list)  : if set to a list of item files the process will ignore these files
     Yields:
         Bytes with information on POSTed/PATCHed items
 
     Returns:
         None if successful, otherwise a bytes error message
     """
-    # TODO: deal with option of file to load (not directory struture)
     if docsdir is None:
         docsdir = []
     # Collect Items
@@ -321,12 +334,13 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
         if os.path.isdir(inserts):  # we've specified a directory
             if not inserts.endswith('/'):
                 inserts += '/'
-            files = [i for i in os.listdir(inserts) if i.endswith('.json')]
+            files = [i for i in os.listdir(inserts) if (i.endswith('.json') or i.endswith('.json.gz'))
+                     and (i not in skip_types if skip_types else True)]
         elif os.path.isfile(inserts):  # we've specified a single file
             files = [inserts]
             # use the item type if provided AND not a list
             # otherwise guess from the filename
-            use_itype = True if (itype and isinstance(itype, basestring)) else False
+            use_itype = True if (itype and isinstance(itype, str)) else False
         else:  # cannot get the file
             err_msg = 'Failure loading inserts from %s. Could not find matching file or directory.' % inserts
             # import pdb; pdb.set_trace()
@@ -339,10 +353,10 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             if use_itype:
                 item_type = itype
             else:
-                item_type = a_file.split('/')[-1].replace(".json", "")
+                item_type = a_file.split('/')[-1].split(".")[0]
                 a_file = inserts + a_file
-            with open(a_file) as f:
-                store[item_type] = json.loads(f.read())
+            store[item_type] = get_json_file_content(a_file)
+
     # if there is a defined set of items, subtract the rest
     if itype:
         if isinstance(itype, list):
@@ -371,7 +385,8 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     # collect schemas
     profiles = testapp.get('/profiles/?frame=raw').json
 
-    # run step1 - if item does not exist, post with minimal metadata
+    # run step1 - if item does not exist, post with minimal metadata (and skip indexing since we will patch
+    # in round 2)
     second_round_items = {}
     if not patch_only:
         for a_type in all_types:
@@ -389,10 +404,9 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                 # file format is required for files, but its usability depends this field
                 if a_type in ['file_format', 'experiment_type']:
                     req_fields.append('valid_item_types')
-                first_fields = list(set(req_fields+ids))
+                first_fields = list(set(req_fields + ids))
             skip_existing_items = set()
             posted = 0
-            patched = 0
             skip_exist = 0
             for an_item in store[a_type]:
                 exists = False
@@ -417,7 +431,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
                         to_post = {key: value for (key, value) in an_item.items() if key in first_fields}
                     to_post = format_for_attachment(to_post, docsdir)
                     try:
-                        res = testapp.post_json('/'+a_type, to_post)
+                        res = testapp.post_json('/' + a_type + '?skip_indexing=true', to_post)  # skip indexing in round 1
                         assert res.status_code == 201
                         posted += 1
                         # yield bytes to work with Response.app_iter
@@ -434,14 +448,16 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             if not post_only:
                 second_round_items[a_type] = [i for i in store[a_type] if i['uuid'] not in skip_existing_items]
             logger.info('{} 1st: {} items posted, {} items exists.'.format(a_type, posted, skip_exist))
-            logger.info('{} 1st: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
+            logger.info('{} 1st: {} items will be patched in second round'
+                        .format(a_type, str(len(second_round_items.get(a_type, [])))))
     elif overwrite and not post_only:
         logger.info('Posting round skipped')
         for a_type in all_types:
             second_round_items[a_type] = [i for i in store[a_type]]
-            logger.info('{}: {} items will be patched in second round'.format(a_type, str(len(second_round_items.get(a_type, [])))))
+            logger.info('{}: {} items will be patched in second round'
+                        .format(a_type, str(len(second_round_items.get(a_type, [])))))
 
-    # Round II - patch the rest of the metadata
+    # Round II - patch the rest of the metadata (ensuring to index by not passing the query param)
     rnd = ' 2nd' if not patch_only else ''
     for a_type in all_types:
         patched = 0
@@ -460,6 +476,7 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
             except Exception as e:
                 print('Patching {} failed. Patch body:\n{}\n\nError Message:\n{}'.format(
                       a_type, str(an_item), str(e)))
+                print('Full error: %s' % traceback.format_exc())
                 e_str = str(e).replace('\n', '')
                 # import pdb; pdb.set_trace()
                 yield str.encode('ERROR: %s\n' % e_str)
@@ -471,15 +488,33 @@ def load_all_gen(testapp, inserts, docsdir, overwrite=True, itype=None, from_jso
     return None
 
 
+def get_json_file_content(filename):
+    """
+    Helper function to obtain objects from (compressed) json files.
+
+    :param filename: str file path
+    :returns: object loaded from file
+    """
+    if filename.endswith(".json"):
+        with open(filename) as f:
+            result = json.loads(f.read())
+    elif filename.endswith(".json.gz"):
+        with gzip.open(filename) as f:
+            result = json.loads(f.read())
+    else:
+        raise Exception("Expecting a .json or .json.gz file but found %s." % filename)
+    return result
+
+
 def load_data(app, indir='inserts', docsdir=None, overwrite=False,
-              use_master_inserts=True):
-    '''
+              use_master_inserts=True, skip_types=None):
+    """
     This function will take the inserts folder as input, and place them to the given environment.
     args:
         app:
         indir (inserts): inserts folder, should be relative to tests/data/
         docsdir (None): folder with attachment documents, relative to tests/data
-    '''
+    """
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -488,7 +523,7 @@ def load_data(app, indir='inserts', docsdir=None, overwrite=False,
     # load master-inserts by default
     if indir != 'master-inserts' and use_master_inserts:
         master_inserts = resource_filename('encoded', 'tests/data/master-inserts/')
-        master_res = load_all(testapp, master_inserts, [])
+        master_res = load_all(testapp, master_inserts, [], skip_types=skip_types)
         if master_res:  # None if successful
             print(LOAD_ERROR_MESSAGE)
             logger.error('load_data: failed to load from %s' % master_inserts, error=master_res)
@@ -540,14 +575,13 @@ def load_local_data(app, overwrite=False):
     for test_insert_dir in test_insert_dirs:
         chk_dir = resource_filename('encoded', "tests/data/" + test_insert_dir)
         for (dirpath, dirnames, filenames) in os.walk(chk_dir):
-            if any([fn for fn in filenames if fn.endswith('.json')]):
+            if any([fn for fn in filenames if fn.endswith('.json') or fn.endswith('.json.gz')]):
                 logger.info('Loading inserts from "{}" directory.'.format(test_insert_dir))
-                return load_data(app, docsdir='documents', indir=test_insert_dir,
-                            use_master_inserts=True, overwrite=overwrite)
+                return load_data(app, docsdir='documents', indir=test_insert_dir, use_master_inserts=True,
+                                 overwrite=overwrite)
 
     # Default to 'inserts' if no temp inserts found.
-    return load_data(app, docsdir='documents', indir='inserts',
-                         use_master_inserts=True, overwrite=overwrite)
+    return load_data(app, docsdir='documents', indir='inserts', use_master_inserts=True, overwrite=overwrite)
 
 
 def load_prod_data(app, overwrite=False):
@@ -558,3 +592,135 @@ def load_prod_data(app, overwrite=False):
         None if successful, otherwise Exception encountered
     """
     return load_data(app, indir='master-inserts', overwrite=overwrite)
+
+
+def load_deploy_data(app, overwrite=True, **kwargs):
+    """
+    Load deploy-inserts and master-inserts. Overwrites duplicate items
+    in both directories to match deploy-inserts version.
+
+    Returns:
+        None if successful, otherwise Exception encountered
+    """
+    return load_data(app, docsdir='documents', indir="deploy-inserts", overwrite=True)
+
+
+# Set of emails required by the application to function
+REQUIRED_USER_CONFIG = [
+    {
+        'email': 'loadxl@hms.harvard.edu',
+        'first_name': 'loadxl',
+        'last_name': 'loadxl',
+        'uuid': '3202fd57-44d2-44fb-a131-afb1e43d8ae5'
+    },
+    {
+        'email': 'cgap.platform@gmail.com',
+        'first_name': 'Platform',
+        'last_name': 'Admin',
+        'uuid': 'b5f738b6-455a-42e5-bc1c-77fbfd9b15d2'
+    },
+    {
+        'email': 'foursight.app@gmail.com',
+        'first_name': 'Foursight',
+        'last_name': 'App',
+        'uuid': '7677f8a8-79d2-4cff-ab0a-a967a2a68e39'
+    },
+    {
+        'email': 'tibanna.app@gmail.com',
+        'first_name': 'Tibanna',
+        'last_name': 'App',
+        'uuid': 'b041dba8-e2b2-4e54-a621-97edb508a0c4'
+    },
+]
+
+
+def load_custom_data(app, overwrite=False):
+    """
+    Load deploy-inserts and master-inserts, EXCEPT instead of loading the default user.json,
+    generate users (if they do not already exist) from the ENCODED_ADMIN_USERS setting in
+    the GAC. We assume it has structure consistent with what the template will build in 4dn-cloud-infra
+    ie:
+        [{"first_name": "John", "last_name": "Doe", "email": "john_doe@example.com"}]
+    """
+    # start with the users
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'TEST',
+    }
+    testapp = webtest.TestApp(app, environ)
+    identity = assume_identity()
+    admin_users = json.loads(identity.get('ENCODED_ADMIN_USERS', '{}'))
+    if not admin_users:  # we assume you must have set one of these
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_custom_data: failed to load users as none were set - ensure GAC value'
+                     ' ENCODED_ADMIN_USERS is set and formatted correctly!')
+        return admin_users
+
+    # post all users
+    for user in (admin_users + REQUIRED_USER_CONFIG):
+        try:
+            first_name, last_name, email, _uuid = (user['first_name'], user['last_name'], user['email'],
+                                                   user.get('uuid', str(uuid.uuid4())))
+        except KeyError:
+            print(LOAD_ERROR_MESSAGE)
+            logger.error('load_custom_data: failed to load users as they were malformed - ensure GAC value'
+                         ' ENCODED_ADMIN_USERS is set, has type array and consists of objects all containing keys'
+                         ' and values for first_name, last_name and email!')
+            return user
+        item = {
+            'first_name': first_name,
+            'last_name': last_name,
+            'email': email,
+            'groups': ['admin'],
+            'uuid': _uuid
+        }
+        testapp.post_json('/User', item, status=201)
+
+    res = load_data(app, docsdir='documents', indir='deploy-inserts', overwrite=overwrite, skip_types=['user.json'])
+    if res:  # None if successful
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_custom_data: failed to load from deploy-inserts', error=res)
+        return res
+
+    return None
+
+
+def load_cypress_data(app, overwrite=False):
+    """
+    Load master-inserts and cypress-test-inserts.
+    By default, does not overwrite duplicate items in both directories
+
+    Returns:
+        None if successful, otherwise Exception encountered
+    """
+    return load_data(app, indir='cypress-test-inserts', overwrite=overwrite)
+
+
+def load_data_by_type(app, indir='master-inserts', overwrite=True, itype=None):
+    """
+    This function will load inserts of type itype from the indir directory.
+    args:
+        indir (inserts): inserts folder, should be relative to tests/data/
+        itype: item type to load (e.g. "higlass_view_config")
+    """
+
+    if itype is None:
+        print('load_data_by_type: No item type specified. Not loading anything.')
+        return
+
+    environ = {
+        'HTTP_ACCEPT': 'application/json',
+        'REMOTE_USER': 'TEST',
+    }
+    testapp = webtest.TestApp(app, environ)
+
+    if not indir.endswith('/'):
+        indir += '/'
+    inserts = resource_filename('encoded', 'tests/data/' + indir)
+
+    res = load_all(testapp, inserts, docsdir=[], overwrite=overwrite, itype=itype)
+    if res:  # None if successful
+        print(LOAD_ERROR_MESSAGE)
+        logger.error('load_data_by_type: failed to load from %s' % indir, error=res)
+        return res
+    return None  # unnecessary, but makes it more clear that no error was encountered

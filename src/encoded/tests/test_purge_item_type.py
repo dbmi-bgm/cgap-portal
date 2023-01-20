@@ -3,7 +3,7 @@ import time
 from ..commands.purge_item_type import purge_item_type_from_storage
 
 
-pytestmark = [pytest.mark.broken]
+pytestmark = [pytest.mark.broken, pytest.mark.workbook]
 
 
 @pytest.fixture

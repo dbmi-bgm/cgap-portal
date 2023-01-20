@@ -10,20 +10,43 @@
         "institution"
     ],
     "additionalProperties": false,
-    "identifyingProperties": ["uuid", "aliases"],
-    "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/documents" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/static_embeds" }
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
     ],
-    "mixinFacets" : [
-        { "$ref": "mixins.json#/facets_common" }
+    "mixinProperties": [
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/documents"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -45,9 +68,13 @@
             "type": "string",
             "enum": [
                 "data_bundle",
+                "accessioning",
                 "metadata_bundle",
                 "simulated_bundle",
-                "vcf"
+                "vcf",
+                "genelist",
+                "variant_update",
+                "family_history"
             ]
         },
         "submission_id": {
@@ -57,7 +84,7 @@
         },
         "parameters": {
             "title": "Parameters",
-            "description":  "A record of explicitly offered form parameters in the submission request.",
+            "description": "A record of explicitly offered form parameters in the submission request.",
             "type": "object",
             "additionalProperties": true,
             "properties": {}

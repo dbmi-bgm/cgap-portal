@@ -3,14 +3,19 @@
 import React from 'react';
 import _ from 'underscore';
 
-import { object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { itemUtil } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/object';
+import { capitalizeSentence } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { basicColumnExtensionMap,
     DisplayTitleColumnWrapper,
     DisplayTitleColumnDefault,
     DisplayTitleColumnUser } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { Schemas, typedefs } from './../util';
+
+import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
+import QuickPopover from '../item-pages/components/QuickPopover';
+import { generateRelationshipMapping, QCMFlag, sortAndAddRolePropsToQCMs } from '../item-pages/CaseView';
+import { CurrentFamilyController, findCanonicalFamilyIndex } from '../item-pages/CaseView/CurrentFamilyController';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
@@ -22,15 +27,13 @@ export const DEFAULT_WIDTH_MAP = { 'lg' : 200, 'md' : 180, 'sm' : 120, 'xs' : 12
 /**
  * Theoretically we could change all these render functions to just be functional React components, maybe a later todo.
  * And move any compute-logic into here for memoization.
- * Not sure if this memoization is fully worthwhile as is often comparing strings (== arrays of characters), tho
- * it'd probably do that in react virtual dom diff otherwise later anyway... need to check.
- *
- * Another thought - it's unlikely that the props passed to this component will _ever_ change, I think.
- * Maybe we could have something like 'shouldComponentUpdate(){ return false; }` to prevent it from ever even
- * attempting to compare props for performance gain (since many table cells).
  *
  * Colors are bound to 'data-status' attribute values in SCSS to statuses, so we re-use those here rather than
  * creating separate 'color map' for this, and override tooltip with custom value.
+ *
+ * IMPORTANT:
+ * WE MEMOIZE THIS AND RE-RENDER SAME THING EVEN IF PROPS CHANGE FOR PERFORMANCE (2nd arg to React.memo).
+ * May need to change in future (e.g. if re-load content without re-instantiating table)
  */
 const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
     const {
@@ -39,8 +42,30 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         statusTip = null,
         mainTitle = null,
         dateTitle = "Created:",
-        date
+        bottom = null,
+        showBottomAsDate = true,
+        date,
+        datePlaceholder = "N/A",
+        titleTip = null,
+        titleTipDelayShow = null,
+        "data-html": tooltipEnableHtml
     } = props;
+
+    let bottomSection = null;
+
+    if (showBottomAsDate) {
+        bottomSection = (
+            <div className="col-date text-smaller text-secondary">
+                { dateTitle && <span className="mr-04">{ dateTitle }</span>}
+                { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : datePlaceholder }
+            </div>);
+    } else {
+        bottomSection = (
+            <div className="col-date text-smaller text-secondary">
+                { bottom || <br/> }
+            </div>);
+    }
+
     return (
         <div className="multi-field-cell">
             <div className="top-row">
@@ -49,16 +74,13 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 </span>
                 <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
             </div>
-            <h4 className="col-main">
-                { mainTitle || "-" }
+            <h4 className="col-main" data-tip={titleTip} data-delay-show={titleTipDelayShow} data-html={tooltipEnableHtml}>
+                <span>{ mainTitle || "-" }</span>
             </h4>
-            <div className="col-date text-center text-smaller">
-                <span className="text-600">{ dateTitle } </span>
-                { date ? <LocalizedTime timestamp={date} formatType="date-sm"/> : "N/A" }
-            </div>
+            { bottomSection }
         </div>
     );
-});
+}, function(){ return false; });
 
 
 /**
@@ -87,7 +109,7 @@ function findSelectedCaseSample(allSamples, selectedIndividual){
 /** Used to show "Case" item-type */
 export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefault({ result }) {
     const title = itemUtil.getTitleStringFromContext(result); // Gets display_title || title || accession || ...
-    const tooltip = (typeof title === "string" && title.length > 20 && title) || null;
+    const titleTip = (typeof title === "string" && title.length > 20 && title) || null;
     const {
         '@id' : caseHref,
         display_title = null,
@@ -98,8 +120,6 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         family = null,
         sample_processing = null
     } = result;
-
-    const mainTitle = accession && case_title ? case_title : display_title;
 
     const { uuid: indvID = null } = individual || {};
     const { uuid: familyID = null } = family || {};
@@ -116,9 +136,14 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
     }
 
     return (
-        <a href={caseHref} className="adv-block-link w-100 title-block d-flex flex-column" data-tip={tooltip} data-delay-show={750}>
-            <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
-        </a>
+        <MultiLevelColumn {...{ date, status, statusTip, titleTip }}
+            titleTipDelayShow={750}
+            dateTitle="Accession Date:" topLeft={<span className="accession text-muted">{ accession }</span>}
+            mainTitle={
+                <a href={caseHref} className="adv-block-link">
+                    { accession && case_title ? case_title : display_title }
+                </a>
+            }/>
     );
 });
 
@@ -127,6 +152,8 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
 
 export const columnExtensionMap = {
     ...basicColumnExtensionMap,
+    ...variantSampleColumnExtensionMap,
+    ...structuralVariantSampleColumnExtensionMap,
     'display_title' : { // TODO: Look into a better way to do this
         'title' : "Title",
         'widthMap' : { 'lg' : 280, 'md' : 250, 'sm' : 200 },
@@ -134,12 +161,14 @@ export const columnExtensionMap = {
         'order' : -100,
         'render' : function renderDisplayTitleColumn(result, parentProps){
             const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
-            const { '@type' : itemTypeList = ["Item"] } = result;
+            const { '@type': itemTypeList = ["Item"] } = result;
             let renderElem;
             if (itemTypeList[0] === "User") {
                 renderElem = <DisplayTitleColumnUser {...{ result }}/>;
             } else if (itemTypeList[0] === "Case") {
                 renderElem = <DisplayTitleColumnCase {...{ result }}/>;
+            } else if (itemTypeList[0] === "VariantSample") {
+                renderElem = <VariantSampleDisplayTitleColumn {...{ result }} />;
             } else {
                 renderElem = <DisplayTitleColumnDefault {...{ result }}/>;
             }
@@ -150,66 +179,51 @@ export const columnExtensionMap = {
             );
         }
     },
-    // TODO: change to organization
-    'lab.display_title' : {
-        'title' : "Lab",
-        'widthMap' : { 'lg' : 200, 'md' : 180, 'sm' : 160 },
-        'render' : function labTitle(result, props){
-            const { lab, submitted_by : { display_title : submitterTitle } = {} } = result;
-            if (!lab) return null;
-            const labLink = <a href={object.atIdFromObject(lab)}>{ lab.display_title }</a>;
-            if (!submitterTitle){
-                return labLink;
-            }
-            return (
-                <span>
-                    <i className="icon icon-fw icon-user far user-icon" data-html data-tip={'<small>Submitted by</small> ' + result.submitted_by.display_title} />
-                    { labLink }
-                </span>
-            );
-        }
-    },
     'report': {
         'title': "Report",
         'render': function renderReportColumn(result, parentProps) {
             const {
                 '@id' : resultHref,
-                '@type' : itemTypeList = ["Item"],
                 report = null
             } = result;
             const {
-                display_title: mainTitle = null,
+                display_title: reportTitle = null,
                 accession = null,
-                last_modified : { date_modified: date = null } = {}
+                last_modified: {
+                    date_modified = null
+                } = {},
             } = report || {};
 
             if (!report || !report.accession) {
                 return null;
             }
 
-            const showAccessionSeparately = accession !== mainTitle;
+            const showAccessionSeparately = accession !== reportTitle;
             return (
-                <a href={resultHref} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status: "not implemented", statusTip: "Not Implemented" }} dateTitle="Last Modified:" topLeft={showAccessionSeparately ? <span className="accession">{ accession }</span> : null} />
-                </a>
+                <MultiLevelColumn status="not implemented" statusTip="Not Implemented" dateTitle="Last Modified:"
+                    date={date_modified}
+                    topLeft={showAccessionSeparately ? <span className="accession text-muted">{ accession }</span> : null}
+                    mainTitle={<a href={resultHref} className="adv-block-link">{ reportTitle }</a>}/>
             );
         }
     },
     'family': {
         'render' : function renderFamilyColumn(result, parentProps) {
-            const { '@type' : itemTypeList = ["Item"], family } = result;
+            const { family } = result;
             if (!family) return null;
             const {
                 '@id' : atId = null,
                 accession = null,
-                date_created: date = null,
-                family_id: mainTitle = null,
+                last_modified: {
+                    date_modified: date = null
+                } = {},
+                family_id = null,
                 uuid = null
             } = family;
 
             let status = null;
             let statusTip = null;
-            if (uuid && mainTitle) {
+            if (uuid && family_id) {
                 status = "complete";
                 statusTip = "Family is created with required fields.";
             } else {
@@ -218,9 +232,9 @@ export const columnExtensionMap = {
             }
 
             return (
-                <a href={atId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Modified:" topLeft={<span className="accession">{ accession }</span>} />
-                </a>
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Last Modified:"
+                    topLeft={<span className="accession text-muted">{ accession }</span>}
+                    mainTitle={<a href={atId} className="adv-block-link">{ family_id }</a>} />
             );
         }
     },
@@ -239,7 +253,7 @@ export const columnExtensionMap = {
                 uuid = null
             } = individual;
 
-            const mainTitle = individual_id ? individual_id : display_title;
+            const individualTitle = individual_id ? individual_id : display_title;
 
             let status = null;
             let statusTip = null;
@@ -252,9 +266,9 @@ export const columnExtensionMap = {
             }
 
             return (
-                <a href={atId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Accessioned:" topLeft={<span className="accession">{ accession }</span>} />
-                </a>
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Accession Date:"
+                    topLeft={<span className="accession text-muted">{ accession }</span>}
+                    mainTitle={<a href={atId} className="adv-block-link">{ individualTitle }</a>}/>
             );
         }
     },
@@ -264,7 +278,7 @@ export const columnExtensionMap = {
             const { '@id' : resultHrefPath, sample = null } = result;
             if (!sample) return null; // Unsure if possible, but fallback to null / '-' in case so (not showing datetitle etc)
             const {
-                workup_type: mainTitle = null,
+                workup_type = null,
                 sequencing_date: date = null,
                 files = []
             } = sample || {};
@@ -292,46 +306,29 @@ export const columnExtensionMap = {
                 status = "incomplete";
             }
 
-            /** @DEPRECATED as of 9/16/20 -- keeping here until confirmation new tips will stay.
-            let status, statusTip;
-            if (complProcLen > 0){
-                status = "released";
-                if (complProcLen === 1) {
-                    statusTip = `Process <span class="text-600">${completed_processes[0]}</span> has completed`;
-                } else {
-                    statusTip = `This sample/case has <strong>${complProcLen}</strong> completed processes`;
-                }
-            } else {
-                status = "uploading";
-                statusTip = "This sample/case has no completed processes yet";
-            }
-            */
-
             return (
-                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Sequenced:" />
-                </a>
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Sequence Date:"
+                    mainTitle={<a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">{ workup_type }</a>}/>
             );
         }
     },
     /** "Bioinformatics" column title */
     'sample_processing.analysis_type': {
         'render' : function renderBioinformaticsColumn(result, parentProps){
-            const { '@id' : resultHrefPath, sample_processing = null } = result;
+            const { sample_processing = null } = result;
             if (!sample_processing) return null; // Fallback to null / '-' in case so (not showing datetitle etc)
 
-            return (
-                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    <BioinformaticsMultiLevelColumn result={result} />
-                </a>
-            );
+            // TODO: Make & use more easily-memoizable per-column components like `BioinformaticsMultiLevelColumn`
+            return <BioinformaticsMultiLevelColumn result={result} />;
         }
     },
     /** "Sample" column title */
     'sample.specimen_type': {
         'render' : function renderSampleColumn(result, parentProps){
             const { sample = null } = result;
-            const { uuid = null, bam_sample_id = null, '@id': sampleId, accession, specimen_type: mainTitle, specimen_collection_date: date } = sample || {};
+            const { uuid = null, bam_sample_id = null, '@id': sampleId, accession, specimen_type = null, specimen_collection_date: date } = sample || {};
+            if (!sample || !specimen_type) return null;
+
             // Unlikely to show in non-Case item results, so didn't add Case filter
 
             let status = null;
@@ -344,9 +341,16 @@ export const columnExtensionMap = {
                 statusTip = "Sample exists, but some field is missing: uuid or bam_sample_id.";
             }
             return (
-                <a href={sampleId} className="adv-block-link">
-                    <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Collected:" topLeft={<span className="accession">{ accession }</span>} />
-                </a>);
+                <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Collection Date:"
+                    topLeft={<span className="accession text-muted">{ accession }</span>}
+                    mainTitle={<a href={sampleId} className="adv-block-link">{ capitalizeSentence(specimen_type) }</a>} />
+            );
+        }
+    },
+    /** "QC" column title */
+    'quality_control_flags.flag' : {
+        'render': function(result, props) {
+            return <QCMultilevelColumn {...{ result }} />;
         }
     },
     'date_published' : {
@@ -402,10 +406,10 @@ export const columnExtensionMap = {
         'render' : function statusIndicator(result, props){
             const statusFormatted = Schemas.Term.toName('status', result.status);
             return (
-                <React.Fragment>
-                    <i className="status-indicator-dot mr-07" data-status={result.status}/>
-                    <span className="value">{ statusFormatted }</span>
-                </React.Fragment>
+                <span className="value">
+                    <i className="status-indicator-dot mr-07" data-status={result.status} />
+                    { statusFormatted }
+                </span>
             );
         }
     },
@@ -415,7 +419,7 @@ export const columnExtensionMap = {
             const { "@id": link } = result;
             if (!result.workflow || !result.workflow.title) return null;
             const { title }  = result.workflow;
-            const workflowHref = object.itemUtil.atId(result.workflow);
+            const workflowHref = itemUtil.atId(result.workflow);
             let retLink;
             if (workflowHref){
                 retLink = <a href={workflowHref || link}>{ title }</a>;
@@ -424,31 +428,15 @@ export const columnExtensionMap = {
             }
             return <span className="value">{ retLink }</span>;
         }
-    },
-    'bam_snapshot': {
-        'noSort' : true,
-        'render' : function(result, props) {
-            const { bam_snapshot = null, uuid = null } = result;
-            if (bam_snapshot) {
-                return (
-                    <div className="mx-auto text-truncate">
-                        <a target="_blank" rel="noreferrer" href={`/${uuid}/@@download`}>
-                            View BAM Snapshot
-                        </a>
-                        <i className="ml-1 icon-sm icon fas icon-external-link-alt"></i>
-                    </div>
-                );
-            }
-            return null;
-        }
     }
 };
 
 
 const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLevelColumn({ result }){
-    const { sample, sample_processing, vcf_file } = result;
+    const { sample, sample_processing, vcf_file, '@id': resultHrefPath } = result;
     const {
-        analysis_type: mainTitle = null,
+        analysis_type = null,
+        analysis_version = null,
         last_modified: { date_modified: date = null } = {}
     } = sample_processing;
     const {
@@ -457,6 +445,7 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
     } = sample || {};
 
     const filesLen = files.length;
+    const mainTitle = analysis_type + (analysis_version ? " (" + analysis_version + ")" : "");
 
     let status = null;
     let statusTip = null;
@@ -488,5 +477,99 @@ const BioinformaticsMultiLevelColumn = React.memo(function BioinformaticsMultiLe
     // Check if overall QCs passed (not yet implemented) -- to add later
 
     // Unlikely to show in non-Case item results, so didn't add Case filter
-    return <MultiLevelColumn {...{ mainTitle, date, status, statusTip }} dateTitle="Last Update:" />;
+    return (
+        <MultiLevelColumn {...{ date, status, statusTip }} dateTitle="Last Modified:"
+            mainTitle={
+                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                    { analysis_type }
+                </a>
+            }/>
+    );
+});
+
+
+const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
+    const {
+        family: canonicalFamilyPartialEmbed = {},
+        sample_processing = {},
+        quality_control_flags = {},
+        '@id': resultHrefPath
+    } = result;
+    const {
+        last_modified: { date_modified: date = null } = {},
+        quality_control_metrics: qualityControlMetrics = [],
+        families: spFamilies = []
+    } = sample_processing;
+
+    // Find full canonical family for this case
+    const familiesWithViewPermission = CurrentFamilyController.filterFamiliesWithViewPermission(spFamilies);
+    const canonicalFamilyIdx = findCanonicalFamilyIndex(familiesWithViewPermission, canonicalFamilyPartialEmbed);
+
+    const {
+        relationships = []
+    } = spFamilies[canonicalFamilyIdx] || {};
+
+    // Create a mapping of individuals to relationship and sex
+    const relationshipMapping = generateRelationshipMapping(relationships);
+
+    const { completed_qcs = [], warn = 0, fail = 0 } = quality_control_flags;
+
+    // title = null, children = [], className, popID, tooltip, placement, htmlContent
+
+    let qcFlags = <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">No Flags</a>;
+    if (warn !== 0 || fail !== 0) {
+        qcFlags = (
+            <div>
+                <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
+                    <span className="mr-05">{fail} <i className={`icon icon-flag fas text-danger ml-05`} /></span>
+                    <span className="ml-05">{warn} <i className={`icon icon-flag fas text-warning ml-05`} /></span>
+                </a>
+                <QuickPopover className="ml-05 mb-03 p-0" tooltip="Click for QC Summary">
+                    <QCPopover {...{ qualityControlMetrics, relationshipMapping }} />
+                </QuickPopover>
+            </div>
+        );
+    }
+
+    const bottom = completed_qcs.length !== 0 ?
+        <div><span className="text-600">{completed_qcs.join(", ")}</span> QC(s) Completed</div>:
+        <div>QCs Incomplete</div>;
+
+    return (
+        <MultiLevelColumn {...{ bottom }} showBottomAsDate={false} mainTitle={qcFlags}/>
+    );
+});
+
+
+const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relationshipMapping }) {
+
+    if (qualityControlMetrics.length === 0) { return "No Quality Control Metrics Available"; }
+
+    const sortedQCMS = sortAndAddRolePropsToQCMs(qualityControlMetrics, relationshipMapping);
+    const flagClasses = "mb-02 d-flex align-items-center justify-content-between";
+
+    return (
+        <div className="p-2">
+            <table className="table table-sm table-borderless">
+                <tbody>
+                    { sortedQCMS.map((qcm, i) => {
+                        const { atID, role, sequencing_type, bam_sample_id, warn = [], fail = [] } = qcm;
+
+                        const warnFlags = warn.map((flag) => <QCMFlag key={flag} cls={flagClasses} type="warn" title={flag} />);
+                        const failFlags = fail.map((flag) => <QCMFlag key={flag} cls={flagClasses} type="fail" title={flag} />);
+
+                        return (
+                            <tr key={atID + bam_sample_id } className={`${ i !== sortedQCMS.length - 1 && "border-bottom"}`}>
+                                <td className="text-left text-600 text-capitalize text-larger pl-03 align-top align-left p-2">
+                                    {role}:
+                                </td>
+                                <td className="text-left align-top text-larger align-left p-2">{sequencing_type}</td>
+                                <td className="p-2">{ warnFlags } { failFlags } { warnFlags.length == 0 && failFlags.length == 0 && "No Flags"}</td>
+                            </tr>
+                        );
+                    })}
+                </tbody>
+            </table>
+        </div>
+    );
 });

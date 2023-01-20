@@ -1,25 +1,25 @@
 import json
 import pytest
-import mock
+import webtest
 
-from datetime import (datetime, timedelta)
-from dcicutils.misc_utils import Retry
+from datetime import datetime, timedelta
+from dcicutils.misc_utils import Retry, ignored, local_attrs
+from dcicutils.qa_utils import notice_pytest_fixtures
 from pyramid.httpexceptions import HTTPBadRequest
 from snovault import TYPES, COLLECTIONS
 from snovault.elasticsearch import create_mapping
-from ..search import lucene_builder
+from snovault.elasticsearch.indexer_utils import get_namespaced_index
+from snovault.schema_utils import load_schema
+from snovault.util import add_default_embeds
+from webtest import AppError
 from ..search.lucene_builder import LuceneBuilder
 from ..search.search_utils import find_nested_path
-from snovault.elasticsearch.indexer_utils import get_namespaced_index
-from snovault.util import add_default_embeds
-from snovault.schema_utils import load_schema
-from webtest import AppError
 
 
-pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search]
+pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
 
 
-### IMPORTANT
+# ==================== IMPORTANT ====================
 # uses the inserts in ./data/workbook_inserts
 # design your tests accordingly
 
@@ -40,6 +40,7 @@ def recursively_find_uuids(json, uuids):
 
 def test_search_view(workbook, es_testapp):
     """ Test basic things about search view """
+    notice_pytest_fixtures(workbook)
     res = es_testapp.get('/search/?type=Item').json
     assert res['@type'] == ['ItemSearchResults', 'Search']
     assert res['@id'] == '/search/?type=Item'
@@ -48,6 +49,12 @@ def test_search_view(workbook, es_testapp):
     assert res['title'] == 'Search'
     assert res['total'] > 0
     assert 'facets' in res
+
+    # type facet should always have > 1 option here, even when it is selected
+    for facet in res['facets']:
+        if facet['field'] == 'type':
+            assert len(facet['terms']) > 1
+            break
     assert 'filters' in res
     assert '@graph' in res
 
@@ -57,6 +64,7 @@ def test_search_with_no_query(workbook, es_testapp):
     using /search/ (with no query) should default to /search/?type=Item
     thus, should satisfy same assertions as test_search_view
     """
+    notice_pytest_fixtures(workbook)
     res = es_testapp.get('/search/').follow(status=200)
     assert res.json['@type'] == ['ItemSearchResults', 'Search']
     assert res.json['@id'] == '/search/?type=Item'
@@ -129,7 +137,8 @@ def test_search_with_simple_query(workbook, es_testapp):
     res = es_testapp.get('/search/?type=Disorder&q=(Sub+-Second) | oranges').follow().json
     assert len(res['@graph']) == 2
     # exclude all
-    res = es_testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)', status=404)
+    es_testapp.get('/search/?type=Disorder&q=(oranges)+(apples)+(bananas)',
+                   status=404)  # expect empty result
 
 
 def test_search_ngram(workbook, es_testapp):
@@ -160,15 +169,15 @@ def test_search_ngram(workbook, es_testapp):
     assert len(res4['@graph']) == 3
     # search for full uuid
     res5 = es_testapp.get('/search/?type=Disorder&q=231111bc-8535-4448-903e-854af460b25').json
-    assert len(res4['@graph']) == 3
+    assert len(res5['@graph']) == 3
     # uuid difference beyond 10
     res6 = es_testapp.get('/search/?type=Disorder&q=231111bc-89').json
-    assert len(res4['@graph']) == 3
+    assert len(res6['@graph']) == 3
     # uuid difference at 10 (should get no results)
     es_testapp.get('/search/?type=Disorder&q=231111bc-9', status=404)
 
 
-@pytest.mark.skip # XXX: What is this really testing?
+@pytest.mark.skip  # XXX: What is this really testing?
 def test_search_facets_and_columns_order(workbook, es_testapp):
     # TODO: Adjust ordering of mixed-in facets, perhaps sort by lookup or something, in order to un-xfail.
     test_type = 'experiment_set_replicate'
@@ -182,10 +191,10 @@ def test_search_facets_and_columns_order(workbook, es_testapp):
     schema_facets = [fct for fct in schema_facets if not fct[1].get('disabled', False)]
     sort_facets = sorted(schema_facets, key=lambda fct: fct[1].get('order', 0))
     res = es_testapp.get('/search/?type=ExperimentSetReplicate&limit=all').json
-    for i,val in enumerate(sort_facets):
+    for i, val in enumerate(sort_facets):
         assert res['facets'][i]['field'] == val[0]
     # assert order of columns when we officially upgrade to python 3.6 (ordered dicts)
-    for key,val in schema.get('columns', {}).items():
+    for key, val in schema.get('columns', {}).items():
         assert res['columns'][key]['title'] == val['title']
 
 
@@ -214,6 +223,7 @@ def dd_dts(es_testapp, workbook):
 
 
 def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     # the MboI enzyme should be returned with all the provided pairs
     gres = es_testapp.get('/search/?type=Disorder&disorder_name=Dummy+Disorder').json
     g_uuids = [item['uuid'] for item in gres['@graph'] if 'uuid' in item]
@@ -233,8 +243,9 @@ def test_search_date_range_find_within(dd_dts, es_testapp, workbook):
         assert set(g_uuids).issubset(set(s_uuids))
 
 
-@pytest.mark.skip # XXX: how to best port?
+@pytest.mark.skip  # XXX: how to best port?
 def test_search_with_nested_integer(es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     search0 = '/search/?type=ExperimentHiC'
     s0res = es_testapp.get(search0).json
     s0_uuids = [item['uuid'] for item in s0res['@graph'] if 'uuid' in item]
@@ -255,6 +266,7 @@ def test_search_with_nested_integer(es_testapp, workbook):
 
 
 def test_search_date_range_dontfind_without(dd_dts, es_testapp, workbook):
+    notice_pytest_fixtures(workbook)
     # the MboI enzyme should be returned with all the provided pairs
     dts = {k: v.replace(':', '%3A') for k, v in dd_dts.items()}
     datepairs = [
@@ -283,8 +295,11 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
     res_stem = es_testapp.get(search).json
     assert len(res_stem['@graph']) > 1
     uuids = [r['uuid'] for r in res_stem['@graph'] if 'uuid' in r]
+    ignored(uuids)  # TODO: Should this be ignored? Does it relate to the not_induced_uuids below?
     wrangler_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e3b"
     tester_uuid = "986b362f-4eb6-4a9c-8173-3ab267307e4c"
+    # TODO: I suspect the next assert suffers from variables having changed names in the interim.
+    #       Is it something that should refer to the unused 'uuids' variable above? -kmp 26-Sep-2022
     # assert induced_stem_uuid not in not_induced_uuids
     # now search for stem +induced (AND is now "+")
     search_and = '/search/?type=User&q=scientist+%2Bcurrent'
@@ -306,72 +321,85 @@ def test_search_query_string_with_booleans(workbook, es_testapp):
     assert tester_uuid not in not_uuids
 
 
-# @pytest.mark.skip  # N/A?
-# def test_metadata_tsv_view(workbook, htmltestapp):
-#
-#     FILE_ACCESSION_COL_INDEX = 3
-#     FILE_DOWNLOAD_URL_COL_INDEX = 0
-#
-#     def check_tsv(result_rows, len_requested = None):
-#         info_row = result_rows.pop(0)
-#         header_row = result_rows.pop(0)
-#
-#         assert header_row[FILE_ACCESSION_COL_INDEX] == 'File Accession'
-#         assert header_row.index('File Download URL') == FILE_DOWNLOAD_URL_COL_INDEX # Ensure we have this column
-#         assert len(result_rows) > 0 # We at least have some rows.
-#
-#         for row_index in range(1):
-#             assert len(result_rows[row_index][FILE_ACCESSION_COL_INDEX]) > 4 # We have a value for File Accession
-#             assert 'http' in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX] # Make sure it seems like a valid URL.
-#             assert '/@@download/' in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX]
-#             assert result_rows[row_index][FILE_ACCESSION_COL_INDEX] in result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX] # That File Accession is also in File Download URL of same row.
-#             assert len(result_rows[row_index][FILE_ACCESSION_COL_INDEX]) < len(result_rows[row_index][FILE_DOWNLOAD_URL_COL_INDEX])
-#
-#         # Last some rows should be 'summary' rows. And have empty spaces for 'Download URL' / first column.
-#         summary_start_row = None
-#         for row_index, row in enumerate(result_rows):
-#             if row[1] == 'Summary':
-#                 summary_start_row = row_index - 1
-#                 break
-#
-#         # Check that summary cells are present, in right place, with some correct-looking values
-#         assert result_rows[summary_start_row + 1][1] == 'Summary'
-#         assert result_rows[summary_start_row + 3][1] == 'Files Selected for Download:'
-#         assert result_rows[summary_start_row + 4][1] == 'Total File Rows:'
-#         assert result_rows[summary_start_row + 5][1] == 'Unique Downloadable Files:'
-#         if len_requested:
-#             assert int(result_rows[summary_start_row + 3][4]) == len_requested
-#         assert int(result_rows[summary_start_row + 4][4]) == summary_start_row
-#         assert int(result_rows[summary_start_row + 5][4]) <= summary_start_row
-#
-#
-#     # run a simple GET query with type=ExperimentSetReplicate
-#     res = htmltestapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv') # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
-#     res = res.maybe_follow() # Follow redirect -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
-#     assert 'text/tsv' in res.content_type
-#     result_rows = [ row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n') ] # Strip out carriage returns and whatnot. Make a plain multi-dim array.
-#
-#     check_tsv(result_rows)
-#
-#     # Perform POST w/ accession triples (main case, for BrowseView downloads)
-#     res2_post_data = { # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values, with key values STRINGIFIED, not to POST JSON request.
-#         "accession_triples" : [
-#             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APU1"],
-#             ["4DNESAAAAAA1","4DNEXO67APU1","4DNFIO67APT1"],
-#             ["4DNESAAAAAA1","4DNEXO67APT1","4DNFIO67APV1"],
-#             ["4DNESAAAAAA1","4DNEXO67APT1","4DNFIO67APY1"],
-#             ["4DNESAAAAAA1","4DNEXO67APV1","4DNFIO67APZ1"],
-#             ["4DNESAAAAAA1","4DNEXO67APV1","4DNFIO67AZZ1"]
-#         ],
-#         'download_file_name' : 'metadata_TEST.tsv'
-#     }
-#
-#     res2 = htmltestapp.post('/metadata/?type=ExperimentSetReplicate', { k : json.dumps(v) for k,v in res2_post_data.items() }) # NEWER URL FORMAT
-#
-#     assert 'text/tsv' in res2.content_type
-#     result_rows = [ row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n') ]
-#
-#     check_tsv(result_rows, len(res2_post_data['accession_triples']))
+@pytest.mark.broken  # test doesn't work, this will keep make from running it
+@pytest.mark.skip  # In case of running the file by name, this still doesn't want to run
+def test_metadata_tsv_view(workbook, html_es_testapp):
+
+    file_accession_col_index = 3
+    file_download_url_col_index = 0
+
+    def check_tsv(result_rows, len_requested=None):
+        info_row = result_rows.pop(0)
+        header_row = result_rows.pop(0)
+        ignored(info_row)
+
+        assert header_row[file_accession_col_index] == 'File Accession'
+        assert header_row.index('File Download URL') == file_download_url_col_index  # Ensure we have this column
+        assert len(result_rows) > 0  # We at least have some rows.
+
+        for row_index in range(1):
+            assert len(result_rows[row_index][file_accession_col_index]) > 4  # We have a value for File Accession
+            assert 'http' in result_rows[row_index][file_download_url_col_index]  # Make sure it seems like a valid URL.
+            assert '/@@download/' in result_rows[row_index][file_download_url_col_index]
+            # That File Accession is also in File Download URL of same row.
+            assert (result_rows[row_index][file_accession_col_index]
+                    in result_rows[row_index][file_download_url_col_index])
+            assert (len(result_rows[row_index][file_accession_col_index])
+                    < len(result_rows[row_index][file_download_url_col_index]))
+
+        # Last some rows should be 'summary' rows. And have empty spaces for 'Download URL' / first column.
+        summary_start_row = None
+        for row_index, row in enumerate(result_rows):
+            if row[1] == 'Summary':
+                summary_start_row = row_index - 1
+                break
+
+        # Check that summary cells are present, in right place, with some correct-looking values
+        assert result_rows[summary_start_row + 1][1] == 'Summary'
+        assert result_rows[summary_start_row + 3][1] == 'Files Selected for Download:'
+        assert result_rows[summary_start_row + 4][1] == 'Total File Rows:'
+        assert result_rows[summary_start_row + 5][1] == 'Unique Downloadable Files:'
+        if len_requested:
+            assert int(result_rows[summary_start_row + 3][4]) == len_requested
+        assert int(result_rows[summary_start_row + 4][4]) == summary_start_row
+        assert int(result_rows[summary_start_row + 5][4]) <= summary_start_row
+
+    # run a simple GET query with type=ExperimentSetReplicate
+    # OLD URL FORMAT IS USED -- TESTING REDIRECT TO NEW URL
+    res = html_es_testapp.get('/metadata/type=ExperimentSetReplicate/metadata.tsv')
+    # Follow redirect
+    # -- https://docs.pylonsproject.org/projects/webtest/en/latest/api.html#webtest.response.TestResponse.maybe_follow
+    res = res.maybe_follow()
+    assert 'text/tsv' in res.content_type
+    # Strip out carriage returns and whatnot. Make a plain multi-dim array.
+    result_rows = [row.rstrip(' \r').split('\t') for row in res.body.decode('utf-8').split('\n')]
+
+    check_tsv(result_rows)
+
+    # Perform POST w/ accession triples (main case, for BrowseView downloads)
+
+    # N.B. '.post', not '.post_json' is used. This dict is converted to POST form values,
+    # with key values STRINGIFIED, not to POST JSON request.
+    res2_post_data = {
+        "accession_triples": [
+            ["4DNESAAAAAA1", "4DNEXO67APU1", "4DNFIO67APU1"],
+            ["4DNESAAAAAA1", "4DNEXO67APU1", "4DNFIO67APT1"],
+            ["4DNESAAAAAA1", "4DNEXO67APT1", "4DNFIO67APV1"],
+            ["4DNESAAAAAA1", "4DNEXO67APT1", "4DNFIO67APY1"],
+            ["4DNESAAAAAA1", "4DNEXO67APV1", "4DNFIO67APZ1"],
+            ["4DNESAAAAAA1", "4DNEXO67APV1", "4DNFIO67AZZ1"]
+        ],
+        'download_file_name': 'metadata_TEST.tsv'
+    }
+
+    res2 = html_es_testapp.post('/metadata/?type=ExperimentSetReplicate',  # NEWER URL FORMAT
+                                {k: json.dumps(v)
+                                 for k, v in res2_post_data.items()})
+
+    assert 'text/tsv' in res2.content_type
+    result_rows = [row.rstrip(' \r').split('\t') for row in res2.body.decode('utf-8').split('\n')]
+
+    check_tsv(result_rows, len(res2_post_data['accession_triples']))
 
 
 def test_default_schema_and_non_schema_facets(workbook, es_testapp):
@@ -383,7 +411,7 @@ def test_default_schema_and_non_schema_facets(workbook, es_testapp):
     assert 'institution.display_title' in embeds
     res = es_testapp.get('/search/?type=User&institution.display_title=HMS+DBMI').json
     assert 'facets' in res
-    facet_fields = [ facet['field'] for facet in res['facets'] ]
+    facet_fields = [facet['field'] for facet in res['facets']]
     # assert 'type' in facet_fields uncomment this if we decide type should exist when searching on a single type
     # assert 'status' in facet_fields uncomment this if status is added back -Will 5/13/2020
     for facet in schema['facets'].keys():
@@ -403,6 +431,7 @@ def test_search_query_string_no_longer_functional(workbook, es_testapp):
     search_range = '/search/?q=date_created%3A>2018-01-01&type=Item'
     res_search = es_testapp.get(search_range, status=404)
     assert len(res_search.json['@graph']) == 0
+
 
 def test_search_with_added_display_title(workbook, es_testapp):
     search = '/search/?type=Individual&father=GAPID3PW26SK'
@@ -450,20 +479,20 @@ def test_search_with_no_value(workbook, es_testapp):
     # grab some random results
     for item in res_json['@graph']:
         maybe_null = item.get('comment')
-        assert( maybe_null is None or maybe_null == 'This comment is to test oranges')
+        assert maybe_null is None or maybe_null == 'This comment is to test oranges'
     res_ids = [r['uuid'] for r in res_json['@graph'] if 'uuid' in r]
     search2 = '/search/?comment=This+comment+is+to+test+apples&type=Disorder'
     res_json2 = es_testapp.get(search2).json
     # just do 1 res here
     check_item = res_json2['@graph'][0]
-    assert(check_item.get('comment') == 'This comment is to test apples')
+    assert check_item.get('comment') == 'This comment is to test apples'
     res_ids2 = [r['uuid'] for r in res_json2['@graph'] if 'uuid' in r]
-    assert(set(res_ids2) != set(res_ids))
+    assert set(res_ids2) != set(res_ids)
 
 
 def test_search_with_static_header(workbook, es_testapp, indexer_testapp):
     """ Performs a search which should be accompanied by a search header """
-    indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
+    #indexer_testapp.post_json('/index', {'record': False})  # try to ensure static_sections are indexed
 
     # No items, just checking header
     search = '/search/?type=Workflow'
@@ -487,9 +516,9 @@ def test_search_multiple_types(workbook, es_testapp):
     assert res['@type'] == ['ItemSearchResults', 'Search']
 
 
-#########################################
-## Tests for collections (search 301s) ##
-#########################################
+# ===========================================
+# === Tests for collections (search 301s) ===
+# ===========================================
 
 def test_collection_limit(workbook, es_testapp):
     res = es_testapp.get('/user/?limit=1', status=301)
@@ -505,17 +534,43 @@ def test_collection_actions_filtered_by_permission(workbook, es_testapp, anon_es
     assert len(res.json['@graph']) == 0
 
 
-@Retry.retry_allowed('test_index_data_workbook.check', wait_seconds=1, retries_allowed=20)
-def check_item_type(client, item_type):
-    # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
-    #
-    # We retry a lot of times because it's still fast if things are working quickly, but if it's
-    # slow it's better to wait than fail the test. Slowness is not what we're trying to check for here.
-    # And even if it's slow for one item, that same wait time will help others have time to catch up,
-    # so it shouldn't be slow for others. At least that's the theory. -kmp 27-Jan-2021
-    return client.get('/%s?limit=all' % item_type, status=[200, 301]).follow()
+class ItemTypeChecker:
+
+    @staticmethod
+    @Retry.retry_allowed('ItemTypeChecker.check_item_type', wait_seconds=1, retries_allowed=5)
+    def check_item_type(client, item_type, deleted=False):
+        # This might get a 404 if not enough time has elapsed, so try a few times before giving up.
+        #
+        # We retry a lot of times because it's still fast if things are working quickly, but if it's
+        # slow it's better to wait than fail the test. Slowness is not what we're trying to check for here.
+        # And even if it's slow for one item, that same wait time will help others have time to catch up,
+        # so it shouldn't be slow for others. At least that's the theory. -kmp 27-Jan-2021
+        extra = "&status=deleted" if deleted else ""
+        return client.get('/%s?limit=all%s' % (item_type, extra), status=[200, 301]).follow()
+
+    CONSIDER_DELETED = True
+
+    @classmethod
+    def get_all_items_of_type(cls, client, item_type):
+        if cls.CONSIDER_DELETED:
+            try:
+                res = cls.check_item_type(client, item_type)
+                items_not_deleted = res.json.get('@graph', [])
+            except webtest.AppError:
+                items_not_deleted = []
+            try:
+                res = cls.check_item_type(client, item_type, deleted=True)
+                items_deleted = res.json.get('@graph', [])
+            except webtest.AppError:
+                items_deleted = []
+            return items_not_deleted + items_deleted
+        else:
+            res = cls.check_item_type(client, item_type)
+            items_not_deleted = res.json.get('@graph', [])
+            return items_not_deleted
 
 
+@pytest.mark.skip  # this test just loads the workbook, reindexes it and searches
 def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
     es = es_testapp.app.registry['elasticsearch']
     # we need to reindex the collections to make sure numbers are correct
@@ -527,7 +582,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
     split_counts = db_es_total.split()
     db_total = int(split_counts[1])
     es_total = int(split_counts[3])
-    assert(db_total == es_total)  # 2nd is db, 4th is es
+    assert db_total == es_total  # 2nd is db, 4th is es
     # e.g., {..., "db_es_compare": {"AnalysisStep": "DB: 26 ES: 26 ", ...}, ...}
     for item_name, item_counts in es_testapp_counts.json['db_es_compare'].items():
         print("item_name=", item_name, "item_counts=", item_counts)
@@ -542,7 +597,7 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         item_type = es_testapp.app.registry[COLLECTIONS][item_name].type_info.item_type
         namespaced_index = get_namespaced_index(es_testapp.app, item_type)
 
-        es_direct_count = es.count(index=namespaced_index, doc_type=item_type).get('count')
+        es_direct_count = es.count(index=namespaced_index).get('count')
         assert es_item_count == es_direct_count
 
         if es_item_count == 0:
@@ -551,10 +606,9 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
         # check items in search result individually
         search_url = '/%s?limit=all' % item_type
         print("search_url=", search_url)
-        res = check_item_type(client=es_testapp, item_type=item_type)
-        for item_res in res.json.get('@graph', []):
-            index_view_res = es.get(index=namespaced_index, doc_type=item_type,
-                                    id=item_res['uuid'])['_source']
+        items = ItemTypeChecker.get_all_items_of_type(client=es_testapp, item_type=item_type)
+        for item_res in items:
+            index_view_res = es.get(index=namespaced_index, id=item_res['uuid'])['_source']
             # make sure that the linked_uuids match the embedded data
             assert 'linked_uuids_embedded' in index_view_res
             assert 'embedded' in index_view_res
@@ -571,7 +625,43 @@ def test_index_data_workbook(workbook, es_testapp, html_es_testapp):
                 html_res = html_es_testapp.get(item_res['@id'])
                 assert html_res.body.startswith(b'<!DOCTYPE html>')
             except Exception as e:
+                ignored(e)
                 pass
+
+
+@pytest.mark.manual
+@pytest.mark.skip
+def test_index_data_workbook_after_posting_deleted_page_c4_570(workbook, es_testapp, html_es_testapp):
+    """
+    Regression test for C4-570.
+
+    This test takes a long time to run since it runs a long-running test three different ways.
+    This test must be invoked manually. 'make test' and 'make travis-test' will skip it because it's marked manual.
+    See details at https://hms-dbmi.atlassian.net/browse/C4-570
+    """
+
+    # Running the test this way should work fine
+    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
+    # But now let's add a deleted page.
+    # test_index_data_workbook will fail if preceded by anything that makes a deleted page
+    es_testapp.post_json('/pages/',
+                         {
+                             "name": "help/user-guide/sample-deleted-page",
+                             "title": "Sample Deleted Page",
+                             "content": [],
+                             "uuid": "db807a0f-2e76-4c77-a6bb-313a9c174252",
+                             "status": "deleted"
+                         },
+                         status=201)
+
+    # This test will now protect itself against failure.
+    test_index_data_workbook(workbook, es_testapp, html_es_testapp)
+
+    # And we can see that if we hadn't protected ourselves against failure, this would reliably fail.
+    with pytest.raises(webtest.AppError):
+        with local_attrs(ItemTypeChecker, CONSIDER_DELETED=False):
+            test_index_data_workbook(workbook, es_testapp, html_es_testapp)
 
 
 class MockedRequest(object):
@@ -590,8 +680,26 @@ class MockedRequest(object):
 def hacked_query():
     """ This is valid lucene that will have 'principals_allowed.view' that differs from what is on the request.
         Our helper method should detect such change and throw an error. """
-    return {'query': {'bool': {'filter': [{'bool': {'must': [{'terms':
-                     {'principals_allowed.view': ['system.Everyone', 'group.PERMISSION_YOU_DONT_HAVE']}}]}}]}}}
+    return {
+        'query': {
+            'bool': {
+                'filter': {
+                    'bool': {
+                        'must': [
+                            {
+                                'terms': {
+                                    'principals_allowed.view': [
+                                        'system.Everyone',
+                                        'group.PERMISSION_YOU_DONT_HAVE'
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                }
+            }
+        }
+    }
 
 
 def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
@@ -599,13 +707,12 @@ def test_search_with_hacked_query(workbook, anon_es_testapp, hacked_query):
         verification function should throw an exception if there is any delta in the permissions object
         we explicitly attach to every search query.
     """
-    with mock.patch.object(lucene_builder, 'convert_search_to_dictionary', return_value=hacked_query):
-        mocked_request_with_least_permissive_permissions = MockedRequest()
-        with pytest.raises(HTTPBadRequest):
-            LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, None)
-        mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
-                                                                                 'group.PERMISSION_YOU_DONT_HAVE'])
-        LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, None)
+    mocked_request_with_least_permissive_permissions = MockedRequest()
+    with pytest.raises(HTTPBadRequest):
+        LuceneBuilder.verify_search_has_permissions(mocked_request_with_least_permissive_permissions, hacked_query)
+    mocked_request_with_same_permissions = MockedRequest(principals_allowed=['system.Everyone',
+                                                                             'group.PERMISSION_YOU_DONT_HAVE'])
+    LuceneBuilder.verify_search_has_permissions(mocked_request_with_same_permissions, hacked_query)
 
 
 def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
@@ -619,11 +726,11 @@ def test_search_with_principals_allowed_fails(workbook, anon_es_testapp):
         anon_es_testapp.get('/search/?type=Item&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
     with pytest.raises(AppError):
         anon_es_testapp.get('/search/?type=Family'
-                        '&proband.display_title=GAPID8J9B9CR'
-                        '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+                            '&proband.display_title=GAPID8J9B9CR'
+                            '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
     with pytest.raises(AppError):
         anon_es_testapp.get('/search/?type=Gene'
-                        '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
+                            '&principals_allowed.view=group.PERMISSION_YOU_DONT_HAVE')
 
 
 def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp, authenticated_es_testapp):
@@ -631,10 +738,10 @@ def test_search_debug_parameter(workbook, es_testapp, anon_es_testapp, authentic
     resp_with_debug = es_testapp.get('/search/?type=Family&debug=true', status=200).json
     assert 'query' in resp_with_debug
     # no results should still show query
-    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=true', status=404).json
+    resp_with_debug = es_testapp.get('/search/?type=Phenotype&debug=true', status=404).json
     assert 'query' in resp_with_debug
     # doesn't matter what you pass
-    resp_with_debug = es_testapp.get('/search/?type=Gene&debug=blah', status=404).json
+    resp_with_debug = es_testapp.get('/search/?type=Phenotype&debug=blah', status=404).json
     assert 'query' in resp_with_debug
     # no results, no admin, no query
     resp_without_debug = anon_es_testapp.get('/search/?type=Family&debug=true', status=404).json
@@ -669,6 +776,19 @@ def test_find_nested_path(sample_processing_mapping, field, nested_path):
 
 class TestNestedSearch(object):
     """ This class encapsulates all helper methods and tests needed to test out nested searches """
+    VARIANT_HG19_ABSENT = "cedff838-99af-4936-a0ae-4dfc63ba8bf4"
+    VARIANT_HG19_CHR1_GA = "842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f"
+    VARIANT_HG19_CHR1_2_AT_DEL = "852bb349-203e-437d-974a-e8d6cb56810a"
+    VARIANT_HG19_CHR1_DEL = "f6aef055-4c88-4a3e-a306-d37a71535d8b"
+    VARIANT_HG19_CHR1_EXT = "4af362a4-4f7f-4ad9-9c80-bf1f94bc143f"
+    VARIANT_HG19_CHR16 = "09ed6e03-b770-4d09-9d71-32dc199c76a3"
+    VARIANTS_WITH_HG19 = [
+        VARIANT_HG19_CHR1_GA,
+        VARIANT_HG19_CHR1_2_AT_DEL,
+        VARIANT_HG19_CHR1_DEL,
+        VARIANT_HG19_CHR1_EXT,
+        VARIANT_HG19_CHR16
+    ]
 
     @staticmethod
     def assert_length_is_expected(result, expected):
@@ -679,136 +799,256 @@ class TestNestedSearch(object):
         """ Checks that a given facet name has the correct number of terms """
         for facet in facets:
             if facet['field'] == name:
-                assert len(facet['terms']) == count
-                return
+                if 'terms' in facet:
+                    assert len(facet['terms']) == count
+                    return
+                else:
+                    for stats_field in ['min', 'max', 'avg', 'sum']:
+                        assert stats_field in facet
+                    return
+        raise AssertionError(f'Facet {name} never located')
 
     def test_search_on_single_nested_field(self, workbook, es_testapp):
-        """ One match for variant with hg19.hg19_pos=12185955 """
+        """ Two matches for variant with hg19.hg19_pos=12185955 """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_pos=12185955').json
-        self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+                             '&hg19.hg19_pos=12185955').json
+        self.assert_length_is_expected(res, 2)
+        uuids = [res['@graph'][0]['uuid'], res['@graph'][1]['uuid']]
+        assert self.VARIANT_HG19_CHR1_DEL in uuids
+        assert self.VARIANT_HG19_CHR1_2_AT_DEL in uuids
 
     def test_or_search_on_same_nested_field(self, workbook, es_testapp):
         """ Should match 2 since OR on this field """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T').follow().json
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
-            assert variant['uuid'] in ['f6aef055-4c88-4a3e-a306-d37a71535d8b', '852bb349-203e-437d-974a-e8d6cb56810a']
+            assert variant['uuid'] in [
+                self.VARIANT_HG19_CHR1_DEL,
+                self.VARIANT_HG19_CHR1_2_AT_DEL
+            ]
 
     def test_and_search_on_nested_field_that_does_not_match(self, workbook, es_testapp):
-        """ This has a chrom value that does not match the position, so will give no results """
+        """ Test various non-matching searches """
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_chrom=chr3', status=404)
+                       '&hg19.hg19_chrom=chr4', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_chrom=chr3', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos.to=0', status=404)  # disqualify on ranges
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos.from=99999999', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos.from=9999999999'
+                       '&hg19.hg19_pos.to=99999999999', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19=No+value'
+                       '&POS.from=100000', status=404)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos=No+value').json
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
 
     def test_and_search_on_nested_field_that_matches_one(self, workbook, es_testapp):
         """ This has the correct 'hg19_chrom', so should match one """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_pos=12185955'
-                          '&hg19.hg19_chrom=chr1').json
+                             '&hg19.hg19_pos.to=12185956'
+                             '&hg19.hg19_chrom=chr2').json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19=No+value').json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
 
     def test_or_search_on_nested_hg_19_multiple_match(self, workbook, es_testapp):
         """ Do an OR search on hg19.hg19_chrom, matching three variants """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom=chr1').json
-        self.assert_length_is_expected(res, 3)
+                             '&hg19.hg19_pos!=12345').follow().json
+        self.assert_length_is_expected(res, 5)
         for variant in res['@graph']:
-            assert variant['uuid'] in [
-                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
-            ]
-
-    def test_negative_search_on_clinic_notes(self, workbook, es_testapp):
-        """ Do an OR search with hg19_post with a negative, should eliminate a variant """
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom=chr1'
-                          '&hg19.hg19_pos!=12185955').follow().json
+                             '&hg19.hg19_chrom=chr1').json
+        self.assert_length_is_expected(res, 4)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185956').json
+        self.assert_length_is_expected(res, 4)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185955'
+                             '&hg19.hg19_pos.from=88832').json
+        self.assert_length_is_expected(res, 4)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185954'
+                             '&hg19.hg19_pos.from=11720331').json
         self.assert_length_is_expected(res, 2)
         for variant in res['@graph']:
             assert variant['uuid'] in [
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
+                self.VARIANT_HG19_CHR1_2_AT_DEL,
+                self.VARIANT_HG19_CHR1_GA,
+                self.VARIANT_HG19_CHR16
             ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos.to=12185956'
+                             '&hg19.hg19_pos.from=12185954').json
+        self.assert_length_is_expected(res, 2)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                self.VARIANT_HG19_CHR1_2_AT_DEL,
+                self.VARIANT_HG19_CHR1_DEL,
+                self.VARIANT_HG19_CHR1_EXT
+            ]
+
+    def test_negative_search_on_hg_19(self, workbook, es_testapp):
+        """ Do an OR search with hg19_post with a negative, should eliminate a variant """
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_chrom=chr1'
+                             '&hg19.hg19_pos!=12185955').follow().json
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                self.VARIANT_HG19_CHR1_GA,
+                self.VARIANT_HG19_CHR1_2_AT_DEL,
+                self.VARIANT_HG19_CHR1_EXT
+            ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos!=12185955'
+                             '&hg19.hg19_chrom=chr1').follow().json
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in [
+                self.VARIANT_HG19_CHR1_GA,
+                self.VARIANT_HG19_CHR1_2_AT_DEL,
+                self.VARIANT_HG19_CHR1_EXT
+            ]
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos!=12345').follow().json
+        self.assert_length_is_expected(res, 5)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
 
     def test_and_search_that_matches_one(self, workbook, es_testapp):
         """ Check three properties that occur in the same sub-embedded object in 1 variant """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom=chr1'
-                          '&hg19.hg19_pos=12185955'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
+                             '&hg19.hg19_chrom=chr1'
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'f6aef055-4c88-4a3e-a306-d37a71535d8b'
-        es_testapp.get('/search/?type=Variant'  # should give no results
-                    '&hg19.hg19_chrom=chr2'  # change should be sufficient for no results
-                    '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_DEL
+        res = es_testapp.get('/search/?type=Variant' 
+                             '&hg19.hg19_chrom=chr2' 
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
+        res = es_testapp.get('/search/?type=Variant'  # re-order above test
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_chrom=chr2').follow().json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_CHR1_2_AT_DEL
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr3'  # diff
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr2'
+                       '&hg19.hg19_pos=12185956'  # diff
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_chrom=chr1'
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185957del', status=404)  # diff
 
     @pytest.mark.skip  # re-enable once workbook inserts are built out more
     def test_and_search_that_matches_multiple(self, workbook, es_testapp):
         """ Check two properties that occur in the same sub-embedded object in 3 variants """
         res = es_testapp.get('/search/?type=Variant'
-                          '&families.members.mother.display_title=GAPIDISC7R73'
-                          '&families.members.father.display_title=GAPID3PW26SK').json
+                             '&families.members.mother.display_title=GAPIDISC7R73'
+                             '&families.members.father.display_title=GAPID3PW26SK').json
         self.assert_length_is_expected(res, 3)
 
     def test_and_search_on_three_fields(self, workbook, es_testapp):
         """ OR search that will match all variants with these fields"""
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom=chr1'
-                          '&hg19.hg19_pos=12185955'
-                          '&hg19.hg19_pos=11901816'
-                          '&hg19.hg19_pos=11780388'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
-                          '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
+                             '&hg19.hg19_chrom=chr1'
+                             '&hg19.hg19_pos=12185955'
+                             '&hg19.hg19_pos=11901816'
+                             '&hg19.hg19_pos=11780388'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
         self.assert_length_is_expected(res, 3)
         for variant in res['@graph']:
-            assert variant['uuid'] in [
-                'f6aef055-4c88-4a3e-a306-d37a71535d8b',
-                '852bb349-203e-437d-974a-e8d6cb56810a',
-                '842b1b54-32fb-4ff3-bfd1-c5b51bc35d7f'
-            ]
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_chrom=chr1'
+                             '&hg19.hg19_pos.to=12185956'  # use range instead
+                             '&hg19.hg19_pos.from=11780388'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T'
+                             '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A').follow().json
+        self.assert_length_is_expected(res, 3)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
 
-    def test_search_with_non_existant_combinations(self, workbook, es_testapp):
+    def test_search_with_non_existent_combinations(self, workbook, es_testapp):
         """ Test that swapping around fields that would match across different sub-embedded objects
             does not actually do so (ie: returns no results). """
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=12185955'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T', status=404)
+                       '&hg19.hg19_pos=12185955'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.11901816A>T', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=11901816'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
+                       '&hg19.hg19_pos=11901816'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=11780388'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+                       '&hg19.hg19_pos=11780388'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        # C4-934 regression test - using = for above range fields causes a terms query,
+        # the below will do a range query that will satisfy if part of the same
+        # nested block but will fail if a separate query
+        es_testapp.get('/search/?type=Variant'
+                       '&hg19.hg19_pos.from=11780387'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.2030666G>A', status=404)
 
     def test_nested_search_with_no_value(self, workbook, es_testapp):
         """ Tests searching on 'No value' alone on a nested field """
         res = es_testapp.get('/search/?type=Variant'
-                          '&hg19.hg19_chrom!=No+value').follow().json
-        self.assert_length_is_expected(res, 3)
+                             '&hg19.hg19_chrom!=No+value').follow().json
+        self.assert_length_is_expected(res, 5)
+        for variant in res['@graph']:
+            assert variant['uuid'] in self.VARIANTS_WITH_HG19
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_chrom=No+value&debug=').json
+        self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_ABSENT
 
     def test_nested_search_with_no_value_combined(self, workbook, es_testapp):
         """ Tests searching on 'No value' combined with another nested field, in this case
             should give no results (no matter the ordering) """
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=No+value'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+                       '&hg19.hg19_pos=No+value'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=No+value'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
+                       '&hg19.hg19_pos=No+value'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.11780388G>A', status=404)
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=No+value'
-                    '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
-        es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos=11780388'
-                    '&hg19.hg19_hgvsg=No+value', status=404)
+                       '&hg19.hg19_pos=11780388'
+                       '&hg19.hg19_hgvsg=No+value', status=404)
+        # sanity check
+        res = es_testapp.get('/search/?type=Variant'
+                             '&hg19.hg19_pos=11780388'
+                             '&hg19.hg19_hgvsg!=No+value').follow().json
+        self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_CHR1_GA
 
     def test_search_nested_with_non_nested_fields(self, workbook, es_testapp):
         """ Tests that combining a nested search with a non-nested one works in any order
@@ -818,27 +1058,66 @@ class TestNestedSearch(object):
             this and have queries like this match variants that do not have an hg19 field.
         """
         es_testapp.get('/search/?type=Variant'
-                    '&hg19.hg19_pos!=11720331'
-                    '&POS=88832', status=404)
-        es_testapp.get('/search/?type=Variant'
-                    '&POS=88832&hg19.hg19_pos!=11720331', status=404)
+                       '&hg19.hg19_pos!=11720331'
+                       '&POS=88832', status=404)  # searching a nested field also checks its existence
         res = es_testapp.get('/search/?type=Variant'
-                          '&POS=88832&hg19.hg19_pos!=11720331&hg19.hg19_pos=No+value').follow().json
+                             '&POS=88832&hg19=No+value').json  # should match 1
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_ABSENT
+        es_testapp.get('/search/?type=Variant'
+                       '&POS=11720331&hg19.hg19_pos=11720331', status=404)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&POS=11720331&hg19.hg19_pos=11780388').json
+        self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_CHR1_GA
+        es_testapp.get('/search/?type=Variant'
+                       '&POS=11720331'
+                       '&hg19.hg19_pos=11780388'
+                       '&hg19.hg19_hgvsg=NC_000001.11:g.12185956del', status=404)
+        es_testapp.get('/search/?type=Variant'
+                       '&POS=11720331'
+                       '&hg19.hg19_pos=11780388'
+                       '&REF=A', status=404)
+        res = es_testapp.get('/search/?type=Variant'
+                             '&POS=11720331'
+                             '&hg19.hg19_pos=11780388'
+                             '&REF=G').json
+        self.assert_length_is_expected(res, 1)
+        for variant in res['@graph']:
+            assert variant['uuid'] == self.VARIANT_HG19_CHR1_GA
 
     def test_search_nested_no_value_with_multiple_other_fields(self, workbook, es_testapp):
         """ Tests that combining a 'No value' search with another nested search and a different non-nested
             field works correctly """
         res = es_testapp.get('/search/?type=Variant'
-                          '&POS=88832'
-                          '&REF=A').json
+                             '&POS=88832'
+                             '&hg19=No+value'
+                             '&REF=A').json
         self.assert_length_is_expected(res, 1)
-        assert res['@graph'][0]['uuid'] == 'cedff838-99af-4936-a0ae-4dfc63ba8bf4'
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
+        res = es_testapp.get('/search/?type=Variant'
+                             '&CHROM=1'
+                             '&hg19=No+value'
+                             '&POS.from=0').json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
+        res = es_testapp.get('/search/?type=Variant'
+                             '&CHROM=1'
+                             '&hg19=No+value'
+                             '&POS.from=0'
+                             '&genes.genes_most_severe_gene.display_title!=No+value').follow().json
+        self.assert_length_is_expected(res, 1)
+        assert res['@graph'][0]['uuid'] == self.VARIANT_HG19_ABSENT
         es_testapp.get('/search/?type=Variant'
-                    '&POS=88832'
-                    '&hg19.hg19_pos=No+value'
-                    '&REF=G', status=404)  # REF should disqualify
+                       '&POS=88832'
+                       '&hg19.hg19_pos=No+value'
+                       '&REF=G', status=404)  # REF should disqualify
+        es_testapp.get('/search/?type=Variant'
+                       '&POS=88832'
+                       '&hg19=No+value'
+                       '&REF=G', status=404)
 
     def test_search_nested_facets_are_correct(self, workbook, es_testapp):
         """ Tests that nested facets are properly rendered both on a normal search and when selecting on
@@ -847,15 +1126,17 @@ class TestNestedSearch(object):
             When examining the aggregations on a field we are not searching on, it possible/likely that
             the set of possible results has been reduced by the search.
         """
-        facets = es_testapp.get('/search/?type=Variant').json['facets']
-        self.verify_facet(facets, 'hg19.hg19_chrom', 1)  # 1 option for chrom
-        self.verify_facet(facets, 'hg19.hg19_pos', 3)  # 3 options for pos, hgvsg
-        self.verify_facet(facets, 'hg19.hg19_hgvsg', 3)
+        facets = es_testapp.get('/search/?type=Variant&additional_facet=hg19.hg19_chrom'
+                                '&additional_facet=hg19.hg19_pos'
+                                '&additional_facet=hg19.hg19_hgvsg').json['facets']
+        self.verify_facet(facets, 'hg19.hg19_chrom', 3)  # 3 options for chrom
+        self.verify_facet(facets, 'hg19.hg19_pos', 0)  # stats
+        self.verify_facet(facets, 'hg19.hg19_hgvsg', 5)
 
         # selecting a facet in search does not affect the cardinality of the aggregation on that facet (alone)
         facets_that_should_show_all_options = es_testapp.get(
             '/search/?type=Variant&hg19.hg19_hgvsg=NC_000001.11:g.12185956del').follow().json['facets']
-        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 3)  # still 3 options
+        self.verify_facet(facets_that_should_show_all_options, 'hg19.hg19_hgvsg', 2)  # 2 options
 
         # selecting two facets has the same behavior
         facets_that_should_show_all_options = es_testapp.get(
@@ -866,12 +1147,17 @@ class TestNestedSearch(object):
         # selecting a different facet can affect the aggregation if it just so happens to eliminate
         # possibilities in other fields - this has always been the case
         facets_that_shows_limited_options = es_testapp.get(
-            '/search/?type=Variant&hg19.hg19_pos=11780388').json['facets']
+            '/search/?type=Variant&hg19.hg19_pos=11780388'
+            '&additional_facet=hg19.hg19_hgvsg').json['facets']
         self.verify_facet(facets_that_shows_limited_options, 'hg19.hg19_hgvsg', 1)  # reduced to only 1 option
+
+        # rescue terms show up (7 terms + no value, see variant.json -> facets)
+        self.verify_facet(facets, 'genes.genes_most_severe_consequence.coding_effect', 8)
+        self.verify_facet(facets, 'genes.genes_most_severe_consequence.location', 8)
 
     def test_search_nested_exists_query(self, workbook, es_testapp):
         """ Tests doing a !=No+value search on a nested sub-field. """
-        es_testapp.get('/search/?type=SampleProcessing&samples.uuid!=No+value', status=404)
+        es_testapp.get('/search/?type=SampleProcessing&samples.accession!=No+value', status=404)
 
     def test_search_nested_field_no_value(self, workbook, es_testapp):
         """ Tests that we can do item.sub_embedded_object=No+value and get correct results
@@ -881,7 +1167,11 @@ class TestNestedSearch(object):
         res = es_testapp.get('/search/?type=Variant&hg19=No+value').json
         self.assert_length_is_expected(res, 1)
         res = es_testapp.get('/search/?type=Variant&hg19!=No+value').follow().json
-        self.assert_length_is_expected(res, 3)
+        self.assert_length_is_expected(res, 5)
+        es_testapp.get('/search/?type=Variant&hg19=No+value'
+                       '&CHROM=2', status=404)  # disqualify on positive CHROM
+        es_testapp.get('/search/?type=Variant&hg19=No+value'
+                       '&CHROM!=1', status=404)  # disqualify on negative CHROM
 
 
 @pytest.fixture(scope='session')
@@ -955,7 +1245,7 @@ class TestSearchHiddenAndAdditionalFacets:
     """ Encapsulates tests meant for testing behavior associated with default_hidden, hidden
         and additional_facets
     """
-    DEFAULT_FACETS = ['first_name', 'validation_errors.name']
+    DEFAULT_FACETS = ['first_name']  # 'validation_errors.name'
     DEFAULT_HIDDEN_FACETS = ['last_name', 'sid']
     ADDITIONAL_FACETS = ['unfaceted_string', 'unfaceted_integer']
     DISABLED_FACETS = ['disabled_string', 'disabled_integer']
@@ -993,8 +1283,8 @@ class TestSearchHiddenAndAdditionalFacets:
     def test_search_multiple_additional_facets(self, workbook, es_testapp, hidden_facet_test_data):
         """ Tests that enabling multiple additional facets works """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
-                             '&additional_facet=unfaceted_string'
-                             '&additional_facet=unfaceted_integer').json['facets']
+                                '&additional_facet=unfaceted_string'
+                                '&additional_facet=unfaceted_integer').json['facets']
         expected = self.DEFAULT_FACETS + self.ADDITIONAL_FACETS
         self.assert_facet_set_equal(expected, facets)
         for facet in facets:  # verify facet type
@@ -1013,8 +1303,8 @@ class TestSearchHiddenAndAdditionalFacets:
     def test_search_multiple_additional_default_hidden_facets(self, workbook, es_testapp, hidden_facet_test_data):
         """ Tests that passing multiple hidden_facets as additionals works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
-                             '&additional_facet=last_name'
-                             '&additional_facet=sid').json['facets']
+                                '&additional_facet=last_name'
+                                '&additional_facet=sid').json['facets']
         expected = self.DEFAULT_FACETS + self.DEFAULT_HIDDEN_FACETS
         self.assert_facet_set_equal(expected, facets)
         for facet in facets:
@@ -1030,8 +1320,8 @@ class TestSearchHiddenAndAdditionalFacets:
     def test_search_mixing_additional_and_default_hidden(self, workbook, es_testapp, hidden_facet_test_data, _facets):
         """ Tests that we can mix additional_facets with those both on and off schema """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
-                             '&additional_facet=%s'
-                             '&additional_facet=%s' % (_facets[0], _facets[1])).json['facets']
+                                '&additional_facet=%s'
+                                '&additional_facet=%s' % (_facets[0], _facets[1])).json['facets']
         expected = self.DEFAULT_FACETS + _facets
         self.assert_facet_set_equal(expected, facets)
         for facet in facets:
@@ -1055,9 +1345,9 @@ class TestSearchHiddenAndAdditionalFacets:
         """ Tests that supplying multiple additional facets combined with hidden still respects the
             hidden restriction. """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
-                             '&additional_facet=%s'
-                             '&additional_facet=%s' 
-                             '&additional_facet=%s' % (_facets[0], _facets[1], _facets[2])).json['facets']
+                                '&additional_facet=%s'
+                                '&additional_facet=%s' 
+                                '&additional_facet=%s' % (_facets[0], _facets[1], _facets[2])).json['facets']
         expected = self.DEFAULT_FACETS + [_facets[0], _facets[1]]  # first two should show
         self.assert_facet_set_equal(expected, facets)
 
@@ -1068,7 +1358,7 @@ class TestSearchHiddenAndAdditionalFacets:
     def test_search_additional_object_facets(self, workbook, es_testapp, hidden_facet_test_data, _facet):
         """ Tests that specifying an object field as an additional_facet works correctly """
         facets = es_testapp.get('/search/?type=TestingHiddenFacets'
-                             '&additional_facet=%s' % _facet).json['facets']
+                                '&additional_facet=%s' % _facet).json['facets']
         expected = self.DEFAULT_FACETS + [_facet]
         self.assert_facet_set_equal(expected, facets)
 
@@ -1081,7 +1371,7 @@ class TestSearchHiddenAndAdditionalFacets:
         """ Tests that specifying an array of object field mapped with nested as an additional_facet
             works correctly. """
         [desired_facet] = [facet for facet in es_testapp.get('/search/?type=TestingHiddenFacets'
-                                                          '&additional_facet=%s' % _facet).json['facets']
+                                                             '&additional_facet=%s' % _facet).json['facets']
                            if facet['field'] == _facet]
         if 'terms' in desired_facet:
             assert len(desired_facet['terms']) == n_expected
@@ -1091,9 +1381,9 @@ class TestSearchHiddenAndAdditionalFacets:
     @pytest.fixture
     def many_non_nested_facets(self, workbook, es_testapp, hidden_facet_test_data):
         return es_testapp.get('/search/?type=TestingHiddenFacets'  
-                           '&additional_facet=non_nested_array_of_objects.fruit'
-                           '&additional_facet=non_nested_array_of_objects.color'
-                           '&additional_facet=non_nested_array_of_objects.uid').json['facets']
+                              '&additional_facet=non_nested_array_of_objects.fruit'
+                              '&additional_facet=non_nested_array_of_objects.color'
+                              '&additional_facet=non_nested_array_of_objects.uid').json['facets']
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('unfaceted_array_of_objects.fruit', 4),
@@ -1108,9 +1398,9 @@ class TestSearchHiddenAndAdditionalFacets:
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
-        ('hg19.hg19_chrom', 1),
-        ('hg19.hg19_hgvsg', 3),
-        ('REF', 3)
+        ('hg19.hg19_chrom', 3),
+        ('hg19.hg19_hgvsg', 5),
+        ('REF', 4)
     ])
     def test_search_additional_facets_workbook(self, workbook, es_testapp, _facet, n_expected):
         """ Tests using additional facets with workbook inserts (using Variant) """
@@ -1120,35 +1410,38 @@ class TestSearchHiddenAndAdditionalFacets:
     @pytest.fixture(scope='module')
     def variant_facets(self, workbook, es_testapp):
         return es_testapp.get('/search/?type=Variant'
-                           '&additional_facet=hg19.hg19_pos'
-                           '&additional_facet=hg19.hg19_chrom'
-                           '&additional_facet=hg19.hg19_hgvsg'
-                           '&additional_facet=REF').json['facets']
+                              '&additional_facet=hg19.hg19_pos'
+                              '&additional_facet=hg19.hg19_chrom'
+                              '&additional_facet=hg19.hg19_hgvsg'
+                              '&additional_facet=REF').json['facets']
 
     @pytest.mark.parametrize('_facet, n_expected', [
         ('hg19.hg19_pos', 11956053.0),  # avg of positions, not meaningful
-        ('hg19.hg19_chrom', 1),
-        ('hg19.hg19_hgvsg', 3),
-        ('REF', 3)
+        ('hg19.hg19_chrom', 3),
+        ('hg19.hg19_hgvsg', 5),
+        ('REF', 4)
     ])
     def test_search_additional_facets_workbook_multiple(self, workbook, es_testapp, _facet, n_expected):
         """ Does all 4 extra aggregations above, checking the resulting facets for correctness """
         res = es_testapp.get('/search/?type=Variant'
-                           '&additional_facet=hg19.hg19_pos'
-                           '&additional_facet=hg19.hg19_chrom'
-                           '&additional_facet=hg19.hg19_hgvsg'
-                           '&additional_facet=REF').json['facets']
+                             '&additional_facet=hg19.hg19_pos'
+                             '&additional_facet=hg19.hg19_chrom'
+                             '&additional_facet=hg19.hg19_hgvsg'
+                             '&additional_facet=REF').json['facets']
         self.check_and_verify_result(res, _facet, n_expected)
 
 
 @pytest.fixture(scope='session')
 def bucket_range_data_raw():
-    """ 10 objects with a numerical field we will bucket on.
+    """ 9 objects with a numerical field we will bucket on.
             'special_integer' has i in it.
             'special_object_that_holds_integer' holds a single integer field with i as well
             'array_of_objects_that_holds_integer' holds 2 objects that are mirrors of one another
+        +
+        1 object with a value for no_value_integer, to test that filtering on a field that sets
+        'add_no_value' to True will not filter documents with 'No value'.
     """
-    return [{
+    entries = [{
         'special_integer': i,
         'special_object_that_holds_integer': {
             'embedded_integer': i
@@ -1164,6 +1457,10 @@ def bucket_range_data_raw():
             },
         ]
     } for i in range(10)]
+    # set no value int on the last element
+    entries[-1]['no_value_integer'] = 8
+    entries[-1]['no_value_integer_array'] = [8]
+    return entries
 
 
 @pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
@@ -1188,6 +1485,10 @@ class TestSearchBucketRangeFacets:
                     assert bucket['doc_count'] == expected_count
 
     @staticmethod
+    def verify_counts(response, expected_count):
+        assert len(response['@graph']) == expected_count
+
+    @staticmethod
     def select_facet(facets, facet_name):
         result = None
         for facet in facets:
@@ -1197,7 +1498,8 @@ class TestSearchBucketRangeFacets:
         return result
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
-        (['special_integer', 'special_object_that_holds_integer.embedded_integer'], 5),
+        (['special_integer'], 5),
+        (['special_object_that_holds_integer.embedded_integer'], 5),
         (['array_of_objects_that_holds_integer.embedded_integer'], 10)
     ])
     def test_search_bucket_range_simple(self, workbook, es_testapp, bucket_range_data, expected_fields, expected_counts):
@@ -1213,7 +1515,7 @@ class TestSearchBucketRangeFacets:
     def test_search_bucket_range_nested_qualifier(self, workbook, es_testapp, bucket_range_data, identifier):
         """ Tests aggregating on a nested field while selecting for a field within the nested object. """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
-                          '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
+                             '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
                                  2, 10)
 
@@ -1223,14 +1525,42 @@ class TestSearchBucketRangeFacets:
     def test_search_bucket_range_nested_qualifier_multiple(self, workbook, es_testapp, bucket_range_data, identifier):
         """ Tests aggregating on a nested field while selecting for a field within the nested object (no change). """
         res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
-                          '&array_of_objects_that_holds_integer.embedded_integer.from=6'
-                          '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
+                             '&array_of_objects_that_holds_integer.embedded_integer.from=6'
+                             '&array_of_objects_that_holds_integer.embedded_identifier=%s' % identifier).json['facets']
         self.verify_facet_counts(res, ['array_of_objects_that_holds_integer.embedded_integer'],
                                  2, 10)
         facet_with_labels = self.select_facet(res, 'array_of_objects_that_holds_integer.embedded_integer')
         for r in facet_with_labels['ranges']:
             assert 'label' in r
             assert r['label'] in ['Low', 'High']
+
+    def test_search_bucket_range_add_no_value(self, workbook, es_testapp, bucket_range_data):
+        """ Tests that providing a range filter on a field that specifies 'add_no_value' does not
+            filter documents that have no value for that field.
+        """
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=0').json  # should detect
+        self.verify_counts(res, 10)
+        es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=10', status=404)  # should not detect
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.to=10').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets&no_value_integer.from=0'
+                             '&no_value_integer.to=10').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=0').json  # should detect
+        self.verify_counts(res, 10)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=8').json  # should detect
+        self.verify_counts(res, 1)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=0&no_value_integer_array.to=7').json  # should detect
+        self.verify_counts(res, 9)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=-1&no_value_integer_array.to=7').json  # should detect
+        self.verify_counts(res, 9)
+        res = es_testapp.get('/search/?type=TestingBucketRangeFacets'
+                             '&no_value_integer_array.from=-1&no_value_integer_array.to=9').json  # should detect
+        self.verify_counts(res, 10)
 
     def test_search_bucket_range_workbook(self, es_testapp, workbook):
         # TODO: write me once some bucket-range aggregations are defined on schemas for workbook inserts

@@ -24,6 +24,8 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     padding-right: 15px;
     display: flex;
     align-items: center;
+    transition: opacity .3s ease-in-out;
+    line-height: 1;
 
     @include navbar-fixed-position {
         height: inherit;
@@ -52,12 +54,10 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     &[disabled] {
-        color: $gray-300;
-
+        opacity: 0.5;
         &:focus,
         &:hover {
             background-color: transparent;
-            color: $gray-300;
             cursor: default;
         }
     }
@@ -78,6 +78,7 @@ $navbar-separator-color : scale-color($navbar-link-color, $alpha: -80%) !default
     }
 
     @include navbar-static-position {
+        /* Sets menu item height when vertically stacked */
         line-height: $navbar-small-height;
         &.big-dropdown-toggle {
             &:after {
@@ -108,6 +109,37 @@ div.navbar-container {
         body.test-warning-visible & {
             padding-bottom: 52px;
         }
+    }
+}
+
+.cgap-logo-wrapper {
+    display: flex;
+    align-items: center;
+    transition:
+        background-color $navbar-transition-length,
+        padding-left $navbar-transition-length;
+
+    > svg {
+        margin-right: 0px;
+        vertical-align: top;
+        display: inline-block;
+        height: 100%;
+        transition:
+            padding $navbar-transition-length,
+            transform $navbar-transition-length,
+            margin-right $navbar-transition-length;
+
+        > g {
+            > path {
+                transition:
+                    fill-opacity .3s .15s ease-out,
+                    fill .3s .15s ease-out,
+                    stroke-opacity .3s .15s ease-out,
+                    stroke .3s .15s ease-out,
+                    stroke-width .3s .15s ease-out;
+            }
+        }
+
     }
 }
 
@@ -143,9 +175,7 @@ div#top-nav.navbar-fixed-top {
 
         border-radius: 0;
         border: none;
-        //box-sizing: content-box; /* Exclude bottom border from min-height */
         min-height: $navbar-full-height; /* Mobile default - overriden for desktop (fixed-position) size */
-        // line-height: $navbar-small-height; /* Mobile default - overriden for desktop (fixed-position) size */
         position: relative;
 
         padding: 0;
@@ -162,7 +192,6 @@ div#top-nav.navbar-fixed-top {
             padding: 0;
             min-height: $navbar-small-height;
             height: $navbar-full-height;
-            // line-height: $navbar-full-height;
             z-index: 10;
 
             -webkit-backface-visibility: hidden;
@@ -189,14 +218,14 @@ div#top-nav.navbar-fixed-top {
             // margin-left: -50px !important;
             color: $navbar-default-brand-color;
             min-width: 270px;
-            height: inherit;
+            height: 100%;
             max-height: $navbar-full-height;
             margin-left: 0px;
             text-decoration: none;
             margin-right: 0;
 
             @include navbar-fixed-position { // = md
-                min-width: 210px;
+                min-width: 215px;
             }
 
             @include navbar-static-position { // Unsure if needed
@@ -205,47 +234,23 @@ div#top-nav.navbar-fixed-top {
             }
 
             > .img-container {
+                line-height: 1;
                 position: relative;
-                height: inherit;
-                display: flex;
-                align-items: center;
-                padding-right: 20px;
-                padding-left: 20px;
+                height: 100%;
+                padding-right: 16px;
+                padding-left: 16px;
                 max-height: inherit;
                 background-color: transparent;
-                transition:
-                    background-color $navbar-transition-length,
-                    padding-left $navbar-transition-length;
 
                 &:hover {
-                    background-color: darken($navbar-background-color, 5%);
+                    background-color: $navbar-link-hover-bg;
                 }
-                
-                //padding-top: 5px;
-                //padding-bottom: 5px;
+
                 > svg#logo_svg {
                     min-width: 80px;
-                    margin-right: 0px;
-                    vertical-align: top;
-                    display: inline-block;
-                    height: 100%;
-                    transition:
-                        padding $navbar-transition-length,
-                        transform $navbar-transition-length,
-                        margin-right $navbar-transition-length;
                     max-height: inherit;
-                    > g {
-                        > path {
-                            transition:
-                                fill-opacity .3s .15s ease-out,
-                                fill .3s .15s ease-out,
-                                stroke-opacity .3s .15s ease-out,
-                                stroke .3s .15s ease-out,
-                                stroke-width .3s .15s ease-out;
-                        }
-                    }
-
                 }
+                
 
                 @include navbar-fixed-position {
                     float: left; // To decrease width
@@ -264,28 +269,21 @@ div#top-nav.navbar-fixed-top {
 
                 > .navbar-title {
                     vertical-align: middle;
-                    font-weight: 300;
-                    color: $navbar-default-brand-color;
-                    margin-left: 15px;
-                    font-size: 1.7rem;
+                    fill: $navbar-default-brand-color;
+                    margin-left: 5px;
+                    width: 98px;
                     display: inline-block;
-                    transform: translate3d(0px,0,0);
-                    transition: font-size $navbar-transition-length, transform $navbar-transition-length;
-
-                    > i.icon.icon-angle-right {
-                        margin-left: 12px;
-                        font-size: 1.25rem;
-                        line-height: inherit;
-                        vertical-align: bottom;
-                        color: transparent;
-                    }
+                    transform: translate3d(0px, 0, 0) scale3d(0.925, 0.925, 1);
+                    transform-origin: 50%;
+                    transition: width $navbar-transition-length, transform $navbar-transition-length;
+                    shape-rendering: geometricPrecision;
         
                     @include navbar-fixed-position {
                         body.scrolled-past-top &,
                         body.is-full-screen &,
                         body.is-item-view & {
-                            font-size: 1.25rem;
-                            transform: translate3d(-5px,0,0);
+                            width: 70px;
+                            transform: translate3d(5px,0,0) scale3d(0.925, 0.925, 1);
                         }
                     }
                 }
@@ -294,12 +292,9 @@ div#top-nav.navbar-fixed-top {
             // Hover over title link state
             &:hover {
                 .navbar-title {
-                    color: $navbar-link-hover-color;
+                    fill: $navbar-link-hover-color;
                     text-shadow: 0 0 0 $navbar-link-hover-color;
-                    > i.icon.icon-angle-right {
-                        color: #ccc !important;
-                        text-shadow: none;
-                    }
+                    transform: translate3d(3px, 0, 0) scale3d(0.925, 0.925, 1);
                 }
             }
 
@@ -309,7 +304,7 @@ div#top-nav.navbar-fixed-top {
         > .navbar-collapse {
 
             @include navbar-fixed-position {
-                height: inherit;
+                height: 100%;
             }
 
             @include navbar-static-position {
@@ -324,7 +319,8 @@ div#top-nav.navbar-fixed-top {
 
             > .navbar-nav {
                 
-                > a {
+                > a,
+                > button {
                     @include navbar-link-button-item;
                 }
 
@@ -362,19 +358,18 @@ div#top-nav.navbar-fixed-top {
                                 width: 30px;
                                 height: 30px;
                             }
+                            .user-first-name {
+                                flex-grow: 0;
+                                flex-shrink: 1;
+                                overflow: hidden;
+                                text-overflow: ellipsis;
+                            }
                             @include media-breakpoint-up(lg){
                                 img.account-icon-image {
                                     margin-right: 12px;
                                 }
                             }
             
-                        }
-
-                        > a {
-                            @include navbar-link-button-item;
-                            white-space: nowrap;
-                            overflow: hidden;
-                            text-overflow: ellipsis;
                         }
 
                         .dropdown-menu {
@@ -386,15 +381,15 @@ div#top-nav.navbar-fixed-top {
                         }
 
                         @include navbar-fixed-position {
-                            max-width: 120px;
+                            max-width: 200px; //120px;
                         }
 
                         @include media-breakpoint-between(lg, xl) {
-                            max-width: 150px;
+                            max-width: 300px; // 150px;
                         }
 
                         @include media-breakpoint-up(xl) {
-                            max-width: 180px;
+                            max-width: 320px; // 180px;
                         }
                     }
 
@@ -533,7 +528,7 @@ div#top-nav.navbar-fixed-top {
         > .navbar-toggler,
         > .navbar-toggler {
             height: $navbar-full-height;
-            line-height: $navbar-full-height;
+            // line-height: $navbar-full-height;
             padding-top: 0;
             padding-bottom: 0;
             padding-left: 20px;

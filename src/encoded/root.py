@@ -1,16 +1,22 @@
+import sys
 import uptime
-from dcicutils import lang_utils
-from pyramid.decorator import reify
-from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
-from .schema_formats import is_accession
-from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
+
 from collections import OrderedDict
-from encoded import APP_VERSION_REGISTRY_KEY
+from dcicutils import lang_utils
+from dcicutils.s3_utils import HealthPageKey
+from dcicutils.env_utils import infer_foursight_url_from_env
+from pyramid.decorator import reify
+from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
+from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
+from .appdefs import APP_VERSION_REGISTRY_KEY, ITEM_INDEX_ORDER
+from .schema_formats import is_accession
+from .util import SettingsKey
 
 
 def includeme(config):
     config.include(health_check)
     config.include(item_counts)
+    config.include(type_metadata)
     config.include(submissions_page)
     config.scan(__name__)
 
@@ -38,8 +44,7 @@ def item_counts(config):
             es_total += es_count
             warn_str = build_warn_string(db_count, es_count)
             item_name = request.registry[COLLECTIONS][item_type].type_info.name
-            db_es_compare[item_name] = ("DB: %s   ES: %s %s" %
-                                         (str(db_count), str(es_count), warn_str))
+            db_es_compare[item_name] = ("DB: %s   ES: %s %s" % (str(db_count), str(es_count), warn_str))
         warn_str = build_warn_string(db_total, es_total)
         db_es_total = ("DB: %s   ES: %s %s" %
                        (str(db_total), str(es_total), warn_str))
@@ -51,6 +56,23 @@ def item_counts(config):
         return response_dict
 
     config.add_view(counts_view, route_name='item-counts')
+
+
+def type_metadata(config):
+
+    config.add_route(
+        'type-metadata',
+        '/type-metadata'
+    )
+
+    def type_metadata_view(request):
+
+        return {
+            'index_order': ITEM_INDEX_ORDER
+        }
+
+    config.add_view(type_metadata_view, route_name='type-metadata')
+
 
 
 def uptime_info():
@@ -71,22 +93,21 @@ def health_check(config):
 
     def health_page_view(request):
 
+        class ExtendedHealthPageKey(HealthPageKey):
+            # This class can contain new entries in HealthPageKey that are waiting to move to dcicutils
+            PYTHON_VERSION = "python_version"
+            pass
+
+        h = ExtendedHealthPageKey
+
+        s = SettingsKey
+
         response = request.response
         response.content_type = 'application/json; charset=utf-8'
         settings = request.registry.settings
 
-        app_url = request.application_url
-        if not app_url.endswith('/'):
-            app_url = ''.join([app_url, '/'])
-
         env_name = settings.get('env.name')
-        # TODO: Move this logic to dcicutils.env_utils
-        # change when we get a CGAP-specific Foursight
-        if env_name and env_name.startswith('fourfront-'):
-            fs_env = env_name[len('fourfront-'):]
-            foursight_url = 'https://foursight.4dnucleome.org/view/' + fs_env
-        else:
-            foursight_url = None
+        foursight_url = infer_foursight_url_from_env(request=request, envname=env_name)
 
         response_dict = {
 
@@ -95,25 +116,32 @@ def health_check(config):
             "@id": "/health",
             "content": None,
 
-            'beanstalk_app_version': settings.get('eb_app_version'),
-            "beanstalk_env": env_name,
-            "blob_bucket": settings.get('blob_bucket'),
-            "database": settings.get('sqlalchemy.url').split('@')[1],  # don't show user /password
-            "display_title": "CGAP Status and Foursight Monitoring",
-            "elasticsearch": settings.get('elasticsearch.server'),
-            "file_upload_bucket": settings.get('file_upload_bucket'),
-            "foursight": foursight_url,
-            "indexer": settings.get("indexer"),
-            "index_server": settings.get("index_server"),
-            "load_data": settings.get('load_test_data'),
-            "metadata_bundles_bucket": settings.get('metadata_bundles_bucket'),
-            "namespace": settings.get('indexer.namespace'),
-            "processed_file_bucket": settings.get('file_wfout_bucket'),
-            'project_version': settings.get('encoded_version'),
-            'snovault_version': settings.get('snovault_version'),
-            "system_bucket": settings.get('system_bucket'),
-            'uptime': uptime_info(),
-            'utils_version': settings.get('utils_version'),
+            h.APPLICATION_BUCKET_PREFIX: settings.get(s.APPLICATION_BUCKET_PREFIX),
+            h.BEANSTALK_APP_VERSION: settings.get(s.EB_APP_VERSION),
+            h.BEANSTALK_ENV: env_name,
+            h.BLOB_BUCKET: settings.get(s.BLOB_BUCKET),
+            h.DATABASE: settings.get(s.SQLALCHEMY_URL).split('@')[1],  # don't show user /password
+            h.DISPLAY_TITLE: "CGAP Status and Foursight Monitoring",
+            h.ELASTICSEARCH: settings.get(s.ELASTICSEARCH_SERVER),
+            h.FILE_UPLOAD_BUCKET: settings.get(s.FILE_UPLOAD_BUCKET),
+            h.FOURSIGHT: foursight_url,
+            h.FOURSIGHT_BUCKET_PREFIX: settings.get(s.FOURSIGHT_BUCKET_PREFIX),
+            h.IDENTITY: settings.get(s.IDENTITY),
+            h.INDEXER: settings.get(s.INDEXER),
+            h.INDEX_SERVER: settings.get(s.INDEX_SERVER),
+            h.LOAD_DATA: settings.get(s.LOAD_TEST_DATA),
+            h.METADATA_BUNDLES_BUCKET: settings.get(s.METADATA_BUNDLES_BUCKET),
+            h.NAMESPACE: settings.get(s.INDEXER_NAMESPACE),
+            h.PROCESSED_FILE_BUCKET: settings.get(s.FILE_WFOUT_BUCKET),
+            h.PROJECT_VERSION: settings.get(s.ENCODED_VERSION),
+            h.PYTHON_VERSION: f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+            h.S3_ENCRYPT_KEY_ID: settings.get(s.S3_ENCRYPT_KEY_ID),
+            h.SNOVAULT_VERSION: settings.get(s.SNOVAULT_VERSION),
+            h.SYSTEM_BUCKET: settings.get(s.SYSTEM_BUCKET),
+            h.TIBANNA_CWLS_BUCKET: settings.get(s.TIBANNA_CWLS_BUCKET),
+            h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
+            h.UPTIME: uptime_info(),
+            h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
 
         }
 
@@ -140,6 +168,7 @@ def submissions_page(config):
         'submissions-page',
         '/submissions'
     )
+
     def submissions_page_view(request):
         response = request.response
         response.content_type = 'application/json; charset=utf-8'
@@ -204,7 +233,7 @@ class CGAPRoot(Root):
         return acl
 
     def get(self, name, default=None):
-        resource = super(CGAPRoot, self).get(name, None)
+        resource = super().get(name, None)
         if resource is not None:
             return resource
         resource = self.connection.get_by_unique_key('page:location', name)
@@ -229,7 +258,7 @@ class CGAPRoot(Root):
 
     def jsonld_type(self):
         """Inherits from '@type' calculated property of Root in snovault/resources.py"""
-        return ['HomePage', 'StaticPage'] + super(CGAPRoot, self).jsonld_type()
+        return ['HomePage', 'StaticPage'] + super().jsonld_type()
 
     @calculated_property(schema={
         "title": "Static Page Content",
@@ -237,40 +266,17 @@ class CGAPRoot(Root):
     })
     def content(self, request):
         """Returns -object- with pre-named sections"""
-        sections_to_get = ['home.introduction']
-        user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
-        return_list = []
-        for section_name in sections_to_get:
-            try:  # Can be caused by 404 / Not Found during indexing
-                res = request.embed('/static-sections', section_name, '@@embedded', as_user=user)
-                return_list.append(res)
-            except KeyError:
-                pass
-        return return_list
-
-    @calculated_property(schema={
-        "title": "Carousel Content",
-        "type": "array"
-    }, category="page")
-    def carousel(self, request):
-        '''Returns list of carousel slides'''
-        user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
-        try:
-            return request.embed('/search/?type=StaticSection&section_type=Home+Page+Slide&sort=name', as_user=user).get('@graph', [])
-        except KeyError:  # Can be caused by 404 / Not Found during indexing
-            return []
-
-    @calculated_property(schema={
-        "title": "Announcements",
-        "type": "array"
-    }, category="page")
-    def announcements(self, request):
-        '''Returns list of latest announcements'''
-        user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
-        try:
-            return request.embed('/search/?type=StaticSection&section_type=Announcement&sort=-date_created', as_user=user).get('@graph', [])
-        except KeyError:  # Can be caused by 404 / Not Found during indexing
-            return []
+        return []
+        # sections_to_get = ['home.introduction']
+        # user = request._auth0_authenticated if hasattr(request, '_auth0_authenticated') else True
+        # return_list = []
+        # for section_name in sections_to_get:
+        #     try:  # Can be caused by 404 / Not Found during indexing
+        #         res = request.embed('/static-sections', section_name, '@@embedded', as_user=user)
+        #         return_list.append(res)
+        #     except KeyError:
+        #         pass
+        # return return_list
 
     @calculated_property(schema={
         "title": "Application version",

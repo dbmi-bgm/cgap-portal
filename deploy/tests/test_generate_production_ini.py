@@ -4,32 +4,30 @@ import os
 import pytest
 import re
 import subprocess
+import typing
 
-from contextlib import contextmanager
+from dcicutils.env_utils import data_set_for_env
+from dcicutils.misc_utils import ignored, override_environ
 from io import StringIO
 from unittest import mock
+from ..generate_production_ini import ProductionIniFileManager
 
-from dcicutils.qa_utils import override_environ
-from .. import generate_production_ini
-from ..generate_production_ini import CGAPDeployer
 
-TEMPLATE_DIR = CGAPDeployer.TEMPLATE_DIR
-build_ini_file_from_template = CGAPDeployer.build_ini_file_from_template
-build_ini_stream_from_template = CGAPDeployer.build_ini_stream_from_template
-any_environment_template_filename = CGAPDeployer.any_environment_template_filename
-environment_template_filename = CGAPDeployer.environment_template_filename
-template_environment_names = CGAPDeployer.template_environment_names
-get_local_git_version = CGAPDeployer.get_local_git_version
-get_eb_bundled_version = CGAPDeployer.get_eb_bundled_version
-get_app_version = CGAPDeployer.get_app_version
-EB_MANIFEST_FILENAME = CGAPDeployer.EB_MANIFEST_FILENAME
-PYPROJECT_FILE_NAME = CGAPDeployer.PYPROJECT_FILE_NAME
-omittable = CGAPDeployer.omittable
+pytestmark = [pytest.mark.unit, pytest.mark.working]
 
-# TODO: Maybe this should move to env_utils? If not, at least to a non-test file.
-#       Then again, if we used the "single parameterized ini file" we could side-step that. -kmp 3-Apr-2020
 
-CGAP_DEPLOY_NAMES = ['cgap', 'cgapdev', 'cgaptest', 'cgapwolf']
+TEMPLATE_DIR = ProductionIniFileManager.TEMPLATE_DIR
+build_ini_file_from_template = ProductionIniFileManager.build_ini_file_from_template
+build_ini_stream_from_template = ProductionIniFileManager.build_ini_stream_from_template
+any_environment_template_filename = ProductionIniFileManager.any_environment_template_filename
+environment_template_filename = ProductionIniFileManager.environment_template_filename
+template_environment_names = ProductionIniFileManager.template_environment_names
+get_local_git_version = ProductionIniFileManager.get_local_git_version
+get_eb_bundled_version = ProductionIniFileManager.get_eb_bundled_version
+get_app_version = ProductionIniFileManager.get_app_version
+EB_MANIFEST_FILENAME = ProductionIniFileManager.EB_MANIFEST_FILENAME
+PYPROJECT_FILE_NAME = ProductionIniFileManager.PYPROJECT_FILE_NAME
+omittable = ProductionIniFileManager.omittable
 
 
 def test_omittable():
@@ -46,6 +44,7 @@ def test_omittable():
     assert omittable("foo=$X", "foo=   \r\n \r\n ")
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_environment_template_filename():
 
     with pytest.raises(ValueError):
@@ -59,17 +58,21 @@ def test_environment_template_filename():
     assert environment_template_filename('cgapdev') == environment_template_filename('fourfront-cgapdev')
 
 
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
 def test_any_environment_template_filename():
 
     actual = os.path.abspath(any_environment_template_filename())
     assert actual.endswith("/ini_files/any.ini")
 
 
-def test_template_environment_names():
+@pytest.mark.skip(reason="We're not using ini_files/*.ini any more.")
+def test_legacy_template_environment_names():
+    # Containerized CGAP uses a single generic template, but while we're still using beanstalks,
+    # we do some minimal testing to make sure all the templates are there. -kmp 4-Oct-2021
 
     names = template_environment_names()
 
-    required_names = CGAP_DEPLOY_NAMES
+    required_names = ['cgap', 'cgapdev', 'cgaptest', 'cgapwolf']
 
     for required_name in required_names:
         assert required_name in names
@@ -79,6 +82,7 @@ MOCKED_SOURCE_BUNDLE = "/some/source/bundle"
 MOCKED_BUNDLE_VERSION = 'v-12345-bundle-version'
 MOCKED_LOCAL_GIT_VERSION = 'v-67890-git-version'
 MOCKED_PROJECT_VERSION = '11.22.33'
+
 
 def make_mocked_check_output_for_get_version(simulate_git_command=True, simulate_git_repo=True):
     def mocked_check_output(command):
@@ -99,7 +103,8 @@ def test_build_ini_file_from_template():
     some_template_file_name = "mydir/whatever"
     some_ini_file_name = "mydir/production.ini"
     env_vars = dict(RDS_DB_NAME='snow_white', RDS_USERNAME='user', RDS_PASSWORD='my-secret',
-                    RDS_HOSTNAME='unittest', RDS_PORT="6543")
+                    RDS_HOSTNAME='unittest', RDS_PORT="6543", ENCODED_ENV_NAME='cgap-devtest',
+                    ENCODED_IDENTITY='C4DatastoreCgapDevtestApplicationConfiguration')
 
     with override_environ(**env_vars):
 
@@ -110,15 +115,19 @@ def test_build_ini_file_from_template():
 
         class MockFileStream:
             FILE_SYSTEM = {}
+
             @classmethod
             def reset(cls):
                 cls.FILE_SYSTEM = {}
+
             def __init__(self, filename, mode):
                 assert 'w' in mode
                 self.filename = filename
                 self.output_string_stream = StringIO()
+
             def __enter__(self):
                 return self.output_string_stream
+
             def __exit__(self, type, value, traceback):
                 self.FILE_SYSTEM[self.filename] = self.output_string_stream.getvalue().strip().split('\n')
 
@@ -216,11 +225,14 @@ def test_build_ini_file_from_template():
                     # because we're simulating the absence of Git.
                     return filename in [some_template_file_name]
                 mock_exists.side_effect = mocked_exists
+
                 class MockDateTime:
                     DATETIME = datetime.datetime
+
                     @classmethod
                     def now(cls):
-                        return cls.DATETIME(2001,2,3,4,55,6)
+                        return cls.DATETIME(2001, 2, 3, 4, 55, 6)
+
                 with mock.patch("io.open", side_effect=mocked_open):
                     with mock.patch.object(datetime, "datetime", MockDateTime()):
                         build_ini_file_from_template(some_template_file_name, some_ini_file_name)
@@ -296,11 +308,13 @@ def test_get_eb_bundled_version():
         mock_exists.return_value = False
         with mock.patch("io.open") as mock_open:
             def mocked_open_error(filename, mode='r'):
+                ignored(filename, mode)
                 raise Exception("Simulated file error (file not found or permissions problem).")
             mock_open.side_effect = mocked_open_error
             assert get_eb_bundled_version() is None
 
 
+@pytest.mark.skip  # obsolete, all are now generated from cgap_any_alpha.ini
 def test_transitional_equivalence():
     """
     We used to use separate files for each environment. This tests that the new any.ini technology,
@@ -316,6 +330,14 @@ def test_transitional_equivalence():
 
     def tester(ref_ini, bs_env, data_set, es_server, es_namespace=None, line_checker=None):
 
+        print("tester entered.")
+        print(" ref_ini=", ref_ini)
+        print(" bs_env=", bs_env)
+        print(" data_set=", data_set)
+        print(" es_server=", es_server)
+        print(" es_namespace=", es_namespace)
+        print(" line_checker=", line_checker)
+
         assert ref_ini[:-4] == bs_env[10:]  # "xxx.ini" needs to match "fourfront-xxx"
 
         es_namespace = es_namespace or bs_env
@@ -326,7 +348,8 @@ def test_transitional_equivalence():
         old_output = StringIO()
         new_output = StringIO()
 
-        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output)
+        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output,
+                                       bs_env=bs_env, es_server=es_server)
         build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, "any.ini"), new_output,
                                        # data_env and es_namespace are something we should be able to default
                                        bs_env=bs_env, es_server=es_server)
@@ -338,11 +361,11 @@ def test_transitional_equivalence():
         # Test of build_ini_from_template with all 4 keyword arguments explicitly supplied (bs_env, data_set,
         # es_server, es_namespace), none defaulted.
 
-
         old_output = StringIO()
         new_output = StringIO()
 
-        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output)
+        build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, ref_ini), old_output,
+                                       bs_env=bs_env, data_set=data_set, es_server=es_server, es_namespace=es_namespace)
         build_ini_stream_from_template(os.path.join(TEMPLATE_DIR, "any.ini"), new_output,
                                        bs_env=bs_env, data_set=data_set, es_server=es_server, es_namespace=es_namespace)
 
@@ -364,12 +387,14 @@ def test_transitional_equivalence():
 
             assert problems == [], "Problems found:\n%s" % "\n".join(problems)
 
-    with mock.patch.object(CGAPDeployer, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
+        print("tester succeeded.")
+
+    with mock.patch.object(ProductionIniFileManager, "get_app_version", return_value=MOCKED_PROJECT_VERSION):
         with mock.patch("toml.load", return_value={"tool": {"poetry": {"version": MOCKED_LOCAL_GIT_VERSION}}}):
 
             class Checker:
 
-                def __init__(self, expect_indexer="true"):
+                def __init__(self, expect_indexer: typing.Optional[str] = "true"):
                     self.indexer = None
                     self.expect_indexer = expect_indexer
 
@@ -389,7 +414,7 @@ def test_transitional_equivalence():
             class ProdChecker(Checker):
 
                 def check(self, line):
-                    if 'bucket =' in line:
+                    if 'bucket =' in line and 'tibanna_' not in line:
                         fragment = 'fourfront-cgap'
                         if fragment not in line:
                             return "'%s' missing in '%s'" % (fragment, line)
@@ -397,19 +422,27 @@ def test_transitional_equivalence():
 
             with override_environ(ENCODED_INDEXER=None):  # Make sure any global settings are masked.
 
-                tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
+                bs_env = "fourfront-cgap"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgap.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
                        line_checker=ProdChecker())
 
-                tester(ref_ini="cgapdev.ini", bs_env="fourfront-cgapdev", data_set="test",
+                bs_env = "fourfront-cgapdev"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgapdev.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgapdev-gnv2sgdngkjbcemdadmaoxcsae.us-east-1.es.amazonaws.com:80",
                        line_checker=Checker())
 
-                tester(ref_ini="cgaptest.ini", bs_env="fourfront-cgaptest", data_set="test",
+                bs_env = "fourfront-cgaptest"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgaptest.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgaptest-dxiczz2zv7f3nshshvevcvmpmy.us-east-1.es.amazonaws.com:80",
                        line_checker=Checker())
 
-                tester(ref_ini="cgapwolf.ini", bs_env="fourfront-cgapwolf", data_set="test",
+                bs_env = "fourfront-cgapwolf"
+                data_set = data_set_for_env(bs_env)
+                tester(ref_ini="cgapwolf.ini", bs_env=bs_env, data_set=data_set,
                        es_server="search-fourfront-cgapwolf-r5kkbokabymtguuwjzspt2kiqa.us-east-1.es.amazonaws.com:80",
                        line_checker=Checker())
 
@@ -430,4 +463,3 @@ def test_transitional_equivalence():
                     tester(ref_ini="cgap.ini", bs_env="fourfront-cgap", data_set="prod",
                            es_server="search-fourfront-cgap-ewf7r7u2nq3xkgyozdhns4bkni.us-east-1.es.amazonaws.com:80",
                            line_checker=ProdChecker(expect_indexer=None))
-

@@ -1,0 +1,236 @@
+:root {
+    --color-paper: white;
+    --background: #fff;
+    font-size: 12pt;
+    zoom: 100%;
+    color: #000;
+}
+
+body,
+#slot-application,
+#application {
+    margin: 0;
+    padding: 0;
+    height: auto !important;
+    width: auto !important;
+    min-height: 0 !important;
+    position: static;
+    text-rendering: geometricPrecision;
+}
+
+
+body h1, h2, h3, h4, h5, h6 {
+    color: #000;
+}
+
+div#slow-load-container {
+    display: none;
+}
+
+/* Hide UI elements on relevant pages */
+div#layout {
+
+    min-height: 0 !important;
+    margin: 0 !important;
+
+    > div.navbar-container {
+        display: none;
+    }
+
+    > div#post-navbar-container {
+        margin: 0 !important;
+        min-height: 0 !important;
+        padding: 0 !important;
+        &:before {
+            display: none;
+            content: none;
+        }
+    }
+
+    .item-page-container {
+
+        div#full-alerts-container {
+            display: none;
+        }
+
+        .tabs-bar-outer > .tabs-bar {
+            > .tab-item:not(.title-tab) {
+                display: none !important;
+                max-width: none;
+                width: 100%;
+            }
+        }
+
+    }
+
+    // Unset some global style which are detrimental in print
+    .mh-inner-tab-height-full {
+        min-height: 0 !important;
+    }
+
+}
+
+footer#page-footer {
+    /* Consider displaying down the road if useful */
+    display: none !important;
+}
+
+div#overlays-container {
+    /* In case any modals/tooltips/overlays visible - todo: consider if needed */
+    display: none !important;
+}
+
+div.__react_component_tooltip {
+    /* In case any tooltips visible */
+    display: none !important;
+}
+
+
+/*** Styles carried over from Bootstrap, minus specific exclusions ***/
+/* Original Source: https://github.com/h5bp/main.css/blob/master/src/_print.css */
+
+@media print {
+    *,
+    *::before,
+    *::after {
+        // Bootstrap specific; comment out `color` and `background`
+        //color: $black !important; // Black prints faster
+        text-shadow: none !important;
+        //background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    a {
+        &:not(.btn) {
+            text-decoration: underline;
+        }
+    }
+
+    abbr[title]::after {
+        content: " (" attr(title) ")";
+    }
+
+    pre {
+        white-space: pre-wrap !important;
+    }
+    pre,
+    blockquote {
+        border: $border-width solid $gray-500; // Bootstrap custom code; using `$border-width` instead of 1px
+        page-break-inside: avoid;
+    }
+
+    //
+    // Printing Tables:
+    // https://web.archive.org/web/20180815150934/http://css-discuss.incutio.com/wiki/Printing_Tables
+    //
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+
+    // Bootstrap specific changes start
+
+    // Specify a size and min-width to make printing closer across browsers.
+    // We don't set margin here because it breaks `size` in Chrome. We also
+    // don't use `!important` on `size` as it breaks in Chrome.
+    @page {
+        size: $print-page-size;
+    }
+    body {
+        min-width: $print-body-min-width !important;
+    }
+    .container {
+        min-width: $print-body-min-width !important;
+    }
+
+    // Bootstrap components
+    .navbar {
+        display: none;
+    }
+    .badge {
+        border: $border-width solid $black;
+    }
+
+    .table {
+        border-collapse: collapse !important;
+    }
+
+    .table-bordered {
+        th,
+        td {
+            border: 1px solid $gray-300 !important;
+        }
+    }
+
+    .table-dark {
+        color: inherit;
+
+        th,
+        td,
+        thead th,
+        tbody + tbody {
+            border-color: $table-border-color;
+        }
+    }
+
+    .table .thead-dark th {
+        color: inherit;
+        border-color: $table-border-color;
+    }
+
+    // Bootstrap specific changes end
+}
+
+/**************************/
+/*** Specific Use Cases ***/
+/**************************/
+
+/*********************************/
+/*** Report Item Print Preview ***/
+/*********************************/
+
+/* Hide everything except print-preview-tab-container */
+
+body[data-path^="/reports/"] {
+    #layout {
+        .item-page-container {
+            .tabs-bar-outer {
+                display: none !important;
+            }
+            .tab-pane-outer.active {
+                > :not(.print-preview-tab-container) {
+                    display: none;
+                }
+
+                > .print-preview-tab-container {
+                    /* Unset styles, assuming this is a .container-wide element, also */
+                    margin: 0 !important;
+                    padding: 0 !important;
+                }
+
+                /* This is a small fix for (only) Chrome printing, which sometimes hides content, possibly due to float miscalculation or something */
+                /* We set padding-bottom to 0.075in when generating pages and then unset it here (acting as a buffer). */
+                .print-preview-pane .pagedjs_sheet .pagedjs_area {
+                    padding-bottom: 0 !important;
+                }
+            }
+        }
+    }
+}

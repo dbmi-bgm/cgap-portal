@@ -1,6 +1,8 @@
 [
     {
-        "aliases": ["admin-admin:doc"],
+        "aliases": [
+            "admin-admin:doc"
+        ],
         "attachment": "photo.zip",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "description": "zipped files",
@@ -10,7 +12,9 @@
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afb48"
     },
     {
-        "aliases": ["admin-admin:addams_ped"],
+        "aliases": [
+            "admin-admin:addams_ped"
+        ],
         "attachment": "addams.txt",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
@@ -19,12 +23,24 @@
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afc50"
     },
     {
-        "aliases": ["admin-admin:simpsons_ped"],
+        "aliases": [
+            "admin-admin:simpsons_ped"
+        ],
         "attachment": "simpsons.txt",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "submitted_by": "wrangler@wrangler.com",
         "status": "shared",
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afc52"
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afc00",
+        "attachment": {
+            "download": "Test_gene_list_genelist.txt",
+            "type": "text/plain",
+	    "href": "data:text/plain;base64,UHl0aG9u"
+        }
     }
 ]

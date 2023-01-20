@@ -52,7 +52,7 @@ export class ItemFileAttachment extends React.PureComponent {
         if (!attachment || !attachment.md5sum || typeof attachment.md5sum !== 'string') return null;
         return (
             <div>
-                <object.TooltipInfoIconContainerAuto tips={this.attachmentTips()} fallbackTitle="MD5" property="md5sum" className="text-500" result={attachment} elementType="span" /> : { attachment.md5sum }
+                <object.TooltipInfoIconContainerAuto tips={this.attachmentTips()} fallbackTitle="MD5" property="md5sum" className="text-500" result={attachment} elementType="span" />: { attachment.md5sum }
             </div>
         );
     }
@@ -62,7 +62,7 @@ export class ItemFileAttachment extends React.PureComponent {
         if (!attachment || !attachment.md5sum || typeof attachment.md5sum !== 'string') return null;
         return (
             <div>
-                <object.TooltipInfoIconContainerAuto tips={this.attachmentTips()} fallbackTitle="File Type" property="type" className="text-500" result={attachment} elementType="span" /> : { attachment.type }
+                <object.TooltipInfoIconContainerAuto tips={this.attachmentTips()} fallbackTitle="File Type" property="type" className="text-500" result={attachment} elementType="span" />: { attachment.type }
             </div>
         );
     }
@@ -77,7 +77,7 @@ export class ItemFileAttachment extends React.PureComponent {
 
         const title = !includeTitle ? null : (
             <object.TooltipInfoIconContainerAuto {..._.pick(this.props, 'tips', 'schemas')} fallbackTitle="Attachment"
-                property={property} result={context} elementType="h5" />
+                property={property} result={context} elementType="h5" className="text-600" />
         );
 
         let contents = null;
@@ -99,7 +99,7 @@ export class ItemFileAttachment extends React.PureComponent {
         }
 
         const elems = (
-            <div className="item-file-attachment inner">
+            <div className="item-file-attachment inner pt-16">
                 { title } { contents }
             </div>
         );

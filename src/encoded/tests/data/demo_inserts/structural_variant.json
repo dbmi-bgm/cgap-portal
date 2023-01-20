@@ -1,0 +1,2841 @@
+[
+    {
+        "END": 155984372,
+        "CHROM": "X",
+        "START": 155803550,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "d6a2b8ba-f0d2-445f-bc61-6a21ba517a06",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000262640",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q28",
+        "date_created": "2021-09-30T21:13:10.543750+00:00",
+        "annotation_id": "DEL_chrX:155803550-155984372",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:35:28.080913+00:00"
+        },
+        "cytoband_start": "q28",
+        "unrelated_count": 0,
+        "uuid": "3d5b7912-6e3f-40a3-b58b-ff52a8bfb839"
+    },
+    {
+        "END": 155958098,
+        "CHROM": "X",
+        "START": 155641324,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "d6a2b8ba-f0d2-445f-bc61-6a21ba517a06",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000262640",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "b0e725be-0bfc-4fc4-8ed2-0827f8ab9295",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000302805",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_exon": "1-2/9",
+                "csq_gene": "b2621639-9113-425c-8a9d-5fed310a359a",
+                "csq_intron": "1-2/8",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000675642",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q28",
+        "date_created": "2021-09-30T21:13:09.048445+00:00",
+        "annotation_id": "DUP_chrX:155641324-155958098",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:35:26.189124+00:00"
+        },
+        "cytoband_start": "q28",
+        "unrelated_count": 0,
+        "uuid": "60da76c9-60f2-4add-9f2d-e8b937b519af"
+    },
+    {
+        "END": 55652546,
+        "CHROM": "X",
+        "START": 52862844,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "b4ff60e7-9c3d-48eb-bd22-1d9eeca9f44e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000168216",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "498b56e7-2907-438d-b7aa-83248c3467f5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000173898",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "844117e0-a255-4856-96f9-c7f9323a4ec7",
+                "csq_strand": false,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000218328",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "9f482f3d-17f5-4418-8b76-38789c8b3d84",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000218436",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "ff88e57b-b569-45eb-b85a-cbe1ad4b9ce3",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000218439",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "a104b920-4072-4ff5-b685-ed8a15c42d48",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000289619",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "b67ad15e-60e9-47f5-b9fb-59e48c9d89c9",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000322213",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "e9054a88-202e-49c7-bc94-5e63becfa578",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000322659",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p11.21",
+        "date_created": "2021-09-30T21:12:54.986047+00:00",
+        "annotation_id": "DEL_chrX:52862844-55652546",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:35:00.957037+00:00"
+        },
+        "cytoband_start": "p11.22",
+        "unrelated_count": 0,
+        "uuid": "fdbab898-4cf5-4823-b0ec-9649a9564a59"
+    },
+    {
+        "END": 2890695,
+        "CHROM": "X",
+        "START": 2776400,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "7bccc204-b5bb-4089-9f32-a6d028241b36",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000353656",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_exon": "4-10/10",
+                "csq_gene": "641cdf5e-2626-4340-aa5a-027eace85a4d",
+                "csq_intron": "3-9/9",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000381174",
+                "csq_consequence": [
+                    "0901a7fc-f892-44d6-ad88-8f46e1e2d656",
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p22.33",
+        "date_created": "2021-09-30T21:12:52.943604+00:00",
+        "annotation_id": "DEL_chrX:2776400-2890695",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:57.310961+00:00"
+        },
+        "cytoband_start": "p22.33",
+        "unrelated_count": 0,
+        "uuid": "822a93b9-c21f-4ef2-b688-17818e037a11"
+    },
+    {
+        "END": 39835841,
+        "CHROM": "22",
+        "START": 39832514,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "gnomadg_ac": 1,
+        "gnomadg_af": 4.6e-05,
+        "gnomadg_an": 21694,
+        "transcript": [
+            {
+                "csq_exon": "4/7",
+                "csq_gene": "979f3c9f-6584-4805-abef-96c9b7cd6787",
+                "csq_intron": "4/6",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000325157",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_cds_position": "710-?",
+                "csq_cdna_position": "931-?",
+                "csq_protein_position": "237-?"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q13.1",
+        "date_created": "2021-09-30T21:12:52.591499+00:00",
+        "annotation_id": "DEL_chr22:39832514-39835841",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:56.754929+00:00"
+        },
+        "cytoband_start": "q13.1",
+        "gnomadg_ac-afr": 0,
+        "gnomadg_ac-amr": 0,
+        "gnomadg_ac-eas": 0,
+        "gnomadg_ac-eur": 1,
+        "gnomadg_ac-oth": 0,
+        "gnomadg_af-afr": 0.0,
+        "gnomadg_af-amr": 0.0,
+        "gnomadg_af-eas": 0.0,
+        "gnomadg_af-eur": 0.000131,
+        "gnomadg_af-oth": 0.0,
+        "gnomadg_an-afr": 9534,
+        "gnomadg_an-amr": 1930,
+        "gnomadg_an-eas": 2416,
+        "gnomadg_an-eur": 7624,
+        "gnomadg_an-oth": 190,
+        "unrelated_count": 0,
+        "uuid": "381383a1-06b5-42b3-8282-5e5d19d9fa90"
+    },
+    {
+        "END": 42137722,
+        "CHROM": "21",
+        "START": 42137640,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "8/9",
+                "csq_gene": "b617e9bc-c2c9-47c6-8c1a-a340402e6a45",
+                "csq_intron": "8/8",
+                "csq_strand": true,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000400423",
+                "csq_consequence": [
+                    "379849b2-52d4-4a94-987f-b8c1834fb978",
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ],
+                "csq_cdna_position": "1722-?"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q22.3",
+        "date_created": "2021-09-30T21:12:51.398665+00:00",
+        "annotation_id": "DEL_chr21:42137640-42137722",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:54.948012+00:00"
+        },
+        "cytoband_start": "q22.3",
+        "unrelated_count": 0,
+        "uuid": "721ea415-00ef-4b42-b5b9-eacc05640c37"
+    },
+    {
+        "END": 7292325,
+        "CHROM": "21",
+        "START": 5357745,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "d18bf3d8-e42c-40b7-a84a-9d544b81b8bf",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000398168",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "6ee07cb4-3a9f-41c0-b7dd-2642f582a7c7",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000464664",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "33aabebe-c327-4d79-832f-a010da093278",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000610664",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "c1a94708-9a3a-4db4-a3bd-7111b5dc5b63",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000613488",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "71828138-c415-4bcd-baec-dbef00e6db20",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000616627",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "6f8f2ffb-e61a-4c10-86c4-137268b6229f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000619537",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p11.2",
+        "date_created": "2021-09-30T21:12:49.568848+00:00",
+        "annotation_id": "DUP_chr21:5357745-7292325",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:51.660550+00:00"
+        },
+        "cytoband_start": "p12",
+        "unrelated_count": 0,
+        "uuid": "3f94ce0a-9d69-4490-8101-8d14833c0c95"
+    },
+    {
+        "END": 54853515,
+        "CHROM": "19",
+        "START": 54819333,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "1-3/8",
+                "csq_gene": "35b3bc98-0514-4b2a-b726-6f728735830e",
+                "csq_intron": "1-3/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000270442",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_exon": "4-8/8",
+                "csq_gene": "caf688d3-8e15-4088-8335-3071c1fe22d2",
+                "csq_intron": "3-7/7",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000326542",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_gene": "c6f6ce3f-d828-4725-84e5-6e2c636a9c54",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000339924",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "555934a8-b389-4f09-91fa-0d8ed0e3ae8f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000345540",
+                "csq_distance": "4817",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q13.42",
+        "date_created": "2021-09-30T21:12:48.117803+00:00",
+        "annotation_id": "DUP_chr19:54819333-54853515",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:48.643271+00:00"
+        },
+        "cytoband_start": "q13.42",
+        "unrelated_count": 0,
+        "uuid": "488d8ad9-a79e-4a52-b01f-85e3ab8ebe70"
+    },
+    {
+        "END": 53480459,
+        "CHROM": "19",
+        "START": 53442706,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "8d2a3174-9eff-449f-a813-470b8f09137b",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000334095",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_exon": "1/4",
+                "csq_gene": "3bb7f28c-f8fe-457e-a5c8-d3099a1dfcea",
+                "csq_intron": "1/3",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000396403",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_exon": "2-6/6",
+                "csq_gene": "22b2cca0-4e3d-49d5-add2-ee55feb1270f",
+                "csq_intron": "1-5/5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000610928",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q13.42",
+        "date_created": "2021-09-30T21:12:46.806111+00:00",
+        "annotation_id": "DUP_chr19:53442706-53480459",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:45.927111+00:00"
+        },
+        "cytoband_start": "q13.42",
+        "unrelated_count": 0,
+        "uuid": "4de9804c-174f-4f18-9840-7fd05c59cf87"
+    },
+    {
+        "END": 52915420,
+        "CHROM": "19",
+        "START": 52888285,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "1/3",
+                "csq_gene": "90046c21-dbdd-4f42-b26d-97ba9771a48b",
+                "csq_intron": "1/2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000391781",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            },
+            {
+                "csq_exon": "4-5/5",
+                "csq_gene": "bc21814a-3160-41ec-96aa-e8c3ee24a240",
+                "csq_intron": "3-4/4",
+                "csq_strand": false,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000596623",
+                "csq_consequence": [
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q13.41",
+        "date_created": "2021-09-30T21:12:43.585801+00:00",
+        "annotation_id": "DEL_chr19:52888285-52915420",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:38.831687+00:00"
+        },
+        "cytoband_start": "q13.41",
+        "unrelated_count": 0,
+        "uuid": "5890b1ab-383d-4f9d-a7c8-8b16dcb26ac0"
+    },
+    {
+        "END": 23967776,
+        "CHROM": "19",
+        "START": 23872687,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "8c53ff8e-7d48-48f9-ad2f-119d01917418",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000322487",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p12",
+        "date_created": "2021-09-30T21:12:42.978330+00:00",
+        "annotation_id": "DEL_chr19:23872687-23967776",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:37.937596+00:00"
+        },
+        "cytoband_start": "p12",
+        "unrelated_count": 0,
+        "uuid": "06781469-6476-44e0-8421-fe0e01097840"
+    },
+    {
+        "END": 8905624,
+        "CHROM": "19",
+        "START": 8896511,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "29-43/84",
+                "csq_gene": "50540532-a51a-47fd-a8aa-165a453eda47",
+                "csq_intron": "28-43/83",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000397910",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "3fb10a89-0693-4f7a-949a-a666bc3c9f45"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.2",
+        "date_created": "2021-09-30T21:12:42.502338+00:00",
+        "annotation_id": "DUP_chr19:8896511-8905624",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:37.193153+00:00"
+        },
+        "cytoband_start": "p13.2",
+        "unrelated_count": 0,
+        "uuid": "d6e75758-15a8-4b24-8662-4cfcbcf91553"
+    },
+    {
+        "END": 7870977,
+        "CHROM": "19",
+        "START": 7870908,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "921330c3-14de-4a74-aac7-ca6ab9b48fc9",
+                "csq_intron": "4/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000615988",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.2",
+        "date_created": "2021-09-30T21:12:42.283839+00:00",
+        "annotation_id": "DEL_chr19:7870908-7870977",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:36.776815+00:00"
+        },
+        "cytoband_start": "p13.2",
+        "unrelated_count": 0,
+        "uuid": "aec9dfc5-27a4-4e73-aad3-92f85575e3d1"
+    },
+    {
+        "END": 78160359,
+        "CHROM": "18",
+        "START": 76288881,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "8a5a9222-bdbf-48d2-9a49-359946cac342",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000253159",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "44e084f6-4c7c-4fa5-a9a1-8a7dc9c41c3f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000299727",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "b70c62ba-1f16-429a-84fc-818e04a5b506",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000354542",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q23",
+        "date_created": "2021-09-30T21:12:38.526362+00:00",
+        "annotation_id": "DEL_chr18:76288881-78160359",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:29.938276+00:00"
+        },
+        "cytoband_start": "q23",
+        "unrelated_count": 1,
+        "uuid": "62ebf253-fad1-44cd-b1c0-2fbc953877be"
+    },
+    {
+        "END": 78160248,
+        "CHROM": "18",
+        "START": 76288141,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "8a5a9222-bdbf-48d2-9a49-359946cac342",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000253159",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "44e084f6-4c7c-4fa5-a9a1-8a7dc9c41c3f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000299727",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "b70c62ba-1f16-429a-84fc-818e04a5b506",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000354542",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q23",
+        "date_created": "2021-09-30T21:12:34.836606+00:00",
+        "annotation_id": "DUP_chr18:76288141-78160248",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:23.125810+00:00"
+        },
+        "cytoband_start": "q23",
+        "unrelated_count": 0,
+        "uuid": "14677428-677d-44bc-901c-6c9f573ff398"
+    },
+    {
+        "END": 21827015,
+        "CHROM": "18",
+        "START": 21822053,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "gnomadg_ac": 1,
+        "gnomadg_af": 4.6e-05,
+        "gnomadg_an": 21694,
+        "transcript": [
+            {
+                "csq_gene": "3941265c-4dbd-4045-a13f-74d590b08298",
+                "csq_intron": "12/20",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000261537",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "3fb10a89-0693-4f7a-949a-a666bc3c9f45"
+                ]
+            },
+            {
+                "csq_gene": "b54fd64f-46d9-4a8c-9646-50482234d2bd",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000384961",
+                "csq_distance": "1989",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "a150ec92-01fe-457d-9b84-1655ed68129e"
+                ]
+            },
+            {
+                "csq_gene": "5aa4de51-5ccb-4e8c-893d-54c33fea1cce",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000385052",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11.2",
+        "date_created": "2021-09-30T21:12:33.816572+00:00",
+        "annotation_id": "DUP_chr18:21822053-21827015",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:22.009560+00:00"
+        },
+        "cytoband_start": "q11.2",
+        "gnomadg_ac-afr": 0,
+        "gnomadg_ac-amr": 1,
+        "gnomadg_ac-eas": 0,
+        "gnomadg_ac-eur": 0,
+        "gnomadg_ac-oth": 0,
+        "gnomadg_af-afr": 0.0,
+        "gnomadg_af-amr": 0.000518,
+        "gnomadg_af-eas": 0.0,
+        "gnomadg_af-eur": 0.0,
+        "gnomadg_af-oth": 0.0,
+        "gnomadg_an-afr": 9534,
+        "gnomadg_an-amr": 1930,
+        "gnomadg_an-eas": 2416,
+        "gnomadg_an-eur": 7624,
+        "gnomadg_an-oth": 190,
+        "unrelated_count": 0,
+        "uuid": "f39dd792-f8fa-4e6d-a4ba-2a21bd3212b1"
+    },
+    {
+        "END": 63887375,
+        "CHROM": "17",
+        "START": 63863876,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "dbbe67a8-78d0-4557-8c9b-0a89cef9f602",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332800",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "71fdc7a2-ac66-4350-8773-04e5b76bb4a1",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000336844",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q23.3",
+        "date_created": "2021-09-30T21:12:32.779675+00:00",
+        "annotation_id": "DEL_chr17:63863876-63887375",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:20.311835+00:00"
+        },
+        "cytoband_start": "q23.3",
+        "unrelated_count": 0,
+        "uuid": "80e3c94e-4653-4e77-913a-ba965f285848"
+    },
+    {
+        "END": 47098379,
+        "CHROM": "17",
+        "START": 46210493,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "025e1d09-ea9d-4ca6-84c6-4e580391ea75",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225512",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "a216c1e1-29c6-4d11-98d4-f87227493321",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225567",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "76cdc55a-edef-43bf-9a8a-16dd8392a098",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000290015",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "0344543a-dd5d-4e2e-8e90-2f13fac57b62",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000320254",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "e5351748-36e8-4804-827d-3c4ec33dcdba",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000322329",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "ff20e30d-b5cc-405f-9607-29b7c8c56889",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000329240",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "11cf07a7-62da-4e0a-8872-202121f366e8",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000333412",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q21.32",
+        "date_created": "2021-09-30T21:12:25.740606+00:00",
+        "annotation_id": "DEL_chr17:46210493-47098379",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:07.078345+00:00"
+        },
+        "cytoband_start": "q21.31",
+        "unrelated_count": 0,
+        "uuid": "763b046f-c2d5-4eee-a1af-6440cdb1f9c1"
+    },
+    {
+        "END": 26857687,
+        "CHROM": "17",
+        "START": 21949478,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "1d04f01b-fd6f-4eaa-8b8e-f1a32945d9b4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000540040",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11.1",
+        "date_created": "2021-09-30T21:12:25.532607+00:00",
+        "annotation_id": "DUP_chr17:21949478-26857687",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:34:06.812410+00:00"
+        },
+        "cytoband_start": "p11.2",
+        "unrelated_count": 0,
+        "uuid": "906ab95b-cef9-4532-9cf6-27a31298728b"
+    },
+    {
+        "END": 20637887,
+        "CHROM": "17",
+        "START": 15819821,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "8ffd9352-1c4c-4145-95ac-d0f662f6ace9",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000176643",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "75b79bbe-4305-4c75-ab4a-1d6356b39ad8",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225609",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "156148a3-b172-4603-abad-0565655dbfab",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225688",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "40e2522e-f40e-4e4b-a1ee-df7c8d78631f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225729",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "118c854a-7565-4843-b408-dfd3ae73fb49",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225737",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "ea05a6c6-8483-4f6c-a853-71e8e709762b",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000225740",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "1601279a-644b-45f3-a0e7-75db32818b33",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000255389",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "ce006e61-4214-4956-8d8f-3c3f22f0fec2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000261499",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "0630a2c6-6afa-4fa7-ab90-bf2d60e3efeb",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000261503",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "3aa45104-8df3-4468-ab7c-859bb4987ddb",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000261646",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p11.2",
+        "date_created": "2021-09-30T21:11:46.904528+00:00",
+        "annotation_id": "DUP_chr17:15819821-20637887",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:53.114937+00:00"
+        },
+        "cytoband_start": "p12",
+        "unrelated_count": 0,
+        "uuid": "d136d60f-a7ab-4f26-b475-2a3bb6415ab6"
+    },
+    {
+        "END": 509483,
+        "CHROM": "17",
+        "START": 509416,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "22/22",
+                "csq_gene": "a06d0704-2118-4d84-9a71-d44248c79b90",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000437048",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_cdna_position": "12274-12340"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.3",
+        "date_created": "2021-09-30T21:11:46.593577+00:00",
+        "annotation_id": "DEL_chr17:509416-509483",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:52.804051+00:00"
+        },
+        "cytoband_start": "p13.3",
+        "unrelated_count": 1,
+        "uuid": "24c26d80-04c5-43b5-925d-3d7f1ede5f39"
+    },
+    {
+        "END": 25126571,
+        "CHROM": "16",
+        "START": 25055418,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "1-2/12",
+                "csq_gene": "907b596a-3685-4a74-9aca-ef66445b9d71",
+                "csq_intron": "1-2/11",
+                "csq_strand": true,
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000380962",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "4507ceb2-f76e-441c-9d66-3eb22bb04095"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p12.1",
+        "date_created": "2021-09-30T21:11:45.259380+00:00",
+        "annotation_id": "DUP_chr16:25055418-25126571",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:50.780858+00:00"
+        },
+        "cytoband_start": "p12.1",
+        "unrelated_count": 0,
+        "uuid": "de8cb070-6959-4e06-a130-5cd5ecde6345"
+    },
+    {
+        "END": 397745,
+        "CHROM": "16",
+        "START": 397657,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "c493a436-c129-46f1-b461-7a5a7db6dea0",
+                "csq_intron": "1/4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000219479",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "3fb10a89-0693-4f7a-949a-a666bc3c9f45"
+                ]
+            },
+            {
+                "csq_gene": "23725b2a-95b9-4794-8bb3-dfed1f426a74",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000219481",
+                "csq_distance": "4140",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.3",
+        "date_created": "2021-09-30T21:11:43.192911+00:00",
+        "annotation_id": "DUP_chr16:397657-397745",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:46.987587+00:00"
+        },
+        "cytoband_start": "p13.3",
+        "unrelated_count": 0,
+        "uuid": "bdef01ac-2d4a-4a7c-b04e-96f83375770d"
+    },
+    {
+        "END": 32622212,
+        "CHROM": "15",
+        "START": 30632165,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "68aee0a5-20e2-40f4-905a-67abeb215bf7",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000256552",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "2cb14a56-bd10-4760-92a7-8f678862f20d",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000306901",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "2e3a439e-f73d-42a7-828d-234f847de0bf",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000307050",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "8b34c1ef-b318-478a-955e-df1d45060aa4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000307145",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_exon": "1-2/12",
+                "csq_gene": "07ffc2bd-5eda-4611-8a77-8ba6167dce8d",
+                "csq_intron": "1-2/11",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361627",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_gene": "edf25251-d0b9-4804-842b-6a677b8dbfe9",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000362065",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "5597f511-8c54-41bc-aa2a-4e322472303a",
+                "csq_strand": false,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000384969",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_exon": "3-11/11",
+                "csq_gene": "1d2d5305-e283-44f2-9ece-6c3b3274abf5",
+                "csq_intron": "2-10/10",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000428041",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_gene": "7975bbe9-cf51-4914-8885-16aab964f532",
+                "csq_strand": false,
+                "csq_biotype": "retained_intron",
+                "csq_feature": "ENST00000435655",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q13.3",
+        "date_created": "2021-09-30T21:11:35.248962+00:00",
+        "annotation_id": "DUP_chr15:30632165-32622212",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:32.375590+00:00"
+        },
+        "cytoband_start": "q13.2",
+        "unrelated_count": 0,
+        "uuid": "d4409b61-a8ad-4bbf-8878-ee21bd2d61a4"
+    },
+    {
+        "END": 105689528,
+        "CHROM": "14",
+        "START": 105569743,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "1ef214fd-c50f-45e5-8fef-fc3d035c2a0a",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000616769",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "f2920d55-d80e-4f6e-98aa-c98d299c0a8f",
+                "csq_strand": true,
+                "csq_biotype": "miRNA",
+                "csq_feature": "ENST00000616772",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q32.33",
+        "date_created": "2021-09-30T21:11:34.829820+00:00",
+        "annotation_id": "DEL_chr14:105569743-105689528",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:31.915451+00:00"
+        },
+        "cytoband_start": "q32.33",
+        "unrelated_count": 0,
+        "uuid": "cf3669f8-15c0-4aaa-b1f5-088ed6218a19"
+    },
+    {
+        "END": 113812973,
+        "CHROM": "13",
+        "START": 113812919,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "9/9",
+                "csq_gene": "553c5659-8055-43c7-9c22-8faa2e8ac45b",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000375353",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_cdna_position": "2042-2095"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q34",
+        "date_created": "2021-09-30T21:11:34.558529+00:00",
+        "annotation_id": "DEL_chr13:113812919-113812973",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:31.478656+00:00"
+        },
+        "cytoband_start": "q34",
+        "unrelated_count": 0,
+        "uuid": "2909d090-b148-42b8-8949-05d5a43efd0d"
+    },
+    {
+        "END": 29348046,
+        "CHROM": "13",
+        "START": 29212996,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "3/3",
+                "csq_gene": "0a011a95-e0e3-46dd-bb05-02e6345acea0",
+                "csq_intron": "2/2",
+                "csq_strand": true,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000255289",
+                "csq_consequence": [
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q12.3",
+        "date_created": "2021-09-30T21:11:33.848503+00:00",
+        "annotation_id": "DEL_chr13:29212996-29348046",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:30.529137+00:00"
+        },
+        "cytoband_start": "q12.3",
+        "unrelated_count": 0,
+        "uuid": "92107e1a-ef9a-468a-b7c4-90ce5fe7f8f1"
+    },
+    {
+        "END": 29347895,
+        "CHROM": "13",
+        "START": 29212479,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "3/3",
+                "csq_gene": "0a011a95-e0e3-46dd-bb05-02e6345acea0",
+                "csq_intron": "2/2",
+                "csq_strand": true,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000255289",
+                "csq_consequence": [
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q12.3",
+        "date_created": "2021-09-30T21:11:33.418763+00:00",
+        "annotation_id": "DUP_chr13:29212479-29347895",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:29.766360+00:00"
+        },
+        "cytoband_start": "q12.3",
+        "unrelated_count": 0,
+        "uuid": "196ff576-8e3a-46f6-865e-1656c6646f14"
+    },
+    {
+        "END": 29346539,
+        "CHROM": "13",
+        "START": 29211121,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "3/3",
+                "csq_gene": "0a011a95-e0e3-46dd-bb05-02e6345acea0",
+                "csq_intron": "2/2",
+                "csq_strand": true,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000255289",
+                "csq_consequence": [
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q12.3",
+        "date_created": "2021-09-30T21:11:33.026381+00:00",
+        "annotation_id": "DUP_chr13:29211121-29346539",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:29.097562+00:00"
+        },
+        "cytoband_start": "q12.3",
+        "unrelated_count": 0,
+        "uuid": "4e8d3db8-0494-4b26-ac60-49a68d273adb"
+    },
+    {
+        "END": 24355886,
+        "CHROM": "13",
+        "START": 22933565,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "461df513-5527-4f10-b2d5-59c4d29cc81a",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000218867",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "9b0ca0af-d591-4eca-8408-82605e2bf08f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000248484",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "06529660-2878-4ae1-b784-cdd9fcd82c07",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332018",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "c44403ea-c7af-4422-85b3-176be4584977",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000343003",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "9d69a763-5f61-4f37-8ab4-19be5c7a98b0",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000382137",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "1f4b5825-3157-4b83-b3b9-a69e082063e1",
+                "csq_strand": true,
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000382141",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q12.12",
+        "date_created": "2021-09-30T21:11:30.576887+00:00",
+        "annotation_id": "DEL_chr13:22933565-24355886",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:25.075102+00:00"
+        },
+        "cytoband_start": "q12.12",
+        "unrelated_count": 1,
+        "uuid": "2ba98f98-eca8-4a18-ae3d-29774c3362b5"
+    },
+    {
+        "END": 19704687,
+        "CHROM": "13",
+        "START": 19203175,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "7499d8ac-c665-4e2b-83e4-d9f903f05840",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000255310",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_exon": "9/9",
+                "csq_gene": "34683fc1-7727-4e7a-ad0c-72f98879b5d4",
+                "csq_intron": "8/8",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000338910",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_gene": "1b41b80b-fb3a-4af4-8157-a649a271d221",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000361479",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q12.11",
+        "date_created": "2021-09-30T21:11:28.579329+00:00",
+        "annotation_id": "DUP_chr13:19203175-19704687",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:21.579694+00:00"
+        },
+        "cytoband_start": "q12.11",
+        "unrelated_count": 0,
+        "uuid": "d09545df-c9a4-47a3-883b-5bfb51170551"
+    },
+    {
+        "END": 38313747,
+        "CHROM": "12",
+        "START": 34019606,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "6c981f10-b5d9-4e83-86bb-c137e2465fa4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000266483",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "b7aa93b3-4931-4a77-b364-ba2b56c55fc5",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000308742",
+                "csq_distance": "3027",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q12",
+        "date_created": "2021-09-30T21:11:27.975442+00:00",
+        "annotation_id": "DEL_chr12:34019606-38313747",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:20.547699+00:00"
+        },
+        "cytoband_start": "p11.1",
+        "unrelated_count": 0,
+        "uuid": "79824593-c310-491c-8261-ff5fd6323901"
+    },
+    {
+        "END": 11077539,
+        "CHROM": "12",
+        "START": 11021866,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "2-3/5",
+                "csq_gene": "6237982f-529d-4183-86c5-162ba5d80030",
+                "csq_intron": "1-3/4",
+                "csq_strand": false,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000381852",
+                "csq_consequence": [
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            },
+            {
+                "csq_exon": "1/1",
+                "csq_gene": "de838dcf-d1e6-4c47-96dd-748fbf2cad8b",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000390673",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_cds_position": "?-705",
+                "csq_cdna_position": "?-754",
+                "csq_protein_position": "?-235"
+            },
+            {
+                "csq_gene": "1abe047f-5f4f-4f38-b6e7-e39a3484876e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000390675",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "4faea39d-f8e5-4e9c-a7da-64c2fc70bb9e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000533467",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_exon": "1/2",
+                "csq_gene": "4ae56d04-665e-4703-8503-6da2865d5e0c",
+                "csq_intron": "1/1",
+                "csq_strand": false,
+                "csq_biotype": "processed_transcript",
+                "csq_feature": "ENST00000534923",
+                "csq_consequence": [
+                    "45f660ff-88ec-4155-a526-efdc644e6780",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            },
+            {
+                "csq_exon": "2/5",
+                "csq_gene": "2faba266-59f6-42d7-819d-3a40e89b246f",
+                "csq_intron": "1-2/4",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000535024",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3bb1eb38-2aee-4232-bc63-dc4690a9b87c",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.2",
+        "date_created": "2021-09-30T21:11:25.758656+00:00",
+        "annotation_id": "DEL_chr12:11021866-11077539",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:16.309297+00:00"
+        },
+        "cytoband_start": "p13.2",
+        "unrelated_count": 0,
+        "uuid": "79e614ba-bf0b-4eda-8796-230a60777c88"
+    },
+    {
+        "END": 7905429,
+        "CHROM": "12",
+        "START": 7798514,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "4/4",
+                "csq_gene": "036139da-fbee-4c2a-b392-aa1d0ddacdb4",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000229307",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "b0cefaa5-a0c8-4255-ad2c-a9c372bdd8ea"
+                ],
+                "csq_cdna_position": "4551-?"
+            },
+            {
+                "csq_gene": "6f06399f-159b-46dd-8ea9-769d39916ac2",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000340749",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.31",
+        "date_created": "2021-09-30T21:11:23.915364+00:00",
+        "annotation_id": "DEL_chr12:7798514-7905429",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:13.148104+00:00"
+        },
+        "cytoband_start": "p13.31",
+        "unrelated_count": 0,
+        "uuid": "809d45f3-60d3-42aa-b06f-ee0753d0e0dd"
+    },
+    {
+        "END": 111353019,
+        "CHROM": "11",
+        "START": 111352963,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "5/5",
+                "csq_gene": "211d323f-8b8f-436e-b969-6ef20c4219bd",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000393067",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_cdna_position": "2111-2166"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q23.1",
+        "date_created": "2021-09-30T21:11:23.503869+00:00",
+        "annotation_id": "DEL_chr11:111352963-111353019",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:12.634997+00:00"
+        },
+        "cytoband_start": "q23.1",
+        "unrelated_count": 0,
+        "uuid": "30a443c0-bd62-4968-8a9c-d0bb11ec586f"
+    },
+    {
+        "END": 55125559,
+        "CHROM": "11",
+        "START": 48727236,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "3ed792de-cedd-4035-b1ec-fb1fa4a2d830",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000256999",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "f4f9a6b3-a02e-4926-98c2-1a3c0a87c5c1",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000319760",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "343c7d87-7303-4c6f-b67c-6ae6246db4db",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000328188",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "017902a0-7218-4c43-9ae2-eb34a827fd5f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332682",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "4d89b59c-13c4-4e19-9b1e-7b2371a6b22e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000335238",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "632071c3-c808-45f4-82ee-d6aa7da7994e",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000418689",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11",
+        "date_created": "2021-09-30T21:11:21.701399+00:00",
+        "annotation_id": "DUP_chr11:48727236-55125559",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:09.072359+00:00"
+        },
+        "cytoband_start": "p11.2",
+        "unrelated_count": 1,
+        "uuid": "f80c5b5a-770c-40d8-aa6a-6a4c13a7b705"
+    },
+    {
+        "END": 55124768,
+        "CHROM": "11",
+        "START": 48726958,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "3ed792de-cedd-4035-b1ec-fb1fa4a2d830",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000256999",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "f4f9a6b3-a02e-4926-98c2-1a3c0a87c5c1",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000319760",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "343c7d87-7303-4c6f-b67c-6ae6246db4db",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000328188",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "017902a0-7218-4c43-9ae2-eb34a827fd5f",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332682",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "4d89b59c-13c4-4e19-9b1e-7b2371a6b22e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000335238",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "632071c3-c808-45f4-82ee-d6aa7da7994e",
+                "csq_strand": true,
+                "csq_biotype": "polymorphic_pseudogene",
+                "csq_feature": "ENST00000418689",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11",
+        "date_created": "2021-09-30T21:11:19.688563+00:00",
+        "annotation_id": "DEL_chr11:48726958-55124768",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:06.159381+00:00"
+        },
+        "cytoband_start": "p11.2",
+        "unrelated_count": 0,
+        "uuid": "713f1271-dc01-40c0-ab8d-83d85cfb4b57"
+    },
+    {
+        "END": 3731272,
+        "CHROM": "11",
+        "START": 3598372,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "71a08a5a-bf98-429d-abb0-cbaf4ecdc033",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000250693",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "2680ad43-8d16-475c-8025-c1623484329e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000250699",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_exon": "15-33/33",
+                "csq_gene": "eeaceeff-2a38-4853-851e-5e2f10584295",
+                "csq_intron": "14-32/32",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000324932",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            },
+            {
+                "csq_gene": "0c4cee3b-c162-4012-a2d7-df758c60a527",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000359918",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p15.4",
+        "date_created": "2021-09-30T21:11:17.002931+00:00",
+        "annotation_id": "DUP_chr11:3598372-3731272",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:32:01.640115+00:00"
+        },
+        "cytoband_start": "p15.4",
+        "unrelated_count": 0,
+        "uuid": "2c6c420f-ec86-4c20-a9f9-5342c5856294"
+    },
+    {
+        "END": 133573756,
+        "CHROM": "10",
+        "START": 133429010,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "088b35fe-a90b-4e00-80ca-c551592e9806",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000252945",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "56943f33-5259-4219-93d2-0e1f74bd3ba1",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000303903",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "44700910-e0fa-472b-8a63-f1f9706c97bc",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000414069",
+                "csq_distance": "4439",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b898b66a-c60b-4e00-b63f-5b5e18c34a48"
+                ]
+            },
+            {
+                "csq_gene": "b9c9611e-4dff-4c2f-be57-aa251b137765",
+                "csq_strand": true,
+                "csq_biotype": "retained_intron",
+                "csq_feature": "ENST00000462252",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q26.3",
+        "date_created": "2021-09-30T21:11:15.464452+00:00",
+        "annotation_id": "DUP_chr10:133429010-133573756",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:59.032783+00:00"
+        },
+        "cytoband_start": "q26.3",
+        "unrelated_count": 1,
+        "uuid": "61d320c0-4466-4b41-9532-0d2b6a4d1236"
+    },
+    {
+        "END": 93618921,
+        "CHROM": "9",
+        "START": 90908057,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "eb6714cc-750e-4cd4-bfb6-3bb6d7399208",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000262551",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "09fc7c7b-6302-4cee-9f1b-37b469e63f1e",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000262554",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "2aa6e1e5-664c-41fd-a4f4-ef068f94360e",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000277165",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "84fa993b-5e98-4574-8344-98a5f9f6158b",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000287996",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "3db9351e-3827-49c8-9546-65dc3e2def67",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000297689",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "68498f38-a8a5-4403-b06d-f87b86a44032",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000297954",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "dad6b901-1822-49cd-8874-aef6bd708e54",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000303617",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "02b21511-9e95-4c1e-a04c-c254146b1cd0",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332591",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "22f5b0f3-d419-42c4-a107-b6bb8a5ba799",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000337352",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q22.31",
+        "date_created": "2021-09-30T21:11:04.962180+00:00",
+        "annotation_id": "DUP_chr9:90908057-93618921",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:39.371078+00:00"
+        },
+        "cytoband_start": "q22.2",
+        "unrelated_count": 0,
+        "uuid": "d72b6416-1f3e-44d2-aa98-4f3a34ce7ed3"
+    },
+    {
+        "END": 43175365,
+        "CHROM": "9",
+        "START": 40543783,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "ea5014f8-d6d6-4f98-aa0a-80ab1094aef8",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000276974",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "856680fe-167e-47ec-a693-3f56eb30ffce",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000332857",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "cd0c0038-7003-488c-ba21-4856fc531fc6",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000377391",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11",
+        "date_created": "2021-09-30T21:11:01.820720+00:00",
+        "annotation_id": "DEL_chr9:40543783-43175365",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:35.164519+00:00"
+        },
+        "cytoband_start": "p11.2",
+        "unrelated_count": 0,
+        "uuid": "01637ea8-161b-4044-a74d-9656fa0969c6"
+    },
+    {
+        "END": 37918434,
+        "CHROM": "9",
+        "START": 37918374,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "6/6",
+                "csq_gene": "882e01a1-c987-4980-8a83-da0bb810ff55",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000377707",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_cdna_position": "3499-3558"
+            },
+            {
+                "csq_gene": "b00e92d9-d6f9-4fdb-9ae3-0711de5aeddc",
+                "csq_intron": "6/11",
+                "csq_strand": false,
+                "csq_biotype": "nonsense_mediated_decay",
+                "csq_feature": "ENST00000540557",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "4507ceb2-f76e-441c-9d66-3eb22bb04095"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p13.1",
+        "date_created": "2021-09-30T21:11:01.438461+00:00",
+        "annotation_id": "DEL_chr9:37918374-37918434",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:34.669277+00:00"
+        },
+        "cytoband_start": "p13.1",
+        "unrelated_count": 0,
+        "uuid": "1508d66f-2d6b-499a-95fb-5ab11df9cfb0"
+    },
+    {
+        "END": 143261930,
+        "CHROM": "8",
+        "START": 143261831,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "3/3",
+                "csq_gene": "52615f19-42d6-406e-a247-25980f59cad6",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000330701",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "d2ca7570-10b9-4314-bc2c-fa6d276c21fb"
+                ],
+                "csq_cdna_position": "3913-4011"
+            },
+            {
+                "csq_gene": "c45cadf1-a1cd-4247-a283-b83439d9ac72",
+                "csq_intron": "2/3",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000522452",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q24.3",
+        "date_created": "2021-09-30T21:11:01.095443+00:00",
+        "annotation_id": "DEL_chr8:143261831-143261930",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:34.292027+00:00"
+        },
+        "cytoband_start": "q24.3",
+        "unrelated_count": 1,
+        "uuid": "9f19f6c7-d459-478d-90ac-5f65ebc489e2"
+    },
+    {
+        "END": 80158669,
+        "CHROM": "8",
+        "START": 80158138,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "gnomadg_ac": 24,
+        "gnomadg_af": 0.001106,
+        "gnomadg_an": 21694,
+        "transcript": [
+            {
+                "csq_gene": "756ceff8-3b4a-4659-a40f-a813b70a02a1",
+                "csq_intron": "1/5",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000379096",
+                "csq_consequence": [
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q21.13",
+        "date_created": "2021-09-30T21:10:59.878404+00:00",
+        "annotation_id": "DEL_chr8:80158138-80158669",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:32.371807+00:00"
+        },
+        "cytoband_start": "q21.13",
+        "gnomadg_ac-afr": 2,
+        "gnomadg_ac-amr": 2,
+        "gnomadg_ac-eas": 0,
+        "gnomadg_ac-eur": 19,
+        "gnomadg_ac-oth": 1,
+        "gnomadg_af-afr": 0.00021,
+        "gnomadg_af-amr": 0.001036,
+        "gnomadg_af-eas": 0.0,
+        "gnomadg_af-eur": 0.002492,
+        "gnomadg_af-oth": 0.005263,
+        "gnomadg_an-afr": 9534,
+        "gnomadg_an-amr": 1930,
+        "gnomadg_an-eas": 2416,
+        "gnomadg_an-eur": 7624,
+        "gnomadg_an-oth": 190,
+        "unrelated_count": 0,
+        "uuid": "73b96521-ec42-4c98-aec9-44cd62728858"
+    },
+    {
+        "END": 12035924,
+        "CHROM": "8",
+        "START": 11930728,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "ec3ea7c9-f55c-44f4-81e3-b34931d018ce",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000382205",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "e723de04-7d8a-44d2-93cc-3a62ec220bc0",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000382208",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "ceee1ed5-a5a8-4a82-96e5-63ecb9677e72",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000382209",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "p23.1",
+        "date_created": "2021-09-30T21:10:59.510530+00:00",
+        "annotation_id": "DUP_chr8:11930728-12035924",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:31.789910+00:00"
+        },
+        "cytoband_start": "p23.1",
+        "unrelated_count": 0,
+        "uuid": "11f91113-547c-4ab0-a211-030b91e992af"
+    },
+    {
+        "END": 142086529,
+        "CHROM": "7",
+        "START": 142060034,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "34-56/71",
+                "csq_gene": "4243bc7b-3251-4e71-b520-672ec7a81520",
+                "csq_intron": "33-56/70",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000475668",
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "90cf5e7d-4e3e-42da-9b8d-f3d912029284",
+                    "3fb10a89-0693-4f7a-949a-a666bc3c9f45"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q34",
+        "date_created": "2021-09-30T21:10:58.849784+00:00",
+        "annotation_id": "DUP_chr7:142060034-142086529",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:30.705767+00:00"
+        },
+        "cytoband_start": "q34",
+        "unrelated_count": 0,
+        "uuid": "ca5c2235-2099-4873-b5d0-509f58f5a910"
+    },
+    {
+        "END": 101034782,
+        "CHROM": "7",
+        "START": 101034074,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "3/13",
+                "csq_gene": "dfc6aa02-a6c4-4cb5-a730-fd44d3bee403",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000306151",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3fb10a89-0693-4f7a-949a-a666bc3c9f45"
+                ],
+                "csq_cds_position": "2659-3366",
+                "csq_cdna_position": "2714-3421",
+                "csq_protein_position": "887-1122"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q22.1",
+        "date_created": "2021-09-30T21:10:58.364463+00:00",
+        "annotation_id": "DUP_chr7:101034074-101034782",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:29.992290+00:00"
+        },
+        "cytoband_start": "q22.1",
+        "unrelated_count": 0,
+        "uuid": "17540797-f0f3-4097-9c5f-13e2b00ab063"
+    },
+    {
+        "END": 101036186,
+        "CHROM": "7",
+        "START": 101034062,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_exon": "3/13",
+                "csq_gene": "dfc6aa02-a6c4-4cb5-a730-fd44d3bee403",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000306151",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "ce0b7d47-e991-46a5-8aad-007f22185132",
+                    "3fb10a89-0693-4f7a-949a-a666bc3c9f45"
+                ],
+                "csq_cds_position": "2647-4770",
+                "csq_cdna_position": "2702-4825",
+                "csq_protein_position": "883-1590"
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q22.1",
+        "date_created": "2021-09-30T21:10:57.957803+00:00",
+        "annotation_id": "DUP_chr7:101034062-101036186",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:29.280679+00:00"
+        },
+        "cytoband_start": "q22.1",
+        "unrelated_count": 0,
+        "uuid": "f0793174-d270-4d3c-abad-b910f608395f"
+    },
+    {
+        "END": 73967987,
+        "CHROM": "7",
+        "START": 66729730,
+        "status": "shared",
+        "SV_TYPE": "DEL",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "64a910d9-0762-4bfe-b199-91aaa0fe937a",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000222800",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "87a4edfe-0463-4e1e-b7ca-9f9710a4bee7",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000222812",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "0764d383-4337-4ba2-966b-8e7e0ca077df",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000223368",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "588578b0-43ae-4db9-bb6c-d6db7811e2ad",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000246868",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "bf40f918-84e8-4b1d-a1e8-ccdb67811c5a",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000252037",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "e096914d-bd29-4ead-a883-2b18d4fa0d0f",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000252594",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "ab428350-c540-488c-8bb9-40e142ede2e9",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000265758",
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "11b95d2b-0a8d-4a01-b54b-a0692d13e9eb",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000284957",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "5eb4a70d-7d9a-4f6b-b0f2-20b8ddd7ef39",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000285805",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            },
+            {
+                "csq_gene": "ad371b3d-f851-4ca1-86b6-4f4243bf6102",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000297873",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "b66bf148-8751-47f5-9ca0-54295b57a6ab"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11.23",
+        "date_created": "2021-09-30T21:10:45.039395+00:00",
+        "annotation_id": "DEL_chr7:66729730-73967987",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:31:05.141233+00:00"
+        },
+        "cytoband_start": "q11.21",
+        "unrelated_count": 0,
+        "uuid": "3f251d07-f966-42db-a620-9e52c1d8bc45"
+    },
+    {
+        "END": 73967811,
+        "CHROM": "7",
+        "START": 66728444,
+        "status": "shared",
+        "SV_TYPE": "DUP",
+        "project": "f586dc9e-64eb-47fe-b140-624fd504d549",
+        "transcript": [
+            {
+                "csq_gene": "64a910d9-0762-4bfe-b199-91aaa0fe937a",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000222800",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "87a4edfe-0463-4e1e-b7ca-9f9710a4bee7",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000222812",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "0764d383-4337-4ba2-966b-8e7e0ca077df",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000223368",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "588578b0-43ae-4db9-bb6c-d6db7811e2ad",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000246868",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "bf40f918-84e8-4b1d-a1e8-ccdb67811c5a",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000252037",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "e096914d-bd29-4ead-a883-2b18d4fa0d0f",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000252594",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "ab428350-c540-488c-8bb9-40e142ede2e9",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000265758",
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "11b95d2b-0a8d-4a01-b54b-a0692d13e9eb",
+                "csq_strand": true,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000284957",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "5eb4a70d-7d9a-4f6b-b0f2-20b8ddd7ef39",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000285805",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            },
+            {
+                "csq_gene": "ad371b3d-f851-4ca1-86b6-4f4243bf6102",
+                "csq_strand": false,
+                "csq_biotype": "protein_coding",
+                "csq_feature": "ENST00000297873",
+                "csq_canonical": true,
+                "csq_consequence": [
+                    "2d8a5fb3-35b9-4995-8598-ebed06fa18fe"
+                ]
+            }
+        ],
+        "institution": "59024e8e-eaea-477c-8f9b-df0bd722cfcb",
+        "cytoband_end": "q11.23",
+        "date_created": "2021-09-30T21:10:32.461731+00:00",
+        "annotation_id": "DUP_chr7:66728444-73967811",
+        "last_modified": {
+            "modified_by": "3202fd57-44d2-44fb-a131-afb1e43d8ae5",
+            "date_modified": "2021-12-07T16:30:41.638016+00:00"
+        },
+        "cytoband_start": "q11.21",
+        "unrelated_count": 0,
+        "uuid": "1df2a546-80a5-4b8f-849b-2ec6f88c93a2"
+    }
+]

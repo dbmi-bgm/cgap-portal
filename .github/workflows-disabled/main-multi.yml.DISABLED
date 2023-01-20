@@ -1,0 +1,106 @@
+# Build for cgap-portal
+
+name: CI
+
+# Controls when the action will run.
+on:
+  # Triggers the workflow on push or pull request events but only for the master branch
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    name: Test Suite for cgap-portal
+
+    # The type of runner that the job will run on
+    runs-on: ubuntu-18.04
+
+    # Build matrix
+    strategy:
+      matrix:
+        test_type: ['unit', 'npm', 'Docker']
+        python_version: ['3.6', '3.7']
+        node_version: ['12']
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python_version }}
+
+      # Per doc for node install at https://github.com/actions/setup-node#usage
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node_version }}
+          check-latest: false
+
+      - name: Install/Link Postgres
+        if: ${{ matrix.test_type == 'npm' || matrix.test_type == 'unit' }}
+        run: |
+          sudo apt-get install curl ca-certificates gnupg
+          curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
+          sudo sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt $(lsb_release -cs)-pgdg main" > /etc/apt/sources.list.d/pgdg.list'
+          sudo apt-get update
+          sudo apt-get install postgresql-11 postgresql-client-11
+          echo "/usr/lib/postgresql/11/bin" >> $GITHUB_PATH
+          sudo ln -s /usr/lib/postgresql/11/bin/initdb /usr/local/bin/initdb
+
+      - name: Install Deps
+        if: ${{ matrix.test_type == 'npm' || matrix.test_type == 'unit' }}
+        run: |
+          node --version
+          make build
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: QA
+        if: ${{ matrix.test_type == 'npm' || matrix.test_type == 'unit' }}
+        env:
+          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          # The need for this old environment variable name will go away soon.
+          # Once the new snovault is in, we should retain these for a little while to make sure the right
+          # variable is being used, and then this can go away. -kmp 9-Mar-2021
+          # I have named the ID slightly differently so we can see if the old names are in use.
+          TRAVIS_JOB_ID: cgap-${{ matrix.test_type }}-x-py${{ matrix.python_version }}-test-${{ github.run_number }}-
+          # This will be the new environment variable name.
+          TEST_JOB_ID: cgap-${{ matrix.test_type }}-py${{ matrix.python_version }}-test-${{ github.run_number }}-
+        run: |
+          # npm test
+          make remote-test-${{ matrix.test_type }}
+
+      - name: Cleanup
+        if: ${{ always() && ( matrix.test_type == 'npm' || matrix.test_type == 'unit' ) }}
+        env:
+          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          # The need for this old environment variable name will go away soon.
+          # Once the new snovault is in, we should retain these for a little while to make sure the right
+          # variable is being used, and then this can go away. -kmp 9-Mar-2021
+          # I have named the ID slightly differently so we can see if the old names are in use.
+          TRAVIS_JOB_ID: cgap-${{ matrix.test_type }}-x-py${{ matrix.python_version }}-test-${{ github.run_number }}-
+          # This will be the new environment variable name.
+          TEST_JOB_ID: cgap-${{ matrix.test_type }}-py${{ matrix.python_version }}-test-${{ github.run_number }}-
+        run: |
+          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+          # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-testing-6-8-vo4mdkmkshvmyddc65ux7dtaou.us-east-1.es.amazonaws.com:443
+
+      - name: Docker Build (Python 3.7 only)
+        if: ${{ matrix.test_type == 'Docker' && matrix.python_version == '3.7' }}
+        run: |
+          touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
+          docker build .

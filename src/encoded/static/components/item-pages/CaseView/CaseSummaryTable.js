@@ -6,6 +6,7 @@ import memoize from 'memoize-one';
 import _ from 'underscore';
 import { Schemas } from './../../util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { capitalizeSentence } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
 
 
@@ -16,16 +17,16 @@ function hasViewPermisison({ '@id' : itemID, display_title }) {
 
 /** @param {Object} props - Contents of a family sub-embedded object. */
 export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
+    const { idToGraphIdentifier = {}, sampleProcessing = [], family } = props;
     const {
+        original_pedigree = null,
         relationships = [],
         members = [],
         proband: { '@id' : probandID } = {},
-        original_pedigree = null,
-        idToGraphIdentifier = {},
-        sampleProcessing = []
-    } = props;
+    } = family || {};
 
     console.log("case summary props", props);
+
     if (members.length === 0){
         return (
             <div className="processing-summary">
@@ -87,7 +88,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     let hasMSA = false; // if there is at least one sample processing object to render (w/2 samples in family)
     let hasCombinedMSA = false; // if there is also a combined MSA (for rendering last row only when there's a combined VCF)
     // add multisample analysis column data to column order/titles and data object
-    sampleProcessing.forEach((sp) => {
+    sampleProcessing.forEach(function(sp){
         const { uuid, processed_files = [], completed_processes = [], samples = [], sample_processed_files = [] } = sp;
         // TODO: If processed_files.length !== spProcFilesWithPermission.length, maybe inform user about this?
         const spProcFilesWithPermission = processed_files.filter(hasViewPermisison);
@@ -107,13 +108,13 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
             sampleProcessingData[uuid]["MSA"] = generateFileDataObject(spProcFilesWithPermission); // populate with multisample analysis objects
 
             // populate with per sample data (no files)
-            samples.forEach((sample) => {
+            samples.forEach(function(sample){
                 const { accession = "" } = sample;
                 sampleProcessingData[uuid][accession] = true;
             });
 
             // populate with per sample data (files) (override any previously set)
-            sample_processed_files.forEach((set) => {
+            sample_processed_files.forEach(function(set){
                 const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
                 sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles.filter(hasViewPermisison));
             });
@@ -178,9 +179,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 overall_quality_status = "",
                 qc_list = [],
                 "@id": qmId,
-                url: qmUrl = qmId || "",
             } = quality_metric;
 
+            let qmUrl = qmId + '/@@download'; // send to @@download instead of url (deprecated for standalone QCs) - Will Jan 24 2022
             const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
 
             let fileOverallQuality = "PASS";
@@ -190,6 +191,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
             // figure out the file's overall quality status
             if (qc_list.length > 0) {
+                qmUrl = qmId; // if qc_list item, link to that metadata item (instead of @@download)
                 // loop through all of the quality metrics and count the number of failures and warnings for this file
                 qc_list.forEach((qm) => {
                     const { value : { overall_quality_status = null } } = qm;
@@ -282,22 +284,18 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 files[0] ?
                     <span className="ellipses" key={`span-${ext}`}>
                         { statusToIcon(overallQuality)}
-                        <a
-                            href={files[0].fileUrl || ""}
+                        <a href={files[0].fileUrl || ""}
                             rel="noopener noreferrer"
                             target="_blank"
-                            data-tip={tooltips[0]}
-                        >
+                            data-tip={tooltips[0]}>
                             { ext.toUpperCase() }
                         </a>
                         { files[0].hasQm ?
-                            <a
-                                href={files[0].qmUrl || ""}
+                            <a href={files[0].qmUrl || ""}
                                 rel="noopener noreferrer"
                                 target="_blank"
                                 className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
-                                data-tip={tooltips[1]}
-                            >
+                                data-tip={tooltips[1]}>
                                 <sup>QC</sup>
                             </a>
                             : null }
@@ -309,7 +307,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 <span className="ellipses" key={`span-multi-${ext}`}>
                     { statusToIcon(overallQuality) } { ext.toUpperCase() }
                     (   {
-                        files.map((file, i) => {
+                        files.map(function(file, i){
                             const { hasQm = false, numWarn = -1, numFail = -1, quality, qmUrl = "", status, fileUrl = "" } = file;
                             const tooltips = calcTooltips(hasQm, numWarn, numFail);
 
@@ -320,14 +318,12 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                                         {i + 1}
                                     </a>
                                     { hasQm ?
-                                        <a
-                                            href={qmUrl}
+                                        <a href={qmUrl}
                                             rel="noopener noreferrer"
                                             target="_blank"
                                             className={`${statusToTextClass(
                                                 getFileQuality(numFail, numWarn))} qc-status-${status}`}
-                                            data-tip={tooltips[1]}
-                                        >
+                                            data-tip={tooltips[1]}>
                                             <sup>QC</sup>
                                         </a>
                                         : null }
@@ -494,7 +490,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                     sample: (
                         <React.Fragment>
                             <span className="d-block">
-                                { specimen_type }
+                                { capitalizeSentence(specimen_type) }
                                 { specimen_notes ? <span className="text-primary" data-tip={ specimen_notes }>*</span>: "" }
                             </span>
                             { specimen_collection_date ?
@@ -525,14 +521,14 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const membersWithoutViewPermissionsLen = membersWithoutViewPermissions.length;
 
     const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
-        <div className="processing-summary">
+        <div className="processing-summary mt-04 px-3">
             { membersWithoutSamplesLen > 0 ?
-                <p className="pl-1 mb-0">
+                <p className="my-0">
                     <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
                 </p>
                 : null }
             { membersWithoutViewPermissionsLen > 0 ?
-                <p className="mb-0">
+                <p className="my-0">
                     <span className="text-600">{ membersWithoutViewPermissionsLen }</span> members without view permissions.
                 </p>
                 : null }
@@ -571,7 +567,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 const extensions = Object.keys(fileData);
                 let renderArr = [];
 
-                extensions.forEach((ext) => {
+                extensions.forEach(function(ext){
                     const jsx = convertFileObjectToJSX(fileData[ext], ext);
                     renderArr = renderArr.concat(jsx);
                 });
@@ -593,7 +589,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                     console.log("exts, extensions,", extensions);
 
                     let renderArr = [];
-                    extensions.forEach((ext) => {
+                    extensions.forEach(function(ext){
                         const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
                         renderArr = renderArr.concat(jsx);
                     });
@@ -703,40 +699,49 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     );
 });
 CaseSummaryTable.propTypes = { // todo: update with required fields
-    clinic_notes : PropTypes.string,
-    family_phenotypic_features : PropTypes.arrayOf(PropTypes.shape({
+    "clinic_notes" : PropTypes.string,
+    "family_phenotypic_features" : PropTypes.arrayOf(PropTypes.shape({
         "@id": PropTypes.string,
         "@type": PropTypes.arrayOf(PropTypes.string),
         "display_title": PropTypes.string,
         "principals_allowed": PropTypes.object,
         "uuid": PropTypes.string
     })),
-    idToGraphIdentifier : PropTypes.object,
-    idx : PropTypes.number,
-    isCurrentFamily : PropTypes.bool,
-    members : PropTypes.arrayOf(PropTypes.shape({
-        "@id" : PropTypes.string,
-        "@type" : PropTypes.arrayOf(PropTypes.string),
-        "accession" : PropTypes.string,
-        "age_at_death_units" : PropTypes.string,
-        "age_units" : PropTypes.string,
-        "display_title" : PropTypes.string,
-        "father" : PropTypes.object,
-        "is_deceased" : PropTypes.bool,
-        "is_infertile" : PropTypes.bool,
-        "is_no_children_by_choice" : PropTypes.bool,
-        "is_pregnancy" : PropTypes.bool,
-        "is_spontaneous_abortion" : PropTypes.bool,
-        "is_still_birth" : PropTypes.bool,
-        "is_termination_of_pregnancy" : PropTypes.bool,
-        "mother" : PropTypes.object,
-        "principals_allowed" : PropTypes.object,
-        "sex" : PropTypes.string,
-        "status" : PropTypes.string,
-        "uuid" : PropTypes.string
-    })),
-    original_pedigree : PropTypes.object,
-    proband : PropTypes.object,
-    sampleProcessing: PropTypes.arrayOf(PropTypes.object),
-    timestamp : PropTypes.string
+    "idToGraphIdentifier" : PropTypes.object,
+    "idx" : PropTypes.number,
+    "isCurrentFamily" : PropTypes.bool,
+    "family": PropTypes.shape({
+        "members" : PropTypes.arrayOf(PropTypes.shape({
+            "@id" : PropTypes.string,
+            "@type" : PropTypes.arrayOf(PropTypes.string),
+            "accession" : PropTypes.string,
+            "age_at_death_units" : PropTypes.string,
+            "age_units" : PropTypes.string,
+            "display_title" : PropTypes.string,
+            "father" : PropTypes.object,
+            "is_deceased" : PropTypes.bool,
+            "is_infertile" : PropTypes.bool,
+            "is_no_children_by_choice" : PropTypes.bool,
+            "is_pregnancy" : PropTypes.bool,
+            "is_spontaneous_abortion" : PropTypes.bool,
+            "is_still_birth" : PropTypes.bool,
+            "is_termination_of_pregnancy" : PropTypes.bool,
+            "mother" : PropTypes.object,
+            "principals_allowed" : PropTypes.object,
+            "sex" : PropTypes.string,
+            "status" : PropTypes.string,
+            "uuid" : PropTypes.string
+        })),
+        "original_pedigree" : PropTypes.object,
+        "proband" : PropTypes.object,
+        "family_phenotypic_features" : PropTypes.arrayOf(PropTypes.shape({
+            "@id": PropTypes.string,
+            "@type": PropTypes.arrayOf(PropTypes.string),
+            "display_title": PropTypes.string,
+            "principals_allowed": PropTypes.object,
+            "uuid": PropTypes.string
+        })),
+    }),
+    "sampleProcessing": PropTypes.arrayOf(PropTypes.object),
+    "timestamp" : PropTypes.string
 };

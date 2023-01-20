@@ -5,5 +5,12 @@
         "description": "This is a test project",
         "status": "current",
         "name": "hms-dbmi"
+    },
+    {
+        "title": "Core Project",
+        "uuid": "98c17432-1541-eb5c-4af5-65c7ab00e621",
+        "description": "This is another test project",
+        "status": "current",
+        "name": "cgap-core"
     }
 ]

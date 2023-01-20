@@ -13,6 +13,8 @@ const mode = (env === 'production' ? 'production' : 'development');
 
 const plugins = [];
 
+console.log("Opened webpack.config.js with env: " + env + " & mode: " + mode);
+
 // don't include momentjs locales (large)
 plugins.push(
     new webpack.IgnorePlugin({
@@ -31,7 +33,8 @@ if (mode === 'production') {
     chunkFilename = '[name].[chunkhash].js';
     devTool = 'source-map';
 } else if (env === 'quick') {
-    devTool = 'eval'; // Fastest
+    // `eval` is fastest but doesn't abide by production Content-Security-Policy, so we check for env=="quick" in app.js to adjust the CSP accordingly.
+    devTool = 'eval';
 } else if (env === 'development') {
     devTool = 'inline-source-map';
 }
@@ -69,17 +72,27 @@ const resolve = {
     //    path.resolve(__dirname, '..', 'node_modules'),
     //    'node_modules'
     //]
+    alias: {}
 };
+
+// Common alias, hopefully is fix for duplicate versions of React
+// on npm version 7+ and can supersede `./setup-npm-links-for-local-development.js`.
+// @see https://blog.maximeheckel.com/posts/duplicate-dependencies-npm-link/
+spcPackageJson = require("@hms-dbmi-bgm/shared-portal-components/package.json");
+spcPeerDependencies = spcPackageJson.peerDependencies || {};
+Object.keys(spcPeerDependencies).forEach(function(packageName) {
+    resolve.alias[packageName] = path.resolve("./node_modules/" + packageName);
+});
+
+// Exclusion -- higlass needs react-bootstrap 0.x but we want 1.x; can remove this line below
+// once update to higlass version w.o. react-bootstrap dependency.
+delete resolve.alias["react-bootstrap"];
 
 const optimization = {
     minimize: mode === "production",
     minimizer: [
-        //new UglifyJsPlugin({
-        //    parallel: true,
-        //    sourceMap: true
-        //})
         new TerserPlugin({
-            parallel: true,
+            parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
             sourceMap: true,
             terserOptions:{
                 compress: true,
@@ -110,6 +123,10 @@ serverPlugins.push(new webpack.DefinePlugin({
     'BUILDTYPE' : JSON.stringify(env)
 }));
 
+// From https://github.com/jsdom/jsdom/issues/3042
+serverPlugins.push(
+    new webpack.IgnorePlugin(/canvas/, /jsdom$/)
+);
 
 if (env === 'development'){
     // Skip for `npm run dev-quick` (`env === "quick"`) since takes a while
@@ -166,7 +183,13 @@ module.exports = [
         //     dns: "empty",
         // },
         externals: [
-            { 'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}' }
+            {
+                'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}',
+                'jsdom': '{JSDOM:{}}',
+                // If load via CDN (to-do in future)
+                // 'react': 'React',
+                // 'react-dom': 'ReactDOM'
+            }
         ],
         module: {
             rules: rules
@@ -175,6 +198,7 @@ module.exports = [
         resolve: {
             ...resolve,
             alias: {
+                ...resolve.alias,
                 // We could eventually put 'pedigree-viz' into own repo/project (under dif name like @hms-dbmi-bgm/react-pedigree-viz or something).
                 'pedigree-viz': path.resolve(__dirname, "./src/encoded/static/components/viz/PedigreeViz"),
                 'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js"),
@@ -218,30 +242,35 @@ module.exports = [
             // server-side build since it might overwrite web bundle's code-split bundles.
             // But probably some way to append/change name of these chunks in this config.
             {
-                'd3': 'd3',
+                'd3': 'var {}',
+                // This is used during build-time only I think...
                 '@babel/register': '@babel/register',
-                'higlass-dependencies': 'empty-module',
+                'higlass-dependencies': 'var {}',
                 // These remaining /higlass/ defs aren't really necessary
                 // but probably speed up build a little bit.
-                'higlass/dist/hglib' : 'empty-module',
-                'higlass-register': 'empty-module',
-                'higlass-sequence': 'empty-module',
-                'higlass-transcripts': 'empty-module',
-                'higlass-clinvar': 'empty-module',
-                'higlass-text': 'empty-module',
-                'higlass-orthologs': 'empty-module',
-                'higlass-pileup': 'empty-module',
-                'higlass-multivec': 'empty-module',
-                'auth0-lock': 'empty-module',
-                'aws-sdk': 'empty-module',
-                'package-lock.json': 'empty-module',
-                'pedigree-viz': 'empty-module',
+                'higlass/dist/hglib' : 'var {}',
+                'higlass-register': 'var {}',
+                'higlass-sequence': 'var {}',
+                'higlass-transcripts': 'var {}',
+                'higlass-clinvar': 'var {}',
+                'higlass-text': 'var {}',
+                'higlass-orthologs': 'var {}',
+                'higlass-pileup': 'var {}',
+                'higlass-multivec': 'var {}',
+                'auth0-lock': 'var {}',
+                'aws-sdk': 'var {}',
+                'package-lock.json': 'var {}',
+                'pagedjs': 'var {}',
+                'pedigree-viz': 'var {}',
                 // Below - prevent some stuff in SPC from being bundled in.
                 // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js
                 // We can clean up and change to 'aws-utils' in here in future as well and alias it to spc/utils/aws. But this needs to be synchronized with SPC and 4DN.
                 // We could have some 'ssr-externals.json' file in SPC (letting it define its own, per own version) and merge it into here.
                 // 'aws-utils': 'empty-module',
-                '../util/aws': 'empty-module'
+                '../util/aws': 'var {}',
+                // We can rely on NodeJS's internal URL API, since it should match API of npm url package by design.
+                // This hopefully improves SSR performance, assuming Node has native non-JS/C code to parse this.
+                // 'url': 'commonjs2 url'
             }
         ],
         output: {

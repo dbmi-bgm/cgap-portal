@@ -2,18 +2,23 @@
 
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
-import { transformResponse } from 'subprocess-middleware';
 import fs from 'fs';
 import { store, mapStateToProps } from './../store';
 import { Provider, connect } from 'react-redux';
 import { JWT, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import App from './../components';
 
+// For production, we only check JS, since assume CSS was built along w. JS.
+const jsFileStats = fs.statSync(__dirname + '/../build/bundle.js');
+let lastBuildTime = Date.parse(jsFileStats.mtime.toUTCString());
+if (process.env.NODE_ENV !== "production") {
+    const cssFileStats = fs.statSync(__dirname + '/../css/style.css');
+    const lastCSSBuildTime = Date.parse(cssFileStats.mtime.toUTCString());
+    lastBuildTime = lastCSSBuildTime > lastBuildTime ? lastCSSBuildTime : lastBuildTime;
+}
 
-const cssFileStats = fs.statSync(__dirname + '/../css/style.css');
-const lastCSSBuildTime = Date.parse(cssFileStats.mtime.toUTCString());
-
-const render = function (AppComponent, body, res) {
+export function appRenderFxn(body, res) {
 
     //var start = process.hrtime();
 
@@ -21,7 +26,7 @@ const render = function (AppComponent, body, res) {
     const disp_dict = {
         'context'           : context,
         'href'              : res.getHeader('X-Request-URL') || object.itemUtil.atId(context),
-        'lastCSSBuildTime'  : lastCSSBuildTime,
+        'lastBuildTime'     : lastBuildTime,
         'alerts'            : [] // Always have fresh alerts per request, else subprocess will re-use leftover global vars/vals.
     };
 
@@ -33,7 +38,6 @@ const render = function (AppComponent, body, res) {
     // It is only returned if successfully authenticated, else is cleared out or set to "expired".
     const jwtToken = res.getHeader('X-Request-JWT');
 
-    let initialSession = false;
     let userInfo = null;
 
     if (JWT.maybeValid(jwtToken)){
@@ -43,8 +47,6 @@ const render = function (AppComponent, body, res) {
         userInfo = JSON.parse(res.getHeader('X-User-Info'));
         if (userInfo){
             JWT.saveUserInfoLocalStorage(userInfo);
-            JWT.save(jwtToken); // Just in case we want to access this later in server-side for some reason.
-            initialSession = true;
         }
     } else if (jwtToken === 'expired'){
         disp_dict.alerts.push(Alerts.LoggedOut);
@@ -58,9 +60,14 @@ const render = function (AppComponent, body, res) {
     var markup, AppWithReduxProps;
 
     try {
-        AppWithReduxProps = connect(mapStateToProps)(AppComponent);
-        markup = ReactDOMServer.renderToString(<Provider store={store}><AppWithReduxProps initialSession={initialSession} /></Provider>);
-        // TODO maybe in future: Try to utilize https://reactjs.org/docs/react-dom-server.html#rendertonodestream instead -- would require big edits to subprocess-middleware, however (e.g. removing buffering, piping stream directly to process.stdout).
+        AppWithReduxProps = connect(mapStateToProps)(App);
+        // TODO maybe in future: Try to utilize https://reactjs.org/docs/react-dom-server.html#rendertonodestream instead.
+        // would require big edits to subprocess-middleware, however (e.g. removing buffering, piping stream directly to process.stdout (?)).
+        markup = ReactDOMServer.renderToString(
+            <Provider store={store}>
+                <AppWithReduxProps />
+            </Provider>
+        );
     } catch (err) {
         store.dispatch({
             type: 'context',
@@ -78,18 +85,20 @@ const render = function (AppComponent, body, res) {
         });
         // To debug in browser, pause on caught exceptions:
         res.statusCode = 500;
-        AppWithReduxProps = connect(mapStateToProps)(AppComponent);
-        markup = ReactDOMServer.renderToString(<Provider store={store}><AppWithReduxProps /></Provider>);
+        AppWithReduxProps = connect(mapStateToProps)(App);
+        markup = ReactDOMServer.renderToString(
+            <Provider store={store}>
+                <AppWithReduxProps />
+            </Provider>
+        );
     }
 
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
+    // Prevent this header from arriving to downstream client for security.
     res.removeHeader("X-Request-JWT");
+
     //var duration = process.hrtime(start);
     //res.setHeader('X-React-duration', duration[0] * 1e6 + (duration[1] / 1000 | 0));
-    return new Buffer('<!DOCTYPE html>\n' + markup);
-};
 
-
-export function build(Component) {
-    return transformResponse(render.bind(render, Component));
+    return Buffer.from('<!DOCTYPE html>\n' + markup);
 }

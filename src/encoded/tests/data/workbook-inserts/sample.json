@@ -1,0 +1,40 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "uuid": "c40ed801-b1bf-4f33-a3c6-d323b23f1d85",
+        "aliases": [
+            "hms-dbmi:sample_1"
+        ],
+        "bam_sample_id": "Sample_ID",
+        "workup_type": "WES",
+        "specimen_type": "peripheral_blood",
+        "processed_files": [
+            "hms-dbmi:sample_1_bam"
+        ]
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "uuid": "dc0b77db-83bc-4886-adb2-0c955a620995",
+        "aliases": [
+            "hms-dbmi:sample_1_no_files"
+        ],
+        "bam_sample_id": "Sample_ID_2",
+        "workup_type": "WES",
+        "specimen_type": "peripheral_blood"
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "uuid": "c40ed801-b1bf-4f33-a3c6-d323b23f1d86",
+        "aliases": [
+            "hms-dbmi:sample_2"
+        ],
+        "bam_sample_id": "Another_Sample_ID",
+        "workup_type": "WGS",
+        "processed_files": [
+            "hms-dbmi:sample_2_bam"
+        ]
+    }
+]

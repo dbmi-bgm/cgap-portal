@@ -658,20 +658,23 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
         return { orderByHeightIndex, seenOrderInIndex, seenPosInIndex };
     }
 
+    const directProbandAncestryPositions = buildAncestralPositions(
+        spansByHeightIndex,
+        [  [ objectGraph[0], 0, 0 ]  ] // Assume first node/indv in objectGraph is the proband.
+    );
+
     const {
         posByHeightIndex,
         positionedIndividuals,
         positionedRelationships,
         seenDirectInRelation,
         qAuxRelationships,
-    } = buildAncestralPositions(
-        spansByHeightIndex,
-        [  [ objectGraph[0], 0, 0 ]  ] // Assume first node/indv in objectGraph is the proband.
-    );
+    } = directProbandAncestryPositions;
 
     const graphSize = objectGraph.length;
     const allSeen = { ...seenDirectInRelation };
     const subtrees = [];
+
     const auxRelationsToMakeSubtreesFor = {}; // We delete from this once connected-to, as a sort of unordered queue.
     qAuxRelationships.forEach(function(qARItem){
         auxRelationsToMakeSubtreesFor[qARItem[0].id] = qARItem;
@@ -679,8 +682,15 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
 
     const skippedAuxRelationships = new Set();
 
+    // Arbitrary counter to terminate if issue present.
+    let runCount = 0;
     // eslint-disable-next-line no-constant-condition
     while (true){
+
+        runCount++;
+        if (runCount > 1000) {
+            throw Error("Hit over 1000 auxiliary relationships. This is possible but inprobable. Investigate if not enormous pedigree.");
+        }
 
         // Order creation of subtrees by auxiliary relations to facilitate connecting (~BFS)
         // back subtrees to parent subtree in order in case multiple layers of auxiliary relations/subtrees
@@ -726,7 +736,15 @@ export function orderObjectGraph(objectGraph, relationships = null, maxHeightInd
             }
         }
 
-        console.log('AAA', nextAuxRelationship, nextChildrenSet);
+        console.log(
+            'Func orderObjectGraph, run:', runCount,
+            nextAuxRelationship,
+            'nextChildrenSet:', nextChildrenSet,
+            'qAuxRelationships:', qAuxRelationships,
+            'objectGraph:', objectGraph,
+            'allSeen:', allSeen,
+            'skippedAuxRelationships:', skippedAuxRelationships
+        );
 
         let nodeAtLowestHI = null;
         for (let i = 0; i < nextChildrenSetCount; i++) {

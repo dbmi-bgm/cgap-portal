@@ -1,8 +1,6 @@
 """init.py lists all the collections that do not have a dedicated types file."""
 
 import transaction
-
-# from pyramid.traversal import find_root
 from snovault import (
     calculated_property,
     collection,
@@ -18,7 +16,7 @@ from snovault.validation import ValidationFailure
 from .base import (
     Item,
     get_item_or_none,
-    set_namekey_from_title,
+    # set_namekey_from_title,
     # ALLOW_OWNER_EDIT,
     # ALLOW_CURRENT,
     DELETED_ACL,
@@ -40,7 +38,25 @@ def includeme(config):
 class Report(Item):
     item_type = 'report'
     schema = load_schema('encoded:schemas/report.json')
-    embedded_list = []
+    embedded_list = [
+        "variant_samples.interpretation.classification",
+        "variant_samples.interpretation.conclusion",
+        "variant_samples.interpretation.acmg_guidelines",
+        "variant_samples.interpretation.note_text",
+        # Institution used for report footer
+        "institution.display_title",
+        "institution.address1",
+        "institution.address2",
+        "institution.city",
+        "institution.state",
+        "institution.country",
+        "institution.postal_code",
+        "institution.phone1",
+        "institution.phone2",
+        "institution.fax",
+        "institution.url",
+        "institution.contact_persons.email"
+    ]
     rev = {'case': ('Case', 'report')}
 
     @calculated_property(schema={

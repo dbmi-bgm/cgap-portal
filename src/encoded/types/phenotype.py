@@ -23,9 +23,15 @@ class Phenotype(Item):
     item_type = 'phenotype'
     schema = load_schema('encoded:schemas/phenotype.json')
     embedded_list = [
+
+        # Phenotype linkTo
+        'slim_terms.hpo_id',
         'slim_terms.is_slim_for',
         'slim_terms.phenotype_name',
-        'parents.hpo_id'
+
+        # Phenotype linkTo
+        'parents.hpo_id',
+        'parents.phenotype_name'
     ]
     name_key = 'hpo_id'
 

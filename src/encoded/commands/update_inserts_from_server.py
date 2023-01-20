@@ -76,8 +76,8 @@ def main():
     # this will work since bin/ commands are run from root FF directory
     inserts_location = 'src/encoded/tests/data'
     # hardcode these to prevent accidental creation of inserts files
-    inserts_files = ['inserts', 'master-inserts', 'perf-testing',
-                     'workbook-inserts', 'temp-local-inserts']
+    inserts_files = ['inserts', 'master-inserts', 'perf-testing', 'workbook-inserts',
+                     'temp-local-inserts', 'deploy-inserts']
     if args.dest not in inserts_files:
         raise Exception('Specified inserts destination %s must be one of: %s'
                         % (args.dest, inserts_files))
@@ -161,7 +161,6 @@ def main():
     for item_type in svr_inserts:
         logger.info('update_inserts: Wrote %s items to %s' %
                     (len(svr_inserts[item_type]), item_type + '.json'))
-
 
 
 if __name__ == "__main__":

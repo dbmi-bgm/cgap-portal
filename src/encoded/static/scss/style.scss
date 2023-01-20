@@ -6,7 +6,8 @@
 @import "encoded/base";
 
 // Bootstrap
-@import "bootstrap/bootstrap";
+// @import "bootstrap/bootstrap";
+@import "../../../../node_modules/bootstrap/scss/bootstrap";
 
 // Some are used in shared-portal-components scss
 @import "encoded/bootstrap-theme-overrides";
@@ -39,11 +40,10 @@
         "encoded/modules/navbar",
         "encoded/modules/tables",
         "encoded/modules/search",
-        "encoded/modules/charts",
         "encoded/modules/tooltip",
         "encoded/modules/pedigree-visualization-detail-pane",   // Requires: common-visualization-detail-pane, pedigree-visualization
         "encoded/modules/item-pages",                           // Requires: pedigree-visualization
         "encoded/modules/static-pages",
         "encoded/modules/slide-in-pane",
         "encoded/modules/workflow-visualization",
-        "encoded/modules/case-submission";
+        "encoded/modules/ingestion-submission";

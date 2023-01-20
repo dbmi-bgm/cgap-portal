@@ -1,4 +1,4 @@
-# Documentation for 4DN/Fourfront Front-End
+# Documentation for CGAP Front-End
 
 
 #### This is a living document. Edit it as needed.
@@ -7,10 +7,16 @@
 
 ## Overview
 
-The client/front-end for the [4DN Data Portal](https://data.4dnucleome.org) functions as a single-page application (SPA) and is written entirely in [ReactJS](https://reactjs.org/). This includes the output/rendering of the `<head>` document HTML element¹.
+The client/front-end for CGAP functions as a single-page application (SPA) and is written entirely in [ReactJS](https://reactjs.org/). This includes the output/rendering of the `<head>` document HTML element¹.
 
 
 **¹** [Rendering 'head' element is against React best practices as of 2014](https://github.com/facebook/react/pull/2311#issuecomment-58743271) -- a long-term to-do includes refactoring this aspect of our front-end.
+
+
+### UI-Centric Diagram
+
+View with clickable links in [Google Drawings](https://docs.google.com/drawings/d/1xeWXa9bhURPuxa9HrDueUBCQY35HysQBwGRSTKsX_Eg/edit?pli=1).
+[![](https://docs.google.com/drawings/d/e/2PACX-1vSZYDhRKweAjSwv7Fg3PLEsouyEgSD3rGI0XByrkE0l-XQuk-djlYmJTE9_JtAh71VAETH6JpLb604g/pub?w=1440&amp;h=1080)](https://docs.google.com/drawings/d/1xeWXa9bhURPuxa9HrDueUBCQY35HysQBwGRSTKsX_Eg/edit?pli=1)
 
 
 ## Server-Side Rendering
@@ -38,7 +44,7 @@ A registry is used to determine which 'page view' to use for a given URI/endpoin
 
 ### Direct Descendant Components/Elements
 
-Some of the components that App/BodyElement renders (or branches out to) are 'ever-present' on each page and don't change or change minimally in response to navigation, this includes Components such as `NavigationBar`, `PageTitle`, `Footer`, `QuickInfoBar`, and `FacetCharts`, as well as some elements (e.g. most things inside the `<head>` tag). Some of these render/return `null` when on a page which does not require them - namely `QuickInfoBar` and `FacetCharts`. `FacetCharts` & `QuickInfoBar` are defined in the root level BodyElement instead of deeper in tree, e.g. `HomePage` + `BrowseView` components, because it must stay present when transitioning/navigating from one page to the other (Home ↔ Browse); being present twice on two separate views would cause it to be dismounted and re-mounted.
+Some of the components that App/BodyElement renders (or branches out to) are 'ever-present' on each page and don't change or change minimally in response to navigation, this includes Components such as `NavigationBar`, `PageTitle`, `Footer`, `QuickInfoBar`, and `FacetCharts`, as well as some elements (e.g. most things inside the `<head>` tag). Some of these render/return `null` when on a page which does not require them - namely `QuickInfoBar` and `FacetCharts`. `FacetCharts` & `QuickInfoBar` are defined in the root level BodyElement instead of deeper in tree, e.g. `HomePage` + `BrowseView` components, because it must stay present when transitioning/navigating from one page to the other (Home ⮂ Browse); being present twice on two separate views would cause it to be dismounted and re-mounted.
 
 `NavigationBar` & `QuickInfoBar` receive selected props/state from App + BodyElement and render their (lack of) visibility - as well as other visual states, data, etc. - in response to them.
 
@@ -57,13 +63,6 @@ The ultimate example of this is the `ChartDataController` and its synchronized `
 
 **³** The Redux store wraps the App component as a parent and could technically be considered the "root" "component" as well by some, though it does not have a render method.
 
-
-## Generating this documentation
-
-To generate this documentation locally, with NPM, node, and all dependencies installed, run this from root directory: `./node_modules/.bin/esdoc`.
-This should generate this documentation into `/docs/javascript-reference/` folder.
-
-We are currently working on improving configuration of the root-level .esdoc.json file so that we can have the [ESDoc Hosting Service (beta)](https://doc.esdoc.org/) generate and host these docs.
 
 ## Future
 

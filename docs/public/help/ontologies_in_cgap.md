@@ -64,7 +64,7 @@ When items are linked through an Association Item then reverse links are made th
 
 **Disorder-Phenotype Associations**
 
-These associations are made by the [HPO project](https://hpo.jax.org/) and provided in a file of [HPOA annotations](http://compbio.charite.de/jenkins/job/hpo.annotations.current/lastSuccessfulBuild/).  Currently the predominant sources of the annotations are OMIM, Orphanet and Decipher but other sources and manually curated annotations are being continuously added to the datasource.
+These associations are made by the [HPO project](https://hpo.jax.org/) and provided in a file of [HPOA annotations](https://hpo.jax.org/app/download/annotation).  Currently the predominant sources of the annotations are OMIM, Orphanet and Decipher but other sources and manually curated annotations are being continuously added to the datasource.
 
 The format of the input file is described [here](https://hpo.jax.org/app/help/annotations)
 
@@ -87,4 +87,4 @@ The fields of the linking item for Disorders to Phenotypes include:
 
 **Gene-Disorder Associations**
 
-The source of the associations between human Genes and Disorders will be obtained from the [Monarch Initiative](https://monarchinitiative.org/).   The associations available from Monarch that were originally imported from the [OMIM](https://www.omim.org/) datasource will be used to populate the portal's Evidence items for this type of association. The source file that includes this information is `gene_disease.9606.tsv` found in this [directory](https://archive.monarchinitiative.org/latest/tsv/gene_associations/)
+The source of the associations between human Genes and Disorders will be obtained from the [Monarch Initiative](https://monarchinitiative.org/).   The associations available from Monarch that were originally imported from the [OMIM](https://www.omim.org/) datasource will be used to populate the portal's Evidence items for this type of association. The source file that includes this information is `gene_disease.9606.tsv.gz` found in this [directory](https://archive.monarchinitiative.org/latest/tsv/gene_associations/)

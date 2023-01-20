@@ -6,58 +6,24 @@
         "country": "USA",
         "fax": "000-000-0000",
         "name": "hms-dbmi",
+        "status": "shared",
         "phone1": "000-000-0000",
         "phone2": "000-000-0000",
-        "pi": "dvuzman@research.bwh.harvard.edu",
         "postal_code": "02115",
         "state": "MA",
         "title": "HMS DBMI",
-        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
-        "contact_persons" : [
-            "dvuzman@research.bwh.harvard.edu"
-        ]
+        "uuid": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "address2": "75 Francis Street",
-        "address1": "Brigham and Women's Hospital",
-        "city": "Boston",
-        "country": "USA",
-        "fax": "000-000-0000",
-        "name": "bwh",
-        "phone1": "000-000-0000",
-        "phone2": "000-000-0000",
-        "pi": "jkrier@bwh.harvard.edu",
-        "postal_code": "02115",
-        "state": "MA",
-        "title": "BWH",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
-        "contact_persons" : [
-            "jkrier@bwh.harvard.edu"
-        ]
+        "name": "cgap-personas",
+        "title": "CGAP Personas",
+        "status": "shared",
+        "uuid": "59024e8e-eaea-477c-8f9b-df0bd722cfcb"
     },
     {
-        "address2": "300 Longwood Avenue",
-        "address1": "Boston Children's Hospital",
-        "city": "Boston",
-        "country": "USA",
-        "fax": "000-000-0000",
-        "name": "bch",
-        "phone1": "000-000-0000",
-        "phone2": "000-000-0000",
-        "pi": "dvuzman@research.bwh.harvard.edu",
-        "postal_code": "02115",
-        "state": "MA",
-        "title": "BCH",
-        "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca765",
-        "contact_persons": [
-            "dvuzman@research.bwh.harvard.edu"
-        ]
-    },
-    {
-        "name": "msa-coalition",
-        "title": "Multiple System Atrophy Coalition",
-        "aliases": ["msa:msa-institution"],
-        "date_created": "2020-11-03T22:19:15.807261+00:00",
-        "uuid": "232539d0-41aa-4cdc-835d-7f164f1462ea"
+        "name": "cgap-backend-team",
+        "title": "CGAP Backend Team",
+        "status": "shared",
+        "uuid": "87199845-51b5-4352-bdea-583edae4bb6a"
     }
 ]

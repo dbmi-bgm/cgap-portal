@@ -1,12 +1,17 @@
 import pytest
 import re
+import json
+from copy import deepcopy
 
 from pkg_resources import resource_listdir
 from snovault import COLLECTIONS, TYPES
 from snovault.schema_utils import load_schema
 
+from ..commands.order_schema_columns_and_facets import order_schema_columns_and_facets
+from .utils import pluralize
 
-pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
+
+pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema, pytest.mark.indexing]
 
 
 SCHEMA_FILES = [
@@ -117,28 +122,11 @@ def compute_master_mixins():
         'supplementary_files'
     ]
     for key in mixin_keys:
-        assert(mixins[key])
+        assert mixins[key]
 
 
 def camel_case(name):
     return ''.join(x for x in name.title() if not x == '_')
-
-
-def pluralize(name):
-    name = name.replace('_', '-')
-    # deal with a few special cases explicitly
-    specials = ['file', 'quality-metric', 'summary-statistic', 'workflow-run']
-    for sp in specials:
-        if name.startswith(sp) and re.search('-(set|flag|format|type)', name) is None:
-            return name.replace(sp, sp + 's')
-        elif name.startswith(sp) and re.search('setting', name):
-            return name.replace(sp, sp + 's')
-    # otherwise just add 's/es/ies'
-    if name.endswith('ly'):
-        return name[:-1] + 'ies'
-    if name.endswith('s'):
-        return name + 'es'
-    return name + 's'
 
 
 # XXX: Mismatch with image.json?
@@ -146,12 +134,10 @@ def pluralize(name):
 def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
 
     abstract = [
-        'microscope_setting.json',
-        'experiment.json',
         'file.json',
         'individual.json',
         'quality_metric.json',
-        'treatment.json',
+        'note.json',
         'workflow_run.json',
         'user_content.json',
         'evidence.json',
@@ -159,7 +145,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
     ]
 
     loaded_schema = load_schema('encoded:schemas/%s' % schema)
-    assert(loaded_schema)
+    assert loaded_schema
 
     typename = schema.replace('.json', '')
     collection_names = [camel_case(typename), pluralize(typename)]
@@ -180,7 +166,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
             assert not any([regex.search(bv) for bv in bad_vals if bad_vals])
 
     # check the mixin properties for each schema
-    if not schema == ('mixins.json'):
+    if schema != 'mixins.json':
         verify_mixins(loaded_schema, master_mixins)
 
     if schema not in ['namespaces.json', 'mixins.json']:
@@ -234,7 +220,7 @@ def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
 
 
 def verify_property(loaded_schema, property):
-    assert(loaded_schema['properties'][property])
+    assert loaded_schema['properties'][property]
 
 
 def verify_mixins(loaded_schema, master_mixins):
@@ -281,3 +267,61 @@ def test_changelogs(testapp, registry):
             res = testapp.get(changelog)
             assert res.status_int == 200, changelog
             assert res.content_type == 'text/markdown'
+
+
+@pytest.mark.parametrize('schema', SCHEMA_FILES)
+def test_facets_and_columns_orders(schema, testapp):
+    """This tests depends on Python 3.6's ordered dicts"""
+
+    loaded_schema = load_schema('encoded:schemas/%s' % schema)
+
+    if "properties" in loaded_schema and ("columns" in loaded_schema or "facets" in loaded_schema):
+        loaded_schema_copy = deepcopy(loaded_schema)
+        loaded_schema_copy = order_schema_columns_and_facets(loaded_schema_copy)
+        failed = False
+
+        if "columns" in loaded_schema:
+            failed = json.dumps(loaded_schema["columns"]) != json.dumps(loaded_schema_copy["columns"])
+
+        if not failed and "facets" in loaded_schema:
+            # Avoid running if already failed.
+            failed = json.dumps(loaded_schema["facets"]) != json.dumps(loaded_schema_copy["facets"])
+
+        assert not failed, '''
+Order of facets or columns in %s file does not match the ordering based on "order" values. \
+Please run `poetry run order-schema-columns-and-facets`. \
+
+If you don't want this test to fail ever again, please consider adding the follow as "pre-commit" \
+file in your .git/hooks directory in order to automatically amend your commits with proper order when \
+schemas change.
+
+>    #!/bin/sh
+>
+>    CHANGED=`git diff HEAD@{0} --stat -- $GIT_DIR/../src/encoded/schemas/ | wc -l`
+>    if [ $CHANGED -gt 0 ];
+>    then
+>        echo "Schemas have changed! Sorting columns and facets..."
+>        python3 $GIT_DIR/../src/encoded/commands/order_schema_columns_and_facets.py
+>        git add $GIT_DIR/../src/encoded/schemas/
+>    fi
+
+        ''' % schema
+
+
+def test_schema_version_present_on_items(app):
+    """Test a valid schema version is present on all non-test item
+    types.
+
+    Expecting positive integer values for non-abstract items, and empty
+    string for all abstract items.
+    """
+    all_types = app.registry.get(TYPES).by_item_type
+    for type_name, item_type in all_types.items():
+        if type_name.startswith("testing"):
+            continue
+        schema_version = item_type.schema_version
+        if item_type.is_abstract is False:
+            assert schema_version
+            assert int(schema_version) >= 1
+        else:
+            assert schema_version == ""

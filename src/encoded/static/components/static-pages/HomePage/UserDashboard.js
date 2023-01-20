@@ -1,17 +1,22 @@
 'use strict';
 
-import React, { useMemo } from 'react';
+import React, { useMemo, useCallback } from 'react';
 import _ from 'underscore';
 
+import Dropdown from 'react-bootstrap/esm/Dropdown';
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
 import { console, ajax, JWT, searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
+
 import { Term } from './../../util/Schemas';
 import { responsiveGridState } from './../../util/layout';
+import { SearchBar } from './../../browse/SearchBar';
+import { AboveTableControlsBaseCGAP } from './../../browse/AboveTableControlsBaseCGAP';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
+import FeedbackButton from '../../item-pages/components/FeedbackButton';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -32,9 +37,11 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
         <React.Fragment>
 
             <div className="dashboard-header">
-                <div className="container-wide d-flex align-items-center">
-                    <i className="icon icon-fw icon-home fas mr-1" />
-                    <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
+                <div className="container-wide d-flex align-items-center justify-content-between">
+                    <div className="align-items-center d-flex">
+                        <i className="icon icon-fw icon-home fas mr-1" />
+                        <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
+                    </div>
                 </div>
             </div>
 
@@ -50,10 +57,11 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
 const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, windowWidth }){
     const searchHref = (
         "/search/?type=Case"
-        + "&report.uuid!=No+value"
         + "&proband_case=true"
+        + "&status!=inactive"
         + "&sort=-last_modified.date_modified"
     );
+
     const maxHeight = typeof windowHeight === "number" ?
         (
             windowHeight
@@ -61,15 +69,29 @@ const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, wi
             - (responsiveGridState(windowWidth) !== "xs" ? 53 : 106) // Height of checkboxes
         )
         : 400;
+
+    // const aboveTableComponent = (
+    //     <AboveTableControlsBase
+    //         panelMap={AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(this.props)}>
+    //             test
+    //     </AboveTableControlsBase>
+    // );
+
     return (
         <div className="recent-cases-table-section mb-36">
-            <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} facets={null} aboveTableComponent={<AboveCasesTableOptions />} />
+            <EmbeddedCaseSearchTable {...{ searchHref, maxHeight }} embeddedTableHeader={<AboveCasesTableOptions />}
+                hideFacets={["project.display_title", "report.uuid", "proband_case"]} stickyFirstColumn />
         </div>
     );
 });
 
-function AboveCasesTableOptions(props){
-    const { context, onFilter, isContextLoading, navigate } = props;
+const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props){
+    const {
+        context,
+        onFilter, isContextLoading, navigate,
+        sortBy, sortColumns,
+        hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions
+    } = props;
     const { filters: ctxFilters = null } = context || {};
 
     const { onlyShowCasesWithReports, onlyShowProbandCases } = useMemo(function(){
@@ -88,40 +110,63 @@ function AboveCasesTableOptions(props){
 
     return (
         <React.Fragment>
+
             <div className="container-wide py-0 bg-white">
-                <div className="tab-section-title">
-                    <h3 className="text-400 my-0 d-flex align-items-center">
-                        Recent Cases&nbsp;
-                        <span className="text-300">from&nbsp;</span>
+                <div className="tab-section-title flex-wrap">
+
+                    <div className="d-flex align-items-center">
+                        <h3 className="text-400 my-0 d-none d-sm-block">
+                            Recent Cases&nbsp;
+                            <span className="text-300">from&nbsp;</span>
+                        </h3>
                         <div className="px-1">
                             <ProjectSelectDropdown {...{ context, onFilter, isContextLoading, navigate }} />
                         </div>
-                    </h3>
-                    <div className="btn-container">
-                        <a className="btn btn-primary btn-block" href="/search/?type=Case&currentAction=add">
-                            <i className="icon icon-plus fas" />
-                            <span className="ml-1 d-none d-sm-inline">New Case</span>
-                        </a>
                     </div>
+
+                    <DropdownButton variant="primary d-flex align-items-center" id="submit-new" className="px-1"
+                        title={<React.Fragment><i className="icon fas icon-plus mr-1"/>Submit New...</React.Fragment>}>
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
+                            Case
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Family History">
+                            Family History
+                        </Dropdown.Item>
+                        <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
+                            Gene List
+                        </Dropdown.Item>
+                    </DropdownButton>
+
                 </div>
             </div>
 
             <hr className="tab-section-title-horiz-divider"/>
-            <div className="container-wide toggle-reports row align-items-center">
-                <div className="col-12 col-sm-auto">
-                    <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
-                        Show Only Cases with Reports
-                    </ProjectFilterCheckbox>
-                </div>
-                <div className="col-12 col-sm-auto">
-                    <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
-                        Show Only Proband Cases
-                    </ProjectFilterCheckbox>
-                </div>
+
+            <div className="container-wide toggle-reports">
+
+                <AboveTableControlsBaseCGAP {...{ hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions, sortBy, sortColumns }}>
+                    <div className="col-12 col-lg-4 py-2">
+                        <SearchBar {...{ isContextLoading, context, navigate }} />
+                    </div>
+                    <div className="d-none d-md-block col">
+                        &nbsp;
+                    </div>
+                    <div className="col-12 col-md-auto">
+                        <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
+                            Show Only Cases with Reports
+                        </ProjectFilterCheckbox>
+                    </div>
+                    <div className="col-12 col-md-auto pb-08 pb-md-0">
+                        <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
+                            Show Only Proband Cases
+                        </ProjectFilterCheckbox>
+                    </div>
+                </AboveTableControlsBaseCGAP>
+
             </div>
         </React.Fragment>
     );
-}
+});
 
 
 class ProjectFilterCheckbox extends React.PureComponent {
@@ -150,9 +195,9 @@ class ProjectFilterCheckbox extends React.PureComponent {
     render(){
         const { isContextLoading, checked, children } = this.props;
         const { isChanging } = this.state;
+        const labelCls = "mb-0 px-2 py-1" + (isChanging ? " is-changing" : "");
         return (
-            <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked}
-                labelClassName={"mb-0 text-400 px-2 py-3" + (isChanging ? " is-changing position-relative" : "")}>
+            <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked} labelClassName={labelCls}>
                 <span className="text-small">
                     { isChanging ? <i className="icon icon-circle-notch icon-spin fas mr-07 text-small" /> : null }
                     { children }
@@ -162,24 +207,32 @@ class ProjectFilterCheckbox extends React.PureComponent {
     }
 }
 
+
 function ProjectSelectDropdown(props){
     const {
         context: searchContext,
         navigate: virtualNavigate,
         onFilter,
-        isContextLoading = false
+        isContextLoading = false,
+        className
     } = props;
     const {
         facets: ctxFacets = [],
         filters: ctxFilters,
         "@id": ctxHref
     } = searchContext || {};
-    const projectFacet = _.findWhere(ctxFacets, { "field" : "project.display_title" });
-    const projectFilter = _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null;
+
+    const { projectFacet, projectFilter } = useMemo(function(){
+        return {
+            projectFacet: _.findWhere(ctxFacets, { "field" : "project.display_title" }) || null,
+            projectFilter: _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null
+        };
+    }, [ searchContext ]);
+
     const { term: projectFilterTerm = null } = projectFilter || {};
     const { terms: facetTerms = [] } = projectFacet || {};
 
-    function onTermSelect(evtKey, e){
+    const onTermSelect = useCallback(function(evtKey, e){
         e.preventDefault();
         if (!evtKey) {
             if (projectFilter) {
@@ -200,33 +253,37 @@ function ProjectSelectDropdown(props){
             const updatedSearchHref = searchFilters.filtersToHref(updatedFilters, ctxHref, null, false, null);
             virtualNavigate(updatedSearchHref);
         }
-    }
+    }, [ onFilter, projectFilter, projectFacet ]);
 
-    let options = null;
-    if (!isContextLoading) {
-        options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
-            if (a === "CGAP Core") return -1;
-            if (b === "CGAP Core") return 1;
-            return bDC - aDC;
-        }).map(function(projectTermObj){
-            const { key: projectTerm, doc_count } = projectTermObj;
-            const active = projectTerm === projectFilterTerm;
-            return (
-                <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
-                    { Term.toName("project.display_title", projectTerm) }
-                    <small className="ml-07">({ doc_count })</small>
-                </DropdownItem>
-            );
-        });
-    }
+    const renderedOptions = useMemo(function(){
+        let options = null;
+        if (!isContextLoading) {
+            options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
+                if (a === "CGAP Core") return -1;
+                if (b === "CGAP Core") return 1;
+                return bDC - aDC;
+            }).map(function(projectTermObj){
+                const { key: projectTerm, doc_count } = projectTermObj;
+                const active = projectTerm === projectFilterTerm;
+                return (
+                    <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
+                        { Term.toName("project.display_title", projectTerm) }
+                        <small className="ml-07">({ doc_count })</small>
+                    </DropdownItem>
+                );
+            });
+        }
+        return options;
+    }, [ isContextLoading, facetTerms ]);
 
     return (
         <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
-            title={ projectFilterTerm || "All Projects" } onSelect={onTermSelect} variant="outline-dark">
-            <DropdownItem eventKey={0} active={!projectFilterTerm}>
+            title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
+            variant="outline-dark" className={className}>
+            <DropdownItem eventKey={null} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
             </DropdownItem>
-            { options }
+            { renderedOptions }
         </DropdownButton>
     );
 

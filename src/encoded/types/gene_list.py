@@ -3,14 +3,26 @@ from snovault import (
     calculated_property,
     collection,
     load_schema,
-    CONNECTION,
-    display_title_schema
+    # CONNECTION,
+    # display_title_schema
 )
 
-from .base import Item, get_item_or_none
+from .base import Item  # , get_item_or_none
+from ..util import convert_integer_to_comma_string
 
 
 log = structlog.getLogger(__name__)
+
+
+def _build_gene_embedded_list():
+    """ Helper function intended to be used to create the embedded list for gene """
+    return [
+        'gene_lists.title',
+        'interpretations.classification',
+        'interpretations.acmg_rules_invoked.*',
+        'interpretations.conclusion',
+        'interpretations.note_text'
+    ]
 
 
 @collection(
@@ -26,7 +38,7 @@ class Gene(Item):
     name_key = 'ensgid'  # use the ENSEMBL Gene ID as the identifier
     schema = load_schema('encoded:schemas/gene.json')
     rev = {'gene_lists': ('GeneList', 'genes')}
-    embedded_list = ['gene_lists.title']
+    embedded_list = _build_gene_embedded_list()
 
     @calculated_property(schema={
         "title": "Display Title",
@@ -50,6 +62,36 @@ class Gene(Item):
         result = self.rev_link_atids(request, "gene_lists")
         if result:
             return result
+
+    @calculated_property(schema={
+        "title": "Start Display",
+        "description": "Formatted gene start position in hg38 coordinates",
+        "type": "string",
+    })
+    def start_display(self, spos=None):
+        """Create comma-formatted gene start position, if possible.
+
+        :param spos: Starting position
+        :type spos: int
+        :returns: Formatted display or None
+        :rtype: str or None
+        """
+        return convert_integer_to_comma_string(spos)
+
+    @calculated_property(schema={
+        "title": "End Display",
+        "description": "Formatted gene end position in hg38 coordinates",
+        "type": "string",
+    })
+    def end_display(self, epos=None):
+        """Create comma-formatted gene end position, if possible.
+
+        :param epos: End position
+        :type epos: int
+        :returns: Formatted display or None
+        :rtype: str or None
+        """
+        return convert_integer_to_comma_string(epos)
 
 
 @collection(

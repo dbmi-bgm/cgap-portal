@@ -4,98 +4,15 @@ import logging
 
 from pyramid.paster import get_app
 from snovault.elasticsearch.create_mapping import run as run_create_mapping
+from snovault.elasticsearch.create_mapping import reindex_by_type_staggered
 from dcicutils.log_utils import set_logging
-# from dcicutils.beanstalk_utils import whodaman
+from ..appdefs import (
+    ITEM_INDEX_ORDER, ENV_HOTSEAT, ENV_WEBDEV, ENV_WEBPROD,
+    BEANSTALK_TEST_ENVS, BEANSTALK_PROD_ENVS, NEW_BEANSTALK_PROD_ENVS,
+)
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__
-
-# This order determines order that items will be mapped + added to the queue
-# Can use item type (e.g. file_fastq) or class name (e.g. FileFastq)
-# XXX: This order is probably not right
-ITEM_INDEX_ORDER = [
-    'Project',
-    'Institution',
-    'AccessKey',
-    'Cohort',
-    'Family',
-    'FilterSet',
-    'Nexus',
-    'User',
-    'Workflow',
-    'WorkflowMapping',
-    'WorkflowRun',
-    'WorkflowRunAwsem',
-    'VariantConsequence',
-    'FileFormat',
-    'FileFastq',
-    'FileProcessed',
-    'FileReference',
-    'Image',
-    'Gene',
-    'GeneList',
-    'Phenotype',
-    'Disorder',
-    'Individual',
-    'Case',
-    'Report',
-    'Document',
-    'QualityMetricBamcheck',
-    'QualityMetricFastqc',
-    'QualityMetricQclist',
-    'QualityMetricWgsBamqc',
-    'QualityMetricBamqc',
-    'QualityMetricCmphet',
-    'QualityMetricWorkflowrun',
-    'QualityMetricVcfcheck',
-    'QualityMetricVcfqc',
-    'QualityMetricPeddyqc',
-    'TrackingItem',
-    'Software',
-    'Sample',
-    'SampleProcessing',
-    'StaticSection',
-    'Page',
-    'AnnotationField',
-    'Variant',
-    'VariantSample',
-    'EvidenceDisPheno',
-    'Page',
-    'GeneAnnotationField',
-    'HiglassViewConfig',
-    'IngestionSubmission',
-]
-
-ENV_HOTSEAT = 'fourfront-cgaphot'
-ENV_MASTERTEST = 'fourfront-cgaptest'
-ENV_PRODUCTION_BLUE = 'fourfront-cgapblue'
-ENV_PRODUCTION_GREEN = 'fourfront-cgapgreen'
-ENV_STAGING = 'fourfront-cgapstaging'
-ENV_WEBDEV = 'fourfront-cgapdev'
-ENV_WEBPROD = 'fourfront-cgap'
-# ENV_WEBPROD2 doesn't have meaning in old CGAP naming. See ENV_STAGING.
-ENV_WOLF = 'fourfront-cgapwolf'
-
-
-NEW_BEANSTALK_PROD_ENVS = [
-    ENV_PRODUCTION_BLUE,
-    ENV_PRODUCTION_GREEN,
-    ENV_STAGING,
-]
-
-
-BEANSTALK_PROD_ENVS = [
-    ENV_WEBPROD,
-    # ENV_WEBPROD2,
-]
-
-
-BEANSTALK_TEST_ENVS = [
-    ENV_HOTSEAT,
-    ENV_MASTERTEST,
-    ENV_WEBDEV,
-    ENV_WOLF,
-]
 
 
 def get_my_env(app):
@@ -136,8 +53,9 @@ def get_deployment_config(app):
             log.info('Looks like we are on hotseat/cgapdev -- do not wipe ES')
             deploy_cfg['WIPE_ES'] = False
         else:
-            log.info('Looks like we are on cgaptest -- wipe ES')
-            deploy_cfg['WIPE_ES'] = True
+            # XXX: enable to force cgaptest reindexing
+            log.info('Looks like we are on cgaptest -- normally we would wipe ES but no longer.')
+            deploy_cfg['WIPE_ES'] = False
     else:
         log.warning('This environment is not recognized: %s' % my_env)
         log.warning('Proceeding without wiping ES')
@@ -177,6 +95,8 @@ def main():
     parser.add_argument('--app-name', help="Pyramid app name in configfile")
     parser.add_argument('--wipe-es', help="Specify to wipe ES", action='store_true', default=False)
     parser.add_argument('--clear-queue', help="Specify to clear the SQS queue", action='store_true', default=False)
+    parser.add_argument('--staggered', default=False, action='store_true',
+                        help='Pass to trigger staggered reindexing, a new mode that will go type-by-type')
 
     args = parser.parse_args()
     app = get_app(args.config_uri, args.app_name)
@@ -184,8 +104,10 @@ def main():
     set_logging(in_prod=app.registry.settings.get('production'), log_name=__name__, level=logging.DEBUG)
     # set_logging(app.registry.settings.get('elasticsearch.server'), app.registry.settings.get('production'),
     #             level=logging.DEBUG)
-
-    _run_create_mapping(app, args)
+    if args.staggered:
+        reindex_by_type_staggered(app)  # note that data flow from args is dropped, only 1 mode for staggered
+    else:
+        _run_create_mapping(app, args)
     exit(0)
 
 

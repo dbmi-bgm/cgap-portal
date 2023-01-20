@@ -1,0 +1,329 @@
+[
+    {
+        "hpo_id": "HP:0000545",
+        "status": "shared",
+        "dbxrefs": [
+            "UMLS:C0027092",
+            "MSH:D009216",
+            "SNOMEDCT_US:57190000"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000545",
+        "synonyms": [
+            "Near sighted",
+            "Nearsightedness",
+            "Close sighted",
+            "Near sightedness"
+        ],
+        "definition": "An abnormality of refraction characterized by the ability to see objects nearby clearly, while objects in the distance appear blurry.",
+        "slim_terms": [
+            "c4c52a02-6cb0-4b86-8667-aca3666e7d65"
+        ],
+        "phenotype_name": "Myopia",
+        "alternative_ids": [
+            "HP:0008012",
+            "HP:0001110",
+            "HP:0007847"
+        ],
+        "uuid": "fcbfd8d2-58d3-4d48-8a1c-57569e53e334"
+    },
+    {
+        "hpo_id": "HP:0001149",
+        "status": "shared",
+        "dbxrefs": [
+            "MSH:D028227",
+            "UMLS:C0155127",
+            "SNOMEDCT_US:1192004",
+            "SNOMEDCT_US:361199007"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001149",
+        "synonyms": [
+            "Biber haab dimmer dystrophy"
+        ],
+        "definition": "The presence of fine, branching linear opacities in Bowman's layer in the central area that may spread to the periphery in the clinical course. The deep corneal stroma may be involved but the process does not reach Descemet's membrane. Recurrent corneal erosion may occur. Histologic examination reveals amyloid deposits in the collagen fibers of the cornea.",
+        "slim_terms": [
+            "c4c52a02-6cb0-4b86-8667-aca3666e7d65"
+        ],
+        "phenotype_name": "Lattice corneal dystrophy",
+        "uuid": "9bb3f1b9-9f8e-4f17-bd4d-10011e62b873"
+    },
+    {
+        "hpo_id": "HP:0001382",
+        "status": "shared",
+        "dbxrefs": [
+            "SNOMEDCT_US:298181000",
+            "UMLS:C1844820"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001382",
+        "synonyms": [
+            "Extensible joints",
+            "Hyperextensible joints",
+            "Double-Jointed",
+            "Increased mobility of joints",
+            "Flexible joints",
+            "Joint hyperextensibility"
+        ],
+        "definition": "The ability of a joint to move beyond its normal range of motion.",
+        "slim_terms": [
+            "1262c802-99bc-4d04-a2b4-910115662bdd"
+        ],
+        "phenotype_name": "Joint hypermobility",
+        "alternative_ids": [
+            "HP:0001378",
+            "HP:0005034"
+        ],
+        "uuid": "3b35f3b3-22cc-4fff-a6f2-a76e3b843774"
+    },
+    {
+        "hpo_id": "HP:0000407",
+        "status": "shared",
+        "dbxrefs": [
+            "MSH:D006319",
+            "UMLS:C0018784",
+            "SNOMEDCT_US:60700002"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000407",
+        "synonyms": [
+            "Sensorineural hearing loss",
+            "Sensorineural deafness",
+            "Hearing loss, sensorineural"
+        ],
+        "definition": "A type of hearing impairment in one or both ears related to an abnormal functionality of the cochlear nerve.",
+        "slim_terms": [
+            "ac3ff33f-b57a-4054-b158-4e669afe5816"
+        ],
+        "phenotype_name": "Sensorineural hearing impairment",
+        "alternative_ids": [
+            "HP:0008576",
+            "HP:0000374",
+            "HP:0008553",
+            "HP:0001916",
+            "HP:0008614",
+            "HP:0001753",
+            "HP:0008611",
+            "HP:0008613",
+            "HP:0008538",
+            "HP:0008565"
+        ],
+        "uuid": "b4e753bb-99d5-477d-8f34-965c0fa76390"
+    },
+    {
+        "hpo_id": "HP:0000716",
+        "status": "shared",
+        "dbxrefs": [
+            "SNOMEDCT_US:35489007",
+            "SNOMEDCT_US:21061000119107",
+            "MSH:D003866",
+            "UMLS:C0011581",
+            "SNOMEDCT_US:78667006"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000716",
+        "synonyms": [
+            "Depression"
+        ],
+        "definition": "Frequent feelings of being down, miserable, and/or hopeless; difficulty recovering from such moods; pessimism about the future; pervasive shame; feeling of inferior self-worth; thoughts of suicide and suicidal behavior.",
+        "slim_terms": [
+            "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c"
+        ],
+        "phenotype_name": "Depressivity",
+        "uuid": "d4f2ea98-1d4a-4dcf-b0b9-1d49f55f3d61"
+    },
+    {
+        "hpo_id": "HP:0000821",
+        "status": "shared",
+        "dbxrefs": [
+            "MSH:D007037",
+            "UMLS:C0020676",
+            "SNOMEDCT_US:40930008"
+        ],
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000821",
+        "synonyms": [
+            "Underactive thyroid",
+            "Low T4"
+        ],
+        "definition": "Deficiency of thyroid hormone.",
+        "slim_terms": [
+            "2a0ccce5-5edf-4777-910a-cacd3c71c5f6"
+        ],
+        "phenotype_name": "Hypothyroidism",
+        "alternative_ids": [
+            "HP:0003222",
+            "HP:0008203"
+        ],
+        "uuid": "5c2fcf82-4596-432e-88f0-7bf2c4bcf62e"
+    },
+    {
+        "uuid": "03d0cb0f-7e54-4ae6-9dfb-9b4538464f33",
+        "phenotype_name": "Abnormal cellular phenotype",
+        "hpo_id": "HP:0025354",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025354",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "d50c4b56-115c-4bca-87f5-55e44b6090db",
+        "phenotype_name": "Abnormality of blood and blood-forming tissues",
+        "hpo_id": "HP:0001871",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001871",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "98183cac-3ee4-4c49-bc0a-2c555f58fef8",
+        "phenotype_name": "Abnormality of connective tissue",
+        "hpo_id": "HP:0003549",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003549",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "16c0b141-183d-42cd-80f1-8080434d51af",
+        "phenotype_name": "Abnormality of head or neck",
+        "hpo_id": "HP:0000152",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000152",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "8259ddf6-021f-4dae-83a6-3f01cb116148",
+        "phenotype_name": "Abnormality of limbs",
+        "hpo_id": "HP:0040064",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0040064",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "82ddd4b7-23de-4d36-931d-e2e115334f26",
+        "phenotype_name": "Abnormality of metabolism/homeostasis",
+        "hpo_id": "HP:0001939",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001939",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "06b60443-b613-4f2a-a8b5-65695d98c38e",
+        "phenotype_name": "Abnormality of prenatal development or birth",
+        "hpo_id": "HP:0001197",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001197",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "f6415a2d-87a0-4705-9f1e-7bd9d147b44c",
+        "phenotype_name": "Abnormality of the breast",
+        "hpo_id": "HP:0000769",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000769",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "7690f700-985b-41c2-9082-8a46a5b08499",
+        "phenotype_name": "Abnormality of the cardiovascular system",
+        "hpo_id": "HP:0001626",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001626",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "48457466-b970-43f2-80b8-8ad98bb5636e",
+        "phenotype_name": "Abnormality of the digestive system",
+        "hpo_id": "HP:0025031",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025031",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "ac3ff33f-b57a-4054-b158-4e669afe5816",
+        "phenotype_name": "Abnormality of the ear",
+        "hpo_id": "HP:0000598",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000598",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "2a0ccce5-5edf-4777-910a-cacd3c71c5f6",
+        "phenotype_name": "Abnormality of the endocrine system",
+        "hpo_id": "HP:0000818",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000818",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "c4c52a02-6cb0-4b86-8667-aca3666e7d65",
+        "phenotype_name": "Abnormality of the eye",
+        "hpo_id": "HP:0000478",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000478",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "d4bf685e-87a2-4642-8a9d-0e6916e1f673",
+        "phenotype_name": "Abnormality of the genitourinary system",
+        "hpo_id": "HP:0000119",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000119",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "304c1c04-7e26-495c-8b8a-ee3c423cea78",
+        "phenotype_name": "Abnormality of the immune system",
+        "hpo_id": "HP:0002715",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002715",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "5972e88f-f1e9-42b2-a130-2bb1adb13c5e",
+        "phenotype_name": "Abnormality of the integument",
+        "hpo_id": "HP:0001574",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001574",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "4d5c05c1-ebf6-421f-a96a-9e0053a632d0",
+        "phenotype_name": "Abnormality of the musculature",
+        "hpo_id": "HP:0003011",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0003011",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "cfa14e52-2ef2-46bc-ac5d-cd6bbf76942c",
+        "phenotype_name": "Abnormality of the nervous system",
+        "hpo_id": "HP:0000707",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000707",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "22f67013-0d5a-4fec-935e-94cec7d76d9a",
+        "phenotype_name": "Abnormality of the respiratory system",
+        "hpo_id": "HP:0002086",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002086",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "1262c802-99bc-4d04-a2b4-910115662bdd",
+        "phenotype_name": "Abnormality of the skeletal system",
+        "hpo_id": "HP:0000924",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0000924",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "1f22c582-837a-49fb-8740-ab52d6301e60",
+        "phenotype_name": "Abnormality of the thoracic cavity",
+        "hpo_id": "HP:0045027",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0045027",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "4acd1d7c-185d-4cc9-a5ae-ab449874a31f",
+        "phenotype_name": "Abnormality of the voice",
+        "hpo_id": "HP:0001608",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001608",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "e0e450de-57e0-4cfb-b757-19b704142e8e",
+        "phenotype_name": "Constitutional symptom",
+        "hpo_id": "HP:0025142",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0025142",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "52e7ecc7-3379-4f79-945d-ae8372efe354",
+        "phenotype_name": "Growth abnormality",
+        "hpo_id": "HP:0001507",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0001507",
+        "is_slim_for": "Phenotypic abnormality"
+    },
+    {
+        "uuid": "fb8289f6-f6b5-4dc3-b6de-b48421732c33",
+        "phenotype_name": "Neoplasm",
+        "hpo_id": "HP:0002664",
+        "hpo_url": "http://purl.obolibrary.org/obo/HP_0002664",
+        "is_slim_for": "Phenotypic abnormality"
+    }
+]

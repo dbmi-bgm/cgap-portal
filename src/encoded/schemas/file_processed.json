@@ -1,30 +1,64 @@
 {
     "title": "Processed file from workflow runs",
-    "description": "Files produced by 4DN pipelines.",
+    "description": "Files produced by CGAP pipelines.",
     "id": "/profiles/file_processed.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["file_format", "project", "institution"],
-    "identifyingProperties": ["uuid", "accession", "aliases"],
+    "required": [
+        "file_format",
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "accession",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/accession" },
-        { "$ref": "mixins.json#/dbxrefs" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "file.json#/properties" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/dbxrefs"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "file.json#/properties"
+        }
     ],
     "mixinFacets": [
-        { "$ref": "file.json#/facets"}
+        {
+            "$ref": "file.json#/facets"
+        }
     ],
     "mixinColumns": [
-        { "$ref": "file.json#/columns"}
+        {
+            "$ref": "file.json#/columns"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -37,6 +71,7 @@
         "file_type": {
             "title": "File Type",
             "description": "The type of file based on the information in the file.",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
             "suggested_enum": [
                 "alignments",
                 "image",
@@ -44,6 +79,7 @@
                 "intermediate file",
                 "raw VCF",
                 "gVCF",
+                "Higlass SV VCF",
                 "full annotated VCF"
             ]
         },
@@ -83,8 +119,12 @@
             "title": "General Classification",
             "type": "string",
             "default": "processed file",
-            "exclude_from": ["FFedit-create"],
-            "enum": ["processed file"]
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "enum": [
+                "processed file"
+            ]
         },
         "source_samples": {
             "title": "Source Samples",
@@ -95,14 +135,9 @@
                 "title": "Source Sample",
                 "type": "string"
             }
-       },
+        },
         "genome_assembly": {
-            "title": "Genome Assembly",
-            "description": "The genome assembly associated with the file - for processing or reference",
-            "type": "string",
-            "default": "GRCh38",
-            "lookup": 30,
-            "enum": ["GRCh38"]
+            "default": "GRCh38"
         },
         "produced_from": {
             "title": "Produced From",
@@ -118,15 +153,52 @@
             "title": "Disable wfr inputs field",
             "description": "Do not compute workflow_run_inputs field for files used as control",
             "type": "boolean",
-            "exclude_from": ["FFedit-create"]
-        }
-     },
-    "facets" : {
-        "workflow_run_inputs.workflow.title" : {
-            "title" : "Input of Workflow"
+            "exclude_from": [
+                "FFedit-create"
+            ]
         },
-        "workflow_run_outputs.workflow.title" : {
-            "title" : "Output of Workflow"
+        "linkto_location": {
+            "title": "LinkTo Location",
+            "description": "Location on which to place a linkTo for this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "array",
+            "items": {
+                "type": "string",
+                "enum": [
+                    "Sample",
+                    "SampleProcessing"
+                ]
+            }
+        },
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
+        },
+        "vcf_to_ingest": {
+            "title": "VCF to Ingest",
+            "description": "Whether file is a VCF with contents to ingest",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "boolean"
+        },
+        "higlass_file": {
+            "title": "File for HiGlass Display",
+            "description": "Whether file is used for HiGlass",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "boolean"
+        }
+    },
+    "facets": {
+        "workflow_run_inputs.workflow.title": {
+            "title": "Input of Workflow"
+        },
+        "workflow_run_outputs.workflow.title": {
+            "title": "Output of Workflow"
         }
     }
 }

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import PropTypes from 'prop-types';
-import moment from 'moment';
 import _ from 'underscore';
 import memoize from 'memoize-one';
 import { parseAnalysisSteps } from '@hms-dbmi-bgm/react-workflow-viz';
@@ -10,6 +9,12 @@ import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/ut
 import { WorkflowNodeElement } from './WorkflowNodeElement';
 import { WorkflowDetailPane } from './WorkflowDetailPane';
 
+
+
+/**
+ * @module
+ * @deprecated - Remove or re-implement, use MetaWorkflowRunView. Provenance graph on-the-fly tracing is deprecated.
+ */
 
 export function getNodesInfo(steps){
     const { nodes } = parseAnalysisSteps(steps, { 'showReferenceFiles' : true, 'showIndirectFiles' : true });

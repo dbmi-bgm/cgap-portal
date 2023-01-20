@@ -9,6 +9,7 @@ import transaction
 
 from botocore.exceptions import ClientError
 from copy import deepcopy
+from dcicutils.ecr_utils import CGAP_ECR_REGION
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPTemporaryRedirect,
@@ -19,7 +20,8 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
-from dcicutils.env_utils import CGAP_ENV_WEBPROD, CGAP_ENV_WOLF
+from dcicutils.secrets_utils import assume_identity
+from dcicutils.misc_utils import override_environ
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -48,15 +50,14 @@ from urllib.parse import (
 )
 from ..authentication import session_properties
 from ..search.search import make_search_subreq
+from ..util import check_user_is_logged_in, make_s3_client
 from .base import (
     Item,
     get_item_or_none,
     collection_add,
     item_edit,
     PROJECT_MEMBER_CREATE_ACL,
-    # lab_award_attribution_embed_list,
 )
-from ..util import check_user_is_logged_in
 
 
 logging.getLogger('boto3').setLevel(logging.CRITICAL)
@@ -81,7 +82,9 @@ file_workflow_run_embeds = [
     'workflow_run_inputs.output_files.value_qc.overall_quality_status'
 ]
 
-file_workflow_run_embeds_processed = file_workflow_run_embeds + [e.replace('workflow_run_inputs.', 'workflow_run_outputs.') for e in file_workflow_run_embeds]
+file_workflow_run_embeds_processed = (file_workflow_run_embeds
+                                      + [e.replace('workflow_run_inputs.', 'workflow_run_outputs.')
+                                         for e in file_workflow_run_embeds])
 
 
 def show_upload_credentials(request=None, context=None, status=None):
@@ -99,6 +102,7 @@ def external_creds(bucket, key, name=None, profile_name=None):
 
     logging.getLogger('boto3').setLevel(logging.CRITICAL)
     credentials = {}
+    s3_encrypt_key_id = None  # might be reassigned later from identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
     if name is not None:
         policy = {
             'Version': '2012-10-17',
@@ -106,20 +110,46 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 {
                     'Effect': 'Allow',
                     'Action': 's3:PutObject',
-                    'Resource': 'arn:aws:s3:::{bucket}/{key}'.format(bucket=bucket, key=key),
-                }
+                    'Resource': f'arn:aws:s3:::{bucket}/{key}',
+                },
             ]
         }
-        # boto.set_stream_logger('boto3')
-        conn = boto3.client('sts', aws_access_key_id=os.environ.get("AWS_ACCESS_KEY_ID"),
-                            aws_secret_access_key=os.environ.get("AWS_SECRET_ACCESS_KEY"))
+        # In the new environment, extract S3 Keys from global application configuration
+        if 'IDENTITY' in os.environ:
+            identity = assume_identity()
+            with override_environ(**identity):
+                conn = boto3.client('sts',
+                                    aws_access_key_id=os.environ.get('S3_AWS_ACCESS_KEY_ID'),
+                                    aws_secret_access_key=os.environ.get('S3_AWS_SECRET_ACCESS_KEY'))
+            s3_encrypt_key_id = identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
+            if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
+                policy['Statement'].append({  # NoQA - PyCharm doesn't like this append for some bogus reason
+                    'Effect': 'Allow',
+                    'Action': [
+                        'kms:Encrypt',
+                        'kms:Decrypt',
+                        'kms:ReEncrypt*',
+                        'kms:GenerateDataKey*',
+                        'kms:DescribeKey'
+                    ],
+                    'Resource': f'arn:aws:kms:{CGAP_ECR_REGION}:{identity["ACCOUNT_NUMBER"]}:key/{s3_encrypt_key_id}'
+                })
+        # In the old account, we are always passing IAM User creds so these will just work
+        else:
+            conn = boto3.client('sts',
+                                aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+                                aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
         token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
+        # Convert Expiration datetime object to string via cast
+        # Uncaught serialization error picked up by Docker - Will 2/25/2021
+        credentials['Expiration'] = str(credentials['Expiration'])
         credentials.update({
-            'upload_url': 's3://{bucket}/{key}'.format(bucket=bucket, key=key),
+            'upload_url': f's3://{bucket}/{key}',
             'federated_user_arn': token.get('FederatedUser').get('Arn'),
             'federated_user_id': token.get('FederatedUser').get('FederatedUserId'),
+            's3_encrypt_key_id': s3_encrypt_key_id,
             'request_id': token.get('ResponseMetadata').get('RequestId'),
             'key': key
         })
@@ -146,6 +176,26 @@ def property_closure(request, propname, root_uuid):
     return seen
 
 
+def _build_file_embedded_list():
+    """Embedded list for File type."""
+    return [
+        # FileFormat linkTo
+        "file_format.file_format",
+
+        # File linkTo
+        "related_files.relationship_type",
+        "related_files.file.accession",
+        "related_files.file.file_format.file_format",
+
+        # QC
+        "quality_metric.@type",
+        "quality_metric.qc_list.qc_type",
+        "quality_metric.qc_list.value.uuid",
+
+        "project.lifecycle_management_active"
+    ]
+
+
 @abstract_collection(
     name='files',
     unique_key='accession',
@@ -159,15 +209,7 @@ class File(Item):
     item_type = 'file'
     base_types = ['File'] + Item.base_types
     schema = load_schema('encoded:schemas/file.json')
-    embedded_list = Item.embedded_list + [
-        'file_format.file_format',
-        'related_files.relationship_type',
-        'related_files.file.accession',
-        'quality_metric.display_title',
-        'quality_metric.@type',
-        'quality_metric.qc_list.qc_type',
-        'quality_metric.qc_list.value.uuid'
-    ]  # + lab_award_attribution_embed_list
+    embedded_list = _build_file_embedded_list()
     name_key = 'accession'
 
     @calculated_property(schema={
@@ -229,7 +271,6 @@ class File(Item):
                 return obucket.get('title')
         return None
 
-
     def _update(self, properties, sheets=None):
         if not properties:
             return
@@ -261,7 +302,7 @@ class File(Item):
             file_formats = []
             for xfile in extra_files:
                 # ensure a file_format (identifier for extra_file) is given and non-null
-                if not('file_format' in xfile and bool(xfile['file_format'])):
+                if not ('file_format' in xfile and bool(xfile['file_format'])):
                     continue
                 eformat = xfile['file_format']
                 if eformat.startswith('/file-formats/'):
@@ -278,7 +319,9 @@ class File(Item):
 
                 xfile['accession'] = properties.get('accession')
                 # just need a filename to trigger creation of credentials
-                xfile['filename'] = xfile['accession']
+                xfile_name = xfile.get("filename")
+                if xfile_name is None:
+                    xfile['filename'] = xfile['accession']
                 xfile['uuid'] = str(uuid)
                 # if not 'status' in xfile or not bool(xfile['status']):
                 #    xfile['status'] = properties.get('status')
@@ -298,7 +341,7 @@ class File(Item):
             if old_creds.get('key') != new_creds.get('key'):
                 try:
                     # delete the old sumabeach
-                    conn = boto3.client('s3')
+                    conn = make_s3_client()
                     bname = old_creds['bucket']
                     conn.delete_object(Bucket=bname, Key=old_creds['key'])
                 except Exception as e:
@@ -339,8 +382,8 @@ class File(Item):
                 # This is a cool python feature. If break is not hit in the loop,
                 # go to the `else` statement. Works for empty lists as well
                 for target_relation in target_fl_props.get('related_files', []):
-                    if (target_relation.get('file') == my_uuid and
-                        target_relation.get('relationship_type') == rev_switch):
+                    if (target_relation.get('file') == my_uuid
+                            and target_relation.get('relationship_type') == rev_switch):
                         break
                 else:
                     # Get the current request in order to queue the forced
@@ -531,6 +574,61 @@ class FileFastq(File):
         return self.rev_link_atids(request, "workflow_run_outputs")
 
 
+def _build_file_submitted_embedded_list():
+    """Embedded list for FileSubmitted items."""
+    return _build_file_embedded_list() + file_workflow_run_embeds + [
+        "quality_metric.overall_quality_status",
+        "quality_metric.Total Sequences",
+        "quality_metric.Sequence length",
+        "quality_metric.url",
+    ]
+
+
+@collection(
+    name="files-submitted",
+    unique_key="accession",
+    properties={
+        "title": "Submitted Files",
+        "description": "Listing of Submitted Files",
+    })
+class FileSubmitted(File):
+    """Collection for individual submitted files."""
+    item_type = 'file_submitted'
+    schema = load_schema('encoded:schemas/file_submitted.json')
+    embedded_list = _build_file_submitted_embedded_list()
+    name_key = 'accession'
+    rev = dict(File.rev, **{
+        'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
+        'workflow_run_outputs': ('WorkflowRun', 'output_files.value'),
+    })
+
+    @calculated_property(schema={
+        "title": "Input of Workflow Runs",
+        "description": "All workflow runs that this file serves as an input to",
+        "type": "array",
+        "items": {
+            "title": "Input of Workflow Run",
+            "type": ["string", "object"],
+            "linkTo": "WorkflowRun"
+        }
+    })
+    def workflow_run_inputs(self, request):
+        return self.rev_link_atids(request, "workflow_run_inputs")
+
+    @calculated_property(schema={
+        "title": "Output of Workflow Runs",
+        "description": "All workflow runs that this file serves as an output from",
+        "type": "array",
+        "items": {
+            "title": "Output of Workflow Run",
+            "type": "string",
+            "linkTo": "WorkflowRun"
+        }
+    })
+    def workflow_run_outputs(self, request):
+        return self.rev_link_atids(request, "workflow_run_outputs")
+
+
 @collection(
     name='files-processed',
     unique_key='accession',
@@ -639,7 +737,7 @@ def post_upload(context, request):
     properties = context.upgrade_properties()
     if properties['status'] not in ('uploading', 'to be uploaded by workflow', 'upload failed'):
         raise HTTPForbidden('status must be "uploading" to issue new credentials')
-    accession_or_external = properties.get('accession')
+    # accession_or_external = properties.get('accession')
     external = context.propsheets.get('external', None)
 
     if external is None:
@@ -761,11 +859,21 @@ def download(context, request):
     if not external:
         external = context.build_external_creds(request.registry, context.uuid, properties)
     if external.get('service') == 's3':
-        conn = boto3.client('s3')
+        external_bucket = external['bucket']
+        wfout_bucket = request.registry.settings['file_wfout_bucket']
+        files_bucket = request.registry.settings['file_upload_bucket']
+        if external_bucket not in [wfout_bucket, files_bucket]:
+            if 'wfout' not in external_bucket:
+                external_bucket = files_bucket
+            else:
+                external_bucket = wfout_bucket
+            log.error(f'Encountered s3 bucket mismatch - ignoring metadata value {external_bucket}'
+                      f' and using registry value {external_bucket}')
+        conn = make_s3_client()
         param_get_object = {
-            'Bucket': external['bucket'],
+            'Bucket': external_bucket,
             'Key': external['key'],
-            'ResponseContentDisposition': "attachment; filename=" + filename
+            'ResponseContentDisposition': 'attachment; filename=' + filename
         }
         if 'Range' in request.headers:
             tracking_values['range_query'] = True
@@ -804,7 +912,7 @@ def download(context, request):
             raise e
         response_dict = {
             'body': response_body.get('Body').read(),
-            # status_code : 206 if partial, 200 if the ragne covers whole file
+            # status_code : 206 if partial, 200 if the range covers whole file
             'status_code': response_body.get('ResponseMetadata').get('HTTPStatusCode'),
             'accept_ranges': response_body.get('AcceptRanges'),
             'content_length': response_body.get('ContentLength'),
@@ -841,7 +949,7 @@ def validate_file_format_validity_for_file_type(context, request):
 
 
 def validate_file_filename(context, request):
-    ''' validator for filename field '''
+    """ validator for filename field """
     found_match = False
     data = request.json
     if 'filename' not in data:
@@ -888,8 +996,7 @@ def validate_file_filename(context, request):
 
 
 def validate_processed_file_unique_md5_with_bypass(context, request):
-    '''validator to check md5 on processed files, unless you tell it
-       not to'''
+    """validator to check md5 on processed files, unless you tell it not to"""
     # skip validator if not file processed
     if context.type_info.item_type != 'file_processed':
         return
@@ -921,8 +1028,8 @@ def validate_processed_file_unique_md5_with_bypass(context, request):
 
 
 def validate_processed_file_produced_from_field(context, request):
-    '''validator to make sure that the values in the
-    produced_from field are valid file identifiers'''
+    """validator to make sure that the values in the
+    produced_from field are valid file identifiers"""
     # skip validator if not file processed
     if context.type_info.item_type != 'file_processed':
         return
@@ -948,9 +1055,9 @@ def validate_processed_file_produced_from_field(context, request):
 
 
 def validate_extra_file_format(context, request):
-    '''validator to check to be sure that file_format of extrafile is not the
+    """validator to check to be sure that file_format of extrafile is not the
        same as the file and is a known format for the schema
-    '''
+    """
     files_ok = True
     data = request.json
     if not data.get('extra_files'):
@@ -979,8 +1086,8 @@ def validate_extra_file_format(context, request):
             try:
                 off_uuid = ok_format_item.get('uuid')
             except AttributeError:
-                raise  Exception("FileFormat Item %s contains unknown FileFormats"
-                                 " in the extrafile_formats property" % file_format_item.get('uuid'))
+                raise Exception("FileFormat Item %s contains unknown FileFormats"
+                                " in the extrafile_formats property" % file_format_item.get('uuid'))
             valid_ext_formats.append(off_uuid)
     seen_ext_formats = []
     # formats = request.registry['collections']['FileFormat']
@@ -1066,7 +1173,7 @@ def file_add(context, request, render=None):
                          validate_file_format_validity_for_file_type,
                          validate_processed_file_unique_md5_with_bypass,
                          validate_processed_file_produced_from_field],
-            request_param=['check_only=true'])
+             request_param=['check_only=true'])
 @debug_log
 def file_edit(context, request, render=None):
     return item_edit(context, request, render)

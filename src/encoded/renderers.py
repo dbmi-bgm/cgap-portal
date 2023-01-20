@@ -4,6 +4,7 @@ import os
 import psutil
 import time
 
+from dcicutils.misc_utils import environ_bool, PRINT, ignored
 from functools import lru_cache
 from pkg_resources import resource_filename
 from pyramid.events import BeforeRender, subscriber
@@ -92,6 +93,7 @@ def validate_request_tween_factory(handler, registry):
     Apache config:
         SetEnvIf Request_Method HEAD X_REQUEST_METHOD=HEAD
     """
+    ignored(registry)
 
     def validate_request_tween(request):
 
@@ -117,6 +119,7 @@ def validate_request_tween_factory(handler, registry):
 
 
 def security_tween_factory(handler, registry):
+    ignored(registry)
 
     def security_tween(request):
         """
@@ -145,8 +148,10 @@ def security_tween_factory(handler, registry):
                         title="No Access",
                         comment="Invalid Authorization header or Auth Challenge response.",
                         headers={
-                            'WWW-Authenticate': ("Bearer realm=\"{}\"; Basic realm=\"{}\""
-                                                 .format(request.domain, request.domain))
+                            'WWW-Authenticate': (
+                                f'Bearer realm="{request.domain}";'
+                                f' Basic realm="{request.domain}"'
+                            )
                         }
                     )
 
@@ -166,12 +171,18 @@ def security_tween_factory(handler, registry):
                 # Especially for initial document requests by browser, but also desired for AJAX and other requests,
                 # unset jwtToken cookie so initial client-side React render has App(instance).state.session = false
                 # to be synced w/ server-side
-                response.set_cookie(name='jwtToken',
-                                    value=None, max_age=0, path='/')  # = Same as response.delete_cookie(..)
+                response.set_cookie(
+                    name='jwtToken',
+                    value=None,  # = i.e., same as response.delete_cookie(..)
+                    domain=request.domain,
+                    max_age=0,
+                    path='/',
+                    overwrite=True
+                )
                 response.status_code = 401
                 response.headers['WWW-Authenticate'] = (
-                    "Bearer realm=\"{}\", title=\"Session Expired\"; Basic realm=\"{}\""
-                    .format(request.domain, request.domain)
+                    f'Bearer realm="{request.domain}", title="Session Expired";'
+                    f' Basic realm="{request.domain}"'
                 )
             else:
                 # We have JWT and it's not expired. Add 'X-Request-JWT' & 'X-User-Info' header.
@@ -185,31 +196,13 @@ def security_tween_factory(handler, registry):
                             # by libs/react-middleware.js which is imported by server.js and compiled into
                             # renderer.js. Is used to get access to User Info on initial web page render.
                             response.headers['X-Request-JWT'] = request.cookies.get('jwtToken', '')
-                            # TODO: Should user_info be copied before the del? If the user info is shared,
-                            #       we are modifying it for other uses. -kmp 24-Jan-2021
-                            user_info = request.user_info  # Re-ified property set in authentication.py
-                            # Redundant - don't need this in SSR nor browser as get from X-Request-JWT.
-                            del user_info["id_token"]
+                            user_info = request.user_info.copy()  # Re-ified property set in authentication.py
                             response.headers['X-User-Info'] = json.dumps(user_info)
                         else:
                             response.headers['X-Request-JWT'] = "null"
             return response
 
         return handler(request)
-
-        # This was commented out when we introduced JWT authentication
-        # Theoretically we mitigate CSRF requests now by grabbing JWT for transactional
-        # requests from Authorization header which acts like a CSRF token.
-        # See authentication.py - get_jwt()
-
-        # token = request.headers.get('X-CSRF-Token')
-        # if token is not None:
-        #     # Avoid dirtying the session and adding a Set-Cookie header
-        #     # XXX Should consider if this is a good idea or not and timeouts
-        #     if token == dict.get(request.session, '_csrft_', None):
-        #         return handler(request)
-        #     raise CSRFTokenError('Incorrect CSRF token')
-        # raise CSRFTokenError('Missing CSRF token')
 
     return security_tween
 
@@ -224,6 +217,7 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
     their removal in security_tween_factory & authentication.py as well as client-side
     (upon "Logout" action). If needed for some reason, can re-enable.
     """  # noQA - not going to break the long URL line above
+    ignored(registry)
 
     ignore = {
         '/favicon.ico',
@@ -260,6 +254,8 @@ def remove_expired_session_cookies_tween_factory(handler, registry):
 
 def set_response_headers_tween_factory(handler, registry):
     """Add additional response headers here"""
+    ignored(registry)
+
     def set_response_headers_tween(request):
         response = handler(request)
         response.headers['X-Request-URL'] = request.url
@@ -317,12 +313,21 @@ def canonical_redirect(event):
 
 # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
 # which should contain 'text/html'
-MIME_TYPES_SUPPORTED = ['text/html', 'application/json', 'application/ld+json']
-MIME_TYPE_DEFAULT = 'application/json'
+MIME_TYPE_HTML = 'text/html'
+MIME_TYPE_JSON = 'application/json'
+MIME_TYPE_LD_JSON = 'application/ld+json'
+
+# Note: In cgap-portal, MIME_TYPE_JSON is at the head of this list. In fourfront, MIME_TYPE_HTML is.
+# The cgap-portal behavior might be a bug we should look at bringing into alignment. -kmp 29-Jan-2022
+MIME_TYPES_SUPPORTED = [MIME_TYPE_JSON, MIME_TYPE_HTML, MIME_TYPE_LD_JSON]
+MIME_TYPE_DEFAULT = MIME_TYPES_SUPPORTED[0]
 MIME_TYPE_TRIAGE_MODE = 'modern'  # if this doesn't work, fall back to 'legacy'
+
+DEBUG_MIME_TYPES = environ_bool("DEBUG_MIME_TYPES", default=False)
 
 
 def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
+    # TODO: I think this function does nothing but return MIME_TYPES_SUPPORTED[0] -kmp 3-Feb-2021
     """
     Given a request, tries to figure out the best kind of MIME type to use in response
     based on what kinds of responses we support and what was requested.
@@ -342,7 +347,7 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
         #      being maintained for backward compatibility, but it will be deprecated in the future,
         #      as it does not conform to the RFC.
         # TODO: Once the modern replacement is shown to work, we should remove this conditional branch.
-        return request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
+        result = request.accept.best_match(MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT)
     else:
         options = request.accept.acceptable_offers(MIME_TYPES_SUPPORTED)
         if not options:
@@ -350,20 +355,37 @@ def best_mime_type(request, mode=MIME_TYPE_TRIAGE_MODE):
             #       no acceptable types are available. (Certainly returning JSON in this case is
             #       not some kind of friendly help toa naive user with an old browser.)
             #       Ref: https://developer.mozilla.org/en-US/docs/Web/HTTP/Status
-            return MIME_TYPE_DEFAULT
+            result = MIME_TYPE_DEFAULT
         else:
             mime_type, score = options[0]
-            return mime_type
+            result = mime_type
+    if DEBUG_MIME_TYPES:
+        PRINT("Using mime type", result, "for", request.method, request.url)
+        for k, v in request.headers.items():
+            PRINT("%s: %s" % (k, v))
+        PRINT("----------")
+    return result
 
 
 @lru_cache(maxsize=16)
 def should_transform(request, response):
     """
     Determines whether to transform the response from JSON->HTML/JS depending on type of response
-    and what the request is looking for to be returned via e.g. request Accept, Authorization header.
-    In case of no Accept header, attempts to guess.
+    and what the request is looking for to be returned via these criteria, which are tried in order
+    until one succeeds:
 
-    Memoized via `lru_cache`. Cache size is set to be 16 (> 1) in case sub-requests fired off during handling.
+    * If the request method is other than GET or HEAD, returns False.
+    * If the response.content_type is other than 'application/json', returns False.
+    * If a 'frame=' query param is given and not 'page' (the default), returns False.
+    * If a 'format=json' query param is given explicitly,
+        * For 'format=html', returns True.
+        * For 'format=json', returns False.
+      This rule does not match if 'format=' is not given explicitly.
+      If 'format=' is given an explicit value of ther than 'html' or 'json', an HTTPNotAcceptable error will be raised.
+    * If the first element of MIME_TYPES_SUPPORTED[0] is 'text/html', returns True.
+    * Otherwise, in all remaining cases, returns False.
+
+    NOTE: Memoized via `lru_cache`. Cache size is set to be 16 (> 1) in case sub-requests fired off during handling.
     """
     # We always return JSON in response to POST, PATCH, etc.
     if request.method not in ('GET', 'HEAD'):
@@ -380,12 +402,12 @@ def should_transform(request, response):
         return False
 
     # The `format` URI param allows us to override request's 'Accept' header.
-    format = request.params.get('format')
-    if format is not None:
-        format = format.lower()
-        if format == 'json':
+    format_param = request.params.get('format')
+    if format_param is not None:
+        format_param = format_param.lower()
+        if format_param == 'json':
             return False
-        if format == 'html':
+        if format_param == 'html':
             return True
         else:
             raise HTTPNotAcceptable("Improper format URI parameter",
@@ -394,17 +416,14 @@ def should_transform(request, response):
     # Web browsers send an Accept request header for initial (e.g. non-AJAX) page requests
     # which should contain 'text/html'
     # See: https://tedboy.github.io/flask/generated/generated/werkzeug.Accept.best_match.html#werkzeug-accept-best-match
-    mime_type = best_mime_type(request)
-    format = mime_type.split('/', 1)[1]  # Will be 1 of 'html', 'json', 'json-ld'
+    mime_type = best_mime_type(request)  # Result will be one of MIME_TYPES_SUPPORTED
 
     # N.B. ld+json (JSON-LD) is likely more unique case and might be sent by search engines (?)
     # which can parse JSON-LDs. At some point we could maybe have it to be same as
     # making an `@@object` or `?frame=object` request (?) esp if fill
     # out @context response w/ schema(s) (or link to schema)
 
-    if format == 'html':
-        return True
-    return False
+    return mime_type == MIME_TYPE_HTML
 
 
 def render_page_html_tween_factory(handler, registry):
@@ -424,7 +443,7 @@ def render_page_html_tween_factory(handler, registry):
     # tricky to enforce (we would need to create one cgroup per process.)
     # So we just manually check the resource usage after each transform.
 
-    rss_limit = 256 * (1024 ** 2)  # MB
+    rss_limit = 512 * (1024 ** 2)  # MB
 
     reload_process = (True
                       if registry.settings.get('reload_templates', False)

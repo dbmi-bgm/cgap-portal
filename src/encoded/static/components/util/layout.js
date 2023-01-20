@@ -1,3 +1,4 @@
+import React, { useEffect, useState } from 'react';
 import { isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/misc';
 
 /**
@@ -47,4 +48,27 @@ export function gridContainerWidth(windowWidth = null){
             if (isServerSide()) return 400;
             return (windowWidth || window.innerWidth) - 20;
     }
+}
+
+/**
+ * Defers mounting of an element until after page render.
+ * Originally used to defer loading of secondary/non-critical
+ * print CSS stylesheet.
+ * @todo Move to SPC.
+ */
+export function DeferMount(props){
+    const { children, delay = 250, onMount = null } = props;
+    const [ isMounted, setIsMounted ] = useState(false);
+    useEffect(function(){
+        setTimeout(function(){
+            setIsMounted(true);
+            if (onMount) {
+                onMount();
+            }
+        }, delay);
+    }, []); // Run once after mount;
+    if (isMounted) {
+        return children;
+    }
+    return null;
 }

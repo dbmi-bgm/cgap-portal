@@ -2,13 +2,19 @@
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
+
+# import datetime as datetime_module
 import logging
+# import os
+import pkg_resources
 import pytest
 import webtest
-import pkg_resources
+from sqlalchemy import exc
+from dcicutils.ff_mocks import NO_SERVER_FIXTURES
 
+from dcicutils.qa_utils import notice_pytest_fixtures, MockFileSystem
 from pyramid.request import apply_request_extensions
-from pyramid.testing import DummyRequest, setUp, tearDown
+from pyramid.testing import DummyRequest
 from pyramid.threadlocal import get_current_registry, manager as threadlocal_manager
 from snovault import DBSESSION, ROOT, UPGRADER
 from snovault.elasticsearch import ELASTIC_SEARCH, create_mapping
@@ -27,17 +33,64 @@ README:
 """
 
 
+# This should work but does not seem to... various issues related to rollbacks occurring or not
+# occurring when they should/shouldn't, probably related to zsa_savepoints
+# @pytest.yield_fixture
+# def external_tx(request, conn):
+#     # overridden from snovault to detect and continue from savepoint error
+#     if NO_SERVER_FIXTURES:
+#         yield 'NO_SERVER_FIXTURES'
+#         return
+#
+#     notice_pytest_fixtures(request)
+#     with conn.begin_nested() as tx:
+#         yield tx
+
+
+# hacked version
+@pytest.yield_fixture
+def external_tx(request, conn):
+    # overridden from snovault to detect and continue from savepoint error
+    if NO_SERVER_FIXTURES:
+        yield 'NO_SERVER_FIXTURES'
+        return
+
+    notice_pytest_fixtures(request)
+    # print('BEGIN external_tx')
+    try:
+        tx = conn.begin_nested()
+    except exc.PendingRollbackError as e:
+        if 'inactive savepoint transaction' in str(e):
+            conn._nested_transaction.rollback()
+            tx = conn.begin_nested()
+        else:
+            raise
+    try:
+        yield tx
+        tx.rollback()
+    except exc.InternalError as e:
+        if 'savepoint' in str(e) and 'does not exist' in str(e):
+            pass
+        else:
+            raise
+
+    # conn does not implement .rollback()
+
+    # The database should be empty unless a data fixture was loaded
+    # for table in Base.metadata.sorted_tables:
+    #     assert conn.execute(table.count()).scalar() == 0
+
+
 @pytest.fixture(autouse=True)
 def autouse_external_tx(external_tx):
     pass
 
 
 @pytest.fixture(scope='session')
-def app_settings(request, wsgi_server_host_port, conn, DBSession):
-
+def app_settings(request, wsgi_server_host_port, conn, DBSession):  # noQA - We didn't choose the fixture name.
+    notice_pytest_fixtures(request, wsgi_server_host_port, conn, DBSession)
     settings = make_app_settings_dictionary()
     settings['auth0.audiences'] = 'http://%s:%s' % wsgi_server_host_port
-    # add some here for file testing
     settings[DBSESSION] = DBSession
     return settings
 
@@ -83,6 +136,7 @@ def pytest_configure():
 
 @pytest.yield_fixture
 def threadlocals(request, dummy_request, registry):
+    notice_pytest_fixtures(request, dummy_request, registry)
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
     yield dummy_request
     threadlocal_manager.pop()
@@ -155,70 +209,88 @@ def root(registry):
     return registry[ROOT]
 
 
+# Available Fixtures
+# ------------------
+#
+#  ################## +-----------------------------------------+----------------------------------------------------+
+#  ################## |               Basic Application         |      Application with ES + Postgres                |
+#  ################## +-----------------------+-----------------+---------------------------+------------------------+
+#  ################## |   JSON content        |  HTML content   |      JSON content         |      HTML content      |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Anonymous User     | anontestapp           | anonhtmltestapp |  anon_es_testapp          | anon_html_es_testapp   |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  System User        | testapp               | htmltestapp     |  es_testapp               | html_es_testapp        |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Authenticated User | authenticated_testapp | -----           |  authenticated_es_testapp | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Submitter User     | submitter_testapp     | -----           |  -----                    | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Indexer User       | -----                 | -----           |  indexer_testapp          | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#  Embed User         | embed_testapp         | -----           |  -----                    | -----                  |
+#  -------------------+-----------------------+-----------------+---------------------------+------------------------+
+#
 # TODO: Reconsider naming to have some underscores interspersed for better readability.
 #       e.g., html_testapp rather than htmltestapp, and especially anon_html_test_app rather than anonhtmltestapp.
 #       -kmp 03-Feb-2020
 
+
+@pytest.fixture
+def anontestapp(app):
+    """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
+    environ = {
+        'HTTP_ACCEPT': "application/json"
+    }
+    return webtest.TestApp(app, environ)
+
+
 @pytest.fixture
 def anonhtmltestapp(app):
+    """TestApp for anonymous (not logged in) user, accepting text/html content."""
     environ = {
         'HTTP_ACCEPT': 'text/html'
     }
     test_app = webtest.TestApp(app, environ)
-    # original_get = test_app.get
-    # # Emulate client acting as a browser when making requests to this (unless other header supplied)
-    # def new_get_request(url, params=None, headers=None, **kwargs):
-    #     new_headers = { "Accept" : "text/html" }
-    #     new_headers.update(headers or {})
-    #     return original_get(url, params=params, headers=new_headers, **kwargs)
-    # setattr(test_app, "get", new_get_request)
     return test_app
 
 
 @pytest.fixture
-def anon_html_es_testapp(es_app):
+def anon_es_testapp(es_app):
+    """ TestApp simulating a bare Request entering the application (with ES enabled) """
     environ = {
-        'HTTP_ACCEPT': 'text/html'
+        'HTTP_ACCEPT': 'application/json'
     }
     return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture
-def htmltestapp(app):
+def anon_html_es_testapp(es_app):
+    """TestApp with ES + Postgres for anonymous (not logged in) user, accepting text/html content."""
     environ = {
-        'HTTP_ACCEPT': 'text/html',
-        'REMOTE_USER': 'TEST',
-    }
-    test_app = webtest.TestApp(app, environ)
-    # original_get = test_app.get
-    # # Emulate client acting as a browser when making requests to this (unless other header supplied)
-    # def new_get_request(url, params=None, headers=None, **kwargs):
-    #     new_headers = { "Accept" : "text/html" }
-    #     new_headers.update(headers or {})
-    #     return original_get(url, params=params, headers=new_headers, **kwargs)
-    # setattr(test_app, "get", new_get_request)
-    return test_app
-
-
-@pytest.fixture
-def html_es_testapp(es_app):
-    """ HTML testapp that uses ES """
-    environ = {
-        'HTTP_ACCEPT': 'text/html',
-        'REMOTE_USER': 'TEST',
+        'HTTP_ACCEPT': 'text/html'
     }
     return webtest.TestApp(es_app, environ)
 
 
 @pytest.fixture(scope="session")
 def testapp(app):
-    """TestApp with JSON accept header.
-    """
+    """TestApp for username TEST, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
-        'REMOTE_USER': 'TEST',
+        'REMOTE_USER': 'TEST'
     }
     return webtest.TestApp(app, environ)
+
+
+@pytest.fixture
+def htmltestapp(app):
+    """TestApp for TEST user, accepting text/html content."""
+    environ = {
+        'HTTP_ACCEPT': 'text/html',
+        'REMOTE_USER': 'TEST',
+    }
+    test_app = webtest.TestApp(app, environ)
+    return test_app
 
 
 @pytest.fixture(scope='session')
@@ -232,19 +304,11 @@ def es_testapp(es_app):
 
 
 @pytest.fixture
-def anontestapp(app):
-    """TestApp for anonymous user (i.e., no user specified), accepting JSON data."""
+def html_es_testapp(es_app):
+    """TestApp with ES + Postgres for TEST user, accepting text/html content."""
     environ = {
-        'HTTP_ACCEPT': 'application/json',
-    }
-    return webtest.TestApp(app, environ)
-
-
-@pytest.fixture
-def anon_es_testapp(es_app):
-    """ TestApp simulating a bare Request entering the application (with ES enabled) """
-    environ = {
-        'HTTP_ACCEPT': 'application/json',
+        'HTTP_ACCEPT': 'text/html',
+        'REMOTE_USER': 'TEST',
     }
     return webtest.TestApp(es_app, environ)
 
@@ -267,7 +331,6 @@ def authenticated_es_testapp(es_app):
         'REMOTE_USER': 'TEST_AUTHENTICATED',
     }
     return webtest.TestApp(es_app, environ)
-
 
 
 @pytest.fixture
@@ -293,6 +356,7 @@ def indexer_testapp(es_app):
 
 @pytest.fixture
 def embed_testapp(app):
+    """TestApp for user EMBED, accepting JSON data."""
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'EMBED',
@@ -302,6 +366,7 @@ def embed_testapp(app):
 
 @pytest.fixture
 def wsgi_app(wsgi_server):
+    """TestApp for WSGI server."""
     return webtest.TestApp(wsgi_server)
 
 
@@ -340,3 +405,9 @@ def workbook(es_app):
     """ Loads a bunch of data (tests/data/workbook-inserts) into the system on first run
         (session scope doesn't work). """
     WorkbookCache.initialize_if_needed(es_app)
+
+
+@pytest.yield_fixture
+def mocked_file_system():
+    with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
+        yield

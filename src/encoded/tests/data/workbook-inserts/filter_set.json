@@ -1,0 +1,25 @@
+[
+    {
+        "title": "FilterSet Created For Case GAPCAJQ1L99X",
+        "status": "shared",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "search_type": "VariantSample",
+        "filter_blocks": [
+            {
+                "name": "Breast cancer",
+                "query": "associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Breast+Cancer+%2828%29&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH"
+            },
+            {
+                "name": "Familial cancer - P/LP/VUS",
+                "query": "GQ.from=60&GQ.to=99&associated_genotype_labels.proband_genotype_label=Heterozygous&associated_genelists=Familial+Cancer+%28148%29&variant.csq_clinvar_clnsig=Uncertain_significance&variant.csq_clinvar_clnsig=Pathogenic&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001&variant.genes.genes_most_severe_consequence.impact=MODERATE&variant.genes.genes_most_severe_consequence.impact=HIGH"
+            },
+            {
+                "name": "Filter Block 1",
+                "query": "variant.csq_gnomade2_af.from=0&variant.csq_gnomade2_af.to=0.001&variant.csq_gnomadg_af.from=0&variant.csq_gnomadg_af.to=0.001"
+            }
+        ],
+        "created_in_case_accession": "GAPCAJQ1L99X",
+        "uuid": "1592bb50-f8db-41ee-8c27-73a8f7471d55"
+    }
+]

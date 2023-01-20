@@ -4,6 +4,9 @@ from ..ingestion.common import get_parameter
 from ..ingestion.exceptions import MissingParameter, BadParameter
 
 
+pytestmark = [pytest.mark.setone, pytest.mark.working]
+
+
 def test_get_parameter():
 
     parameters = {
@@ -38,7 +41,7 @@ def test_get_parameter():
     assert get_parameter(parameters, "foo", as_type=force_title, default="stuff") == "Bar"
 
     assert get_parameter(parameters, "foo", as_type=str) == "bar"
-    assert get_parameter(parameters, "enabled", as_type=bool) == True
+    assert get_parameter(parameters, "enabled", as_type=bool) is True
     assert get_parameter(parameters, "alpha", as_type=int) == 42
     assert get_parameter(parameters, "beta", as_type=int) == 42
 
@@ -59,14 +62,14 @@ def test_get_parameter():
 
     for key in bool_tests:
         if key.startswith("t"):
-            assert get_parameter(bool_tests, key, as_type=bool) == True
+            assert get_parameter(bool_tests, key, as_type=bool) is True
         elif key.startswith("f"):
-            assert get_parameter(bool_tests, key, as_type=bool) == False
+            assert get_parameter(bool_tests, key, as_type=bool) is False
 
     for key in bool_tests:
         if key.startswith("t"):
-            assert get_parameter(bool_tests, key, as_type=bool, update=True) == True
+            assert get_parameter(bool_tests, key, as_type=bool, update=True) is True
         elif key.startswith("f"):
-            assert get_parameter(bool_tests, key, as_type=bool, update=True) == False
+            assert get_parameter(bool_tests, key, as_type=bool, update=True) is False
 
     assert bool_tests == { k: k.startswith('t') for k in bool_tests.keys() }

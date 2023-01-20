@@ -2,6 +2,7 @@
 
 import _ from 'underscore';
 import React from 'react';
+import memoize from 'memoize-one';
 
 import { linkFromItem } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/object';
 import { LocalizedTime, format as dateFormat } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
@@ -29,7 +30,8 @@ export function set(schemas){
 
 
 export const Term = {
-    toName : function(field, term, allowJSXOutput = false, addDescriptionTipForLinkTos = true){
+
+    toName: function(field, term, allowJSXOutput = false, addDescriptionTipForLinkTos = true){
 
         if (allowJSXOutput && typeof term !== 'string' && term && typeof term === 'object'){
             // Object, probably an item.
@@ -38,106 +40,14 @@ export const Term = {
 
         let name = null;
 
-        switch (field) {
-            case '@id':
-                return term;
-            case 'type':
-                return getTitleForType(term, get());
-            case 'status':
-                if (allowJSXOutput){
-                    return (
-                        <React.Fragment>
-                            <i className="status-indicator-dot mr-07" data-status={term} />
-                            { capitalizeSentence(term) }
-                        </React.Fragment>
-                    );
-                }
-                return capitalizeSentence(term);
-            case 'date_created':
-            case 'last_modified.date_modified':
-            case 'date_modified':
-            case 'public_release':
-            case 'project_release':
-                if (allowJSXOutput){
-                    return <LocalizedTime timestamp={term} localize={false} />;
-                }
-                return dateFormat(term);
-            case 'accession':
-                //if (allowJSXOutput) {
-                //    return <span className="accession text-small">{ term }</span>;
-                //}
-                return term;
+        const termTranslateFunc = fieldToTransformationDict()[field];
 
-            /** Fields that are lowercase with underscores but could be ~ proper nouns otherwise */
-            case "project_roles.project": // Related to User (hardcoded enum field)
-            case "gene_biotype":
-                if (typeof term !== 'string') return term;
-                return term.split("_").map(capitalize).join(" ");
-
-            /** Related to Individual Items: */
-            case 'is_pregnancy':
-            case 'is_spontaneous_abortion':
-            case 'is_infertile':
-            case 'is_termination_of_pregnancy':
-            case 'is_still_birth':
-            case 'is_deceased':
-                if (typeof term === "boolean"){
-                    // Boolean, or undefined to be considered as "false"
-                    return (term && "True") || "False";
-                }
-                if (typeof term === "undefined") {
-                    return "False";
-                }
-                // Common cases, e.g. from search result:
-                if (term === "true") return "True";
-                if (term === "false") return "False";
-                if (term === "No value") return term; // Ideally could have this as "False" but then get 2+ "False" values in list of Facet terms.
-                return term;
-            case 'sex':
-                if (term === "M") name = "Male";
-                if (term === "F") name = "Female";
-                if (term === "U") name = "Undetermined";
-                if (allowJSXOutput) {
-                    return (
-                        <React.Fragment>
-                            <i className={`mr-03 icon icon-fw icon-${Term.genderCharacterToIcon(term)}`}/>
-                            { name }
-                        </React.Fragment>
-                    );
-                }
-                return name;
-
-            /** Related to File Items: */
-            case 'file_type':
-            case 'file_classification':
-            case 'file_type_detailed':
-            case 'files.file_type':
-            case 'files.file_classification':
-            case 'files.file_type_detailed':
-            case 'ancestry':
-                return capitalizeSentence(term);
-            case 'life_status':
-                return capitalize(term);
-            case 'file_size':
-            case 'attachment.size':
-                if (typeof term === 'number'){
-                    name = term;
-                } else if (!isNaN(parseInt(term))) {
-                    name = parseInt(term);
-                }
-                if (typeof name === 'number' && !isNaN(name)){
-                    return bytesToLargerUnit(name);
-                } else {
-                    name = null;
-                }
-                break;
-
-            default:
-                break;
+        if (termTranslateFunc) {
+            return termTranslateFunc(term);
         }
 
 
-        // Custom stuff
+        // Custom stuff - todo consider converting to dict lookup also
         if (field.indexOf('quality_metric.') > -1){
             if (field.slice(-11) === 'Total reads')     return roundLargeNumber(term);
             if (field.slice(-15) === 'Total Sequences') return roundLargeNumber(term);
@@ -169,6 +79,129 @@ export const Term = {
         return m[gender];
     }
 };
+
+/** Globally memoized, since creation of object is expensive part of obj lookup */
+const fieldToTransformationDict = memoize(function(){
+
+    function returnLocalizedTime(term, allowJSXOutput){
+        if (allowJSXOutput){
+            return <LocalizedTime timestamp={term} localize={false} />;
+        }
+        return dateFormat(term);
+    }
+
+    function returnTerm(term, allowJSXOutput){
+        return term;
+    }
+
+    function returnBoolean(term, allowJSXOutput){
+        if (typeof term === "boolean"){
+            // Boolean, or undefined to be considered as "false"
+            return (term && "True") || "False";
+        }
+        if (typeof term === "undefined") {
+            return "False";
+        }
+        // Common cases, e.g. from search result:
+        if (term === "true") return "True";
+        if (term === "false") return "False";
+        if (term === "No value") return term; // Ideally could have this as "False" but then get 2+ "False" values in list of Facet terms.
+        return term;
+    }
+
+    function returnFileSize(term, allowJSXOutput){
+        let val = term;
+        if (typeof term === 'number'){
+            val = term;
+        } else if (!isNaN(parseInt(term))) {
+            val = parseInt(term);
+        }
+        if (typeof val === 'number' && !isNaN(val)){
+            return bytesToLargerUnit(val);
+        } else {
+            return null;
+        }
+    }
+
+    const exactFieldNameDict = {
+        "@id": returnTerm,
+        "type": function(term, allowJSXOutput){ return getTitleForType(term, get()); },
+        "status" : function(term, allowJSXOutput){
+            if (allowJSXOutput){
+                return (
+                    <React.Fragment>
+                        <i className="status-indicator-dot mr-07" data-status={term} />
+                        { capitalizeSentence(term) }
+                    </React.Fragment>
+                );
+            }
+            return capitalizeSentence(term);
+        },
+        "date_created": returnLocalizedTime,
+        "last_modified.date_modified": returnLocalizedTime,
+        "date_modified": returnLocalizedTime,
+        "public_release": returnLocalizedTime,
+        "project_release": returnLocalizedTime,
+        "approved_date": returnLocalizedTime,
+        "accession": returnTerm,
+        /** Fields that are lowercase with underscores but could be ~ proper nouns otherwise */
+        "project_roles.project": function(term, allowJSXOutput){
+            if (typeof term !== 'string') return term;
+            return term.split("_").map(capitalize).join(" ");
+        },
+        "gene_biotype": function(term, allowJSXOutput){
+            if (typeof term !== 'string') return term;
+            return term.split("_").map(capitalize).join(" ");
+        },
+        /** Related to Individual Items, mostly: */
+        "is_pregnancy": returnBoolean,
+        "is_spontaneous_abortion": returnBoolean,
+        "is_infertile": returnBoolean,
+        "is_termination_of_pregnancy": returnBoolean,
+        "is_still_birth": returnBoolean,
+        "is_deceased": returnBoolean,
+        "sex": function(term, allowJSXOutput){
+            let txtName = null;
+            if (term === "M") txtName = "Male";
+            if (term === "F") txtName = "Female";
+            if (term === "U") txtName = "Undetermined";
+            if (allowJSXOutput) {
+                return (
+                    <React.Fragment>
+                        <i className={`mr-03 icon icon-fw icon-${Term.genderCharacterToIcon(term)}`}/>
+                        { txtName }
+                    </React.Fragment>
+                );
+            }
+            return txtName;
+        },
+        "file_type": capitalizeSentence,
+        "file_classification": capitalizeSentence,
+        "file_type_detailed": capitalizeSentence,
+        "files.file_type": capitalizeSentence,
+        "files.file_classification": capitalizeSentence,
+        "files.file_type_detailed": capitalizeSentence,
+        "ancestry": capitalizeSentence,
+        "life_status": capitalize,
+        "project_roles.role": capitalize,
+        "file_size": returnFileSize,
+        "attachment.size": returnFileSize,
+        "associated_genotype_labels.proband_genotype_label": function(term, allowJSXOutput){
+            switch (term){
+                case "False":
+                    return "Sex inconsistent";
+                case "False (multiallelic in family)":
+                case "False  (multiallelic in family)":
+                    return "Sex inconsistent (multiallelic in family)";
+                default:
+                    return term;
+            }
+        }
+    };
+
+    return exactFieldNameDict;
+});
+
 
 
 export const Field = {
@@ -208,3 +241,33 @@ export const Field = {
 
 };
 
+
+/**
+ * Builds dictionaries of facets from schemas.
+ * Will exclude any additionally-calculated facets.
+ * Globally memoized since will have only 1 instance of schemas per app instance.
+ *
+ * @returns {Object<string,{ field: string, aggregation_type: string }>}
+ */
+export const buildSchemaFacetDictionary = memoize(function(schemas){
+    const facetsByType = {};
+    if (!schemas) {
+        return facetsByType;
+    }
+    Object.keys(schemas).forEach(function(typeName){
+        const typeSchema = schemas[typeName];
+        const { facets = {} } = typeSchema;
+        facetsByType[typeName] = {};
+        Object.keys(facets).forEach(function(facetFieldName){
+            const facetObj = facets[facetFieldName];
+            // `facetObj` contains up to but not including: field, title, description, grouping, order, field_type, disabled, default_hidden
+            const { aggregation_type = "terms" } = facetObj;
+            facetsByType[typeName][facetFieldName] = {
+                ...facetObj,
+                aggregation_type,
+                "field": facetFieldName
+            };
+        });
+    });
+    return facetsByType;
+});

@@ -7,10 +7,13 @@ import { CSSTransition } from 'react-transition-group';
 export class SlideInPane extends React.PureComponent {
 
     static getDerivedStateFromProps(props, state){
-        if (props.in && props.in !== state.in){
-            return { 'in' : props.in };
+        const { in: propIn } = props;
+        const { pastIn } = state;
+        const nextState = { "pastIn": propIn };
+        if (!propIn && pastIn){
+            nextState.transitioningOut = true;
         }
-        return null;
+        return nextState;
     }
 
     static defaultProps = {
@@ -21,17 +24,9 @@ export class SlideInPane extends React.PureComponent {
         super(props);
         this.onExited = this.onExited.bind(this);
         this.state = {
-            'transitioningOut' : false,
-            'in' : props.in || false
+            "transitioningOut": false,
+            "pastIn": false
         };
-    }
-
-    componentDidUpdate(pastProps){
-        const { in: propIn } = this.props;
-        if (!propIn && pastProps.in){
-            // Transition out
-            this.setState({ 'transitioningOut' : true });
-        }
     }
 
     onExited(){
@@ -39,14 +34,14 @@ export class SlideInPane extends React.PureComponent {
     }
 
     render(){
-        const { onClose, fromSide, overlaysContainer, children, ...passProps } = this.props;
-        const { transitioningOut, in: stateIn } = this.state;
-        if (!stateIn && !transitioningOut){
+        const { onClose, in: propIn, fromSide, overlaysContainer, children, ...passProps } = this.props;
+        const { transitioningOut } = this.state;
+        if (!propIn && !transitioningOut){
             return null;
         }
 
         return ReactDOM.createPortal(
-            <CSSTransition classNames="slide-in-pane-transition" appear in={stateIn && !transitioningOut}
+            <CSSTransition classNames="slide-in-pane-transition" appear in={propIn && !transitioningOut}
                 unmountOnExit timeout={{ enter: 10, exit: 400 }} onExited={this.onExited}>
                 <div id="slide-in-pane-container" {...passProps}>
                     <div className="overlay-bg" onClick={onClose} />

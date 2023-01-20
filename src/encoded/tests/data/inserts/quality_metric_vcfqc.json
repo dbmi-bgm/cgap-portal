@@ -3,7 +3,84 @@
         "uuid": "595e3ec5-e4f8-4930-9c70-6e65e9a72d93",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
-        "submitted_by": "soohyun_lee@hms.harvard.edu",
-        "filtering_condition": "((Exonic and splice variants OR spliceAI>0.2) AND (gnomAD AF<0.01)) OR (Clinvar Pathogenic/Likely Pathogenic or Conflicting Submissions)"
+        "filtering_condition": "((Exonic and splice variants OR spliceAI>0.2) AND (gnomAD AF<0.01)) OR (Clinvar Pathogenic/Likely Pathogenic or Conflicting Submissions)",
+        "total variants": [
+            {
+                "total": 20000,
+                "name": "test001_sample"
+            },
+            {
+                "total": 30000,
+                "name": "test002_sample"
+            }
+        ],
+        "overall_quality_status": "PASS"
+    },
+    {
+        "uuid": "eaa17b48-12f9-4fac-80ac-9ffc4dbddbb6",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "total variants": [
+            {
+                "total": 100,
+                "name": "test001_sample"
+            },
+            {
+                "total": 120,
+                "name": "test002_sample"
+            }
+        ],
+        "overall_quality_status": "PASS"
+    },
+    {
+        "uuid": "0c4c2bde-1bb8-4545-a9e8-5583c5672712",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "total variants": [
+            {
+                "total": 2000,
+                "name": "test001_sample"
+            },
+            {
+                "total": 3000,
+                "name": "test002_sample"
+            }
+        ],
+        "transition-transversion ratio": [
+            {
+                "ratio": 2.4,
+                "name": "test001_sample"
+            },
+            {
+                "ratio": 1.95,
+                "name": "test002_sample"
+            }
+        ],
+        "heterozygosity ratio": {
+            "SNV": [
+                {
+                    "ratio": 2.4,
+                    "name": "test001_sample"
+                },
+                {
+                    "ratio": 2.95,
+                    "name": "test002_sample"
+                }
+            ]
+        },
+        "mendelian errors in trio": {
+            "SNV": [
+                {
+                    "name": "test001_sample",
+                    "counts": {
+                        "het": {
+                            "total": 100,
+                            "de_novo": 3
+                        }
+                    }
+                }
+            ]
+        },
+        "overall_quality_status": "PASS"
     }
 ]

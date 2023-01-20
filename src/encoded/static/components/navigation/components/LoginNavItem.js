@@ -8,7 +8,7 @@ import { UserRegistrationModal } from './UserRegistrationModal';
 
 
 export const LoginNavItem = React.memo(function LoginNavItem(props){
-    const { id =  "loginbtn", isRegistrationModalVisible, showLock, isLoading } = props;
+    const { id = "loginbtn", unverifiedUserEmail, showLock, isLoading, isAuth0LibraryLoaded = true } = props;
     const onClick = useCallback(function(e){
         // Prevent setting URL to '#' as might cause navigation away from tab.
         // `useCallback(fn, deps)` is equivalent to `useMemo(() => fn, deps)`
@@ -19,7 +19,8 @@ export const LoginNavItem = React.memo(function LoginNavItem(props){
     }, [ showLock ]);
     return (
         <React.Fragment>
-            <a role="button" href="#" key="login-reg-btn" active={isRegistrationModalVisible} onClick={onClick} className="nav-link user-account-item" id={id}>
+            <a role="button" href="#" className={"nav-link user-account-item" + (unverifiedUserEmail ? " active" : "")}
+                id={id} onClick={onClick} disabled={!isAuth0LibraryLoaded}>
                 { isLoading ? (
                     <span className="pull-right">
                         <i className="account-icon icon icon-spin icon-circle-notch fas align-middle"/>
@@ -28,11 +29,11 @@ export const LoginNavItem = React.memo(function LoginNavItem(props){
                     <React.Fragment>
                         <i className="account-icon icon icon-user fas" />
                         <span>Log In</span>
-                        <span className="d-none d-xl-inline"> / Register</span>
+                        <span className="d-none d-xl-inline">&nbsp;/ Register</span>
                     </React.Fragment>
                 )}
             </a>
-            { isRegistrationModalVisible ? <UserRegistrationModal {...props} /> : null }
+            { unverifiedUserEmail ? <UserRegistrationModal {...props} /> : null }
         </React.Fragment>
     );
 });
@@ -49,7 +50,7 @@ LoginNavItem.propTypes = {
  * Somewhat 'wrap-around' but arguably likely cleanest way to open Auth0 login dialog modal
  * from Alert and not require to move up and pass down login-related stuff like `showLock()`.
  */
-const onAlertLoginClick = function(e) {
+export const onAlertLoginClick = function(e) {
     e.preventDefault();
     const btnElem = document.getElementById("loginbtn");
     if (btnElem && typeof btnElem.click === "function"){

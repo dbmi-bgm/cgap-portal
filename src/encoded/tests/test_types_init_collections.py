@@ -1,6 +1,6 @@
 import pytest
 
-from datetime import datetime
+# from datetime import datetime
 from dcicutils.misc_utils import utc_today_str
 from ..types.image import Image
 
@@ -37,13 +37,13 @@ def protocol_w_attach(testapp, protocol_data, attachment):
 
 def test_document_display_title_w_attachment(testapp, protocol_data, attachment):
     protocol_data['attachment'] = attachment
-    del(protocol_data['protocol_type'])
+    del protocol_data['protocol_type']
     res = testapp.post_json('/document', protocol_data).json['@graph'][0]
     assert res.get('display_title') == 'red-dot.png'
 
 
 def test_document_display_title_wo_attachment(testapp, protocol_data):
-    del(protocol_data['protocol_type'])
+    del protocol_data['protocol_type']
     res = testapp.post_json('/document', protocol_data).json['@graph'][0]
     assert res.get('display_title') == 'Document from ' + utc_today_str()
 

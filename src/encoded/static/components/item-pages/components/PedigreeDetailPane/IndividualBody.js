@@ -106,6 +106,7 @@ export class IndividualBody extends React.PureComponent {
             '@id' : individualID,
             ancestry,
             phenotypic_features = [],
+            disorders = [],
             actions = []
         } = loadedIndividualItem || individualItem;
 
@@ -149,7 +150,10 @@ export class IndividualBody extends React.PureComponent {
                 </div>
 
                 <div className="details">
-                    { ancestry ? <InlineDetailRow label="Ancestry" value={ancestry} /> : null }
+                    { ancestry ?
+                        <InlineDetailRow label="Ancestry" value={ancestry.join(" • ")} />
+                        : null }
+                    <Disorders {...{ disorders }} diseaseToIndex={diseaseToIndex} />
                     <PhenotypicFeatures features={phenotypic_features} diseaseToIndex={diseaseToIndex} />
                     <ClinicianNotes individual={loadedIndividualItem || individualItem} haveEditPermission={haveEditPermission} />
                     <FileWrapper individual={loadedIndividualItem || individualItem } {...{ haveEditPermission, schemas }} />
@@ -196,29 +200,67 @@ function PhenotypicFeatures({ features, diseaseToIndex }){
                 '@id' : featureID,
                 display_title: title
             },
-            onset_age = null,
-            onset_age_units = null
+            onset_age: onsetAge = null,
+            onset_age_units: onsetAgeUnits = null
         } = feature;
         const diseaseIndex = diseaseToIndex[title] || -1;
         return (
-            <div className="detail-row-list-item phenotypic-feature" key={featureID}>
-                <div className="legend-patch" data-disease-index={diseaseIndex} />
-                <span className="title"><a href={featureID}>{ title }</a></span>
-                { onset_age !== null && onset_age_units !== null ? (
-                    <span className="onset" data-tip="Age of onset">
-                        <small> @ </small>
-                        { "" + onset_age + " " + onset_age_units + (onset_age > 1 ? "s" : "") }
-                    </span>
-                ) : null }
-            </div>
+            <DiseaseListItem key={featureID}
+                {...{ onsetAge, onsetAgeUnits, featureID, title, diseaseIndex }} />
         );
     });
 
     return (
-        <div className="detail-row phenotypic-features" data-describing="phenotypic_features">
-            <label className="d-block">Phenotypic Features</label>
-            { renderedFeatures.length > 0 ? renderedFeatures
+        <DiseaseList diseaseListItems={renderedFeatures} diseaseType="Phenotypic Features"/>
+    );
+}
+
+
+function Disorders({ disorders, diseaseToIndex }){
+    const renderedDisorders = disorders.map(function(disorder, idx){
+        const {
+            disorder : {
+                '@id' : featureID,
+                display_title: title
+            },
+            onset_age: onsetAge = null,
+            onset_age_units: onsetAgeUnits = null
+        } = disorder;
+        const diseaseIndex = diseaseToIndex[title] || -1;
+        return (
+            <DiseaseListItem key={featureID}
+                {...{ onsetAge, onsetAgeUnits, featureID, title, diseaseIndex }} />
+        );
+    });
+
+    return (
+        <DiseaseList diseaseListItems={renderedDisorders} diseaseType="Disorders"/>
+    );
+}
+
+function DiseaseList({ diseaseListItems, diseaseType }) {
+    return (
+        <div className="detail-row diseases" data-describing="diseases">
+            <label className="d-block">{diseaseType}</label>
+            { diseaseListItems.length > 0 ? diseaseListItems
                 : <em>None</em> }
+        </div>
+    );
+}
+
+function DiseaseListItem(props) {
+    const { featureID, diseaseIndex, title, onsetAge, onsetAgeUnits } = props;
+
+    return (
+        <div className="detail-row-list-item disease" key={featureID}>
+            <div className="legend-patch" data-disease-index={diseaseIndex} />
+            <span className="title text-truncate text-capitalize"><a href={featureID}>{ title }</a></span>
+            { onsetAge !== null && onsetAgeUnits !== null ? (
+                <span className="onset" data-tip="Age of onset">
+                    <small> @ </small>
+                    { "" + onsetAge + " " + onsetAgeUnits + (onsetAge > 1 ? "s" : "") }
+                </span>
+            ) : null }
         </div>
     );
 }

@@ -26,7 +26,7 @@ export const AnnotationBrowserTabBody = React.memo(function AnnotationBrowserTab
             // Force Higlass to repaint. Without this the tracks can be positioned incorrectly
             hgc.boundRefreshView();
         }
-    }, [ active ]); 
+    }, [ active ]);
 
     return (
         <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>

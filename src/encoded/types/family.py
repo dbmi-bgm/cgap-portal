@@ -4,6 +4,7 @@ import structlog
 from base64 import b64encode
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from dcicutils.misc_utils import ignored
 from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.paster import get_app
 from pyramid.view import view_config
@@ -22,24 +23,11 @@ from ..util import get_trusted_email
 log = structlog.getLogger(__name__)
 
 
-@collection(
-    name='families',
-    unique_key='accession',
-    properties={
-        'title': 'Families',
-        'description': 'Listing of Families',
-    })
-class Family(Item):
-    item_type = 'family'
-    name_key = 'accession'
-    schema = load_schema('encoded:schemas/family.json')
-    rev = {'sample_procs': ('SampleProcessing', 'families'),
-           'case': ('Case', 'family')}
+def _build_family_embedded_list():
+    return [
 
-    embedded_list = [
+        # Individual linkTo
         "members.accession",
-        "members.father",
-        "members.mother",
         "members.status",
         "members.sex",
         "members.is_deceased",
@@ -57,18 +45,29 @@ class Family(Item):
         "members.cause_of_infertility",
         "members.ancestry",
         "members.clinic_notes",
-        "members.phenotypic_features.phenotypic_feature",
+
+        # Individual linkTo
+        "members.father.accession",
+        "members.mother.accession",
+
+        # Phenotype linkTo
+        "members.phenotypic_features.phenotypic_feature.hpo_id",
+        "members.phenotypic_features.phenotypic_feature.phenotype_name",
         "members.phenotypic_features.onset_age",
         "members.phenotypic_features.onset_age_units",
+
+        # Sample linkTo
         "members.samples.status",
         "members.samples.bam_sample_id",
         "members.samples.specimen_type",
         "members.samples.specimen_notes",
         "members.samples.specimen_collection_date",
         "members.samples.workup_type",
-        "members.samples.processed_files",
-        "members.samples.processed_files.workflow_run_outputs",
-        "members.samples.processed_files.quality_metric",
+        "members.samples.completed_processes",
+
+        # File linkTo / QC
+        "members.samples.processed_files.workflow_run_outputs.@id",
+        "members.samples.processed_files.quality_metric.@id",
         "members.samples.processed_files.quality_metric.qc_list.qc_type",
         "members.samples.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "members.samples.processed_files.quality_metric.qc_list.value.url",
@@ -76,7 +75,9 @@ class Family(Item):
         "members.samples.processed_files.quality_metric.overall_quality_status",
         "members.samples.processed_files.quality_metric.url",
         "members.samples.processed_files.quality_metric.status",
-        "members.samples.files.quality_metric",
+
+        # QC
+        "members.samples.files.quality_metric.@id",
         "members.samples.files.quality_metric.qc_list.qc_type",
         "members.samples.files.quality_metric.qc_list.value.overall_quality_status",
         "members.samples.files.quality_metric.qc_list.value.url",
@@ -84,10 +85,13 @@ class Family(Item):
         "members.samples.files.quality_metric.overall_quality_status",
         "members.samples.files.quality_metric.url",
         "members.samples.files.quality_metric.status",
-        "members.samples.completed_processes",
+
+        # Sample linkTo
         "analysis_groups.samples.accession",
-        "analysis_groups.processed_files",
-        "analysis_groups.processed_files.quality_metric",
+
+        # QC
+        "analysis_groups.processed_files.@id",
+        "analysis_groups.processed_files.quality_metric.@id",
         "analysis_groups.processed_files.quality_metric.qc_list.qc_type",
         "analysis_groups.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.qc_list.value.url",
@@ -95,9 +99,10 @@ class Family(Item):
         "analysis_groups.processed_files.quality_metric.overall_quality_status",
         "analysis_groups.processed_files.quality_metric.url",
         "analysis_groups.processed_files.quality_metric.status",
-        "analysis_groups.sample_processed_files",
+
+        # QC
         "analysis_groups.sample_processed_files.sample.accession",
-        "analysis_groups.sample_processed_files.processed_files.quality_metric",
+        "analysis_groups.sample_processed_files.processed_files.quality_metric.@id",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.qc_type",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.overall_quality_status",
         "analysis_groups.sample_processed_files.processed_files.quality_metric.qc_list.value.url",
@@ -107,6 +112,23 @@ class Family(Item):
         "analysis_groups.sample_processed_files.processed_files.quality_metric.status",
         "analysis_groups.completed_processes",
     ]
+
+
+@collection(
+    name='families',
+    unique_key='accession',
+    properties={
+        'title': 'Families',
+        'description': 'Listing of Families',
+    })
+class Family(Item):
+    item_type = 'family'
+    name_key = 'accession'
+    schema = load_schema('encoded:schemas/family.json')
+    rev = {'sample_procs': ('SampleProcessing', 'families'),
+           'case': ('Case', 'family')}
+
+    embedded_list = _build_family_embedded_list()
 
     @calculated_property(schema={
         "title": "Cases",
@@ -267,6 +289,7 @@ class Family(Item):
             'second-cousin', 'second-cousin-once-removed(descendant)', 'second-cousin-twice-removed(descendant)',
             'family-in-law', 'extended-family', 'not-linked'
                  ]
+        ignored(roles)  # TODO: Should this in fact be ignored?
         # return a nested list of  [acc, calculated_relation, association]
         # start convert with seed roles
         Converter = {
@@ -632,7 +655,7 @@ def process_pedigree(context, request):
     fam_props = context.upgrade_properties()
     post_extra = {'project': fam_props['project'],
                   'institution': fam_props['institution']}
-    xml_extra = {'ped_datetime': ped_datetime}
+    xml_extra = {'ped_datetime': ped_datetime.isoformat()}
 
     family_uuids = create_family_proband(testapp, xml_data, refs, 'managedObjectID',
                                          family_item, post_extra, xml_extra)
@@ -1060,7 +1083,7 @@ def etree_to_dict(ele, ref_container=None, ref_field=''):
     ret = None
 
     # represent the element with a dict if there are children or attributes
-    children = ele.getchildren()
+    children = list(ele)  # ele.getchildren() - .getchildren() is deprecated
     if children or ele.attrib:
         ret = {}
         # add child elements and attributes from this element
@@ -1120,7 +1143,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     family_members = {}
     uuids_by_ref = {}
     proband = None
-    errors = []
+    # errors = []
     xml_type = 'people'
     item_type = 'Individual'
     for round in ['first', 'second']:

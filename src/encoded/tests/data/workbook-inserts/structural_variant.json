@@ -1,0 +1,17 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "status": "in review",
+        "uuid": "0ab92af3-26f5-4865-a3d0-f47c200f7b32",
+        "CHROM": "1",
+        "START": 12000,
+        "END": 14250,
+        "SV_TYPE": "DEL",
+        "transcript": [
+            {
+                "csq_gene": "ad9883a2-6886-4ca0-9402-7c49734c12fb"
+            }
+        ]
+    }
+]

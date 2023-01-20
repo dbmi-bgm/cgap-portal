@@ -4,19 +4,52 @@
     "id": "/profiles/sample_processing.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": [ "project", "institution"],
-    "identifyingProperties": ["uuid", "aliases"],
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/attribution" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/static_embeds" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/submitted_files"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
+        },
+        {
+            "$ref": "mixins.json#/processed_files"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -37,9 +70,14 @@
                 "Custom"
             ]
         },
+        "analysis_version": {
+            "title": "Analysis Version",
+            "description": "The version of the pipeline that is intended to be run",
+            "type": "string"
+        },
         "samples": {
             "title": "Samples",
-            "description": "Samples used in the analysis",
+            "description": "Samples used in a case analysis",
             "type": "array",
             "items": {
                 "title": "Sample",
@@ -82,16 +120,6 @@
                         }
                     }
                 }
-            }
-        },
-        "processed_files": {
-            "title": "Processed Files",
-            "description": "Processed files that are combined results for the sample analysis.",
-            "type": "array",
-            "items": {
-                "title": "Processed File",
-                "type": "string",
-                "linkTo": "FileProcessed"
             }
         },
         "completed_processes": {

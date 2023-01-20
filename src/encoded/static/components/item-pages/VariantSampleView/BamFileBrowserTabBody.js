@@ -30,6 +30,20 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
         }
     }, [ active ]);
 
+    function exportDisplay(){
+        const hgc = higlassContainerRef.current.getHiGlassComponent();
+        if (!hgc) {
+            console.warn("Higlass component not found.");
+            return;
+        }
+        const svg = hgc.api.exportAsSvg();
+
+        var element = document.createElement('a');
+        element.setAttribute('href', 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(svg));
+        element.setAttribute('download', file+".svg");
+        element.click();
+    }
+
     return (
         <div className={"browser-tab-body card-body" + (!active ? " d-none" : "")}>
             <div className="row">
@@ -37,10 +51,15 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
                     <div className="inner-card-section flex-grow-1 pb-2 pb-xl-1">
                         <div className="info-header-title">
                             <h4>
-                                BAM File Viewer
+                                BAM File Browser
                             </h4>
                         </div>
                         <div className="info-body">
+                            <div className="text-right">
+                                <button type="button" className="btn btn-primary btn-sm" onClick={exportDisplay}>
+                                    <i className="icon icon-download icon-sm fas mr-1"></i>Export
+                                </button>
+                            </div>
                             <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} requestingTab="bam" bamSampleId={bamSampleId} file={file}/>
                         </div>
                     </div>

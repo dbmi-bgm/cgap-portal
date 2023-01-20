@@ -1,0 +1,16 @@
+
+<h5>
+    The hg19 coordinates for structural variants are calculated.
+</h5>
+
+<p>
+All variants are currently called for the hg38 reference genome. If the variant in hg19
+coordinates is not available, the conversion calculation was not successful.
+</p>
+
+<p>
+For structural variants, both the start and end coordinates are converted to hg19 via an
+implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If
+either one of these conversions fails, the variant will not be available in hg19
+coordinates.
+</p>

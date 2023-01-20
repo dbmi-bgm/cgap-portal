@@ -127,7 +127,21 @@ export class HiGlassPlainContainer extends React.PureComponent {
                     'higlass-dependencies'
                 ).then((loadedDeps) =>{
                     higlassDependencies = loadedDeps;
-                    const { higlassRegister, SequenceTrack, TranscriptsTrack, ClinvarTrack, TextTrack, OrthologsTrack, PileupTrack, GnomadTrack } = higlassDependencies;
+                    const {
+                      higlassRegister,
+                      SequenceTrack,
+                      TranscriptsTrack,
+                      ClinvarTrack,
+                      TextTrack,
+                      OrthologsTrack,
+                      PileupTrack,
+                      GnomadTrack,
+                      SvTrack,
+                      GeneralVcfTrack,
+                      CohortTrack,
+                      GeneListTrack,
+                      BigwigDataFetcher
+                    } = higlassDependencies;
 
                     higlassRegister({
                         name: 'SequenceTrack',
@@ -164,6 +178,33 @@ export class HiGlassPlainContainer extends React.PureComponent {
                         track: GnomadTrack,
                         config: GnomadTrack.config,
                     });
+                    higlassRegister({
+                        name: 'SvTrack',
+                        track: SvTrack,
+                        config: SvTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'GeneralVcfTrack',
+                        track: GeneralVcfTrack,
+                        config: GeneralVcfTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'CohortTrack',
+                        track: CohortTrack,
+                        config: CohortTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'GeneListTrack',
+                        track: GeneListTrack,
+                        config: GeneListTrack.config,
+                    });
+                    higlassRegister(
+                      {
+                        dataFetcher: BigwigDataFetcher,
+                        config: BigwigDataFetcher.config,
+                      },
+                      { pluginType: "dataFetcher" }
+                    );
 
                     finish();
                 });
@@ -231,9 +272,9 @@ const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContaine
     const { HiGlassComponent } = higlassDependencies || {};
 
     let hiGlassInstance = null;
+    const placeholderStyle = { width: width || null };
 
     if (isValidating || !mounted || !higlassInitialized || higlassVersionUsed === null){ // Still loading/initializing...
-        const placeholderStyle = { width: width || null };
         if (typeof height === 'number' && height >= 140){
             placeholderStyle.height = height;
             placeholderStyle.paddingTop = (height / 2) - 40;

@@ -7,6 +7,7 @@ import memoize from 'memoize-one';
 
 import { navigate, console, analytics, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { UserContentBodyList } from './../../static-pages/components/UserContentBodyList';
+import ReactTooltip from 'react-tooltip';
 
 
 /**
@@ -94,7 +95,7 @@ export class TabView extends React.PureComponent {
         };
     }
 
-    static calculateAdditionalTabs = memoize(function(staticContentList, contents){
+    static calculateAdditionalTabs(staticContentList, contents){
 
         // If func, run it to return contents.
         // Do this here so that memoization is useful, else will always be new instance
@@ -114,16 +115,13 @@ export class TabView extends React.PureComponent {
         });
 
         // Filter down to locations which don't already exist in our tabs.
-        staticTabContent = _.filter(
-            _.map(staticTabContent, function(s){
-                const splitLocation = s.location.split(':');
-                const tabKey = splitLocation.slice(1).join(':'); // This could have more ':'s in it, theoretically.
-                return _.extend({ tabKey }, s);
-            }),
-            function(s){
-                return existingTabKeys.indexOf(s.tabKey) === -1;
-            }
-        );
+        staticTabContent = staticTabContent.map(function(s){
+            const splitLocation = s.location.split(':');
+            const tabKey = splitLocation.slice(1).join(':'); // This could have more ':'s in it, theoretically.
+            return _.extend({ tabKey }, s);
+        }).filter(function(s){
+            return existingTabKeys.indexOf(s.tabKey) === -1;
+        });
 
         const groupedContent = _.groupBy(staticTabContent, 'tabKey');
 
@@ -148,11 +146,11 @@ export class TabView extends React.PureComponent {
         // Content with position : 'tab' gets its own tab.
         //
 
-        const staticTabContentSingles = _.filter(staticContentList, function(s){
+        const staticTabContentSingles = staticContentList.filter(function(s){
             return s.content && !s.content.error && s.location === 'tab';
         });
 
-        _.forEach(staticTabContentSingles, function(s, idx){
+        staticTabContentSingles.forEach(function(s, idx){
             const { content: { title = null, options : { title_icon = null } } } = s;
             const showTitle = title || 'Custom Tab ' + (idx + 1);
             const tabKey = title.toLowerCase().split(' ').join('_');
@@ -160,9 +158,9 @@ export class TabView extends React.PureComponent {
         });
 
         return resultArr;
-    });
+    }
 
-    static combineSystemAndCustomTabs = memoize(function(additionalTabs, contents){
+    static combineSystemAndCustomTabs(additionalTabs, contents){
         if (typeof contents === 'function') contents = contents();
         let allTabs;
         if (additionalTabs.length === 0){
@@ -179,7 +177,7 @@ export class TabView extends React.PureComponent {
             }
         }
         return allTabs;
-    });
+    }
 
     static propTypes = {
         'contents' : PropTypes.oneOfType([PropTypes.func, PropTypes.arrayOf(PropTypes.shape({
@@ -203,7 +201,6 @@ export class TabView extends React.PureComponent {
 
     constructor(props){
         super(props);
-        this.getActiveKey = this.getActiveKey.bind(this);
         this.setActiveKey = this.setActiveKey.bind(this);
         this.getTabByHref = this.getTabByHref.bind(this);
         this.maybeSwitchTabAccordingToHref = this.maybeSwitchTabAccordingToHref.bind(this);
@@ -211,6 +208,12 @@ export class TabView extends React.PureComponent {
 
         this.state = {
             currentTabKey : (props.contents && TabView.getDefaultActiveKeyFromContents(props.contents)) || null
+        };
+
+        this.memoized = {
+            combineSystemAndCustomTabs: memoize(TabView.combineSystemAndCustomTabs),
+            calculateAdditionalTabs: memoize(TabView.calculateAdditionalTabs),
+            currentTabIdx: memoize(function(allTabs, currentTabKey){ return _.findIndex(allTabs, { 'key' : currentTabKey }); })
         };
 
         this.tabsRef = React.createRef();
@@ -223,37 +226,46 @@ export class TabView extends React.PureComponent {
     }
 
     componentDidUpdate(pastProps, pastState){
-        if (pastProps.href !== this.props.href){
+        const { href } = this.props;
+        const { currentTabKey } = this.state;
+        if (pastProps.href !== href){
             this.maybeSwitchTabAccordingToHref();
+            return;
         }
-    }
-
-    getActiveKey(){
-        return this.state.currentTabKey;
+        if (pastState.currentTabKey !== currentTabKey) {
+            setTimeout(ReactTooltip.rebuild, 0);
+        }
     }
 
     setActiveKey(nextKey){
         this.setState({ 'currentTabKey' : nextKey });
     }
 
+    /**
+     * Returns null if on same tab as href.
+     * @todo Maybe consider moving that ^.
+     */
     getTabByHref(){
         const { contents, href } = this.props;
-        const hrefParts = memoizedUrlParse(href);
-        const hash = typeof hrefParts.hash === 'string' && hrefParts.hash.length > 0 && hrefParts.hash.slice(1);
-        const currKey = this.getActiveKey();
+        const { currentTabKey: currKey } = this.state;
+        const { hash } = memoizedUrlParse(href);
 
-        if (currKey === hash){
+        let firstHashPart = null;
+        if (typeof hash === "string" && hash.length > 1) {
+            [ firstHashPart ] = hash.slice(1).split(".");
+        }
+
+        if (currKey === firstHashPart){
             return null;
         }
 
-        const allContentObjs = hash && TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents);
-        const foundContent = Array.isArray(allContentObjs) && _.findWhere(allContentObjs, { 'key' : hash });
+        const allContentObjs = (hash && this.memoized.combineSystemAndCustomTabs(this.additionalTabs(), contents)) || [];
+        const foundContent = allContentObjs.find(function({ key }){
+            const [ keyFirstHashPart ] = key.split(".");
+            return firstHashPart === keyFirstHashPart;
+        });
 
-        if (!foundContent){
-            return null;
-        }
-
-        return foundContent;
+        return foundContent || null;
     }
 
     maybeSwitchTabAccordingToHref(){
@@ -278,7 +290,7 @@ export class TabView extends React.PureComponent {
 
         if (static_content.length === 0) return []; // No content defined for Item.
 
-        return TabView.calculateAdditionalTabs(static_content, contents);
+        return this.memoized.calculateAdditionalTabs(static_content, contents);
     }
 
     onTabClick(tabKey, evt){
@@ -302,8 +314,8 @@ export class TabView extends React.PureComponent {
         const { contents, prefixTabs = [], suffixTabs = [] } = this.props;
         const { currentTabKey } = this.state;
 
-        const allTabs = TabView.combineSystemAndCustomTabs(this.additionalTabs(), contents);
-        const currentTabIdx = _.findIndex(allTabs, { 'key' : currentTabKey });
+        const allTabs = this.memoized.combineSystemAndCustomTabs(this.additionalTabs(), contents);
+        const currentTabIdx = this.memoized.currentTabIdx(allTabs, currentTabKey);
         const currentTab = allTabs[currentTabIdx];
 
         if (!currentTab) {
@@ -386,7 +398,7 @@ class TabPane extends React.PureComponent {
 
     cacheCurrentTabContent(){
         const { currentTab, currentTabIdx: idx } = this.props;
-        const { key, content, cache = true } = currentTab;
+        const { key, content, cache = false } = currentTab;
         this.cachedContent[key] = { content, idx, key, cache };
     }
 
@@ -398,11 +410,12 @@ class TabPane extends React.PureComponent {
         return _.values(this.cachedContent).filter(function(viewObj){
             return viewObj && (viewObj.cache || viewObj.key === currKey);
         }).map(function({ content, idx, key }){
-            const cls = "tab-pane-outer" + (currKey === key ? " active" : " d-none");
+            const isActiveTab = currKey === key;
+            const cls = "tab-pane-outer" + (isActiveTab ? " active" : " d-none");
             return (
                 <div className={cls} data-tab-key={key} id={key} key={key || idx}>
                     <TabPaneErrorBoundary>
-                        { content }
+                        { React.cloneElement(content, { isActiveTab }) }
                     </TabPaneErrorBoundary>
                 </div>
             );

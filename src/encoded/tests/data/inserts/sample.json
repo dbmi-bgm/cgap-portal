@@ -4,14 +4,24 @@
         "institution": "hms-dbmi",
         "status": "shared",
         "uuid": "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
-        "bam_sample_id": "test001_sample"
+        "bam_sample_id": "test001_sample",
+        "workup_type": "WGS",
+        "specimen_type": "peripheral blood",
+        "processed_files": [
+            "10002377-49e5-4c33-afab-9ec90d65faf3"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "status": "shared",
         "uuid": "283f6047-61cd-4ddb-8881-ec1c87082569",
-        "bam_sample_id": "test002_sample"
+        "workup_type": "WGS",
+        "bam_sample_id": "test002_sample",
+        "specimen_type": "peripheral blood",
+        "processed_files": [
+            "10002377-49e5-4c33-afab-9ec90d65faa1"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -40,10 +50,12 @@
             "date_sent": "2020-03-04",
             "date_completed": "2020-03-05"
         },
-        "other_specimen_ids": [{
-            "id_type": "BCGG-ID",
-            "id": "45678"
-        }],
+        "other_specimen_ids": [
+            {
+                "id_type": "BCGG-ID",
+                "id": "45678"
+            }
+        ],
         "specimen_collection_date": "2020-03-06",
         "date_transported": "2020-03-07",
         "transported_by": "FedEx",
@@ -51,7 +63,10 @@
         "specimen_accepted": "Yes",
         "dna_concentration": "100 ng/uL",
         "library_info": [
-            {"field": "plate ID", "value": "A197"}
+            {
+                "field": "plate ID",
+                "value": "A197"
+            }
         ],
         "sequence_id": "BAE12345",
         "sequencing_date": "2020-03-10",

@@ -45,6 +45,10 @@ export default class HealthView extends React.PureComponent {
     static defaultProps = {
         "excludedKeys" : [ ...ItemDetailList.Detail.defaultProps.excludedKeys, 'content' ],
         "keyTitleDescriptionMapConfig" : {
+            'application_bucket_prefix' : {
+                title : "Application Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's application buckets."
+            },
             'aggregations' : {
                 title : 'Aggregations',
                 description : "Aggregations of ES-indexed data."
@@ -80,9 +84,13 @@ export default class HealthView extends React.PureComponent {
                 title : "Foursight",
                 description : "URI of corresponding Foursight page."
             },
-            'metadata_bundles_bucket' : {
-                title: "MetaData Bundles Bucket",
-                description : "Name of S3 bucket used for metadata bundles."
+            'foursight_bucket_prefix' : {
+                title : "Foursight Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's foursight buckets."
+            },
+            'identity': {
+                title : "Identity",
+                description : "An application configuration key that represents the current environment."
             },
             'indexer' : {
                 title : "Indexer",
@@ -95,6 +103,10 @@ export default class HealthView extends React.PureComponent {
             'load_data' : {
                 title : "Loaded Data",
                 description : "Data which was loaded into database on initialization or boot."
+            },
+            'metadata_bundles_bucket' : {
+                title: "MetaData Bundles Bucket",
+                description : "Name of S3 bucket used for metadata bundles."
             },
             'namespace': {
                 title : "Namespace",
@@ -112,17 +124,33 @@ export default class HealthView extends React.PureComponent {
                 title : "Project Version",
                 description : "Software version for this portal's software."
             },
-            'snovault_version': {
-                title : "Snovault Version",
-                description : "Software version of dcicsnovault being used."
+            'python_version': {
+                title : "Python Version",
+                description : "Software version of Python used by this portal.",
             },
             'spc_version': {
                 title : "Shared Portal Components Version",
                 description : "Software version of shared-portal-components package being used."
             },
+            'snovault_version': {
+                title : "Snovault Version",
+                description : "Software version of dcicsnovault being used."
+            },
+            's3_encrypt_key_id': {
+                title : "S3 Encrypt Key Id",
+                description : "Name of key whose value is the encrypt key for uploaded file data stored on S3."
+            },
             'system_bucket' : {
                 title : 'System Bucket',
                 description : "Name of S3 Bucket used for system data."
+            },
+            'tibanna_cwls_bucket': {
+                title : "Tibanna CWLs Bucket",
+                description : "Name of S3 bucket used for tibanna CWL files."
+            },
+            'tibanna_output_bucket': {
+                title : "Tibanna Output Bucket",
+                description : "Name of S3 bucket used for tibanna output."
             },
             'uptime': {
                 title : 'Uptime',

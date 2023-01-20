@@ -4,19 +4,43 @@
     "id": "/profiles/phenotype.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["phenotype_name", "hpo_id"],
-    "identifyingProperties": ["uuid", "aliases"],
+    "required": [
+        "phenotype_name",
+        "hpo_id"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/dbxrefs" },
-        { "$ref": "mixins.json#/alternative_ids" },
-        { "$ref": "mixins.json#/static_embeds" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/dbxrefs"
+        },
+        {
+            "$ref": "mixins.json#/alternative_ids"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -25,16 +49,16 @@
         "status": {
             "default": "shared"
         },
-        "hpo_id" : {
-            "title" : "HPO Identifier",
-            "description" : "Identifier of phenotype at hpo.jax.org. E.g. \"HP:0000347\"",
-            "type" : "string",
+        "hpo_id": {
+            "title": "HPO Identifier",
+            "description": "Identifier of phenotype at hpo.jax.org. E.g. \"HP:0000347\"",
+            "type": "string",
             "uniqueKey": true
         },
-        "phenotype_name" : {
-            "title" : "Phenotype Name",
+        "phenotype_name": {
+            "title": "Phenotype Name",
             "description": "HPO assigned official term name",
-            "type" : "string"
+            "type": "string"
         },
         "hpo_url": {
             "title": "URL",
@@ -42,9 +66,9 @@
             "type": "string",
             "format": "uri"
         },
-        "parents" : {
+        "parents": {
             "title": "Parent Phenotypes",
-            "type" : "array",
+            "type": "array",
             "items": {
                 "title": "Parent",
                 "type": "string",
@@ -65,25 +89,27 @@
             "title": "Slim Branch",
             "description": "If the phenotype is a category the value is the slot that the slim is for",
             "type": "string",
-            "enum": ["Phenotypic abnormality"]
+            "enum": [
+                "Phenotypic abnormality"
+            ]
         },
-        "definition" : {
-            "title" : "Definition",
+        "definition": {
+            "title": "Definition",
             "description": "Definition of this phenotype",
-            "type" : "string",
+            "type": "string",
             "formInput": "textarea"
         },
-        "synonyms" : {
-            "type" : "array",
-            "title" : "Synonyms",
-            "items" : {
-                "type" : "string",
+        "synonyms": {
+            "type": "array",
+            "title": "Synonyms",
+            "items": {
+                "type": "string",
                 "title": "Synonym"
             }
         },
-        "comment" : {
-            "type" : "string",
-            "title" : "Comment",
+        "comment": {
+            "type": "string",
+            "title": "Comment",
             "formInput": "textarea"
         },
         "suggested_replacements": {

@@ -1,7 +1,6 @@
 [
     {
         "status": "in review",
-        "submitted_by": "b041dba8-e2b2-4e54-a621-97edb508a0c4",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "overall_quality_status": "PASS",
         "transition-transversion ratio": [
@@ -60,7 +59,6 @@
                 }
             }
         ],
-        "schema_version": "1",
         "uuid": "d58e195a-bb9e-4493-a2aa-8f533f8cddcc",
         "depth of coverage": [
             {
@@ -1292,10 +1290,8 @@
     },
     {
         "status": "in review",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "overall_quality_status": "PASS",
-        "schema_version": "1",
         "uuid": "d918bc25-0888-4658-811b-53c20b944b76",
         "transition-transversion ratio": [
             {

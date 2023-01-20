@@ -1,0 +1,33 @@
+[
+    {
+        "email": "jkrier@bwh.harvard.edu",
+        "first_name": "Joel",
+        "last_name": "Krier",
+        "uuid": "986b362f-4eb6-4a9c-8173-3acba722bba1",
+        "project": "c2f37035-f7df-4e00-aca7-6bfbe2d5f936",
+        "project_roles": [
+            {
+                "project": "c2f37035-f7df-4e00-aca7-6bfbe2d5f936",
+                "role": "clinician"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
+    },
+    {
+        "email": "aghazani@bwh.harvard.edu",
+        "first_name": "Arezou",
+        "last_name": "Ghazani",
+        "uuid": "f9524d43-01b5-4b71-94c6-32d2d09c3343",
+        "groups": [
+            "admin"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [
+            {
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                "role": "developer"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234"
+    }
+]

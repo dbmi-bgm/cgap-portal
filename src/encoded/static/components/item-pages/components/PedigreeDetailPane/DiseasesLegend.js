@@ -22,7 +22,7 @@ export function DiseasesLegend (props) {
         return null;
     }
 
-    return availableDiseases.map(function(aD){
+    return availableDiseases.map(function(aD, idx){
         const {
             display_title: title,
             '@id': id
@@ -32,11 +32,11 @@ export function DiseasesLegend (props) {
         const checked = !!(diseaseIndex);
 
         return (
-            <div className="detail-row disease-option" key={id}>
+            <div className="detail-row disease-option text-capitalize" key={id}>
                 <Checkbox checked={checked}
                     onChange={onToggleSelectedDisease} name={title}
-                    className="text-400">
-                    <span className="align-middle text-400">{ title }</span>
+                    labelClassName="text-400 mb-0">
+                    <span className="align-middle">{ title }</span>
                 </Checkbox>
                 <div className="disease-color-patch ml-1" data-disease-index={diseaseIndex}>
                     <span>{ diseaseIndex }</span>

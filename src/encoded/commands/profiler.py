@@ -51,12 +51,22 @@ def parse_restriction(value):
     return value
 
 
+# Per https://specs.openstack.org/openstack/api-wg/guidelines/http/methods.html
+# although TRACE is the only method that actively disallows a body,
+# in normal practice GET, DELETE, TRACE, OPTIONS and HEAD methods are not expected to have a body.
+
+BODYLESS_METHODS = {'get', 'delete', 'trace', 'options', 'head'}
+
 def run(testapp, method, path, data, warm_ups, filename, sortby, stats, callers, callees, response_body):
-    method = method.lower()
-    if method == 'get':
-        fn = lambda: testapp.get(path)
-    else:
-        fn = lambda: getattr(testapp, method)(path, data, content_type='application/json')
+    method_name = method.lower()
+
+    def make_request_caller(method_fn, *, with_data):
+        if with_data:
+            return lambda: method_fn(path, data, content_type='application/json')
+        else:
+            return lambda: method_fn(path)
+
+    fn = make_request_caller(method_fn=getattr(testapp, method_name), with_data=method_name in BODYLESS_METHODS)
     for n in range(warm_ups):
         res = fn()
         logger.info('Warm up %d:\n\t%s', n + 1, res.headers['X-Stats'].replace('&', '\n\t'))

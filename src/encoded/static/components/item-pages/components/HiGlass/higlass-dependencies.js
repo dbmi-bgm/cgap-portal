@@ -12,6 +12,11 @@ import { default as TextTrack } from 'higlass-text/es/TextTrack';
 import { default as OrthologsTrack } from 'higlass-orthologs/es/OrthologsTrack';
 import { default as PileupTrack } from 'higlass-pileup/es/PileupTrack';
 import { default as GnomadTrack } from 'higlass-gnomad/es/GnomadTrack';
+import { default as SvTrack } from 'higlass-sv/es/SvTrack';
+import { default as GeneralVcfTrack } from 'higlass-general-vcf/es/GeneralVcfTrack';
+import { default as CohortTrack } from 'higlass-cohort/es/CohortTrack';
+import { default as GeneListTrack } from 'higlass-cohort/es/GeneListTrack';
+import { default as BigwigDataFetcher } from 'higlass-bigwig-datafetcher/es/BigwigDataFetcher';
 
 export {
     HiGlassComponent,
@@ -22,5 +27,10 @@ export {
     TextTrack,
     OrthologsTrack,
     PileupTrack,
-    GnomadTrack
+    GnomadTrack,
+    SvTrack,
+    GeneralVcfTrack,
+    CohortTrack,
+    GeneListTrack,
+    BigwigDataFetcher
 };

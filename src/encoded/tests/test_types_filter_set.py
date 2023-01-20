@@ -2,7 +2,8 @@ import pytest
 from webtest import AppError
 
 
-pytestmark = [pytest.mark.working, pytest.mark.search]
+pytestmark = [pytest.mark.working, pytest.mark.search, pytest.mark.workbook]
+
 COMPOUND_SEARCH_URL = '/compound_search'
 FILTER_SET_URL = '/filter_set'
 VARIANT_URL = '/variant'
@@ -33,7 +34,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
 
     # execute given the @id of a filter_set
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 6
 
     # execute given flags only
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -45,7 +46,7 @@ def test_filter_set_barebones(workbook, es_testapp, barebones_filter_set):
         ],
         'search_type': 'Project'  # NOTE: will work since we are not actually validating this
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
     # do it again, this time with a type that will return 404
     es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -85,7 +86,7 @@ def simple_filter_set():
 def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
     """ Test posting a non-trivial (but simple) filter set """
     res = es_testapp.post_json(FILTER_SET_URL, simple_filter_set, status=201).json
-    uuid = res['@graph'][0]['@id']
+    at_id = res['@graph'][0]['@id']
     es_testapp.post_json('/index', {})
 
     # execute filter_blocks only
@@ -96,7 +97,7 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
                                                 }],
                                                 'search_type': 'Variant'
                                             }).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 5
 
     # execute given flags only
     compound_search_res = es_testapp.post_json('/compound_search', {
@@ -108,7 +109,7 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
         ],
         'search_type': 'Project'
     }).json['@graph']
-    assert len(compound_search_res) == 1
+    assert len(compound_search_res) == 2
 
     # execute the same search using filter_blocks and flags
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {
@@ -124,16 +125,17 @@ def test_filter_set_simple(workbook, es_testapp, simple_filter_set):
         ],
         'search_type': 'Variant'
     }).json['@graph']
-    assert len(compound_search_res) == 4
+    assert len(compound_search_res) == 5
 
-    # do similar search with @id
-    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 1
+    # do similar search with `simple_filter_set` FilterSet Item @id
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': at_id}).json['@graph']
+    assert len(compound_search_res) == 2
 
 
 @pytest.fixture
 def typical_filter_set():
-    """ A filter set with two filter blocks and a flag """
+    """ A filter set with two filter blocks, a flag, and preset/
+    default assignments"""
     return {
         'title': 'Test filter set',
         'search_type': 'Variant',
@@ -154,7 +156,18 @@ def typical_filter_set():
             }
         ],
         'project': 'hms-dbmi',
-        'institution': 'hms-dbmi'
+        'institution': 'hms-dbmi',
+        'preset_for_projects': [
+            '4e4f2247-352a-46ad-9aec-70c218d94884',
+            '1ddaa694-b80c-4c3e-95c3-684344a71aaf'
+            ],
+        'preset_for_users': [
+            '2feea865-1d90-496d-8632-fb12b6a3429f'
+            ],
+        'default_for_projects': [
+            'c159d935-1451-4ae1-801c-bdd25cd5d4ec',
+            '4d2db0db-4a80-4845-b0e0-c029b6538032'
+            ]
     }
 
 
@@ -165,7 +178,7 @@ def test_filter_set_typical(workbook, es_testapp, typical_filter_set):
 
     # execute the more complicated filter_set by @id
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 4
 
 
 @pytest.fixture
@@ -209,7 +222,7 @@ def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
     flags = res['@graph'][0]['flags']
 
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, {'@id': uuid}).json['@graph']
-    assert len(compound_search_res) == 4  # all variants will match
+    assert len(compound_search_res) == 5  # all variants will match
 
     # Modify POS
     filter_set = {
@@ -220,10 +233,10 @@ def test_filter_set_complex(workbook, es_testapp, complex_filter_set):
     for block in filter_blocks:
         query = block['query']
         if 'POS' in query:
-            block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/4 variants
+            block['query'] = 'POS.from=0&POS.to=80000'  # excludes 1/5 variants
             break
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
-    assert len(compound_search_res) == 3
+    assert len(compound_search_res) == 4
 
 
 def test_filter_set_intersection(workbook, es_testapp, complex_filter_set):
@@ -288,10 +301,11 @@ def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_wit
     compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
     assert len(compound_search_res) == 2
 
-    # add chr=2 flag, giving no results
+    # add chr=2 flag, giving 1 result
     for filter_block in filter_set['filter_blocks']:
         filter_block['flags_applied'].append('hg19_chrom_is_two')
-    es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set, status=404)
+    compound_search_res = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set).json['@graph']
+    assert len(compound_search_res) == 1
 
     # disable all flags, still only giving 2 results
     for filter_block in filter_set['filter_blocks']:
@@ -315,8 +329,8 @@ def test_filter_set_selectively_apply_flags(workbook, es_testapp, filter_set_wit
 @pytest.fixture
 def filter_set_with_only_flags():
     return {
-        'search_type': 'Variant',
-        'global_flags': 'CHROM=1'
+        "search_type": "Variant",
+        "global_flags": "CHROM=1"
     }
 
 
@@ -326,7 +340,7 @@ def test_compound_search_only_global_flags(workbook, es_testapp, filter_set_with
         explicitly for correctness in this test.
     """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_only_flags).json
-    assert len(resp['@graph']) == 4
+    assert len(resp['@graph']) == 6
 
 
 @pytest.fixture
@@ -346,7 +360,7 @@ def test_compound_search_single_filter_block(workbook, es_testapp, filter_set_wi
         /search redirect is functioning if we get facets on the response.
     """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block).json
-    assert len(resp['@graph']) == 1
+    assert len(resp['@graph']) == 2
     assert 'facets' in resp
 
 
@@ -373,7 +387,7 @@ def test_compound_search_filter_and_flags(workbook, es_testapp, filter_set_with_
         /search redirect is functioning if we get facets on the response.
     """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_single_filter_block_and_flags).json
-    assert len(resp['@graph']) == 1
+    assert len(resp['@graph']) == 2
     assert 'facets' in resp
 
 
@@ -402,7 +416,7 @@ def filter_set_with_multiple_disabled_flags():
 def test_compound_search_disabled_flags(workbook, es_testapp, filter_set_with_multiple_disabled_flags):
     """ Tests a compound search with all flags disabled (raw filter_blocks + global_flags). """
     resp = es_testapp.post_json(COMPOUND_SEARCH_URL, filter_set_with_multiple_disabled_flags).json
-    assert len(resp['@graph']) == 2
+    assert len(resp['@graph']) == 3
 
 
 @pytest.fixture

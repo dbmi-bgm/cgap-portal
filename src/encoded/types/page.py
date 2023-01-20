@@ -2,22 +2,17 @@
 The type file for the collection Pages.  Which is used for static pages on the portal
 """
 
+from dcicutils.misc_utils import filtered_warnings
 from pyramid.httpexceptions import ( # 301-307 redirect code response
     HTTPMovedPermanently,
     HTTPFound,
     HTTPSeeOther,
     HTTPTemporaryRedirect
 )
-from pyramid.view import (
-    view_config,
-)
-from snovault import (
-    collection,
-    load_schema,
-    COLLECTIONS,
-    CONNECTION
-)
+from pyramid.view import view_config
+from snovault import collection, load_schema, COLLECTIONS, CONNECTION
 from snovault.resource_views import item_view_page
+from snovault.util import debug_log
 from snovault.validators import (
     validate_item_content_post,
     validate_item_content_put,
@@ -27,21 +22,10 @@ from snovault.validators import (
     no_validate_item_content_put,
     no_validate_item_content_patch
 )
-from snovault.util import debug_log
-from urllib.parse import (
-    urlparse,
-    urlencode
-)
-from dcicutils.misc_utils import filtered_warnings
+from urllib.parse import urlparse, urlencode
 from ..search.search import get_iterable_search_results
-from .base import (
-    Item,
-    collection_add,
-    item_edit
-)
-from .user_content import (
-    StaticSection
-)
+from .base import Item, collection_add, item_edit
+# from .user_content import StaticSection
 
 
 def get_pyramid_http_exception_for_redirect_code(code):
@@ -312,7 +296,7 @@ def static_page(request):
         uri_to_use = (parsed_redirect_uri.scheme and (parsed_redirect_uri.scheme + ':') or '') + '//' if parsed_redirect_uri.netloc else ''
         uri_to_use += parsed_redirect_uri.path
         uri_to_use += '?' + urlencode({ 'redirected_from' : '/' + context.properties.get('name', str(context.uuid)) }) + ((parsed_redirect_uri.query and ('&' + parsed_redirect_uri.query)) or '')
-         # Fallback to 307 as is 'safest' (response isn't cached by browsers)
+        # Fallback to 307 as is 'safest' (response isn't cached by browsers)
         return get_pyramid_http_exception_for_redirect_code(context.properties['redirect'].get('code', 307))(location=uri_to_use, detail="Redirected from " + page_name)
     item = item_view_page(context, request)
     cleanup_page_tree(item)

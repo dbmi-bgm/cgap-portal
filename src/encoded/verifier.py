@@ -1,3 +1,4 @@
+from dcicutils.misc_utils import ignored
 from functools import wraps
 from snovault import TYPES
 # TODO: Production code should not rely on tests.
@@ -22,6 +23,7 @@ def verifier(func):
 
 @verifier
 def verify_get_from_es(item_uuid, indexer_testapp, registry):
+    ignored(registry)
     # get from elasticsearch
     es_item = indexer_testapp.get("/" + item_uuid + "/").follow(status=200).json
     item_type = es_item['@type'][0]
@@ -49,7 +51,7 @@ def verify_get_from_db(item_uuid, item_type, indexer_testapp):
 def verify_profile(item_type, indexer_testapp):
     # is this something we actually know about?
     profile = indexer_testapp.get("/profiles/" + item_type + ".json").json
-    assert(profile)
+    assert profile
     item_type_camel = profile['id'].strip('.json').split('/')[-1]
     return item_type_camel
 
@@ -68,14 +70,14 @@ def verify_can_embed(item_type_camel, es_item, indexer_testapp, registry):
 
     assert embeds == pyr_item_type.factory.embedded
     got_embeds = indexer_testapp.get(es_item['@id'] + "@@embedded").json
-    assert(got_embeds)
+    assert got_embeds
 
 
 @verifier
 def verify_indexing(item_uuid, indexer_testapp):
     # test indexing this bad by
     res = indexer_testapp.get("/" + item_uuid + "/@@index-data")
-    assert(res)
+    assert res
 
 
 @verifier
@@ -90,6 +92,7 @@ def verify_mapping(registry, item_type):
 
 
 def verify_item(item_uuid, indexer_testapp, testapp, registry):
+    ignored(testapp)
     es_item, item_type = verify_get_from_es(item_uuid, indexer_testapp, registry)
     verify_get_by_accession(es_item, item_type, indexer_testapp)
     verify_get_from_db(item_uuid, item_type, indexer_testapp)

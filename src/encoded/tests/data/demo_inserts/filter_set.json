@@ -1,7 +1,6 @@
 [
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "flags": [
             {
@@ -15,7 +14,6 @@
         ],
         "uuid": "dcf15d5e-40aa-43bc-b81c-32c70c9afbbb",
         "search_type": "VariantSample",
-        "schema_version": "1",
         "date_created": "2020-07-15T02:39:54.260756+00:00",
         "title": "Test filter set",
         "aliases": [

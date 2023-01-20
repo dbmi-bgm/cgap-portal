@@ -7,6 +7,8 @@ import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { console, layout, ajax, object, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
+import { GeneTranscriptDisplayTitle, getMostSevereConsequence, getTranscriptLocation } from './AnnotationSections';
+import QuickPopover from '../components/QuickPopover';
 
 
 
@@ -18,9 +20,10 @@ export function VariantSampleInfoHeader(props) {
         currentGeneItemLoading,
         onSelectTranscript,
         schemas,
-        caseID = <span className="text-muted"> - </span> // null
+        caseID = null,
+        showTranscriptSelection = true
     } = props;
-    const { variant: { dbsnp_rs_number = fallbackElem } = {} } = context;
+    const { variant: { ID = fallbackElem } = {} } = context;
 
     function getTipForField(field, itemType = "VariantSample"){
         if (!schemas) return null;
@@ -35,18 +38,18 @@ export function VariantSampleInfoHeader(props) {
             <div className="card-body">
                 <div className="row flex-column flex-lg-row">
 
-                    { caseID ?
-                        <div className="inner-card-section col pb-2 pb-lg-0 col-lg-2 col-xl-1 d-flex flex-column">
+                    {/* caseID ?
+                        <div className="inner-card-section col pb-2 pb-xl-0 col-lg-2 col-xl-1 d-flex flex-column">
                             <div className="info-header-title">
                                 <h4 className="text-truncate">Case ID</h4>
                             </div>
                             <div className="info-body flex-grow-1 d-flex align-items-center">
-                                <h4 className="text-400 text-center w-100">{ caseID }</h4>
+                                <h4 className="text-400 text-center w-100">{ caseID || fallbackElem }</h4>
                             </div>
                         </div>
-                        : null }
+                    : null */}
 
-                    <div className="inner-card-section col pb-2 pb-lg-0">
+                    <div className="inner-card-section col pb-2 pb-xl-0">
                         <div className="info-header-title">
                             <h4>Position</h4>
                         </div>
@@ -63,7 +66,7 @@ export function VariantSampleInfoHeader(props) {
 
                             <div className="row mb-03">
                                 <div className="col-12 col-xl-2">
-                                    <label htmlFor="variant.dbsnp_rs_number" className="mb-0" data-tip={getTipForField("variant.dbsnp_rs_number")}>
+                                    <label htmlFor="variant.ID" className="mb-0" data-tip={getTipForField("variant.ID")}>
                                         dbSNP:
                                     </label>
                                 </div>
@@ -71,16 +74,16 @@ export function VariantSampleInfoHeader(props) {
                                  * 'col[-xl]-auto' allows entire item to ellide to next row.
                                  * May or may not be preferable depending on value content/type.
                                  */}
-                                <div className="col-12 col-xl-auto" id="variant.dbsnp_rs_number">
-                                    { dbsnp_rs_number }
+                                <div className="col-12 col-xl-auto" id="variant.ID">
+                                    { ID }
                                 </div>
                             </div>
 
                         </div>
                     </div>
-
-                    <TranscriptSelectionSection {...{ context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas }} />
-
+                    { showTranscriptSelection ?
+                        <TranscriptSelectionSection {...{ context, currentTranscriptIdx, currentGeneItemLoading, onSelectTranscript, schemas }} />
+                        : null }
                 </div>
             </div>
         </div>
@@ -107,7 +110,7 @@ function TranscriptSelectionSection(props){
 
     const geneListOptions = geneTranscriptList.map(function(transcript, idx){
         return (
-            <DropdownItem key={idx} eventKey={idx} active={idx === currentTranscriptIdx}>
+            <DropdownItem key={idx} eventKey={idx.toString()} active={idx === currentTranscriptIdx}>
                 <GeneTranscriptDisplayTitle transcript={transcript} />
             </DropdownItem>
         );
@@ -130,7 +133,6 @@ function TranscriptSelectionSection(props){
             <span>
                 { selectedGeneTitle }
                 { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
-                &nbsp;
             </span>
         ) : <em>No gene selected</em>;
         body = <TranscriptSelectionSectionBody {...{ schemas }} currentTranscript={geneTranscriptList[currentTranscriptIdx]} />;
@@ -138,7 +140,7 @@ function TranscriptSelectionSection(props){
 
 
     return (
-        <div className="inner-card-section col pb-2 pb-lg-0">
+        <div className="inner-card-section col-12 col-xl pb-xl-2">
 
             <div className="info-header-title">
                 {/* passing 'py-1' to className of button via `size` prop - kinda hacky - noting here in case changes in future version, or if find better prop to use */}
@@ -159,13 +161,13 @@ function TranscriptSelectionSection(props){
 function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
     const fallbackElem = <em className="text-muted" data-tip="Not Available"> - </em>;
     const {
-        vep_hgvsc = fallbackElem,
-        vep_hgvsp = fallbackElem,
-        vep_exon = null,
-        vep_gene : {
+        csq_hgvsc = fallbackElem,
+        csq_hgvsp = fallbackElem,
+        csq_exon = null,
+        csq_gene : {
             display_title: currentGeneDisplayTitle = null
         } = {},
-        vep_consequence = []
+        csq_consequence = []
     } = currentTranscript || {};
 
     /* Helper func to basically just shorten `schemaTransforms.getSchemaProperty(field, schemas, itemType);`. */
@@ -176,42 +178,42 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
     }
 
     const mostSevereConsequence = useMemo(function(){
-        return getMostSevereConsequence(vep_consequence);
-    }, [ vep_consequence ]);
+        return getMostSevereConsequence(csq_consequence);
+    }, [ csq_consequence ]);
 
     const transcriptLocation = useMemo(function(){
         return getTranscriptLocation(currentTranscript, mostSevereConsequence);
     }, [ currentTranscript, mostSevereConsequence ]);
 
-    const { coding_effect: consequenceCodingEffect = fallbackElem } = mostSevereConsequence || {};
+    const { display_title: consequenceTitle = fallbackElem } = mostSevereConsequence || {};
 
     return (
         <div className="row">
 
 
 
-            <div className="col-5 col-lg-12 col-xl-5">
+            <div className="col-5">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-6">
+                    <div className="col-12 col-lg-5 col-xl-6">
                         <label htmlFor="calculated_transcript_location" className="mb-0">Location:</label>
                     </div>
-                    <div className="col-12 col-lg" id="calculated_transcript_location">
+                    <div className="col-12 col-lg-auto" id="calculated_transcript_location">
                         { transcriptLocation }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-6">
-                        <label htmlFor="variant.transcript.vep_consequence.coding_effect" className="mb-0"
-                            data-tip={getTipForField("transcript.vep_consequence.coding_effect")}>
-                            Coding Effect:
+                    <div className="col-12 col-lg-5 col-xl-6">
+                        <label htmlFor="variant.transcript.csq_consequence" className="mb-0"
+                            data-tip={getTipForField("transcript.csq_consequence")}>
+                            Consequence:
                         </label>
                     </div>
-                    <div className="col-12 col-lg" id="variant.transcript.vep_consequence.coding_effect">
-                        { consequenceCodingEffect }
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_consequence">
+                        { consequenceTitle }
                     </div>
                 </div>
 
@@ -219,13 +221,13 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
 
 
 
-            <div className="col-7 col-lg-12 col-xl-7">
+            <div className="col-7">
 
                 {/* We could make these below into reusable component later once know this what we want fo sure */}
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-3">
-                        <label htmlFor="variant.transcript.vep_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.vep_gene")}>
+                    <div className="col-12 col-lg-4 col-xl-4">
+                        <label htmlFor="variant.transcript.csq_gene.display_title" className="mb-0" data-tip={getTipForField("transcript.csq_gene")}>
                             Gene:
                         </label>
                     </div>
@@ -234,26 +236,26 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
                             * May or may not be preferable depending on value content/type/label-size.
                             * Will consider consistency more after.
                             */}
-                    <div className="col-12 col-lg" id="variant.transcript.vep_gene.display_title">
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_gene.display_title">
                         { currentGeneDisplayTitle || <em>None selected</em> }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-3">
-                        <label htmlFor="vep_hgvsc" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsc")}>cDNA:</label>
+                    <div className="col-12 col-lg-4 col-xl-4">
+                        <label htmlFor="csq_hgvsc" className="mb-0" data-tip={getTipForField("transcript.csq_hgvsc")}>cDNA:</label>
                     </div>
-                    <div className="col-12 col-lg-auto" id="variant.transcript.vep_hgvsc">
-                        { vep_hgvsc }
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_hgvsc">
+                        { csq_hgvsc }
                     </div>
                 </div>
 
                 <div className="row mb-03">
-                    <div className="col-12 col-lg-4 col-xl-3">
-                        <label htmlFor="vep_hgvsp" className="mb-0" data-tip={getTipForField("transcript.vep_hgvsp")}>AA / AA:</label>
+                    <div className="col-12 col-lg-4 col-xl-4">
+                        <label htmlFor="csq_hgvsp" className="mb-0" data-tip={getTipForField("transcript.csq_hgvsp")}>AA / AA:</label>
                     </div>
-                    <div className="col-12 col-lg" id="variant.transcript.vep_hgvsp">
-                        { vep_hgvsp }
+                    <div className="col-12 col-lg-auto" id="variant.transcript.csq_hgvsp">
+                        { csq_hgvsp }
                     </div>
                 </div>
 
@@ -262,113 +264,71 @@ function TranscriptSelectionSectionBody({ schemas, currentTranscript }){
         </div>
     );
 }
-
-
-function GeneTranscriptDisplayTitle({ transcript, className = "text-600" }){
-    if (!transcript) return null;
-    const {
-        vep_canonical = false,
-        vep_feature_ncbi = null,
-        vep_feature = <em>No Name</em>,
-        vep_biotype = null,
-        vep_gene : {
-            display_title: geneDisplayTitle = null
-        } = {}
-    } = transcript;
-    return (
-        <span className={className}>
-            <span>{ vep_feature_ncbi || vep_feature }</span>
-            <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
-            { vep_canonical ? <span className="text-300"> (canonical)</span> : null }
-        </span>
-    );
-}
-
-/** This will likely need/get feedback and may change */
-function getMostSevereConsequence(vep_consequence = []){
-    const impactMap = {
-        "HIGH" : 0,
-        "MODERATE" : 1,
-        "LOW" : 2,
-        "MODIFIER" : 3
-    };
-
-    if (vep_consequence.length === 0) {
-        return null;
-    }
-
-    const [ mostSevereConsequence ] = vep_consequence.slice().sort(function({ impact: iA }, { impact: iB }){
-        return impactMap[iA] - impactMap[iB];
-    });
-
-    return mostSevereConsequence;
-}
-
-function getTranscriptLocation(transcript, mostSevereConsequence = null){
-    const {
-        vep_exon = null,
-        vep_intron = null,
-        vep_distance = null,
-    } = transcript || {};
-
-    const { var_conseq_name = null } = mostSevereConsequence || {};
-    const consequenceName = (typeof var_conseq_name === "string" && var_conseq_name.toLowerCase()) || null;
-
-    let returnString = null;
-
-    if (vep_exon !== null) { // In case vep_exon is `0` or something (unsure if possible)
-        returnString = "Exon " + vep_exon;
-    } else if (vep_intron !== null) {
-        returnString = "Intron " + vep_intron;
-    } else if (vep_distance !== null) {
-        if (consequenceName === "downstream_gene_variant") {
-            returnString = vep_distance + "bp downstream";
-        } else if (consequenceName === "upstream_gene_variant") {
-            returnString = vep_distance + "bp upstream";
-        }
-    }
-
-    if (consequenceName === "3_prime_utr_variant"){
-        returnString = returnString ? returnString + " (3′ UTR)" : "3′ UTR" ;
-    } else if (consequenceName === "5_prime_utr_variant"){
-        returnString = returnString ? returnString + " (5′ UTR)" : "5′ UTR" ;
-    }
-
-    return returnString;
-}
-
 function GDNAList({ context }){
     const fallbackElem = <em data-tip="Not Available"> - </em>;
     const { variant = {} } = context;
     const {
-        mutanno_hgvsg = fallbackElem,
+        // mutanno_hgvsg = fallbackElem, // (temporarily?) removed
+        // display_title: hgvsg_placeholder = fallbackElem, // Superseded by more explicit `hgvsg`
         // POS: pos,
+        hgvsg = fallbackElem,
         CHROM: chrom = fallbackElem,
-        hg19 = []
+        hg19_chr = fallbackElem,
+        hgvsg_hg19 = fallbackElem
     } = variant;
 
-    const renderedRows = [];
-
-    // Canononical GRCh38 entry
-    renderedRows.push(
-        <div className="row pb-1 pb-md-03" key="GRCh38">
-            <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
-            <div className="col-12 col-md-2">{ chrom }</div>
-            <div className="col-12 col-md-7">{ mutanno_hgvsg }</div>
-        </div>
+    const renderedRows =  (
+        <React.Fragment>
+            {/* Canononical GRCh38 entry */}
+            <div className="row pb-1 pb-md-03" key="GRCh38">
+                <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
+                <div className="col-12 col-md-2">{ chrom }</div>
+                <div className="col-12 col-md-7">{ hgvsg }</div>
+            </div>
+            {/* Legacy GRCh37/hg19 support. */}
+            <div className="row pb-1 pb-md-03" key="GRCh37">
+                <div className="col-12 col-md-3 font-italic">
+                    <em>GRCh37 (hg19)</em>
+                    <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm">
+                        {hg19PopoverContent}
+                    </QuickPopover>
+                </div>
+                <div className="col-12 col-md-2 ">{ hg19_chr }</div>
+                <div className="col-12 col-md-7">{ hgvsg_hg19 }</div>
+            </div>
+        </React.Fragment>
     );
 
-    // Legacy GRCh37/hg19 support.
-    hg19.forEach(function({ hg19_pos, hg19_chrom, hg19_hgvsg }, idx){
+    //Legacy GRCh37/hg19 support.
+    /** @DEPRECATED as of Annotations v20; leaving here since csq_hg19 may be reverted to array again in future
+     * csq_hg19.forEach(function({ hg19_pos, hg19_chr, csq_hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
                 <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
-                <div className="col-12 col-md-2 ">{ hg19_chrom }</div>
-                <div className="col-12 col-md-7">{ hg19_hgvsg }</div>
+                <div className="col-12 col-md-2 ">{ hg19_chr }</div>
+                <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
             </div>
         );
     });
+    */
 
     return renderedRows;
 }
 
+
+const hg19PopoverTitle = "The HGVS-formatted variant in hg19 coordinates is calculated.";
+const hg19PopoverContent = (
+    <div>
+        <p>
+            All variants are currently called for the hg38 reference genome. If the variant in hg19
+            coordinates is not available, the conversion calculation was not successful.
+        </p>
+        <p>
+            To calculate the variant for hg19 coordinates, the hg38 position is converted to hg19
+            via an implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If the hg19 conversion
+            is successful, the variant is then converted to HGSV format. If the HGSV conversion is
+            also successful, the result will be displayed. Otherwise, only the hg38 coordinates for
+            the variant will be displayed.
+        </p>
+    </div>
+);

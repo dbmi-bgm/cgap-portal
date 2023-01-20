@@ -1,9 +1,24 @@
 Local Installation
 ==================
 
+Docker Instructions
+^^^^^^^^^^^^^^^^^^^
+
+The portal is meant to be run via Docker, but running tests or a local deployment outside of Docker requires the legacy instructions below. For Docker instructions see `docker local docs. <./docker-local.rst>`_.
+
+Legacy Instructions
+^^^^^^^^^^^^^^^^^^^
+
 The following instructions are for running a CGAP deployment with macOS and homebrew.
 
-CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or greater. If part of the HMS team, it is recommended to use Python 3.4.3, since that's what is running on our servers. It is best practice to create a fresh Python virtualenv using one of these versions before proceeding to the following steps.
+Note that as of summer 2021, these instructions are out of date. Please refer to the Docker setup. There are no guarantees the legacy instructions will work from this point forward.
+
+CGAP is known to work with Python 3.7.x and 3.8.x and will not work with Python 3.9 or greater.
+If part of the HMS team, it is recommended to use a high patch version, such as Python 3.8.13,
+since that's what we try to do with our servers, but any version of 3.8 should work if you
+find you are unable to install that particular patch version.
+It is best practice to create a fresh Python
+virtualenv using one of these versions before proceeding to the following steps.
 
 * Step 0: Obtain AWS keys. These will need to added to your environment variables or through the AWS CLI (installed later in this process).
 
@@ -18,13 +33,20 @@ CGAP is known to work with Python 3.6.x and will not work with Python 3.7 or gre
    $ brew install freetype libjpeg libtiff littlecms webp  # Required by Pillow
    $ brew cask install homebrew/cask-versions/adoptopenjdk8
    $ brew tap homebrew/versions
-   $ brew install elasticsearch@6.8 node@10
+   $ brew install opensearch node@16
 
 
-You may need to link the brew-installed elasticsearch::
+You may need to link the brew-installed opensearch::
 
-   $ brew link --force elasticsearch@6.8
+   $ brew link --force opensearch
 
+
+If you are migrating from elasticsearch@6 to opensearch::
+
+    $ brew uninstall elasticsearch@6
+    $ brew install opensearch
+
+Note that this may bring in a new JDK.
 
 If you need to update dependencies::
 
@@ -126,7 +148,7 @@ To build production-ready bundles, do::
 
 To build development bundles and continue updating them as you edit source files, run::
 
-   $ npm run dev
+   $ npm run dev-quick
 
 The development bundles are not minified, to speed up building.
 

@@ -14,7 +14,7 @@ import { patchedConsoleInstance as console } from '@hms-dbmi-bgm/shared-portal-c
 
 export function shouldDisplayStructuredData(baseDomain){
     if (baseDomain.indexOf('data.4dnucleome.org') > -1) return true;
-    if (baseDomain.indexOf('localhost:8000') > -1) return true;
+    if (baseDomain.indexOf('localhost') > -1) return true;
     return false;
 }
 

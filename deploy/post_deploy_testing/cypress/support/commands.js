@@ -31,7 +31,7 @@ import { Buffer } from 'buffer';
 
 /** Expected to throw error of some sort if not on search page, or no results. */
 Cypress.Commands.add('searchPageTotalResultCount', function(options){
-    return cy.get('div.above-results-table-row .box.results-count > div.d-inline-block > span.text-500')
+    return cy.get('div.above-results-table-row #results-count')
         .invoke('text').then(function(resultText){
             return parseInt(resultText);
         });
@@ -61,23 +61,37 @@ Cypress.Commands.add('scrollToCenterElement', { prevSubject : true }, (subject, 
 /**
  * This emulates login.js. Perhaps we should adjust login.js somewhat to match this better re: navigate.then(...) .
  */
-Cypress.Commands.add('login4DN', function(options = { 'useEnvToken' : true }){
+Cypress.Commands.add('loginCGAP', function(options = { 'useEnvToken': false, 'email': null }){
 
     function performLogin(token){
         return cy.window().then((w)=>{
-            w.fourfront.JWT.save(token);
             cy.request({
                 'url' : '/login',
                 'method' : 'POST',
                 'body' : JSON.stringify({ 'id_token' : token }),
-                'headers' : { 'Authorization': 'Bearer ' + token, 'Content-Type' : "application/json; charset=UTF-8" },
+                'headers' : {
+                    'Authorization': 'Bearer ' + token,
+                    'Accept': "application/json",
+                    'Content-Type': "application/json; charset=UTF-8"
+                },
                 'followRedirect' : true
             }).then(function(resp){
-                w.fourfront.JWT.saveUserInfoLocalStorage(resp.body);
-                // Triggers app.state.session change (req'd to update UI)
-                w.fourfront.app.updateUserInfo();
-                // Refresh curr page/context
-                w.fourfront.navigate('', { 'inPlace' : true });
+                if (resp.status && resp.status === 200) {
+                    cy.request({
+                        'url': '/session-properties',
+                        'method': 'GET',
+                        'headers' : {
+                            'Accept': "application/json",
+                            'Content-Type': "application/json; charset=UTF-8"
+                        }
+                    }).then(function (userInfoResponse) {
+                        w.fourfront.JWT.saveUserInfoLocalStorage(userInfoResponse.body);
+                        // Triggers app.state.session change (req'd to update UI)
+                        w.fourfront.app.updateAppSessionState();
+                        // Refresh curr page/context
+                        w.fourfront.navigate('', { 'inPlace' : true });
+                    }).end();
+                }
             }).end();
         }).end();
     }
@@ -95,14 +109,14 @@ Cypress.Commands.add('login4DN', function(options = { 'useEnvToken' : true }){
 
     // If no token, we try to generate/impersonate one ourselves
 
-    const email = options.email || options.user || Cypress.env('LOGIN_AS_USER') || '4dndcic@gmail.com';
+    const email = options.email || options.user || "cypress-test-user@cgap.hms.harvard.edu";
     const auth0client = Cypress.env('Auth0Client');
     const auth0secret = Cypress.env('Auth0Secret');
 
     if (!auth0client || !auth0secret) throw new Error('Cannot test login if no Auth0Client & Auth0Secret in ENV vars.');
 
     Cypress.log({
-        'name' : "Login 4DN",
+        'name' : "Login CGAP",
         'message' : 'Attempting to impersonate-login for ' + email,
         'consoleProps' : ()=>{
             return { auth0client, auth0secret, email };
@@ -117,7 +131,7 @@ Cypress.Commands.add('login4DN', function(options = { 'useEnvToken' : true }){
         "iss": "https://hms-dbmi.auth0.com/"
     };
 
-    jwt_token = jwt.sign(jwtPayload, new Buffer(auth0secret, 'base64'));
+    jwt_token = jwt.sign(jwtPayload, Buffer.from(auth0secret, 'utf-8'));
     expect(jwt_token).to.have.length.greaterThan(0);
     Cypress.log({
         'name' : "Login 4DN",
@@ -127,46 +141,14 @@ Cypress.Commands.add('login4DN', function(options = { 'useEnvToken' : true }){
 
 });
 
-Cypress.Commands.add('logout4DN', function(options = { 'useEnvToken' : true }){
+Cypress.Commands.add('logoutCGAP', function(options = { 'useEnvToken' : true }){
     cy.get("#user_account_nav_button").click().wait(100).end()
         .get('#logoutbtn').click().end().get('#user_account_nav_button').should('contain', 'Log In').wait(300).end()
         .get('#slow-load-container').should('not.have.class', 'visible').end();
 });
 
 
-/*** Browse View Utils ****/
 
-Cypress.Commands.add('getQuickInfoBarCounts', function(options = { shouldNotEqual : '' }){
-
-    return cy.get('#stats-stat-expsets').invoke('text').should('have.length.above', 0).should('not.equal', '' + options.shouldNotEqual)
-        .then(function(expsetCountElemText){
-            return cy.get('#stats-stat-experiments').then(function(expCountElem){
-                return cy.get('#stats-stat-files').then((fileCountElem)=>{
-                    const experiment_sets = parseInt(expsetCountElemText);
-                    const experiments = parseInt(expCountElem.text());
-                    const files = parseInt(fileCountElem.text());
-                    return { experiment_sets, experiments, files };
-                });
-            });
-        });
-
-});
-
-
-
-Cypress.Commands.add('getSelectAllFilesButton', function(options = {}){
-    return cy.get('div.above-results-table-row #select-all-files-button');
-});
-
-Cypress.Commands.add('getFileTypePanelButton', function(options = {}){
-    return cy.get('div.above-results-table-row #selected-files-file-type-filter-button');
-});
-
-// TODO: Change these functions to use the `id` attributes of these buttons once they make it to prod.
-
-Cypress.Commands.add('getDownloadButton', function(options = {}){
-    return cy.get('div.above-results-table-row div.clearfix > div:nth-child(1) > div:nth-child(2) > div.btn-group > button.btn:nth-child(1)');
-});
 
 /** Session Caching */
 

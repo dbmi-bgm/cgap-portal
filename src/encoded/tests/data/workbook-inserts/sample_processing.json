@@ -1,0 +1,73 @@
+[
+    {
+        "uuid": "589fee08-e054-4786-862d-f7250a435793",
+        "aliases": [
+            "hms-dbmi:no_samples"
+        ],
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "processed_files": [
+            "hms-dbmi:final_snv_vcf",
+            "hms-dbmi:final_sv_vcf"
+        ]
+    },
+    {
+        "uuid": "589fee08-e054-4786-862d-f7250a435794",
+        "aliases": [
+            "hms-dbmi:one_sample"
+        ],
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1"
+        ],
+        "processed_files": [
+            "hms-dbmi:final_snv_vcf",
+            "hms-dbmi:final_sv_vcf",
+            "hms-dbmi:vep_snv_vcf"
+        ]
+    },
+    {
+        "uuid": "d9a26951-9bfa-4a11-a014-35d5724bfbff",
+        "aliases": [
+            "hms-dbmi:one_sample_no_vcfs"
+        ],
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1"
+        ]
+    },
+    {
+        "uuid": "5cac1b7d-563d-4258-b93b-37b3a6f765d5",
+        "aliases": [
+            "hms-dbmi:one_sample_no_files"
+        ],
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1_no_files"
+        ]
+    },
+    {
+        "uuid": "8471a80f-81c6-4663-a182-c2955c21c6ce",
+        "aliases": [
+            "hms-dbmi:two_samples"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1",
+            "hms-dbmi:sample_2"
+        ],
+        "families": [
+            "abd99160-49b5-459e-aded-22bdbdf2c1e9"
+        ],
+        "processed_files": [
+            "hms-dbmi:final_snv_vcf",
+            "hms-dbmi:some_vcf",
+            "hms-dbmi:final_sv_vcf",
+            "hms-dbmi:vep_snv_vcf"
+        ]
+    }
+]

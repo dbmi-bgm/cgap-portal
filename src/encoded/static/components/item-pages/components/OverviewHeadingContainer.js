@@ -11,6 +11,8 @@ import Collapse from 'react-bootstrap/esm/Collapse';
  * A collapsible panel that is meant to be shown near top of Item views.
  * Is meant to display a grid of Item properties, rendered out via `OverViewBodyItem`s.
  * However the component may be extended to display other things, e.g. as `ExpandableStaticHeader` does.
+ *
+ * @deprecated
  */
 export class OverviewHeadingContainer extends React.Component {
 

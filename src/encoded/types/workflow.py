@@ -1,15 +1,16 @@
 """The type file for the workflow related items.
 """
 
-import copy
 import boto3
+import copy
 import cProfile
 import io
 import json
 import pstats
 
 from collections import OrderedDict, deque
-from dcicutils.env_utils import CGAP_ENV_WEBDEV, is_stg_or_prd_env, prod_bucket_env
+from dcicutils.env_utils import default_workflow_env, is_stg_or_prd_env, prod_bucket_env
+from dcicutils.misc_utils import ignored, ignorable
 from inspect import signature
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
@@ -17,17 +18,15 @@ from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
 from snovault.util import debug_log
 from time import sleep
-from .base import (
-    Item,
-    # lab_award_attribution_embed_list
-)
+
+from .base import Item  # , lab_award_attribution_embed_list
 
 
 TIBANNA_CODE_NAME = 'zebra'
 TIBANNA_WORKFLOW_RUNNER_LAMBDA_FUNCTION = 'run_workflow_zebra'
 TIBANNA_WORKFLOW_STATUS_LAMBDA_FUNCTION = 'status_wfr_zebra'
 
-ENV_WEBDEV = CGAP_ENV_WEBDEV
+ENV_WEBDEV = default_workflow_env('cgap')
 
 steps_run_data_schema = {
     "type": "object",
@@ -400,6 +399,7 @@ def trace_workflows(original_file_set_to_trace, request, options=None):
         else:
             for step_uuid, in_file_uuid in step_uuids:
                 next_params = ( step_uuid, get_model_obj(in_file_uuid), depth + 1 )
+                ignored(next_params)  # TODO: seems a very specific value to compute and throw away. is this a bug?
                 # Potentially temporary check to skip further tracing of files which we don't
                 # have WFR inputs for.
                 next_file_model_obj = get_model_obj(in_file_uuid)
@@ -647,6 +647,27 @@ def trace_workflows(original_file_set_to_trace, request, options=None):
     return steps
 
 
+def _build_workflows_embedded_list():
+    """ Helper function for building workflow embedded list. """
+    return Item.embedded_list + [
+            'steps.name',
+
+            # Objects
+            'steps.inputs.*',
+            'steps.outputs.*',
+
+            # Software linkTo
+            'steps.meta.software_used.name',
+            'steps.meta.software_used.title',
+            'steps.meta.software_used.version',
+            'steps.meta.software_used.source_url',
+
+            # FileFormat linkTo
+            'arguments.argument_format.file_format',
+
+            'arguments.argument_type',
+            'arguments.workflow_argument_name'
+    ]
 
 
 @collection(
@@ -660,22 +681,7 @@ class Workflow(Item):
 
     item_type = 'workflow'
     schema = workflow_schema
-    embedded_list = (
-        Item.embedded_list +
-        # lab_award_attribution_embed_list +
-        [
-            'steps.name',
-            'steps.inputs',
-            'steps.outputs',
-            'steps.meta.software_used.name',
-            'steps.meta.software_used.title',
-            'steps.meta.software_used.version',
-            'steps.meta.software_used.source_url',
-            'arguments.argument_type',
-            'arguments.argument_format',
-            'arguments.workflow_argument_name'
-        ]
-    )
+    embedded_list = _build_workflows_embedded_list()
     rev = {
         'newer_versions': ('Workflow', 'previous_version')
     }
@@ -695,9 +701,59 @@ class Workflow(Item):
         return self.rev_link_atids(request, "newer_versions")
 
 
+def _build_workflow_run_embedded_list():
+    """ Helper function for building workflow embedded list. """
+    return Item.embedded_list + [
+        # Workflow linkTo
+        'workflow.category',
+        'workflow.experiment_types',
+        'workflow.app_name',
+        'workflow.title',
+        'workflow.steps.name',
+
+        # Software linkTo
+        'workflow.steps.meta.software_used.name',
+        'workflow.steps.meta.software_used.title',
+        'workflow.steps.meta.software_used.version',
+        'workflow.steps.meta.software_used.source_url',
+
+        # String
+        'input_files.workflow_argument_name',
+        # File linkTo
+        'input_files.value.filename',
+        'input_files.value.display_title',
+        'input_files.value.href',
+        'input_files.value.file_format',
+        'input_files.value.accession',
+        'input_files.value.@type',
+        'input_files.value.@id',
+        'input_files.value.file_size',
+        'input_files.value.quality_metric.url',
+        'input_files.value.quality_metric.overall_quality_status',
+        'input_files.value.status',
+
+        # String
+        'output_files.workflow_argument_name',
+
+        # File linkTo
+        'output_files.value.filename',
+        'output_files.value.display_title',
+        'output_files.value.href',
+        'output_files.value.file_format',
+        'output_files.value.accession',
+        'output_files.value.@type',
+        'output_files.value.@id',
+        'output_files.value.file_size',
+        'output_files.value.quality_metric.url',
+        'output_files.value.quality_metric.overall_quality_status',
+        'output_files.value.status',
+        'output_files.value_qc.url',
+        'output_files.value_qc.overall_quality_status'
+    ]
+
+
 @collection(
     name='workflow-runs',
-    unique_key='accession',
     properties={
         'title': 'Workflow Runs',
         'description': 'Listing of executions of 4DN analysis workflows',
@@ -707,48 +763,8 @@ class WorkflowRun(Item):
 
     item_type = 'workflow_run'
     schema = load_schema('encoded:schemas/workflow_run.json')
-    name_key = 'accession'
-    embedded_list = (
-        Item.embedded_list +
-        # lab_award_attribution_embed_list +
-        [
-            'workflow.category',
-            # 'workflow.experiment_types',
-            'workflow.app_name',
-            'workflow.title',
-            'workflow.steps.name',
-            'workflow.steps.meta.software_used.name',
-            'workflow.steps.meta.software_used.title',
-            'workflow.steps.meta.software_used.version',
-            'workflow.steps.meta.software_used.source_url',
-            'input_files.workflow_argument_name',
-            'input_files.value.filename',
-            'input_files.value.display_title',
-            'input_files.value.href',
-            'input_files.value.file_format',
-            'input_files.value.accession',
-            'input_files.value.@type',
-            'input_files.value.@id',
-            'input_files.value.file_size',
-            'input_files.value.quality_metric.url',
-            'input_files.value.quality_metric.overall_quality_status',
-            'input_files.value.status',
-            'output_files.workflow_argument_name',
-            'output_files.value.filename',
-            'output_files.value.display_title',
-            'output_files.value.href',
-            'output_files.value.file_format',
-            'output_files.value.accession',
-            'output_files.value.@type',
-            'output_files.value.@id',
-            'output_files.value.file_size',
-            'output_files.value.quality_metric.url',
-            'output_files.value.quality_metric.overall_quality_status',
-            'output_files.value.status',
-            'output_files.value_qc.url',
-            'output_files.value_qc.overall_quality_status'
-        ]
-    )
+    embedded_list = _build_workflow_run_embedded_list()
+
     @calculated_property(schema=workflow_run_steps_property_schema, category='page')
     def steps(self, request):
         '''
@@ -907,8 +923,10 @@ class WorkflowMapping(Item):
 
 
 def validate_input_json(context, request):
+    ignored(context)
     input_json = request.json
     wkfl_uuid = input_json.get('workflow_uuid', 'None')
+    ignorable(wkfl_uuid)
     # if not context.get(wkfl_uuid):
     #    request.errors.add('body', None, 'workflow_uuid %s not found in the system' % wkfl_uuid)
     if not input_json.get('metadata_only'):
@@ -927,7 +945,7 @@ def pseudo_run(context, request):
     # for testing
     if not env:
         env = ENV_WEBDEV
-    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
+    input_json['output_bucket'] = request.registry.settings['file_wfout_bucket']
     input_json['env_name'] = env
     if input_json.get('app_name', None) is None:
         input_json['app_name'] = 'pseudo-workflow-run'
@@ -935,7 +953,7 @@ def pseudo_run(context, request):
     # ideally select bucket from file metadata itself
     for i, nput in enumerate(input_json['input_files']):
         if not nput.get('bucket_name'):
-            input_json['input_files'][i]['bucket_name'] = 'elasticbeanstalk-%s-files' % env
+            input_json['input_files'][i]['bucket_name'] = request.registry.settings['file_upload_bucket']
 
     # hand-off to tibanna for further processing
     aws_lambda = boto3.client('lambda', region_name='us-east-1')
@@ -973,8 +991,9 @@ def pseudo_run(context, request):
 
     return res_dict
 
-
 def _wfoutput_bucket_for_env(env):
+    # XXX: this function should no longer be used.
+    raise NotImplementedError("_wfoutput_bucket_for_env is a beanstalk operation that shouldn't be used.")
     return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
 
 
@@ -989,7 +1008,7 @@ def run_workflow(context, request):
     # for testing
     if not env:
         env = ENV_WEBDEV
-    input_json['output_bucket'] = _wfoutput_bucket_for_env(env)
+    input_json['output_bucket'] = request.registry.settings['file_wfout_bucket']
     input_json['env_name'] = env
 
     # hand-off to tibanna for further processing

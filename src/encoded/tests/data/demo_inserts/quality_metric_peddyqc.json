@@ -1,0 +1,27 @@
+[
+    {
+        "status": "in review",
+        "date_created": "2020-08-12T17:43:16.634676+00:00",
+        "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "654ff7e8-4ae8-4d64-871e-3e8c8dbddd5a",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "overall_quality_status": "PASS",
+        "ancestry and sex prediction": [
+            {
+                "name": "456-WGS",
+                "predicted sex": "female",
+                "predicted ancestry": "SAS"
+            },
+            {
+                "name": "457-WGS",
+                "predicted sex": "female",
+                "predicted ancestry": "SAS"
+            },
+            {
+                "name": "458-WGS",
+                "predicted sex": "male",
+                "predicted ancestry": "SAS"
+            }
+        ]
+    }
+]

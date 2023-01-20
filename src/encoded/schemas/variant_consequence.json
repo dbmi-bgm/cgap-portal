@@ -4,21 +4,50 @@
     "id": "/profiles/variant_consequence.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
-    "required": ["var_conseq_name", "var_conseq_id"],
-    "identifyingProperties": ["uuid", "aliases", "disorder_id"],
+    "required": [
+        "var_conseq_name",
+        "var_conseq_id"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "disorder_id"
+    ],
     "additionalProperties": false,
     "mixinProperties": [
-        { "$ref": "mixins.json#/schema_version" },
-        { "$ref": "mixins.json#/uuid" },
-        { "$ref": "mixins.json#/aliases" },
-        { "$ref": "mixins.json#/submitted" },
-        { "$ref": "mixins.json#/modified" },
-        { "$ref": "mixins.json#/status" },
-        { "$ref": "mixins.json#/dbxrefs" },
-        { "$ref": "mixins.json#/alternative_ids" },
-        { "$ref": "mixins.json#/static_embeds" },
-        { "$ref": "mixins.json#/tags" },
-        { "$ref": "mixins.json#/attribution" }
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/dbxrefs"
+        },
+        {
+            "$ref": "mixins.json#/alternative_ids"
+        },
+        {
+            "$ref": "mixins.json#/static_embeds"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
     ],
     "properties": {
         "schema_version": {
@@ -27,20 +56,20 @@
         "status": {
             "default": "shared"
         },
-        "var_conseq_name" : {
-            "title" : "Sequence Ontology Style Name of the Variant Consequence",
-            "type" : "string"
+        "var_conseq_name": {
+            "title": "Sequence Ontology Style Name of the Variant Consequence",
+            "type": "string"
         },
-        "var_conseq_id" : {
-            "title" : "Variant Consequence Identifier",
-            "description" : "SO term ID for the variant consequence eg. SO:0001893",
-            "type" : "string",
+        "var_conseq_id": {
+            "title": "Variant Consequence Identifier",
+            "description": "SO term ID for the variant consequence eg. SO:0001893",
+            "type": "string",
             "uniqueKey": true
         },
-        "definition" : {
-            "title" : "Definition",
+        "definition": {
+            "title": "Definition",
             "description": "Definition of this variant consequence",
-            "type" : "string"
+            "type": "string"
         },
         "url": {
             "title": "URL",
@@ -48,9 +77,9 @@
             "type": "string",
             "format": "uri"
         },
-        "comment" : {
-            "type" : "string",
-            "title" : "Comment",
+        "comment": {
+            "type": "string",
+            "title": "Comment",
             "formInput": "textarea"
         },
         "severity_order_estimate": {
@@ -62,19 +91,41 @@
             "title": "IMPACT",
             "description": "The IMPACT rating expresses a subjective call on the likely impact of the variant (see snpEff). MODIFIER - usually non-coding variants or variants affecting non-coding genes, where predictions are difficult or there is no evidence of impact. LOW - a variant that is assumed to be mostly harmless or unlikely to change protein behaviour. MODERATE - a non-disruptive variant that might change protein effectiveness. HIGH - the variant is assumed to have high (disruptive) impact in the protein, probably causing protein truncation, loss of function or triggering nonsense mediated decay.",
             "type": "string",
-            "enum": ["HIGH", "MODERATE", "LOW", "MODIFIER"]
+            "enum": [
+                "HIGH",
+                "MODERATE",
+                "LOW",
+                "MODIFIER"
+            ]
         },
         "location": {
             "title": "Location",
             "description": "The location within the gene/transcript upon which the variant has its consequence",
             "type": "string",
-            "enum": ["splice site", "CDS", "miRNA", "UTR", "intron", "ncRNA", "downstream", "upstream"]
+            "enum": [
+                "splice site",
+                "CDS",
+                "miRNA",
+                "UTR",
+                "intron",
+                "ncRNA",
+                "downstream",
+                "upstream"
+            ]
         },
         "coding_effect": {
             "title": "Coding Effect",
             "description": "Effect of variant that resides within the coding sequence",
             "type": "string",
-            "enum": ["Nonsense", "Frameshift", "Stop lost", "Start lost", "Inframe indel", "Missense", "Synonymous"]
+            "enum": [
+                "Nonsense",
+                "Frameshift",
+                "Stop lost",
+                "Start lost",
+                "Inframe indel",
+                "Missense",
+                "Synonymous"
+            ]
         }
     }
 }

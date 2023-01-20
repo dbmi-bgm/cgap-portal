@@ -3,9 +3,9 @@ import re
 import snovault
 import string
 
-from datetime import date
-from functools import lru_cache
-from jsonschema_serialize_fork import NO_DEFAULT
+# from datetime import date
+# from functools import lru_cache
+# from jsonschema_serialize_fork import NO_DEFAULT
 from pyramid.security import (
     # ALL_PERMISSIONS,
     Allow,
@@ -14,11 +14,11 @@ from pyramid.security import (
     # DENY_ALL,
     Everyone,
 )
-from pyramid.traversal import find_root
+# from pyramid.traversal import find_root
 from pyramid.view import (
     view_config,
 )
-from pyramid.httpexceptions import HTTPUnprocessableEntity
+# from pyramid.httpexceptions import HTTPUnprocessableEntity
 from snovault.util import debug_log
 # import snovault default post / patch stuff so we can overwrite it in this file
 from snovault.validators import (
@@ -36,13 +36,16 @@ from snovault.crud_views import (
     item_edit as sno_item_edit,
 )
 from snovault.interfaces import CONNECTION
+from typing import Any, List, Tuple, Union
 # from ..schema_formats import is_accession
 from ..server_defaults import get_userid, add_last_modified
 
 
+Acl = List[Tuple[Any, Any, Union[str, List[str]]]]
+
 # Item acls
 # TODO (C4-332): consolidate all acls into one place - i.e. their own file
-ONLY_ADMIN_VIEW_ACL = [
+ONLY_ADMIN_VIEW_ACL: Acl = [
     (Allow, 'group.admin', ['view', 'edit']),
     (Allow, 'group.read-only-admin', ['view']),
     (Allow, 'remoteuser.INDEXER', ['view']),
@@ -56,36 +59,41 @@ ONLY_ADMIN_VIEW_ACL = [
     will probably be more items than a regular user shouldn't create
     this gets added to the Collection class __init__
 """
-PROJECT_MEMBER_CREATE_ACL = [
+PROJECT_MEMBER_CREATE_ACL: Acl = [
     (Allow, 'group.project_editor', 'add'),
     (Allow, 'group.project_editor', 'create'),
 ]
 
 # this is for pages that should be visible to public
-ALLOW_EVERYONE_VIEW_ACL = [
+ALLOW_EVERYONE_VIEW_ACL: Acl = [
     (Allow, Everyone, 'view'),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 # view for shared items - add a status for common cgap items
 # not sure if we want project members to have create on these?
-ALLOW_AUTHENTICATED_VIEW_ACL = [
+ALLOW_AUTHENTICATED_VIEW_ACL: Acl = [
     (Allow, Authenticated, 'view'),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
-ALLOW_PROJECT_MEMBER_EDIT_ACL = [
+ALLOW_PROJECT_MEMBER_EDIT_ACL: Acl = [
     (Allow, 'role.project_editor', ['view', 'edit']),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 
-ALLOW_PROJECT_MEMBER_VIEW_ACL = [
+ALLOW_PROJECT_MEMBER_VIEW_ACL: Acl = [
     (Allow, 'role.project_editor', 'view'),
 ] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
-DELETED_ACL = [
+DELETED_ACL: Acl = [
     (Deny, Everyone, 'visible_for_edit')
 ] + ONLY_ADMIN_VIEW_ACL
 
-ALLOW_PROJECT_MEMBER_ADD_ACL = PROJECT_MEMBER_CREATE_ACL
+ALLOW_PROJECT_MEMBER_ADD_ACL: Acl = PROJECT_MEMBER_CREATE_ACL
+
+# Used for 'draft' status
+ALLOW_OWNER_EDIT: Acl = [
+    (Allow, 'role.owner', ['view', 'edit']),
+] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
 
 
 def get_item_or_none(request, value, itype=None, frame='object'):
@@ -130,7 +138,7 @@ def get_item_or_none(request, value, itype=None, frame='object'):
     return item
 
 
-def set_namekey_from_title(properties):
+def set_namekey_from_title(properties):  # TODO: I'm not sure this is used anywhere. -kmp 25-Sep-2022
     name = None
     if properties.get('title'):
         exclude = set(string.punctuation.replace('-', ''))
@@ -151,9 +159,9 @@ def validate_item_type_of_linkto_field(context, request):
     pass
 
 
-##
-## Common lists of embeds to be re-used in certain files (similar to schema mixins)
-##
+# ----------
+# Common lists of embeds to be re-used in certain files (similar to schema mixins)
+# ----------
 
 static_content_embed_list = [
     "static_headers.*",            # Type: UserContent, may have differing properties
@@ -181,7 +189,7 @@ class AbstractCollection(snovault.AbstractCollection):
         super(AbstractCollection, self).__init__(*args, **kw)
 
     def get(self, name, default=None):
-        '''
+        """
         heres' and example of why this is the way it is:
         ontology terms have uuid or term_id as unique ID keys
         and if neither of those are included in post, try to
@@ -189,7 +197,7 @@ class AbstractCollection(snovault.AbstractCollection):
         No - fail load with non-existing term message
         Multiple - fail load with ‘ambiguous name - more than 1 term with that name exist use ID’
         Single result - get uuid and use that for post/patch
-        '''
+        """
         resource = super(AbstractCollection, self).get(name, None)
         if resource is not None:
             return resource
@@ -246,10 +254,13 @@ class Item(snovault.Item):
         'in review': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'uploaded': ALLOW_PROJECT_MEMBER_EDIT_ACL,
         'uploading': ALLOW_PROJECT_MEMBER_EDIT_ACL,
+        'archived': ALLOW_PROJECT_MEMBER_VIEW_ACL,
         'deleted': DELETED_ACL,
         'replaced': ONLY_ADMIN_VIEW_ACL,
-        # everyone view - restrict to specific items via schema
-        'public': ALLOW_EVERYONE_VIEW_ACL
+        # Everyone can view - restricted to specific items via schemas.
+        'public': ALLOW_EVERYONE_VIEW_ACL,
+        # Only creator can view - restricted to specific items via schemas.
+        'draft': ALLOW_OWNER_EDIT
     }
     FACET_ORDER_OVERRIDE = {}  # empty by default
 
@@ -303,6 +314,10 @@ class Item(snovault.Item):
         if 'project' in properties:
             project_editors = 'editor_for.%s' % properties['project']
             roles[project_editors] = 'role.project_editor'
+        # This emulates __ac_local_roles__ of User.py (role.owner) - taken from 4DN in 2022-01
+        if 'submitted_by' in properties:
+            submitter = 'userid.%s' % properties['submitted_by']
+            roles[submitter] = 'role.owner'
         return roles
 
     def add_accession_to_title(self, title):
@@ -331,11 +346,6 @@ class Item(snovault.Item):
         return False
 
     def _update(self, properties, sheets=None):
-        props = {}
-        try:
-            props = self.properties
-        except KeyError:
-            pass
         add_last_modified(properties)
         super(Item, self)._update(properties, sheets)
 
@@ -423,7 +433,7 @@ def create(context, request):
     context=Collection,
     permission='add',
     request_method='POST',
-    #validators=[] # TURNS OFF VALIDATION HERE ([validate_item_content_post] previously)
+    # validators=[]  # TURNS OFF VALIDATION HERE ([validate_item_content_post] previously)
     validators=[validate_item_content_post]
 )
 @view_config(

@@ -36,6 +36,29 @@ def qc_metric_fastqc_bad_status(institution, project):
 
 
 @pytest.fixture
+def qc_peddy(institution, project):
+    return {
+        "uuid": "ff9e47c1-35bd-46fd-8a2e-e5d7b8956f44",
+        'institution': institution['@id'],
+        'project': project['@id'],
+        "ancestry and sex prediction": [
+            {
+                "name": "sample1",
+                "predicted sex": "female",
+                "predicted ancestry": "SAS"
+            },
+            {
+                "name": "sample2",
+                "predicted sex": "male",
+                "predicted ancestry": "AFR"
+            }
+        ],
+        "url": "https://url.com",
+        "overall_quality_status": "PASS"
+    }
+
+
+@pytest.fixture
 def qc_bamcheck_data1(institution, project):
     return {
         "uuid": "af8e47c1-35bd-46fd-8a2e-e5d7b89560aa",
@@ -59,29 +82,31 @@ def qc_bamcheck_data2(institution, project):
 
 @pytest.fixture
 def vcf_qc(testapp, institution, project):
+    # This definition of 'item' had two uuid's in it, so I've commented out the earlier of them, which I believe
+    # is the one Python was already ignoring. -kmp 26-Sep-2022
+    #   "uuid": "af8e47c1-35bd-46fd-8a2e-e5d7b8956111",
     item = {
-        "uuid": "af8e47c1-35bd-46fd-8a2e-e5d7b8956111",
         'institution': institution['@id'],
         'project': project['@id'],
-        "total variants":  [
+        "total variants": [
             {"DEL": 476325, "INS": 427047, "MAV": 0, "MNV": 2962, "SNV": 3855162, "name": "NA12879_sample", "total": 4761496},
             {"DEL": 481574, "INS": 432004, "MAV": 0, "MNV": 2948, "SNV": 3853052, "name": "NA12878_sample", "total": 4769578},
             {"DEL": 486782, "INS": 441348, "MAV": 0, "MNV": 3083, "SNV": 3834002, "name": "NA12877_sample", "total": 4765215}],
-        "heterozygosity ratio":  {
-            "SNV":  [
+        "heterozygosity ratio": {
+            "SNV": [
                 {"name": "NA12879_sample", "ratio": 1.63, "counts": {"het": 2388333, "hom": 1466829, "total": 3855162}},
                 {"name": "NA12878_sample", "ratio": 1.63, "counts": {"het": 2386563, "hom": 1466489, "total": 3853052}},
                 {"name": "NA12877_sample", "ratio": 1.56, "counts": {"het": 2339204, "hom": 1494798, "total": 3834002}}]
         },
-        "overall_quality_status":  "PASS",
-        "mendelian errors in trio":  {
+        "overall_quality_status": "PASS",
+        "mendelian errors in trio": {
             "SNV":   [
                 {
                     "name": "NA12879_sample",
                     "counts": {"het": {"miss": 25792, "total": 2388333, "errors": 1223, "de_novo": 48148},
                                "hom": {"miss": 27539, "total": 1466829, "errors": 21467}}}]
         },
-        "transition-transversion ratio":  [
+        "transition-transversion ratio": [
             {"name": "NA12879_sample", "ratio": 1.96},
             {"name": "NA12878_sample", "ratio": 1.96},
             {"name": "NA12877_sample", "ratio": 1.96}],
@@ -106,15 +131,18 @@ def bam_qc(testapp, institution, project):
 
 
 @pytest.fixture
-def qclist(testapp, institution, project, bam_qc):
+def qclist(testapp, institution, project, bam_qc, qc_peddy):
+    peddyqc = testapp.post_json('/quality_metric_peddyqc', qc_peddy).json['@graph'][0]
     item = {
         'institution': institution['@id'],
         'project': project['@id'],
         "status": "in review",
         "overall_quality_status": "PASS",
         "uuid": "f94b0c13-24f9-4be4-9663-5d2213c5678e",
-        "qc_list": [{'qc_type': "quality_metric_bamqc",
-                     'value': bam_qc['@id']}]
+        "qc_list": [
+            {'qc_type': "quality_metric_bamqc", 'value': bam_qc['@id']},
+            {'qc_type': 'quality_metric_peddyqc', 'value': peddyqc['@id']}
+        ]
     }
     return testapp.post_json('/quality_metric_qclist', item).json['@graph'][0]
 
@@ -122,6 +150,11 @@ def qclist(testapp, institution, project, bam_qc):
 def test_post_qc_metric(testapp, qc_metric_fastqc):
     res = testapp.post_json('/quality_metric_fastqc', qc_metric_fastqc, status=201)
     assert res.json['@graph'][0]['overall_quality_status'] == "PASS"
+
+def test_post_qc_metric_peddy(testapp, qc_peddy):
+    res = testapp.post_json('/quality_metric_peddyqc', qc_peddy, status=201)
+    assert res.json['@graph'][0]['overall_quality_status'] == "PASS"
+    assert len(res.json['@graph'][0]['ancestry and sex prediction']) == 2
 
 
 def test_post_bad_qc(testapp, qc_metric_fastqc_bad_status, qc_metric_fastqc_no_project):
@@ -170,7 +203,11 @@ def test_quality_metric_qclist(qclist):
     summary = qclist['quality_metric_summary']
     expected_summary = [
         {'title': 'Total Reads', 'sample': 'NA12879_sample', 'value': '467863567', 'numberType': 'integer'},
-        {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'}
-        ]
+        {'title': 'Coverage', 'sample': 'NA12879_sample', 'value': '30x', 'numberType': 'string'},
+        {'title': 'Predicted Sex', 'sample': 'sample1', 'value': 'female', 'numberType': 'string'},
+        {'title': 'Predicted Sex', 'sample': 'sample2', 'value': 'male', 'numberType': 'string'},
+        {'title': 'Predicted Ancestry', 'sample': 'sample1', 'value': 'SAS', 'numberType': 'string'},
+        {'title': 'Predicted Ancestry', 'sample': 'sample2', 'value': 'AFR', 'numberType': 'string'}
+    ]
     for an_exp_info in expected_summary:
         assert an_exp_info in summary

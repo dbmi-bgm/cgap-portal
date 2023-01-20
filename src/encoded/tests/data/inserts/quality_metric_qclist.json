@@ -1,17 +1,66 @@
-[{
-    "uuid": "e2caceec-ffac-44f2-8614-8a901ce9ea0f",
-    "qc_list": [
-        {
-            "qc_type": "quality_metric_bamcheck",
-            "value": "108e47c1-35bd-46fd-8a2e-e5d7b89560eb"
-        },
-        {
-            "qc_type": "quality_metric_wgs_bamqc",
-            "value": "08c4829f-5efa-421f-a556-4ffa2e63692c"
-        }
-    ],
-    "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-    "institution": "hms-dbmi",
-    "submitted_by": "soohyun_lee@hms.harvard.edu"
-}
+[
+    {
+        "uuid": "e2caceec-ffac-44f2-8614-8a901ce9ea0f",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_bamcheck",
+                "value": "108e47c1-35bd-46fd-8a2e-e5d7b89560eb"
+            },
+            {
+                "qc_type": "quality_metric_wgs_bamqc",
+                "value": "08c4829f-5efa-421f-a556-4ffa2e63692c"
+            }
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
+    },
+    {
+        "uuid": "9c650173-a669-4c4f-8f42-4b50e8e88e5a",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "value": "dcaa6bf3-82f3-4b69-ae05-d5f00fec54ad"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": "595e3ec5-e4f8-4930-9c70-6e65e9a72d93"
+            }
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
+    },
+    {
+        "uuid": "21aaf9c1-cb02-40df-b90a-ccf1d7ce84b6",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "value": "dcaa6bf3-82f3-4b69-ae05-d5f00fec54ad"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": "eaa17b48-12f9-4fac-80ac-9ffc4dbddbb6"
+            }
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
+    },
+    {
+        "uuid": "ac30b28b-61dd-4136-b46d-9ed66a484219",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcfcheck",
+                "value": "dcaa6bf3-82f3-4b69-ae05-d5f00fec54ad"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": "0c4c2bde-1bb8-4545-a9e8-5583c5672712"
+            },
+            {
+                "qc_type": "quality_metric_peddyqc",
+                "value": "9a96c886-4907-443c-bb99-7520210e4751"
+            }
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi"
+    }
 ]

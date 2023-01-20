@@ -19,11 +19,12 @@ export default class DocumentView extends DefaultItemView {
 
 
 const DocumentViewOverview = React.memo(function DocumentViewOverview({ context, schemas }){
+    const { "@type": [ leafItemType = "Document" ] = [] } = context || {};
     const tips = object.tipsFromSchema(schemas, context);
     return (
         <div>
             <div className="row overview-blocks">
-                <ItemFileAttachment context={context} tips={tips} wrapInColumn="col-12 col-md-6" includeTitle btnSize="lg" itemType="Document" />
+                <ItemFileAttachment context={context} tips={tips} wrapInColumn="col-12 col-md-6" includeTitle btnSize="lg" itemType={leafItemType} />
             </div>
         </div>
     );

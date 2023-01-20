@@ -1,7 +1,6 @@
 [
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83ccc",
@@ -14,12 +13,10 @@
         ],
         "accession": "GAPCAQPHN61Y",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83bbb",
@@ -33,12 +30,10 @@
         ],
         "accession": "GAPCAKQB9FPJ",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
     },
     {
         "status": "shared",
-        "submitted_by": "986b362f-4eb6-4a9c-8173-3ab267221234",
         "sample_processing": "8dd51b60-2d65-4e74-ac86-08ff9159be90",
         "institution": "84ac37a8-c135-4c95-86cb-93028399d37e",
         "uuid": "81278096-7c10-4c5a-8ac3-5e3014e83aaa",
@@ -52,7 +47,6 @@
         ],
         "accession": "GAPCALNEKP7C",
         "project": "9a62ef81-7942-4550-a13c-18a915d70b8d",
-        "schema_version": "1",
         "family": "21f2af73-2c2e-4101-bbfb-bb2754f302ad"
     }
 ]

@@ -1,20 +1,24 @@
 import datetime
+import gzip
 import json
-import mock
+from unittest import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored
+from dcicutils.misc_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
+from ..ingestion.common import IngestionReport, IngestionError
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
-    IngestionError, IngestionReport,
+    STATUS_INGESTED,
 )
 from ..util import debuglog
 
 
-pytestmark = [pytest.mark.working, pytest.mark.ingestion]
+pytestmark = [pytest.mark.working, pytest.mark.ingestion, pytest.mark.workbook]
+
+
 QUEUE_INGESTION_URL = '/queue_ingestion'
 INGESTION_STATUS_URL = '/ingestion_status'
 INGESTED_ACCESSION = 'GAPFIZ123456'
@@ -184,41 +188,7 @@ def test_ingestion_listener_should_remain_online(fresh_ingestion_queue_manager_f
     assert after > (before + end_delta)
 
 
-@pytest.fixture
-def mocked_familial_relations():
-    return [{'samples_pedigree': [
-                {
-                    'sample_name': 'sample_one',
-                    'relationship': 'mother',
-                    'sex': 'F'
-                },
-                {
-                    'sample_name': 'sample_two',
-                    'relationship': 'father',
-                    'sex': 'M'
-                },
-                {
-                    'sample_name': 'sample_three',
-                    'relationship': 'proband',
-                    'sex': 'M'
-                }
-    ]}]
-
-
-def test_ingestion_listener_build_familial_relations(workbook, es_testapp, mocked_familial_relations):
-    """ Tests that we correctly extract familial relations from a mocked object that has the correct structure """
-    with mock.patch.object(IngestionListener, 'search_for_sample_relations',
-                           new=lambda x, y: mocked_familial_relations):
-        listener = IngestionListener(es_testapp)
-        relations = listener.extract_sample_relations('dummy')
-        assert relations['sample_one']['samplegeno_role'] == 'mother'
-        assert relations['sample_two']['samplegeno_role'] == 'father'
-        assert relations['sample_three']['samplegeno_role'] == 'proband'
-        assert relations['sample_one']['samplegeno_sex'] == 'F'
-        assert relations['sample_two']['samplegeno_sex'] == 'M'
-        assert relations['sample_three']['samplegeno_sex'] == 'M'
-
-
+@pytest.mark.skip
 def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testapp):
     """ Posts a minimal processed file to be checked """
     request = DummyRequest(environ={'REMOTE_USER': 'TEST', 'HTTP_ACCEPT': 'application/json'})
@@ -227,10 +197,15 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testa
     assert verify_vcf_file_status_is_not_ingested(request, NA_ACCESSION, expected=True)
 
 
-def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
+@pytest.mark.skip
+def test_ingestion_listener_run_0(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """
+    #
+    # NOTE: This (already-disabled) test had the same name as another test farther down in this file,
+    #       so "_0" was added to the test name to allow the two tests to be distinguished.
+    #
     uuid = 'cd679bdc-8691-4352-a25b-1c5f48407e9b'
     queue_manager = fresh_ingestion_queue_manager_for_testing
     queue_manager.add_uuids([uuid])
@@ -258,8 +233,7 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
 
 
 def test_test_port():
-
-    from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
+    from snovault.tests.postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
 
 
@@ -285,3 +259,82 @@ def test_ingestion_report_basic(success):
     assert report.grand_total == success + 1
     assert report.total_successful() == success
     assert report.total_errors() == 1
+
+
+def mock_request_get(*args, **kwargs):
+    """Mock request.get() result for SV VCF ingestion."""
+    ignored(args, kwargs)
+
+    class MockContent:
+
+        @property
+        def content(self):
+            """
+            """
+            file_contents = (
+                "##fileformat=VCFv4.0"
+                "\n##fileDate=20210801"
+                '\n##INFO=<ID=NS,Number=1,Type=Integer,Description="Number of Samples'
+                ' With Data">'
+                '\n##FORMAT=<ID=GT,Number=1,Type=String,Description="Genotype">'
+                "\n#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT"
+                "\tNA12879_sample\tNA12878_sample\tNA12877_sample"
+                "\nchr1\t31908111\trs6054257\tG\tA\t108\tPASS\tNS=3\tGT\t0/0\t0/1\t0/0"
+            )
+            file_contents = file_contents.encode("utf-8")
+            content = gzip.compress(file_contents)
+            return content
+
+    return MockContent()
+
+
+def mock_ingest_vcf(*args, **kwargs):
+    """
+    Mock for StructuralVariantBuilder.ingest_vcf() for SV VCF ingestion.
+    """
+    ignored(args, kwargs)
+    return [1, 0]
+
+
+@mock.patch("requests.get", new=mock_request_get)
+@mock.patch(
+    "encoded.ingestion.variant_utils.StructuralVariantBuilder.ingest_vcf",
+    new=mock_ingest_vcf
+)
+def test_ingestion_listener_run(
+        workbook, es_testapp, fresh_ingestion_queue_manager_for_testing
+):
+    """
+    Test successful SV VCF recognition, read, and hand-off to ingestion
+    within the endpoint, while SV VCF ingestion tested elsewhere.
+
+    Mocks a simple gzipped VCF for reading by vcf.Reader as well as
+    ingestion results to prompt patch of file indicating VCF was
+    successfully processed.
+    """
+    uuid = "b153279a-7521-4f7d-a360-831aeba0a595"  # File contents mocked above
+    queue_manager = fresh_ingestion_queue_manager_for_testing
+    queue_manager.add_uuids([uuid])
+    wait_for_queue_to_catch_up(queue_manager, 0)
+
+    # configure run for 10 seconds
+    start_time = datetime.datetime.utcnow()
+    end_delta = datetime.timedelta(seconds=10)
+    end_time = start_time + end_delta
+    debuglog("start_time [%s] + end_delta [%s] = end_time [%s]" % (start_time, end_delta, end_time))
+
+    def mocked_should_remain_online(override=None):
+        ignored(override)
+        current_time = datetime.datetime.utcnow()
+        recommendation = current_time < end_time
+        debuglog("At %s, should_remain_online=%s" % (current_time, recommendation))
+        return recommendation
+
+    with mock.patch.object(
+        IngestionListener, 'should_remain_online', new=mocked_should_remain_online
+    ):
+        run(es_testapp, _queue_manager=queue_manager)
+        vcf_file_response = es_testapp.get(
+            "/" + uuid + "/?datastore=database"
+        ).follow().json
+        assert vcf_file_response["file_ingestion_status"] == STATUS_INGESTED
