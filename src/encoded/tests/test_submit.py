@@ -1289,7 +1289,7 @@ class TestAccessionRow:
             obj.sample.metadata["requisition_acceptance"]["accepted_rejected"]
             == "Accepted"
         )
-        assert obj.sample.metadata["tags"] == ["foo", "bar", "fu"]
+        assert obj.sample.metadata["tags"] == ["foo", "BAR", "fu"]
         assert obj.analysis.metadata["samples"] == [obj.sample.alias]
         assert obj.individual.metadata["samples"] == [obj.sample.alias]
 
