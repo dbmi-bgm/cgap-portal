@@ -351,6 +351,7 @@ def mother_bam_file(testapp, project, institution, file_formats, mother_bam_qc):
     }
     return testapp.post_json('/file_processed', item).json['@graph'][0]
 
+
 @pytest.fixture
 def mother_sample(testapp, project, institution, mother_bam_file):
     item = {
@@ -708,7 +709,7 @@ def fam(testapp, project, female_individual, institution, grandpa, mother, fathe
 
 
 @pytest.fixture
-def sample_proc_fam(testapp, project, institution, fam):
+def sample_proc_fam(testapp, project, institution, fam, meta_workflow_run):
     data = {
         'project': project['@id'],
         'institution': institution['@id'],
@@ -724,7 +725,8 @@ def sample_proc_fam(testapp, project, institution, fam):
             "GAPSAUNCLE01",
             "GAPSACOUSIN1"
             ],
-        'families': [fam['@id']]
+        'families': [fam['@id']],
+        "meta_workflow_runs": [meta_workflow_run["@id"]],
     }
     res = testapp.post_json('/sample_processing', data).json['@graph'][0]
     return res
@@ -1060,6 +1062,49 @@ def workflow_run_awsem_json(testapp, institution, project, workflow_bam):
             'institution': institution['@id'],
             'run_status': 'started',
             }
+
+
+@pytest.fixture
+def meta_workflow(testapp, project, institution, workflow_bam):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "title": "A beautiful pipeline",
+        "name": "Beautiful Pipeline",
+        "workflows": [
+            {
+                "name": "BAM processing",
+                "workflow": workflow_bam["@id"],
+            },
+        ],
+    }
+    return testapp.post_json("/meta_workflow", item, status=201).json["@graph"][0]
+
+
+@pytest.fixture
+def meta_workflow_run(
+    testapp, project, institution, meta_workflow, workflow_run_awsem, mother_bam_file
+):
+    item = {
+        "project": project["@id"],
+        "institution": institution["@id"],
+        "final_status": "completed",
+        "title": "A beautiful pipeline run",
+        "meta_workflow": meta_workflow["@id"],
+        "workflow_runs": [
+            {
+                "name": "BAM processing",
+                "status": "completed",
+                "workflow_run": workflow_run_awsem["@id"],
+                "output": [
+                    {
+                        "file": mother_bam_file["@id"],
+                    },
+                ],
+            },
+        ],
+    }
+    return testapp.post_json("/meta_workflow_run", item, status=201).json["@graph"][0]
 
 
 @pytest.fixture

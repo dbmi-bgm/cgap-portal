@@ -2,8 +2,9 @@
 import re
 import snovault
 import string
+from dataclasses import dataclass
 from requests import Request
-from typing import Any, List, Tuple, Union
+from typing import Any, Iterable, List, Optional, Sequence, Tuple, Union
 
 from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.security import (
@@ -31,7 +32,7 @@ from snovault.crud_views import (
 )
 from snovault.interfaces import CONNECTION
 
-from .utils import display_pipelines
+from .. import custom_embed
 from ..server_defaults import get_userid, add_last_modified
 
 
@@ -495,8 +496,8 @@ def item_edit(context, request, render=None):
 
 
 def validate_item_pipelines_get(context: Item, request: Request) -> None:
-    display_pipelines = getattr(context, "display_pipelines", False)
-    if not display_pipelines:
+    pipeline_properties = getattr(context, "pipeline_properties", [])
+    if not pipeline_properties:
         raise HTTPMethodNotAllowed(detail="Item cannot display pipelines")
 
 
@@ -508,5 +509,80 @@ def validate_item_pipelines_get(context: Item, request: Request) -> None:
     validators=[validate_item_pipelines_get],
 )
 @debug_log
-def pipelines(context, request):
-    return display_pipelines(context, request)
+def pipelines(context: Item, request: Request) -> dict:
+    pipeline_retriever = PipelineRetriever(context, request)
+    pipelines = pipeline_retriever.get_pipelines()
+    return PipelineDisplayer(pipelines).get_display()
+
+
+@dataclass(frozen=True)
+class PipelineRetriever:
+
+    PIPELINE_PROPERTIES = "pipeline_properties"
+    UUID = "uuid"
+
+    context: Item
+    request: Request
+
+    def get_pipeline_properties(self) -> List[str]:
+        return getattr(self.context, self.PIPELINE_PROPERTIES, [])
+
+    def get_pipelines(self) -> List[dict]:
+        item_with_embeds = self.get_item_with_embeds()
+        return self.get_pipelines_from_embeds(item_with_embeds)
+
+    def get_item_with_embeds(self) -> List[dict]:
+        item_identifier = self.get_item_identifier()
+        custom_embed_parameters = self.get_custom_embed_parameters()
+        return custom_embed.CustomEmbed(
+            self.request, item_identifier, custom_embed_parameters
+        ).get_embedded_fields()
+
+    def get_item_identifier(self) -> str:
+        return str(getattr(self.context, self.UUID, ""))
+
+    def get_custom_embed_parameters(self) -> dict:
+        return {custom_embed.REQUESTED_FIELDS: self.get_properties_to_embed()}
+
+    def get_properties_to_embed(self) -> List[str]:
+        result = []
+        for pipeline_property in self.get_pipeline_properties():
+            result.extend(
+                self.get_properties_to_embed_from_pipeline_property(pipeline_property)
+            )
+        return result
+
+    def get_properties_to_embed_from_pipeline_property(
+        self,
+        pipeline_property: str
+    ) -> List[str]:
+        split_properties = [
+            term for term in pipeline_property.split(custom_embed.PROPERTY_SPLITTER)
+            if term
+        ]
+        return [
+            self.make_embed_property(
+                custom_embed.PROPERTY_SPLITTER.join(split_properties[:idx + 1])
+            )
+            for idx in range(len(split_properties))
+        ]
+
+    @staticmethod
+    def make_embed_property(property_to_embed: str) -> str:
+        return (
+            property_to_embed
+            + custom_embed.PROPERTY_SPLITTER
+            + custom_embed.EMBED_ALL_FIELDS_MARKER
+        )
+
+    def get_pipelines_from_item(self, item: dict) -> List[dict]:
+        pass
+
+
+@dataclass(frozen=True)
+class PipelineDisplayer:
+
+    pipelines: Sequence[dict]
+
+    def get_display(self) -> dict:
+        pass

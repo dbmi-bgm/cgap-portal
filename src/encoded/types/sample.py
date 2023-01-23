@@ -1094,7 +1094,7 @@ class SampleProcessing(Item):
     schema = load_schema("encoded:schemas/sample_processing.json")
     embedded_list = _build_sample_processing_embedded_list()
     rev = {"case": ("Case", "sample_processing")}
-    display_pipelines = True
+    pipeline_properties = ["meta_workflow_runs", "samples.meta_workflow_runs"]
 
     QC_VALUE_SCHEMA = {
         "title": "Value",

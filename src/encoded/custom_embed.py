@@ -8,7 +8,10 @@ from pyramid.traversal import find_resource
 from pyramid.view import view_config
 from snovault.util import debug_log
 
+
 ATID_PATTERN = re.compile("/[a-zA-Z-]+/[a-zA-Z0-9-_:]+/")
+EMBED_ALL_FIELDS_MARKER = "*"
+PROPERTY_SPLITTER = "."
 GENELIST_ATID = re.compile("/gene-lists/[a-zA-Z0-9-]+/")
 MINIMAL_EMBEDS = ["projects", "institutions", "users"]
 MINIMAL_EMBED_ATID = re.compile("/(" + "|".join(MINIMAL_EMBEDS) + ")/[a-zA-Z0-9-_:]+/")
@@ -26,6 +29,7 @@ KEYS_TO_IGNORE = [
 ]
 FORBIDDEN_MSG = {"error": "no view permissions"}
 DATABASE_ITEM_KEY = "@type"  # Key specific to JSON objects that are CGAP items
+REQUESTED_FIELDS = "requested_fields"
 
 
 def includeme(config):
@@ -43,7 +47,7 @@ class CustomEmbed:
         self.ignored_embeds = embed_props.get("ignored_embeds", [])
         self.desired_embeds = embed_props.get("desired_embeds", [])
         self.embed_depth = embed_props.get("embed_depth", 4)
-        self.requested_fields = embed_props.get("requested_fields", [])
+        self.requested_fields = embed_props.get(REQUESTED_FIELDS, [])
 
         self.cache = {}
         self.invalid_ids = []
@@ -54,6 +58,9 @@ class CustomEmbed:
         else:
             depth = -1
             self.result = self.embed(item, depth)
+
+    def get_embedded_fields(self) -> dict:
+        return self.result
 
     def add_actions(self, item):
         """
@@ -241,7 +248,7 @@ class CustomEmbed:
         """
         field_dict = {}
         for field in self.requested_fields:
-            field_keys = field.split(".")
+            field_keys = field.split(PROPERTY_SPLITTER)
             field_keys = [x for x in field_keys if x]
             field_dict = self.build_nested_dict(field_dict, field_keys)
         return field_dict
@@ -306,7 +313,7 @@ class CustomEmbed:
                             "The 'actions' field was requested for a JSON object"
                             " that is not a database item."
                         )
-                if "*" not in fields_to_keep:
+                if EMBED_ALL_FIELDS_MARKER not in fields_to_keep:
                     culled_item = {}
                     for field in fields_to_keep:
                         try:
@@ -380,7 +387,7 @@ def embed(context, request):
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
         "embed_depth": embed_depth,
-        "requested_fields": requested_fields,
+        REQUESTED_FIELDS: requested_fields,
     }
     for item_id in ids:
         item_embed = CustomEmbed(request, item_id, embed_props)
