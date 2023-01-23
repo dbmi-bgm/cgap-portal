@@ -700,7 +700,7 @@ const bioinfoPopoverContent = {
     ),
     transTransRatio: (
         <div>
-            The Transition/Transversion ratio is calculated by bcftools. Expected values are 1.8-2.1 overall for WGS, and 2.3-3.3 for WES. Values outside this range can indicate lower accuracy of calls.
+            The Transition/Transversion ratio is calculated by bcftools. Expected values are 1.8-2.1 overall for WGS, and 2.2-3.3 for WES. Values outside this range can indicate lower accuracy of calls.
         </div>
     ),
     coverage: (
