@@ -115,7 +115,8 @@
                             "pending",
                             "running",
                             "completed",
-                            "failed"
+                            "failed",
+                            "stopped"
                         ]
                     },
                     "dependencies": {
