@@ -6,6 +6,23 @@ cgap-portal
 Change Log
 ----------
 
+12.5.0
+======
+
+`PR 677: Sample tag submission <https://github.com/dbmi-bgm/cgap-portal/pull/677>`_
+
+* Enable sample tag submission via accessioning spreadsheet
+
+
+12.4.0
+======
+
+`PR 680: Staggered Indexing <https://github.com/dbmi-bgm/cgap-portal/pull/680>`_
+
+* Reindex by type support
+* Allow more utils versions
+
+
 12.3.1
 ======
 
