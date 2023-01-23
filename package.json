@@ -70,7 +70,7 @@
     "higlass-pileup": "1.4.1",
     "higlass-gnomad": "0.2.2-beta.1",
     "higlass-general-vcf": "0.1.2-beta.1",
-    "higlass-cohort": "0.2.1-beta.0",
+    "higlass-cohort": "0.2.3",
     "higlass-bigwig-datafetcher": "0.1.2",
     "higlass-sv": "1.0.4-beta.0",
     "markdown-to-jsx": "^6.11.4",
