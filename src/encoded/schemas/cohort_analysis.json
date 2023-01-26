@@ -19,6 +19,16 @@
             "$ref": "abstract_analysis.json#/properties"
         }
     ],
+    "mixinFacets": [
+        {
+            "$ref": "abstract_analysis.json#/facets"
+        }
+    ],
+    "mixinColumns": [
+        {
+            "$ref": "abstract_analysis.json#/columns"
+        }
+    ],
     "properties": {
         "schema_version": {
             "default": "1"

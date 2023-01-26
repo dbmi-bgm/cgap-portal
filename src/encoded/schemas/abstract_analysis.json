@@ -61,15 +61,37 @@
             "description": "External identifier for the analysis",
             "type": "string"
         },
-        "title": {
-            "title": "Title",
-            "description": "Title for the analysis",
-            "type": "string"
-        },
         "description": {
             "title": "Description",
             "description": "Description of the analysis",
             "type": "string"
+        }
+    },
+    "facets": {
+        "project.display_title": {
+            "title": "Project",
+            "order": 10
+        },
+        "samples": {
+            "title": "Samples",
+            "description": "Samples in the analysis",
+            "order": 20
+        },
+        "sample.individual": {
+            "title": "Individuals",
+            "description": "Individuals in the analysis",
+            "order": 30
+        },
+        "sample.workup_type": {
+            "title": "Sequencing",
+            "description": "Sequencing type of the samples in the analysis",
+            "order": 40
+        }
+    },
+    "columns": {
+        "display_title": {
+            "title": "Analysis ID",
+            "order": 10
         }
     }
 }
