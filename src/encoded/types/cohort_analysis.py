@@ -19,7 +19,7 @@ class CohortAnalysis(AbstractAnalysis):
     item_type = "cohort_analysis"
     name_key = "accession"
     schema = load_schema("encoded:schemas/cohort_analysis.json")
-    embedded_list = _build_cohort_analysis_embedded_list()
+    embedded_list = AbstractAnalysis.embedded_list + _build_cohort_analysis_embedded_list()
 
     @calculated_property(
         schema={

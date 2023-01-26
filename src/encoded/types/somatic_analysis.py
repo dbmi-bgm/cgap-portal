@@ -19,4 +19,4 @@ class SomaticAnalysis(AbstractAnalysis):
     item_type = "somatic_analysis"
     name_key = "accession"
     schema = load_schema("encoded:schemas/somatic_analysis.json")
-    embedded_list = _build_somatic_analysis_embedded_list()
+    embedded_list = AbstractAnalysis.embedded_list + _build_somatic_analysis_embedded_list()
