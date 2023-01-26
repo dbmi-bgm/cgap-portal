@@ -509,16 +509,6 @@
             "type": "string",
             "lookup": 21,
             "uniqueKey": true
-        },
-        "tissue_category": {
-            "title": "Tissue Category",
-            "description": "The category of tissue from which the sample was derived",
-            "type": "string",
-            "enum": [
-                "tumor",
-                "normal",
-                "germline"
-            ]
         }
     }
 }
