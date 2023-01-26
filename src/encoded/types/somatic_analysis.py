@@ -1,4 +1,4 @@
-from snovault import collection, load_schema, calculated_property
+from snovault import collection, load_schema
 
 from .analysis import AbstractAnalysis
 
