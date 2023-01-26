@@ -249,6 +249,9 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             setLastSavedPresetFilterSet,
         };
 
+        const savePresetDropdownCls = "btn btn-outline-primary btn-sm text-truncate w-100";
+        const btnInner = <div><i className="icon icon-save fas mr-05" /> Save Current FilterSet as a Preset</div>;
+
         if (!presetResults || presetResults.length === 0){
             if (isLoadingPresets) {
                 // Only show loading indicator in body for lack of initial results.
@@ -268,8 +271,8 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                                 Create a FilterSet and then click <em>Save As...</em> to create a preset.
                             </p>
                         </div>
-                        <div className="py-4 px-3 bg-white">
-                            <SaveFilterSetPresetButton {...savePresetDropdownProps} />
+                        <div className="p-2 bg-white">
+                            <SaveFilterSetPresetButton {...savePresetDropdownProps} {...{ btnInner }} btnCls={savePresetDropdownCls} />
                         </div>
                     </div>
                 );
@@ -297,8 +300,8 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                         const isDeleted = deletedPresetUUIDs[thisPresetFSUUID];
                         return <PresetFilterSetResult {...commonProps} {...{ presetFilterSet, isOriginOfCurrentCaseFilterSet, isDeleted }} key={thisPresetFSUUID}  />;
                     }) }
-                    <div className="py-4 px-3 bg-white">
-                        <SaveFilterSetPresetButton {...savePresetDropdownProps} />
+                    <div className="p-2 bg-white">
+                        <SaveFilterSetPresetButton {...savePresetDropdownProps} {...{ btnInner }} btnCls={savePresetDropdownCls}/>
                     </div>
                 </div>
             );
