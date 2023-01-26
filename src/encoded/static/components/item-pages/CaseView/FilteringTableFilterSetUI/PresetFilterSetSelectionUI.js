@@ -249,7 +249,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             setLastSavedPresetFilterSet,
         };
 
-        const savePresetDropdownCls = "btn btn-outline-primary btn-sm text-truncate w-100";
+        const savePresetDropdownCls = "btn btn-outline-primary-dark btn-sm text-truncate w-100";
         const btnInner = <div><i className="icon icon-save fas mr-05" /> Save Current FilterSet as a Preset</div>;
 
         if (!presetResults || presetResults.length === 0){
