@@ -11,6 +11,7 @@ import ReactTooltip from 'react-tooltip';
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime, format as formatDateTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { CountIndicator } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/FacetList/FacetTermsList';
+import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 
 
 /**
@@ -216,9 +217,13 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             hasCurrentFilterSetChanged,
             isFetchingInitialFilterSetItem,
             currentCaseFilterSet,
+            originalPresetFilterSet,
+            lastSavedPresetFilterSet,
             hasFilterSetChangedFromOriginalPreset,
+            hasFilterSetChangedFromLastSavedPreset,
             isOriginalPresetFilterSetLoading,
-            refreshOriginalPresetFilterSet
+            refreshOriginalPresetFilterSet,
+            setLastSavedPresetFilterSet
         } = this.props;
         const {
             isLoadingPresets,
@@ -231,6 +236,19 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
         } = this.state;
 
         let body = null;
+
+        const savePresetDropdownProps = {
+            filterSet: currentCaseFilterSet,
+            caseItem,
+            isEditDisabled,
+            originalPresetFilterSet,
+            hasFilterSetChangedFromOriginalPreset,
+            hasFilterSetChangedFromLastSavedPreset,
+            lastSavedPresetFilterSet,
+            isOriginalPresetFilterSetLoading,
+            setLastSavedPresetFilterSet,
+        };
+
         if (!presetResults || presetResults.length === 0){
             if (isLoadingPresets) {
                 // Only show loading indicator in body for lack of initial results.
@@ -241,13 +259,18 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                 );
             } else {
                 body = (
-                    <div className="py-4 px-3 bg-white border-bottom">
-                        <h4 className="my-0 text-400">
-                            No presets saved yet
-                        </h4>
-                        <p>
-                            Create a FilterSet and then click <em>Save As...</em> to create a preset.
-                        </p>
+                    <div>
+                        <div className="py-4 px-3 bg-white border-bottom">
+                            <h4 className="my-0 text-400">
+                                No presets saved yet
+                            </h4>
+                            <p>
+                                Create a FilterSet and then click <em>Save As...</em> to create a preset.
+                            </p>
+                        </div>
+                        <div className="py-4 px-3 bg-white">
+                            <SaveFilterSetPresetButton {...savePresetDropdownProps} />
+                        </div>
                     </div>
                 );
             }
@@ -274,6 +297,9 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                         const isDeleted = deletedPresetUUIDs[thisPresetFSUUID];
                         return <PresetFilterSetResult {...commonProps} {...{ presetFilterSet, isOriginOfCurrentCaseFilterSet, isDeleted }} key={thisPresetFSUUID}  />;
                     }) }
+                    <div className="py-4 px-3 bg-white">
+                        <SaveFilterSetPresetButton {...savePresetDropdownProps} />
+                    </div>
                 </div>
             );
         }
