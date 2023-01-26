@@ -1,6 +1,10 @@
 from snovault import calculated_property, collection, load_schema
 
-from .base import Item
+from .analysis import AbstractAnalysis
+
+
+def _build_cohort_analysis_embedded_list():
+    return []
 
 
 @collection(
@@ -10,19 +14,8 @@ from .base import Item
         "description": "Listing of Cohort Analyses",
     },
 )
-class CohortAnalysis(Item):
+class CohortAnalysis(AbstractAnalysis):
     item_type = "cohort_analysis"
+    name_key = "accession"
     schema = load_schema("encoded:schemas/cohort_analysis.json")
-    embedded_list = []
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "Cohort analysis display title",
-        "type": "string"
-    })
-    def display_title(self, accession, title=None):
-        if title:
-            result = f"{title} ({accession})"
-        else:
-            result = accession
-        return result
+    embedded_list = _build_cohort_analysis_embedded_list()

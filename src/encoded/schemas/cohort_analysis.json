@@ -16,37 +16,7 @@
     "additionalProperties": false,
     "mixinProperties": [
         {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
-            "$ref": "mixins.json#/aliases"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
-        },
-        {
-            "$ref": "mixins.json#/modified"
-        },
-        {
-            "$ref": "mixins.json#/status"
-        },
-        {
-            "$ref": "mixins.json#/attribution"
-        },
-        {
-            "$ref": "mixins.json#/submitted_files"
-        },
-        {
-            "$ref": "mixins.json#/meta_workflow_runs"
-        },
-        {
-            "$ref": "mixins.json#/accession"
-        },
-        {
-            "$ref": "mixins.json#/processed_files"
+            "$ref": "abstract_analysis.json#/properties"
         }
     ],
     "properties": {
@@ -55,16 +25,6 @@
         },
         "accession": {
             "accessionType": "CA"
-        },
-        "title": {
-            "title": "Title",
-            "description": "Title for the analysis",
-            "type": "string"
-        },
-        "description": {
-            "title": "Description",
-            "description": "Description of the analysis",
-            "type": "string"
         },
         "control_samples": {
             "title": "Control Samples",
