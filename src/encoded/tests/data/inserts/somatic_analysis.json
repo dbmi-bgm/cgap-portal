@@ -6,7 +6,7 @@
         "aliases": [
             "hms-dbmi:tumor_analysis_001"
         ],
-        "title": "tumor_analysis_001",
+        "external_identifier": "tumor_analysis_001",
         "description": "Breast cancer tumor vs. normal",
         "samples": [
             "f4bbc709-40fe-48a4-afde-8e886b571903",
@@ -20,7 +20,7 @@
         "aliases": [
             "hms-dbmi:normal_analysis_001"
         ],
-        "title": "normal_analysis_001",
+        "external_identifier": "normal_analysis_001",
         "description": "Normal tissue analysis",
         "samples": [
             "f4bbc709-40fe-48a4-afde-8e886b571904"
