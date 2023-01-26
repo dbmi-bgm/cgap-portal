@@ -7,7 +7,10 @@ from .base import Item
 
 
 def _build_abstract_analysis_embedded_list() -> List[str]:
-    return []
+    return [
+        "samples.individual",
+        "samples.individual.families",
+    ]
 
 
 class AbstractAnalysis(ABC, Item):

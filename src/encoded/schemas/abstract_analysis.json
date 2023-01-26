@@ -82,10 +82,15 @@
             "description": "Individuals in the analysis",
             "order": 30
         },
+        "sample.individual.families": {
+            "title": "Families",
+            "description": "Families in the analysis",
+            "order": 40
+        },
         "sample.workup_type": {
             "title": "Sequencing",
             "description": "Sequencing type of the samples in the analysis",
-            "order": 40
+            "order": 50
         }
     },
     "columns": {
