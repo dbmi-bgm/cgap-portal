@@ -8,9 +8,9 @@ from .base import Item
 class AbstractAnalysis(ABC, Item):
 
     @calculated_property(schema=display_title_schema)
-    def display_title(self, accession, title=None):
-        if title:
-            result = f"{title} ({accession})"
+    def display_title(self, accession, external_identifier=None):
+        if external_identifier:
+            result = external_identifier
         else:
             result = accession
         return result
