@@ -688,6 +688,9 @@ const bioinfoPopoverContent = {
             to fewer than 500. Briefly, these filters include: (1) including SVs based on VEP annotations; (2) removing SVs with only intronic
             or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
             population allele frequency, and a panel of 20 unrelated samples; and (4) removing SVs over a certain size.
+            <p>
+                Note: SVs are only available for WGS samples.
+            </p>
         </div>
     ),
     heterozygosity: (
@@ -698,6 +701,13 @@ const bioinfoPopoverContent = {
     transTransRatio: (
         <div>
             The Transition/Transversion ratio is calculated by bcftools. Expected values are 1.8-2.1 overall for WGS, and 2.3-3.3 for WES. Values outside this range can indicate lower accuracy of calls.
+        </div>
+    ),
+    coverage: (
+        <div>
+            Coverage is calculated by samtools. For WGS samples, expected values are
+            &gt; 25X, and failures are &lt; 10X. For WES samples, expected values are
+            &gt; 70X, and failures are &lt; 40X.
         </div>
     )
 };
@@ -765,7 +775,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 <BioinfoStatsEntry label="Total Number of Reads">
                     { reads.value ? decorateNumberWithCommas(+reads.value) : fallbackElem }
                 </BioinfoStatsEntry>
-                <BioinfoStatsEntry label="Coverage">
+                <BioinfoStatsEntry label="Coverage" popoverContent={bioinfoPopoverContent.coverage}>
                     { coverage.value || fallbackElem }
                     { (coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
