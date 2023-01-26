@@ -16,17 +16,17 @@
     "additionalProperties": false,
     "mixinProperties": [
         {
-            "$ref": "abstract_analysis#/properties"
+            "$ref": "abstract_analysis.json#/properties"
         }
     ],
     "mixinFacets": [
         {
-            "$ref": "abstract_analysis#/facets"
+            "$ref": "abstract_analysis.json#/facets"
         }
     ],
     "mixinColumns": [
         {
-            "$ref": "abstract_analysis#/columns"
+            "$ref": "abstract_analysis.json#/columns"
         }
     ],
     "properties": {
