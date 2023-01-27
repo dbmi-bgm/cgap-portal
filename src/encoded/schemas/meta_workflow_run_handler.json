@@ -88,7 +88,7 @@
         },   
         "meta_workflow_runs": {
             "title": "MetaWorkflow Runs",
-            "description": "The list of metaworkflow runs with their status and output files",
+            "description": "The list of metaworkflow runs with their status and output files, in sorted order",
             "type": "array", 
             "items": {
                 "title": "MetaWorkflow Run",
