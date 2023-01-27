@@ -1,7 +1,7 @@
 {
-    "title": "Abstract Analysis",
-    "description": "Abstract analysis of samples",
-    "id": "/profiles/abstract_analysis.json",
+    "title": "Analysis",
+    "description": "Analysis of samples",
+    "id": "/profiles/analysis.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [
@@ -14,44 +14,6 @@
         "accession"
     ],
     "additionalProperties": false,
-    "mixinProperties": [
-        {
-            "$ref": "mixins.json#/schema_version"
-        },
-        {
-            "$ref": "mixins.json#/uuid"
-        },
-        {
-            "$ref": "mixins.json#/aliases"
-        },
-        {
-            "$ref": "mixins.json#/submitted"
-        },
-        {
-            "$ref": "mixins.json#/modified"
-        },
-        {
-            "$ref": "mixins.json#/status"
-        },
-        {
-            "$ref": "mixins.json#/attribution"
-        },
-        {
-            "$ref": "mixins.json#/tags"
-        },
-        {
-            "$ref": "mixins.json#/submitted_files"
-        },
-        {
-            "$ref": "mixins.json#/meta_workflow_runs"
-        },
-        {
-            "$ref": "mixins.json#/processed_files"
-        },
-        {
-            "$ref": "mixins.json#/accession"
-        }
-    ],
     "properties": {
         "accession": {
             "accessionType": "AN"
@@ -72,22 +34,22 @@
             "title": "Project",
             "order": 10
         },
-        "samples": {
+        "samples.display_title": {
             "title": "Samples",
             "description": "Samples in the analysis",
             "order": 20
         },
-        "sample.individual": {
+        "samples.individual.display_title": {
             "title": "Individuals",
             "description": "Individuals in the analysis",
             "order": 30
         },
-        "sample.individual.families": {
+        "samples.individual.families.display_title": {
             "title": "Families",
             "description": "Families in the analysis",
             "order": 40
         },
-        "sample.workup_type": {
+        "samples.workup_type": {
             "title": "Sequencing",
             "description": "Sequencing type of the samples in the analysis",
             "order": 50
@@ -95,7 +57,7 @@
     },
     "columns": {
         "display_title": {
-            "title": "Analysis ID",
+            "title": "Title",
             "order": 10
         }
     }

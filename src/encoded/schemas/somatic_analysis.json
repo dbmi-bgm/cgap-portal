@@ -16,17 +16,53 @@
     "additionalProperties": false,
     "mixinProperties": [
         {
-            "$ref": "abstract_analysis.json#/properties"
+            "$ref": "analysis.json#/properties"
+        },
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        },
+        {
+            "$ref": "mixins.json#/tags"
+        },
+        {
+            "$ref": "mixins.json#/submitted_files"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
+        },
+        {
+            "$ref": "mixins.json#/processed_files"
+        },
+        {
+            "$ref": "mixins.json#/accession"
         }
     ],
     "mixinFacets": [
         {
-            "$ref": "abstract_analysis.json#/facets"
+            "$ref": "analysis.json#/facets"
         }
     ],
     "mixinColumns": [
         {
-            "$ref": "abstract_analysis.json#/columns"
+            "$ref": "analysis.json#/columns"
         }
     ],
     "properties": {

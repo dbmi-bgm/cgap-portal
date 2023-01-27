@@ -1,21 +1,35 @@
-from abc import ABC
 from typing import List, Optional, Union
 
-from snovault import calculated_property, display_title_schema
+from snovault import (
+    abstract_collection, calculated_property, display_title_schema, load_schema
+)
 
 from .base import Item
 
 
-def _build_abstract_analysis_embedded_list() -> List[str]:
+def _build_analysis_embedded_list() -> List[str]:
     return [
         "samples.individual",
+        "samples.workup_type",
         "samples.individual.families",
     ]
 
 
-class AbstractAnalysis(ABC, Item):
+@abstract_collection(
+    name="analyses",
+    unique_key="accession",
+    properties={
+        "title": "Analyses",
+        "description": "Listing of Analyses",
+    },
+)
+class Analysis(Item):
 
-    embedded_list = _build_abstract_analysis_embedded_list()
+    item_type = "analysis"
+    base_types = ["Analysis"] + Item.base_types
+    schema = load_schema("encoded:schemas/analysis.json")
+    name_key = "accession"
+    embedded_list = _build_analysis_embedded_list()
 
     @calculated_property(schema=display_title_schema)
     def display_title(
