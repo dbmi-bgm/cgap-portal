@@ -6,10 +6,27 @@ cgap-portal
 Change Log
 ----------
 
-12.5.0
+12.7.0
 ======
 
 * Allow configuration of Auth0Domain and Auth0AllowedConnections
+* Set a bigger `large_client_header_buffers` so we can tolerate a larger cookie package
+
+
+12.6.0
+======
+`PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676/files>`_
+
+* Update higlass dependencies to latest (some beta) realeases to resolve security issues
+* Update SPC to latest release: v0.1.58
+
+
+12.5.0
+======
+
+`PR 677: Sample tag submission <https://github.com/dbmi-bgm/cgap-portal/pull/677>`_
+
+* Enable sample tag submission via accessioning spreadsheet
 
 
 12.4.0
