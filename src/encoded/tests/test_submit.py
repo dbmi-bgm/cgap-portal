@@ -467,6 +467,7 @@ def row_dict():
         "specimen type": "Peripheral_Blood",
         "test requested": "WGS",
         "test number": "2",
+        "tags": "foo,BAR, fu, ",
     }
 
 
@@ -1288,6 +1289,7 @@ class TestAccessionRow:
             obj.sample.metadata["requisition_acceptance"]["accepted_rejected"]
             == "Accepted"
         )
+        assert obj.sample.metadata["tags"] == ["foo", "BAR", "fu"]
         assert obj.analysis.metadata["samples"] == [obj.sample.alias]
         assert obj.individual.metadata["samples"] == [obj.sample.alias]
 

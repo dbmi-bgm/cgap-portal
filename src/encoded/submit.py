@@ -408,6 +408,7 @@ class AccessionRow:
     FAMILIES = "families"
     SUBMITTED_FILES = "files"
     WORKUP_TYPE = "workup_type"
+    TAGS = "tags"
 
     # Spreadsheet constants
     GENOME_BUILD = "genome_build"
@@ -621,9 +622,13 @@ class AccessionRow:
             self.CASE_FILES,
             self.GENOME_BUILD,
             self.VARIANT_TYPE,
+            self.TAGS,
         ]
         info = map_fields(self.metadata, info, fields, "sample")
-        update_value_capitalization(info, to_upper=self.PROPERTY_VALUES_TO_UPPER)
+        update_value_capitalization(
+            info,
+            to_upper=self.PROPERTY_VALUES_TO_UPPER,
+        )
         # handle enum values
         replace_cell_contents(info, "specimen_accepted", y="Yes", n="No")
         # handle bam sample ID
@@ -640,6 +645,9 @@ class AccessionRow:
             if self.metadata.get("second specimen id type"):
                 other_id["id_type"] = self.metadata["second specimen id type"]
             info["other_specimen_ids"] = [other_id]
+        tags = info.get(self.TAGS)
+        if tags:
+            info[self.TAGS] = string_to_array(tags)
         req_info = map_fields(
             self.metadata, {}, ["date sent", "date completed"], "requisition"
         )

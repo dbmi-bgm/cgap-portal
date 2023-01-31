@@ -15,17 +15,18 @@ import uuid
 from dcicutils.misc_utils import PRINT
 from dcicutils.qa_utils import notice_pytest_fixtures
 from elasticsearch.exceptions import NotFoundError
-from snovault import DBSESSION  # , TYPES
+from snovault import DBSESSION, TYPES
 from snovault.elasticsearch import ELASTIC_SEARCH
+# from snovault.storage import Base
 from snovault.elasticsearch.create_mapping import (
-    # type_mapping,
+    type_mapping,
     create_mapping_by_type,
     build_index_record,
     compare_against_existing_mapping
 )
 from snovault.elasticsearch.indexer_utils import get_namespaced_index, compute_invalidation_scope
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
-from sqlalchemy import func
+from sqlalchemy import func  # , MetaData, exc
 from timeit import default_timer as timer
 from unittest import mock
 from .helpers import local_collections
@@ -89,6 +90,7 @@ def setup_and_teardown(es_app):
 def test_indexing_simple(setup_and_teardown, es_app, es_testapp, indexer_testapp):
     es = es_app.registry['elasticsearch']
     namespaced_ppp = get_namespaced_index(es_app, 'testing_post_put_patch')
+
     doc_count = es.count(index=namespaced_ppp).get('count')
     assert doc_count == 0
     # First post a single item so that subsequent indexing is incremental
@@ -113,6 +115,7 @@ def test_indexing_simple(setup_and_teardown, es_app, es_testapp, indexer_testapp
         count += 1
     assert res.json['total'] >= 2
     assert uuid in uuids
+
     namespaced_indexing = get_namespaced_index(es_app, 'indexing')
     indexing_doc = es.get(index=namespaced_indexing, id='latest_indexing')
     indexing_source = indexing_doc['_source']
@@ -121,8 +124,10 @@ def test_indexing_simple(setup_and_teardown, es_app, es_testapp, indexer_testapp
     assert 'indexing_content' in indexing_source
     assert indexing_source['indexing_status'] == 'finished'
     assert indexing_source['indexing_count'] > 0
+
     testing_ppp_mappings = es.indices.get_mapping(index=namespaced_ppp)[namespaced_ppp]
     assert 'mappings' in testing_ppp_mappings
+
     testing_ppp_settings = es.indices.get_settings(index=namespaced_ppp)[namespaced_ppp]
     assert 'settings' in testing_ppp_settings
     # ensure we only have 1 shard for tests
@@ -140,8 +145,7 @@ def test_create_mapping_on_indexing(setup_and_teardown, es_app, es_testapp, regi
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
     for item_type in item_types:
-        # Why were we computing this unused quantity? -kmp 31-Jan-2023
-        # item_mapping = type_mapping(registry[TYPES], item_type)
+        type_mapping(registry[TYPES], item_type)
         try:
             namespaced_index = get_namespaced_index(es_app, item_type)
             item_index = es.indices.get(index=namespaced_index)

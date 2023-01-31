@@ -279,6 +279,7 @@ class NoNestedCommit(BaseException):
     """
     pass
 
+
 @contextlib.contextmanager
 def begin_nested(*, app, commit=True):
     session = app.registry[DBSESSION]
@@ -290,6 +291,7 @@ def begin_nested(*, app, commit=True):
                 raise NoNestedCommit()  # Raising an error will bypass an attempt to commit
     except NoNestedCommit:
         pass
+
 
 @contextlib.contextmanager
 def local_collections(*, app, collections):

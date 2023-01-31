@@ -6,10 +6,33 @@ cgap-portal
 Change Log
 ----------
 
-`PR 680: Staggered Indexing <https://github.com/dbmi-bgm/cgap-portal/pull/680>`_
+
+12.7.0
+======
+
+Backport pytest 7.2 support from Fourfront
+
+
+12.6.0
+======
+`PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676/files>`_
+
+* Update higlass dependencies to latest (some beta) realeases to resolve security issues
+* Update SPC to latest release: v0.1.58
+
+
+12.5.0
+======
+
+`PR 677: Sample tag submission <https://github.com/dbmi-bgm/cgap-portal/pull/677>`_
+
+* Enable sample tag submission via accessioning spreadsheet
+
 
 12.4.0
 ======
+
+`PR 680: Staggered Indexing <https://github.com/dbmi-bgm/cgap-portal/pull/680>`_
 
 * Reindex by type support
 * Allow more utils versions
