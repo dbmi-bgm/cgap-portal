@@ -1234,7 +1234,7 @@ def hidden_facet_data_two():
     }
 
 
-@pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
+@pytest.fixture(scope='module')  # TODO consider this further.
 def hidden_facet_test_data(workbook, es_testapp, hidden_facet_data_one, hidden_facet_data_two):
     es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_one, status=201)
     es_testapp.post_json('/TestingHiddenFacets', hidden_facet_data_two, status=201)
@@ -1463,7 +1463,7 @@ def bucket_range_data_raw():
     return entries
 
 
-@pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
+@pytest.fixture(scope='module')  # XXX: consider scope further - Will 11/5/2020
 def bucket_range_data(workbook, es_testapp, bucket_range_data_raw):
     for entry in bucket_range_data_raw:
         es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
