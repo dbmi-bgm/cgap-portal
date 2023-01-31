@@ -7,7 +7,7 @@ from .conftest_settings import ORDER
 pytestmark = [pytest.mark.setone, pytest.mark.broken, pytest.mark.schema, pytest.mark.indexing, pytest.mark.sloppy]
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture  # (scope='session') - Changed to function scope by Kent, paralleling what Fourfront does. 26-Jan-2023
 def minitestdata(app, conn):
     tx = conn.begin_nested()
 
@@ -28,8 +28,7 @@ def minitestdata(app, conn):
     tx.rollback()
 
 
-
-@pytest.yield_fixture(scope='session')
+@pytest.fixture  # (scope='session')
 def minitestdata2(app, conn):
     tx = conn.begin_nested()
 
