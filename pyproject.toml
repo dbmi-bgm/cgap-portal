@@ -2,7 +2,7 @@
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
 version = "12.6.0"
-description = "Clinical Genomics Analysis Platform"
+description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
 readme = "README.rst"
