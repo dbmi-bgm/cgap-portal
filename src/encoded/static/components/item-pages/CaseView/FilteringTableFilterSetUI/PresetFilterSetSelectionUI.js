@@ -323,7 +323,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
 
         return (
             <div className="filterset-preset-selection-body h-100">
-                <div className="results-heading my-0 py-2 px-2 bg-light">
+                <div className="results-heading my-0 py-2 px-2 bg-light border-bottom">
                     <div className="row align-items-center">
                         <h5 className="col text-400 my-0">
                             <i className="icon icon-copy far mr-08"/>
