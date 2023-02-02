@@ -310,8 +310,8 @@ export class SaveFilterSetPresetButton extends React.Component {
 
     render(){
         const {
-            btnCls = "btn btn-outline-light btn-sm text-truncate",
-            btnInner = "Save as Preset",
+            btnCls = "btn btn-outline-light btn-sm text-truncate d-flex align-items-center",
+            btnInner = <><i className="icon fas icon-plus-circle mr-05" />Create Preset</>,
             caseItem,
             filterSet,
             isEditDisabled,
