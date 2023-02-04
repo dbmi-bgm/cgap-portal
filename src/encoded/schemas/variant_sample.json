@@ -816,6 +816,7 @@
         },
         "MQ": {
             "title": "Mapping Quality",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_mapping_quality.html",
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 14,
