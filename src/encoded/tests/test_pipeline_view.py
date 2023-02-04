@@ -7,8 +7,10 @@ from uuid import uuid4
 import pytest
 from webtest import TestApp
 
-from ..types import base as base_module
-from ..types.base import Item, PipelineRetriever, PipelineToDisplay, RecursivePipelineRetriever
+from .. import pipeline_view as pipeline_view_module
+from ..pipeline_view import (
+    Item, PipelineRetriever, PipelineToDisplay, RecursivePipelineRetriever
+)
 
 
 class Mocks:
