@@ -136,6 +136,11 @@
     </p>
 
     <p>
+        <strong>Tags</strong>: Comma-separated tags to apply to the sample. Acceptable
+        characters include letters, numbers, underscores, dashes, and spaces.
+    </p>
+
+    <p>
         <strong>Files</strong>: Comma-separated file names to upload for the <i>sample</i>.
         These files should contain data related only to one individual in
         the case, e.g. FASTQs, BAMs, or CRAMs.
