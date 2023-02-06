@@ -10,12 +10,15 @@ from . import custom_embed
 from .types.base import Item
 
 
+PIPELINE_PROPERTIES = "pipeline_properties"
+
+
 def includeme(config):
     config.scan(__name__)
 
 
 def validate_item_pipelines_get(context: Item, request: Request) -> None:
-    pipeline_properties = getattr(context, "pipeline_properties", [])
+    pipeline_properties = getattr(context, PIPELINE_PROPERTIES, [])
     if not pipeline_properties:
         raise HTTPMethodNotAllowed(detail="Item cannot display pipelines")
 
@@ -28,9 +31,10 @@ def validate_item_pipelines_get(context: Item, request: Request) -> None:
     validators=[validate_item_pipelines_get],
 )
 @debug_log
-def pipelines(context: Item, request: Request) -> dict:
-    pipeline_retriever = PipelineRetriever(context, request)
-    pipelines_to_display = pipeline_retriever.get_pipelines_to_display()
+def pipelines(context: Item, request: Request) -> Dict:
+    pipelines_to_display = PipelineRetriever(
+        context, request
+    ).get_pipelines_to_display()
     return PipelineDisplayer(pipelines_to_display).get_display()
 
 
@@ -55,7 +59,7 @@ class PipelineToDisplay:
     parent_item: Mapping[str, Any]
     pipeline: Mapping[str, Any]
 
-    def get_parent_item_display(self) -> str:
+    def get_parent_item_display(self) -> Dict[str, str]:
         return {
             self.ATID: self.get_parent_item_atid(),
             self.NAME: self.get_parent_item_name(),
@@ -67,7 +71,7 @@ class PipelineToDisplay:
     def get_parent_item_name(self) -> str:
         return self.parent_item.get(self.DISPLAY_TITLE, "")
 
-    def get_pipeline_display(self) -> Mapping[str, Any]:
+    def get_pipeline_display(self) -> Dict[str, Any]:
         return {
             self.ATID: self.get_pipeline_atid(),
             self.RUN_STATUS: self.get_pipeline_run_status(),
@@ -100,7 +104,6 @@ class PipelineToDisplay:
 @dataclass(frozen=True)
 class PipelineRetriever:
 
-    PIPELINE_PROPERTIES = "pipeline_properties"
     UUID = "uuid"
 
     context: Item
@@ -124,7 +127,7 @@ class PipelineRetriever:
         return {custom_embed.REQUESTED_FIELDS: self.get_properties_to_embed()}
 
     def get_properties_to_embed(self) -> List[str]:
-        result = ["*"]
+        result = [custom_embed.EMBED_ALL_FIELDS_MARKER]
         for pipeline_property in self.get_pipeline_properties():
             result.extend(
                 self.get_properties_to_embed_from_pipeline_property(pipeline_property)
@@ -132,25 +135,25 @@ class PipelineRetriever:
         return result
 
     def get_pipeline_properties(self) -> List[str]:
-        return getattr(self.context, self.PIPELINE_PROPERTIES, [])
+        return getattr(self.context, PIPELINE_PROPERTIES, [])
 
     def get_properties_to_embed_from_pipeline_property(
         self, pipeline_property: str
     ) -> List[str]:
-        split_properties = [
-            term
-            for term in pipeline_property.split(custom_embed.PROPERTY_SPLITTER)
-            if term
-        ]
+        split_properties = self.split_pipeline_property(pipeline_property)
+        properties_to_embed = self.get_all_possible_embeds(split_properties)
         return [
-            self.make_embed_property(
-                custom_embed.PROPERTY_SPLITTER.join(split_properties[: idx + 1])
-            )
+            self.make_embed_property(property_to_embed)
+            for property_to_embed in properties_to_embed
+        ]
+
+    def get_all_possible_embeds(self, split_properties: List[str]) -> List[str]:
+        return [
+            custom_embed.PROPERTY_SPLITTER.join(split_properties[:idx + 1])
             for idx in range(len(split_properties))
         ]
 
-    @staticmethod
-    def make_embed_property(property_to_embed: str) -> str:
+    def make_embed_property(self, property_to_embed: str) -> str:
         return (
             property_to_embed
             + custom_embed.PROPERTY_SPLITTER
