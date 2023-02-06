@@ -2,11 +2,8 @@
 import re
 import snovault
 import string
-from dataclasses import dataclass
-from requests import Request
-from typing import Any, Dict, Iterable, List, Mapping, Optional, Sequence, Tuple, Union
+from typing import Any, List, Tuple, Union
 
-from pyramid.httpexceptions import HTTPMethodNotAllowed
 from pyramid.security import (
     Allow,
     Authenticated,
@@ -32,7 +29,6 @@ from snovault.crud_views import (
 )
 from snovault.interfaces import CONNECTION
 
-from .. import custom_embed
 from ..server_defaults import get_userid, add_last_modified
 
 

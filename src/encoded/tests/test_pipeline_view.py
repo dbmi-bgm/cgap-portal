@@ -56,7 +56,7 @@ class Patches:
     @contextmanager
     def get_item_with_embeds(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module.PipelineRetriever, "get_item_with_embeds", **kwargs
+            pipeline_view_module.PipelineRetriever, "get_item_with_embeds", **kwargs
         ) as mocked_item:
             yield mocked_item
 
@@ -64,7 +64,7 @@ class Patches:
     @contextmanager
     def get_pipelines(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module.PipelineRetriever, "get_pipelines", **kwargs
+            pipeline_view_module.PipelineRetriever, "get_pipelines", **kwargs
         ) as mocked_item:
             yield mocked_item
 
@@ -80,7 +80,7 @@ class Patches:
     @contextmanager
     def custom_embed(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module.custom_embed, "CustomEmbed", **kwargs
+            pipeline_view_module.custom_embed, "CustomEmbed", **kwargs
         ) as result:
             yield result
 
@@ -88,7 +88,7 @@ class Patches:
     @contextmanager
     def get_pipelines_for_pipeline_property(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module.PipelineRetriever, "get_pipelines_for_pipeline_property", **kwargs
+            pipeline_view_module.PipelineRetriever, "get_pipelines_for_pipeline_property", **kwargs
         ) as result:
             yield result
 
@@ -96,7 +96,7 @@ class Patches:
     @contextmanager
     def recursive_pipeline_retriever(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module, "RecursivePipelineRetriever", **kwargs
+            pipeline_view_module, "RecursivePipelineRetriever", **kwargs
         ) as result:
             yield result
 
@@ -104,7 +104,7 @@ class Patches:
     @contextmanager
     def pipeline_to_display(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module, "PipelineToDisplay", **kwargs
+            pipeline_view_module, "PipelineToDisplay", **kwargs
         ) as result:
             yield result
 
@@ -112,7 +112,7 @@ class Patches:
     @contextmanager
     def recursive_get_pipelines_from_dict(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module.RecursivePipelineRetriever, "recursive_get_pipelines_from_dict", **kwargs
+            pipeline_view_module.RecursivePipelineRetriever, "recursive_get_pipelines_from_dict", **kwargs
         ) as result:
             yield result
 
@@ -120,7 +120,7 @@ class Patches:
     @contextmanager
     def recursive_get_pipelines_from_item(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            base_module.RecursivePipelineRetriever,
+            pipeline_view_module.RecursivePipelineRetriever,
             "recursive_get_pipelines_from_item",
             **kwargs
         ) as result:

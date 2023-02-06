@@ -10,6 +10,10 @@ from . import custom_embed
 from .types.base import Item
 
 
+def includeme(config):
+    config.scan(__name__)
+
+
 def validate_item_pipelines_get(context: Item, request: Request) -> None:
     pipeline_properties = getattr(context, "pipeline_properties", [])
     if not pipeline_properties:
