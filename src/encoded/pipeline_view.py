@@ -36,6 +36,7 @@ def pipelines(context: Item, request: Request) -> dict:
 
 @dataclass(frozen=True)
 class PipelineToDisplay:
+    """TODO: Finalize display properties once front-end settles."""
 
     ATID = "@id"
     COMPLETED = "completed"
@@ -134,16 +135,16 @@ class PipelineRetriever:
         return getattr(self.context, self.PIPELINE_PROPERTIES, [])
 
     def get_properties_to_embed_from_pipeline_property(
-        self,
-        pipeline_property: str
+        self, pipeline_property: str
     ) -> List[str]:
         split_properties = [
-            term for term in pipeline_property.split(custom_embed.PROPERTY_SPLITTER)
+            term
+            for term in pipeline_property.split(custom_embed.PROPERTY_SPLITTER)
             if term
         ]
         return [
             self.make_embed_property(
-                custom_embed.PROPERTY_SPLITTER.join(split_properties[:idx + 1])
+                custom_embed.PROPERTY_SPLITTER.join(split_properties[: idx + 1])
             )
             for idx in range(len(split_properties))
         ]
@@ -167,9 +168,7 @@ class PipelineRetriever:
         return result
 
     def get_pipelines_for_pipeline_property(
-        self,
-        embedded_properties: Mapping,
-        pipeline_property: str
+        self, embedded_properties: Mapping, pipeline_property: str
     ) -> List[PipelineToDisplay]:
         properties_to_get = self.split_pipeline_property(pipeline_property)
         return RecursivePipelineRetriever(
@@ -179,7 +178,8 @@ class PipelineRetriever:
     @staticmethod
     def split_pipeline_property(pipeline_property: str) -> List[str]:
         return [
-            term for term in pipeline_property.split(custom_embed.PROPERTY_SPLITTER)
+            term
+            for term in pipeline_property.split(custom_embed.PROPERTY_SPLITTER)
             if term
         ]
 
@@ -254,10 +254,11 @@ class RecursivePipelineRetriever:
 
 @dataclass(frozen=True)
 class PipelineDisplayer:
+    """TODO: Finalize display once front-end settles."""
 
     pipelines_to_display: Sequence[PipelineToDisplay]
 
-    def get_display(self) -> Dict[str, List[Dict]]: 
+    def get_display(self) -> Dict[str, List[Dict]]:
         result = {}
         for pipeline_to_display in self.pipelines_to_display:
             parent_atid = pipeline_to_display.get_parent_item_atid()

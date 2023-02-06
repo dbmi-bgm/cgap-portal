@@ -9,12 +9,14 @@ from webtest import TestApp
 
 from .. import pipeline_view as pipeline_view_module
 from ..pipeline_view import (
-    Item, PipelineRetriever, PipelineToDisplay, RecursivePipelineRetriever
+    Item,
+    PipelineRetriever,
+    PipelineToDisplay,
+    RecursivePipelineRetriever,
 )
 
 
 class Mocks:
-
     @staticmethod
     def autospec_instance_with_attributes(
         item_to_mock: object, attributes: Optional[Mapping[str, Any]] = None
@@ -24,22 +26,27 @@ class Mocks:
             for attribute, value in attributes.items():
                 setattr(mocked_item, attribute, value)
         return mocked_item
-        
+
     @staticmethod
-    def mock_context(attributes: Optional[Mapping[str, Any]] = None) -> mock.NonCallableMagicMock:
+    def mock_context(
+        attributes: Optional[Mapping[str, Any]] = None
+    ) -> mock.NonCallableMagicMock:
         return Mocks.autospec_instance_with_attributes(Item, attributes)
 
     @staticmethod
-    def mock_request(attributes: Optional[Mapping[str, Any]] = None) -> mock.NonCallableMagicMock:
+    def mock_request(
+        attributes: Optional[Mapping[str, Any]] = None
+    ) -> mock.NonCallableMagicMock:
         return Mocks.autospec_instance_with_attributes(Request, attributes)
 
     @staticmethod
-    def mock_pipeline_to_display(attributes: Optional[Mapping[str, Any]] = None) -> mock.NonCallableMagicMock:
+    def mock_pipeline_to_display(
+        attributes: Optional[Mapping[str, Any]] = None
+    ) -> mock.NonCallableMagicMock:
         return Mocks.autospec_instance_with_attributes(PipelineToDisplay, attributes)
 
 
 class Patches:
-
     @staticmethod
     @contextmanager
     def patch_context(
@@ -72,7 +79,7 @@ class Patches:
     @contextmanager
     def get_pipeline_properties(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            PipelineRetriever, 'get_pipeline_properties', **kwargs
+            PipelineRetriever, "get_pipeline_properties", **kwargs
         ) as result:
             yield result
 
@@ -88,7 +95,9 @@ class Patches:
     @contextmanager
     def get_pipelines_for_pipeline_property(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            pipeline_view_module.PipelineRetriever, "get_pipelines_for_pipeline_property", **kwargs
+            pipeline_view_module.PipelineRetriever,
+            "get_pipelines_for_pipeline_property",
+            **kwargs
         ) as result:
             yield result
 
@@ -112,7 +121,9 @@ class Patches:
     @contextmanager
     def recursive_get_pipelines_from_dict(**kwargs) -> mock.MagicMock:
         with Patches.patch_context(
-            pipeline_view_module.RecursivePipelineRetriever, "recursive_get_pipelines_from_dict", **kwargs
+            pipeline_view_module.RecursivePipelineRetriever,
+            "recursive_get_pipelines_from_dict",
+            **kwargs
         ) as result:
             yield result
 
@@ -203,7 +214,7 @@ class TestPipelineRetriever:
             ([], ["*"]),
             (["foo"], ["*", "foo.*"]),
             (["foo", "bar.buz"], ["*", "foo.*", "bar.*", "bar.buz.*"]),
-        ]
+        ],
     )
     def test_get_properties_to_embed(
         self, pipeline_properties: Sequence[str], expected: Sequence[str]
@@ -218,7 +229,7 @@ class TestPipelineRetriever:
             ({}, []),
             ({"foo": "bar"}, []),
             ({"pipeline_properties": ["foo", "bar"]}, ["foo", "bar"]),
-        ]
+        ],
     )
     def test_get_pipeline_properties(
         self, item_attributes: Mapping[str, Any], expected: Sequence[str]
@@ -233,15 +244,18 @@ class TestPipelineRetriever:
             ("", []),
             ("foo", ["foo.*"]),
             ("foo.bar", ["foo.*", "foo.bar.*"]),
-        ]
+        ],
     )
     def test_get_properties_to_embed_from_pipeline_property(
-            self, pipeline_property: str, expected: List[str]
+        self, pipeline_property: str, expected: List[str]
     ) -> None:
         pipeline_retriever = self.pipeline_retriever()
-        assert pipeline_retriever.get_properties_to_embed_from_pipeline_property(
-            pipeline_property
-        ) == expected
+        assert (
+            pipeline_retriever.get_properties_to_embed_from_pipeline_property(
+                pipeline_property
+            )
+            == expected
+        )
 
     def test_make_embed_property(self) -> None:
         pipeline_retriever = self.pipeline_retriever()
@@ -260,9 +274,10 @@ class TestPipelineRetriever:
                 result = retriever.get_pipelines(item_with_pipelines)
                 expected = self.SOME_PIPELINES_TO_DISPLAY * pipeline_property_count
                 assert result == expected
-                assert len(
-                    mock_get_pipelines_for_pipeline_property.mock_calls
-                ) == pipeline_property_count
+                assert (
+                    len(mock_get_pipelines_for_pipeline_property.mock_calls)
+                    == pipeline_property_count
+                )
                 for idx in range(pipeline_property_count):
                     mock_get_pipelines_for_pipeline_property.assert_any_call(
                         item_with_pipelines, self.SOME_PIPELINE_PROPERTIES[idx]
@@ -281,14 +296,13 @@ class TestPipelineRetriever:
             mock_recursive_retriever.assert_called_once_with(*expected_call)
             assert result == mock_recursive_retriever.return_value.get_pipelines()
 
-
     @pytest.mark.parametrize(
         "pipeline_property,expected",
         [
             ("", []),
             ("foo", ["foo"]),
             ("foo.bar", ["foo", "bar"]),
-        ]
+        ],
     )
     def test_split_pipeline_property(
         self, pipeline_property: str, expected: Sequence[str]
@@ -335,7 +349,7 @@ class TestRecursivePipelineRetriever:
             (
                 SOME_ITEM_WITH_PIPELINE,
                 None,
-                [PipelineToDisplay(SOME_ITEM, SOME_PIPELINE)]
+                [PipelineToDisplay(SOME_ITEM, SOME_PIPELINE)],
             ),
             (SOME_ITEM_WITH_PIPELINE, ["foo"], []),
             (SOME_PIPELINE, None, []),
@@ -343,15 +357,15 @@ class TestRecursivePipelineRetriever:
             (
                 SOME_LIST_WITH_ITEM_WITH_PIPELINE,
                 None,
-                [PipelineToDisplay(SOME_ITEM_WITH_PIPELINE, SOME_PIPELINE)]
+                [PipelineToDisplay(SOME_ITEM_WITH_PIPELINE, SOME_PIPELINE)],
             ),
-        ]
+        ],
     )
     def test_get_pipelines(
         self,
         item: Any,
         pipeline_properties: Union[Sequence[str], None],
-        expected: Sequence[PipelineToDisplay]
+        expected: Sequence[PipelineToDisplay],
     ) -> None:
         retriever = self.recursive_pipeline_retriever(
             item=item, pipeline_properties=pipeline_properties
@@ -366,7 +380,7 @@ class TestRecursivePipelineRetriever:
             (SOME_ITEM, [], False, False),
             (SOME_PIPELINE, SOME_PIPELINE_PROPERTIES, True, False),
             (SOME_PIPELINE, [], False, True),
-        ]
+        ],
     )
     def test_get_pipelines_from_dict(
         self,
@@ -390,7 +404,9 @@ class TestRecursivePipelineRetriever:
                 elif expected_pipeline_to_display:
                     mock_recursive_get_pipelines_from_dict.assert_not_called()
                     assert result == [mock_pipeline_to_display.return_value]
-                    mock_pipeline_to_display.assert_called_once_with(self.SOME_ITEM, item)
+                    mock_pipeline_to_display.assert_called_once_with(
+                        self.SOME_ITEM, item
+                    )
                 else:
                     mock_recursive_get_pipelines_from_dict.assert_not_called()
                     mock_pipeline_to_display.assert_not_called()
@@ -402,7 +418,7 @@ class TestRecursivePipelineRetriever:
             (SOME_NON_ITEM, False),
             (SOME_ITEM, False),
             (SOME_PIPELINE, True),
-        ]
+        ],
     )
     def test_is_pipeline_item(self, item: Mapping, expected: bool) -> None:
         retriever = self.recursive_pipeline_retriever(item=item)
@@ -414,7 +430,7 @@ class TestRecursivePipelineRetriever:
             (SOME_PIPELINE, SOME_PIPELINE_PROPERTIES, []),
             (SOME_NON_ITEM, SOME_PIPELINE_PROPERTIES, ["bar", ["bar"]]),
             (SOME_NON_ITEM, ["foo"], ["bar", []]),
-        ]
+        ],
     )
     def test_recursive_get_pipelines_from_dict(
         self,
@@ -441,7 +457,7 @@ class TestRecursivePipelineRetriever:
         [
             (ANOTHER_NON_ITEM),
             (SOME_PIPELINE_PROPERTIES),
-        ]
+        ],
     )
     def test_recursive_get_pipelines_from_list(
         self,
@@ -464,10 +480,14 @@ class TestRecursivePipelineRetriever:
         [
             (SOME_NON_ITEM, None, [SOME_ITEM, SOME_NON_ITEM, SOME_PIPELINE_PROPERTIES]),
             (SOME_NON_ITEM, ["foo"], [SOME_ITEM, SOME_NON_ITEM, ["foo"]]),
-            (SOME_PIPELINE, None, [SOME_PIPELINE, SOME_PIPELINE, SOME_PIPELINE_PROPERTIES]),
+            (
+                SOME_PIPELINE,
+                None,
+                [SOME_PIPELINE, SOME_PIPELINE, SOME_PIPELINE_PROPERTIES],
+            ),
             (SOME_PIPELINE, [], [SOME_ITEM, SOME_PIPELINE, []]),
             (SOME_PIPELINE, ["foo"], [SOME_PIPELINE, SOME_PIPELINE, ["foo"]]),
-        ]
+        ],
     )
     def test_recursive_get_pipelines_from_item(
         self,
@@ -487,7 +507,9 @@ class TestRecursivePipelineRetriever:
             mock_recursive_pipeline_retriever.assert_called_once_with(
                 *expected_call_args
             )
-            assert result == mock_recursive_pipeline_retriever.return_value.get_pipelines()
+            assert (
+                result == mock_recursive_pipeline_retriever.return_value.get_pipelines()
+            )
 
     @pytest.mark.parametrize(
         "item,properties_to_get,expected",
@@ -496,24 +518,26 @@ class TestRecursivePipelineRetriever:
             (SOME_NON_ITEM, SOME_PIPELINE_PROPERTIES, SOME_ITEM),
             (SOME_PIPELINE, [], SOME_ITEM),
             (SOME_PIPELINE, SOME_PIPELINE_PROPERTIES, SOME_PIPELINE),
-        ]
+        ],
     )
     def test_get_parent_item_to_pass(
         self, item: Any, properties_to_get: Sequence[str], expected: Mapping
     ) -> None:
         recursive_pipeline_retriever = self.recursive_pipeline_retriever()
-        assert recursive_pipeline_retriever.get_parent_item_to_pass(
-            item, properties_to_get
-        ) == expected
+        assert (
+            recursive_pipeline_retriever.get_parent_item_to_pass(
+                item, properties_to_get
+            )
+            == expected
+        )
 
-    
     @pytest.mark.parametrize(
         "item,expected",
         [
             (SOME_NON_ITEM, False),
             (ANOTHER_NON_ITEM, False),
             (SOME_ITEM, True),
-        ]
+        ],
     )
     def test_is_item(self, item: Any, expected: bool) -> None:
         retriever = self.recursive_pipeline_retriever()
