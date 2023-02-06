@@ -252,7 +252,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
         const savePresetDropdownCls = "btn btn-outline-primary-dark btn-sm text-truncate w-100";
         const btnInner = <div><i className="icon icon-plus-circle fas mr-05" /> Create Preset from Current FilterSet</div>;
         const createPresetBtn = (
-            <div className="p-2 bg-white">
+            <div className={`p-2 bg-white ${ isLoadingPresets || !presetResults || !presetResults.length ? "": "border-bottom"}`}>
                 <SaveFilterSetPresetButton {...savePresetDropdownProps} {...{ btnInner }} btnCls={savePresetDropdownCls} />
             </div>);
 
@@ -323,7 +323,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
 
         return (
             <div className="filterset-preset-selection-body h-100">
-                <div className={`results-heading my-0 py-2 px-2 bg-light ${isLoadingPresets || !presetResults || !presetResults.length ? "": "border-bottom"}`}>
+                <div className="results-heading my-0 py-2 px-2 bg-light">
                     <div className="row align-items-center">
                         <h5 className="col text-400 my-0">
                             <i className="icon icon-copy far mr-08"/>
