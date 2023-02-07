@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+12.7.1
+======
+
+`PR 688: Rename CGAP <https://github.com/dbmi-bgm/cgap-portal/pull/688/files>`_
+
+* Update "Clinical Genome Analysis Platform" to "Computational Genome Analysis Platform".
+
+
 12.7.0
 ======
 
