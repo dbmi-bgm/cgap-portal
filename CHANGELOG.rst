@@ -6,8 +6,17 @@ cgap-portal
 Change Log
 ----------
 
+12.7.0
+======
+
+`PR 681: SNV mapping quality <https://github.com/dbmi-bgm/cgap-portal/pull/681>`_
+
+* Add mapping quality to VariantSample schema
+
+
 12.6.0
 ======
+
 `PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676/files>`_
 
 * Update higlass dependencies to latest (some beta) realeases to resolve security issues
