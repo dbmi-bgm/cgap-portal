@@ -13,6 +13,7 @@ Change Log
 
 * Add a new Case Preset button near the list of preset (+ update wording, tooltips, iconography)
 * Update Cypress tests
+* Update SPC to [0.1.59](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.59)
 
 
 12.7.1
