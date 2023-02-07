@@ -162,6 +162,18 @@
             "scope": "sample_variant",
             "schema_title": "Genotype"
         },
+        "MQ": {
+            "title": "Mapping Quality",
+            "field_name": "MQ",
+            "type": "number",
+            "do_import": true,
+            "vcf_field": "MQ",
+            "source_name": "VCF",
+            "source_version": "VCFv4.2",
+            "description": "Root mean square mapping quality",
+            "scope": "sample_variant",
+            "schema_title": "Mapping Quality"
+        },
         "PGT": {
             "title": "Phasing information",
             "field_name": "PGT",
@@ -800,6 +812,14 @@
             "aggregation_type": "stats",
             "number_step": 1,
             "order": 13,
+            "grouping": "Variant Quality"
+        },
+        "MQ": {
+            "title": "Mapping Quality",
+            "extended_description": "src/encoded/docs/extended_description_VariantSample_mapping_quality.html",
+            "aggregation_type": "stats",
+            "number_step": 1,
+            "order": 14,
             "grouping": "Variant Quality"
         },
         "samplegeno.samplegeno_numgt": {
