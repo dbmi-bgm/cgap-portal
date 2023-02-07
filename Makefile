@@ -47,8 +47,23 @@ configure:  # does any pre-requisite installs
 	@#pip install poetry==1.1.9  # this version is known to work. -kmp 11-Mar-2021
 	# Pin to version 1.1.15 for now to avoid this error:
 	#   Because encoded depends on wheel (>=0.29.0) which doesn't match any versions, version solving failed.
+	pip install wheel==0.37.1
 	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
+ifeq ($(shell uname -s), Darwin)
+ifeq ($(shell uname -m), arm64)
+	@echo "Looks like this is a Mac M1. Doing some special installs for this to workround sundry problems."
+	pip install isodate==0.5.4
+	pip install pysam==0.19.1
+	pip install keepalive
+	pip install dcicpyvcf
+	# On the Apple M1, poetry (or pip) install of h5py may not work;
+	# a brew install of hdf5 (if not yet installed) and using this should do the trick:
+	@$(eval HDF5_DIR=$(shell brew --prefix hdf5))
+	HDF5_DIR=${HDF5_DIR} pip install "h5py==3.6.0"
+	@echo "Done with special Mac M1 installs."
+endif
+endif
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
