@@ -63,7 +63,7 @@ const HomePageTitle = React.memo(function HomePageTitle(props){
 
     // return (
     //     <PageTitleContainer alerts={alerts}>
-    //         {/* <TitleAndSubtitleUnder subtitle="Clinical Genomics Analysis Platform" className="home-page-title">
+    //         {/* <TitleAndSubtitleUnder subtitle="Computational Genome Analysis Platform" className="home-page-title">
     //             Welcome
     //         </TitleAndSubtitleUnder> */}
     //     </PageTitleContainer>

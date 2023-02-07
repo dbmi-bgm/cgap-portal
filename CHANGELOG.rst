@@ -6,15 +6,33 @@ cgap-portal
 Change Log
 ----------
 
-12.7.0
+12.8.0
 ======
 
 * Allow configuration of Auth0Domain and Auth0AllowedConnections
 * Set a bigger `large_client_header_buffers` so we can tolerate a larger cookie package
 
 
+12.7.1
+======
+
+`PR 688: Rename CGAP <https://github.com/dbmi-bgm/cgap-portal/pull/688/files>`_
+
+* Update "Clinical Genome Analysis Platform" to "Computational Genome Analysis Platform".
+
+
+12.7.0
+======
+
+`PR 681: SNV mapping quality <https://github.com/dbmi-bgm/cgap-portal/pull/681>`_
+
+* Add mapping quality to VariantSample schema
+>>>>>>> master
+
+
 12.6.0
 ======
+
 `PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676/files>`_
 
 * Update higlass dependencies to latest (some beta) realeases to resolve security issues
