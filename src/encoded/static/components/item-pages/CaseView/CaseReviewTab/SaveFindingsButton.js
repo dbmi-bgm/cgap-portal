@@ -7,46 +7,22 @@ import { getAllNotesFromVariantSample } from './../variant-sample-selection-pane
 
 
 
-
+/** Deprecated - logic will soon be moved into UpdateInterpretationsButton.js */
 export class SaveFindingsButton extends React.Component {
 
-    constructor(props){
-        super(props);
-        this.onClick = this.onClick.bind(this);
-    }
-
-    onClick(e){
-        e.stopPropagation();
-        const {
-            patchItems,
-            changedClassificationsByVS,
-            changedClassificationsCount,
-            variantSampleListItem,
-            fetchVariantSampleListItem,
-            isLoadingVariantSampleListItem,
-            disabled: propDisabled,
-            alreadyInReportNotes,
-            fetchedReportItem,
-            fetchReportItem
-        } = this.props;
-
-        if (propDisabled || !fetchedReportItem || isLoadingVariantSampleListItem || changedClassificationsCount === 0) {
-            return false;
-        }
-
-        const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
-
-        const payloads = []; // [ [path, payload], ... ]
+    static buildSaveFindingsToReportPatchPayloads(
+        existingReportVariantSamples,
+        vslVariantSampleItems,
+        changedClassificationsByVS,
+        alreadyInReportNotes
+    ) {
+        const notePayloads = []; // [ [path, payload], ... ]
 
         const vsItemsToAddToReport = [];
         const vsItemsToRemoveFromReport = [];
 
-        vsObjects.forEach(function(vsObject){
-            const { variant_sample_item } = vsObject;
-            const {
-                "@id": vsAtID,
-                uuid: vsUUID,
-            } = variant_sample_item;
+        vslVariantSampleItems.forEach(function(variant_sample_item){
+            const { "@id": vsAtID, uuid: vsUUID } = variant_sample_item;
             const { [vsUUID]: classificationToSaveForVS = undefined } = changedClassificationsByVS;
 
             const allNotes = getAllNotesFromVariantSample(variant_sample_item);
@@ -81,25 +57,97 @@ export class SaveFindingsButton extends React.Component {
                 }
             }
 
-            payloads.push(payload);
+            notePayloads.push(payload);
+
         });
 
         const shouldAdjustReportVariantSamples = vsItemsToAddToReport.length > 0 || vsItemsToRemoveFromReport.length > 0;
 
+        let reportVariantSampleUUIDsToPatch = null;
+
         if (shouldAdjustReportVariantSamples) {
-            const { "@id": reportAtID, variant_samples: reportVariantSamples = [] } = fetchedReportItem;
-            const nextVariantSampleUUIDs = _.union(
+            reportVariantSampleUUIDsToPatch = _.union(
                 _.without(
-                    _.pluck(reportVariantSamples, "uuid"),
+                    _.pluck(existingReportVariantSamples, "uuid"),
                     ...vsItemsToRemoveFromReport
                 ),
                 vsItemsToAddToReport
             );
-            payloads.unshift([ reportAtID, { "variant_samples": nextVariantSampleUUIDs } ]);
         }
 
+        return { notePayloads, reportVariantSampleUUIDsToPatch };
+    }
 
-        patchItems(payloads, (countCompleted, patchErrors) => {
+    constructor(props){
+        super(props);
+        this.onClick = this.onClick.bind(this);
+    }
+
+    onClick(e){
+        e.stopPropagation();
+        const {
+            patchItems,
+            changedClassificationsByVS,
+            changedClassificationsCount,
+            variantSampleListItem,
+            fetchVariantSampleListItem,
+            isLoadingVariantSampleListItem,
+            disabled: propDisabled,
+            alreadyInReportNotes,
+            fetchedReportItem,
+            fetchReportItem
+        } = this.props;
+
+        if (propDisabled || !fetchedReportItem || isLoadingVariantSampleListItem || changedClassificationsCount === 0) {
+            return false;
+        }
+
+        const {
+            "@id": reportAtID,
+            variant_samples: reportVariantSamples,
+            structural_variant_samples: reportStructuralVariantSamples
+        } = fetchedReportItem;
+
+        const {
+            variant_samples: snvVSObjects = [],
+            structural_variant_samples: cnvVSObjects = []
+        } = variantSampleListItem || {};
+
+
+        const snvVSItems = snvVSObjects.map(function({ variant_sample_item }){
+            return variant_sample_item;
+        }).filter(function({ "@id": vsAtID }){
+            // Filters out any VSes without view permissions, if any.
+            // TODO: check actions for edit ability, perhaps.
+            return !!(vsAtID);
+        });
+
+        const cnvVSItems = cnvVSObjects.map(function({ variant_sample_item }){
+            return variant_sample_item;
+        }).filter(function({ "@id": vsAtID }){
+            return !!(vsAtID);
+        });
+
+        const {
+            notePayloads: snvNotePayloads,
+            reportVariantSampleUUIDsToPatch: reportSNVUUIDList
+        } = SaveFindingsButton.buildSaveFindingsToReportPatchPayloads(reportVariantSamples, snvVSItems, changedClassificationsByVS, alreadyInReportNotes);
+        const {
+            notePayloads: cnvNotePayloads,
+            reportVariantSampleUUIDsToPatch: reportCNVUUIDList
+        } = SaveFindingsButton.buildSaveFindingsToReportPatchPayloads(reportStructuralVariantSamples, cnvVSItems, changedClassificationsByVS, alreadyInReportNotes);
+
+
+        const allPayloads = snvNotePayloads.concat(cnvNotePayloads);
+
+        if (reportSNVUUIDList) {
+            allPayloads.push([ reportAtID, { "variant_samples": reportSNVUUIDList } ]);
+        }
+        if (reportCNVUUIDList) {
+            allPayloads.push([ reportAtID, { "structural_variant_samples": reportCNVUUIDList } ]);
+        }
+
+        patchItems(allPayloads, (countCompleted, patchErrors) => {
             if (countCompleted > 0) {
                 // We don't need to call updateClassificationForVS(...) here, since
                 // changedClassificationsByVS will be updated in CaseReviewController componentDidUpdate.
@@ -110,7 +158,7 @@ export class SaveFindingsButton extends React.Component {
                     throw new Error("No `props.fetchVariantSampleListItem` supplied to SaveFindingsButton");
                 }
 
-                if (shouldAdjustReportVariantSamples) {
+                if (reportSNVUUIDList || reportCNVUUIDList) {
                     if (typeof fetchReportItem === "function") {
                         console.log("Refreshing our fetchedReportItem.");
                         fetchReportItem();
