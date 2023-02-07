@@ -6,10 +6,19 @@ cgap-portal
 Change Log
 ----------
 
+12.7.2
+======
+
+`PR 689: Save filterset btn updates <https://github.com/dbmi-bgm/cgap-portal/pull/689>`_
+
+* Add a new Case Preset button near the list of preset (+ update wording, tooltips, iconography)
+* Update Cypress tests
+
+
 12.7.1
 ======
 
-`PR 688: Rename CGAP <https://github.com/dbmi-bgm/cgap-portal/pull/688/files>`_
+`PR 688: Rename CGAP <https://github.com/dbmi-bgm/cgap-portal/pull/688>`_
 
 * Update "Clinical Genome Analysis Platform" to "Computational Genome Analysis Platform".
 
@@ -25,7 +34,7 @@ Change Log
 12.6.0
 ======
 
-`PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676/files>`_
+`PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676>`_
 
 * Update higlass dependencies to latest (some beta) realeases to resolve security issues
 * Update SPC to latest release: v0.1.58
