@@ -272,7 +272,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                                 No presets saved yet
                             </h4>
                             <p>
-                                Create a FilterSet and then click <em>Save As...</em> to create a preset.
+                                Create a FilterSet and then click <em>Create Preset</em> to generate a preset for your case.
                             </p>
                         </div>
                         { createPresetBtn }
