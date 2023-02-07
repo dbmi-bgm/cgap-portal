@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+12.8.0
+======
+
+* Allow configuration of Auth0Domain and Auth0AllowedConnections
+* Set a bigger `large_client_header_buffers` so we can tolerate a larger cookie package
+
+
 12.7.1
 ======
 
@@ -20,6 +27,7 @@ Change Log
 `PR 681: SNV mapping quality <https://github.com/dbmi-bgm/cgap-portal/pull/681>`_
 
 * Add mapping quality to VariantSample schema
+>>>>>>> master
 
 
 12.6.0
