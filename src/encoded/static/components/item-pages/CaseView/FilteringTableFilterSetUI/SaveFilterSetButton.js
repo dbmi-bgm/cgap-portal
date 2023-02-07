@@ -290,7 +290,7 @@ export function SaveFilterSetButton(props){
 
     return (
         <button type="button" className={className} disabled={disabled}
-            onClick={onSaveBtnClick} data-tip="Save this Case FilterSet">
+            onClick={onSaveBtnClick} data-tip="Save FilterSet for this Case">
             { isSavingFilterSet ?
                 <i className="icon icon-spin icon-circle-notch fas" />
                 : (
