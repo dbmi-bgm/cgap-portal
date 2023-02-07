@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-12.7.2
+12.8.1
 ======
 
 `PR 689: Save filterset btn updates <https://github.com/dbmi-bgm/cgap-portal/pull/689>`_
@@ -14,6 +14,13 @@ Change Log
 * Add a new Case Preset button near the list of preset (+ update wording, tooltips, iconography)
 * Update Cypress tests
 * Update SPC to [0.1.59](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.59)
+
+
+12.8.0
+======
+
+* Allow configuration of Auth0Domain and Auth0AllowedConnections
+* Set a bigger `large_client_header_buffers` so we can tolerate a larger cookie package
 
 
 12.7.1
@@ -30,6 +37,7 @@ Change Log
 `PR 681: SNV mapping quality <https://github.com/dbmi-bgm/cgap-portal/pull/681>`_
 
 * Add mapping quality to VariantSample schema
+>>>>>>> master
 
 
 12.6.0
