@@ -8,6 +8,11 @@ Change Log
 
 12.8.0
 ======
+* Added special steps to workaround issues on Mac M1.
+
+
+12.8.0
+======
 
 * Allow configuration of Auth0Domain and Auth0AllowedConnections
 * Set a bigger `large_client_header_buffers` so we can tolerate a larger cookie package
