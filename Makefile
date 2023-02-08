@@ -50,20 +50,6 @@ configure:  # does any pre-requisite installs
 	pip install wheel==0.37.1
 	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
-ifeq ($(shell uname -s), Darwin)
-ifeq ($(shell uname -m), arm64)
-	@echo "Looks like this is a Mac M1. Doing some special installs for this to workround sundry problems."
-	pip install isodate==0.5.4
-	pip install pysam==0.19.1
-	pip install keepalive
-	pip install dcicpyvcf
-	# On the Apple M1, poetry (or pip) install of h5py may not work;
-	# a brew install of hdf5 (if not yet installed) and using this should do the trick:
-	@$(eval HDF5_DIR=$(shell brew --prefix hdf5))
-	HDF5_DIR=${HDF5_DIR} pip install "h5py==3.6.0"
-	@echo "Done with special Mac M1 installs."
-endif
-endif
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
@@ -75,10 +61,15 @@ macbuild-poetry:
 	make macpoetry-install
 
 build:  # builds
+ifeq ($(shell uname -s), Darwin)
+	@echo "Looks like this is Mac so executing: make macbuild"
+	make macbuild
+else
 	make build-poetry
 	make build-after-poetry
+endif
 
-macbuild:  # builds for Catalina
+macbuild:  # Builds for MacOS (see: bin/macpoetry-install)
 	make macbuild-poetry
 	make build-after-poetry
 
