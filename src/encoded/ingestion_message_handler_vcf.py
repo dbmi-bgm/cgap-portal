@@ -27,12 +27,6 @@ from ingestion_message_handler_decorator import ingestion_message_handler
 log = structlog.getLogger(__name__)
 
 
-# self.vapp
-# self.set_status()
-# self.patch_ingestion_report()
-# self.update_status()
-# self.patch_ingestion_report()
-
 @ingestion_message_handler
 def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener) -> bool:
     """
