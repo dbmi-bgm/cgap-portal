@@ -14,6 +14,7 @@ import signal
 import structlog
 import threading
 import time
+from typing import Tuple
 import webtest
 import tempfile
 
@@ -43,23 +44,25 @@ from .util import (
     subrequest_object, register_path_content_type, vapp_for_email,  # vapp_for_ingestion,
     SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
+from .ingestion_listener_defs import (
+    VARIANT_SCHEMA,
+    VARIANT_SAMPLE_SCHEMA,
+    STATUS_QUEUED,
+    STATUS_INGESTED,
+    STATUS_DISABLED,
+    STATUS_ERROR,
+    STATUS_IN_PROGRESS,
+    SHARED,
+    STRUCTURAL_VARIANT_SCHEMA,
+    STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
+    DEBUG_SUBMISSIONS,
+)
+from .ingestion_message_handler_decorator import ingestion_message_handlers
 
 
 log = structlog.getLogger(__name__)
 EPILOG = __doc__
 INGESTION_QUEUE = 'ingestion_queue'
-VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
-VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
-STATUS_QUEUED = 'Queued'
-STATUS_INGESTED = 'Ingested'
-STATUS_DISABLED = 'Ingestion disabled'
-STATUS_ERROR = 'Error'
-STATUS_IN_PROGRESS = 'In progress'
-SHARED = 'shared'
-STRUCTURAL_VARIANT_SCHEMA = resolve_file_path("./schemas/structural_variant.json")
-STRUCTURAL_VARIANT_SAMPLE_SCHEMA = resolve_file_path(
-    "./schemas/structural_variant_sample.json"
-)
 
 
 def includeme(config):
@@ -251,8 +254,6 @@ def ingestion_status(context, request):
     }
 
 
-DEBUG_SUBMISSIONS = environ_bool("DEBUG_SUBMISSIONS", default=False)
-
 
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
     ignored(s3_client)  # we might want to restore the ability to pass this, but no one actually does. -kmp 6-Dec-2021
@@ -439,6 +440,12 @@ class IngestionListener:
                 debuglog("Deleted messages")
                 break
 
+    def decompose_message(self, message: dict) -> Tuple[str, str, dict]:
+        body = json.loads(message["Body"])
+        uuid = body["uuid"]
+        ingestion_type = body.get("ingestion_type", "vcf")
+        return ingestion_type, uuid, body
+
     def _patch_value(self, uuid, field, value):
         """ Patches field with value on item uuid """
         self.vapp.patch_json('/' + uuid, {field: value})
@@ -535,6 +542,11 @@ class IngestionListener:
                     continue
 
                 debuglog("Did NOT process", uuid, "as", ingestion_type)
+
+                # C4-990/2023-02-09/dmichaels
+                for handler in ingestion_message_handlers():
+                    if handler(message, self):
+                        discard(message)
 
                 # locate file meta data
                 try:
