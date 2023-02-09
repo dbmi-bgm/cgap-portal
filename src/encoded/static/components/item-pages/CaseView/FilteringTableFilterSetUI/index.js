@@ -322,7 +322,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
             "currentCaseFilterSet": filterSet,
             caseItem, bodyOpen, session, importFromPresetFilterSet, hasCurrentFilterSetChanged, isEditDisabled,
             originalPresetFilterSet, refreshOriginalPresetFilterSet, hasFilterSetChangedFromOriginalPreset, isOriginalPresetFilterSetLoading,
-            isFetchingInitialFilterSetItem, lastSavedPresetFilterSet
+            isFetchingInitialFilterSetItem, lastSavedPresetFilterSet, hasFilterSetChangedFromLastSavedPreset, setLastSavedPresetFilterSet
         };
 
 
