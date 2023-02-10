@@ -10,8 +10,8 @@ def ingestion_message_handlers():
     Resturns a list of all registered ingestion message handler functions.
     Example usage is like this:
 
-        listener = get_reference_to_your_ingestion_listener()
-        message = IngestionMessage(get_next_ingestion_message())
+        listener: IngestionListener = get_reference_to_your_ingestion_listener()
+        message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
         for handler in ingestion_message_handlers():
             handler(message, listener)
     """
@@ -69,23 +69,27 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             raise Exception(f"Too few arguments (need two) for ingestion handler function: {wrapped_function.__name__}")
         if len(wrapped_function_signature.parameters) > 2:
             raise Exception(f"Too many arguments (need two) for ingestion handler function: {wrapped_function.__name__}")
+        return_annotation = wrapped_function_signature.return_annotation
+        if not return_annotation or (return_annotation.__name__ != "_empty" and return_annotation.__name__ != "bool"):
+            raise Exception(f"Wrong return value type (need unspecified or bool) "
+                            f"for ingestion handler function: {wrapped_function.__name__}")
         parameters = iter(wrapped_function_signature.parameters.items())
         first_parameter = next(parameters)
         if first_parameter and len(first_parameter) >= 2:
             first_parameter_annotation = first_parameter[1].annotation
-            if first_parameter_annotation and first_parameter_annotation.__name__ != "_empty":
-                if first_parameter_annotation != IngestionMessage:
-                    raise Exception(f"Wrong first argument type (need none or IngestionMessage) "
-                                    "for ingestion handler function: {wrapped_function.__name__}")
+            if not first_parameter_annotation or (first_parameter_annotation.__name__ != "_empty" and
+                                                  first_parameter_annotation != IngestionMessage):
+                raise Exception(f"Wrong first argument type (need unspecified or IngestionMessage) "
+                                f"for ingestion handler function: {wrapped_function.__name__}")
         second_parameter = next(parameters)
         if second_parameter and len(second_parameter) >= 2:
             second_parameter_annotation = second_parameter[1].annotation
-            if second_parameter_annotation and second_parameter_annotation != inspect._empty:
+            if not second_parameter_annotation or (second_parameter_annotation.__name__ != "_empty" and
+                                                   second_parameter_annotation.__name__ != "IngestionListener"):
                 # We only check the for type name of the type of the second IngestionListener argument;
                 # we cannot import the IngestionListener because would be a recursive import.
-                if second_parameter_annotation.__name__ != "IngestionListener":
-                    raise Exception(f"Wrong second argument type (need none or IngestionListener) "
-                                    "for ingestion handler function: {wrapped_function.__name__}")
+                raise Exception(f"Wrong second argument type (need unspecified or IngestionListener) "
+                                f"for ingestion handler function: {wrapped_function.__name__}")
         if ingestion_type:
             if callable(ingestion_type):
                 PRINT(f"Registering message handler: {wrapped_function.__name__} (type: <lambda>)")
