@@ -4,7 +4,6 @@ from encoded.ingestion_message import IngestionMessage
 
 _ingestion_message_handlers = []
 
-
 def get_ingestion_message_handlers():
     """
     Resturns a list of all registered ingestion message handler functions.

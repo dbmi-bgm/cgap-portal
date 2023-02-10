@@ -11,6 +11,12 @@ class IngestionListener:
     pass
 
 
+raw_message = {"Body": "{\"uuid\":\"someuuid\", \"ingestion_type\":\"vcf\"}"}
+ingestion_listener = {}
+handler_calls = set()
+print('xyzzy')
+
+
 def test_ingestion_message_handler_decorator_signature():
 
     @ingestion_message_handler
@@ -33,56 +39,76 @@ def test_ingestion_message_handler_decorator_signature():
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def f():
+        def bad_f():
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def f(message):
+        def bad_g(message):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def f(message, listener, foo):
+        def bad_h(message, listener, foo):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def f(message: IngestionMessage, listener: str):
+        def bad_i(message: IngestionMessage, listener: str):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def f(message: str, listener):
+        def bad_j(message: str, listener):
             pass
 
 
 def test_ingestion_message_handler_decorator_calls():
-
-    handler_calls = set()
-    raw_message = {"Body": "{\"uuid\":\"someuuid\", \"ingestion_type\":\"vcf\"}"}
-    sample_listener = {}
 
     @ingestion_message_handler
     def f(message, listener):
         handler_calls.add("f")
         assert message.type == "vcf"
         assert message.uuid == "someuuid"
-        assert listener is sample_listener
+        assert listener is ingestion_listener
 
     @ingestion_message_handler
     def g(message, listener):
         handler_calls.add("g")
         assert message.type == "vcf"
         assert message.uuid == "someuuid"
-        assert listener is sample_listener
+        assert listener is ingestion_listener
 
     @ingestion_message_handler
     def h(message, listener):
         handler_calls.add("h")
         assert message.type == "vcf"
         assert message.uuid == "someuuid"
-        assert listener is sample_listener
+        assert listener is ingestion_listener
 
-    call_ingestion_message_handler(raw_message, sample_listener)
+    call_ingestion_message_handler(raw_message, ingestion_listener)
     assert handler_calls == {"f", "g", "h"}
+
+
+def test_ingestion_message_handler_decorator_vcf_calls():
+
+    raw_message = {"Body": "{\"uuid\":\"someuuid\", \"ingestion_type\":\"vcf\"}"}
+    handler_calls = set()
+
+    @ingestion_message_handler(type="vcf")
+    def ff(message, listener):
+        handler_calls.add("f")
+        assert message.type == "vcf"
+        assert message.uuid == "someuuid"
+        assert listener is ingestion_listener
+
+    @ingestion_message_handler
+    def gg(message, listener):
+        handler_calls.add("g")
+        assert message.type == "vcf"
+        assert message.uuid == "someuuid"
+        assert listener is ingestion_listener
+
+    call_ingestion_message_handler(raw_message, ingestion_listener)
+    assert handler_calls == {"f", "g"}
+    #assert len(get_ingestion_message_handlers()) == 9
