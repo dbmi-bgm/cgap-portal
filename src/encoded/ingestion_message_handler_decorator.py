@@ -1,5 +1,6 @@
 from dcicutils.misc_utils import ignored, PRINT
-from .ingestion_message import IngestionMessage
+from ingestion_message import IngestionMessage
+import inspect
 
 
 _ingestion_message_handlers = []
@@ -69,6 +70,29 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                 PRINT(f"Registering message handler: {wrapped_function.__name__} (type: {ingestion_type})")
         else:
             PRINT(f"Registering message handler: {wrapped_function.__name__}")
+
+        # Check the signature of the ingestion message handler function.
+        # it should contain two arguments with either no type hints/annotations or if
+        # present then they should be for IngestionMessage and IngestionListener, respectively.
+        wrapped_function_signature = inspect.signature(wrapped_function)
+        if len(wrapped_function_signature.parameters) < 2:
+            raise Exception(f"Too few arguments (need 2) for ingestion handler function: {wrapped_function.__name__}")
+        if len(wrapped_function_signature.parameters) > 2:
+            raise Exception(f"Too many arguments (need 2) for ingestion handler function: {wrapped_function.__name__}")
+        parameters = iter(wrapped_function_signature.parameters.items())
+        first_parameter = next(parameters)
+        if first_parameter and len(first_parameter) >= 2:
+            first_parameter_annotation = first_parameter[1].annotation
+            if first_parameter_annotation and first_parameter_annotation != inspect._empty:
+                if first_parameter_annotation != IngestionMessage:
+                    raise Exception("Unexpected first argument type (need none or IngestionMessage) for ingestion handler function!")
+        second_parameter = next(parameters)
+        if second_parameter and len(second_parameter) >= 2:
+            second_parameter_annotation = second_parameter[1].annotation
+            if second_parameter_annotation and second_parameter_annotation != inspect._empty:
+                # TODO: Better way to check for IngestionListener type; cannot import because recursive.
+                if not str(second_parameter_annotation).endswith(".IngestionListener'>"):
+                    raise Exception("Unexpected second argument type (need none or IngestionListener) for ingestion handler function!")
 
         def ingestion_message_handler_function(*args, **kwargs):
             """
