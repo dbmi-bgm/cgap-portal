@@ -1,6 +1,5 @@
 from dcicutils.misc_utils import ignored, PRINT
 import json
-from typing import Tuple
 
 
 _ingestion_message_handlers = []
