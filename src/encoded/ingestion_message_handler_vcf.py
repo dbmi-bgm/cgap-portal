@@ -21,50 +21,46 @@ from .ingestion_listener_defs import (
     STRUCTURAL_VARIANT_SCHEMA,
     STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
 )
-from ingestion_message_handler_decorator import ingestion_message_handler
+from .ingestion_message import IngestionMessage
+from .ingestion_message_handler_decorator import ingestion_message_handler
 
 
 log = structlog.getLogger(__name__)
 
 
-@ingestion_message_handler
-def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener) -> bool:
+@ingestion_message_handler(ingestion_type="vcf")
+def ingestion_message_handler_vcf(message: IngestionMessage, listener: IngestionListener) -> bool:
     """
-    This is the part of ingestion_listener.IngestionListener.run which handles a
+    This is the part of listener.IngestionListener.run which handles a
     single message within the (effectively-infinite) incoming message handling loop,
     specifically for CGAP; refactored out February 2023.
     Returns True if the message was successfully handled, otherwise False.
     """
 
-    ingestion_type, uuid, _ = ingestion_listener.decompose_message(message)
-
-    if ingestion_type != "vcf":
-        return False
-
     # locate file meta data
     try:
-        file_meta = ingestion_listener.vapp.get('/' + uuid).follow().json
-        location = ingestion_listener.vapp.get(file_meta['href']).location
+        file_meta = listener.vapp.get('/' + message.uuid).follow().json
+        location = listener.vapp.get(file_meta['href']).location
         log.info('Got vcf location: %s' % location)
     except Exception as e:
-        log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
+        log.error('Could not locate uuid: %s with error: %s' % (message.uuid, e))
         return False
 
     # if this file has been ingested (or explicitly disabled), do not do anything with this uuid
     if file_meta.get('file_ingestion_status', 'N/A') in [STATUS_INGESTED, STATUS_DISABLED]:
-        log.error('Skipping ingestion of file %s due to disabled ingestion status' % uuid)
+        log.error('Skipping ingestion of file %s due to disabled ingestion status' % message.uuid)
         return False
 
     # attempt download with workaround
     try:
         raw_content = requests.get(location).content
     except Exception as e:
-        log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
+        log.error('Could not download file uuid: %s with error: %s' % (message.uuid, e))
         return False
 
     # gunzip content, pass to parser, post variants/variant_samples
     # patch in progress status
-    ingestion_listener.set_status(uuid, STATUS_IN_PROGRESS)
+    listener.set_status(message.uuid, STATUS_IN_PROGRESS)
     # decoded_content = gunzip_content(raw_content)
     # debuglog('Got decoded content: %s' % decoded_content[:20])
 
@@ -83,7 +79,7 @@ def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener
             reformat_vcf(reformat_args)
         except Exception as e:
             log.error(f'Exception encountered in reformat script {e} - input VCF may be malformed')
-            ingestion_listener.set_status(uuid, STATUS_ERROR)
+            listener.set_status(message.uuid, STATUS_ERROR)
             return True
 
         # Add altcounts by gene
@@ -98,11 +94,11 @@ def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener
             add_altcounts(alt_counts_args)
         except Exception as e:
             log.error(f'Exception encountered in altcounts script {e} - input VCF may be malformed')
-            ingestion_listener.set_status(uuid, STATUS_ERROR)
+            listener.set_status(message.uuid, STATUS_ERROR)
             return True
         parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                            reader=Reader(formatted_with_alt_counts))
-        variant_builder = VariantBuilder(ingestion_listener.vapp, parser, file_meta['accession'],
+        variant_builder = VariantBuilder(listener.vapp, parser, file_meta['accession'],
                                          project=file_meta['project']['@id'],
                                          institution=file_meta['institution']['@id'])
     elif vcf_type == "SV":
@@ -121,7 +117,7 @@ def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener
             reader=Reader(formatted_vcf),
         )
         variant_builder = StructuralVariantBuilder(
-            ingestion_listener.vapp,
+            listener.vapp,
             parser,
             file_meta["accession"],
             project=file_meta["project"]["@id"],
@@ -142,7 +138,7 @@ def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener
             reader=Reader(formatted_vcf),
         )
         variant_builder = CNVBuilder(
-            ingestion_listener.vapp,
+            listener.vapp,
             parser,
             file_meta["accession"],
             project=file_meta["project"]["@id"],
@@ -155,21 +151,21 @@ def ingestion_message_handler_vcf(message, ingestion_listener: IngestionListener
         # VCF - this should not happen but can in certain circumstances. In this
         # case we need to patch error status and discard the current message.
         log.error('Caught error in VCF processing in ingestion listener: %s' % e)
-        ingestion_listener.set_status(uuid, STATUS_ERROR)
-        ingestion_listener.patch_ingestion_report(ingestion_listener.build_ingestion_error_report(msg=e), uuid)
+        listener.set_status(message.uuid, STATUS_ERROR)
+        listener.patch_ingestion_report(listener.build_ingestion_error_report(msg=e), message.uuid)
         return True
 
     # report results in error_log regardless of status
     msg = variant_builder.ingestion_report.brief_summary()
     log.error(msg)
-    if ingestion_listener.update_status is not None and callable(ingestion_listener.update_status):
-        ingestion_listener.update_status(msg=msg)
+    if listener.update_status is not None and callable(listener.update_status):
+        listener.update_status(msg=msg)
 
     # if we had no errors, patch the file status to 'Ingested'
     if error > 0:
-        ingestion_listener.set_status(uuid, STATUS_ERROR)
-        ingestion_listener.patch_ingestion_report(variant_builder.ingestion_report, uuid)
+        listener.set_status(message.uuid, STATUS_ERROR)
+        listener.patch_ingestion_report(variant_builder.ingestion_report, message.uuid)
     else:
-        ingestion_listener.set_status(uuid, STATUS_INGESTED)
+        listener.set_status(message.uuid, STATUS_INGESTED)
 
     return True

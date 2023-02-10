@@ -9,14 +9,11 @@ import json
 import os
 import psycopg2
 import re
-import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import signal
 import structlog
 import threading
 import time
-from typing import Tuple
 import webtest
-import tempfile
 
 from dcicutils.env_utils import is_stg_or_prd_env
 from dcicutils.misc_utils import VirtualApp, ignored, check_true, full_class_name, environ_bool, PRINT
@@ -27,36 +24,22 @@ from pyramid.request import Request
 # from pyramid.response import Response
 from pyramid.view import view_config
 from snovault.util import debug_log
-from vcf import Reader
-from .ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
-from .commands.reformat_vcf import runner as reformat_vcf
-from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionReport
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
 from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
-# from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
-    resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
     subrequest_object, register_path_content_type, vapp_for_email,  # vapp_for_ingestion,
     SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
 from .ingestion_listener_defs import (
-    VARIANT_SCHEMA,
-    VARIANT_SAMPLE_SCHEMA,
     STATUS_QUEUED,
     STATUS_INGESTED,
-    STATUS_DISABLED,
-    STATUS_ERROR,
-    STATUS_IN_PROGRESS,
-    SHARED,
-    STRUCTURAL_VARIANT_SCHEMA,
-    STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
     DEBUG_SUBMISSIONS,
 )
+from .ingestion_message import IngestionMessage
 from .ingestion_message_handler_decorator import ingestion_message_handlers
 
 
@@ -440,12 +423,6 @@ class IngestionListener:
                 debuglog("Deleted messages")
                 break
 
-    def decompose_message(self, message: dict) -> Tuple[str, str, dict]:
-        body = json.loads(message["Body"])
-        uuid = body["uuid"]
-        ingestion_type = body.get("ingestion_type", "vcf")
-        return ingestion_type, uuid, body
-
     def _patch_value(self, uuid, field, value):
         """ Patches field with value on item uuid """
         self.vapp.patch_json('/' + uuid, {field: value})
@@ -505,184 +482,22 @@ class IngestionListener:
             debuglog("Got", len(messages), "messages.")
 
             # ingest each VCF file
-            for message in messages:
+            for message in list(messages):
+
+                # C4-990/2023-02-09/dmichaels
+                # Added the list wrapper for the above messages, i.e. list(messages),
+                # so that when we remove a message from the messages list via the
+                # discard function the loop does not end up skipping the next message.
 
                 debuglog("Message:", message)
 
-                body = json.loads(message['Body'])
-                uuid = body['uuid']
-                ingestion_type = body.get('ingestion_type', 'vcf')  # Older protocol doesn't yet know to expect this
-                log.info('Ingesting uuid %s' % uuid)
-
-                if ingestion_type != 'vcf':
-                    # Let's minimally disrupt things for now. We can refactor this later
-                    # to make all the parts work the same -kmp
-                    if self.INGEST_AS_USER:
-                        try:
-                            debuglog("REQUESTING RESTRICTED PROCESSING:", uuid)
-                            process_submission(submission_id=uuid,
-                                               ingestion_type=ingestion_type,
-                                               # bundles_bucket=submission.bucket,
-                                               app=self.vapp.app)
-                            debuglog("RESTRICTED PROCESSING DONE:", uuid)
-                        except Exception as e:
-                            log.error(e)
-                    else:
-                        submission = SubmissionFolio(vapp=self.vapp, ingestion_type=ingestion_type,
-                                                     submission_id=uuid)
-                        handler = get_ingestion_processor(ingestion_type)
-                        try:
-                            debuglog("HANDLING:", uuid)
-                            handler(submission)
-                            debuglog("HANDLED:", uuid)
-                        except Exception as e:
-                            log.error(e)
-                    # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
-                    discard(message)
-                    continue
-
-                debuglog("Did NOT process", uuid, "as", ingestion_type)
+                ingestion_message = IngestionMessage(message)
 
                 # C4-990/2023-02-09/dmichaels
                 for handler in ingestion_message_handlers():
-                    if handler(message, self):
+                    if handler(ingestion_message, self):
                         discard(message)
-
-                # locate file meta data
-                try:
-                    file_meta = self.vapp.get('/' + uuid).follow().json
-                    location = self.vapp.get(file_meta['href']).location
-                    log.info('Got vcf location: %s' % location)
-                except Exception as e:
-                    log.error('Could not locate uuid: %s with error: %s' % (uuid, e))
-                    continue
-
-                # if this file has been ingested (or explicitly disabled), do not do anything with this uuid
-                if file_meta.get('file_ingestion_status', 'N/A') in [STATUS_INGESTED, STATUS_DISABLED]:
-                    log.error('Skipping ingestion of file %s due to disabled ingestion status' % uuid)
-                    continue
-
-                # attempt download with workaround
-                try:
-                    raw_content = requests.get(location).content
-                except Exception as e:
-                    log.error('Could not download file uuid: %s with error: %s' % (uuid, e))
-                    continue
-
-                # gunzip content, pass to parser, post variants/variant_samples
-                # patch in progress status
-                self.set_status(uuid, STATUS_IN_PROGRESS)
-                # decoded_content = gunzip_content(raw_content)
-                # debuglog('Got decoded content: %s' % decoded_content[:20])
-
-                vcf_type = file_meta.get("variant_type", "SNV")
-                if vcf_type == "SNV":
-                    # Apply VCF reformat
-                    vcf_to_be_formatted = tempfile.NamedTemporaryFile(suffix='.gz')
-                    vcf_to_be_formatted.write(raw_content)
-                    formatted = tempfile.NamedTemporaryFile()
-                    reformat_args = {
-                        'inputfile': vcf_to_be_formatted.name,
-                        'outputfile': formatted.name,
-                        'verbose': False
-                    }
-                    try:
-                        reformat_vcf(reformat_args)
-                    except Exception as e:
-                        log.error(f'Exception encountered in reformat script {e} - input VCF may be malformed')
-                        self.set_status(uuid, STATUS_ERROR)
-                        discard(message)
-                        continue
-
-                    # Add altcounts by gene
-                    # Note: you cannot pass this file object to vcf.Reader if it's in rb mode
-                    # It's also not guaranteed that it reads utf-8, so pass explicitly
-                    formatted_with_alt_counts = tempfile.NamedTemporaryFile(mode='w+', encoding='utf-8')
-                    alt_counts_args = {
-                        'inputfile': formatted.name,
-                        'outputfile': formatted_with_alt_counts.name
-                    }
-                    try:
-                        add_altcounts(alt_counts_args)
-                    except Exception as e:
-                        log.error(f'Exception encountered in altcounts script {e} - input VCF may be malformed')
-                        self.set_status(uuid, STATUS_ERROR)
-                        discard(message)
-                        continue
-                    parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
-                                       reader=Reader(formatted_with_alt_counts))
-                    variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
-                                                     project=file_meta['project']['@id'],
-                                                     institution=file_meta['institution']['@id'])
-                elif vcf_type == "SV":
-                    # No reformatting necesssary for SV VCF
-                    decoded_content = gunzip_content(raw_content)
-                    debuglog('Got decoded content: %s' % decoded_content[:20])
-                    formatted_vcf = tempfile.NamedTemporaryFile(
-                        mode="w+", encoding="utf-8"
-                    )
-                    formatted_vcf.write(decoded_content)
-                    formatted_vcf.seek(0)
-                    parser = StructuralVariantVCFParser(
-                        None,
-                        STRUCTURAL_VARIANT_SCHEMA,
-                        STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
-                        reader=Reader(formatted_vcf),
-                    )
-                    variant_builder = StructuralVariantBuilder(
-                        self.vapp,
-                        parser,
-                        file_meta["accession"],
-                        project=file_meta["project"]["@id"],
-                        institution=file_meta["institution"]["@id"],
-                    )
-                elif vcf_type == "CNV":
-                    decoded_content = gunzip_content(raw_content)
-                    debuglog('Got decoded content: %s' % decoded_content[:20])
-                    formatted_vcf = tempfile.NamedTemporaryFile(
-                        mode="w+", encoding="utf-8"
-                    )
-                    formatted_vcf.write(decoded_content)
-                    formatted_vcf.seek(0)
-                    parser = StructuralVariantVCFParser(
-                        None,
-                        STRUCTURAL_VARIANT_SCHEMA,
-                        STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
-                        reader=Reader(formatted_vcf),
-                    )
-                    variant_builder = CNVBuilder(
-                        self.vapp,
-                        parser,
-                        file_meta["accession"],
-                        project=file_meta["project"]["@id"],
-                        institution=file_meta["institution"]["@id"],
-                    )
-                try:
-                    success, error = variant_builder.ingest_vcf()
-                except Exception as e:
-                    # if exception caught here, we encountered an error reading the actual
-                    # VCF - this should not happen but can in certain circumstances. In this
-                    # case we need to patch error status and discard the current message.
-                    log.error('Caught error in VCF processing in ingestion listener: %s' % e)
-                    self.set_status(uuid, STATUS_ERROR)
-                    self.patch_ingestion_report(self.build_ingestion_error_report(msg=e), uuid)
-                    discard(message)
-                    continue
-
-                # report results in error_log regardless of status
-                msg = variant_builder.ingestion_report.brief_summary()
-                log.error(msg)
-                if self.update_status is not None and callable(self.update_status):
-                    self.update_status(msg=msg)
-
-                # if we had no errors, patch the file status to 'Ingested'
-                if error > 0:
-                    self.set_status(uuid, STATUS_ERROR)
-                    self.patch_ingestion_report(variant_builder.ingestion_report, uuid)
-                else:
-                    self.set_status(uuid, STATUS_INGESTED)
-
-                discard(message)
+                        break
 
             # This is just fallback cleanup in case messages weren't cleaned up within the loop.
             # In normal operation, they will be.

@@ -1,5 +1,5 @@
 from dcicutils.misc_utils import ignored, PRINT
-from encoded.ingestion_message import IngestionMessage
+from ingestion_message import IngestionMessage
 
 
 _ingestion_message_handlers = []
@@ -90,3 +90,41 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         return ingestion_message_handler_function
 
     return ingestion_message_handler_wrapper(f) if not has_decorator_args else ingestion_message_handler_wrapper
+
+
+@ingestion_message_handler
+def f(message, listener):
+    print('helo/f')
+    print(message.to_dict())
+
+@ingestion_message_handler(ingestion_type="vcf")
+def g(message, listener):
+    print('helo/g')
+    print(message.to_dict())
+
+def xyzzy(message: IngestionMessage):
+    return not message.is_type("vcf")
+
+@ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
+def h(message, listener):
+    print('helo/h')
+    print(message.to_dict())
+
+@ingestion_message_handler(lambda message: xyzzy(message))
+def i(message, listener):
+    print('helo/i')
+    print(message.to_dict())
+
+print()
+print('calling with vcf message')
+raw_message = {"Body": "{\"uuid\":\"someuuid\",\"ingestion_type\":\"vcf\"}"}
+message = IngestionMessage(raw_message)
+for handler in ingestion_message_handlers():
+    handler(message, None)
+print()
+print('calling with non-vcf message')
+raw_message = {"Body": "{\"uuid\":\"someuuid\",\"ingestion_type\":\"someothertype\"}"}
+message = IngestionMessage(raw_message)
+for handler in ingestion_message_handlers():
+    handler(message, None)
+

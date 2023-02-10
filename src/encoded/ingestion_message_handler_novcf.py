@@ -13,7 +13,8 @@ from .ingestion_listener import IngestionListener
 from .ingestion_listener_defs import (
     DEBUG_SUBMISSIONS,
 )
-from ingestion_message_handler_decorator import ingestion_message_handler
+from .ingestion_message import IngestionMessage
+from .ingestion_message_handler_decorator import ingestion_message_handler
 
 
 log = structlog.getLogger(__name__)
@@ -53,34 +54,29 @@ def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=Non
         }
 
 
-@ingestion_message_handler
-def ingestion_message_handler_novcf(message, ingestion_listener: IngestionListener) -> bool:
-
-    ingestion_type, uuid, _ = ingestion_listener.decompose_message(message)
-
-    if ingestion_type == "vcf":
-        return False
+@ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
+def ingestion_message_handler_novcf(message: IngestionMessage, listener: IngestionListener) -> bool:
 
     # Let's minimally disrupt things for now. We can refactor this later
     # to make all the parts work the same -kmp
-    if ingestion_listener.INGEST_AS_USER:
+    if listener.INGEST_AS_USER:
         try:
-            debuglog("REQUESTING RESTRICTED PROCESSING:", uuid)
-            process_submission(submission_id=uuid,
-                               ingestion_type=ingestion_type,
+            debuglog("REQUESTING RESTRICTED PROCESSING:", message.uuid)
+            process_submission(submission_id=message.uuid,
+                               ingestion_type=message.type,
                                # bundles_bucket=submission.bucket,
-                               app=ingestion_listener.vapp.app)
-            debuglog("RESTRICTED PROCESSING DONE:", uuid)
+                               app=listener.vapp.app)
+            debuglog("RESTRICTED PROCESSING DONE:", message.uuid)
         except Exception as e:
             log.error(e)
     else:
-        submission = SubmissionFolio(vapp=ingestion_listener.vapp, ingestion_type=ingestion_type,
-                                     submission_id=uuid)
-        handler = get_ingestion_processor(ingestion_type)
+        submission = SubmissionFolio(vapp=listener.vapp, ingestion_type=message.type,
+                                     submission_id=message.uuid)
+        handler = get_ingestion_processor(message.type)
         try:
-            debuglog("HANDLING:", uuid)
+            debuglog("HANDLING:", message.uuid)
             handler(submission)
-            debuglog("HANDLED:", uuid)
+            debuglog("HANDLED:", message.uuid)
         except Exception as e:
             log.error(e)
     # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
