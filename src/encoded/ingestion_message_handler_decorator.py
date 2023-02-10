@@ -68,7 +68,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         if len(wrapped_function_signature.parameters) < 2:
             raise Exception(f"Too few arguments (need two) for ingestion handler function: {wrapped_function.__name__}")
         if len(wrapped_function_signature.parameters) > 2:
-            raise Exception(f"Too many arguments (need two) for ingestion handler function: {wrapped_function.__name__}")
+            raise Exception(f"Too many arguments (need two) "
+                            f"for ingestion handler function: {wrapped_function.__name__}")
         return_annotation = wrapped_function_signature.return_annotation
         if not return_annotation or (return_annotation.__name__ != "_empty" and return_annotation.__name__ != "bool"):
             raise Exception(f"Wrong return value type (need unspecified or bool) "
@@ -123,7 +124,7 @@ def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
     Calls at most one of the ingestion message handler functions registered via
     the @ingestion_message_handler decorator, for the given message, and listener.
-    If a handler is called then returns True, otherwise False.
+    If a handler is called then returns True, otherwise returns False.
 
     Though NOTE that this "at most" is controlled by the handler function itself;
     if a handler function returns True it conveys that the message was handled,
