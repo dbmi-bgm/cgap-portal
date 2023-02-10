@@ -2,8 +2,6 @@ from dcicutils.misc_utils import ignored, PRINT
 from ingestion_message import IngestionMessage
 import inspect
 
-from i import IngestionListener
-
 _ingestion_message_handlers = []
 
 
