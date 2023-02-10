@@ -473,24 +473,6 @@ class IngestionListener:
             # it should also get removed from our to-do list.
             messages.remove(msg)
 
-#       # C4-990/2023-02-09/dmichaels
-#       def call_ingestion_message_handler(message) -> None:
-#           """
-#           Calls at most one of the ingestion message handler functions registered
-#           via the @ingestion_message_handler decorator, for the given (raw) message.
-#
-#           Though NOTE that this "at most" is controlled by the handler function itself;
-#           if a handler function returns True it conveys that the message was handled,
-#           and that no more handlers should be called, and that it should be discarded
-#           from future processing; otherwise it is assumed the message was not handled,
-#           and further handlers should be called for the message, until one returns True.
-#           """
-#           ingestion_message = IngestionMessage(message)
-#           for handler in get_ingestion_message_handlers():
-#               if handler(ingestion_message, self) is True:
-#                   discard(message)
-#                   break
-
         while self.should_remain_online():
 
             debuglog("About to get messages.")
