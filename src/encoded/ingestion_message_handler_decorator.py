@@ -2,6 +2,7 @@ from dcicutils.misc_utils import ignored, PRINT
 from ingestion_message import IngestionMessage
 import inspect
 
+from i import IngestionListener
 
 _ingestion_message_handlers = []
 
@@ -74,7 +75,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         first_parameter = next(parameters)
         if first_parameter and len(first_parameter) >= 2:
             first_parameter_annotation = first_parameter[1].annotation
-            if first_parameter_annotation and first_parameter_annotation != inspect._empty:
+            if first_parameter_annotation and first_parameter_annotation.__name__ != "_empty":
                 if first_parameter_annotation != IngestionMessage:
                     raise Exception(f"Wrong first argument type (need none or IngestionMessage) "
                                     "for ingestion handler function: {wrapped_function.__name__}")
@@ -82,8 +83,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         if second_parameter and len(second_parameter) >= 2:
             second_parameter_annotation = second_parameter[1].annotation
             if second_parameter_annotation and second_parameter_annotation != inspect._empty:
-                # TODO: Better way to check for IngestionListener type; cannot import because recursive.
-                if not str(second_parameter_annotation).endswith(".IngestionListener'>"):
+                # We only check the for type name of the type of the second IngestionListener argument;
+                # we cannot import the IngestionListener because would be a recursive import.
+                if second_parameter_annotation.__name__ != "IngestionListener":
                     raise Exception(f"Wrong second argument type (need none or IngestionListener) "
                                     "for ingestion handler function: {wrapped_function.__name__}")
         if ingestion_type:
