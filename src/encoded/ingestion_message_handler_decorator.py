@@ -1,5 +1,5 @@
 from dcicutils.misc_utils import ignored, PRINT
-from ingestion_message import IngestionMessage
+from .ingestion_message import IngestionMessage
 
 
 _ingestion_message_handlers = []
@@ -11,10 +11,9 @@ def ingestion_message_handlers():
     Example usage is like this:
 
         listener = get_reference_to_your_ingestion_listener()
-        message = get_next_ingestion_message()
+        message = IngestionMessage(get_next_ingestion_message())
         for handler in ingestion_message_handlers():
-            if handler(message, listener):
-                ingestion_listener.discard_message()
+            handler(message, listener)
     """
     return _ingestion_message_handlers
 
@@ -29,9 +28,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
     Although any function may be annotated with this decorator, at this time and
     for our purposes it is expected to have a signature as show in the example above;
-    this is not enforced at this time but may well be in the future.
+    this is NOT enforced at this time but MAY well be in the future.
 
-    In addition, you can pass an type argument to the decorator to limit the call of the
+    In addition, you can pass an type argument to the decorator to LIMIT the call of the
     decorated function to messages with an ingestion type which matches the given value
     if it is a string, or if it is a function/lambda then iff a call to that function,
     with the message as an argument, returns True. For example:

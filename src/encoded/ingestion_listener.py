@@ -475,9 +475,19 @@ class IngestionListener:
 
         # C4-990/2023-02-09/dmichaels
         def call_ingestion_message_handler(message) -> None:
+            """
+            Calls at most one of the ingestion message handler functions registered
+            via the @ingestion_message_handler decorator, for the given (raw) message.
+
+            Though NOTE that this "at most" is controlled by the handler function itself;
+            if a handler function returns True it conveys that the message was handled,
+            and that no more handlers should be called, and that it should be discarded
+            from future processing; otherwise it is assumed the message was not handled,
+            and further handlers should be called for the message until one returns True.
+            """
             ingestion_message = IngestionMessage(message)
             for handler in ingestion_message_handlers():
-                if handler(ingestion_message, self):
+                if handler(ingestion_message, self) is True:
                     discard(message)
                     break
 
@@ -495,8 +505,8 @@ class IngestionListener:
                 # C4-990/2023-02-09/dmichaels
                 # Added the list wrapper around messages in the above loop,
                 # i.e. list(messages), so that when we remove a message from
-                # the messages list via the # discard function the loop does
-                # not end up skipping the next message.
+                # the messages list via the discard function (above) the loop
+                # does not end up skipping the very next message.
 
                 debuglog("Message:", message)
 
