@@ -5,14 +5,14 @@ import inspect
 _ingestion_message_handlers = []
 
 
-def ingestion_message_handlers():
+def get_ingestion_message_handlers():
     """
     Resturns a list of all registered ingestion message handler functions.
     Example usage is like this:
 
         listener: IngestionListener = get_reference_to_your_ingestion_listener()
         message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
-        for handler in ingestion_message_handlers():
+        for handler in get_ingestion_message_handlers():
             handler(message, listener)
     """
     return _ingestion_message_handlers
@@ -44,7 +44,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
-    Once registered the ingestion_message_handlers function in this module, above,
+    Once registered the get_ingestion_message_handlers function in this module, above,
     can be used to get a list of all registered ingestion message handler functions.
     """
     ignored(decorator_args)
@@ -117,3 +117,23 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         return ingestion_message_handler_function
 
     return ingestion_message_handler_wrapper(f) if not has_decorator_args else ingestion_message_handler_wrapper
+
+
+def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
+    """
+    Calls at most one of the ingestion message handler functions registered via
+    the @ingestion_message_handler decorator, for the given message, and listener.
+    If a handler is called then returns True, otherwise False.
+
+    Though NOTE that this "at most" is controlled by the handler function itself;
+    if a handler function returns True it conveys that the message was handled,
+    and that no more handlers should be called, and that it should be discarded
+    from future processing; otherwise it is assumed the message was not handled,
+    and further handlers should be called for the message, until one returns True.
+    """
+    if not isinstance(message, IngestionMessage):
+        message = IngestionMessage(message)
+    for handler in get_ingestion_message_handlers():
+        if handler(message, listener) is True:
+            return True
+    return False

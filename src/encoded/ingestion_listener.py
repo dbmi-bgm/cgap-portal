@@ -40,7 +40,7 @@ from .ingestion_listener_defs import (
     DEBUG_SUBMISSIONS,
 )
 from .ingestion_message import IngestionMessage
-from .ingestion_message_handler_decorator import ingestion_message_handlers
+from .ingestion_message_handler_decorator import call_ingestion_message_handler
 
 
 log = structlog.getLogger(__name__)
@@ -473,23 +473,23 @@ class IngestionListener:
             # it should also get removed from our to-do list.
             messages.remove(msg)
 
-        # C4-990/2023-02-09/dmichaels
-        def call_ingestion_message_handler(message) -> None:
-            """
-            Calls at most one of the ingestion message handler functions registered
-            via the @ingestion_message_handler decorator, for the given (raw) message.
-
-            Though NOTE that this "at most" is controlled by the handler function itself;
-            if a handler function returns True it conveys that the message was handled,
-            and that no more handlers should be called, and that it should be discarded
-            from future processing; otherwise it is assumed the message was not handled,
-            and further handlers should be called for the message, until one returns True.
-            """
-            ingestion_message = IngestionMessage(message)
-            for handler in ingestion_message_handlers():
-                if handler(ingestion_message, self) is True:
-                    discard(message)
-                    break
+#       # C4-990/2023-02-09/dmichaels
+#       def call_ingestion_message_handler(message) -> None:
+#           """
+#           Calls at most one of the ingestion message handler functions registered
+#           via the @ingestion_message_handler decorator, for the given (raw) message.
+#
+#           Though NOTE that this "at most" is controlled by the handler function itself;
+#           if a handler function returns True it conveys that the message was handled,
+#           and that no more handlers should be called, and that it should be discarded
+#           from future processing; otherwise it is assumed the message was not handled,
+#           and further handlers should be called for the message, until one returns True.
+#           """
+#           ingestion_message = IngestionMessage(message)
+#           for handler in get_ingestion_message_handlers():
+#               if handler(ingestion_message, self) is True:
+#                   discard(message)
+#                   break
 
         while self.should_remain_online():
 
@@ -511,7 +511,8 @@ class IngestionListener:
                 debuglog("Message:", message)
 
                 # C4-990/2023-02-09/dmichaels
-                call_ingestion_message_handler(message)
+                if call_ingestion_message_handler(message, self):
+                    discard(message)
 
             # This is just fallback cleanup in case messages weren't cleaned up within the loop.
             # In normal operation, they will be.
