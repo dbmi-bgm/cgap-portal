@@ -1,4 +1,4 @@
-from dcicutils.misc_utils import PRINT
+from dcicutils.misc_utils import ignored, PRINT
 import json
 from typing import Tuple
 
@@ -68,14 +68,15 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     Once registered the ingestion_message_handlers function in this module, above,
     can be used to get a list of all registered ingestion message handler functions.
     """
+    ignored(decorator_args)
     has_decorator_args = True if not callable(f) else False
     ingestion_type = None
 
     if has_decorator_args:
+        if isinstance(f, str):
+            ingestion_type = f
         if decorator_kwargs:
             ingestion_type = decorator_kwargs.get("ingestion_type", decorator_kwargs.get("type"))
-        elif args and isinstance(args[0], str):
-            ingestion_type = args[0]
         if not (isinstance(ingestion_type, str) or callable(ingestion_type)):
             ingestion_type = None
 
