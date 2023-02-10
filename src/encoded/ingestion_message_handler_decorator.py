@@ -1,32 +1,14 @@
 from dcicutils.misc_utils import ignored, PRINT
-import json
+from encoded.ingestion_message import IngestionMessage
 
 
 _ingestion_message_handlers = []
 
 
-class IngestionMessage:
-
-    def __init__(self, message: dict) -> None:
-        self.body = json.loads(message["Body"]) or {}
-        self.uuid = self.body["uuid"] or ""
-        self.type = self.body.get("ingestion_type", "vcf") or ""
-
-    def is_type(self, value: str) -> bool:
-        return isinstance(value, str) and self.type.lower() == value.lower()
-
-    def to_dict(self) -> dict:
-        return {
-            "uuid": self.type,
-            "type": self.uuid,
-            "body": self.body
-        }
-
-
 def ingestion_message_handlers():
     """
     Resturns a list of all registered ingestion message handler functions.
-    Usage is like this:
+    Example usage is like this:
 
         listener = get_reference_to_your_ingestion_listener()
         message = get_next_ingestion_message()
@@ -39,7 +21,7 @@ def ingestion_message_handlers():
 
 def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     """
-    Decorator for ingestion message handlers to be used like this:
+    Decorator for ingestion message handlers to be used for example like this:
 
         @ingestion_message_handler
         your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
@@ -49,18 +31,18 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     for our purposes it is expected to have a signature as show in the example above;
     this is not enforced at this time but may well be in the future.
 
-    In addition, you can pass an type argument to the decorator to limit the call of
-    the function to messages with an ingestion type which matches the given value
-    if it is a string, or if it is a function/lambda then if a call to that function,
+    In addition, you can pass an type argument to the decorator to limit the call of the
+    decorated function to messages with an ingestion type which matches the given value
+    if it is a string, or if it is a function/lambda then iff a call to that function,
     with the message as an argument, returns True. For example:
 
-        @ingestion_message_handler(ingestion_type="VCF")
+        @ingestion_message_handler(type="VCF")
         your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     or with a lambda:
 
-        @ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
+        @ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
         your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
@@ -68,7 +50,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     can be used to get a list of all registered ingestion message handler functions.
     """
     ignored(decorator_args)
-    has_decorator_args = True if not callable(f) else False
+    has_decorator_args = True if not callable(f) or f.__name__ == "<lambda>" else False
     ingestion_type = None
 
     if has_decorator_args:
@@ -99,9 +81,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                 message = args[0]
                 if callable(ingestion_type):
                     if not ingestion_type(message):
-                        return None
+                        return False
                 elif not message.is_type(ingestion_type):
-                    return None
+                    return False
             return wrapped_function(*args, **kwargs)
 
         _ingestion_message_handlers.append(lambda args, kwargs: ingestion_message_handler_function(args, kwargs))
