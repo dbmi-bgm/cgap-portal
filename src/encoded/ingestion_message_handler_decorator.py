@@ -27,9 +27,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
-    Although any function may be annotated with this decorator, at this time and
-    for our purposes it is expected to have a signature as show in the example above;
-    this is NOT enforced at this time but MAY well be in the future.
+    Although any function may be annotated with this decorator, at this time and for our purposes
+    it is expected to have a signature as show in the example above; this IS enforced to some extent.
 
     In addition, you can pass an type argument to the decorator to LIMIT the call of the
     decorated function to messages with an ingestion type which matches the given value
@@ -87,7 +86,6 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                 if not str(second_parameter_annotation).endswith(".IngestionListener'>"):
                     raise Exception(f"Wrong second argument type (need none or IngestionListener) "
                                     "for ingestion handler function: {wrapped_function.__name__}")
-
         if ingestion_type:
             if callable(ingestion_type):
                 PRINT(f"Registering message handler: {wrapped_function.__name__} (type: <lambda>)")

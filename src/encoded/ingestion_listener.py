@@ -483,7 +483,7 @@ class IngestionListener:
             if a handler function returns True it conveys that the message was handled,
             and that no more handlers should be called, and that it should be discarded
             from future processing; otherwise it is assumed the message was not handled,
-            and further handlers should be called for the message until one returns True.
+            and further handlers should be called for the message, until one returns True.
             """
             ingestion_message = IngestionMessage(message)
             for handler in ingestion_message_handlers():
