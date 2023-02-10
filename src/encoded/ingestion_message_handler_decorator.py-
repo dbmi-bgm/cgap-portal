@@ -1,6 +1,6 @@
 from dcicutils.misc_utils import ignored, PRINT
+from ingestion_message import IngestionMessage
 import inspect
-from encoded.ingestion_message import IngestionMessage
 
 _ingestion_message_handlers = []
 
@@ -68,8 +68,13 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         if len(wrapped_function_signature.parameters) < 2:
             raise Exception(f"Too few arguments (need two) for ingestion handler function: {wrapped_function.__name__}")
         if len(wrapped_function_signature.parameters) > 2:
-            raise Exception(f"Too many arguments (need two) "
-                            f"for ingestion handler function: {wrapped_function.__name__}")
+            # Allow a final kwargs.
+            has_third_kwargs_parameter = (True if len(wrapped_function_signature.parameters) == 3 and
+                                                  any(p.kind == inspect.Parameter.VAR_KEYWORD
+                                                      for p in wrapped_function_signature.parameters.values()) else False)
+            if not has_third_kwargs_parameter:
+                raise Exception(f"Too many arguments (need two) "
+                                f"for ingestion handler function: {wrapped_function.__name__}")
         return_annotation = wrapped_function_signature.return_annotation
         if not return_annotation or (return_annotation.__name__ != "_empty" and return_annotation.__name__ != "bool"):
             raise Exception(f"Wrong return value type (need unspecified or bool) "
@@ -114,7 +119,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                     return False
             return wrapped_function(*args, **kwargs)
 
-        _ingestion_message_handlers.append(lambda args, kwargs: ingestion_message_handler_function(args, kwargs))
+        _ingestion_message_handlers.append(lambda args, **kwargs: ingestion_message_handler_function(args, kwargs))
         return ingestion_message_handler_function
 
     return ingestion_message_handler_wrapper(f) if not has_decorator_args else ingestion_message_handler_wrapper
@@ -138,3 +143,49 @@ def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
         if handler(message, listener) is True:
             return True
     return False
+
+
+@ingestion_message_handler
+def f(message, listener, **kwargs) -> bool:
+    print('helo/f')
+    print(message.to_dict())
+    return True
+
+@ingestion_message_handler(ingestion_type="vcf")
+def g(message, listener, **kwargs) -> bool:
+    print('helo/g')
+    print(message.to_dict())
+    return True
+
+def xyzzy(message: IngestionMessage) -> bool:
+    return not message.is_type("vcf")
+
+@ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
+def h(message, listener, **kwargs) -> bool:
+    print('helo/h')
+    print(message.to_dict())
+    return True
+
+@ingestion_message_handler(lambda message: xyzzy(message))
+def i(message: IngestionMessage, listener, **kwargs):
+    print('helo/i')
+    print(message.to_dict())
+    return True
+
+print()
+print('calling with vcf message')
+raw_message = {"Body": "{\"uuid\":\"someuuid\",\"ingestion_type\":\"vcf\"}"}
+message = IngestionMessage(raw_message)
+for handler in get_ingestion_message_handlers():
+    handler(message, None)
+print()
+print('calling with non-vcf message')
+raw_message = {"Body": "{\"uuid\":\"someuuid\",\"ingestion_type\":\"someothertype\"}"}
+message = IngestionMessage(raw_message)
+for handler in get_ingestion_message_handlers():
+    handler(message, None, abc=123)
+
+
+print()
+print('calling with loop')
+call_ingestion_message_handler(message, None)
