@@ -473,6 +473,14 @@ class IngestionListener:
             # it should also get removed from our to-do list.
             messages.remove(msg)
 
+        # C4-990/2023-02-09/dmichaels
+        def call_ingestion_message_handler(message) -> None:
+            ingestion_message = IngestionMessage(message)
+            for handler in ingestion_message_handlers():
+                if handler(ingestion_message, self):
+                    discard(message)
+                    break
+
         while self.should_remain_online():
 
             debuglog("About to get messages.")
@@ -485,19 +493,15 @@ class IngestionListener:
             for message in list(messages):
 
                 # C4-990/2023-02-09/dmichaels
-                # Added the list wrapper for the above messages, i.e. list(messages),
-                # so that when we remove a message from the messages list via the
-                # discard function the loop does not end up skipping the next message.
+                # Added the list wrapper around messages in the above loop,
+                # i.e. list(messages), so that when we remove a message from
+                # the messages list via the # discard function the loop does
+                # not end up skipping the next message.
 
                 debuglog("Message:", message)
 
-                ingestion_message = IngestionMessage(message)
-
                 # C4-990/2023-02-09/dmichaels
-                for handler in ingestion_message_handlers():
-                    if handler(ingestion_message, self):
-                        discard(message)
-                        break
+                call_ingestion_message_handler(message)
 
             # This is just fallback cleanup in case messages weren't cleaned up within the loop.
             # In normal operation, they will be.
