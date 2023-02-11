@@ -38,37 +38,37 @@ def test_ingestion_message_handler_decorator_bad_signature():
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_f():
+        def bad_a():
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_g(message):
+        def bad_b(message):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_h(message, listener, foo):
+        def bad_c(message, listener, foo):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_i(message: IngestionMessage, listener: str):
+        def bad_d(message: IngestionMessage, listener: str):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_j(message: str, listener):
+        def bad_e(message: str, listener):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_k(message, listener) -> None:
+        def bad_f(message, listener) -> None:
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler
-        def bad_k(message, listener) -> str:
+        def bad_g(message, listener) -> str:
             pass
 
 
@@ -159,11 +159,11 @@ def test_ingestion_message_handler_decorator():
 
     assert len(get_ingestion_message_handlers()) == 9
 
-    # Note we rely on handlers being called in order of declaration just for testing;
-    # in real life such ordering should not be relied upon; though actually in real
-    # life we probably won't even use this functionality of multiple handlers being
-    # called for a message via the return of a non-True value from the handler, i.e.
-    # the stuff that this "unprocessed" feature supports in these tests.
+    # Note we rely on handlers being called in order of definition just for testing;
+    # in real life such ordering should not be relied upon; though actually in
+    # real life we may not even use this functionality of multiple handlers being
+    # called for a message via the return of a non-True value from the handler,
+    # i.e.  the stuff that this "unprocessed" feature supports in these tests.
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF)
