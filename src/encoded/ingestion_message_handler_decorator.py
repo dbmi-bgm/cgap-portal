@@ -2,7 +2,9 @@ from dcicutils.misc_utils import ignored, PRINT
 import inspect
 from encoded.ingestion_message import IngestionMessage
 
+
 _ingestion_message_handlers = []
+
 
 def get_ingestion_message_handlers():
     """
