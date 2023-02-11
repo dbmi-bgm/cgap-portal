@@ -127,7 +127,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                     return False
             # Here the handler decorator has no ingestion_type specifier or if it does
             # it indicates that this message is intended to be processed by this handler 
-            # and we will call it here, returning its value. 
+            # and we will call it here, returning its value, which, if True, indicates that
+            # the message was actually processed, or if False, that it was not processed.
             return wrapped_function(*args, **kwargs)
 
         _ingestion_message_handlers.append(lambda args, kwargs: ingestion_message_handler_function(args, kwargs))
