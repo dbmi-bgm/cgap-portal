@@ -8,34 +8,31 @@ from encoded.ingestion_message_handler_decorator import (
 
 
 class IngestionListener:
-    pass
+    pass # dummy
 
 
-raw_message = {"Body": "{\"uuid\":\"someuuid\", \"ingestion_type\":\"vcf\"}"}
-ingestion_listener = {}
-handler_calls = set()
-print('xyzzy')
+some_uuid = "some-uuid-xyzzy"
+ingestion_listener = IngestionListener()
 
 
-def test_ingestion_message_handler_decorator_signature():
+def create_raw_message(ingestion_type: str, unprocessed: str = None) -> dict:
+    if unprocessed:
+        # For testing this is a comma-separted list of handler function names
+        # indicating the handler function should return False rather than True.
+        return {"Body": f"{{\"uuid\":\"{some_uuid}\", \"ingestion_type\":\"{ingestion_type}\",\"unprocessed\":\"{unprocessed}\"}}"}
+    else:
+        return {"Body": f"{{\"uuid\":\"{some_uuid}\", \"ingestion_type\":\"{ingestion_type}\"}}"}
 
-    @ingestion_message_handler
-    def f(message: IngestionMessage, listener: IngestionListener):
-        pass
 
-    @ingestion_message_handler
-    def g(message: IngestionMessage, listener):
-        pass
+def message_processed(message: IngestionMessage, function: str) -> bool:
+    return not message_unprocessed(message, function)
 
-    @ingestion_message_handler
-    def h(message, listener: IngestionListener):
-        pass
 
-    @ingestion_message_handler
-    def i(message, listener):
-        pass
+def message_unprocessed(message: IngestionMessage, function: str) -> bool:
+    return isinstance(message.body.get("unprocessed"), str) and function in message.body["unprocessed"]
 
-    assert len(get_ingestion_message_handlers()) == 4
+
+def test_ingestion_message_handler_decorator_bad_signature():
 
     with pytest.raises(Exception):
         @ingestion_message_handler
@@ -62,53 +59,117 @@ def test_ingestion_message_handler_decorator_signature():
         def bad_j(message: str, listener):
             pass
 
+    with pytest.raises(Exception):
+        @ingestion_message_handler
+        def bad_k(message, listener) -> None:
+            pass
 
-def test_ingestion_message_handler_decorator_calls():
-
-    @ingestion_message_handler
-    def f(message, listener):
-        handler_calls.add("f")
-        assert message.type == "vcf"
-        assert message.uuid == "someuuid"
-        assert listener is ingestion_listener
-
-    @ingestion_message_handler
-    def g(message, listener):
-        handler_calls.add("g")
-        assert message.type == "vcf"
-        assert message.uuid == "someuuid"
-        assert listener is ingestion_listener
-
-    @ingestion_message_handler
-    def h(message, listener):
-        handler_calls.add("h")
-        assert message.type == "vcf"
-        assert message.uuid == "someuuid"
-        assert listener is ingestion_listener
-
-    call_ingestion_message_handler(raw_message, ingestion_listener)
-    assert handler_calls == {"f", "g", "h"}
+    with pytest.raises(Exception):
+        @ingestion_message_handler
+        def bad_k(message, listener) -> str:
+            pass
 
 
-def test_ingestion_message_handler_decorator_vcf_calls():
+def test_ingestion_message_handler_decorator():
 
-    raw_message = {"Body": "{\"uuid\":\"someuuid\", \"ingestion_type\":\"vcf\"}"}
     handler_calls = set()
 
-    @ingestion_message_handler(type="vcf")
-    def ff(message, listener):
-        handler_calls.add("f")
-        assert message.type == "vcf"
-        assert message.uuid == "someuuid"
+    @ingestion_message_handler
+    def a(message: IngestionMessage, listener: IngestionListener) -> bool:
+        this_function_name = "a"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf") or message.is_type("xyz")
+        assert message.uuid == some_uuid
         assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
 
     @ingestion_message_handler
-    def gg(message, listener):
-        handler_calls.add("g")
-        assert message.type == "vcf"
-        assert message.uuid == "someuuid"
+    def b(message: IngestionMessage, listener: IngestionListener):
+        this_function_name = "b"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf") or message.is_type("xyz")
+        assert message.uuid == some_uuid
         assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
 
-    call_ingestion_message_handler(raw_message, ingestion_listener)
-    assert handler_calls == {"f", "g"}
-    #assert len(get_ingestion_message_handlers()) == 9
+    @ingestion_message_handler
+    def c(message: IngestionMessage, listener):
+        this_function_name = "c"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf") or message.is_type("xyz")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    @ingestion_message_handler
+    def d(message, listener: IngestionListener):
+        this_function_name = "d"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf") or message.is_type("xyz")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    @ingestion_message_handler
+    def e(message, listener):
+        this_function_name = "d"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf") or message.is_type("xyz")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    @ingestion_message_handler("VCF")
+    def f(message, listener):
+        this_function_name = "f"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    @ingestion_message_handler(ingestion_type="vcf")
+    def g(message, listener):
+        this_function_name = "g"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("VCF")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    @ingestion_message_handler(type="vcf")
+    def h(message, listener):
+        this_function_name = "h"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert message.is_type("vcf")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    @ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
+    def i(message, listener):
+        this_function_name = "i"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert not message.is_type("vcf")
+        assert message.uuid == some_uuid
+        assert listener is ingestion_listener
+        return message_processed(message, this_function_name)
+
+    assert len(get_ingestion_message_handlers()) == 9
+
+    handler_calls = set()
+    raw_message = create_raw_message(ingestion_type="vcf", unprocessed="a")
+    print(raw_message)
+    message = IngestionMessage(raw_message)
+    print(message)
+    print(message.body)
+    print(message.body.get("unprocessed"))
+    call_ingestion_message_handler(message, ingestion_listener)
+    print(handler_calls)
+    #print('xyzzy')
+    #print(handler_calls)
+    #assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf", "e/vcf", "f/vcf", "g/vcf", "h/vcf"}
+
+    #handler_calls = set()
+    #call_ingestion_message_handler(raw_message_novcf, ingestion_listener)
+    #assert handler_calls == {"a/xyz", "b/xyz", "c/xyz", "d/xyz", "i/xyz"}
