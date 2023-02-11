@@ -6,10 +6,6 @@ from .ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
-from .util import (
-    gunzip_content,
-    debuglog,
-)
 from .ingestion_listener import IngestionListener
 from .ingestion_listener_defs import (
     VARIANT_SCHEMA,
@@ -23,17 +19,18 @@ from .ingestion_listener_defs import (
 )
 from .ingestion_message import IngestionMessage
 from .ingestion_message_handler_decorator import ingestion_message_handler
+from .util import (gunzip_content, debuglog)
 
 
 log = structlog.getLogger(__name__)
 
 
-@ingestion_message_handler(ingestion_type="vcf")
+@ingestion_message_handler(ingestion_type=IngestionMessage.TYPE_VCF)
 def ingestion_message_handler_vcf(message: IngestionMessage, listener: IngestionListener) -> bool:
     """
-    This is the part of listener.IngestionListener.run which handles a
+    This is the part of listener.IngestionListener.run function which handles a
     single message within the (effectively-infinite) incoming message handling loop,
-    specifically for CGAP; refactored out February 2023.
+    specifically for VCF files; refactored out of ingestion_listener.py February 2023.
     Returns True if the message was successfully handled, otherwise False.
     """
 

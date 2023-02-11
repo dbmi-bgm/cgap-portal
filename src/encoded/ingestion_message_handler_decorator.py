@@ -2,9 +2,9 @@
 # to globally register ingestion message handler functions, as well as functions to
 # get the list of registered handler functions and to call them for a given message.
 
-from dcicutils.misc_utils import ignored, PRINT
 import inspect
-from encoded.ingestion_message import IngestionMessage
+from dcicutils.misc_utils import ignored, PRINT
+from .ingestion_message import IngestionMessage
 
 
 _ingestion_message_handlers = []
@@ -119,7 +119,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                     # intended to be processed by this handler and will not be called.
                     return False
             # Here the handler decorator has no ingestion_type specifier or if it does
-            # it indicates that this message is intended to be processed by this handler 
+            # it indicates that this message is intended to be processed by this handler
             # and we will call it here, returning its value, which, if True, indicates that
             # the message was actually processed, or if False, that it was not processed.
             return True if wrapped_function(*args, **kwargs) else False

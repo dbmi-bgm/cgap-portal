@@ -3,21 +3,50 @@ import structlog
 from dcicutils.misc_utils import ignored, PRINT
 from .ingestion.common import metadata_bundles_bucket
 from .ingestion.processors import get_ingestion_processor
-from .types.ingestion import SubmissionFolio
-from .util import (
-    debuglog,
-    vapp_for_email,
-    make_s3_client,
-)
 from .ingestion_listener import IngestionListener
-from .ingestion_listener_defs import (
-    DEBUG_SUBMISSIONS,
-)
+from .ingestion_listener_defs import DEBUG_SUBMISSIONS
 from .ingestion_message import IngestionMessage
 from .ingestion_message_handler_decorator import ingestion_message_handler
+from .types.ingestion import SubmissionFolio
+from .util import (debuglog, vapp_for_email, make_s3_client)
 
 
 log = structlog.getLogger(__name__)
+
+
+@ingestion_message_handler(ingestion_type=lambda message: not message.is_vcf())
+def ingestion_message_handler_novcf(message: IngestionMessage, listener: IngestionListener) -> bool:
+    """
+    This is the part of listener.IngestionListener.run function which handles a
+    single message within the (effectively-infinite) incoming message handling loop,
+    specifically for non-VCF files; refactored out of ingestion_listener.py February 2023.
+    Returns True if the message was successfully handled, otherwise False.
+    """
+
+    # Let's minimally disrupt things for now. We can refactor this later
+    # to make all the parts work the same -kmp
+    if listener.INGEST_AS_USER:
+        try:
+            debuglog("REQUESTING RESTRICTED PROCESSING:", message.uuid)
+            process_submission(submission_id=message.uuid,
+                               ingestion_type=message.type,
+                               # bundles_bucket=submission.bucket,
+                               app=listener.vapp.app)
+            debuglog("RESTRICTED PROCESSING DONE:", message.uuid)
+        except Exception as e:
+            log.error(e)
+    else:
+        submission = SubmissionFolio(vapp=listener.vapp, ingestion_type=message.type,
+                                     submission_id=message.uuid)
+        handler = get_ingestion_processor(message.type)
+        try:
+            debuglog("HANDLING:", message.uuid)
+            handler(submission)
+            debuglog("HANDLED:", message.uuid)
+        except Exception as e:
+            log.error(e)
+    # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
+    return True
 
 
 def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=None, s3_client=None):
@@ -52,32 +81,3 @@ def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=Non
             "ingestion_type": ingestion_type,
             "submission_id": submission_id,
         }
-
-
-@ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
-def ingestion_message_handler_novcf(message: IngestionMessage, listener: IngestionListener) -> bool:
-
-    # Let's minimally disrupt things for now. We can refactor this later
-    # to make all the parts work the same -kmp
-    if listener.INGEST_AS_USER:
-        try:
-            debuglog("REQUESTING RESTRICTED PROCESSING:", message.uuid)
-            process_submission(submission_id=message.uuid,
-                               ingestion_type=message.type,
-                               # bundles_bucket=submission.bucket,
-                               app=listener.vapp.app)
-            debuglog("RESTRICTED PROCESSING DONE:", message.uuid)
-        except Exception as e:
-            log.error(e)
-    else:
-        submission = SubmissionFolio(vapp=listener.vapp, ingestion_type=message.type,
-                                     submission_id=message.uuid)
-        handler = get_ingestion_processor(message.type)
-        try:
-            debuglog("HANDLING:", message.uuid)
-            handler(submission)
-            debuglog("HANDLED:", message.uuid)
-        except Exception as e:
-            log.error(e)
-    # If we suceeded, we don't need to do it again, and if we failed we don't need to fail again.
-    return True
