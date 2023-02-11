@@ -114,9 +114,18 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                 message = args[0]
                 if callable(ingestion_type):
                     if not ingestion_type(message):
+                        # Since the ingestion_type specified for the handler decorator
+                        # is a lambda which returned falsity, then this message is not
+                        # intended to be processed by this handler and will not be called.
                         return False
                 elif not message.is_type(ingestion_type):
+                    # Since the ingestion_type specified for the handler decorator is string
+                    # which does not match the type of the message, then this message is not
+                    # intended to be processed by this handler and will not be called.
                     return False
+            # Here the handler decorator has no ingestion_type specifier or if it does
+            # it indicates that this message is intended to be processed by this handler 
+            # and we will call it here, returning its value. 
             return wrapped_function(*args, **kwargs)
 
         _ingestion_message_handlers.append(lambda args, kwargs: ingestion_message_handler_function(args, kwargs))
