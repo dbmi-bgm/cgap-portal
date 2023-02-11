@@ -6,19 +6,6 @@ from encoded.ingestion_message import IngestionMessage
 _ingestion_message_handlers = []
 
 
-def get_ingestion_message_handlers():
-    """
-    Resturns a list of all registered ingestion message handler functions.
-    Example usage is like this:
-
-      listener: IngestionListener = get_reference_to_your_ingestion_listener()
-      message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
-      for handler in get_ingestion_message_handlers():
-          handler(message, listener)
-    """
-    return _ingestion_message_handlers
-
-
 def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     """
     Decorator to globally register ingestion message handlers, to be used for example like this:
@@ -27,7 +14,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
-    Once registered the get_ingestion_message_handlers function in this module (above)
+    Once registered the get_ingestion_message_handlers function in this module (below)
     can be used to get a list of all registered ingestion message handler functions.
     And/or the call_ingestion_message_handler function (below) can be used to iterate
     thru and call (at most one) registered message handler for a given message.
@@ -139,17 +126,33 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     return ingestion_message_handler_wrapper(f) if not has_decorator_args else ingestion_message_handler_wrapper
 
 
+def get_ingestion_message_handlers():
+    """
+    Resturns a list of all registered ingestion message handler functions.
+    Example usage is like this:
+
+      listener: IngestionListener = get_reference_to_your_ingestion_listener()
+      message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
+      for handler in get_ingestion_message_handlers():
+          handler(message, listener)
+    """
+    return _ingestion_message_handlers
+
+
 def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
     Calls at most one of the ingestion message handler functions registered via
     the @ingestion_message_handler decorator, for the given message, and listener.
     If a handler is called then returns True, otherwise returns False.
 
-    Though NOTE that this "at most" is controlled by the handler function itself;
+    NOTE however that this "at most" is controlled by the handler function itself;
     if a handler function returns True it conveys that the message was handled,
     and that no more handlers should be called, and that it should be discarded
     from future processing; otherwise it is assumed the message was not handled,
     and further handlers should be called for the message, until one returns True.
+
+    Also NOTE that the order the registered ingestion message handlers is the order
+    in which they were defined, but this ordering should NEVER be relied upon.
     """
     if not isinstance(message, IngestionMessage):
         # Allow passing a non-IngestionMessage type message, which we will
