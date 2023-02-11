@@ -1,3 +1,7 @@
+# Module containing the definition of the @ingestion_message_handler decorator used
+# to globally register ingestion message handler functions, as well as functions to
+# get the list of registered handler functions and to call them for a given message.
+
 from dcicutils.misc_utils import ignored, PRINT
 import inspect
 from encoded.ingestion_message import IngestionMessage
@@ -22,24 +26,24 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     Although any function may be annotated with this decorator, at this time and for our purposes
     it is expected to have a signature as show in the example above; this IS enforced to some extent.
 
-    In addition, you can pass an type argument to the decorator to LIMIT the call of the
-    decorated function to messages with an ingestion type which matches the given value
-    if it is a string, or if it is a function/lambda then iff a call to that function,
-    with the message as an argument, returns True. For example, to define a message
-    handler to be called ONLY for message types which are "vcf".
+    In addition, you can pass an type argument to the decorator to LIMIT the call of the decorated
+    handler function to messages with an ingestion type which matches the given value, if it is a
+    string, or if it is a function/lambda, then iff a call to that function, with the message as
+    an argument, returns True. For example, to define a message handler to be called ONLY for
+    message types which are "vcf":
 
-      @ingestion_message_handler(type="vcf")
+      @ingestion_message_handler(ingestion_type="vcf")
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     or with a lambda, for example like this:
 
-      @ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
+      @ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     In this example, the handler would ONLY be called for message types which are NOT "vcf".
-    Note that type names case-insenstive.
+    Note that ingestion type names are in both cases treated as case-insenstive.
     """
     ignored(decorator_args)
     has_decorator_args = True if not callable(f) or f.__name__ == "<lambda>" else False
@@ -141,15 +145,15 @@ def get_ingestion_message_handlers():
 
 def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
-    Calls at most one of the ingestion message handler functions registered via
-    the @ingestion_message_handler decorator, for the given message, and listener.
-    If a handler is called then returns True, otherwise returns False.
+    Calls at most (nominally - see below) one of the ingestion message handler functions
+    registered via the @ingestion_message_handler decorator, for the given message, and
+    listener. If at least one handler was called then returns True, otherwise returns False.
 
-    NOTE however that this "at most" is controlled by the handler function itself;
-    if a handler function returns True it conveys that the message was handled,
-    and that no more handlers should be called, and that it should be discarded
-    from future processing; otherwise it is assumed the message was not handled,
-    and further handlers should be called for the message, until one returns True.
+    NOTE however that this "at most" is controlled by the handler function itself; if a handler
+    function returns True (the expected/typical case) it conveys that the message WAS processed,
+    and that no more handlers should be called (and presumably that it should be discarded by
+    the caller from any future processing; otherwise it is assumed that the message was NOT
+    processed, and further handlers would be called for the message, until one returns True.
 
     Also NOTE that the order the registered ingestion message handlers is the order
     in which they were defined, but this ordering should NEVER be relied upon.
