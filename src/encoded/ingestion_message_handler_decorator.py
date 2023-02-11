@@ -19,16 +19,16 @@ def get_ingestion_message_handlers():
 
 def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     """
-    Decorator to define ingestion message handlers, to be used for example like this:
+    Decorator to globally register ingestion message handlers, to be used for example like this:
 
         @ingestion_message_handler
-        your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
+        your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     Once registered the get_ingestion_message_handlers function in this module (above)
     can be used to get a list of all registered ingestion message handler functions.
-    And or the call_ingestion_message_handler function (below) can be used to iterate
-    thru and call (at most one) message handler for a given message.
+    And/or the call_ingestion_message_handler function (below) can be used to iterate
+    thru and call (at most one) registered message handler for a given message.
 
     Although any function may be annotated with this decorator, at this time and for our purposes
     it is expected to have a signature as show in the example above; this IS enforced to some extent.
@@ -40,13 +40,13 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     handler to be called only for message types which are "vcf".
 
         @ingestion_message_handler(type="vcf")
-        your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
+        your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     or with a lambda, for example like this:
 
         @ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
-        your_ingester_message_handler(message: IngestionMessage, listener: IngestionLister) -> bool:
+        your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
             return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     In this example, the handler would only be called for message types which are NOT "vcf".
@@ -68,10 +68,12 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
         # Check the signature of the ingestion message handler function.
         # it should contain two arguments with either no type hints/annotations or if
-        # present then they should be for IngestionMessage and IngestionListener, respectively.
+        # present then they should be for IngestionMessage and IngestionListener, respectively;
+        # and if it contains a return value hint, it should be of type bool.
         wrapped_function_signature = inspect.signature(wrapped_function)
         if len(wrapped_function_signature.parameters) < 2:
-            raise Exception(f"Too few arguments (need two) for ingestion handler function: {wrapped_function.__name__}")
+            raise Exception(f"Too few arguments (need two) "
+                            f"for ingestion handler function: {wrapped_function.__name__}")
         if len(wrapped_function_signature.parameters) > 2:
             raise Exception(f"Too many arguments (need two) "
                             f"for ingestion handler function: {wrapped_function.__name__}")
