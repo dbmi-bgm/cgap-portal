@@ -162,58 +162,65 @@ def test_ingestion_message_handler_decorator():
     # Note we rely on handlers being called in order of declaration just for testing;
     # in real life such ordering should not be relied upon; though actually in real
     # life we probably won't even use this functionality of multiple handlers being
-    # called for a message via the return of a non-True value from the handler.
+    # called for a message via the return of a non-True value from the handler, i.e.
+    # the stuff that this "unprocessed" feature supports in these tests.
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF)
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b,c")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b,c,d")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf", "e/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b,c,d,e")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf", "e/vcf", "f/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b,c,d,e,f")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf", "e/vcf", "f/vcf", "g/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b,c,d,e,f,g")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf", "e/vcf", "f/vcf", "g/vcf", "h/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF, unprocessed="a,b,c,d,e,f,g,h")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is False
     assert handler_calls == {"a/vcf", "b/vcf", "c/vcf", "d/vcf", "e/vcf", "f/vcf", "g/vcf", "h/vcf"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_NOVCF, unprocessed="a,b,c,d,e")
-    call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
     assert handler_calls == {"a/xyz", "b/xyz", "c/xyz", "d/xyz", "e/xyz", "i/xyz"}
-
-    #handler_calls = set()
-    #call_ingestion_message_handler(raw_message_novcf, INGESTION_LISTENER)
-    #assert handler_calls == {"a/xyz", "b/xyz", "c/xyz", "d/xyz", "i/xyz"}
