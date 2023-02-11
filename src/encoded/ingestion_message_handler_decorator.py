@@ -9,10 +9,10 @@ def get_ingestion_message_handlers():
     Resturns a list of all registered ingestion message handler functions.
     Example usage is like this:
 
-        listener: IngestionListener = get_reference_to_your_ingestion_listener()
-        message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
-        for handler in get_ingestion_message_handlers():
-            handler(message, listener)
+      listener: IngestionListener = get_reference_to_your_ingestion_listener()
+      message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
+      for handler in get_ingestion_message_handlers():
+          handler(message, listener)
     """
     return _ingestion_message_handlers
 
@@ -21,9 +21,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     """
     Decorator to globally register ingestion message handlers, to be used for example like this:
 
-        @ingestion_message_handler
-        your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
-            return handle_message_returning_true_if_interested_and_successful_otherwise_false()
+      @ingestion_message_handler
+      your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
+          return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     Once registered the get_ingestion_message_handlers function in this module (above)
     can be used to get a list of all registered ingestion message handler functions.
@@ -37,19 +37,19 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     decorated function to messages with an ingestion type which matches the given value
     if it is a string, or if it is a function/lambda then iff a call to that function,
     with the message as an argument, returns True. For example, to define a message
-    handler to be called only for message types which are "vcf".
+    handler to be called ONLY for message types which are "vcf".
 
-        @ingestion_message_handler(type="vcf")
-        your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
-            return handle_message_returning_true_if_interested_and_successful_otherwise_false()
+      @ingestion_message_handler(type="vcf")
+      your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
+          return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
     or with a lambda, for example like this:
 
-        @ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
-        your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
-            return handle_message_returning_true_if_interested_and_successful_otherwise_false()
+      @ingestion_message_handler(type=lambda message: not message.is_type("vcf"))
+      your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
+          return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
-    In this example, the handler would only be called for message types which are NOT "vcf".
+    In this example, the handler would ONLY be called for message types which are NOT "vcf".
     Note that type names case-insenstive.
     """
     ignored(decorator_args)
