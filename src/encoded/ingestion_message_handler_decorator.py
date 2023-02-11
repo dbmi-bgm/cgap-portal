@@ -149,8 +149,8 @@ def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     and further handlers should be called for the message, until one returns True.
     """
     if not isinstance(message, IngestionMessage):
-        # Allow passing a raw (non-IngestionMessage type) message, which we
-        # will assume is a raw message from which we create an IngestionMessage.
+        # Allow passing a non-IngestionMessage type message, which we will
+        # assume is a raw message from which we create an IngestionMessage.
         message = IngestionMessage(message)
     for handler in get_ingestion_message_handlers():
         if handler(message, listener) is True:
