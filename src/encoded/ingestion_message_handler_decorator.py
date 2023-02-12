@@ -34,7 +34,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
       @ingestion_message_handler(ingestion_type="vcf")
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
-          return handle_message_returning_true_if_interested_and_successful_otherwise_false()
+          return handle_message_returning_true_if_processed_otherwise_false()
 
     or an example using a lambda instead looks like this:
 
@@ -79,7 +79,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         if first_parameter and len(first_parameter) >= 2:
             first_parameter_annotation = first_parameter[1].annotation
             if not first_parameter_annotation or (first_parameter_annotation.__name__ != "_empty" and
-                                                  first_parameter_annotation != IngestionMessage):
+                                                  not issubclass(first_parameter_annotation, IngestionMessage)):
                 raise Exception(f"Wrong first argument type (need unspecified or IngestionMessage) "
                                 f"for ingestion handler function: {wrapped_function.__name__}")
         second_parameter = next(parameters)
@@ -87,7 +87,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             second_parameter_annotation = second_parameter[1].annotation
             if not second_parameter_annotation or (second_parameter_annotation.__name__ != "_empty" and
                                                    second_parameter_annotation.__name__ != "IngestionListener"):
-                # We only check the for type name of the type of the second IngestionListener argument;
+                # We only check the for type NAME of the type of the second IngestionListener argument;
                 # we cannot import the IngestionListener because would be a recursive import.
                 raise Exception(f"Wrong second argument type (need unspecified or IngestionListener) "
                                 f"for ingestion handler function: {wrapped_function.__name__}")
@@ -145,7 +145,7 @@ def get_ingestion_message_handlers():
 
 def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
-    Calls at most (nominally - see below) one of the ingestion message handler functions
+    Calls at most one (nominally - see below) of the ingestion message handler functions
     registered via the @ingestion_message_handler decorator, for the given message, and
     listener. If at least one handler was called then returns True, otherwise returns False.
 
