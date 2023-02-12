@@ -160,7 +160,7 @@ def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     function returns True (the expected/typical case) it conveys that the message WAS processed,
     and that no more handlers should be called (and presumably that it should be discarded by
     the caller from any future processing); otherwise it is assumed that the message was NOT
-    processed, and further handlers would be called for the message, until one returns True.
+    processed, and further handlers WOULD be called for the message, until one returns True.
 
     Also NOTE that the order the registered ingestion message handlers happens to be in
     the order in which they were defined, but this ordering should NEVER be relied upon.
