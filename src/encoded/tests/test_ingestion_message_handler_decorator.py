@@ -15,7 +15,7 @@ class IngestionListener(IngestionListenerBase):
 SOME_UUID = "some-uuid-xyzzy"
 INGESTION_LISTENER = IngestionListener()
 INGESTION_TYPE_VCF = "vcf"
-INGESTION_TYPE_NOVCF = "xyz"
+INGESTION_TYPE_NOVCF = "novcf"
 
 
 def create_raw_message(ingestion_type: str, unprocessed: str = None) -> dict:
@@ -81,7 +81,7 @@ def test_ingestion_message_handler_decorator():
     def a(message: IngestionMessage, listener: IngestionListener) -> bool:
         this_function_name = "a"
         handler_calls.add(f"{this_function_name}/{message.type}")
-        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("xyz")
+        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("novcf")
         assert message.uuid == SOME_UUID
         assert listener is INGESTION_LISTENER
         return message_processed(message, this_function_name)
@@ -90,7 +90,7 @@ def test_ingestion_message_handler_decorator():
     def b(message: IngestionMessage, listener: IngestionListener):
         this_function_name = "b"
         handler_calls.add(f"{this_function_name}/{message.type}")
-        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("xyz")
+        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("novcf")
         assert message.uuid == SOME_UUID
         assert listener is INGESTION_LISTENER
         return message_processed(message, this_function_name)
@@ -99,7 +99,7 @@ def test_ingestion_message_handler_decorator():
     def c(message: IngestionMessage, listener):
         this_function_name = "c"
         handler_calls.add(f"{this_function_name}/{message.type}")
-        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("xyz")
+        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("novcf")
         assert message.uuid == SOME_UUID
         assert listener is INGESTION_LISTENER
         return message_processed(message, this_function_name)
@@ -108,7 +108,7 @@ def test_ingestion_message_handler_decorator():
     def d(message, listener: IngestionListener):
         this_function_name = "d"
         handler_calls.add(f"{this_function_name}/{message.type}")
-        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("xyz")
+        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("novcf")
         assert message.uuid == SOME_UUID
         assert listener is INGESTION_LISTENER
         return message_processed(message, this_function_name)
@@ -117,7 +117,7 @@ def test_ingestion_message_handler_decorator():
     def e(message, listener):
         this_function_name = "e"
         handler_calls.add(f"{this_function_name}/{message.type}")
-        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("xyz")
+        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type("novcf")
         assert message.uuid == SOME_UUID
         assert listener is INGESTION_LISTENER
         return message_processed(message, this_function_name)
@@ -158,7 +158,16 @@ def test_ingestion_message_handler_decorator():
         assert listener is INGESTION_LISTENER
         return message_processed(message, this_function_name)
 
-    assert len(get_ingestion_message_handlers()) == 9
+    @ingestion_message_handler(ingestion_type=lambda message: not message.is_type(INGESTION_TYPE_VCF))
+    def j(message, listener):
+        this_function_name = "j"
+        handler_calls.add(f"{this_function_name}/{message.type}")
+        assert not message.is_type(INGESTION_TYPE_VCF)
+        assert message.uuid == SOME_UUID
+        assert listener is INGESTION_LISTENER
+        return message_processed(message, this_function_name)
+
+    assert len(get_ingestion_message_handlers()) == 10
 
     # Note we rely on handlers being called in order of definition just for testing;
     # in real life such ordering should not be relied upon; though actually in
@@ -224,4 +233,10 @@ def test_ingestion_message_handler_decorator():
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_NOVCF, unprocessed="a,b,c,d,e")
     result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
     assert result is True
-    assert handler_calls == {"a/xyz", "b/xyz", "c/xyz", "d/xyz", "e/xyz", "i/xyz"}
+    assert handler_calls == {"a/novcf", "b/novcf", "c/novcf", "d/novcf", "e/novcf", "i/novcf"}
+
+    handler_calls = set()
+    ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_NOVCF, unprocessed="a,b,c,d,e,i")
+    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert result is True
+    assert handler_calls == {"a/novcf", "b/novcf", "c/novcf", "d/novcf", "e/novcf", "i/novcf", "j/novcf"}
