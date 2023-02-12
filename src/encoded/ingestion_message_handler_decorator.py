@@ -41,7 +41,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
       @ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
-          return handle_message_returning_true_if_interested_and_successful_otherwise_false()
+          return handle_message_returning_true_if_processed_otherwise_false()
 
     In this example, the handler would ONLY be called for message types which are NOT "vcf".
     Note that ingestion type names are in both cases treated as case-insenstive.
