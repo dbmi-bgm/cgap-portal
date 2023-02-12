@@ -483,7 +483,6 @@ class IngestionListener:
 
             # ingest each VCF file
             for message in list(messages):
-
                 # C4-990/2023-02-09/dmichaels
                 # Added the list wrapper around messages in the above loop,
                 # i.e. list(messages), so that when we remove a message from
@@ -493,7 +492,10 @@ class IngestionListener:
                 debuglog("Message:", message)
 
                 # C4-990/2023-02-09/dmichaels
+                # This calls at most one our message handlers
+                # registered via the @ingestion_message_handler decorator.
                 if call_ingestion_message_handler(message, self):
+                    # Here one of our message handlers was called and it processed this message.
                     discard(message)
 
             # This is just fallback cleanup in case messages weren't cleaned up within the loop.

@@ -21,7 +21,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     Once registered the get_ingestion_message_handlers function in this module (below)
     can be used to get a list of all registered ingestion message handler functions.
     And/or the call_ingestion_message_handler function (below) can be used to iterate
-    thru and call (at most one) registered message handler for a given message.
+    thru and call (at most one, nominally) registered message handler for a given message.
 
     Although any function may be annotated with this decorator, at this time and for our purposes
     it is expected to have a signature as show in the example above; this IS enforced to some extent.
@@ -36,7 +36,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_interested_and_successful_otherwise_false()
 
-    or with a lambda, for example like this:
+    or an example using a lambda instead looks like this:
 
       @ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
