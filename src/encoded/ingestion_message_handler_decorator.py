@@ -144,12 +144,12 @@ def get_ingestion_message_handlers():
       for handler in get_ingestion_message_handlers():
           handler(message, listener)
 
-    Note that this example will invoke ALL handlers which are targeted for the given
-    message type as controlled by any ingestion_type which might be specified on the
-    @ingestion_message_handler decorator for the handler function; this is in CONTRAST
-    to the behavior of the call_ingestion_message_handler function (below) which stops
+    Note that in this example we will invoke ALL handlers which are targeted for the given
+    message type as controlled by any ingestion_type which might have been specified for
+    the @ingestion_message_handler decorator for the handler function; this is in CONTRAST
+    to the behavior of the call_ingestion_message_handler function (below) which STOPS
     calling any handlers once ONE of them return True (indicating that that message
-    has indeed been processed).
+    has indeed been successfully processed).
     """
     return _ingestion_message_handlers
 
@@ -157,21 +157,21 @@ def get_ingestion_message_handlers():
 def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
     Calls at most one (nominally - see below) of the ingestion message handler functions
-    registered via the @ingestion_message_handler decorator, for the given message, and
-    listener. If at least one handler was called then returns True, otherwise returns False.
+    globally registered via the @ingestion_message_handler decorator, for the given message,
+    and listener. If at least ONE handler was called then returns True, otherwise returns False.
 
-    NOTE however that this "at most" is controlled by the handler function itself; if a handler
+    NOTE however that this "at most" is controlled by the handler function ITSELF; if a handler
     function returns True (the expected/typical case) it conveys that the message WAS processed,
-    and that no more handlers should be called (and presumably that it should be discarded by
+    and that NO more handlers should be called (and presumably that it should be discarded by
     the caller from any future processing); otherwise it is assumed that the message was NOT
-    processed, and further handlers WOULD be called for the message, until one returns True.
+    processed, and further handlers WOULD be called for the message, until ONE returns True.
 
-    Also NOTE that the order the registered ingestion message handlers happens to be in
-    the order in which they were defined, but this ordering should NEVER be relied upon.
+    Also NOTE that the order in which the registered ingestion message handlers are called is
+    the same the order in which they were defined, but this ordering should NOT be relied upon.
     """
     if not isinstance(message, IngestionMessage):
-        # Allow passing a non-IngestionMessage type message, which we will
-        # assume is a raw message from which we create an IngestionMessage.
+        # Allow passing a message which is NOT of type IngestionMessage, which we
+        # will ASSUME is a RAW message from which we create an IngestionMessage.
         message = IngestionMessage(message)
     for handler in get_ingestion_message_handlers():
         if handler(message, listener) is True:
