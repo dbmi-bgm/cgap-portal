@@ -149,7 +149,7 @@ def get_ingestion_message_handlers():
     the @ingestion_message_handler decorator for the handler function; this is in CONTRAST
     to the behavior of the call_ingestion_message_handler function (below) which STOPS
     calling any handlers once ONE of them return True (indicating that that message
-    has indeed been successfully processed).
+    has indeed been successfully processed, and not further processing is desired).
     """
     return _ingestion_message_handlers
 
