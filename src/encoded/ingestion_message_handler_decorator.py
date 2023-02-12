@@ -17,7 +17,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
       @ingestion_message_handler
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
-          return handle_message_returning_true_if_interested_and_successful_otherwise_false()
+          return handle_message_returning_true_if_processed_otherwise_false()
 
     Once registered the get_ingestion_message_handlers function in this module (below)
     can be used to get a list of all registered ingestion message handler functions.
