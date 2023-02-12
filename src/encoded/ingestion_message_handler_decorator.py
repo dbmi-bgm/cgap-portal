@@ -4,6 +4,7 @@
 
 import inspect
 from dcicutils.misc_utils import ignored, PRINT
+from .ingestion_listener_base import IngestionListenerBase
 from .ingestion_message import IngestionMessage
 
 
@@ -86,9 +87,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         if second_parameter and len(second_parameter) >= 2:
             second_parameter_annotation = second_parameter[1].annotation
             if not second_parameter_annotation or (second_parameter_annotation.__name__ != "_empty" and
-                                                   second_parameter_annotation.__name__ != "IngestionListener"):
-                # We only check the for type NAME of the type of the second IngestionListener argument;
-                # we cannot import the IngestionListener because would be a recursive import.
+                                                   not issubclass(second_parameter_annotation, IngestionListenerBase)):
                 raise Exception(f"Wrong second argument type (need unspecified or IngestionListener) "
                                 f"for ingestion handler function: {wrapped_function.__name__}")
         if ingestion_type:
@@ -142,9 +141,9 @@ def get_ingestion_message_handlers():
 
     Note that this example will invoke ALL handlers which are targeted for the given
     message type as controlled by any ingestion_type which might be specified on the
-    @ingestion_message_handler decorator for the handler function; this is in contrast
+    @ingestion_message_handler decorator for the handler function; this is in CONTRAST
     to the behavior of the call_ingestion_message_handler function (below) which stops
-    calling any handlers once one of them return True (indicating that that message
+    calling any handlers once ONE of them return True (indicating that that message
     has indeed been processed).
     """
     return _ingestion_message_handlers

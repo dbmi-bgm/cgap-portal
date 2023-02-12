@@ -5,8 +5,8 @@ class IngestionMessage:
 
     TYPE_VCF = "vcf"
 
-    def __init__(self, message: dict) -> None:
-        self.body = json.loads(message["Body"]) or {}
+    def __init__(self, raw_message: dict) -> None:
+        self.body = json.loads(raw_message["Body"]) or {}
         self.uuid = self.body["uuid"] or ""
         self.type = self.body.get("ingestion_type", "vcf") or ""
 

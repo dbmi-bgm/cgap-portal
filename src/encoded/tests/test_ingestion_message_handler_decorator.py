@@ -1,5 +1,6 @@
 import pytest
 from encoded.ingestion_message import IngestionMessage
+from encoded.ingestion_listener_base import IngestionListenerBase
 from encoded.ingestion_message_handler_decorator import (
     call_ingestion_message_handler,
     get_ingestion_message_handlers,
@@ -7,7 +8,7 @@ from encoded.ingestion_message_handler_decorator import (
 )
 
 
-class IngestionListener:
+class IngestionListener(IngestionListenerBase):
     pass # dummy
 
 

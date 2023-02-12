@@ -359,7 +359,7 @@ def get_queue_manager(request, *, override_name):
             else IngestionQueueManager(request.registry, override_name=override_name))
 
 
-class IngestionListener:
+class IngestionListener(IngestionListenerBase):
     """ Organizes helper functions for the ingestion listener """
     POLL_INTERVAL = 10  # seconds between each poll
     INGEST_AS_USER = environ_bool('INGEST_AS_USER', default=True)  # The new way, but possible to disable for now
