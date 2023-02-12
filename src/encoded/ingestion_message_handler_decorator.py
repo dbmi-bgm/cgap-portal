@@ -110,16 +110,16 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                 if callable(ingestion_type):
                     if not ingestion_type(message):
                         # Since the ingestion_type specified for the handler decorator
-                        # is a lambda which returned falsity, then this message is not
+                        # is a lambda which returned falsity, then this message is NOT
                         # intended to be processed by this handler and will not be called.
                         return False
                 elif not message.is_type(ingestion_type):
                     # Since the ingestion_type specified for the handler decorator is string
-                    # which does not match the type of the message, then this message is not
+                    # which does not match the type of the message, then this message is NOT
                     # intended to be processed by this handler and will not be called.
                     return False
             # Here the handler decorator has no ingestion_type specifier or if it does
-            # it indicates that this message is intended to be processed by this handler
+            # it indicates that this message IS intended to be processed by this handler
             # and we will call it here, returning its value, which, if True, indicates that
             # the message was actually processed, or if False, that it was not processed.
             return True if wrapped_function(*args, **kwargs) else False
@@ -139,6 +139,13 @@ def get_ingestion_message_handlers():
       message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
       for handler in get_ingestion_message_handlers():
           handler(message, listener)
+
+    Note that this example will invoke ALL handlers which are targeted for the given
+    message type as controlled by any ingestion_type which might be specified on the
+    @ingestion_message_handler decorator for the handler function; this is in contrast
+    to the behavior of the call_ingestion_message_handler function (below) which stops
+    calling any handlers once one of them return True (indicating that that message
+    has indeed been processed).
     """
     return _ingestion_message_handlers
 
