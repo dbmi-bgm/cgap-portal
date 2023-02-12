@@ -27,11 +27,11 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     Although any function may be annotated with this decorator, at this time and for our purposes
     it is expected to have a signature as show in the example above; this IS enforced to some extent.
 
-    In addition, you can pass an type argument to the decorator to LIMIT the call of the decorated
-    handler function to messages with an ingestion type which matches the given value, if it is a
-    string, or if it is a function/lambda, then iff a call to that function, with the message as
-    an argument, returns True. For example, to define a message handler to be called ONLY for
-    message types which are "vcf":
+    In addition, you can pass an ingestion_type argument to the decorator to LIMIT the call of the
+    decorated handler function to messages with an ingestion type which matches the specified value,
+    if it is a string, or if it is a function/lambda, then iff a call to that function, with the
+    message passed as an argument, returns True. For example, to define a message handler to be
+    called ONLY for message types which are "vcf":
 
       @ingestion_message_handler(ingestion_type="vcf")
       your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
@@ -63,9 +63,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     def ingestion_message_handler_wrapper(wrapped_function):
 
         # Check the signature of the ingestion message handler function.
-        # it should contain two arguments with either no type hints/annotations or if
-        # present then they should be for IngestionMessage and IngestionListener, respectively;
-        # and if it contains a return value hint, it should be of type bool.
+        # It should contain two arguments with either no type annotations or if present
+        # then they should be for IngestionMessage and IngestionListener, respectively;
+        # and if it contains a return value annotation, it should be of type bool.
         wrapped_function_signature = inspect.signature(wrapped_function)
         if len(wrapped_function_signature.parameters) < 2:
             raise Exception(f"Too few arguments (need two) "
@@ -74,7 +74,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             raise Exception(f"Too many arguments (need two) "
                             f"for ingestion handler function: {wrapped_function.__name__}")
         return_annotation = wrapped_function_signature.return_annotation
-        if not return_annotation or (return_annotation.__name__ != "_empty" and return_annotation.__name__ != "bool"):
+        if not return_annotation or (return_annotation.__name__ != "_empty" and
+                                     return_annotation != bool):
             raise Exception(f"Wrong return value type (need unspecified or bool) "
                             f"for ingestion handler function: {wrapped_function.__name__}")
         parameters = iter(wrapped_function_signature.parameters.items())
