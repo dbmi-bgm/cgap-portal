@@ -113,12 +113,12 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                     if not ingestion_type(message):
                         # Since the ingestion_type specified for the handler decorator
                         # is a lambda which returned falsity, then this message is NOT
-                        # intended to be processed by this handler and will not be called.
+                        # intended to be processed by this handler, it will not be called.
                         return False
                 elif not message.is_type(ingestion_type):
                     # Since the ingestion_type specified for the handler decorator is string
                     # which does not match the type of the message, then this message is NOT
-                    # intended to be processed by this handler and will not be called.
+                    # intended to be processed by this handler, it will not be called.
                     return False
             # Here the handler decorator has no ingestion_type specifier or if it does
             # it indicates that this message IS intended to be processed by this handler
