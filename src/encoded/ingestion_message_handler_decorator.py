@@ -68,31 +68,31 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         # and if it contains a return value annotation, it should be of type bool.
         wrapped_function_signature = inspect.signature(wrapped_function)
         if len(wrapped_function_signature.parameters) < 2:
-            raise Exception(f"Too few arguments (need two) "
-                            f"for ingestion handler function: {wrapped_function.__name__}")
+            raise ValueError(f"Too few arguments (need two) "
+                             f"for ingestion handler function: {wrapped_function.__name__}")
         if len(wrapped_function_signature.parameters) > 2:
-            raise Exception(f"Too many arguments (need two) "
-                            f"for ingestion handler function: {wrapped_function.__name__}")
+            raise ValueError(f"Too many arguments (need two) "
+                             f"for ingestion handler function: {wrapped_function.__name__}")
         return_annotation = wrapped_function_signature.return_annotation
         if not return_annotation or (return_annotation.__name__ != "_empty" and
                                      return_annotation != bool):
-            raise Exception(f"Wrong return value type (need unspecified or bool) "
-                            f"for ingestion handler function: {wrapped_function.__name__}")
+            raise ValueError(f"Wrong return value type (need unspecified or bool) "
+                             f"for ingestion handler function: {wrapped_function.__name__}")
         parameters = iter(wrapped_function_signature.parameters.items())
         first_parameter = next(parameters)
         if first_parameter and len(first_parameter) >= 2:
             first_parameter_annotation = first_parameter[1].annotation
             if not first_parameter_annotation or (first_parameter_annotation.__name__ != "_empty" and
                                                   not issubclass(first_parameter_annotation, IngestionMessage)):
-                raise Exception(f"Wrong first argument type (need unspecified or IngestionMessage) "
-                                f"for ingestion handler function: {wrapped_function.__name__}")
+                raise ValueError(f"Wrong first argument type (need unspecified or IngestionMessage) "
+                                 f"for ingestion handler function: {wrapped_function.__name__}")
         second_parameter = next(parameters)
         if second_parameter and len(second_parameter) >= 2:
             second_parameter_annotation = second_parameter[1].annotation
             if not second_parameter_annotation or (second_parameter_annotation.__name__ != "_empty" and
                                                    not issubclass(second_parameter_annotation, IngestionListenerBase)):
-                raise Exception(f"Wrong second argument type (need unspecified or IngestionListener) "
-                                f"for ingestion handler function: {wrapped_function.__name__}")
+                raise ValueError(f"Wrong second argument type (need unspecified or IngestionListener) "
+                                 f"for ingestion handler function: {wrapped_function.__name__}")
         if ingestion_type:
             if callable(ingestion_type):
                 PRINT(f"Registering message handler: {wrapped_function.__name__} (type: <lambda>)")
