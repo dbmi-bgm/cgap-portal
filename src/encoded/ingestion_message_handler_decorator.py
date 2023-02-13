@@ -156,7 +156,7 @@ def get_ingestion_message_handlers():
 
 def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
-    Calls at most one (nominally - see below) of the ingestion message handler functions
+    Calls AT MOST one (NOMINALLY - see below) of the ingestion message handler functions
     globally registered via the @ingestion_message_handler decorator, for the given message,
     and listener. If at least ONE handler was called then returns True, otherwise returns False.
 
@@ -170,8 +170,8 @@ def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     the same the order in which they were defined, but this ordering should NOT be relied upon.
     """
     if not isinstance(message, IngestionMessage):
-        # Allow passing a message which is NOT of type IngestionMessage, which we
-        # will ASSUME is a RAW message from which we create an IngestionMessage.
+        # Allow passing a message which is NOT of type IngestionMessage, which we will
+        # ASSUME in this case is a RAW message from which we create an IngestionMessage.
         message = IngestionMessage(message)
     for handler in get_ingestion_message_handlers():
         if handler(message, listener) is True:
