@@ -20,8 +20,10 @@ INGESTION_TYPE_NOVCF = "novcf"
 
 def create_raw_message(ingestion_type: str, unprocessed: str = None) -> dict:
     if unprocessed:
-        # For testing this is a comma-separted list of handler function names
-        # indicating the handler function should return False rather than True.
+        # For testing this is a comma-separated list of handler function names
+        # indicating the handler function should return False rather than True;
+        # this False will indicate, to call_ingestion_message_handler, that the message
+        # was not processed and the ingestion message handler call loop should continue.
         return {"Body": f"{{\"uuid\":\"{SOME_UUID}\", \"ingestion_type\":\"{ingestion_type}\",\"unprocessed\":\"{unprocessed}\"}}"}
     else:
         return {"Body": f"{{\"uuid\":\"{SOME_UUID}\", \"ingestion_type\":\"{ingestion_type}\"}}"}

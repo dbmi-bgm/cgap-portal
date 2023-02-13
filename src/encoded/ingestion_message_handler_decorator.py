@@ -63,7 +63,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
     def ingestion_message_handler_wrapper(wrapped_function):
 
-        # Check the signature of the ingestion message handler function.
+        # Sanity check the signature of the decorated ingestion message handler function.
         # It should contain two arguments with either no type annotations or if present
         # then they should be for IngestionMessage and IngestionListener, respectively;
         # and if it contains a return value annotation, it should be of type bool.
