@@ -136,8 +136,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
 def get_ingestion_message_handlers():
     """
-    Resturns a list of all globally registered ingestion message handler functions.
-    Example usage is like this:
+    Resturns a list of all ingestion message handler functions which were globally registered
+    via the @ingestion_message_handler decorator. Example usage is like this:
 
       listener: IngestionListener = get_reference_to_your_ingestion_listener()
       message: IngestionMessage = IngestionMessage(get_next_raw_ingestion_message())
