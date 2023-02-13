@@ -124,8 +124,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             # it indicates that this message IS intended to be processed by this handler
             # and we will call it here, returning its value, which, if True, indicates that
             # the message was actually processed, or if False, that it was not processed.
-            # TODO MAYBE: Could check that arguments are IngestionMessage and IngestionListener
-            # types/subclasses respectively, and that the return value from this call is True or False.
+            # TODO MAYBE: Should we check that arguments are IngestionMessage and IngestionListener
+            # types/subclasses respectively, and that the return value from this call is True or False?
+            # TODO MAYBE: Should we allow a raw message here (like in call_ingestion_message_handler)?
             return True if wrapped_function(*args, **kwargs) else False
 
         _ingestion_message_handlers.append(lambda args, kwargs: ingestion_message_handler_function(args, kwargs))
