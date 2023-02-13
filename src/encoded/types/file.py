@@ -136,10 +136,16 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 })
         # In the old account, we are always passing IAM User creds so these will just work
         else:
-            conn = boto3.client('sts',
-                                aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
-                                aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
-        token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
+            token = None
+            try:
+                conn = boto3.client('sts',
+                                    aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
+                                    aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
+                token = conn.get_federation_token(Name=name, Policy=json.dumps(policy))
+            except Exception as e:
+                if os.environ.get('AWS_SESSION_TOKEN'):
+                    raise RuntimeError("Federated session credentials are not allowed here.")
+                raise e
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
         # Convert Expiration datetime object to string via cast
