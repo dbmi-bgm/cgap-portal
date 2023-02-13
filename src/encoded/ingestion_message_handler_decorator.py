@@ -3,6 +3,7 @@
 # get the list of registered handler functions and to call them for a given message.
 
 import inspect
+from typing import Union
 from dcicutils.misc_utils import ignored, PRINT
 from .ingestion_listener_base import IngestionListenerBase
 from .ingestion_message import IngestionMessage
@@ -155,7 +156,7 @@ def get_ingestion_message_handlers():
     return _ingestion_message_handlers
 
 
-def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
+def call_ingestion_message_handler(message: Union[IngestionMessage, dict], listener) -> bool:
     """
     Calls AT MOST one (NOMINALLY - see below) of the ingestion message handler functions
     globally registered via the @ingestion_message_handler decorator, for the given message,
@@ -172,7 +173,7 @@ def call_ingestion_message_handler(message: IngestionMessage, listener) -> bool:
     """
     if not isinstance(message, IngestionMessage):
         # Allow passing a message which is NOT of type IngestionMessage, which we will
-        # ASSUME in this case is a RAW message from which we create an IngestionMessage.
+        # ASSUME in this case is a RAW (dict) message from which we create an IngestionMessage.
         message = IngestionMessage(message)
     for handler in get_ingestion_message_handlers():
         if handler(message, listener) is True:
