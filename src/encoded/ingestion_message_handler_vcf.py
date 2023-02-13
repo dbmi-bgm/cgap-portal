@@ -25,6 +25,10 @@ from .util import (gunzip_content, debuglog)
 log = structlog.getLogger(__name__)
 
 
+def includeme(config):
+    config.scan(__name__)
+
+
 @ingestion_message_handler(ingestion_type=IngestionMessage.TYPE_VCF)
 def ingestion_message_handler_vcf(message: IngestionMessage, listener: IngestionListener) -> bool:
     """

@@ -14,6 +14,10 @@ from .util import (debuglog, vapp_for_email, make_s3_client)
 log = structlog.getLogger(__name__)
 
 
+def includeme(config):
+    config.scan(__name__)
+
+
 @ingestion_message_handler(ingestion_type=lambda message: not message.is_vcf())
 def ingestion_message_handler_novcf(message: IngestionMessage, listener: IngestionListener) -> bool:
     """
