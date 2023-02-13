@@ -4,7 +4,7 @@ from dcicutils.misc_utils import ignored, PRINT
 from .ingestion.common import metadata_bundles_bucket
 from .ingestion.processors import get_ingestion_processor
 from .ingestion_listener import IngestionListener
-from .ingestion_listener_defs import DEBUG_SUBMISSIONS
+from .ingestion_listener_base import DEBUG_SUBMISSIONS
 from .ingestion_message import IngestionMessage
 from .ingestion_message_handler_decorator import ingestion_message_handler
 from .types.ingestion import SubmissionFolio

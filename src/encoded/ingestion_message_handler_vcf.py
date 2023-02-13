@@ -7,7 +7,7 @@ from .commands.reformat_vcf import runner as reformat_vcf
 from .commands.add_altcounts_by_gene import main as add_altcounts
 from .ingestion.variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
 from .ingestion_listener import IngestionListener
-from .ingestion_listener_defs import (
+from .ingestion_listener_base import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
     STATUS_INGESTED,

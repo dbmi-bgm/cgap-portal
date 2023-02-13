@@ -34,12 +34,12 @@ from .util import (
     subrequest_object, register_path_content_type, vapp_for_email,  # vapp_for_ingestion,
     SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
-from .ingestion_listener_defs import (
+from .ingestion_listener_base import (
     STATUS_QUEUED,
     STATUS_INGESTED,
     DEBUG_SUBMISSIONS,
+    IngestionListenerBase,
 )
-from .ingestion_message import IngestionMessage
 from .ingestion_message_handler_decorator import call_ingestion_message_handler
 
 
