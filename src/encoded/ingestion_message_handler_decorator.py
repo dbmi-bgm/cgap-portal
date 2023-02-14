@@ -107,6 +107,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             This is the function called on each actual ingestion message handler call.
             """
             message = args[0] if args and isinstance(args[0], IngestionMessage) else None
+            if not message:
+                raise ValueError(f"Argument passed to message handler not of type IngestionMessage!")
             PRINT(f"Checking message ({message.uuid}) type ({message.type}) for handler: {wrapped_function.__name__}")
             if ingestion_type and message:
                 # Here the decorator specified an ingestion type;
@@ -116,13 +118,15 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                         # Since the ingestion_type specified for the handler decorator
                         # is a lambda which returned falsity, then this message is NOT
                         # intended to be processed by this handler, it will not be called.
-                        PRINT(f"Message ({message.uuid}) type ({message.type}) NOT intended (via lambda) for handler: {wrapped_function.__name__}")
+                        PRINT(f"Message ({message.uuid}) type ({message.type}) "
+                              f"NOT intended for handler: {wrapped_function.__name__}")
                         return False
                 elif not message.is_type(ingestion_type):
                     # Since the ingestion_type specified for the handler decorator is string
                     # which does not match the type of the message, then this message is NOT
                     # intended to be processed by this handler, it will not be called.
-                    PRINT(f"Message ({message.uuid}) type ({message.type}) NOT intended for (via string) handler: {wrapped_function.__name__}")
+                    PRINT(f"Message ({message.uuid}) type ({message.type}) "
+                          f"NOT intended for handler: {wrapped_function.__name__}")
                     return False
             # Here the handler decorator has no ingestion_type specifier or if it does
             # it indicates that this message IS intended to be processed by this handler
@@ -131,10 +135,12 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             # TODO MAYBE: Should we check that arguments are IngestionMessage and IngestionListener
             # types/subclasses respectively, and that the return value from this call is True or False?
             # TODO MAYBE: Should we allow a raw message here (like in call_ingestion_message_handler)?
-            PRINT(f"Calling message ({message.uuid}) type ({message.type}) handler: {wrapped_function.__name__}")
-            result = True if wrapped_function(*args, **kwargs) else False
-            PRINT(f"After calling message ({message.uuid}) type ({message.type}) handler: {wrapped_function.__name__} -> {result}")
-            return result
+            PRINT(f"Calling message ({message.uuid}) type ({message.type}) "
+                  f"handler: {wrapped_function.__name__}")
+            result = wrapped_function(*args, **kwargs)
+            PRINT(f"Called message ({message.uuid}) type ({message.type}) "
+                  f"handler: {wrapped_function.__name__} -> {result}")
+            return True if result else False
 
         _ingestion_message_handlers.append(lambda args, kwargs: ingestion_message_handler_function(args, kwargs))
         return ingestion_message_handler_function
