@@ -39,7 +39,7 @@ def ingestion_message_handler_vcf(message: IngestionMessage, listener: Ingestion
     Returns True if the message was successfully handled, otherwise False.
     """
 
-    PRINT("VCF ingestion message handler called for message ({message.uuid}) type: {message.type}")
+    PRINT(f"VCF ingestion message handler called for message ({message.uuid}) type: {message.type}")
 
     # locate file meta data
     try:
