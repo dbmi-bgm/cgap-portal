@@ -89,6 +89,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
         };
 
         this.hgcRef = React.createRef();
+        
     }
 
     componentDidMount(){
@@ -266,9 +267,12 @@ export class HiGlassPlainContainer extends React.PureComponent {
 
 
 const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContainerBody(props, ref){
+    
     const { viewConfig, options, hasRuntimeError, disabled, isValidating, mounted, higlassInitialized, width, height, mountCount, placeholder, style, className, packageLockJson } = props;
     const outerKey = "mount-number-" + mountCount;
-    const { dependencies: { higlass : { version: higlassVersionUsed = null } = {} } = {} } = packageLockJson || {};
+    //const { dependencies: { higlass : { version: higlassVersionUsed = null } = {} } = {} } = packageLockJson || {};
+    const higlassVersionUsed = "1.12.0";
+
     const { HiGlassComponent } = higlassDependencies || {};
 
     let hiGlassInstance = null;

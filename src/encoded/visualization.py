@@ -381,6 +381,7 @@ def get_higlass_cohort_viewconf(context, request):
             cohort_variant_test_results(str) : location of the variant VCF file on S3
             cohort_gene_test_results(str) : location of the gene VCF file on S3
             cohort_density(str) : location of the density bigwig file on S3
+            variant_detail_source(str): location of the affected samples VCF
 
     Returns:
         A dictionary.
@@ -404,6 +405,7 @@ def get_higlass_cohort_viewconf(context, request):
     cohort_variant_test_results = request.json_body.get('cohort_variant_test_results', None)
     cohort_gene_test_results = request.json_body.get('cohort_gene_test_results', None)
     cohort_density = request.json_body.get('cohort_density', None)
+    variant_detail_source = request.json_body.get('variant_detail_source', None)
 
     if not cohort_variant_test_results or not cohort_density or not cohort_gene_test_results:
         return {
@@ -419,7 +421,10 @@ def get_higlass_cohort_viewconf(context, request):
             if track['uid'] == "cohort_track":
                 track['data']['vcfUrl'] = cohort_variant_test_results
                 track['data']['tbiUrl'] = cohort_variant_test_results + ".tbi"
-            elif track['uid'] == "gene_result_track":
+                if variant_detail_source:
+                    track['options']['variantDetailSource']['vcfUrl'] = variant_detail_source
+                    track['options']['variantDetailSource']['tbiUrl'] = variant_detail_source + ".tbi"
+            elif track['uid'] == "gene_list_track":
                 track['data']['vcfUrl'] = cohort_gene_test_results
                 track['data']['tbiUrl'] = cohort_gene_test_results + ".tbi"
             elif track['uid'] == "density_track":
