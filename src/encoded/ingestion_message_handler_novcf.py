@@ -27,6 +27,8 @@ def ingestion_message_handler_novcf(message: IngestionMessage, listener: Ingesti
     Returns True if the message was successfully handled, otherwise False.
     """
 
+    PRINT("Non-VCF ingestion message handler called for message ({message.uuid}) type: {message.type}")
+
     # Let's minimally disrupt things for now. We can refactor this later
     # to make all the parts work the same -kmp
     if listener.INGEST_AS_USER:

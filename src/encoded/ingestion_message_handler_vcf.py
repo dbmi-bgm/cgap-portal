@@ -1,6 +1,7 @@
 import requests  # XXX: C4-211 should not be needed but is // KMP needs this, too, until subrequest posts work
 import structlog
 import tempfile
+from dcicutils.misc_utils import PRINT
 from vcf import Reader
 from .ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
 from .commands.reformat_vcf import runner as reformat_vcf
@@ -37,6 +38,8 @@ def ingestion_message_handler_vcf(message: IngestionMessage, listener: Ingestion
     specifically for VCF files; refactored out of ingestion_listener.py February 2023.
     Returns True if the message was successfully handled, otherwise False.
     """
+
+    PRINT("VCF ingestion message handler called for message ({message.uuid}) type: {message.type}")
 
     # locate file meta data
     try:
