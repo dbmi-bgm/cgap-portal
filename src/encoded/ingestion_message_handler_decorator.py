@@ -17,7 +17,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     Decorator to globally register ingestion message handlers, to be used for example like this:
 
       @ingestion_message_handler
-      your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
+      def your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_processed_otherwise_false()
 
     Once registered the get_ingestion_message_handlers function in this module (below)
@@ -35,13 +35,13 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     called ONLY for message types which are "vcf":
 
       @ingestion_message_handler(ingestion_type="vcf")
-      your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
+      def your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_processed_otherwise_false()
 
     or an example using a lambda instead looks like this:
 
       @ingestion_message_handler(ingestion_type=lambda message: not message.is_type("vcf"))
-      your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
+      def your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener) -> bool:
           return handle_message_returning_true_if_processed_otherwise_false()
 
     In this example, the handler would ONLY be called for message types which are NOT "vcf".
