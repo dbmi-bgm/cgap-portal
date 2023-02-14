@@ -191,3 +191,12 @@ def call_ingestion_message_handler(message: Union[IngestionMessage, dict], liste
         if handler(message, listener) is True:
             return True
     return False
+
+
+def clear_ingestion_message_handlers():
+    """
+    Clears all globally registered ingestion message handlers.
+    This is for TESTING purposes ONLY!
+    """
+    global _ingestion_message_handlers
+    _ingestion_message_handlers = []
