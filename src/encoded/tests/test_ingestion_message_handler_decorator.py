@@ -3,7 +3,6 @@ from encoded.ingestion_message import IngestionMessage
 from encoded.ingestion_listener_base import IngestionListenerBase
 from encoded.ingestion_message_handler_decorator import (
     call_ingestion_message_handler,
-    clear_ingestion_message_handlers,
     get_ingestion_message_handlers,
     ingestion_message_handler,
 )
