@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+12.9.0
+======
+
+* Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
+  new `@ingestion_message_handler` decorator functions; specific message handling
+  code now in `ingestion_message_handler_novcf.py` and `ingestion_message_handler_vcf.py`.
+
+
 12.8.2
 ======
 
