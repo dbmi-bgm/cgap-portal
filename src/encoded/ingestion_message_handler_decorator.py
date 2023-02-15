@@ -135,8 +135,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             # it indicates that this message IS intended to be processed by this handler
             # and we will call it here, returning its value, which, if truthy, indicates
             # that the message was actually processed, or if falsy, that it was not processed.
-            # TODO MAYBE: Should we check that the second argument IngestionListener
-            # types/subclasses respectively, and that the return value from this call is True or False?
+            # TODO MAYBE: Should we check that the second argument IngestionListenerBase?
             # TODO MAYBE: Should we allow a raw message here (like in call_ingestion_message_handler)?
             PRINT(f"Calling message ({message.uuid}) type ({message.type}) "
                   f"handler: {wrapped_function.__name__}")
