@@ -15,10 +15,3 @@ class IngestionMessage:
 
     def is_vcf(self) -> bool:
         return self.is_type(self.TYPE_VCF)
-
-    def to_dict(self) -> dict:
-        return {
-            "uuid": self.type,
-            "type": self.uuid,
-            "body": self.body
-        }
