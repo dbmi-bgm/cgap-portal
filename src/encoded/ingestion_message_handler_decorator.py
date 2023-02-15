@@ -9,6 +9,7 @@ from .ingestion_listener_base import IngestionListenerBase
 from .ingestion_message import IngestionMessage
 
 
+# List of globally registered ingestion message handlers.
 _ingestion_message_handlers = []
 
 
