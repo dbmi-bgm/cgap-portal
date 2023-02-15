@@ -123,7 +123,9 @@ export const FieldBlocks = React.memo(function FieldBlocks({ filterBlock, facetD
         // Get rest of field schemas for term facets
         const termFields = Object.keys(termQs);
         termFields.forEach(function(field){
-            allFieldSchemas[field] = getSchemaProperty(field, schemas, "VariantSample");
+            // Make sure a clean version of the field (without ! -- denoting omitted items) is retained
+            const cleanField = field.endsWith('!') ? field.slice(0, -1): field;
+            allFieldSchemas[field] = getSchemaProperty(cleanField, schemas, "VariantSample");
         });
 
         // Combine & sort all filtered-on fields by their schema.facet.order, if any.
@@ -170,9 +172,11 @@ function FieldBlock({ field, terms, fieldFacet, fieldSchema }){
 
     const title = facetTitle || fieldTitle || field;
 
+    const excludedField = field.endsWith('!');
+
     const valueBlocks = terms.map(function(val, idx){
         return (
-            <div className="value-block" key={idx}>
+            <div className="value-block" key={idx} data-excluded={excludedField}>
                 { val }
             </div>
         );
@@ -184,7 +188,7 @@ function FieldBlock({ field, terms, fieldFacet, fieldSchema }){
                 { valueBlocks }
             </div>
             <div className="field-name">
-                <em>{ title }</em>
+                <em>{excludedField && "Excluded "}{ title }</em>
             </div>
         </div>
     );

@@ -1885,6 +1885,7 @@ i.status-indicator-dot {
 					border-radius: 25px;
 					padding: 5px 10px;
 					background-color: #fff;
+					border: 1px solid #fff;
 					position: relative;
 					/* box-shadow: 0 2px 8px -3px #000; */
 					white-space: nowrap;
@@ -1903,6 +1904,10 @@ i.status-indicator-dot {
 							right: -4px;
 							position: absolute;
 						}
+					}
+					&[data-excluded="true"] {
+						background-color: #fddbdb;
+						border: 1px solid #d16a6a;
 					}
 				}
 			}
