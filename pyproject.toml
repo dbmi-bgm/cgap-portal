@@ -150,8 +150,7 @@ pytest-instafail = ">=0.3.0"
 pytest-mock = ">=0.11.0"
 pytest-timeout = ">=1.0.0"
 pytest-xdist = ">=1.14"
-#wheel = ">=0.29.0"
-wheel = "0.37.1"
+wheel = ">=0.29.0"
 
 
 # In pytest 6.0, we'll be able to use this instead of a separate pytest.ini configuration.

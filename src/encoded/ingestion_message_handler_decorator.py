@@ -106,9 +106,11 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             """
             This is the function called on each actual ingestion message handler call.
             """
+            # Make sure the first argument is an IngestionMessage.
             message = args[0] if args and isinstance(args[0], IngestionMessage) else None
             if not message:
                 raise ValueError(f"Argument passed to message handler not of type IngestionMessage!")
+            # See if we should call this handler based on any ingestion_type specified in the decorator.
             PRINT(f"Checking message ({message.uuid}) type ({message.type}) for handler: {wrapped_function.__name__}")
             if ingestion_type and message:
                 # Here the decorator specified an ingestion type;
@@ -130,9 +132,9 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                     return False
             # Here the handler decorator has no ingestion_type specifier or if it does
             # it indicates that this message IS intended to be processed by this handler
-            # and we will call it here, returning its value, which, if True, indicates that
-            # the message was actually processed, or if False, that it was not processed.
-            # TODO MAYBE: Should we check that arguments are IngestionMessage and IngestionListener
+            # and we will call it here, returning its value, which, if truthy, indicates
+            # that the message was actually processed, or if falsy, that it was not processed.
+            # TODO MAYBE: Should we check that the second argument IngestionListener
             # types/subclasses respectively, and that the return value from this call is True or False?
             # TODO MAYBE: Should we allow a raw message here (like in call_ingestion_message_handler)?
             PRINT(f"Calling message ({message.uuid}) type ({message.type}) "
