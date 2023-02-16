@@ -7,8 +7,7 @@
     "required": [
         "project",
         "institution",
-        "meta_workflow_handler",
-        "associated_item"
+        "meta_workflow_handler"
     ],
     "additionalProperties": false,
     "identifyingProperties": [
