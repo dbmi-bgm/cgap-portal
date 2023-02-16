@@ -6,6 +6,56 @@ cgap-portal
 Change Log
 ----------
 
+12.8.2
+======
+
+* Fix `Auth0AllowedConnections` for local deploy usage
+
+
+12.8.1
+======
+
+`PR 689: Save filterset btn updates <https://github.com/dbmi-bgm/cgap-portal/pull/689>`_
+
+* Add a new Case Preset button near the list of preset (+ update wording, tooltips, iconography)
+* Update Cypress tests
+* Update SPC to [0.1.59](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.59)
+
+
+12.8.0
+======
+
+`PR 683: Auth0 Customization Support <https://github.com/dbmi-bgm/cgap-portal/pull/683>`_
+
+* Allow configuration of Auth0Domain and Auth0AllowedConnections
+* Set a bigger `large_client_header_buffers` so we can tolerate a larger cookie package
+
+
+12.7.1
+======
+
+`PR 688: Rename CGAP <https://github.com/dbmi-bgm/cgap-portal/pull/688>`_
+
+* Update "Clinical Genome Analysis Platform" to "Computational Genome Analysis Platform".
+
+
+12.7.0
+======
+
+`PR 681: SNV mapping quality <https://github.com/dbmi-bgm/cgap-portal/pull/681>`_
+
+* Add mapping quality to VariantSample schema
+
+
+12.6.0
+======
+
+`PR 676: End of year npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/676>`_
+
+* Update higlass dependencies to latest (some beta) realeases to resolve security issues
+* Update SPC to latest release: v0.1.58
+
+
 12.5.0
 ======
 

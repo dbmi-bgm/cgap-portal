@@ -1,8 +1,8 @@
 # Action that Runs Cypress Tests
 
-name: Cypress Tests - MGB 
+name: Cypress Tests - MGB
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
 
   # Allows you to run this workflow manually from the Actions tab
@@ -12,7 +12,7 @@ on:
 jobs:
   cypress-run:
     # The type of runner that the job will run on
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     strategy:
       fail-fast: false  # suggested by Cypress
       matrix:
@@ -33,7 +33,7 @@ jobs:
           npm ci
           $(npm bin)/cypress install
           $(npm bin)/cypress cache prune
-      
+
       - name: Cypress
         env:
           CYPRESS_KEY: ${{ secrets.CYPRESS_KEY }}
