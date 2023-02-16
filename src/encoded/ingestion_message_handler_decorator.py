@@ -157,8 +157,8 @@ def call_ingestion_message_handler(message: Union[IngestionMessage, dict], liste
     to handle messages with types which does NOT correspond to any specifically registered handlers.
     """
     if not isinstance(message, IngestionMessage):
-        # We allow passing a message which is NOT of type IngestionMessage, which we will
-        # ASSUME in this case is a RAW (dict) message from which we create an IngestionMessage.
+        # For convenience, allow passing a message which is NOT of type IngestionMessage, which we
+        # will ASSUME in this case is a RAW (dict) message from which we create an IngestionMessage.
         message = IngestionMessage(message)
     # Get the handler for this message type, or the default handler of none specifically found.
     handler = (_ingestion_message_handlers.get(message.type) or
