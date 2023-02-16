@@ -51,7 +51,9 @@ elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
 granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
-h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
+#h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
+h5py = "^3.5.0"
+^3.5.0
 # html5lib = "0.9999999"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
@@ -63,7 +65,8 @@ keepalive = "0.5"
 loremipsum = "1.0.5"
 netaddr = ">=0.8.0,<1"
 negspy = "0.2.24"
-numpy = "1.19.1" # negspy needs it
+#numpy = "1.19.1"  # negspy needs it
+numpy = "^1.24.2"  # negspy needs it
 openpyxl = "^3.0.7,!=3.0.8"  # a version 3.0.8 appeared but then got withdrawn, for now just pin 3.0.7. try again later.
 passlib = "^1.7.4"
 PasteDeploy = "1.5.2"
