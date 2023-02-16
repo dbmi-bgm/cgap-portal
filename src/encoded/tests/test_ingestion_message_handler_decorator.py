@@ -19,7 +19,7 @@ INGESTION_TYPE_NOVCF = "novcf"
 INGESTION_TYPE_OTHER = "other"
 
 
-def create_raw_message(ingestion_type: str, unprocessed: str = None) -> dict:
+def create_raw_message(ingestion_type: str) -> dict:
     return {"Body": f"{{\"uuid\":\"{SOME_UUID}\", \"ingestion_type\":\"{ingestion_type}\"}}"}
 
 
