@@ -70,7 +70,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
         # Sanity check the signature of the decorated ingestion message handler function.
         # It should contain two arguments with either no type annotations or if present
-        # then they should be for IngestionMessage and IngestionListener, respectively.
+        # then they should be for IngestionMessage and IngestionListenerBase, respectively.
         # Return value annotation is not checked.
         wrapped_function_signature = inspect.signature(wrapped_function)
         if len(wrapped_function_signature.parameters) < 2:
@@ -92,7 +92,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             second_parameter_annotation = second_parameter[1].annotation
             if not second_parameter_annotation or (second_parameter_annotation.__name__ != "_empty" and
                                                    not issubclass(second_parameter_annotation, IngestionListenerBase)):
-                raise ValueError(f"Wrong second argument type (need unspecified or IngestionListener) "
+                raise ValueError(f"Wrong second argument type (need unspecified or IngestionListenerBase) "
                                  f"for ingestion message handler function: {wrapped_function.__name__}")
         PRINT(f"Registering ingestion message handler: {wrapped_function.__name__} (type: {ingestion_type})")
 
