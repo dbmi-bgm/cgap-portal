@@ -5,8 +5,8 @@
 import inspect
 from typing import Union
 from dcicutils.misc_utils import ignored, PRINT
-from encoded.ingestion_listener_base import IngestionListenerBase
-from encoded.ingestion_message import IngestionMessage
+from .ingestion_listener_base import IngestionListenerBase
+from .ingestion_message import IngestionMessage
 
 
 # Dictionary (by ingestion type) of globally registered ingestion message handlers.
