@@ -1,6 +1,6 @@
 # Module containing the definition of the @ingestion_message_handler decorator used
-# to globally register ingestion message handler functions, as well as functions to
-# get the list of registered handler functions and to call them for a given message.
+# to globally register ingestion message handler functions, as well as a function
+# to call the appropriate registered handler for a given message.
 
 import inspect
 from typing import Union
