@@ -863,7 +863,7 @@ python-versions = ">=3.6"
 
 [package.dependencies]
 bitarray = ">=1.2.0"
-h5py = ">=2.10.0"
+h5py = ">=3.6.0"
 matplotlib = "3.3.4"
 numpy = ">=1.18.0"
 pysam = ">=0.15.0"
@@ -882,7 +882,7 @@ docs = ["sphinx"]
 
 [[package]]
 name = "h5py"
-version = "2.10.0"
+version = "3.8.0"
 description = "Read and write HDF5 files from Python"
 category = "main"
 optional = false
