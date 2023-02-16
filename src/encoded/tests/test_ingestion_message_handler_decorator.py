@@ -117,7 +117,7 @@ def test_error_undefined_handler():
         call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
 
 
-def test_ingestion_message_handler_decorator_one():
+def test_one():
 
     for_testing_clear_ingestion_message_handlers()
     handler_calls = None
