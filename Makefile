@@ -53,6 +53,7 @@ configure:  # does any pre-requisite installs
 	pip install isodate==0.5.4
 	pip install keepalive==0.5
 	pip install dcicpyvcf==1.0.0
+	pip install zope.sqlalchemy==1.6
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
