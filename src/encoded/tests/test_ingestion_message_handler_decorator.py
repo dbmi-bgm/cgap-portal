@@ -79,10 +79,21 @@ def test_error_decorated_function_signature():
             pass
 
 
-def test_error_duplicate_default_handlers():
+def test_error_duplicate_default_handlers_one():
 
     with pytest.raises(Exception):
         @ingestion_message_handler
+        def a(message, listener):
+            pass
+        @ingestion_message_handler  # same as above (i.e. default)
+        def duplicate_a(message, listener):
+            pass
+
+
+def test_error_duplicate_default_handlers_two():
+
+    with pytest.raises(Exception):
+        @ingestion_message_handler(ingestion_type="default")
         def a(message, listener):
             pass
         @ingestion_message_handler  # same as above (i.e. default)

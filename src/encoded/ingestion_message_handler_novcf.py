@@ -18,7 +18,7 @@ def includeme(config):
     config.scan(__name__)
 
 
-@ingestion_message_handler(ingestion_type=lambda message: not message.is_vcf())
+@ingestion_message_handler(ingestion_type="default")
 def ingestion_message_handler_novcf(message: IngestionMessage, listener: IngestionListener) -> bool:
     """
     This is the part of listener.IngestionListener.run function which handles a
