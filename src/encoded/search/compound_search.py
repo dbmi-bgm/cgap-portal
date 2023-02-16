@@ -29,6 +29,7 @@ class CompoundSearchBuilder:
 
         Entry point is "execute_filter_set".
     """
+    ALL = 'all'
     TYPE = 'search_type'
     ID = '@id'
     QUERY = 'query'

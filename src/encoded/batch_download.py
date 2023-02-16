@@ -19,9 +19,14 @@ log = structlog.getLogger(__name__)
 
 def includeme(config):
     config.add_route('variant_sample_search_spreadsheet', '/variant-sample-search-spreadsheet/')
+#    config.add_route("case_search_spreadsheet", "/case-search-spreadsheet/")
     config.scan(__name__)
 
 
+#@view_config(route_name="case_search_spreadsheet", request_method=["GET", "POST"])
+#@debug_log
+#def case_search_spreadsheet(context, request):
+#    pass
 
 
 ###########################################################################

@@ -194,6 +194,7 @@ def main(global_config, **local_config):
     config.include('.visualization')
     config.include('.ingestion_listener')
     config.include('.custom_embed')
+    config.include('.drr_batch_download')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
