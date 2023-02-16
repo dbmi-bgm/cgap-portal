@@ -193,7 +193,7 @@ def main(global_config, **local_config):
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
-    # Temporarily comment out for testin as causing GA CI to break I think (dmichaels/2023-02-16).
+    # TODO: Temporarily comment out for testin as causing GA CI to break I think (dmichaels/2023-02-16).
     # config.include('.ingestion_message_handler_vcf')
     # config.include('.ingestion_message_handler_novcf')
     config.include('.custom_embed')

@@ -35,7 +35,8 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
 
       @ingestion_message_handler(ingestion_type="vcf")
       def your_ingester_message_handler(message: IngestionMessage, listener: IngestionListener):
-          # Handle your message here; return whatever you like.
+          # Handle your message here; return whatever you like;
+          # it will be returned in turn by call_ingestion_message_handler.
 
     Note that ingestion type names are (space-trimmed and) treated as case-insenstive.
 
