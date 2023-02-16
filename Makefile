@@ -65,8 +65,13 @@ macbuild-poetry:
 	make macpoetry-install
 
 build:  # builds
+ifeq ($(shell uname -s), Darwin)
+	@echo "Looks like this is Mac so executing: make macbuild"
+	make macbuild
+else
 	make build-poetry
 	make build-after-poetry
+endif
 
 macbuild:  # builds for Catalina
 	make macbuild-poetry

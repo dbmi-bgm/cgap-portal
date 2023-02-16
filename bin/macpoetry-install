@@ -1,3 +1,34 @@
 #!/bin/bash
 
+
+echo "Begin Mac specific build script (bin/macpoetry-install)."
+
+if [[ `uname -o` == "Darwin" && `uname -m` == "arm64" ]] ; then
+    echo "Looks like this is a Mac M1. Doing some special installs for this to workround sundry problems."
+    pip install isodate==0.5.4
+    pip install pysam==0.20.0
+    pip install keepalive==0.5
+    pip install dcicpyvcf==1.0.0
+    pip install numpy==1.24.1
+    pip install h5py==3.6.0
+    # On the Apple M1, poetry (or pip) install of h5py may not work;
+    # a brew install of hdf5 (if not yet installed) and using this should do the trick:
+    # HDF5_DIR=`brew --prefix hdf5` pip install "h5py==3.6.0"
+    echo "Done with special installs for Mac M1."
+fi
+
 CFLAGS="-I$(brew --prefix zlib)/include" LDFLAGS="-L$(brew --prefix zlib)/lib" poetry install
+
+if [[ `uname -o` == "Darwin" && `uname -m` == "arm64" ]] ; then
+    #
+    # These worked around Mac M1 issues (after the build) running (at least) make deploy1a.
+    #
+    echo "Some more special installs for Mac M1."
+    pip uninstall -y psutil
+    pip install --no-binary :all: psutil
+    pip uninstall -y pytabix
+    pip install pytabix
+    echo "Done with more special installs for Mac M1."
+fi
+
+echo "End Mac specific build script (bin/macpoetry-install)."
