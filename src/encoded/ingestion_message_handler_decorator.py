@@ -159,7 +159,6 @@ def call_ingestion_message_handler(message: Union[IngestionMessage, dict], liste
         return handler(message, listener)
     else:
         raise RuntimeError(f"No ingestion message handler defined for ingestion message type: {message.type}")
-    return False
 
 
 def for_testing_clear_ingestion_message_handlers():
