@@ -27,22 +27,22 @@ def test_error_decorator_arguments():
 
     with pytest.raises(Exception):
         @ingestion_message_handler(123)  # wrong decorator arg type
-        def bad_g(message, listener):
+        def bad_a(message, listener):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler("vcf", 123)  # too many decorator args
-        def bad_g(message, listener):
+        def bad_b(message, listener):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler(xyzzy="vcf")  # unknown named decorator kwarg
-        def bad_g(message, listener):
+        def bad_c(message, listener):
             pass
 
     with pytest.raises(Exception):
         @ingestion_message_handler("vcf", ingestion_type="vcf")  # too many decorator args
-        def bad_g(message, listener):
+        def bad_d(message, listener):
             pass
 
 
@@ -82,9 +82,11 @@ def test_error_decorated_function_signature():
 def test_error_duplicate_default_handlers_one():
 
     with pytest.raises(Exception):
+
         @ingestion_message_handler
         def a(message, listener):
             pass
+
         @ingestion_message_handler  # same as above (i.e. default)
         def duplicate_a(message, listener):
             pass
@@ -93,9 +95,11 @@ def test_error_duplicate_default_handlers_one():
 def test_error_duplicate_default_handlers_two():
 
     with pytest.raises(Exception):
+
         @ingestion_message_handler(ingestion_type="default")
         def a(message, listener):
             pass
+
         @ingestion_message_handler  # same as above (i.e. default)
         def duplicate_a(message, listener):
             pass
@@ -104,9 +108,11 @@ def test_error_duplicate_default_handlers_two():
 def test_error_duplicate_typed_handlers():
 
     with pytest.raises(Exception):
+
         @ingestion_message_handler("some-message-type")
         def a(message, listener):
             pass
+
         @ingestion_message_handler("some-message-type")  # same as above
         def duplicate_a(message, listener):
             pass
@@ -117,12 +123,15 @@ def test_error_undefined_handler():
     for_testing_clear_ingestion_message_handlers()
 
     with pytest.raises(Exception):
+
         @ingestion_message_handler("some-message-type")
         def a(message, listener):
             pass
+
         @ingestion_message_handler("some-other-message-type")
         def duplicate_a(message, listener):
             pass
+
         ingestion_message = create_raw_message(ingestion_type="some-third-message-type")
         # This should throw exception because no relevant handler found.
         call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
