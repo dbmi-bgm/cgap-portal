@@ -6,6 +6,16 @@ cgap-portal
 Change Log
 ----------
 
+12.8.3
+======
+
+`PR 684: QC + tooltip updates <https://github.com/dbmi-bgm/cgap-portal/pull/684>`_
+
+* Decrease WES Ti/Tv lower bounds for warning/failure
+* Add coverage tooltip to QC report
+* Minor updates to variant facet tooltips
+
+
 12.8.2
 ======
 
