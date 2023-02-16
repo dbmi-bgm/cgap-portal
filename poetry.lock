@@ -958,11 +958,14 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "isodate"
-version = "0.5.4"
+version = "0.6.1"
 description = "An ISO 8601 date/time/duration parser and formatter"
 category = "main"
 optional = false
 python-versions = "*"
+
+[package.dependencies]
+six = "*"
 
 [[package]]
 name = "itsdangerous"
@@ -2206,7 +2209,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.1,<3.9"
-content-hash = "0714b58c4636aab21bc3033013213165a5410f29d7f32471435b0c035c716881"
+content-hash = "7ac6e4b2fa6d56f35217be7f82b279cf06efc9459de66be3141fb2654193cb81"
 
 [metadata.files]
 apipkg = [
@@ -2693,7 +2696,8 @@ importlib-metadata = [
     {file = "importlib_metadata-5.0.0.tar.gz", hash = "sha256:da31db32b304314d044d3c12c79bd59e307889b287ad12ff387b3500835fc2ab"},
 ]
 isodate = [
-    {file = "isodate-0.5.4.tar.gz", hash = "sha256:42105c41d037246dc1987e36d96f3752ffd5c0c24834dd12e4fdbe1e79544e31"},
+    {file = "isodate-0.6.1-py2.py3-none-any.whl", hash = "sha256:0751eece944162659049d35f4f549ed815792b38793f07cf73381c1c87cbed96"},
+    {file = "isodate-0.6.1.tar.gz", hash = "sha256:48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"},
 ]
 itsdangerous = [
     {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
