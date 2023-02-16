@@ -35,11 +35,19 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
           # Handle your message here; return whatever you like.
 
     Note that ingestion type names are (space-trimmed and) treated as case-insenstive.
+
+    If the ingestion_type is not specified in the decorator, then the registered handler is said
+    to be the DEFAULT handler and will handle any message type not covered by any other registered
+    handler. There MUST be exactly ONE handler registered able to handle any expected message type,
+    otherwise an exception will be thrown (either at handler registration time, i.e. startup; or
+    at runtime, i.e. if an incoming message is found not to have an associated handler and there is
+    no default handler; this latter bit is handled by the call_ingestion_message_handler function below.
     """
     ignored(decorator_args)
     has_decorator_args = True if not callable(f) or f.__name__ == "<lambda>" else False
     ingestion_type = None
 
+    # Sanity check any decorator arguments; currently just the optional ingestion_type.
     if has_decorator_args:
         if f is not None:
             decorator_args = (f, *decorator_args)
@@ -106,11 +114,11 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             # message type) this should check should not be necessary, though extra check may not hurt.
             PRINT(f"Checking message ({message.uuid}) type ({message.type}) for handler: {wrapped_function.__name__}")
             if ingestion_type and ingestion_type != _DEFAULT_INGESTION_MESSAGE_HANDLER_NAME:
-                # Here the decorator specified an ingestion type;
+                # Here the decorator specified a NON-default ingestion type;
                 # check it and only call the wrapped function if they match.
                 if not message.is_type(ingestion_type):
-                    # Since the ingestion_type specified for the handler decorator is string
-                    # which does not match the type of the message, then this message is NOT
+                    # Since the ingestion_type specified for the handler decorator
+                    # does NOT match the type of the message, then this message is NOT
                     # intended to be processed by this handler, it will not be called.
                     PRINT(f"Message ({message.uuid}) type ({message.type}) "
                           f"NOT intended for handler: {wrapped_function.__name__}")
