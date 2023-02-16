@@ -7,10 +7,16 @@ Change Log
 ----------
 
 
-12.8.2
+12.8.3
 ======
 
 Backport pytest 7.2 support from Fourfront
+
+
+12.8.2
+======
+
+* Fix `Auth0AllowedConnections` for local deploy usage
 
 
 12.8.1
