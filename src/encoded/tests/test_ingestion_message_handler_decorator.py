@@ -149,6 +149,18 @@ def test_error_invalid_call_arguments():
     with pytest.raises(Exception):
         call_ingestion_message_handler(ingestion_message, "wrong-type-should-be-IngestionListenerBase")
 
+    ingestion_message = create_raw_message(ingestion_type="some-message-type")
+    with pytest.raises(Exception):
+        call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER, "extra-arg")
+
+    ingestion_message = create_raw_message(ingestion_type="some-message-type")
+    with pytest.raises(Exception):
+        call_ingestion_message_handler(ingestion_message)  # missing IngestionListenerBase arg
+
+    ingestion_message = create_raw_message(ingestion_type="some-message-type")
+    with pytest.raises(Exception):
+        call_ingestion_message_handler()  # missing args
+
     with pytest.raises(Exception):
         a(ingestion_message, INGESTION_LISTENER)  # wrong first arg type (raw dict rather than IngestionMessage)
 
