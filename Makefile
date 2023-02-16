@@ -53,8 +53,8 @@ configure:  # does any pre-requisite installs
 	pip install isodate==0.5.4
 	pip install keepalive==0.5
 	pip install dcicpyvcf==1.0.0
-	echo poetry update h5py
-	poetry update h5py  # TEMPORARY TESTING: TO DO IN GA NOT ON PROBLEMATIC M1
+	# echo poetry update h5py
+	# poetry update h5py  # TEMPORARY TESTING: TO DO IN GA NOT ON PROBLEMATIC M1
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
