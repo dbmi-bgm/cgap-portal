@@ -100,6 +100,22 @@ def test_ingestion_message_handler_decorator_bad_duplicate_type_handlers():
             pass
 
 
+def test_ingestion_message_handler_decorator_undefined():
+
+    for_testing_clear_ingestion_message_handlers()
+
+    with pytest.raises(Exception):
+        @ingestion_message_handler("some-message-type")
+        def a(message, listener):
+            pass
+        @ingestion_message_handler("some-other-message-type")
+        def duplicate_a(message, listener):
+            pass
+        handler_calls = set()
+        ingestion_message = create_raw_message(ingestion_type="some-third-message-type")
+        result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+
+
 def test_ingestion_message_handler_decorator_one():
 
     for_testing_clear_ingestion_message_handlers()

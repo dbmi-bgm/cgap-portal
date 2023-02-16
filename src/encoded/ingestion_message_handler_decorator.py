@@ -58,7 +58,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     def ingestion_message_handler_wrapper(wrapped_function):
 
         if ingestion_type in _ingestion_message_handlers:
-            raise ValueError(f"Ingestion message handler already defined for ingestion type: {ingestion_type}")
+            raise ValueError(f"Ingestion message handler already defined for ingestion message type: {ingestion_type}")
 
         # Sanity check the signature of the decorated ingestion message handler function.
         # It should contain two arguments with either no type annotations or if present
@@ -67,10 +67,10 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
         wrapped_function_signature = inspect.signature(wrapped_function)
         if len(wrapped_function_signature.parameters) < 2:
             raise ValueError(f"Too few arguments (need two) "
-                             f"for ingestion handler function: {wrapped_function.__name__}")
+                             f"for ingestion message handler function: {wrapped_function.__name__}")
         if len(wrapped_function_signature.parameters) > 2:
             raise ValueError(f"Too many arguments (need two) "
-                             f"for ingestion handler function: {wrapped_function.__name__}")
+                             f"for ingestion message handler function: {wrapped_function.__name__}")
         parameters = iter(wrapped_function_signature.parameters.items())
         first_parameter = next(parameters)
         if first_parameter and len(first_parameter) >= 2:
@@ -78,14 +78,14 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             if not first_parameter_annotation or (first_parameter_annotation.__name__ != "_empty" and
                                                   not issubclass(first_parameter_annotation, IngestionMessage)):
                 raise ValueError(f"Wrong first argument type (need unspecified or IngestionMessage) "
-                                 f"for ingestion handler function: {wrapped_function.__name__}")
+                                 f"for ingestion message handler function: {wrapped_function.__name__}")
         second_parameter = next(parameters)
         if second_parameter and len(second_parameter) >= 2:
             second_parameter_annotation = second_parameter[1].annotation
             if not second_parameter_annotation or (second_parameter_annotation.__name__ != "_empty" and
                                                    not issubclass(second_parameter_annotation, IngestionListenerBase)):
                 raise ValueError(f"Wrong second argument type (need unspecified or IngestionListener) "
-                                 f"for ingestion handler function: {wrapped_function.__name__}")
+                                 f"for ingestion message handler function: {wrapped_function.__name__}")
         if ingestion_type:
             PRINT(f"Registering ingestion message handler: "
                   f"{wrapped_function.__name__} (type: {ingestion_type})")
@@ -158,7 +158,7 @@ def call_ingestion_message_handler(message: Union[IngestionMessage, dict], liste
     if handler:
         return handler(message, listener)
     else:
-        raise Exception(f"No ingestion message handler defined for ingestion type: {message.type}")
+        raise Exception(f"No ingestion message handler defined for ingestion message type: {message.type}")
     return False
 
 
