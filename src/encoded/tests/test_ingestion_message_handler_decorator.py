@@ -16,13 +16,14 @@ SOME_UUID = "some-uuid-xyzzy"
 INGESTION_LISTENER = IngestionListener()
 INGESTION_TYPE_VCF = "vcf"
 INGESTION_TYPE_NOVCF = "novcf"
+INGESTION_TYPE_OTHER = "other"
 
 
 def create_raw_message(ingestion_type: str, unprocessed: str = None) -> dict:
     return {"Body": f"{{\"uuid\":\"{SOME_UUID}\", \"ingestion_type\":\"{ingestion_type}\"}}"}
 
 
-def test_ingestion_message_handler_decorator_bad_decorator_arguments():
+def test_error_decorator_arguments():
 
     with pytest.raises(Exception):
         @ingestion_message_handler(123)  # wrong decorator arg type
@@ -45,7 +46,7 @@ def test_ingestion_message_handler_decorator_bad_decorator_arguments():
             pass
 
 
-def test_ingestion_message_handler_decorator_bad_decorated_function_signature():
+def test_error_decorated_function_signature():
 
     with pytest.raises(Exception):
         @ingestion_message_handler
@@ -78,7 +79,7 @@ def test_ingestion_message_handler_decorator_bad_decorated_function_signature():
             pass
 
 
-def test_ingestion_message_handler_decorator_bad_duplicate_default_handlers():
+def test_error_duplicate_default_handlers():
 
     with pytest.raises(Exception):
         @ingestion_message_handler
@@ -89,7 +90,7 @@ def test_ingestion_message_handler_decorator_bad_duplicate_default_handlers():
             pass
 
 
-def test_ingestion_message_handler_decorator_bad_duplicate_type_handlers():
+def test_error_duplicate_typed_handlers():
 
     with pytest.raises(Exception):
         @ingestion_message_handler("some-message-type")
@@ -100,7 +101,7 @@ def test_ingestion_message_handler_decorator_bad_duplicate_type_handlers():
             pass
 
 
-def test_ingestion_message_handler_decorator_undefined():
+def test_error_undefined_handler():
 
     for_testing_clear_ingestion_message_handlers()
 
@@ -111,15 +112,14 @@ def test_ingestion_message_handler_decorator_undefined():
         @ingestion_message_handler("some-other-message-type")
         def duplicate_a(message, listener):
             pass
-        handler_calls = set()
         ingestion_message = create_raw_message(ingestion_type="some-third-message-type")
-        result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+        # This should throw exception because no relevant handler found.
+        call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
 
 
 def test_ingestion_message_handler_decorator_one():
 
     for_testing_clear_ingestion_message_handlers()
-
     handler_calls = None
 
     @ingestion_message_handler
@@ -127,13 +127,13 @@ def test_ingestion_message_handler_decorator_one():
         this_function_name = "a"
         result = f"{this_function_name}/{message.type}"
         handler_calls.add(result)
-        assert message.is_type(INGESTION_TYPE_VCF) or message.is_type(INGESTION_TYPE_NOVCF)
+        assert not message.is_type(INGESTION_TYPE_VCF) and not message.is_type(INGESTION_TYPE_NOVCF)
         assert message.uuid == SOME_UUID
         assert listener is INGESTION_LISTENER
         return result
 
     @ingestion_message_handler(ingestion_type=INGESTION_TYPE_VCF)
-    def b(message: IngestionMessage, listener: IngestionListener):
+    def b(message: IngestionMessage, listener: IngestionListener) -> str:
         this_function_name = "b"
         result = f"{this_function_name}/{message.type}"
         handler_calls.add(result)
@@ -142,14 +142,30 @@ def test_ingestion_message_handler_decorator_one():
         assert listener is INGESTION_LISTENER
         return result
 
+    @ingestion_message_handler(INGESTION_TYPE_NOVCF)
+    def c(message, listener):
+        this_function_name = "c"
+        result = f"{this_function_name}/{message.type}"
+        handler_calls.add(result)
+        assert message.is_type(INGESTION_TYPE_NOVCF)
+        assert message.uuid == SOME_UUID
+        assert listener is INGESTION_LISTENER
+        return result
+
     handler_calls = set()
-    ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_NOVCF)
-    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
-    assert result == f"a/{IngestionMessage(ingestion_message).type}"
+    ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_OTHER)
+    handler_result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert handler_result == f"a/{IngestionMessage(ingestion_message).type}"
     assert handler_calls == {f"a/{IngestionMessage(ingestion_message).type}"}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF)
-    result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
-    assert result == f"b/{IngestionMessage(ingestion_message).type}"
+    handler_result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert handler_result == f"b/{IngestionMessage(ingestion_message).type}"
     assert handler_calls == {f"b/{IngestionMessage(ingestion_message).type}"}
+
+    handler_calls = set()
+    ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_NOVCF)
+    handler_result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
+    assert handler_result == f"c/{IngestionMessage(ingestion_message).type}"
+    assert handler_calls == {f"c/{IngestionMessage(ingestion_message).type}"}
