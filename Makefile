@@ -47,7 +47,6 @@ configure:  # does any pre-requisite installs
 	@#pip install poetry==1.1.9  # this version is known to work. -kmp 11-Mar-2021
 	# Pin to version 1.1.15 for now to avoid this error:
 	#   Because encoded depends on wheel (>=0.29.0) which doesn't match any versions, version solving failed.
-	pip install wheel==0.37.1
 	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
@@ -61,15 +60,10 @@ macbuild-poetry:
 	make macpoetry-install
 
 build:  # builds
-ifeq ($(shell uname -s), Darwin)
-	@echo "Looks like this is Mac so executing: make macbuild"
-	make macbuild
-else
 	make build-poetry
 	make build-after-poetry
-endif
 
-macbuild:  # Builds for MacOS (see: bin/macpoetry-install)
+macbuild:  # builds for Catalina
 	make macbuild-poetry
 	make build-after-poetry
 
