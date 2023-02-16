@@ -6,12 +6,22 @@ cgap-portal
 Change Log
 ----------
 
-12.9.0
+12.9.4
 ======
 
 * Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
   new `@ingestion_message_handler` decorator functions; specific message handling
   code now in `ingestion_message_handler_novcf.py` and `ingestion_message_handler_vcf.py`.
+
+
+12.8.3
+======
+
+`PR 684: QC + tooltip updates <https://github.com/dbmi-bgm/cgap-portal/pull/684>`_
+
+* Decrease WES Ti/Tv lower bounds for warning/failure
+* Add coverage tooltip to QC report
+* Minor updates to variant facet tooltips
 
 
 12.8.2
