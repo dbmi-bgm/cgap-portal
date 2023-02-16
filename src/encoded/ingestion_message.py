@@ -2,7 +2,11 @@ import json
 
 
 class IngestionMessage:
-
+    """
+    Wrapper for raw ingestion message from SQS. Extracts ingestion type and uuid for
+    easy/unified access. This is the type expected by the ingestion_message_handler decorator.
+    Note that the ingestion type name  string is trimmed and treated as case-insensitive.
+    """
     TYPE_VCF = "vcf"
 
     def __init__(self, raw_message: dict) -> None:
