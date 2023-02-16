@@ -12,7 +12,7 @@ from .ingestion_message import IngestionMessage
 # Dictionary (by ingestion type) of globally registered ingestion message handlers.
 _ingestion_message_handlers = {}
 
-_DEFAULT_INGESTION_MESSAGE_HANDLER_NAME = "<default>"
+_DEFAULT_INGESTION_TYPE_FOR_DEFAULT_HANDLER = "<default>"
 
 
 def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
@@ -41,7 +41,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
     handler. There MUST be exactly ONE handler registered able to handle any expected message type,
     otherwise an exception will be thrown (either at handler registration time, i.e. startup; or
     at runtime, i.e. if an incoming message is found not to have an associated handler and there is
-    no default handler; this latter bit is handled by the call_ingestion_message_handler function below.
+    no default handler; this latter bit is handled by the call_ingestion_message_handler function below).
     """
     ignored(decorator_args)
     has_decorator_args = True if not callable(f) or f.__name__ == "<lambda>" else False
@@ -61,7 +61,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             raise ValueError(f"Invalid @ingestion_message_handler decorator usage (argument must be ingestion type string).")
         ingestion_type = ingestion_type.strip().lower()
     if not ingestion_type or ingestion_type == "default":
-        ingestion_type = _DEFAULT_INGESTION_MESSAGE_HANDLER_NAME
+        ingestion_type = _DEFAULT_INGESTION_TYPE_FOR_DEFAULT_HANDLER
 
     def ingestion_message_handler_wrapper(wrapped_function):
 
@@ -94,12 +94,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
                                                    not issubclass(second_parameter_annotation, IngestionListenerBase)):
                 raise ValueError(f"Wrong second argument type (need unspecified or IngestionListener) "
                                  f"for ingestion message handler function: {wrapped_function.__name__}")
-        if ingestion_type:
-            PRINT(f"Registering ingestion message handler: "
-                  f"{wrapped_function.__name__} (type: {ingestion_type})")
-        else:
-            PRINT(f"Registering ingestion message handler: "
-                  f"{wrapped_function.__name__} (type: {_DEFAULT_INGESTION_MESSAGE_HANDLER_NAME})")
+        PRINT(f"Registering ingestion message handler: {wrapped_function.__name__} (type: {ingestion_type})")
 
         def ingestion_message_handler_function(*args, **kwargs):
             """
@@ -124,7 +119,7 @@ def ingestion_message_handler(f=None, *decorator_args, **decorator_kwargs):
             # should be unnecessary, though extra check will not hurt; it would only come up if calling a
             # registered message handler directly (i.e. not via call_ingestion_message_handler).
             PRINT(f"Checking message ({message.uuid}) type ({message.type}) for handler: {wrapped_function.__name__}")
-            if ingestion_type and ingestion_type != _DEFAULT_INGESTION_MESSAGE_HANDLER_NAME:
+            if ingestion_type and ingestion_type != _DEFAULT_INGESTION_TYPE_FOR_DEFAULT_HANDLER:
                 # Here the decorator specified a NON-default ingestion type for this handler;
                 # check and only call this handler (the wrapped function) if the handler
                 # ingestion type matches the ingestion message type.
@@ -172,7 +167,7 @@ def call_ingestion_message_handler(message: Union[IngestionMessage, dict], liste
         message = IngestionMessage(message)
     # Get the handler for this message type, or the default handler of none specifically found.
     handler = (_ingestion_message_handlers.get(message.type) or
-               _ingestion_message_handlers.get(_DEFAULT_INGESTION_MESSAGE_HANDLER_NAME))
+               _ingestion_message_handlers.get(_DEFAULT_INGESTION_TYPE_FOR_DEFAULT_HANDLER))
     if handler:
         return handler(message, listener)
     else:
