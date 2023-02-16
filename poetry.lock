@@ -865,7 +865,7 @@ python-versions = ">=3.6"
 bitarray = ">=1.2.0"
 h5py = ">=3.6.0"
 matplotlib = "3.3.4"
-numpy = ">=1.18.0"
+numpy = ">=1.24.1"
 pysam = ">=0.15.0"
 pytabix = ">=0.0.2"
 
@@ -889,7 +889,7 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
-numpy = ">=1.7"
+numpy = ">=1.24.1"
 six = "*"
 
 [[package]]
@@ -1043,7 +1043,7 @@ python-versions = ">=3.6"
 [package.dependencies]
 cycler = ">=0.10"
 kiwisolver = ">=1.0.1"
-numpy = ">=1.15"
+numpy = ">=1.24.1"
 pillow = ">=6.2.0"
 pyparsing = ">=2.0.3,<2.0.4 || >2.0.4,<2.1.2 || >2.1.2,<2.1.6 || >2.1.6"
 python-dateutil = ">=2.1"
@@ -1127,7 +1127,7 @@ python-versions = "*"
 
 [[package]]
 name = "numpy"
-version = "1.19.1"
+version = "1.24.1"
 description = "NumPy is the fundamental package for array computing with Python."
 category = "main"
 optional = false
