@@ -30,6 +30,7 @@ CGAP_STATIC_MAX_AGE = 1800
 # tune this to get more data points when analyzing performance
 SENTRY_TRACE_RATE = .1
 DEFAULT_AUTH0_DOMAIN = 'hms-dbmi.auth0.com'
+DEFAULT_AUTH0_ALLOWED_CONNECTIONS = 'github,google-oauth2,partners,hms-it'
 
 
 def static_resources(config):
@@ -133,6 +134,9 @@ def main(global_config, **local_config):
     settings['auth0.domain'] = settings.get('auth0.domain', os.environ.get('Auth0Domain', DEFAULT_AUTH0_DOMAIN))
     settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
     settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
+    settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
+                                                         os.environ.get('Auth0AllowedConnections',
+                                                                        DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
     settings['auth0.options'] = {
         'auth': {
             'sso': False,
@@ -143,9 +147,7 @@ def main(global_config, **local_config):
                 'prompt': 'select_account'
             }
         },
-        'allowedConnections': [  # TODO: make at least this part configurable
-            'github', 'google-oauth2', 'partners'
-        ]
+        'allowedConnections': settings['auth0.allowed_connections']
     }
     # set google reCAPTCHA keys
     # TODO propagate from GAC
