@@ -137,6 +137,22 @@ def test_error_undefined_handler():
         call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
 
 
+def test_error_invalid_call_arguments():
+
+    for_testing_clear_ingestion_message_handlers()
+
+    @ingestion_message_handler("some-message-type")
+    def a(message, listener):
+        pass
+
+    ingestion_message = create_raw_message(ingestion_type="some-message-type")
+    with pytest.raises(Exception):
+        call_ingestion_message_handler(ingestion_message, "wrong-type-should-be-IngestionListenerBase")
+
+    with pytest.raises(Exception):
+        a(ingestion_message, INGESTION_LISTENER)  # wrong first arg type (raw dict rather than IngestionMessage)
+
+
 def test_one():
 
     for_testing_clear_ingestion_message_handlers()
