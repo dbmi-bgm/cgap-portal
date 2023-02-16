@@ -156,16 +156,16 @@ def test_one():
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_OTHER)
     handler_result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
     assert handler_result == f"a/{IngestionMessage(ingestion_message).type}"
-    assert handler_calls == {f"a/{IngestionMessage(ingestion_message).type}"}
+    assert handler_calls == {handler_result}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_VCF)
     handler_result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
     assert handler_result == f"b/{IngestionMessage(ingestion_message).type}"
-    assert handler_calls == {f"b/{IngestionMessage(ingestion_message).type}"}
+    assert handler_calls == {handler_result}
 
     handler_calls = set()
     ingestion_message = create_raw_message(ingestion_type=INGESTION_TYPE_NOVCF)
     handler_result = call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
     assert handler_result == f"c/{IngestionMessage(ingestion_message).type}"
-    assert handler_calls == {f"c/{IngestionMessage(ingestion_message).type}"}
+    assert handler_calls == {handler_result}

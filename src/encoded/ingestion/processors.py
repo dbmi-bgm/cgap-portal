@@ -20,6 +20,8 @@ def ingestion_processor(processor_type):
     """
 
     def ingestion_type_decorator(fn):
+        if processor_type in INGESTION_UPLOADERS:
+            raise RuntimeError(f"Ingestion type {processor_type} is already defined.")
         INGESTION_UPLOADERS[processor_type] = fn
         return fn
 
