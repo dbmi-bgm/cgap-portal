@@ -51,8 +51,7 @@ elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
 granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
-#h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
-h5py = "^3.5.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
+h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
 # html5lib = "0.9999999"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
