@@ -51,6 +51,8 @@ configure:  # does any pre-requisite installs
 	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	pip install isodate==0.5.4
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
