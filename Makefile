@@ -57,6 +57,7 @@ configure:  # does any pre-requisite installs
 
 build-poetry:
 	make configure
+	poetry update h5py  # TEMPORARY TESTING: TO DO IN GA NOT ON PROBLEMATIC M1
 	poetry install
 
 macbuild-poetry:
