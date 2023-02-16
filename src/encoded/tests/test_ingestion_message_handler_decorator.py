@@ -1,7 +1,7 @@
 import pytest
 from encoded.ingestion_message import IngestionMessage
-from encoded.ingestion_listener_base import IngestionListenerBase
-from encoded.ingestion_message_handler_decorator import (
+from ..ingestion_listener_base import IngestionListenerBase
+from ..ingestion_message_handler_decorator import (
     call_ingestion_message_handler,
     ingestion_message_handler,
     for_testing_clear_ingestion_message_handlers,
@@ -9,7 +9,7 @@ from encoded.ingestion_message_handler_decorator import (
 
 
 class IngestionListener(IngestionListenerBase):
-    pass # dummy
+    pass  # dummy
 
 
 SOME_UUID = "some-uuid-xyzzy"

@@ -49,6 +49,8 @@ INGESTION_QUEUE = 'ingestion_queue'
 
 
 def includeme(config):
+    config.include('.ingestion_message_handler_vcf')
+    config.include('.ingestion_message_handler_novcf')
     # config.add_route('process_ingestion', '/process_ingestion')
     config.add_route('queue_ingestion', '/queue_ingestion')
     config.add_route('ingestion_status', '/ingestion_status')
