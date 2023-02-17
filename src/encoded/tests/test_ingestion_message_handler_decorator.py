@@ -19,10 +19,19 @@ INGESTION_TYPE_NOVCF = "novcf"
 INGESTION_TYPE_OTHER = "other"
 
 
+def isolate_ingestion_message_handler_decorator_test(f):
+    def wrapper():
+        for_testing_clear_ingestion_message_handlers()
+        f()
+        for_testing_clear_ingestion_message_handlers()
+    return wrapper
+
+
 def create_raw_message(ingestion_type: str) -> dict:
     return {"Body": f"{{\"uuid\":\"{SOME_UUID}\", \"ingestion_type\":\"{ingestion_type}\"}}"}
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_decorator_arguments():
 
     with pytest.raises(Exception):
@@ -46,6 +55,7 @@ def test_error_decorator_arguments():
             pass
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_decorated_function_signature():
 
     with pytest.raises(Exception):
@@ -79,6 +89,7 @@ def test_error_decorated_function_signature():
             pass
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_duplicate_default_handlers_one():
 
     with pytest.raises(Exception):
@@ -92,6 +103,7 @@ def test_error_duplicate_default_handlers_one():
             pass
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_duplicate_default_handlers_two():
 
     with pytest.raises(Exception):
@@ -105,6 +117,7 @@ def test_error_duplicate_default_handlers_two():
             pass
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_duplicate_typed_handlers():
 
     with pytest.raises(Exception):
@@ -118,9 +131,8 @@ def test_error_duplicate_typed_handlers():
             pass
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_undefined_handler():
-
-    for_testing_clear_ingestion_message_handlers()
 
     with pytest.raises(Exception):
 
@@ -137,9 +149,8 @@ def test_error_undefined_handler():
         call_ingestion_message_handler(ingestion_message, INGESTION_LISTENER)
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_error_invalid_call_arguments():
-
-    for_testing_clear_ingestion_message_handlers()
 
     @ingestion_message_handler("some-message-type")
     def a(message, listener):
@@ -165,9 +176,9 @@ def test_error_invalid_call_arguments():
         a(ingestion_message, INGESTION_LISTENER)  # wrong first arg type (raw dict rather than IngestionMessage)
 
 
+@isolate_ingestion_message_handler_decorator_test
 def test_one():
 
-    for_testing_clear_ingestion_message_handlers()
     handler_calls = None
 
     @ingestion_message_handler

@@ -27,7 +27,7 @@ log = structlog.getLogger(__name__)
 
 
 def includeme(config):
-    config.scan(__name__)
+    pass
 
 
 @ingestion_message_handler(ingestion_type=IngestionMessage.TYPE_VCF)
