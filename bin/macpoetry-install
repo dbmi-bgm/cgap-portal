@@ -24,8 +24,8 @@ if [[ `uname -o` == "Darwin" && `uname -m` == "arm64" ]] ; then
     # These worked around Mac M1 issues (after the build) running (at least) make deploy1a.
     #
     echo "Some more special installs for Mac M1."
-    pip uninstall -y psutil
-    pip install --no-binary :all: psutil
+    # pip uninstall -y psutil
+    # pip install --no-binary :all: psutil
     pip uninstall -y pytabix
     pip install pytabix
     echo "Done with more special installs for Mac M1."
