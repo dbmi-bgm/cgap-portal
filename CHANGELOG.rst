@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+12.8.4
+======
+
+* Changes for build on Mac M1.
+
+
 12.8.3
 ======
 
