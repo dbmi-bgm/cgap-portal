@@ -42,22 +42,14 @@ requests = ">=0.14.0"
 
 [[package]]
 name = "awscli"
-<<<<<<< Updated upstream
-version = "1.27.73"
-=======
 version = "1.27.74"
->>>>>>> Stashed changes
 description = "Universal Command Line Environment for AWS."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-<<<<<<< Updated upstream
-botocore = "1.29.73"
-=======
 botocore = "1.29.74"
->>>>>>> Stashed changes
 colorama = ">=0.2.5,<0.4.5"
 docutils = ">=0.10,<0.17"
 PyYAML = ">=3.10,<5.5"
@@ -97,22 +89,14 @@ python-versions = "*"
 
 [[package]]
 name = "boto3"
-<<<<<<< Updated upstream
-version = "1.26.73"
-=======
 version = "1.26.74"
->>>>>>> Stashed changes
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 
 [package.dependencies]
-<<<<<<< Updated upstream
-botocore = ">=1.29.73,<1.30.0"
-=======
 botocore = ">=1.29.74,<1.30.0"
->>>>>>> Stashed changes
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -478,11 +462,7 @@ xray = ["mypy-boto3-xray (>=1.26.0,<1.27.0)"]
 
 [[package]]
 name = "botocore"
-<<<<<<< Updated upstream
-version = "1.29.73"
-=======
 version = "1.29.74"
->>>>>>> Stashed changes
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
@@ -2277,13 +2257,8 @@ aws-requests-auth = [
     {file = "aws_requests_auth-0.4.3-py2.py3-none-any.whl", hash = "sha256:646bc37d62140ea1c709d20148f5d43197e6bd2d63909eb36fa4bb2345759977"},
 ]
 awscli = [
-<<<<<<< Updated upstream
-    {file = "awscli-1.27.73-py3-none-any.whl", hash = "sha256:c85a1542fe57e61cd8194f68ef9b0bb36788d4eb494540a26254a51d0c0876aa"},
-    {file = "awscli-1.27.73.tar.gz", hash = "sha256:f86bfbf37628f5303df09d005bf221366132d1ba02e94f04f44b3fab5ac8104e"},
-=======
     {file = "awscli-1.27.74-py3-none-any.whl", hash = "sha256:55530418bbefb69e52674d567238d565d83e73a382d50de68559fe70c996a6aa"},
     {file = "awscli-1.27.74.tar.gz", hash = "sha256:09b22f1e5544d641e880d6a6fb420143213cc294c0d20231523adad544c829c9"},
->>>>>>> Stashed changes
 ]
 backports-statistics = [
     {file = "backports.statistics-0.1.0-py2.py3-none-any.whl", hash = "sha256:2732e003151620762ba3ea25b881b5ca0debe2fcbf41b32b6eaff5842a8b99d7"},
@@ -2383,26 +2358,16 @@ bitarray = [
     {file = "bitarray-2.7.2.tar.gz", hash = "sha256:7ea42120162bc089a169c58039ce2f0198b5d9bb6cac7c076c3035176335811c"},
 ]
 boto3 = [
-<<<<<<< Updated upstream
-    {file = "boto3-1.26.73-py3-none-any.whl", hash = "sha256:98efcc8472c58060856bf42e9afe10eefb60c0e52680db0a43daf96e7a1216de"},
-    {file = "boto3-1.26.73.tar.gz", hash = "sha256:bd92def38355ea055c6c29bd599832878eecc19cad21dab34ade38280e1b403b"},
-=======
     {file = "boto3-1.26.74-py3-none-any.whl", hash = "sha256:57f1696cbf5927180521ddabc37f10eb6650ccedc2b784dfb04502193bb65df9"},
     {file = "boto3-1.26.74.tar.gz", hash = "sha256:a3cf126d18194e5d350ec46f99f1fff15beacdf091d1979e8471681688e14ba1"},
->>>>>>> Stashed changes
 ]
 boto3-stubs = [
     {file = "boto3-stubs-1.26.73.tar.gz", hash = "sha256:4fa86d7c0e326f00d7514fd56192db9dd2236017c45c96be4993b0d59f33e104"},
     {file = "boto3_stubs-1.26.73-py3-none-any.whl", hash = "sha256:7ce59560315190d72119c14020aa2f56200745d92f0b125caa9ceea5878f262e"},
 ]
 botocore = [
-<<<<<<< Updated upstream
-    {file = "botocore-1.29.73-py3-none-any.whl", hash = "sha256:df467573a96d2e1ba1196b5a30b0a5e4a83fd960d27b5c2f8f128c9148dc120e"},
-    {file = "botocore-1.29.73.tar.gz", hash = "sha256:a9f0e006b3342424d59d5e23dc1ca0c6972c909a727dcd0811c9b20966d4adf8"},
-=======
     {file = "botocore-1.29.74-py3-none-any.whl", hash = "sha256:cb1e1a584c0bea3b1bcf39710eb7b2e58add56945598d95356bf9f6d4cc8b6ae"},
     {file = "botocore-1.29.74.tar.gz", hash = "sha256:bf1515908c8ffdffa249e112fd9bbb54d919ce8fb5ee88baf9c198dda6172fd5"},
->>>>>>> Stashed changes
 ]
 botocore-stubs = [
     {file = "botocore_stubs-1.29.73-py3-none-any.whl", hash = "sha256:7579ce60994635f8866e43650907fbf5a65554730101b8fc7bc3acf7eef499e5"},
