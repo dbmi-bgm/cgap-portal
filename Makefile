@@ -36,6 +36,7 @@ npm-setup:  # runs all front-end setup
 	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
+	pip install setuptools==57.5.0
 	pip install "moto[server]==1.3.7"
 
 macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
@@ -201,6 +202,10 @@ remote-test-unit:  # Note this does the 'indexing' tests
 
 update:  # updates dependencies
 	poetry update
+ifeq ($(shell uname -s), Darwin)
+	cp poetry.lock poetry.lock-backup
+	./fixup-poetry-dot-lock.sh
+endif
 
 debug-docker-local:
 	@scripts/debug-docker-local
