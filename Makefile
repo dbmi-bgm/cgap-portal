@@ -193,6 +193,7 @@ test-integrated:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy and not static"
 
 test-static:
+	pip install setuptools==57.5.0
 	poetry run python -m pytest -vv -m static
 	make lint
 
