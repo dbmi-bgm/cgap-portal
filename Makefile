@@ -51,6 +51,12 @@ configure:  # does any pre-requisite installs
 	pip install wheel==0.37.1
 	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
+	pip install isodate==0.5.4
+	pip install pysam==0.20.0
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
+	pip install numpy==1.24.1
+	pip install h5py==3.6.0
 	pip install zope.sqlalchemy==1.6
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
