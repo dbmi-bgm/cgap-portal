@@ -36,6 +36,7 @@ npm-setup:  # runs all front-end setup
 	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
+	pip install setuptools==57.5.0
 	pip install "moto[server]==1.3.7"
 
 macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
@@ -49,6 +50,14 @@ configure:  # does any pre-requisite installs
 	#   Because encoded depends on wheel (>=0.29.0) which doesn't match any versions, version solving failed.
 	pip install wheel==0.37.1
 	pip install poetry==1.1.15
+	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
+	pip install isodate==0.5.4
+	pip install pysam==0.20.0
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
+	pip install numpy==1.24.1
+	pip install h5py==3.6.0
+	pip install zope.sqlalchemy==1.6
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
@@ -184,6 +193,7 @@ test-integrated:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy and not static"
 
 test-static:
+	pip install setuptools==57.5.0
 	poetry run python -m pytest -vv -m static
 	make lint
 
@@ -198,7 +208,23 @@ remote-test-unit:  # Note this does the 'indexing' tests
 	poetry run python -m pytest -xvv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing and not static" --aws-auth --es search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
 update:  # updates dependencies
+	pip install --upgrade pip
+	pip install wheel==0.37.1
+	pip install poetry==1.1.15
+	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
+	pip install isodate==0.5.4
+	pip install pysam==0.20.0
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
+	pip install numpy==1.24.1
+	pip install h5py==3.6.0
+	pip install zope.sqlalchemy==1.6
+	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	poetry update
+ifeq ($(shell uname -s), Darwin)
+	cp poetry.lock poetry.lock-backup
+	./fixup-poetry-dot-lock.sh
+endif
 
 debug-docker-local:
 	@scripts/debug-docker-local
