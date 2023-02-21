@@ -57,7 +57,7 @@ rsa = ">=3.1.2,<4.8"
 s3transfer = ">=0.6.0,<0.7.0"
 
 [[package]]
-name = "backports-statistics"
+name = "backports.statistics"
 version = "0.1.0"
 description = "statistics backport 2.6 - 3.3"
 category = "main"
@@ -625,7 +625,7 @@ python-versions = ">=3.6"
 
 [[package]]
 name = "dcicpyvcf"
-version = "1.0.0.1b0"
+version = "1.0.0"
 description = "Variant Call Format (VCF) parser for Python"
 category = "main"
 optional = false
@@ -972,14 +972,11 @@ testing = ["flake8 (<5)", "flufl.flake8", "importlib-resources (>=1.3)", "packag
 
 [[package]]
 name = "isodate"
-version = "0.6.1"
+version = "0.5.4"
 description = "An ISO 8601 date/time/duration parser and formatter"
 category = "main"
 optional = false
 python-versions = "*"
-
-[package.dependencies]
-six = "*"
 
 [[package]]
 name = "itsdangerous"
@@ -1015,6 +1012,14 @@ python-versions = "*"
 name = "jsonschema-serialize-fork"
 version = "2.1.1"
 description = "Fork of Julian Berman's jsonschema to include support for serializing defaults"
+category = "main"
+optional = false
+python-versions = "*"
+
+[[package]]
+name = "keepalive"
+version = "0.5"
+description = "urllib keepalive support for python"
 category = "main"
 optional = false
 python-versions = "*"
@@ -1670,7 +1675,7 @@ python-versions = "*"
 rdflib = "*"
 
 [[package]]
-name = "repoze-debug"
+name = "repoze.debug"
 version = "1.1"
 description = "Forensic debugging WSGI middleware"
 category = "main"
@@ -2183,7 +2188,7 @@ docs = ["furo", "jaraco.packaging (>=9)", "jaraco.tidelift (>=1.4)", "rst.linker
 testing = ["flake8 (<5)", "func-timeout", "jaraco.functools", "jaraco.itertools", "more-itertools", "pytest (>=6)", "pytest-black (>=0.3.7)", "pytest-checkdocs (>=2.4)", "pytest-cov", "pytest-enabler (>=1.3)", "pytest-flake8", "pytest-mypy (>=0.9.1)"]
 
 [[package]]
-name = "zope-deprecation"
+name = "zope.deprecation"
 version = "4.4.0"
 description = "Zope Deprecation Infrastructure"
 category = "main"
@@ -2198,7 +2203,7 @@ docs = ["Sphinx"]
 test = ["zope.testrunner"]
 
 [[package]]
-name = "zope-interface"
+name = "zope.interface"
 version = "4.7.2"
 description = "Interfaces for Python"
 category = "main"
@@ -2214,7 +2219,7 @@ test = ["zope.event"]
 testing = ["coverage", "nose", "zope.event"]
 
 [[package]]
-name = "zope-sqlalchemy"
+name = "zope.sqlalchemy"
 version = "1.6"
 description = "Minimal Zope/SQLAlchemy transaction integration"
 category = "main"
@@ -2233,7 +2238,7 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.8.1,<3.9"
-content-hash = "e2fd44d84e956697fc5e2d22a609da8c29e6709041249a24f8d0751d9abddb4d"
+content-hash = "8b2da40a581d55d546289349b472a361b87e63a0437658fabbaf2e48f55111a2"
 
 [metadata.files]
 apipkg = [
@@ -2255,7 +2260,7 @@ awscli = [
     {file = "awscli-1.27.75-py3-none-any.whl", hash = "sha256:c216b1fecaee8b7f12704cb48da3c798dea6f934e3d2ed6ec574f135abb22685"},
     {file = "awscli-1.27.75.tar.gz", hash = "sha256:4ddceb061e6dbdc313cf2c9ff36e16324605f8a94c30fb334aef81a7a0766482"},
 ]
-backports-statistics = [
+"backports.statistics"= [
     {file = "backports.statistics-0.1.0-py2.py3-none-any.whl", hash = "sha256:2732e003151620762ba3ea25b881b5ca0debe2fcbf41b32b6eaff5842a8b99d7"},
     {file = "backports.statistics-0.1.0.tar.gz", hash = "sha256:714ab29b9b9937c6ec65d8c6a3dcc39ee4972f929d55977b018bb9f204ba1f98"},
 ]
@@ -2633,7 +2638,7 @@ cycler = [
     {file = "cycler-0.11.0.tar.gz", hash = "sha256:9c87405839a19696e837b3b818fed3f5f69f16f1eec1a1ad77e043dcea9c772f"},
 ]
 dcicpyvcf = [
-    {file = "dcicpyvcf-1.0.0.1b0.tar.gz", hash = "sha256:6303f63cd6c486ba826e7ea44428f39e00d8411ca97d46874ab9f68df8f45959"},
+    {file = "dcicpyvcf-1.0.0.tar.gz", hash = "sha256:c5bf8d585002ab3b95d13a47803376b456b931865e4189c38a18cca47b108449"},
 ]
 dcicsnovault = [
     {file = "dcicsnovault-7.1.3-py3-none-any.whl", hash = "sha256:e7723215338b9aee8093dbfed8464930e524ccec03ac2d71ddc7982ffa99b7b2"},
@@ -2807,8 +2812,7 @@ importlib-metadata = [
     {file = "importlib_metadata-6.0.0.tar.gz", hash = "sha256:e354bedeb60efa6affdcc8ae121b73544a7aa74156d047311948f6d711cd378d"},
 ]
 isodate = [
-    {file = "isodate-0.6.1-py2.py3-none-any.whl", hash = "sha256:0751eece944162659049d35f4f549ed815792b38793f07cf73381c1c87cbed96"},
-    {file = "isodate-0.6.1.tar.gz", hash = "sha256:48c5881de7e8b0a0d648cb024c8062dc84e7b840ed81e864c7614fd3c127bde9"},
+    {file = "isodate-0.5.4.tar.gz", hash = "sha256:42105c41d037246dc1987e36d96f3752ffd5c0c24834dd12e4fdbe1e79544e31"},
 ]
 itsdangerous = [
     {file = "itsdangerous-2.1.2-py3-none-any.whl", hash = "sha256:2c2349112351b88699d8d4b6b075022c0808887cb7ad10069318a8b0bc88db44"},
@@ -2824,6 +2828,10 @@ jmespath = [
 ]
 jsonschema-serialize-fork = [
     {file = "jsonschema_serialize_fork-2.1.1.tar.gz", hash = "sha256:49b502326ac408729f72c95db018bf0e4d47860e3cd76e944f368f41a5483ed5"},
+]
+keepalive = [
+    {file = "keepalive-0.5.tar.gz", hash = "sha256:3c6b96f9062a5a76022f0c9d41e9ef5552d80b1cadd4fccc1bf8f183ba1d1ec1"},
+    {file = "keepalive-0.5.zip", hash = "sha256:f18cb2f4e7af9fc0119fb4d1b731af6c06bd9e12a57f54df32929dc2bcb58c82"},
 ]
 kiwisolver = [
     {file = "kiwisolver-1.4.4-cp310-cp310-macosx_10_9_universal2.whl", hash = "sha256:2f5e60fabb7343a836360c4f0919b8cd0d6dbf08ad2ca6b9cf90bf0c76a3c4f6"},
@@ -3413,7 +3421,7 @@ rdflib-jsonld = [
     {file = "rdflib-jsonld-0.6.0.tar.gz", hash = "sha256:03af8b5540a8e7bb0dae0d9ba1a3bd7f6435abd82cfb4b3ad5e0cdb1bf45a2a6"},
     {file = "rdflib_jsonld-0.6.0-py2.py3-none-any.whl", hash = "sha256:d290c03c5097ec3d96bd20dad8ff8b535e3e7cf53d05acf8ac48983eb36a4572"},
 ]
-repoze-debug = [
+"repoze.debug"= [
     {file = "repoze.debug-1.1-py2-none-any.whl", hash = "sha256:1d90e5b088b167bcde13bdedfe2e34f15fe8a1f53103e406e49b7c11be4d994d"},
     {file = "repoze.debug-1.1.tar.gz", hash = "sha256:f897fbb3a09499b0cee3fe2c5e4579ff04e5b0b87b1aad6098d242cbbf573000"},
 ]
@@ -3681,11 +3689,11 @@ zipp = [
     {file = "zipp-3.14.0-py3-none-any.whl", hash = "sha256:188834565033387710d046e3fe96acfc9b5e86cbca7f39ff69cf21a4128198b7"},
     {file = "zipp-3.14.0.tar.gz", hash = "sha256:9e5421e176ef5ab4c0ad896624e87a7b2f07aca746c9b2aa305952800cb8eecb"},
 ]
-zope-deprecation = [
+"zope.deprecation"= [
     {file = "zope.deprecation-4.4.0-py2.py3-none-any.whl", hash = "sha256:f1480b74995958b24ce37b0ef04d3663d2683e5d6debc96726eff18acf4ea113"},
     {file = "zope.deprecation-4.4.0.tar.gz", hash = "sha256:0d453338f04bacf91bbfba545d8bcdf529aa829e67b705eac8c1a7fdce66e2df"},
 ]
-zope-interface = [
+"zope.interface"= [
     {file = "zope.interface-4.7.2-cp27-cp27m-macosx_10_9_x86_64.whl", hash = "sha256:34381fcecc6e6f57d72bc2fab6175976eeacdd61dbb34427a37b260238278199"},
     {file = "zope.interface-4.7.2-cp27-cp27m-manylinux1_i686.whl", hash = "sha256:4d0830e1d544b2c303064ec01923de2b9d6f5b5d0d78608a91d758b0f469361c"},
     {file = "zope.interface-4.7.2-cp27-cp27m-manylinux1_x86_64.whl", hash = "sha256:73a618e734803ded8b8d8f14f9a6371c6a1acc445840cf6ae57733041e796671"},
@@ -3726,7 +3734,7 @@ zope-interface = [
     {file = "zope.interface-4.7.2-cp38-cp38-win_amd64.whl", hash = "sha256:d79da12a15edd6d7c366766954c4b6de0247e85ba35ee2ad9f37f972e7080f8a"},
     {file = "zope.interface-4.7.2.tar.gz", hash = "sha256:fd1101bd3fcb4f4cf3485bb20d6cb0b56909b94d3bd2a53a6cb9d381c3da3365"},
 ]
-zope-sqlalchemy = [
+"zope.sqlalchemy"= [
     {file = "zope.sqlalchemy-1.6-py2.py3-none-any.whl", hash = "sha256:63c4560fdd2d55c6e5658a22f6835a3c12eac1a3af8140a01400f7367aac91ed"},
     {file = "zope.sqlalchemy-1.6.tar.gz", hash = "sha256:9c53be9a57275566595ada79bdffcd624a12fcf6435f6e6807416541b912f5ab"},
 ]
