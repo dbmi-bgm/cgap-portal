@@ -194,7 +194,7 @@ def main(global_config, **local_config):
     config.include('.visualization')
     config.include('.ingestion_listener')
     config.include('.ingestion_message_handler_vcf')
-    config.include('.ingestion_message_handler_novcf')
+    config.include('.ingestion_message_handler_default')
     config.include('.custom_embed')
 
     if 'elasticsearch.server' in config.registry.settings:

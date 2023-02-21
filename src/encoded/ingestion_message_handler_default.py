@@ -19,7 +19,7 @@ def includeme(config):
 
 
 @ingestion_message_handler(ingestion_type="default")
-def ingestion_message_handler_novcf(message: IngestionMessage, listener: IngestionListener) -> bool:
+def ingestion_message_handler_default(message: IngestionMessage, listener: IngestionListener) -> bool:
     """
     This is the part of listener.IngestionListener.run function which handles a
     single message within the (effectively-infinite) incoming message handling loop,
