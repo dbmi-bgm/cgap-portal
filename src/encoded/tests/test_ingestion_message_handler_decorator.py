@@ -4,7 +4,7 @@ from ..ingestion_listener_base import IngestionListenerBase
 from ..ingestion_message_handler_decorator import (
     call_ingestion_message_handler,
     ingestion_message_handler,
-    for_testing_clear_ingestion_message_handlers,
+    clear_ingestion_message_handlers_for_testing,
 )
 
 
@@ -21,9 +21,9 @@ INGESTION_TYPE_OTHER = "other"
 
 def isolate_ingestion_message_handler_decorator_test(f):
     def wrapper():
-        for_testing_clear_ingestion_message_handlers()
+        clear_ingestion_message_handlers_for_testing()
         f()
-        for_testing_clear_ingestion_message_handlers()
+        clear_ingestion_message_handlers_for_testing()
     return wrapper
 
 

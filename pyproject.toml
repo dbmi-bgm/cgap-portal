@@ -60,7 +60,7 @@ jsonschema_serialize_fork = "^2.1.1"
 loremipsum = "1.0.5"
 netaddr = ">=0.8.0,<1"
 negspy = "0.2.24"
-numpy = "^1.24.1" # negspy needs it
+numpy = "^1.24.1"  # negspy needs it
 openpyxl = "^3.0.7,!=3.0.8"  # a version 3.0.8 appeared but then got withdrawn, for now just pin 3.0.7. try again later.
 passlib = "^1.7.4"
 PasteDeploy = "1.5.2"

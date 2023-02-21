@@ -183,7 +183,7 @@ def call_ingestion_message_handler(message: Union[IngestionMessage, dict], liste
         raise RuntimeError(f"No ingestion message handler defined for ingestion message type: {message.type}")
 
 
-def for_testing_clear_ingestion_message_handlers():
+def clear_ingestion_message_handlers_for_testing():
     """
     Clears all globally registered ingestion message handlers.
     This is for TESTING purposes ONLY!
