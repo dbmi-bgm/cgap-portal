@@ -56,7 +56,6 @@ h5py = "^3.6.0"  # Needs this exact vesion until Python 3.6 support is dropped. 
 humanfriendly = "^1.44.9"
 hupper = "1.5"
 idna = ">=2.10,<3"
-isodate = "0.5.4"
 jmespath = "0.9.0"
 jsonschema_serialize_fork = "^2.1.1"
 keepalive = "0.5"

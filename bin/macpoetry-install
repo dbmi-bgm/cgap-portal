@@ -5,7 +5,6 @@ echo "Begin Mac specific build script (bin/macpoetry-install)."
 
 if [[ `uname -o` == "Darwin" && `uname -m` == "arm64" ]] ; then
     echo "Looks like this is a Mac M1. Doing some special installs for this to workround sundry problems."
-    pip install isodate==0.5.4
     pip install pysam==0.20.0
     pip install keepalive==0.5
     pip install dcicpyvcf==1.0.0
