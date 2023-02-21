@@ -44,6 +44,14 @@ RUN apt-get update && apt-get upgrade -y && \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
     pip install --upgrade pip && \
     pip install poetry==1.1.15 && \
+	pip install wheel==0.37.1 && \
+	pip install setuptools==57.5.0 && \
+	pip install isodate==0.5.4 && \
+	pip install pysam==0.20.0 && \
+	pip install keepalive==0.5 && \
+	pip install dcicpyvcf==1.0.0 && \
+	pip install numpy==1.24.1 && \
+	pip install h5py==3.6.0 && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
