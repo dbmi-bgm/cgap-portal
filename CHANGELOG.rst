@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+12.8.4
+======
+
+* Add a landing page for the infrastructure repository to Readthedocs
+
+
 12.8.3
 ======
 
