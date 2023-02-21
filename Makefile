@@ -36,6 +36,15 @@ npm-setup:  # runs all front-end setup
 	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
+	pip install wheel==0.37.1
+	pip install poetry==1.1.15
+	pip install setuptools==57.5.0
+	pip install isodate==0.5.4
+	pip install pysam==0.20.0
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
+	pip install numpy==1.24.1
+	pip install h5py==3.6.0
 	pip install "moto[server]==1.3.7"
 
 macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
@@ -50,6 +59,12 @@ configure:  # does any pre-requisite installs
 	pip install wheel==0.37.1
 	pip install poetry==1.1.15
 	pip install setuptools==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
+	pip install isodate==0.5.4
+	pip install pysam==0.20.0
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
+	pip install numpy==1.24.1
+	pip install h5py==3.6.0
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
@@ -199,6 +214,7 @@ remote-test-unit:  # Note this does the 'indexing' tests
 
 update:  # updates dependencies
 	poetry update
+	./scripts/fixup-poetry-dot-lock.sh
 
 debug-docker-local:
 	@scripts/debug-docker-local
