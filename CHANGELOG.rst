@@ -12,6 +12,8 @@ Change Log
 * Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
   new `@ingestion_message_handler` decorator functions; specific message handling
   code now in `ingestion_message_handler_novcf.py` and `ingestion_message_handler_vcf.py`.
+* Updated poetry (from 1.1.15) to 1.2.2 (in Makefile and Dockerfile).
+* Removed isodate and keepalive from pyproject.toml.
 
 
 12.8.3
