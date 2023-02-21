@@ -199,6 +199,15 @@ test-integrated:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy and not static"
 
 test-static:
+	pip install wheel==0.37.1
+	pip install poetry==1.1.15
+	pip install setuptools==57.5.0
+	pip install isodate==0.5.4
+	pip install pysam==0.20.0
+	pip install keepalive==0.5
+	pip install dcicpyvcf==1.0.0
+	pip install numpy==1.24.1
+	pip install h5py==3.6.0
 	poetry run python -m pytest -vv -m static
 	make lint
 
