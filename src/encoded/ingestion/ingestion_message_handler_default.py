@@ -26,7 +26,7 @@ def ingestion_message_handler_default(message: IngestionMessage, listener: Inges
     Returns True if the message was successfully handled, otherwise False.
     """
 
-    PRINT(f"Non-VCF ingestion message handler called for message ({message.uuid}) type: {message.type}")
+    PRINT(f"Default ingestion message handler called for message ({message.uuid}) type: {message.type}")
 
     # Let's minimally disrupt things for now. We can refactor this later
     # to make all the parts work the same -kmp
