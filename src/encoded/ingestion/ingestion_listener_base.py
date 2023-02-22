@@ -1,5 +1,5 @@
 from dcicutils.misc_utils import environ_bool
-from .util import resolve_file_path
+from ..util import resolve_file_path
 
 VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
 VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')

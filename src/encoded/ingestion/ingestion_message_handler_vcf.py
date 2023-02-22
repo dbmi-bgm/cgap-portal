@@ -3,11 +3,10 @@ import structlog
 import tempfile
 from dcicutils.misc_utils import PRINT
 from vcf import Reader
-from .ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
-from .commands.reformat_vcf import runner as reformat_vcf
-from .commands.add_altcounts_by_gene import main as add_altcounts
-from .ingestion.variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
-from .ingestion_listener import IngestionListener
+from ..commands.reformat_vcf import runner as reformat_vcf
+from ..commands.add_altcounts_by_gene import main as add_altcounts
+from ..ingestion_listener import IngestionListener
+from ..util import (gunzip_content, debuglog)
 from .ingestion_listener_base import (
     VARIANT_SCHEMA,
     VARIANT_SAMPLE_SCHEMA,
@@ -20,7 +19,8 @@ from .ingestion_listener_base import (
 )
 from .ingestion_message import IngestionMessage
 from .ingestion_message_handler_decorator import ingestion_message_handler
-from .util import (gunzip_content, debuglog)
+from .vcf_utils import VCFParser, StructuralVariantVCFParser
+from .variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
 
 
 log = structlog.getLogger(__name__)

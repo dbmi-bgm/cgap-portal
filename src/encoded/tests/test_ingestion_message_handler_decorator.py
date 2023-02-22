@@ -1,7 +1,7 @@
 import pytest
-from encoded.ingestion_message import IngestionMessage
-from ..ingestion_listener_base import IngestionListenerBase
-from ..ingestion_message_handler_decorator import (
+from ..ingestion.ingestion_message import IngestionMessage
+from ..ingestion.ingestion_listener_base import IngestionListenerBase
+from ..ingestion.ingestion_message_handler_decorator import (
     call_ingestion_message_handler,
     ingestion_message_handler,
     clear_ingestion_message_handlers_for_testing,
