@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
+import React, { useState, useMemo, useRef, useCallback, useEffect, useContext } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
@@ -307,50 +307,92 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
         ReactTooltip.rebuild();
     }, [vslSortType]);
 
-    return (
-        <React.Fragment>
-            <Accordion
-                defaultActiveKey="0"
-                className="w-100"
-            >
-                {!isActiveTab ? null : <CaseInfoToggle eventKey="0" {...{ caseNamedID, caseNamedTitle, caseAccession, onViewPedigreeBtnClick, currPedigreeFamily }}>Click me!</CaseInfoToggle>}
-                <Accordion.Collapse eventKey="0">
-                    <>
-                        <div className="container-wide bg-light pt-36 pb-36">
-                            <div className="card-group case-summary-card-row">
-                                {!isActiveTab ? null : (
-                                    <div className="col-stats mb-2 mb-lg-0">
-                                        <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission, canonicalFamily }} numFamilies={1} />
-                                    </div>
-                                )}
-                                <div id="case-overview-ped-link" className="col-pedigree-viz">
-                                    <div className="card d-flex flex-column">
-                                        <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
-                                            <div>
-                                                <i className="icon icon-sitemap fas icon-fw mr-1" />
-                                                <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
-                                                    Pedigree
-                                                </h4>
-                                            </div>
-                                            <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
-                                                onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
-                                                View
-                                            </button>
+    const [loadingAccordion, setLoadingAccordion] = useState(true);
+    const [accordion, setAccordion] = useState(null);
+
+    let defaultAccordionState = "0";
+
+    function usePrevious(value) {
+        const ref = useRef();
+        useEffect(() => {
+            ref.current = value; //assign the value of ref to the argument
+        }, [value]); //this code will run when the value of 'value' changes
+        return ref.current; //in the end, return the current ref value.
+    }
+
+    const prevHref = usePrevious(href);
+
+    useEffect(() => {
+        // Want to make sure to skip that very first render where href is undefined, but before the dot path appears
+        // (see note by dependency aray for info on when there isn't a dot path...)
+        // Second render after that should have the "real href" with dotpath present (OR schemas should have loaded instead)
+        if (loadingAccordion && (prevHref || schemas)) {
+
+            // Only show case information by default when loading into accessioning (explicitly or no dot path provided)
+            const dotPath = DotRouter.getDotPath(href);
+            defaultAccordionState = (dotPath === ".accessioning" || !dotPath) ? "0" : null; // "0" is open, null is close
+
+            // Need the defaultActiveKey to be correct on first render, so defining it here, and THEN rendering
+            setAccordion(
+                <Accordion
+                    defaultActiveKey={defaultAccordionState}
+                    className="w-100"
+                >
+                    {!isActiveTab ? null : <CaseInfoToggle eventKey="0" {...{ caseNamedID, caseNamedTitle, caseAccession, onViewPedigreeBtnClick, currPedigreeFamily }}>Click me!</CaseInfoToggle>}
+                    <Accordion.Collapse eventKey="0">
+                        <>
+                            <div className="container-wide bg-light pt-36 pb-36">
+                                <div className="card-group case-summary-card-row">
+                                    {!isActiveTab ? null : (
+                                        <div className="col-stats mb-2 mb-lg-0">
+                                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission, canonicalFamily }} numFamilies={1} />
                                         </div>
-                                        {pedBlock}
+                                    )}
+                                    <div id="case-overview-ped-link" className="col-pedigree-viz">
+                                        <div className="card d-flex flex-column">
+                                            <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
+                                                <div>
+                                                    <i className="icon icon-sitemap fas icon-fw mr-1" />
+                                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
+                                                        Pedigree
+                                                    </h4>
+                                                </div>
+                                                <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
+                                                    onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
+                                                    View
+                                                </button>
+                                            </div>
+                                            {pedBlock}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
-
-                        <div className="container-wide bg-light pt-12 pb-6">
-                            <div className="processing-summary-tables-container mt-0">
-                                {caseSearchTables}
+                            <div className="container-wide bg-light pt-12 pb-6">
+                                <div className="processing-summary-tables-container mt-0">
+                                    {caseSearchTables}
+                                </div>
                             </div>
-                        </div>
-                    </>
-                </Accordion.Collapse>
-            </Accordion>
+                        </>
+                    </Accordion.Collapse>
+                </Accordion>
+            );
+
+            // Once a default state has been decided, load the accordion
+            setLoadingAccordion(false);
+        }
+    },
+    // Use of schemas here is kiiinda hacky. When there is no dotpath, we need a way to know that there will not be a second update of href (which there isn't if server href matches href from window).
+    // In app.js that second update of href happens in componentDidMount() when window is loaded. loadSchemas() is triggered right AFTER that, so schemas will always appear after that final href update.
+    // We're using that here to ensure that SOMETHING will be rendered for the accordion in the case there is no second update of href. If there's a better way to do this: fix it.
+    [
+        href,
+        schemas
+    ]);
+
+    return (
+        <React.Fragment>
+            {loadingAccordion && <div className="container-wide d-flex justify-content-center" style={{ minHeight: "78px" }}><div className="pt-3"><i className="icon-spin icon-circle-notch fas" /></div></div>}
+            {!loadingAccordion && accordion}
 
             {canonicalFamily && caseIndividual ?
                 <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
@@ -442,7 +484,7 @@ function CaseInfoToggle({ eventKey, caseNamedID, caseNamedTitle, caseAccession, 
                     </button>
                 </h3>
             </div>
-            { showLine && <Fade in={isCurrentEventKey}><hr className="tab-section-title-horiz-divider" /></Fade> }
+            {showLine && <Fade in={isCurrentEventKey}><hr className="tab-section-title-horiz-divider" /></Fade>}
         </>
     );
 }
@@ -456,7 +498,10 @@ class DotRouter extends React.PureComponent {
     static getDotPath(href) {
         // Path must contain both tab (hashroute) and dotpath to navigate properly
         const hashString = (url.parse(href, false).hash || "#").slice(1) || null;
-        if (!hashString) return null;
+
+        // Handle the case where there's no dot path
+        if (!hashString || hashString.indexOf(".") < 0) return null;
+
         const dotPathSplit = hashString.split(".");
         return "." + dotPathSplit[dotPathSplit.length - 1];
     }
