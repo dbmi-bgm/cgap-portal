@@ -596,7 +596,9 @@ class DotRouter extends React.PureComponent {
                 const clsSuffix = overridingContentsClassName || contentsClassName || null;
                 const cls = "tab-router-contents" + (clsSuffix ? " " + clsSuffix : "") + (!active ? " d-none" : "");
                 allTabContents.push(
-                    <div className={cls} id={(prependDotPath || "") + dotPath} data-tab-index={index} key={dotPath}>
+                    <div className={cls}
+                        id={dotPath} // used to be this, but doesn't seem important...? id={(prependDotPath || "") + dotPath}
+                        data-tab-index={index} key={dotPath}>
                         <TabPaneErrorBoundary>
                             {transformedChildren}
                         </TabPaneErrorBoundary>
