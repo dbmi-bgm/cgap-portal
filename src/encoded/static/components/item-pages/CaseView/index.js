@@ -1,12 +1,12 @@
 'use strict';
 
-import React, { useState, useMemo, useRef, useCallback, useEffect, useContext } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
 import url from 'url';
 import ReactTooltip from 'react-tooltip';
 
-import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { capitalize, decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -32,6 +32,7 @@ import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReview
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
 import { Accordion, AccordionContext, Fade, useAccordionToggle } from 'react-bootstrap';
+import { usePrevious } from '../../util/hooks';
 
 
 
@@ -311,14 +312,6 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
     const [accordion, setAccordion] = useState(null);
 
     let defaultAccordionState = "0";
-
-    function usePrevious(value) {
-        const ref = useRef();
-        useEffect(() => {
-            ref.current = value; //assign the value of ref to the argument
-        }, [value]); //this code will run when the value of 'value' changes
-        return ref.current; //in the end, return the current ref value.
-    }
 
     const prevHref = usePrevious(href);
 
