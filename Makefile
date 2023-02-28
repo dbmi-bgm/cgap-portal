@@ -36,7 +36,8 @@ npm-setup:  # runs all front-end setup
 	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
-	pip install "moto[server]==1.3.7"
+	@echo "Not installing moto[server]==1.3.7 because we don't use the server part any more."
+	@#pip install "moto[server]==1.3.7"
 
 macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
 	bin/macpoetry-install
