@@ -150,6 +150,15 @@ clean-python:
 	pip uninstall encoded
 	pip uninstall -y -r <(pip freeze)
 
+test-full:
+	@git log -1 --decorate | head -1
+	@date
+	make test-unit-full || echo "unit tests failed"
+	make test-npm-full || echo "npm tests failed"
+	make test-static || echo "static tests failed"
+	@git log -1 --decorate | head -1
+	@date
+
 test:
 	@git log -1 --decorate | head -1
 	@date
@@ -159,6 +168,17 @@ test:
 	@git log -1 --decorate | head -1
 	@date
 
+
+BASE_MARKERS = not manual and not broken and not sloppy and not static
+# Unit tests
+NORM_MARKERS = not performance and not integratedx
+# Performance tests
+PERF_MARKERS = performance and not integratedx
+# Integration tests
+INTG_MARKERS = not performance and (integrated or integratedx)
+
+TEST_NAME ?= missing_TEST_NAME
+
 retest:
 	poetry run python -m pytest -vv -r w --last-failed
 
@@ -166,16 +186,25 @@ test-any:
 	poetry run python -m pytest -xvv -r w --timeout=200
 
 test-npm:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not sloppy and not indexing and not static"
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
+
+test-npm-full:
+	poetry run python -m pytest -vv  -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
+
+test-unit-full:
+	poetry run python -m pytest -vv  -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing"
 
 test-unit:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "not manual and not integratedx and not performance and not broken and not sloppy and indexing and not static"
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing"
+
+test-one:
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing" -k "${TEST_NAME}"
 
 test-performance:
-	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and not integratedx and performance and not broken and not sloppy and not static"
+	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS} and ${PERF_MARKERS}"
 
 test-integrated:
-	poetry run python -m pytest -xvv -r w --timeout=200 -m "not manual and (integrated or integratedx) and not performance and not broken and not sloppy and not static"
+	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS) and ${INTG_MARKERS}"
 
 test-static:
 	poetry run python -m pytest -vv -m static
