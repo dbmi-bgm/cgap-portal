@@ -53,7 +53,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                         </svg>
                     </div>
                     <div className="cgap-tagline text-center px-2 text-small pt-1">The <strong>Computational Genome Analysis Platform (CGAP)</strong> is an intuitive, open-source analysis tool designed to support complex research &amp; clinical genomics workflows.</div>
-                    <LoginController {...{ updateAppSessionState, auth0Options, session }}>
+                    <LoginController {...{ updateAppSessionState, auth0Options }}>
                         <LoginBox className="mt-25" session={session} />
                     </LoginController>
                     <div className="cgap-links text-primary text-small mt-2 mb-5 row">
