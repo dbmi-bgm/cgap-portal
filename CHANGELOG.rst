@@ -6,6 +6,32 @@ cgap-portal
 Change Log
 ----------
 
+12.8.5
+======
+`PR 694: Reload login box after logging out <https://github.com/dbmi-bgm/cgap-portal/pull/694>`_
+
+* Update SPC to newest release [0.1.60](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.60)
+  * This release enables UI to use custom auth0 configurations accessed via `/auth0_config` endpoint
+  * Note: `auth0Options` may still be passed to `<LoginController>` but only values for keys not returned by `/auth0_config` are used as fallback
+* Fix logout auth0 lock related bug
+
+
+12.8.4
+======
+
+* Add a landing page for the infrastructure repository to Readthedocs
+
+
+12.8.3
+======
+
+`PR 684: QC + tooltip updates <https://github.com/dbmi-bgm/cgap-portal/pull/684>`_
+
+* Decrease WES Ti/Tv lower bounds for warning/failure
+* Add coverage tooltip to QC report
+* Minor updates to variant facet tooltips
+
+
 12.8.2
 ======
 
