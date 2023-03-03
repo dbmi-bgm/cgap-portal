@@ -19,7 +19,7 @@ const auth0Options = {
 };
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
-    const { updateAppSessionState } = props;
+    const { updateAppSessionState, session } = props;
 
     // Upon mount, unset alerts from any other pages, to prevent vertical scroll.
     useEffect(function(){
@@ -54,7 +54,7 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                     </div>
                     <div className="cgap-tagline text-center px-2 text-small pt-1">The <strong>Computational Genome Analysis Platform (CGAP)</strong> is an intuitive, open-source analysis tool designed to support complex research &amp; clinical genomics workflows.</div>
                     <LoginController {...{ updateAppSessionState, auth0Options }}>
-                        <LoginBox className="mt-25" />
+                        <LoginBox className="mt-25" session={session} />
                     </LoginController>
                     <div className="cgap-links text-primary text-small mt-2 mb-5 row">
                         <div className="text-600 pr-sm-1 col-12 col-sm-auto text-center"><a href="https://cgap.hms.harvard.edu">CGAP Homepage</a></div>
@@ -68,17 +68,19 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
 });
 
 const LoginBox = React.memo(function LoginBox (props) {
-    const { showLock, isAuth0LibraryLoaded, unverifiedUserEmail } = props;
+    const { showLock, isAuth0LibraryLoaded, unverifiedUserEmail, session } = props;
 
     useEffect(function(){
         // Also show lock again when unverifiedUserEmail is unset, since when registration modal pops up, LoginController will hide lock.
-        if (!isAuth0LibraryLoaded || unverifiedUserEmail) return;
-        showLock();
-    }, [ isAuth0LibraryLoaded, unverifiedUserEmail ]);
+        if (!isAuth0LibraryLoaded || unverifiedUserEmail || session) return;
+        setTimeout(()=>{
+            showLock();
+        }, 100);
+    }, [ isAuth0LibraryLoaded, unverifiedUserEmail, session ]);
 
     return (
         <React.Fragment>
-            <LoginBoxContainerElement />
+            { !session && <LoginBoxContainerElement /> }
             { unverifiedUserEmail ? <UserRegistrationModal {...props} /> : null }
         </React.Fragment>
     );
