@@ -461,12 +461,12 @@ function CaseInfoToggle({ eventKey, caseNamedID, caseNamedTitle, caseAccession, 
             <div className="container-wide clickable" onClick={decoratedOnClick}>
                 <h3 className="tab-section-title">
                     <div className="d-flex align-items-center">
-                        <i className={`icon icon-${icon} fas mr-1 text-large`} />
+                        <i className={`icon icon-${icon} fas mr-2 text-large`} />
                         <div className="pt-12 pb-06">
                             <span>
                                 {caseNamedTitle || caseNamedID}
                             </span>
-                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
+                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession} stopPropagation>
                                 {caseAccession}
                             </object.CopyWrapper>
                         </div>
