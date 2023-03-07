@@ -12,7 +12,7 @@ import React, { useRef, useEffect } from 'react';
 /**
  * For replicating the functionality of "pastProps" in functional components
  * @param {*} value The value (prop or state) that you're trying to keep track of
- * @returns The current value
+ * @returns The previous value
  */
 export function usePrevious(value) {
     const ref = useRef();
