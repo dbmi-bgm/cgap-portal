@@ -6,7 +6,7 @@ import _ from 'underscore';
 import url from 'url';
 import ReactTooltip from 'react-tooltip';
 
-import { console, navigate, object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { capitalize, decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -31,7 +31,8 @@ import { CaseReviewTab } from './CaseReviewTab';
 import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
 import QuickPopover from './../components/QuickPopover';
-import { Accordion, AccordionContext, Card, useAccordionToggle } from 'react-bootstrap';
+import { Accordion, AccordionContext, Fade, useAccordionToggle } from 'react-bootstrap';
+import { usePrevious } from '../../util/hooks';
 
 
 
@@ -71,7 +72,7 @@ export default class CaseView extends DefaultItemView {
      *    return <CommonItemView tabs={tabs} />;
      * }
      */
-    getControllers(){
+    getControllers() {
         return [
             PedigreeVizLoader,
             CurrentFamilyController, // <- This passes down props.currFamily into PedigreeTabViewOptionsController. Could possibly change to just use context.family now.
@@ -80,7 +81,7 @@ export default class CaseView extends DefaultItemView {
         ];
     }
 
-    getTabViewContents(controllerProps = {}){
+    getTabViewContents(controllerProps = {}) {
         const { currPedigreeFamily } = controllerProps;
         const { "@id": familyAtID, members = [] } = currPedigreeFamily || {};
 
@@ -105,7 +106,7 @@ export default class CaseView extends DefaultItemView {
      * To be removed once UX is more certain.
      * AttachmentInputController, AttachmentInputMenuOption from './attachment-input'
      */
-    additionalItemActionsContent(){
+    additionalItemActionsContent() {
         return super.additionalItemActionsContent();
         // const { context, href } = this.props;
         // const { actions = [] } = context;
@@ -121,7 +122,7 @@ export default class CaseView extends DefaultItemView {
     }
 }
 
-const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
+const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
     const {
         // Passed in from App or redux
         context = {},
@@ -179,35 +180,35 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
      * permission for attached items such as Family & Individual.
      * @type {boolean}
      */
-    const haveCaseEditPermission = useMemo(function(){
-        return !!(_.findWhere(caseActions, { "name" : "edit" }));
-    }, [ context ]);
+    const haveCaseEditPermission = useMemo(function () {
+        return !!(_.findWhere(caseActions, { "name": "edit" }));
+    }, [context]);
 
-    const secondaryFamilies = useMemo(function(){
-        return (familiesWithViewPermission || []).filter(function(spFamily){
+    const secondaryFamilies = useMemo(function () {
+        return (familiesWithViewPermission || []).filter(function (spFamily) {
             // canonicalFamily would have been selected from this same list, so object references
             // should be identical and we don't have to compare uuid strings (slower)
             return spFamily !== canonicalFamily;
         });
-    }, [ familiesWithViewPermission, canonicalFamily ]);
+    }, [familiesWithViewPermission, canonicalFamily]);
 
     const {
         countIndividuals: numIndividuals,
         countIndividualsWSamples: numWithSamples
-    } = useMemo(function(){
+    } = useMemo(function () {
         const { members = [] } = canonicalFamily || {};
         let countIndividuals = 0;
         let countIndividualsWSamples = 0;
-        members.forEach(function({ samples }){
+        members.forEach(function ({ samples }) {
             if (Array.isArray(samples) && samples.length > 0) {
                 countIndividualsWSamples++;
             }
             countIndividuals++;
         });
         return { countIndividuals, countIndividualsWSamples };
-    }, [ canonicalFamily ]);
+    }, [canonicalFamily]);
 
-    const anyAnnotatedVariantSamples = useMemo(function(){ // checks for notes on SNVs and CNV/SVs
+    const anyAnnotatedVariantSamples = useMemo(function () { // checks for notes on SNVs and CNV/SVs
         const allSelections = vsSelections.concat(cnvSelections);
         const allSelectionsLen = allSelections.length;
 
@@ -220,16 +221,16 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         }
 
         return false;
-    }, [ variantSampleListItem ]);
+    }, [variantSampleListItem]);
 
-    const onViewPedigreeBtnClick = useCallback(function(evt){
+    const onViewPedigreeBtnClick = useCallback(function (evt) {
         evt.preventDefault();
         evt.stopPropagation();
         if (!currPedigreeFamily) return false;
         // By default, click on link elements would trigger ajax request to get new context.
         // (unless are external links)
         navigate("#pedigree", { skipRequest: true, replace: true });
-    }, [ /* empty == executed only once ever */ ]);
+    }, [ /* empty == executed only once ever */]);
 
     let caseSearchTables;
     if (caseIndividual) {
@@ -273,7 +274,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
             }
         }
 
-        if (graphData){
+        if (graphData) {
             // Potential to-do, onComponentDidUpdate, find height in DOM of container, set to state, pass down here.
             pedBlock = (
                 <div className="pedigree-pane-wrapper flex-fill">
@@ -307,57 +308,86 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         ReactTooltip.rebuild();
     }, [vslSortType]);
 
+    const [loadingAccordion, setLoadingAccordion] = useState(true);
+    const [accordion, setAccordion] = useState(null);
+
+    let defaultAccordionState = "0";
+
+    const prevHref = usePrevious(href);
+
+    useEffect(() => {
+        // Want to make sure to skip that very first render where href is undefined, but before the dot path appears
+        // (see note by dependency aray for info on when there isn't a dot path...)
+        // Second render after that should have the "real href" with dotpath present (OR schemas should have loaded instead)
+        if (loadingAccordion && (prevHref || schemas)) {
+
+            // Only show case information by default when loading into accessioning (explicitly or no dot path provided)
+            const dotPath = DotRouter.getDotPath(href);
+            defaultAccordionState = (dotPath === ".accessioning" || !dotPath) ? "0" : null; // "0" is open, null is close
+
+            // Need the defaultActiveKey to be correct on first render, so defining it here, and THEN rendering
+            setAccordion(
+                <Accordion
+                    defaultActiveKey={defaultAccordionState}
+                    className="w-100"
+                >
+                    {!isActiveTab ? null : <CaseInfoToggle eventKey="0" {...{ caseNamedID, caseNamedTitle, caseAccession, onViewPedigreeBtnClick, currPedigreeFamily }}>Click me!</CaseInfoToggle>}
+                    <Accordion.Collapse eventKey="0">
+                        <>
+                            <div className="container-wide bg-light pt-36 pb-36">
+                                <div className="card-group case-summary-card-row">
+                                    {!isActiveTab ? null : (
+                                        <div className="col-stats mb-2 mb-lg-0">
+                                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission, canonicalFamily }} numFamilies={1} />
+                                        </div>
+                                    )}
+                                    <div id="case-overview-ped-link" className="col-pedigree-viz">
+                                        <div className="card d-flex flex-column">
+                                            <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
+                                                <div>
+                                                    <i className="icon icon-sitemap fas icon-fw mr-1" />
+                                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
+                                                        Pedigree
+                                                    </h4>
+                                                </div>
+                                                <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
+                                                    onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
+                                                    View
+                                                </button>
+                                            </div>
+                                            {pedBlock}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className="container-wide bg-light pt-12 pb-6">
+                                <div className="processing-summary-tables-container mt-0">
+                                    {caseSearchTables}
+                                </div>
+                            </div>
+                        </>
+                    </Accordion.Collapse>
+                </Accordion>
+            );
+
+            // Once a default state has been decided, load the accordion
+            setLoadingAccordion(false);
+        }
+    },
+    // Use of schemas here is kiiinda hacky. When there is no dotpath, we need a way to know that there will not be a second update of href (which there isn't if server href matches href from window).
+    // In app.js that second update of href happens in componentDidMount() when window is loaded. loadSchemas() is triggered right AFTER that, so schemas will always appear after that final href update.
+    // We're using that here to ensure that SOMETHING will be rendered for the accordion in the case there is no second update of href. If there's a better way to do this: fix it.
+    [
+        href,
+        schemas
+    ]);
+
     return (
         <React.Fragment>
-            { !isActiveTab ? null : (
-                <div className="container-wide">
-                    <h3 className="tab-section-title">
-                        <div className="pt-12 pb-06">
-                            <span>
-                                { caseNamedTitle || caseNamedID }
-                            </span>
-                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession}>
-                                { caseAccession }
-                            </object.CopyWrapper>
-                        </div>
-                    </h3>
-                </div>
-            ) }
-            <hr className="tab-section-title-horiz-divider" />
-            <div className="container-wide bg-light pt-36 pb-36">
-                <div className="card-group case-summary-card-row">
-                    { !isActiveTab ? null : (
-                        <div className="col-stats mb-2 mb-lg-0">
-                            <CaseStats caseItem={context} {...{ description, numIndividuals, numWithSamples, caseFeatures, haveCaseEditPermission, canonicalFamily }} numFamilies={1} />
-                        </div>
-                    )}
-                    <div id="case-overview-ped-link" className="col-pedigree-viz">
-                        <div className="card d-flex flex-column">
-                            <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
-                                <div>
-                                    <i className="icon icon-sitemap fas icon-fw mr-1"/>
-                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
-                                        Pedigree
-                                    </h4>
-                                </div>
-                                <button type="button" className="btn btn-primary btn-sm view-pedigree-btn"
-                                    onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
-                                    View
-                                </button>
-                            </div>
-                            { pedBlock }
-                        </div>
-                    </div>
-                </div>
-            </div>
+            {loadingAccordion && <div className="container-wide d-flex justify-content-center" style={{ minHeight: "78px" }}><div className="pt-3"><i className="icon-spin icon-circle-notch fas" /></div></div>}
+            {!loadingAccordion && accordion}
 
-            <div className="container-wide bg-light pt-12 pb-6">
-                <div className="processing-summary-tables-container mt-0">
-                    { caseSearchTables }
-                </div>
-            </div>
-
-            { canonicalFamily && caseIndividual ?
+            {canonicalFamily && caseIndividual ?
                 <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
                     <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
                         <AccessioningTab {...{ context, href, canonicalFamily, secondaryFamilies }} />
@@ -371,7 +401,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
                     </DotRouterTab>
                     <DotRouterTab dotPath=".interpretation" cache disabled={disableInterpretation} tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
-                            { isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas"/> : null }
+                            {isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas" /> : null}
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
@@ -396,18 +426,18 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props){
         </React.Fragment>
     );
 });
-CaseInfoTabView.getTabObject = function(props){
+CaseInfoTabView.getTabObject = function (props) {
     const { context: { variant_sample_list_id } = {}, href } = props;
     return {
-        "tab" : (
+        "tab": (
             <React.Fragment>
-                <i className="icon icon-cogs fas icon-fw"/>
+                <i className="icon icon-cogs fas icon-fw" />
                 <span>Case Info</span>
             </React.Fragment>
         ),
-        "key" : "case-info",
-        "disabled" : false,
-        "content" : (
+        "key": "case-info",
+        "disabled": false,
+        "content": (
             <VariantSampleListController id={variant_sample_list_id} href={href}>
                 <CaseInfoTabView {...props} />
             </VariantSampleListController>
@@ -416,6 +446,41 @@ CaseInfoTabView.getTabObject = function(props){
     };
 };
 
+function CaseInfoToggle({ eventKey, caseNamedID, caseNamedTitle, caseAccession, onViewPedigreeBtnClick, currPedigreeFamily }) {
+    // Want the line to fade out shortly after animation is triggered, not before (hence not using isCurrentEventKey which would trigger immediately)
+    let showLine = true;
+    const decoratedOnClick = useAccordionToggle(eventKey, () => { showLine = !showLine; });
+
+    const activeEventKey = useContext(AccordionContext);
+    const isCurrentEventKey = activeEventKey === eventKey;
+
+    const icon = isCurrentEventKey ? "minus" : "plus";
+
+    return (
+        <>
+            <div className="container-wide clickable" onClick={decoratedOnClick}>
+                <h3 className="tab-section-title">
+                    <div className="d-flex align-items-center">
+                        <i className={`icon icon-${icon} fas mr-2 text-large`} />
+                        <div className="pt-12 pb-06">
+                            <span>
+                                {caseNamedTitle || caseNamedID}
+                            </span>
+                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession} stopPropagation>
+                                {caseAccession}
+                            </object.CopyWrapper>
+                        </div>
+                    </div>
+                    <button type="button" className="btn btn-primary btn-sm view-pedigree-btn py-2 px-4 rounded"
+                        onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
+                        View Pedigree
+                    </button>
+                </h3>
+            </div>
+            {showLine && <Fade in={isCurrentEventKey}><hr className="tab-section-title-horiz-divider" /></Fade>}
+        </>
+    );
+}
 
 /**
  * @todo
@@ -426,7 +491,10 @@ class DotRouter extends React.PureComponent {
     static getDotPath(href) {
         // Path must contain both tab (hashroute) and dotpath to navigate properly
         const hashString = (url.parse(href, false).hash || "#").slice(1) || null;
-        if (!hashString) return null;
+
+        // Handle the case where there's no dot path
+        if (!hashString || hashString.indexOf(".") < 0) return null;
+
         const dotPathSplit = hashString.split(".");
         return "." + dotPathSplit[dotPathSplit.length - 1];
     }
@@ -456,13 +524,13 @@ class DotRouter extends React.PureComponent {
     }
 
     static defaultProps = {
-        "className" : null,
-        "navClassName" : "container-wide",
-        "contentsClassName" : "container-wide",
-        "elementID" : "dot-router"
+        "className": null,
+        "navClassName": "container-wide",
+        "contentsClassName": "container-wide",
+        "elementID": "dot-router"
     };
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.getCurrentTab = this.getCurrentTab.bind(this);
         this.memoized = {
@@ -478,7 +546,7 @@ class DotRouter extends React.PureComponent {
         const { children, href } = this.props;
         const dotPath = this.memoized.getDotPath(href);
 
-        if (dotPath){
+        if (dotPath) {
             for (let i = 0; i < children.length; i++) {
                 const currChild = children[i];
                 if (currChild.props.dotPath === dotPath && !currChild.props.disabled) {
@@ -495,11 +563,11 @@ class DotRouter extends React.PureComponent {
     render() {
         const { children, className, prependDotPath, navClassName, contentsClassName, elementID, isActive = true } = this.props;
         const currentTab = this.getCurrentTab();
-        const { props : { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
+        const { props: { dotPath: currTabDotPath } } = currentTab; // Falls back to default tab if not in hash.
         // const contentClassName = "tab-router-contents" + (contentsClassName ? " " + contentsClassName : "");
         const allTabContents = [];
 
-        const adjustedChildren = React.Children.map(children, function(childTab, index){
+        const adjustedChildren = React.Children.map(children, function (childTab, index) {
             const {
                 props: {
                     dotPath,
@@ -514,7 +582,7 @@ class DotRouter extends React.PureComponent {
             if (active || cache) {
                 // If we cache tab contents, then pass down `props.isActiveDotRouterTab` so select downstream components
                 // can hide or unmount themselves when not needed for performance.
-                const transformedChildren = !cache ? tabChildren : React.Children.map(tabChildren, (child)=>{
+                const transformedChildren = !cache ? tabChildren : React.Children.map(tabChildren, (child) => {
                     if (!React.isValidElement(child)) {
                         // String or something
                         return child;
@@ -528,9 +596,11 @@ class DotRouter extends React.PureComponent {
                 const clsSuffix = overridingContentsClassName || contentsClassName || null;
                 const cls = "tab-router-contents" + (clsSuffix ? " " + clsSuffix : "") + (!active ? " d-none" : "");
                 allTabContents.push(
-                    <div className={cls} id={(prependDotPath || "") + dotPath} data-tab-index={index} key={dotPath}>
+                    <div className={cls}
+                        id={dotPath} // used to be this, but doesn't seem important...? id={(prependDotPath || "") + dotPath}
+                        data-tab-index={index} key={dotPath}>
                         <TabPaneErrorBoundary>
-                            { transformedChildren }
+                            {transformedChildren}
                         </TabPaneErrorBoundary>
                     </div>
                 );
@@ -543,10 +613,10 @@ class DotRouter extends React.PureComponent {
             <div className={"tab-router" + (className ? " " + className : "")} id={elementID}>
                 <nav className={"dot-tab-nav" + (navClassName ? " " + navClassName : "")}>
                     <div className="dot-tab-nav-list">
-                        { adjustedChildren }
+                        {adjustedChildren}
                     </div>
                 </nav>
-                { allTabContents }
+                {allTabContents}
             </div>
         );
     }
@@ -564,10 +634,10 @@ const DotRouterTab = React.memo(function DotRouterTab(props) {
         ...passProps
     } = props;
 
-    const onClick = useCallback(function(){
+    const onClick = useCallback(function () {
         const targetDotPath = prependDotPath + dotPath;
         const navOpts = { "skipRequest": true, "replace": true, "dontScrollToTop": true };
-        navigate("#" + targetDotPath, navOpts, function(){
+        navigate("#" + targetDotPath, navOpts, function () {
             // Maybe uncomment - this could be annoying if someone is also trying to keep Status Overview visible or something.
             // layout.animateScrollTo(targetDotPath);
         });
@@ -582,24 +652,24 @@ const DotRouterTab = React.memo(function DotRouterTab(props) {
             className={"arrow-tab" + (disabled ? " disabled " : "") + (active ? " active" : "")}>
             <div className="btn-prepend d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
-                    <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z"/>
-                    <path d="M 0,3.3e-6 1.5875,0 v 2.1166667 z"/>
+                    <path d="M 0,4.2333333 1.5875,2.1166667 v 2.1166666 z" />
+                    <path d="M 0,3.3e-6 1.5875,0 v 2.1166667 z" />
                 </svg>
             </div>
-            <div className="btn-title">{ tabTitle }</div>
+            <div className="btn-title">{tabTitle}</div>
             <div className="btn-append d-xs-none">
                 <svg viewBox="0 0 1.5875 4.2333333" width={6} height={16}>
-                    <path d="M 0,3.3e-6 1.5875,2.1166733 0,4.2333333 Z"/>
+                    <path d="M 0,3.3e-6 1.5875,2.1166733 0,4.2333333 Z" />
                 </svg>
             </div>
         </button>
     );
-}, function(prevProps, nextProps){
+}, function (prevProps, nextProps) {
     // Custom equality comparison func.
     // Skip comparing the hardcoded `prependDotPath` & `dotPath` -- revert if those props become dynamic.
     // Also skip checking for props.children, since that is rendered by `DotRouter` and not this `DotRouterTab`.
     const compareKeys = ["disabled", "active", "tabTitle"];
-    const anyChanged = _.any(compareKeys, function(k){
+    const anyChanged = _.any(compareKeys, function (k) {
         return prevProps[k] !== nextProps[k];
     });
     return !anyChanged;
@@ -608,13 +678,13 @@ const DotRouterTab = React.memo(function DotRouterTab(props) {
 const AccessioningTab = React.memo(function AccessioningTab(props) {
     const { context, canonicalFamily, secondaryFamilies = [] } = props;
     const { display_title: primaryFamilyTitle, '@id': canonicalFamilyAtID } = canonicalFamily;
-    const [ isSecondaryFamiliesOpen, setSecondaryFamiliesOpen ] = useState(false);
+    const [isSecondaryFamiliesOpen, setSecondaryFamiliesOpen] = useState(false);
     const secondaryFamiliesLen = secondaryFamilies.length;
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
         <div className="pt-2">
-            <button type="button" className="btn btn-block btn-outline-dark" onClick={function(){ setSecondaryFamiliesOpen(function(currentIsSecondaryFamiliesOpen){ return !currentIsSecondaryFamiliesOpen; }); }}>
-                { !isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families' }
+            <button type="button" className="btn btn-block btn-outline-dark" onClick={function () { setSecondaryFamiliesOpen(function (currentIsSecondaryFamiliesOpen) { return !currentIsSecondaryFamiliesOpen; }); }}>
+                {!isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families'}
             </button>
         </div>
     );
@@ -638,27 +708,27 @@ const AccessioningTab = React.memo(function AccessioningTab(props) {
                             <div key={canonicalFamilyAtID} className="primary-family">
                                 <h4 className="mt-0 mb-16 text-400">
                                     <span className="text-300">Primary Cases from </span>
-                                    { primaryFamilyTitle }
+                                    {primaryFamilyTitle}
                                 </h4>
                                 <FamilyAccessionStackedTable family={canonicalFamily} result={context}
                                     fadeIn collapseLongLists collapseShow={1} />
                             </div>
                         ]}
                         collapsible={!isSecondaryFamiliesOpen ? null :
-                            secondaryFamilies.map(function(family){
-                                const { display_title, '@id' : familyID } = family;
+                            secondaryFamilies.map(function (family) {
+                                const { display_title, '@id': familyID } = family;
                                 return (
                                     <div className="py-4 secondary-family" key={familyID}>
                                         <h4 className="mt-0 mb-05 text-400">
                                             <span className="text-300">Related Cases from </span>
-                                            { display_title }
+                                            {display_title}
                                         </h4>
-                                        <FamilyAccessionStackedTable result={context} family={family} collapseLongLists/>
+                                        <FamilyAccessionStackedTable result={context} family={family} collapseLongLists />
                                     </div>
                                 );
                             })
                         } />
-                    { viewSecondaryFamiliesBtn }
+                    {viewSecondaryFamiliesBtn}
                 </div>
             </div>
         </React.Fragment>
@@ -773,71 +843,71 @@ function BioinfoStatTable({ qualityControlMetrics }) {
         <React.Fragment>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Total Number of Reads">
-                    { reads.value ? decorateNumberWithCommas(+reads.value) : fallbackElem }
+                    {reads.value ? decorateNumberWithCommas(+reads.value) : fallbackElem}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage" popoverContent={bioinfoPopoverContent.coverage}>
-                    { coverage.value || fallbackElem }
-                    { (coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
+                    {coverage.value || fallbackElem}
+                    {(coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
-                    { totalSNVIndelVars.value ? decorateNumberWithCommas(+totalSNVIndelVars.value): fallbackElem }
+                    {totalSNVIndelVars.value ? decorateNumberWithCommas(+totalSNVIndelVars.value) : fallbackElem}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
-                    { transTransRatio.value || fallbackElem }
-                    { (transTransRatio.value && transTransRatio.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(transTransRatio.flag)} ml-05`} />}
+                    {transTransRatio.value || fallbackElem}
+                    {(transTransRatio.value && transTransRatio.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(transTransRatio.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Submitted Sex" >
-                    { submittedSex.value || fallbackElem }
+                    {submittedSex.value || fallbackElem}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
-                    { mapLongFormSexToLetter(predictedSex.value) || fallbackElem }&nbsp;
-                    { !!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
-                    { predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
+                    {mapLongFormSexToLetter(predictedSex.value) || fallbackElem}&nbsp;
+                    {!!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a>}
+                    {predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
-                    { heterozygosity.value || fallbackElem }
-                    { (heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`}/>}
+                    {heterozygosity.value || fallbackElem}
+                    {(heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
-                    { filteredSNVIndelVariants.value ? decorateNumberWithCommas(+filteredSNVIndelVariants.value) : fallbackElem }
+                    {filteredSNVIndelVariants.value ? decorateNumberWithCommas(+filteredSNVIndelVariants.value) : fallbackElem}
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
                 <BioinfoStatsEntry label="Submitted Ancestry" >
-                    { submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-" }
+                    {submittedAncestry.length > 0 && submittedAncestry.join(", ") || "-"}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
-                    { predictedAncestry.value || fallbackElem }&nbsp;
-                    { !!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a> }
+                    {predictedAncestry.value || fallbackElem}&nbsp;
+                    {!!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNV/Indel De novo Fraction">
-                    { deNovo.value || fallbackElem }
-                    { (deNovo.value && deNovo.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(deNovo.flag)} ml-05`}/>}
+                    {deNovo.value || fallbackElem}
+                    {(deNovo.value && deNovo.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(deNovo.flag)} ml-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
-                    { filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem }
+                    {filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem}
                 </BioinfoStatsEntry>
             </div>
         </React.Fragment>
     );
 }
 
-function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }){
+function BioinfoStatsEntry({ tooltip, label, children, popoverContent = null }) {
     const id = "biostatsentry_" + label.split(" ").join("_");
     return (
         <div className="col-12 col-md-6 col-lg-3 col-xl-3 py-2">
             <div className="qc-summary">
                 <label className="d-inline mb-0" htmlFor={id}>
-                    { label }:
-                    { !popoverContent && tooltip ?
+                    {label}:
+                    {!popoverContent && tooltip ?
                         <i className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={tooltip} data-place="right"/>
-                        : null }
+                            data-tip={tooltip} data-place="right" />
+                        : null}
                 </label>
-                { popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{ popoverContent }</QuickPopover>: null }
-                <div {...{ id }}>{ children }</div>
+                {popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{popoverContent}</QuickPopover> : null}
+                <div {...{ id }}>{children}</div>
             </div>
         </div>
     );
@@ -865,7 +935,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 
     const title = (
         <h4 data-family-index={0} className="my-0 d-inline-block w-100">
-            <span className="text-400">{ familyDisplayTitle }</span>
+            <span className="text-400">{familyDisplayTitle}</span>
             {/* { pedFileName ? <span className="text-300">{ " (" + pedFileName + ")" }</span> : null } */}
             <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right d-flex align-items-center"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
@@ -894,7 +964,7 @@ const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Multisample Analysis Table</h4>
                 <div className="card-body family-index-0" data-is-current-family={true}>
-                    { title }
+                    {title}
                     <CaseSummaryTable family={canonicalFamily} sampleProcessing={[sampleProcessing]} isCurrentFamily={true} idx={0} {...{ idToGraphIdentifier, relationshipMapping }} />
                 </div>
             </div>
@@ -921,9 +991,9 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
             <div className="d-flex align-items-center justify-items-center">
                 <i className={`icon icon-${icon} fas mr-1`} />
                 <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
-                    {role ? `${role}:`: ""}
+                    {role ? `${role}:` : ""}
                     <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">
-                        {specimenType && sequencingType ? `${specimenType} - ${sequencingType}`:
+                        {specimenType && sequencingType ? `${specimenType} - ${sequencingType}` :
                             specimenType ? specimenType : sequencingType}
                     </div>
                     <div className="text-400 text-muted text-truncate d-inline-block">
@@ -931,7 +1001,7 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
                     </div>
                 </div>
             </div>
-            { children }
+            {children}
         </div>
     );
 }
@@ -959,7 +1029,7 @@ function QCMAccordion(props) {
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
-            { sortedQCMs.map((qcm, i) => <QCMAccordionDrawer key={qcm.individual_accession} idx={i} {...{ idToGraphIdentifier, relationshipMapping, qcmLen }} qualityControlMetrics={qcm} />)}
+            {sortedQCMs.map((qcm, i) => <QCMAccordionDrawer key={qcm.individual_accession} idx={i} {...{ idToGraphIdentifier, relationshipMapping, qcmLen }} qualityControlMetrics={qcm} />)}
         </Accordion>
     );
 }
@@ -982,11 +1052,11 @@ function QCMAccordionDrawer(props) {
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
 
     return (
-        <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0": ""} ${idx === (qcmLen - 1) ? "border-bottom-0": ""}`} key={atID}>
+        <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0" : ""} ${idx === (qcmLen - 1) ? "border-bottom-0" : ""}`} key={atID}>
             <QCMAccordionToggle eventKey={atID} {...{ role, sequencingType, sampleID, specimenType }}>
                 <div className="d-flex align-items-center justify-items-center ml-2 ml-sm-0">
-                    { failFlags }
-                    { warnFlags }
+                    {failFlags}
+                    {warnFlags}
                 </div>
             </QCMAccordionToggle>
             <Accordion.Collapse eventKey={atID}>
@@ -997,8 +1067,8 @@ function QCMAccordionDrawer(props) {
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
                     }}>
-                        <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{ individual_id || individual_accession }</a>
-                        <span className="gen-identifier text-600 text-serif text-small pt-03">{ idToGraphIdentifier[atID] }</span>&nbsp;
+                        <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{individual_id || individual_accession}</a>
+                        <span className="gen-identifier text-600 text-serif text-small pt-03">{idToGraphIdentifier[atID]}</span>&nbsp;
                     </div>
                     <div className="card-body px-5">
                         <BioinfoStatTable {...{ qualityControlMetrics }} />
@@ -1023,7 +1093,7 @@ export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
 }
 
 function qcmFieldNameToDisplay(field = "") {
-    switch(field) {
+    switch (field) {
         // Special cases
         case "de_novo_fraction":
             return "De novo Fraction";

@@ -6,6 +6,16 @@ cgap-portal
 Change Log
 ----------
 
+12.8.6
+======
+`PR 697: Bch case drawer <https://github.com/dbmi-bgm/cgap-portal/pull/697>`_
+
+* Allows case information to be shown/hidden via a toggle
+  * Default state is dependent upon tab selected (dotPath); accessioning tab will load case info open, other tabs will keep it closed on load
+  * Add e.stopPropagation prop to the copyWrrapper, so the copy accession button doesn't trigger open/closing (requires an SPC update)
+* Create a utility file for storing reusable custom React hooks (+ move pre-existing ones there)
+
+
 12.8.5
 ======
 `PR 694: Reload login box after logging out <https://github.com/dbmi-bgm/cgap-portal/pull/694>`_
