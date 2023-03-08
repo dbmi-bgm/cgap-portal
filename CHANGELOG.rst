@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+12.8.7
+======
+`PR 698: More FASTQ paired-end options <https://github.com/dbmi-bgm/cgap-portal/pull/698>`_
+
+* Allow dashes as separators for paired-end read information in FASTQ names
+
+
 12.8.6
 ======
 `PR 697: Bch case drawer <https://github.com/dbmi-bgm/cgap-portal/pull/697>`_
