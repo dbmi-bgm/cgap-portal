@@ -26,7 +26,7 @@
                       "autocompleteServer": "https://cgap-higlass.com/api/v1"
                   },
                   "autocompleteSource": "/api/v1/suggest/?d=gene_annotation_hg38&",
-                  "chromInfoPath": "https://aveit-msa.s3.amazonaws.com/hg38.mod.chrom.sizes",
+                  "chromInfoPath": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes",
                   "tracks": {
                       "top": [
                           {
@@ -80,9 +80,9 @@
                               "uid": "fastaex",
                               "data": {
                                   "type": "fasta",
-                                  "faiUrl": "https://aveit-msa.s3.amazonaws.com/hg38.fa.fai",
-                                  "fastaUrl": "https://aveit-msa.s3.amazonaws.com/hg38.fa",
-                                  "chromSizesUrl": "https://aveit-msa.s3.amazonaws.com/hg38.mod.chrom.sizes"
+                                  "faiUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.fa.fai",
+                                  "fastaUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.fa",
+                                  "chromSizesUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes"
                               },
                               "type": "horizontal-sequence",
                               "width": 768,
@@ -162,7 +162,7 @@
                                 "type": "vcf",
                                 "vcfUrl": "URL_TO_VCF",
                                 "tbiUrl": "URL_TO_TBI",
-                                "chromSizesUrl": "https://aveit-msa.s3.amazonaws.com/hg38.mod.chrom.sizes"
+                                "chromSizesUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes"
                               },
                               "width": 450
                             },
@@ -211,7 +211,7 @@
                                   "type": "vcf",
                                   "vcfUrl": "URL_TO_VCF",
                                   "tbiUrl": "URL_TO_TBI",
-                                  "chromSizesUrl": "https://aveit-msa.s3.amazonaws.com/hg38.mod.chrom.sizes"
+                                  "chromSizesUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes"
                               },
                               "width": 450
                           },
@@ -243,7 +243,7 @@
                               "data": {
                                   "type": "bbi",
                                   "url": "URL_TO_BW",
-                                  "chromSizesUrl": "https://aveit-msa.s3.amazonaws.com/hg38.mod.chrom.sizes"
+                                  "chromSizesUrl": "https://cgap-higlass.s3.amazonaws.com/sequence/hg38.mod.chrom.sizes"
                               },
                               "uid": "density_track",
                               "type": "bar",
