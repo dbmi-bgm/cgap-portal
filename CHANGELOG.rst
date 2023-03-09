@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+12.9.0
+======
+`PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
+
+* Improved cohort browser
+* Upgrade of Higlass to 1.12.2
+
+
 12.8.7
 ======
 `PR 698: More FASTQ paired-end options <https://github.com/dbmi-bgm/cgap-portal/pull/698>`_
