@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+12.9.0
+======
+`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+
+* Add complex relationship analysis facet for StructuralVariantSamples
+* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
+
+
 12.8.7
 ======
 `PR 698: More FASTQ paired-end options <https://github.com/dbmi-bgm/cgap-portal/pull/698>`_
