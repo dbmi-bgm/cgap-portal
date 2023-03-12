@@ -48,7 +48,7 @@ function CohortCheckbox({ label, checked, onChange }) {
   );
 }
 
-function AssociationTestFilter({ associationTests, onChange }) {
+function AssociationTestFilter({ associationTests, activeTest, onChange }) {
   if (typeof onChange !== "function") return null;
 
   return (
@@ -58,12 +58,53 @@ function AssociationTestFilter({ associationTests, onChange }) {
       </label>
       <select
         className="form-control form-control-sm d-block"
-        aria-label=".form-select-sm example"
         onChange={onChange}
-        defaultValue={associationTests[0]}
+        defaultValue={activeTest}
       >
         {associationTests.map((gl) => (
           <option value={gl}>{gl}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function MaskFilter({ masks, activeMask, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <label className="form-label font-weight-normal mb-0">
+        Selected mask
+      </label>
+      <select
+        className="form-control form-control-sm d-block"
+        onChange={onChange}
+        defaultValue={activeMask}
+      >
+        {masks.map((gl) => (
+          <option value={gl}>{gl}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
+function ControlFilter({ controlList, activeControl, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <label className="form-label font-weight-normal mb-0">
+        Selected control group
+      </label>
+      <select
+        className="form-control form-control-sm d-block"
+        onChange={onChange}
+        defaultValue={activeControl}
+      >
+        {controlList.map((c) => (
+          <option value={c.key}>{c.item}</option>
         ))}
       </select>
     </div>
@@ -87,6 +128,10 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
       higlassContainerCohort,
       higlassContainerAnnotation,
       availableAssociationTests,
+      variantDetailSource,
+      activeAssociationTest,
+      availableMasks,
+      activeMask
     } = props;
     this.cohortVariantTestResults = cohortVariantTestResults;
     this.cohortGeneTestResults = cohortGeneTestResults;
@@ -94,16 +139,24 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     this.higlassContainerCohort = higlassContainerCohort;
     this.higlassContainerAnnotation = higlassContainerAnnotation;
     this.availableAssociationTests = availableAssociationTests;
+    this.variantDetailSource = variantDetailSource;
+    this.activeAssociationTest = activeAssociationTest;
+    this.availableMasks = availableMasks;
+    this.activeMask = activeMask;
+    this.controlList = [{
+      key: "control",
+      item: "Verified controls"
+    },
+    {
+      key: "gnomad2",
+      item: "gnomAD v2"
+    },
+    {
+      key: "gnomad3",
+      item: "gnomAD v3"
+    }];
+    this.activeControl = "control"
 
-    this.state = {
-      activeTab: "cohort",
-      activeConsequenceLevels: [CL_HIGH, CL_MODERATE],
-      showAlleleFrequencies: false,
-      geneLists: {},
-    };
-  }
-
-  componentDidMount() {
     this.handleTabClick = this.handleTabClick.bind(this);
     this.applyGeneListFilter = this.applyGeneListFilter.bind(this);
     this.applyAssociationTestFilter =
@@ -114,6 +167,16 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     this.changeShowAlleleFrequencies =
       this.changeShowAlleleFrequencies.bind(this);
     this.exportDisplay = this.exportDisplay.bind(this);
+
+    this.state = {
+      activeTab: "cohort",
+      activeConsequenceLevels: [CL_HIGH, CL_MODERATE],
+      showAlleleFrequencies: false,
+      geneLists: {},
+    };
+  }
+
+  componentDidMount() {
     getGeneLists(this.processLoadedGeneList);
   }
 
@@ -150,6 +213,7 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
               track.options["consequenceLevels"] = acl;
             }
           });
+
           hgc.api.setViewConfig(viewconfCohort);
         }
       }
@@ -185,7 +249,37 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
       const viewconfCohort = hgc.api.getViewConfig();
       viewconfCohort.views[0].tracks.top.forEach((track) => {
         if (track.type === "geneList") {
-          track.options["defaultStatistic"] = selectedTest;
+          track.options["activeStatistic"] = selectedTest;
+        }
+      });
+      hgc.api.setViewConfig(viewconfCohort);
+    }
+  }
+
+  applyMaskFilter(event) {
+    const selectedMask = event.target.value;
+
+    const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+    if (hgc) {
+      const viewconfCohort = hgc.api.getViewConfig();
+      viewconfCohort.views[0].tracks.top.forEach((track) => {
+        if (track.type === "geneList") {
+          track.options["activeMask"] = "MASK_"+selectedMask;
+        }
+      });
+      hgc.api.setViewConfig(viewconfCohort);
+    }
+  }
+
+  applyControlFilter(event) {
+    const selectedControl = event.target.value;
+
+    const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+    if (hgc) {
+      const viewconfCohort = hgc.api.getViewConfig();
+      viewconfCohort.views[0].tracks.top.forEach((track) => {
+        if (track.type === "cohort") {
+          track.options["controlGroup"] = selectedControl;
         }
       });
       hgc.api.setViewConfig(viewconfCohort);
@@ -268,6 +362,25 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
     );
   }
 
+  applyCaddFilter(event, minMax) {
+    const val = event.target.value;
+
+    const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
+    if (hgc) {
+      const viewconfCohort = hgc.api.getViewConfig();
+      viewconfCohort.views[0].tracks.top.forEach((track) => {
+        if (track.type === "cohort") {
+          if(minMax === "min"){
+            track.options["minCadd"] = val === "" ? 0 : val;
+          }else{
+            track.options["maxCadd"] = val === "" ? 200 : val;
+          }
+        }
+      });
+      hgc.api.setViewConfig(viewconfCohort);
+    }
+  }
+
   exportDisplay() {
     const hgc = this.higlassContainerCohort.current.getHiGlassComponent();
     if (!hgc) {
@@ -337,13 +450,13 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                   <GeneSearchBox
                     higlassContainer={this.higlassContainerCohort}
                   />
-                  <div className="mt-2">
+                  {/* <div className="mt-2">
                     <CohortCheckbox
                       label="Show Allele Frequencies"
                       checked={this.state.showAlleleFrequencies}
                       onChange={this.changeShowAlleleFrequencies}
                     />
-                  </div>
+                  </div> */}
                   <div className="d-block bg-light px-2 mb-1 mt-1">
                     <small>GENE LEVEL FILTERING</small>
                   </div>
@@ -353,30 +466,41 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                   />
                   <AssociationTestFilter
                     associationTests={this.availableAssociationTests}
+                    activeTest={this.activeAssociationTest}
                     onChange={this.applyAssociationTestFilter}
+                  />
+                  <MaskFilter
+                    masks={this.availableMasks}
+                    activeMask={this.activeMask}
+                    onChange={this.applyMaskFilter.bind(this)}
                   />
                   <div className="d-block bg-light px-2 mb-1 mt-2">
                     <small>VARIANT LEVEL FILTERING</small>
                   </div>
-                  <div className="mt-1 text-muted">CADD Score</div>
+                  <ControlFilter
+                    controlList={this.controlList}
+                    activeControl={this.activeControl}
+                    onChange={this.applyControlFilter.bind(this)}
+                  />
+                  <div className="mt-1">CADD Score</div>
                   <div className="row">
                     <div className="col-sm-6">
-                      <div class="form-group">
+                      <div className="form-group">
                         <input
                           type="text"
-                          class="form-control form-control-sm"
+                          className="form-control form-control-sm"
                           placeholder="Min"
-                          disabled
+                          onChange={(evt) => this.applyCaddFilter(evt, "min")}
                         />
                       </div>
                     </div>
                     <div className="col-sm-6">
-                      <div class="form-group">
+                      <div className="form-group">
                         <input
                           type="text"
-                          class="form-control form-control-sm"
+                          className="form-control form-control-sm"
                           placeholder="Max"
-                          disabled
+                          onChange={(evt) => this.applyCaddFilter(evt, "max")}
                         />
                       </div>
                     </div>
@@ -414,6 +538,7 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                   cohortVariantTestResults={this.cohortVariantTestResults}
                   cohortGeneTestResults={this.cohortGeneTestResults}
                   cohortVariantDensity={this.cohortVariantDensity}
+                  variantDetailSource={this.variantDetailSource}
                   ref={this.higlassContainerCohort}
                   requestingTab="cohort"
                 />
@@ -451,7 +576,11 @@ export const EmbeddedCohortBrowser = React.memo(function EmbeddedCohortBrowser(
     cohortVariantTestResults,
     cohortGeneTestResults,
     cohortVariantDensity,
+    variantDetailSource,
     availableAssociationTests,
+    activeAssociationTest,
+    availableMasks,
+    activeMask
   } = props;
   const higlassContainerCohort = useRef(null);
   const higlassContainerAnnotation = useRef(null);
@@ -461,7 +590,11 @@ export const EmbeddedCohortBrowser = React.memo(function EmbeddedCohortBrowser(
       cohortVariantTestResults={cohortVariantTestResults}
       cohortGeneTestResults={cohortGeneTestResults}
       cohortVariantDensity={cohortVariantDensity}
+      variantDetailSource={variantDetailSource}
       availableAssociationTests={availableAssociationTests}
+      activeAssociationTest={activeAssociationTest}
+      availableMasks={availableMasks}
+      activeMask={activeMask}
       higlassContainerCohort={higlassContainerCohort}
       higlassContainerAnnotation={higlassContainerAnnotation}
     />
