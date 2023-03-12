@@ -36,6 +36,7 @@ pytestmark = [pytest.mark.working, pytest.mark.indexing]
 
 # These 3 versions are known to be compatible, older versions should not be
 # used, odds are 14 can be used as well - Will Sept 13 2022
+# TODO: Probably should import snovault's compatible versions from snovault.tests.test_storage.POSTGRES_COMPATIBLE_MAJOR_VERSIONS
 POSTGRES_COMPATIBLE_MAJOR_VERSIONS = ['11', '12', '13', '14']
 
 
