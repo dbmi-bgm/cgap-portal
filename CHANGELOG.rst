@@ -6,6 +6,41 @@ cgap-portal
 Change Log
 ----------
 
+12.9.0
+======
+`PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
+
+* Improved cohort browser
+* Upgrade of Higlass to 1.12.2
+
+
+12.8.7
+======
+`PR 698: More FASTQ paired-end options <https://github.com/dbmi-bgm/cgap-portal/pull/698>`_
+
+* Allow dashes as separators for paired-end read information in FASTQ names
+
+
+12.8.6
+======
+`PR 697: Bch case drawer <https://github.com/dbmi-bgm/cgap-portal/pull/697>`_
+
+* Allows case information to be shown/hidden via a toggle
+  * Default state is dependent upon tab selected (dotPath); accessioning tab will load case info open, other tabs will keep it closed on load
+  * Add e.stopPropagation prop to the copyWrrapper, so the copy accession button doesn't trigger open/closing (requires an SPC update)
+* Create a utility file for storing reusable custom React hooks (+ move pre-existing ones there)
+
+
+12.8.5
+======
+`PR 694: Reload login box after logging out <https://github.com/dbmi-bgm/cgap-portal/pull/694>`_
+
+* Update SPC to newest release [0.1.60](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.60)
+  * This release enables UI to use custom auth0 configurations accessed via `/auth0_config` endpoint
+  * Note: `auth0Options` may still be passed to `<LoginController>` but only values for keys not returned by `/auth0_config` are used as fallback
+* Fix logout auth0 lock related bug
+
+
 12.8.4
 ======
 

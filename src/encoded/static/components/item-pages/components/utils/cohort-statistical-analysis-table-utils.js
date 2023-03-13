@@ -2,7 +2,7 @@ import { object, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/componen
 import { console } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 import { CHROMS, chr2Abs } from "./chrom-utils";
 
-export const parseVcfRecord = (vcfRecord, statTests) => {
+export const parseVcfRecord = (vcfRecord, availableTests, availableMasks) => {
   const info = vcfRecord["INFO"];
   const posAbs = chr2Abs(vcfRecord.CHROM, +vcfRecord.POS);
 
@@ -11,17 +11,20 @@ export const parseVcfRecord = (vcfRecord, statTests) => {
     chrom: vcfRecord.CHROM,
     start: vcfRecord.POS,
     end: info.END[0],
-    geneName: info.NAME[0],
+    geneName: info.SYMBOL[0],
     info: info,
     posAbs: posAbs,
   };
 
-  //statTests - List of statistical tests to display
-  statTests.forEach((testName) => {
-    if (info[testName]) {
-      parsedResult[testName] = info[testName][0];
-    }
+  //availableTests - List of statistical tests to display
+  availableMasks.forEach((maskName) => {
+    availableTests.forEach((testName) => {
+      const currentName  = `MASK_${maskName}_${testName}`;
+      // We need to set a negative number here, so that the sorting works. This will be replaces with "-" in the display
+      parsedResult[currentName] = info[currentName] ? info[currentName][0] : -1; 
+    });
   });
+  
   return parsedResult;
 };
 

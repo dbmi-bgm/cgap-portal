@@ -155,7 +155,7 @@
             names must contain one of the following sub-strings:
         </li>
         <ul>
-            <li><i>_R1_</i> or <i>_R1.</i> (forward reads) </li>
+            <li><i>_R1_</i> or <i>_R1.</i> or <i>-R1-</i> (forward reads) </li>
 
             <ul>
                 <li>Examples: samplename_S1_L001<i>_R1_</i>001.fastq.gz, samplename<i>_R1.</i>fastq.gz </li>
@@ -163,7 +163,7 @@
 
         </ul>
         <ul>
-            <li><i>_R2_</i> or <i>_R2.</i> (reverse reads)</li>
+            <li><i>_R2_</i> or <i>_R2.</i> or <i>-R2-</i> (reverse reads)</li>
             <ul>
                 <ul>
                     <li>Examples: samplename_S1_L001<i>_R2_</i>001.fastq.gz, samplename<i>_R2.</i>fastq.gz</li>
