@@ -280,12 +280,12 @@ class NoNestedCommit(BaseException):
     pass
 
 
-@contextlib.contextmanager
+@contextlib.contextmanager  # To be moved to snovault
 def begin_nested(*, app, commit=True):
     session = app.registry[DBSESSION]
     connection = session.connection().connect()
     try:
-        with connection.begin_nested() as tx:
+        with connection.begin_nested():  # as tx:
             yield
             if not commit:
                 raise NoNestedCommit()  # Raising an error will bypass an attempt to commit
@@ -293,7 +293,7 @@ def begin_nested(*, app, commit=True):
         pass
 
 
-@contextlib.contextmanager
+@contextlib.contextmanager  # To be moved to snovault
 def local_collections(*, app, collections):
     with begin_nested(app=app, commit=False):
         # import pdb; pdb.set_trace()
