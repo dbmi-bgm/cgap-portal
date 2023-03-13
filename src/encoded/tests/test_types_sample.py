@@ -700,7 +700,6 @@ class TestFileForQc:
     }
     FILE_PROCESSED_SNV_VEP_VCF_2 = {
         "variant_type": "SNV",
-        "file_type": "Annotated VCF",
         "description": "output from VEP in VCF format",
         "file_format": VCF_FILE_FORMAT,
         "qc_list": QcTestConstants.PEDDY_QC_LIST,

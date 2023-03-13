@@ -581,6 +581,12 @@ class FileForQc(ItemProperties):
             self.file_type == self.FINAL_VCF_FILE_TYPE or self.vcf_to_ingest
         )
 
+    def has_snvs(self):
+        return self.variant_type == self.VARIANT_TYPE_SNV
+
+    def has_svs(self):
+        return self.variant_type == self.VARIANT_TYPE_SV
+
     def is_vep_vcf(self):
         """Whether file is a VEP VCF.
 
@@ -589,9 +595,13 @@ class FileForQc(ItemProperties):
         :return: `True` if VEP VCF, `False` otherwise
         :rtype: bool
         """
-        return self.is_vcf() and (
-            self.VEP_ANNOTATED_STRING in self.file_type.lower()
-            or self.VEP_OUTPUT_STRING in self.description.lower()
+        return (
+            self.is_vcf()
+            and self.has_snvs()
+            and (
+                self.VEP_ANNOTATED_STRING in self.file_type.lower()
+                or self.VEP_OUTPUT_STRING in self.description.lower()
+            )
         )
 
     def is_snv_final_vcf(self):
@@ -600,7 +610,7 @@ class FileForQc(ItemProperties):
         :return: `True` if final SNV VCF, `False` otherwise
         :rtype: bool
         """
-        return self.variant_type == self.VARIANT_TYPE_SNV and self.is_final_vcf()
+        return self.has_snvs() and self.is_final_vcf()
 
     def is_sv_final_vcf(self):
         """Whether file is a final SV VCF.
@@ -608,7 +618,7 @@ class FileForQc(ItemProperties):
         :return: `True` if final SV VCF, `False` otherwise
         :rtype: bool
         """
-        return self.variant_type == self.VARIANT_TYPE_SV and self.is_final_vcf()
+        return self.has_svs() and self.is_final_vcf()
 
     def get_quality_metric_type(self):
         """Determine appropriate class for associated QualityMetric.
