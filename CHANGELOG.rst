@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+12.9.1
+======
+`PR 702: VEP QC metrics fix <https://github.com/dbmi-bgm/cgap-portal/pull/702>`_
+
+* Fix VEP-annotated VCF recognition for updated SNV pipelines (v1.1.0)
+
+
 12.9.0
 ======
 `PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
