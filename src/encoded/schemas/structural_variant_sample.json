@@ -360,6 +360,34 @@
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Sample ID)"
                     },
+                    "samplegeno_role": {
+                        "title": "Familial Relation",
+                        "description": "Relationship of the person who submitted this sample relative to the proband",
+                        "type": "string",
+                        "suggested_enum": [
+                            "proband",
+                            "father",
+                            "mother",
+                            "brother",
+                            "sister",
+                            "sibling",
+                            "half-brother",
+                            "half-sister",
+                            "half-sibling",
+                            "wife",
+                            "husband",
+                            "son",
+                            "daughter",
+                            "child",
+                            "grandson",
+                            "granddaughter",
+                            "grandchild",
+                            "grandmother",
+                            "family-in-law",
+                            "extended-family",
+                            "not linked"
+                        ]
+                    },
                     "samplegeno_quality": {
                         "title": "Sample Genotype Quality",
                         "field_name": "samplegeno_quality",
@@ -638,6 +666,11 @@
         },
         "samplegeno.samplegeno_numgt": {
             "title": "Sample Genotype (Numeric)",
+            "order": 60,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_role": {
+            "title": "Sample Relationship",
             "order": 60,
             "grouping": "Complex Relationship Analysis"
         },
