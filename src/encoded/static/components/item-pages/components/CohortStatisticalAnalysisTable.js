@@ -71,6 +71,26 @@ function GeneListFilter({ geneLists, onChange }) {
   );
 }
 
+function MaskFilter({ availableMasks, activeMask, onChange }) {
+  if (typeof onChange !== "function") return null;
+
+  return (
+    <div className="mb-1">
+      <div className="mb-0">Selected Mask</div>
+      <select
+        className="form-control form-control-sm d-block"
+        aria-label=".form-select-sm example"
+        onChange={onChange}
+        defaultValue={activeMask}
+      >
+        {availableMasks.map((gl) => (
+          <option value={gl} key={gl}>{gl}</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 function ShowMore({ recordDifference, onClick }) {
   if (typeof onClick !== "function") return null;
   if (recordDifference > 0) {
@@ -86,9 +106,10 @@ function ShowMore({ recordDifference, onClick }) {
 class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
   constructor(props) {
     super(props);
-    const { numRows, vcfLocation, statTests, activeTests } = props;
+    const { numRows, vcfLocation, availableAssociationTests, activeAssociationTests, availableMasks, activeMask } = props;
 
-    this.statTests = statTests;
+    this.availableAssociationTests = availableAssociationTests;
+    this.availableMasks = availableMasks;
     this.numRowsOriginal = numRows;
 
     this.state = {
@@ -96,8 +117,9 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       numRows: numRows,
       vcfRecordsFiltered: [],
       vcfRecordsToDisplay: [],
-      sortedBy: activeTests[0],
-      activeTests: activeTests,
+      sortedBy: activeAssociationTests[0],
+      activeTests: activeAssociationTests,
+      activeMask: activeMask,
       geneLists: {},
       filter: {},
     };
@@ -116,6 +138,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     this.changeActiveTests = this.changeActiveTests.bind(this);
     this.setLoadedGeneList = this.setLoadedGeneList.bind(this);
     this.applyGeneListFilter = this.applyGeneListFilter.bind(this);
+    this.applyMaskFilter = this.applyMaskFilter.bind(this);
     this.loadData();
   }
 
@@ -146,7 +169,8 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
             const vcfRecord = tbiVCFParser.parseLine(line);
             const parsedVcfRecord = parseVcfRecord(
               vcfRecord,
-              this.props.statTests
+              this.availableAssociationTests,
+              this.availableMasks
             );
             const id = parsedVcfRecord["id"];
             // We are using this indexing strategy for more efficient gene list filtering
@@ -176,7 +200,8 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
   }
 
   sortRecordsByTest(records, testName) {
-    records.sort((a, b) => b[testName] - a[testName]);
+    const currentName  = `MASK_${this.state.activeMask}_${testName}`;
+    records.sort((a, b) => b[currentName] - a[currentName]);
     return records;
   }
 
@@ -228,7 +253,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     let sortedBy = this.state.sortedBy;
     // A test was clicked that is currently sorted by
     if (sortedBy === clickedTest || !activeTests.includes(sortedBy)) {
-      sortedBy = activeTests[0] || this.statTests[0];
+      sortedBy = activeTests[0] || this.availableAssociationTests[0];
       this.sortRecordsByTestAndUpdateState(
         this.state.vcfRecordsFiltered,
         sortedBy
@@ -317,6 +342,20 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     this.applyFilter(this.state.filter);
   }
 
+  applyMaskFilter(event) {
+    const val = event.target.value;
+    this.setState({
+      activeMask: val
+    },
+    function() {
+      this.sortRecordsByTestAndUpdateState(
+        this.state.vcfRecordsFiltered,
+        this.state.sortedBy
+      );
+    });
+    
+  }
+
   getTableHeader() {
     const headerCols = [];
     headerCols.push(<th key="th.geneName">Gene name</th>);
@@ -348,7 +387,8 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
       const cols = [];
       cols.push(<td key={id + "geneName"}>{record["geneName"]}</td>);
       this.state.activeTests.forEach((test) => {
-        const val = format(".2f")(record[test]);
+        const currentName  = `MASK_${this.state.activeMask}_${test}`;
+        const val = record[currentName] < 0 ? '-' : format(".2f")(record[currentName]);
         cols.push(<td key={id + test}>{val}</td>);
       });
       rows.push(<tr key={id}>{cols}</tr>);
@@ -384,8 +424,14 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
             onChange={this.applyGeneListFilter}
           />
 
+          <MaskFilter
+            availableMasks={this.availableMasks}
+            activeMask={this.state.activeMask}
+            onChange={this.applyMaskFilter}
+          />
+
           <div className="mt-2">Statistical tests</div>
-          {this.statTests.map((test) => (
+          {this.availableAssociationTests.map((test) => (
             <StatTestCheckbox
               key={test}
               label={test}

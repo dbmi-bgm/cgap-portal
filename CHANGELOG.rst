@@ -8,10 +8,10 @@ Change Log
 
 12.9.0
 ======
-`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+`PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
 
-* Add complex relationship analysis facet for StructuralVariantSamples
-* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
+* Improved cohort browser
+* Upgrade of Higlass to 1.12.2
 
 
 12.8.7
