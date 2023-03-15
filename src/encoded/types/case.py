@@ -243,6 +243,8 @@ def _build_case_embedded_list():
         "active_filterset.title",
         "active_filterset_sv.@id",
         "active_filterset_sv.title",
+        # FilterSet linkTo
+        "cohort.filter_set.*",
         # Project linkTo
         "project.name",
         # File linkTo
