@@ -435,7 +435,9 @@ class TestQcFlagger:
             ("5", False, True, False, "fail"),
             ("3.4", False, True, False, "warn"),
             ("3.0", False, True, False, "pass"),
-            ("2.2", False, True, False, "warn"),
+            ("2.2", False, True, False, "pass"),
+            ("2.15", False, True, False, "warn"),
+            ("2.1", False, True, False, "warn"),
             ("1.5", False, True, False, "fail"),
         ],
     )

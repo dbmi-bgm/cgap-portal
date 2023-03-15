@@ -467,6 +467,7 @@ def row_dict():
         "specimen type": "Peripheral_Blood",
         "test requested": "WGS",
         "test number": "2",
+        "tags": "foo,BAR, fu, ",
     }
 
 
@@ -1288,6 +1289,7 @@ class TestAccessionRow:
             obj.sample.metadata["requisition_acceptance"]["accepted_rejected"]
             == "Accepted"
         )
+        assert obj.sample.metadata["tags"] == ["foo", "BAR", "fu"]
         assert obj.analysis.metadata["samples"] == [obj.sample.alias]
         assert obj.individual.metadata["samples"] == [obj.sample.alias]
 
@@ -2184,8 +2186,16 @@ class TestSubmittedFilesParser:
             ("fastq_filer1.fastq.gz", None),
             ("fastq_file_R1.fastq.gz", 1),
             ("fastq_file_r1.fastq.gz", 1),
+            ("fastq_file-R1.fastq.gz", 1),
+            ("fastq_file-r1.fastq.gz", 1),
             ("fastq_file_R1_001.fastq.gz", 1),
             ("fastq_file_r1_001.fastq.gz", 1),
+            ("fastq_file_R1-001.fastq.gz", 1),
+            ("fastq_file_r1-001.fastq.gz", 1),
+            ("fastq_file-R1_001.fastq.gz", 1),
+            ("fastq_file-r1_001.fastq.gz", 1),
+            ("fastq_file-R1-001.fastq.gz", 1),
+            ("fastq_file-r1-001.fastq.gz", 1),
             ("fastq_file_R2.fastq.gz", 2),
             ("fastq_file_r2.fastq.gz", 2),
             ("fastq_file_R2_001.fastq.gz", 2),

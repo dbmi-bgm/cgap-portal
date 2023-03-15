@@ -19,7 +19,7 @@ const auth0Options = {
 };
 
 export const GuestHomeView = React.memo(function GuestHomeView(props){
-    const { updateAppSessionState } = props;
+    const { updateAppSessionState, session } = props;
 
     // Upon mount, unset alerts from any other pages, to prevent vertical scroll.
     useEffect(function(){
@@ -52,9 +52,9 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
                             <path d="M393.98,6.03c-1-1.6-2.35-2.84-4.07-3.72s-3.65-1.32-5.81-1.32h-12.74V35.28h5.64v-12.94h7.1c2.16,0,4.09-.44,5.81-1.32,1.71-.88,3.07-2.12,4.07-3.72,1-1.6,1.49-3.48,1.49-5.64s-.5-4.03-1.49-5.63Zm-4.92,8.7c-.52,.87-1.23,1.54-2.13,2.01-.9,.47-1.94,.71-3.11,.71h-6.81V5.88h6.81c1.18,0,2.21,.24,3.11,.71,.9,.47,1.61,1.14,2.13,2.01,.52,.87,.78,1.89,.78,3.06s-.26,2.2-.78,3.06Z"/>
                         </svg>
                     </div>
-                    <div className="cgap-tagline text-center px-2 text-small pt-1">The <strong>Clinical Genome Analysis Platform (CGAP)</strong> is an intuitive, open-source analysis tool designed to support complex research &amp; clinical genomics workflows.</div>
+                    <div className="cgap-tagline text-center px-2 text-small pt-1">The <strong>Computational Genome Analysis Platform (CGAP)</strong> is an intuitive, open-source analysis tool designed to support complex research &amp; clinical genomics workflows.</div>
                     <LoginController {...{ updateAppSessionState, auth0Options }}>
-                        <LoginBox className="mt-25" />
+                        <LoginBox className="mt-25" session={session} />
                     </LoginController>
                     <div className="cgap-links text-primary text-small mt-2 mb-5 row">
                         <div className="text-600 pr-sm-1 col-12 col-sm-auto text-center"><a href="https://cgap.hms.harvard.edu">CGAP Homepage</a></div>
@@ -68,17 +68,19 @@ export const GuestHomeView = React.memo(function GuestHomeView(props){
 });
 
 const LoginBox = React.memo(function LoginBox (props) {
-    const { showLock, isAuth0LibraryLoaded, unverifiedUserEmail } = props;
+    const { showLock, isAuth0LibraryLoaded, unverifiedUserEmail, session } = props;
 
     useEffect(function(){
         // Also show lock again when unverifiedUserEmail is unset, since when registration modal pops up, LoginController will hide lock.
-        if (!isAuth0LibraryLoaded || unverifiedUserEmail) return;
-        showLock();
-    }, [ isAuth0LibraryLoaded, unverifiedUserEmail ]);
+        if (!isAuth0LibraryLoaded || unverifiedUserEmail || session) return;
+        setTimeout(()=>{
+            showLock();
+        }, 100);
+    }, [ isAuth0LibraryLoaded, unverifiedUserEmail, session ]);
 
     return (
         <React.Fragment>
-            <LoginBoxContainerElement />
+            { !session && <LoginBoxContainerElement /> }
             { unverifiedUserEmail ? <UserRegistrationModal {...props} /> : null }
         </React.Fragment>
     );

@@ -35,7 +35,7 @@ export default class HomePage extends React.PureComponent {
                 { session ?
                     <UserDashboard {...commonProps} {...{ schemas, windowHeight, windowWidth }} />
                     :
-                    <GuestHomeView {...commonProps} {...{ updateAppSessionState }} />
+                    <GuestHomeView {...commonProps} {...{ updateAppSessionState, session }} />
                 }
             </div>
         );
@@ -43,31 +43,9 @@ export default class HomePage extends React.PureComponent {
 
 }
 
-
+// TODO: Get rid of this entirely
 const HomePageTitle = React.memo(function HomePageTitle(props){
-    const { session, alerts } = props;
-
     return null;
-    // if (session){
-    //     return (
-    //         // We can also make into .container-wide..
-    //         // <React.Fragment>
-    //         //     <PageTitleContainer alerts={alerts} className="container pb-55">
-    //         //         <OnlyTitle>My Dashboard</OnlyTitle>
-    //         //     </PageTitleContainer>
-    //         //     <hr className="tab-section-title-horiz-divider"/>
-    //         // </React.Fragment>
-    //         null
-    //     );
-    // }
-
-    // return (
-    //     <PageTitleContainer alerts={alerts}>
-    //         {/* <TitleAndSubtitleUnder subtitle="Clinical Genomics Analysis Platform" className="home-page-title">
-    //             Welcome
-    //         </TitleAndSubtitleUnder> */}
-    //     </PageTitleContainer>
-    // );
 });
 
 

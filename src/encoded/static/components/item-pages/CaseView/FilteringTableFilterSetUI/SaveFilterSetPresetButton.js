@@ -310,6 +310,8 @@ export class SaveFilterSetPresetButton extends React.Component {
 
     render(){
         const {
+            btnCls = "btn btn-outline-light btn-sm text-truncate d-flex align-items-center",
+            btnInner = <><i className="icon fas icon-plus-circle mr-05" />Create Preset</>,
             caseItem,
             filterSet,
             isEditDisabled,
@@ -426,9 +428,9 @@ export class SaveFilterSetPresetButton extends React.Component {
 
                 { modal }
 
-                <button className="btn btn-outline-light btn-sm text-truncate" type="button" onClick={disabled ? null : this.onClickSavePresetButton}
-                    disabled={disabled} data-tip="Create copy of this current FilterSet and set it as a preset for yourself">
-                    { savingStatus === 1 ? <i className="icon icon-circle-notch icon-spin fas"/> : "Save as Preset" }
+                <button className={btnCls} type="button" onClick={disabled ? null : this.onClickSavePresetButton}
+                    disabled={disabled} data-tip="Save this FilterSet as a Preset available for all cases in your project">
+                    { savingStatus === 1 ? <i className="icon icon-circle-notch icon-spin fas"/> : btnInner }
                 </button>
 
                 {/*
