@@ -510,9 +510,19 @@
             "lookup": 21,
             "uniqueKey": true
         },
-        "is_tumor": {
-            "title": "Tumor status",
-            "type": "boolean"
+        "tissue_type": {
+            "title": "Tissue Type",
+            "description": "Description of the kind of tissue collected with respect to disease status or proximity to tumor tissue",
+            "type": "string",
+            "enum": [
+                "Tumor",
+                "Normal",
+                "Abnormal",
+                "Peritumoral",
+                "Unknown",
+                "Not Reported"
+            ],
+            "comment": "Adapted from TCGA schema: https://github.com/NCI-GDC/gdcdictionary/blob/develop/gdcdictionary/schemas/sample.yaml"
         }
     }
 }
