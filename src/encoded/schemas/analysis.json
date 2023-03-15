@@ -33,26 +33,6 @@
         "project.display_title": {
             "title": "Project",
             "order": 10
-        },
-        "samples.display_title": {
-            "title": "Samples",
-            "description": "Samples in the analysis",
-            "order": 20
-        },
-        "samples.individual.display_title": {
-            "title": "Individuals",
-            "description": "Individuals in the analysis",
-            "order": 30
-        },
-        "samples.individual.families.display_title": {
-            "title": "Families",
-            "description": "Families in the analysis",
-            "order": 40
-        },
-        "samples.workup_type": {
-            "title": "Sequencing",
-            "description": "Sequencing type of the samples in the analysis",
-            "order": 50
         }
     },
     "columns": {
