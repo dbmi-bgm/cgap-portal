@@ -1,9 +1,11 @@
+from typing import List
+
 from snovault import collection, load_schema
 
 from .analysis import Analysis
 
 
-def _build_somatic_analysis_embedded_list():
+def _build_somatic_analysis_embedded_list() -> List[str]:
     return []
 
 

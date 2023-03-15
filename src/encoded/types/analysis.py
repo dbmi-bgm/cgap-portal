@@ -8,11 +8,7 @@ from .base import Item
 
 
 def _build_analysis_embedded_list() -> List[str]:
-    return [
-        "samples.individual",
-        "samples.workup_type",
-        "samples.individual.families",
-    ]
+    return []
 
 
 @abstract_collection(
