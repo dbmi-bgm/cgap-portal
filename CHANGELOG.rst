@@ -6,6 +6,16 @@ cgap-portal
 Change Log
 ----------
 
+13.0.0
+======
+`PR 703: Somatic data model <https://github.com/dbmi-bgm/cgap-portal/pull/703>`_
+
+* Add SomaticAnalysis item
+* Add Analysis abstract collection for SomaticAnalysis and CohortAnalysis
+* Remove Cohort item
+* Add tissue_type property to Sample
+
+
 12.9.0
 ======
 `PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
