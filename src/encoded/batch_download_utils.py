@@ -1,11 +1,26 @@
 import csv
+import json
+from abc import ABC, abstractmethod
+from dataclasses import dataclass
+from typing import (
+    Any, Callable, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
+)
 from urllib.parse import parse_qs
-import structlog
-from snovault.util import simple_path_ids  # , debug_log
 
+import structlog
+from pyramid.request import Request
+from pyramid.response import Response
+from snovault.util import simple_path_ids
+
+from .drr_item_models import JsonObject
+from .root import CGAPRoot
+from .search.compound_search import CompoundSearchBuilder
 
 
 log = structlog.getLogger(__name__)
+
+OrderedSpreadsheetColumn = Tuple[str, str, Union[str, Callable]]
+
 
 # Unsure if we might prefer the below approach to avoid recursion or not-
 # def simple_path_ids(obj, path):
@@ -165,15 +180,198 @@ def stream_tsv_output(
             yield writer.writerow(row)
 
 
-# TODO: Fortunately, I don't see any uses of this function. -kmp 25-Sep-2022
-#
-# def build_xlsx_spreadsheet(dictionaries_iterable, spreadsheet_mappings):
-#     """TODO"""
-#     from tempfile import NamedTemporaryFile
-#     from openpyxl import Workbook
-#     wb = Workbook()
-#
-#     with NamedTemporaryFile() as tmp:
-#         wb.save(tmp.name)
-#         tmp.seek(0)
-#         stream = tmp.read()  # TODO: Seems like you'd want to return this value? -kmp 25-Sep-2022
+class SpreadsheetCreationError(Exception):
+    pass
+
+
+@dataclass(frozen=True)
+class SpreadsheetColumn:
+
+    title: str
+    description: str
+    to_evaluate: Union[str, Callable]
+
+    def get_title(self):
+        return self.title
+
+    def get_description(self):
+        return self.description
+
+    def get_field_for_item(self, item: Any) -> str:
+        if self.is_property_evaluator() and isinstance(item, JsonObject):
+            return self._get_field_from_item(item)
+        if self.is_callable_evaluator():
+            return self.to_evaluate(item)
+        raise ValueError(
+            f"Unable to evaluate item {item} with evaluator {self.to_evaluate}"
+        )
+
+    def _get_field_from_item(self, item: Any) -> str:
+        pass
+
+    def is_property_evaluator(self):
+        return isinstance(self.to_evaluate, str)
+
+    def is_callable_evaluator(self):
+        return callable(self.to_evaluate)
+
+
+@dataclass(frozen=True)
+class SpreadsheetTemplate(ABC):
+
+    @abstractmethod
+    def get_headers(self) -> None:
+        pass
+
+    @abstractmethod
+    def get_column_titles(self) -> None:
+        pass
+
+    @abstractmethod
+    def get_column_descriptions(self) -> None:
+        pass
+
+    @abstractmethod
+    def get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
+        pass
+
+    def _convert_column_tuples_to_spreadsheet_columns(
+        self,
+        columns: Sequence[OrderedSpreadsheetColumn],
+    ) -> List[SpreadsheetColumn]:
+        return [SpreadsheetColumn(*column) for column in columns]
+
+
+@dataclass(frozen=True)
+class SpreadsheetPost:
+
+    CASE_ACCESSION = "case_accession"
+    CASE_TITLE = "case_title"
+    COMPOUND_SEARCH_REQUEST = "compound_search_request"
+    FILE_FORMAT = "file_format"
+
+    CSV_EXTENSION = "csv"
+    TSV_EXTENSION = "tsv"
+    ACCEPTABLE_FILE_FORMATS = set([TSV_EXTENSION, CSV_EXTENSION])
+    DEFAULT_FILE_FORMAT = TSV_EXTENSION
+
+    request: Request
+
+    @property
+    def parameters(self) -> Dict[str, Any]:
+        return self.request.params
+
+    def get_file_format(self) -> str:
+        return self.parameters.get(self.FILE_FORMAT, self.DEFAULT_FILE_FORMAT)
+
+    def get_case_accession(self) -> str:
+        return self.parameters.get(self.CASE_ACCESSION, "")
+
+    def get_case_title(self) -> str:
+        return self.parameters.get(self.CASE_TITLE, "")
+
+    def get_associated_compound_search(self) -> Dict:
+        # May want to validate this value
+        # Going with Alex's format here for json.loading if a string
+        # Not sure this should be a dict; might be an array
+        compound_search = self.parameters.get(self.COMPOUND_SEARCH_REQUEST, {})
+        if isinstance(compound_search, str):
+            compound_search = json.loads(compound_search)
+        return compound_search
+
+
+@dataclass(frozen=True)
+class FilterSetSearch:
+
+    GLOBAL_FLAGS = "global_flags"
+    INTERSECT = "intersect"
+
+    context: CGAPRoot
+    request: Request
+    compound_search: Mapping
+
+    def get_search_results(self) -> None:
+        return CompoundSearchBuilder.execute_filter_set(
+            self.context,
+            self.request,
+            self.get_filter_set(),
+            to=CompoundSearchBuilder.ALL,
+            global_flags=self.get_global_flags(),
+            intersect=self.is_intersect(),
+            return_generator=True,
+        )
+
+    def get_filter_set(self) -> None:
+        return CompoundSearchBuilder.extract_filter_set_from_search_body(
+            self.request, self.compound_search
+        )
+
+    def get_global_flags(self) -> Union[str, None]:
+        return self.compound_search.get(self.GLOBAL_FLAGS)
+
+    def is_intersect(self) -> bool:
+        return bool(self.get_intersect())
+
+    def get_intersect(self) -> str:
+        return self.compound_search.get(self.INTERSECT, "")
+
+
+@dataclass(frozen=True)
+class SpreadsheetGenerator:
+
+    CSV_FILE_FORMAT = "csv"
+    TSV_FILE_FORMAT = "tsv"
+    DEFAULT_FILE_FORMAT = TSV_FILE_FORMAT
+    FILE_FORMAT_TO_DELIMITER = {CSV_FILE_FORMAT: ",", TSV_FILE_FORMAT: "\t"}
+
+    items_to_evaluate: Sequence[JsonObject]
+    spreadsheet_template: SpreadsheetTemplate
+    file_name: str
+    file_format: Optional[str] = DEFAULT_FILE_FORMAT
+
+    def get_spreadsheet_response(self) -> Response:
+        return Response(
+            app_iter=self._stream_spreadsheet(), headers=self._get_response_headers()
+        )
+
+    def _stream_spreadsheet(self) -> Iterator[Callable]:
+        writer = self._get_writer()
+        for row in self._yield_rows():
+            if row:
+                yield writer.writerow(row)
+
+    def _get_writer(self) -> csv.writer:
+        delimiter = self._get_delimiter()
+        return csv.writer(delimiter=delimiter, quoting=csv.QUOTE_NONNUMERIC)
+
+    def _get_delimiter(self) -> str:
+        result = self.FILE_FORMAT_TO_DELIMITER.get(self.file_format)
+        if result is None:
+            raise ValueError
+        return result
+
+    def _get_response_headers(self) -> Dict:
+        return {
+            "X-Accel-Buffering": "no",
+            "Content-Disposition": f"attachment; filename={self.file_name}",
+            "Content-Type": f"text/{self.file_format}",
+            "Content-Description": "File Transfer",
+            "Cache-Control": "no-store"
+        }
+
+    def _yield_rows(self) -> Iterator[Sequence[str]]:
+        self._yield_headers()
+        self._yield_column_rows()
+        self._yield_item_rows()
+
+    def _yield_headers(self) -> Iterator[Sequence[str]]:
+        for header in self.spreadsheet_template.get_headers():
+            yield header
+
+    def _yield_column_rows(self) -> Iterator[Sequence[str]]:
+        yield self.spreadsheet_template.get_column_titles()
+        yield self.spreadsheet_template.get_column_descriptions()
+
+    def _yield_item_rows(self) -> Iterator[Sequence[str]]:
+        for item in self.items_to_evaluate:
+            yield self.spreadsheet_template.get_row_for_item(item)

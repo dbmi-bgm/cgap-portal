@@ -7,7 +7,10 @@ import pytest
 from webtest import TestApp
 
 from .. import drr_batch_download as drr_batch_download_module
-from ..drr_batch_download import CASE_SPREADSHEET_URL, SpreadsheetPost
+from ..drr_batch_download import (
+    CASE_SPREADSHEET_URL, SpreadsheetPost,
+    VariantSampleForSpreadsheet
+)
 
 
 def test_get_request_body(testapp: TestApp) -> None:
