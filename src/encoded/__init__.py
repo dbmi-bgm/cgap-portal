@@ -136,7 +136,7 @@ def main(global_config, **local_config):
     settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
     settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
                                                          os.environ.get('Auth0AllowedConnections',
-                                                                        DEFAULT_AUTH0_ALLOWED_CONNECTIONS)).split(',')
+                                                                        DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
     settings['auth0.options'] = {
         'auth': {
             'sso': False,
