@@ -3,7 +3,7 @@ import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import (
-    Any, Callable, Dict, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
+    Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
 )
 from urllib.parse import parse_qs
 
@@ -14,12 +14,21 @@ from snovault.util import simple_path_ids
 
 from .drr_item_models import JsonObject
 from .root import CGAPRoot
-from .search.compound_search import CompoundSearchBuilder
+from .search.compound_search import GLOBAL_FLAGS, INTERSECT, CompoundSearchBuilder
+from .types.base import Item
+from .types.filter_set import FILTER_BLOCKS
 
 
 log = structlog.getLogger(__name__)
 
 OrderedSpreadsheetColumn = Tuple[str, str, Union[str, Callable]]
+
+CSV_EXTENSION = "csv"
+TSV_EXTENSION = "tsv"
+ACCEPTABLE_FILE_FORMATS = set([TSV_EXTENSION, CSV_EXTENSION])
+DEFAULT_FILE_FORMAT = TSV_EXTENSION
+FILE_FORMAT_TO_DELIMITER = {CSV_EXTENSION: ",", TSV_EXTENSION: "\t"}
+
 
 
 # Unsure if we might prefer the below approach to avoid recursion or not-
@@ -99,15 +108,16 @@ def convert_item_to_sheet_dict(item, spreadsheet_mappings):
 
 def human_readable_filter_block_queries(filterset_blocks_request):
     parsed_filter_block_qs = []
-    fb_len = len(filterset_blocks_request["filter_blocks"])
-    for fb in filterset_blocks_request["filter_blocks"]:
+    fb_len = len(filterset_blocks_request[FILTER_BLOCKS])
+    for fb in filterset_blocks_request[FILTER_BLOCKS]:
         curr_fb_str = None
-        if not fb["query"]:
+        query = fb.get("query")
+        if not query:
             curr_fb_str = "<Any>"
             if fb_len > 1:
                 curr_fb_str = "( " + curr_fb_str + " )"
         else:
-            qs_dict = parse_qs(fb["query"])
+            qs_dict = parse_qs(query)
             curr_fb_q = []
             for field, value in qs_dict.items():
                 formstr = field + " = "
@@ -120,13 +130,12 @@ def human_readable_filter_block_queries(filterset_blocks_request):
             if fb_len > 1:
                 curr_fb_str = "( " + curr_fb_str + " )"
         parsed_filter_block_qs.append(curr_fb_str)
-    return (" AND " if filterset_blocks_request.get("intersect", False) else " OR ").join(parsed_filter_block_qs)
+    return (" AND " if filterset_blocks_request.get(INTERSECT, False) else " OR ").join(parsed_filter_block_qs)
 
 
 class Echo(object):
     def write(self, line):
         return line.encode("utf-8")
-
 
 
 def stream_tsv_output(
@@ -207,7 +216,7 @@ class SpreadsheetColumn:
         )
 
     def _get_field_from_item(self, item: Any) -> str:
-        pass
+        return simple_path_ids(item, self.to_evaluate)
 
     def is_property_evaluator(self):
         return isinstance(self.to_evaluate, str)
@@ -220,19 +229,19 @@ class SpreadsheetColumn:
 class SpreadsheetTemplate(ABC):
 
     @abstractmethod
-    def get_headers(self) -> None:
+    def _get_headers(self) -> None:
         pass
 
     @abstractmethod
-    def get_column_titles(self) -> None:
+    def _get_column_titles(self) -> None:
         pass
 
     @abstractmethod
-    def get_column_descriptions(self) -> None:
+    def _get_column_descriptions(self) -> None:
         pass
 
     @abstractmethod
-    def get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
+    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
         pass
 
     def _convert_column_tuples_to_spreadsheet_columns(
@@ -240,6 +249,23 @@ class SpreadsheetTemplate(ABC):
         columns: Sequence[OrderedSpreadsheetColumn],
     ) -> List[SpreadsheetColumn]:
         return [SpreadsheetColumn(*column) for column in columns]
+
+    def yield_rows(self, items_to_evaluate: Sequence[JsonObject]) -> Iterator[Sequence[str]]:
+        self._yield_headers()
+        self._yield_column_rows()
+        self._yield_item_rows(items_to_evaluate)
+
+    def _yield_headers(self) -> Iterator[Sequence[str]]:
+        for header in self._get_headers():
+            yield header
+
+    def _yield_column_rows(self) -> Iterator[Sequence[str]]:
+        yield self._get_column_titles()
+        yield self._get_column_descriptions()
+
+    def _yield_item_rows(self, items_to_evaluate: JsonObject) -> Iterator[Sequence[str]]:
+        for item in items_to_evaluate:
+            yield self._get_row_for_item(item)
 
 
 @dataclass(frozen=True)
@@ -250,19 +276,14 @@ class SpreadsheetPost:
     COMPOUND_SEARCH_REQUEST = "compound_search_request"
     FILE_FORMAT = "file_format"
 
-    CSV_EXTENSION = "csv"
-    TSV_EXTENSION = "tsv"
-    ACCEPTABLE_FILE_FORMATS = set([TSV_EXTENSION, CSV_EXTENSION])
-    DEFAULT_FILE_FORMAT = TSV_EXTENSION
-
     request: Request
 
     @property
-    def parameters(self) -> Dict[str, Any]:
+    def parameters(self) -> JsonObject:
         return self.request.params
 
     def get_file_format(self) -> str:
-        return self.parameters.get(self.FILE_FORMAT, self.DEFAULT_FILE_FORMAT)
+        return self.parameters.get(self.FILE_FORMAT, DEFAULT_FILE_FORMAT)
 
     def get_case_accession(self) -> str:
         return self.parameters.get(self.CASE_ACCESSION, "")
@@ -270,7 +291,7 @@ class SpreadsheetPost:
     def get_case_title(self) -> str:
         return self.parameters.get(self.CASE_TITLE, "")
 
-    def get_associated_compound_search(self) -> Dict:
+    def get_compound_search(self) -> JsonObject:
         # May want to validate this value
         # Going with Alex's format here for json.loading if a string
         # Not sure this should be a dict; might be an array
@@ -283,50 +304,41 @@ class SpreadsheetPost:
 @dataclass(frozen=True)
 class FilterSetSearch:
 
-    GLOBAL_FLAGS = "global_flags"
-    INTERSECT = "intersect"
-
-    context: CGAPRoot
+    context: Union[CGAPRoot, Item]
     request: Request
     compound_search: Mapping
 
-    def get_search_results(self) -> None:
+    def get_search_results(self) -> Iterator[JsonObject]:
         return CompoundSearchBuilder.execute_filter_set(
             self.context,
             self.request,
-            self.get_filter_set(),
+            self._get_filter_set(),
             to=CompoundSearchBuilder.ALL,
-            global_flags=self.get_global_flags(),
-            intersect=self.is_intersect(),
+            global_flags=self._get_global_flags(),
+            intersect=self._is_intersect(),
             return_generator=True,
         )
 
-    def get_filter_set(self) -> None:
+    def _get_filter_set(self) -> JsonObject:
         return CompoundSearchBuilder.extract_filter_set_from_search_body(
             self.request, self.compound_search
         )
 
-    def get_global_flags(self) -> Union[str, None]:
-        return self.compound_search.get(self.GLOBAL_FLAGS)
+    def _get_global_flags(self) -> Union[str, None]:
+        return self.compound_search.get(GLOBAL_FLAGS)
 
-    def is_intersect(self) -> bool:
-        return bool(self.get_intersect())
+    def _is_intersect(self) -> bool:
+        return bool(self._get_intersect())
 
-    def get_intersect(self) -> str:
-        return self.compound_search.get(self.INTERSECT, "")
+    def _get_intersect(self) -> str:
+        return self.compound_search.get(INTERSECT, "")
 
 
 @dataclass(frozen=True)
 class SpreadsheetGenerator:
 
-    CSV_FILE_FORMAT = "csv"
-    TSV_FILE_FORMAT = "tsv"
-    DEFAULT_FILE_FORMAT = TSV_FILE_FORMAT
-    FILE_FORMAT_TO_DELIMITER = {CSV_FILE_FORMAT: ",", TSV_FILE_FORMAT: "\t"}
-
-    items_to_evaluate: Sequence[JsonObject]
-    spreadsheet_template: SpreadsheetTemplate
     file_name: str
+    rows_to_write: Iterable[Sequence[Any]]
     file_format: Optional[str] = DEFAULT_FILE_FORMAT
 
     def get_spreadsheet_response(self) -> Response:
@@ -336,16 +348,17 @@ class SpreadsheetGenerator:
 
     def _stream_spreadsheet(self) -> Iterator[Callable]:
         writer = self._get_writer()
-        for row in self._yield_rows():
+        for row in self.rows_to_write:
             if row:
                 yield writer.writerow(row)
 
     def _get_writer(self) -> csv.writer:
+        """Using csv.writer for formatting lines, not writing to actual file here."""
         delimiter = self._get_delimiter()
-        return csv.writer(delimiter=delimiter, quoting=csv.QUOTE_NONNUMERIC)
+        return csv.writer(Echo(), delimiter=delimiter, quoting=csv.QUOTE_NONNUMERIC)
 
     def _get_delimiter(self) -> str:
-        result = self.FILE_FORMAT_TO_DELIMITER.get(self.file_format)
+        result = FILE_FORMAT_TO_DELIMITER.get(self.file_format)
         if result is None:
             raise ValueError
         return result
@@ -353,25 +366,13 @@ class SpreadsheetGenerator:
     def _get_response_headers(self) -> Dict:
         return {
             "X-Accel-Buffering": "no",
-            "Content-Disposition": f"attachment; filename={self.file_name}",
+            "Content-Disposition": (
+                f"attachment; filename={self._get_file_name_with_extension()}"
+            ),
             "Content-Type": f"text/{self.file_format}",
             "Content-Description": "File Transfer",
             "Cache-Control": "no-store"
         }
 
-    def _yield_rows(self) -> Iterator[Sequence[str]]:
-        self._yield_headers()
-        self._yield_column_rows()
-        self._yield_item_rows()
-
-    def _yield_headers(self) -> Iterator[Sequence[str]]:
-        for header in self.spreadsheet_template.get_headers():
-            yield header
-
-    def _yield_column_rows(self) -> Iterator[Sequence[str]]:
-        yield self.spreadsheet_template.get_column_titles()
-        yield self.spreadsheet_template.get_column_descriptions()
-
-    def _yield_item_rows(self) -> Iterator[Sequence[str]]:
-        for item in self.items_to_evaluate:
-            yield self.spreadsheet_template.get_row_for_item(item)
+    def _get_file_name_with_extension(self) -> str:
+        return f"{self.file_name}.{self.file_format}"
