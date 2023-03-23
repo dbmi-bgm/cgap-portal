@@ -36,7 +36,12 @@ npm-setup:  # runs all front-end setup
 	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
-	pip install "moto[server]==1.3.7"
+	@# This setup was needed here because there was no bracket syntax in pypoetry.com.
+	@# Now that we're using a higher version of moto, and not using the server parts, we don't need this here.
+	@# It's now all done in pyproject.toml, getting a higher version as well.
+	@# This comment and this make target can go away once that's proven effective. -kmp 23-Mar-2023
+	@# pip install "moto[server]==1.3.7"
+	@echo "'moto[server]' not being installed here. Regular 'moto' will be installed by pyproject.toml."
 
 macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
 	bin/macpoetry-install
