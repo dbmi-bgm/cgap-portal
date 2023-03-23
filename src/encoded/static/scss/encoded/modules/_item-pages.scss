@@ -1137,32 +1137,20 @@ i.status-indicator-dot {
 	
 	}
 
-	#case-overview-ped-link {
-		/* max-height: 336px; */
-		margin-left: 0;
-
-		// > .card {
-		// 	@include media-breakpoint-down(lg){
-		// 		margin-top: 70px;
-		// 		border-bottom-right-radius: $card-border-radius; // prev: 10px;
-		// 		border-bottom-left-radius: $card-border-radius; // prev: 10px;
-		// 	}
-		// }
-
-		div.pedigree-vis-heading {
-
-			.view-pedigree-btn {
-				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
-				border-radius: 40px;
-				color: #fff;
-				/* border: 1px solid cornflowerblue; */
-				border: none;
-				padding: 4px 24px 3px;
-				&:hover {
-					background-color: darken($color: cornflowerblue, $amount: 7.5%);
-				}
-			}
+	#case-overview-ped-link div.pedigree-vis-heading .view-pedigree-btn,
+	.tab-section-title .view-pedigree-btn {
+		background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
+		border-radius: 40px;
+		color: #fff;
+		border: none;
+		padding: 4px 24px 3px;
+		&:hover {
+			background-color: darken($color: cornflowerblue, $amount: 7.5%);
 		}
+	}
+
+	#case-overview-ped-link {
+		margin-left: 0;
 
 		.pedigree-placeholder {
 			position: relative;
