@@ -333,6 +333,7 @@
             "type": "array",
             "items": {
                 "title": "Sample Genotype",
+                "enable_nested": true,
                 "type": "object",
                 "properties": {
                     "samplegeno_numgt": {
@@ -358,6 +359,34 @@
                         "description": "Sample ID",
                         "scope": "sample_variant",
                         "schema_title": "Sample Genotype (Sample ID)"
+                    },
+                    "samplegeno_role": {
+                        "title": "Familial Relation",
+                        "description": "Relationship of the person who submitted this sample relative to the proband",
+                        "type": "string",
+                        "suggested_enum": [
+                            "proband",
+                            "father",
+                            "mother",
+                            "brother",
+                            "sister",
+                            "sibling",
+                            "half-brother",
+                            "half-sister",
+                            "half-sibling",
+                            "wife",
+                            "husband",
+                            "son",
+                            "daughter",
+                            "child",
+                            "grandson",
+                            "granddaughter",
+                            "grandchild",
+                            "grandmother",
+                            "family-in-law",
+                            "extended-family",
+                            "not linked"
+                        ]
                     },
                     "samplegeno_quality": {
                         "title": "Sample Genotype Quality",
@@ -633,11 +662,345 @@
         },
         "confidence_class": {
             "title": "Call Confidence",
-            "order": 52
+            "order": 55
+        },
+        "samplegeno.samplegeno_numgt": {
+            "title": "Sample Genotype (Numeric)",
+            "order": 60,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_role": {
+            "title": "Sample Relationship",
+            "order": 60,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "samplegeno.samplegeno_sampleid": {
+            "title": "Sample ID",
+            "order": 60,
+            "grouping": "Complex Relationship Analysis"
+        },
+        "associated_genotype_labels.proband_genotype_label": {
+            "title": "Proband Genotype",
+            "order": 70,
+            "grouping": "Genotype",
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.mother_genotype_label": {
+            "title": "Mother Genotype",
+            "order": 71,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.father_genotype_label": {
+            "title": "Father Genotype",
+            "order": 72,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.co_parent_genotype_label": {
+            "title": "Co-Parent Genotype",
+            "order": 73,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_genotype_label": {
+            "title": "Sister Genotype",
+            "order": 74,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_II_genotype_label": {
+            "title": "Sister II Genotype",
+            "order": 75,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_III_genotype_label": {
+            "title": "Sister III Genotype",
+            "order": 76,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.sister_IV_genotype_label": {
+            "title": "Sister IV Genotype",
+            "order": 77,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_genotype_label": {
+            "title": "Brother Genotype",
+            "order": 78,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_II_genotype_label": {
+            "title": "Brother II Genotype",
+            "order": 79,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_III_genotype_label": {
+            "title": "Brother III Genotype",
+            "order": 80,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.brother_IV_genotype_label": {
+            "title": "Brother IV Genotype",
+            "order": 81,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_genotype_label": {
+            "title": "Daughter Genotype",
+            "order": 82,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_II_genotype_label": {
+            "title": "Daughter II Genotype",
+            "order": 83,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_III_genotype_label": {
+            "title": "Daughter III Genotype",
+            "order": 84,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.daughter_IV_genotype_label": {
+            "title": "Daughter IV Genotype",
+            "order": 85,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_genotype_label": {
+            "title": "Son Genotype",
+            "order": 86,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_II_genotype_label": {
+            "title": "Son II Genotype",
+            "order": 87,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_III_genotype_label": {
+            "title": "Son III Genotype",
+            "order": 88,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
+        },
+        "associated_genotype_labels.son_IV_genotype_label": {
+            "title": "Son IV Genotype",
+            "order": 89,
+            "grouping": "Genotype",
+            "default_hidden": true,
+            "rescue_terms": [
+                "Heterozygous",
+                "Homozygous reference",
+                "Homozygous alternate",
+                "Missing",
+                "Hemizygous reference",
+                "False",
+                "Hemizygous alternate",
+                "-"
+            ]
         },
         "inheritance_modes": {
             "title": "Inheritance Modes",
-            "order": 55,
+            "order": 90,
             "grouping": "Inheritance",
             "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode.html",
             "default_hidden": true,
@@ -661,7 +1024,7 @@
         },
         "proband_only_inheritance_modes": {
             "title": "Inheritance Modes",
-            "order": 55,
+            "order": 100,
             "grouping": "Inheritance",
             "extended_description": "src/encoded/docs/extended_description_StructuralVariantSample_inheritance_mode_proband_only.html",
             "default_hidden": true,
@@ -670,342 +1033,23 @@
                 "Y-linked"
             ]
         },
-        "associated_genotype_labels.proband_genotype_label": {
-            "title": "Proband Genotype",
-            "order": 60,
-            "grouping": "Genotype",
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.mother_genotype_label": {
-            "title": "Mother Genotype",
-            "order": 61,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.father_genotype_label": {
-            "title": "Father Genotype",
-            "order": 62,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.co_parent_genotype_label": {
-            "title": "Co-Parent Genotype",
-            "order": 63,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.sister_genotype_label": {
-            "title": "Sister Genotype",
-            "order": 64,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.sister_II_genotype_label": {
-            "title": "Sister II Genotype",
-            "order": 65,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.sister_III_genotype_label": {
-            "title": "Sister III Genotype",
-            "order": 66,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.sister_IV_genotype_label": {
-            "title": "Sister IV Genotype",
-            "order": 67,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.brother_genotype_label": {
-            "title": "Brother Genotype",
-            "order": 68,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.brother_II_genotype_label": {
-            "title": "Brother II Genotype",
-            "order": 69,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.brother_III_genotype_label": {
-            "title": "Brother III Genotype",
-            "order": 70,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.brother_IV_genotype_label": {
-            "title": "Brother IV Genotype",
-            "order": 71,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.daughter_genotype_label": {
-            "title": "Daughter Genotype",
-            "order": 72,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.daughter_II_genotype_label": {
-            "title": "Daughter II Genotype",
-            "order": 73,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.daughter_III_genotype_label": {
-            "title": "Daughter III Genotype",
-            "order": 74,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.daughter_IV_genotype_label": {
-            "title": "Daughter IV Genotype",
-            "order": 75,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.son_genotype_label": {
-            "title": "Son Genotype",
-            "order": 76,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.son_II_genotype_label": {
-            "title": "Son II Genotype",
-            "order": 77,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.son_III_genotype_label": {
-            "title": "Son III Genotype",
-            "order": 78,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
-        "associated_genotype_labels.son_IV_genotype_label": {
-            "title": "Son IV Genotype",
-            "order": 79,
-            "grouping": "Genotype",
-            "default_hidden": true,
-            "rescue_terms": [
-                "Heterozygous",
-                "Homozygous reference",
-                "Homozygous alternate",
-                "Missing",
-                "Hemizygous reference",
-                "False",
-                "Hemizygous alternate",
-                "-"
-            ]
-        },
         "structural_variant.CHROM": {
             "title": "Chromosome",
-            "order": 90,
+            "order": 100,
             "grouping": "Location"
         },
         "structural_variant.START": {
             "title": "Start Position",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 91,
+            "order": 101,
             "grouping": "Location"
         },
         "structural_variant.END": {
             "title": "End Position",
             "aggregation_type": "stats",
             "number_step": 1,
-            "order": 92,
+            "order": 102,
             "grouping": "Location"
         }
     }

@@ -6,6 +6,15 @@ cgap-portal
 Change Log
 ----------
 
+12.10.0
+=======
+`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+
+* Add complex relationship analysis facet for StructuralVariantSamples
+* Add samplegeno_role to StructuralVariantSample schema
+* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
+
+
 12.9.0
 ======
 `PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
