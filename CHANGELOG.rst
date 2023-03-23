@@ -7,12 +7,21 @@ Change Log
 ----------
 
 
-12.9.1
-======
+12.10.1
+=======
 
 * Backport pytest 7.2 support from Fourfront
 * Move to poetry 1.3.2
 * Remove dependence in a pinned version of setuptools
+
+
+12.10.0
+=======
+`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+
+* Add complex relationship analysis facet for StructuralVariantSamples
+* Add samplegeno_role to StructuralVariantSample schema
+* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
 
 
 12.9.0
