@@ -78,18 +78,6 @@ rsa = ">=3.1.2,<4.8"
 s3transfer = ">=0.6.0,<0.7.0"
 
 [[package]]
-name = "backports.statistics"
-version = "0.1.0"
-description = "statistics backport 2.6 - 3.3"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "backports.statistics-0.1.0-py2.py3-none-any.whl", hash = "sha256:2732e003151620762ba3ea25b881b5ca0debe2fcbf41b32b6eaff5842a8b99d7"},
-    {file = "backports.statistics-0.1.0.tar.gz", hash = "sha256:714ab29b9b9937c6ec65d8c6a3dcc39ee4972f929d55977b018bb9f204ba1f98"},
-]
-
-[[package]]
 name = "beautifulsoup4"
 version = "4.11.2"
 description = "Screen-scraping library"
@@ -1039,22 +1027,21 @@ setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "7.1.3"
+version = "7.2.1.1b3"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
 python-versions = ">=3.8.1,<3.9"
 files = [
-    {file = "dcicsnovault-7.1.3-py3-none-any.whl", hash = "sha256:e7723215338b9aee8093dbfed8464930e524ccec03ac2d71ddc7982ffa99b7b2"},
-    {file = "dcicsnovault-7.1.3.tar.gz", hash = "sha256:17570533244f644a4445a779a7a4b6602b82e96000faadaff811d74dab5a702a"},
+    {file = "dcicsnovault-7.2.1.1b3-py3-none-any.whl", hash = "sha256:ebb7b459ca02e2143b6c5b080611fd92d97e61bc4da2c6034f436d651da523fb"},
+    {file = "dcicsnovault-7.2.1.1b3.tar.gz", hash = "sha256:dfdb0ee2a5fbece31dfefe29f643261f71abfb5aa14fe10aa02476f9ddc4ea5a"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
-"backports.statistics" = "0.1.0"
 boto3 = ">=1.24.36"
 botocore = ">=1.27.36"
-dcicutils = ">=6.5.0,<7.0.0"
+dcicutils = ">=6.10.0,<7.0.0"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -1073,7 +1060,7 @@ pyramid-retry = ">=1.0,<2.0"
 pyramid-tm = ">=2.5,<3.0"
 pyramid-translogger = ">=0.1,<0.2"
 python-dateutil = ">=2.8.2,<3.0.0"
-python_magic = ">=0.4.11,<1"
+python_magic = ">=0.4.27"
 pytz = ">=2021.3"
 rdflib = ">=4.2.2,<5.0.0"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
@@ -1090,19 +1077,19 @@ WebTest = ">=2.0.35,<3.0.0"
 WSGIProxy2 = "0.4.2"
 xlrd = ">=1.0.0,<2.0.0"
 "zope.deprecation" = ">=4.4.0,<5.0.0"
-"zope.interface" = ">=4.7.2,<5.0.0"
+"zope.interface" = ">=4.7.2,<6"
 "zope.sqlalchemy" = "1.6"
 
 [[package]]
 name = "dcicutils"
-version = "6.9.0"
+version = "6.10.1"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
 python-versions = ">=3.7,<3.10"
 files = [
-    {file = "dcicutils-6.9.0-py3-none-any.whl", hash = "sha256:f3502d0087e93c8f0c1e1982603c528a5875fd371a15ab5d6d871d87eebeef65"},
-    {file = "dcicutils-6.9.0.tar.gz", hash = "sha256:a6f8869d2063ef25021c8a0cc16dfe9c633178c740826f1ef0e163b5a0bfd6e8"},
+    {file = "dcicutils-6.10.1-py3-none-any.whl", hash = "sha256:50c380912bd29d420d07f0646a9733d52c2a667e55db9d8bc7d2d2cb0f16f9f9"},
+    {file = "dcicutils-6.10.1.tar.gz", hash = "sha256:dcfa5fa38bcc2184a5586034cbd64eb9cc72b93041cdbfd3c6cc1a5bc31a556a"},
 ]
 
 [package.dependencies]
@@ -2622,21 +2609,6 @@ pytest = ">=3.6"
 testing = ["fields", "hunter", "process-tests (==2.0.2)", "pytest-xdist", "six", "virtualenv"]
 
 [[package]]
-name = "pytest-exact-fixtures"
-version = "0.3"
-description = "Parse queries in Lucene and Elasticsearch syntaxes"
-category = "dev"
-optional = false
-python-versions = "*"
-files = [
-    {file = "pytest_exact_fixtures-0.3-py2.py3-none-any.whl", hash = "sha256:853436198b51026de937b06de60ab5276a6c924614e36193c60041140b66aec6"},
-    {file = "pytest_exact_fixtures-0.3.tar.gz", hash = "sha256:f3e93bbea59f74f0beb5bf71cd18048e2b478ad665e71c37a4f8b33f4ec72718"},
-]
-
-[package.dependencies]
-pytest = ">=3.3.0"
-
-[[package]]
 name = "pytest-forked"
 version = "1.6.0"
 description = "run tests in isolated forked subprocesses"
@@ -3736,4 +3708,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.9"
-content-hash = "34a9a747788bc59f368804241c61c7d95f4c05f2d5af7a4ad50eea7d4a0ac1b8"
+content-hash = "6b93d0c92ec0e9daa0591042adcf6e49b472285f75135bd17a8f2a0549504353"

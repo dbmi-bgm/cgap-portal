@@ -12,6 +12,8 @@ import time
 import transaction
 import uuid
 
+from dcicutils.qa_utils import notice_pytest_fixtures, Eventually
+from snovault.tools import index_n_items_for_testing, make_es_count_checker, local_collections
 from snovault import DBSESSION, TYPES
 from snovault.storage import Base
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
@@ -67,74 +69,65 @@ def app(es_app_settings, request):
     db_session.bind.pool.dispose()
 
 
-@pytest.yield_fixture
-def setup_and_teardown(app):
+@pytest.fixture
+def setup_and_teardown(es_app):
     """
     Run create mapping and purge queue before tests and clear out the
     DB tables after the test
     """
 
-    # BEFORE THE TEST - run create mapping for tests types and clear queues
-    create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
-    app.registry[INDEXER_QUEUE].clear_queue()
-
-    yield  # run the test
-
-    # AFTER THE TEST
-    session = app.registry[DBSESSION]
-    connection = session.connection().connect()
-    meta = MetaData(bind=session.connection())
-    meta.reflect()
-    # sqlalchemy 1.4 - use TRUNCATE instead of DELETE
-    while True:
-        try:
-            table_names = ','.join(table.name for table in reversed(Base.metadata.sorted_tables))
-            connection.execute(f'TRUNCATE {table_names} RESTART IDENTITY;')
-            break
-        except exc.OperationalError as e:
-            if 'statement timeout' in str(e):
-                continue
-            else:
-                raise
-        except exc.InternalError as e:
-            if 'current transaction is aborted' in str(e):
-                break
-            else:
-                raise
-    session.flush()
-    mark_changed(session())  # Has it always changed? -kmp 12-Oct-2022
-    transaction.commit()
+    with local_collections(app=es_app, collections=TEST_COLLECTIONS):
+        yield
 
 
 @pytest.mark.slow
 @pytest.mark.flaky
 def test_indexing_simple(app, setup_and_teardown, testapp, indexer_testapp):
+    notice_pytest_fixtures(setup_and_teardown)  # unused here, but has a side-effect
+
     es = app.registry['elasticsearch']
     namespaced_ppp = get_namespaced_index(app, 'testing_post_put_patch')
     doc_count = es.count(index=namespaced_ppp).get('count')
     assert doc_count == 0
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
-    res = indexer_testapp.post_json('/index', {'record': True})
-    assert res.json['indexing_count'] == 1
+
+    index_n_items_for_testing(indexer_testapp, 1)
+    # res = indexer_testapp.post_json('/index', {'record': True})
+    # assert res.json['indexing_count'] == 1
+
     res = testapp.post_json('/testing-post-put-patch/', {'required': ''})
     uuid = res.json['@graph'][0]['uuid']
-    res = indexer_testapp.post_json('/index', {'record': True})
-    assert res.json['indexing_count'] == 1
-    time.sleep(3)
+
+    index_n_items_for_testing(indexer_testapp, 1)
+    # res = indexer_testapp.post_json('/index', {'record': True})
+    # assert res.json['indexing_count'] == 1
+
+    Eventually.call_assertion(make_es_count_checker(2, es=es, namespaced_index=namespaced_ppp))
+
+    # time.sleep(3)
     # check es directly
-    doc_count = es.count(index=namespaced_ppp).get('count')
-    assert doc_count == 2
+    # doc_count = es.count(index=namespaced_ppp).get('count')
+    # assert doc_count == 2
+
     res = testapp.get('/search/?type=TestingPostPutPatch')
     uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
-    count = 0
-    while uuid not in uuids and count < 20:
-        time.sleep(1)
+
+    @Eventually.consistent(tries=25, wait_seconds=1)
+    def check_for_uuids():
         res = testapp.get('/search/?type=TestingPostPutPatch')
         uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
-        count += 1
-    assert res.json['total'] >= 2
-    assert uuid in uuids
+        assert res.json['total'] >= 2
+        assert uuid in uuids
+
+    # count = 0
+    # while uuid not in uuids and count < 20:
+    #     time.sleep(1)
+    #     res = testapp.get('/search/?type=TestingPostPutPatch')
+    #     uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
+    #     count += 1
+    # assert res.json['total'] >= 2
+    # assert uuid in uuids
 
     namespaced_indexing = get_namespaced_index(app, 'indexing')
     indexing_doc = es.get(index=namespaced_indexing, id='latest_indexing')
