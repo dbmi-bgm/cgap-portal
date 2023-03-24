@@ -161,14 +161,15 @@ test-full:
 	@date
 	make test-static-full || echo "static tests failed"
 	make test-unit-full || echo "unit tests failed"
-	make test-indexing-full || echo "npm tests failed"
+	make test-npm || echo "npm tests failed"
+	make test-indexing-full || echo "indexing tests failed"
 	@git log -1 --decorate | head -1
 	@date
 
 test:
 	@git log -1 --decorate | head -1
 	@date
-	make test-static && make test-unit && make test-indexing
+	make test-static && make test-unit && make test-npm && make test-indexing
 	@git log -1 --decorate | head -1
 	@date
 
@@ -218,6 +219,10 @@ test-performance:
 test-integrated:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS} and ${INTG_MARKERS}"
 
+test-npm:
+	@#At one point we did 'npm test' here, but now we do separate cypress tests. -kmp 24-Mar-2023
+	@echo "npm tests would run here if they were enabled. Instead we have a separate Cypress test GA workflow."
+
 test-static-full:
 	poetry run python -m pytest -vv -m static
 	make lint-full
@@ -237,8 +242,7 @@ remote-test:  # Actually, we don't normally use this. Instead the GA workflow se
 	make remote-test-indexing && make remote-test-npm && make remote-test-unit
 
 remote-test-npm:
-	@#At one point we did 'npm test' here, but now we do separate cypress tests. -kmp 24-Mar-2023
-	@echo "npm tests would run here if they were enabled. Instead we have a separate Cypress test workflow."
+	make test-npm
 
 remote-test-unit:
 	make remote-test-indexing-not-es

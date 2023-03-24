@@ -78,6 +78,7 @@ jobs:
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
           make remote-test-unit
+          make remote-test-npm
 
       - name: Cleanup (UNIT)
         if: ${{ always() && matrix.test_type == 'UNIT' }}
@@ -110,7 +111,6 @@ jobs:
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
           make remote-test-index
-          make remote-test-npm
 
       - name: Cleanup (INDEX)
         if: ${{ always() && matrix.test_type == 'INDEX' }}
