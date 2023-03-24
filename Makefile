@@ -234,19 +234,19 @@ REMOTE_ES = search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-ea
 REMOTE_MARKERS = ${BASE_MARKERS} and ${NORM_MARKERS} and not broken_remotely
 
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
-	make remote-test-indexing && make remote-test-npm && make remote-test-unit
+	make remote-test-slow && make remote-test-npm && make remote-test-unit
 
 remote-test-npm:
 	@#At one point we did 'npm test' here, but now we do separate cypress tests. -kmp 24-Mar-2023
 	@echo "npm tests would run here if they were enabled. Instead we have a separate Cypress test workflow."
 
 remote-test-unit:  # these are bundled because they are the faster ones
-	make remote-test-indexing-not-es && make remote-test-unit
+	make remote-test-indexing-not-es && make remote-test-not-indexing
 
-remote-test-unit-only:  # Note this only does the 'not indexing' tests
+remote-test-not-indexing:  # Note this only does the 'not indexing' tests
 	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${REMOTE_MARKERS} and not indexing" --aws-auth --es ${REMOTE_ES} --instafail --force-flaky --max-runs=2 --durations=20 --cov src/encoded
 
-remote-test-indexing:
+remote-test-slow:
 	make remote-test-indexing-es
 
 remote-test-indexing-es:

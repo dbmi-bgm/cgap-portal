@@ -25,7 +25,7 @@ jobs:
     # Build matrix
     strategy:
       matrix:
-        test_type: ['UNIT', 'INDEXING', 'Docker']
+        test_type: ['UNIT', 'SLOW', 'Docker']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
         python_version: ['3.8']
         node_version: ['16']
@@ -45,7 +45,7 @@ jobs:
           check-latest: false
 
       - name: Install/Link Postgres
-        if: ${{ matrix.test_type == 'UNIT' || matrix.test_type == 'INDEXING' }}
+        if: ${{ matrix.test_type == 'UNIT' || matrix.test_type == 'SLOW' }}
         run: |
           sudo apt-get install curl ca-certificates gnupg
           curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
@@ -55,7 +55,7 @@ jobs:
           echo "/usr/lib/postgresql/14/bin" >> $GITHUB_PATH
           sudo ln -s /usr/lib/postgresql/14/bin/initdb /usr/local/bin/initdb
       - name: Install Deps
-        if: ${{ matrix.test_type == 'INDEXING' || matrix.test_type == 'UNIT' }}
+        if: ${{ matrix.test_type == 'SLOW' || matrix.test_type == 'UNIT' }}
         run: |
           node --version
           make build
@@ -65,42 +65,6 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
-
-      - name: QA (INDEXING)
-        if: ${{ matrix.test_type == 'INDEXING' }}
-        env:
-          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          # The need for this old environment variable name will go away soon.
-          # Once the new snovault is in, we should retain these for a little while to make sure the right
-          # variable is being used, and then this can go away. -kmp 9-Mar-2021
-          # I have named the ID slightly differently so we can see if the old names are in use.
-          TRAVIS_JOB_ID: cgap-idx-x-test-${{ github.run_number }}-
-          # This will be the new environment variable name.
-          TEST_JOB_ID: cgap-idx-test-${{ github.run_number }}-
-          GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
-          ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
-        run: |
-          make remote-test-indexing
-          make remote-test-npm
-
-      - name: Cleanup (INDEXING)
-        if: ${{ always() && matrix.test_type == 'INDEXING' }}
-        env:
-          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
-          # The need for this old environment variable name will go away soon.
-          # Once the new snovault is in, we should retain these for a little while to make sure the right
-          # variable is being used, and then this can go away. -kmp 9-Mar-2021
-          # I have named the ID slightly differently so we can see if the old names are in use.
-          TRAVIS_JOB_ID: cgap-idx-x-test-${{ github.run_number }}-
-          # This will be the new environment variable name.
-          TEST_JOB_ID: cgap-idx-test-${{ github.run_number }}-
-          GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
-          ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
-        run: |
-          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
-          # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
-          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
-          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: QA (UNIT)
         if: ${{ matrix.test_type == 'UNIT' }}
@@ -130,6 +94,45 @@ jobs:
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
           poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+
+      - name: QA (SLOW)
+        if: ${{ matrix.test_type == 'SLOW' }}
+        env:
+          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          # The need for this old environment variable name will go away soon.
+          # Once the new snovault is in, we should retain these for a little while to make sure the right
+          # variable is being used, and then this can go away. -kmp 9-Mar-2021
+          # I have named the ID slightly differently so we can see if the old names are in use.
+          TRAVIS_JOB_ID: cgap-slow-x-test-${{ github.run_number }}-
+          # This will be the new environment variable name.
+          TEST_JOB_ID: cgap-slow-test-${{ github.run_number }}-
+          GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
+          ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
+        run: |
+          make remote-test-slow
+          make remote-test-npm
+
+      - name: Cleanup (SLOW)
+        if: ${{ always() && matrix.test_type == 'SLOW' }}
+        env:
+          S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          # The need for this old environment variable name will go away soon.
+          # Once the new snovault is in, we should retain these for a little while to make sure the right
+          # variable is being used, and then this can go away. -kmp 9-Mar-2021
+          # I have named the ID slightly differently so we can see if the old names are in use.
+          TRAVIS_JOB_ID: cgap-slow-x-test-${{ github.run_number }}-
+          # This will be the new environment variable name.
+          TEST_JOB_ID: cgap-slow-test-${{ github.run_number }}-
+          GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
+          ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
+        run: |
+          poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
+          poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          # On a one-time basis to clean up some old indexes, need to do this. Delete before merging this branch as unneeded:
+          poetry run wipe-test-indices cgap-idx-x-test search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+          poetry run wipe-test-indices cgap-idx-test search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
         if: ${{ matrix.test_type == 'Docker' && matrix.node_version == '16' && matrix.python_version == '3.8' }}
