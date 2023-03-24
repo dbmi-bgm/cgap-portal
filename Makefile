@@ -240,17 +240,20 @@ remote-test-npm:
 	@#At one point we did 'npm test' here, but now we do separate cypress tests. -kmp 24-Mar-2023
 	@echo "npm tests would run here if they were enabled. Instead we have a separate Cypress test workflow."
 
-remote-test-unit:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -xvv -r w --timeout=600 -m "${REMOTE_MARKERS} and not indexing" --aws-auth --es ${REMOTE_ES} --instafail --force-flaky --max-runs=2 --durations=20 --cov src/encoded
+remote-test-unit:  # these are bundled because they are the faster ones
+	make remote-test-indexing-not-es && make remote-test-unit
 
-remote-test-indexing:  # Note this does the 'indexing' tests
-	make remote-test-indexing-es && make remote-test-indexing-not-es
+remote-test-unit-only:  # Note this only does the 'not indexing' tests
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${REMOTE_MARKERS} and not indexing" --aws-auth --es ${REMOTE_ES} --instafail --force-flaky --max-runs=2 --durations=20 --cov src/encoded
+
+remote-test-indexing:
+	make remote-test-indexing-es
 
 remote-test-indexing-es:
-	poetry run python -m pytest -xvv -r w --timeout=300 -m "${REMOTE_MARKERS} and indexing and es" --aws-auth --es ${REMOTE_ES} --cov-append
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=300 -m "${REMOTE_MARKERS} and indexing and es" --aws-auth --es ${REMOTE_ES} --cov-append
 
 remote-test-indexing-not-es:
-	poetry run python -m pytest -xvv -r w --timeout=300 -m "${REMOTE_MARKERS} and indexing and not es" --aws-auth --es ${REMOTE_ES} --cov-append
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=300 -m "${REMOTE_MARKERS} and indexing and not es" --aws-auth --es ${REMOTE_ES} --cov-append
 
 update:  # updates dependencies
 	poetry update
