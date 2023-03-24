@@ -159,23 +159,21 @@ clean-python:
 test-full:
 	@git log -1 --decorate | head -1
 	@date
+	make test-static-full || echo "static tests failed"
 	make test-unit-full || echo "unit tests failed"
-	make test-npm-full || echo "npm tests failed"
-	make test-static || echo "static tests failed"
+	make test-indexing-full || echo "npm tests failed"
 	@git log -1 --decorate | head -1
 	@date
 
 test:
 	@git log -1 --decorate | head -1
 	@date
-	make test-unit || echo "unit tests failed"
-	make test-npm || echo "npm tests failed"
-	make test-static || echo "static tests failed"
+	make test-static && make test-unit && make test-indexing
 	@git log -1 --decorate | head -1
 	@date
 
 
-BASE_MARKERS = not manual and not broken and not sloppy and not static
+BASE_MARKERS = not manual and not sloppy and not static and not broken
 # Unit tests
 NORM_MARKERS = not performance and not integratedx
 # Performance tests
@@ -183,48 +181,72 @@ PERF_MARKERS = performance and not integratedx
 # Integration tests
 INTG_MARKERS = not performance and (integrated or integratedx)
 
-TEST_NAME ?= missing_TEST_NAME
-
 retest:
 	poetry run python -m pytest -vv -r w --last-failed
 
 test-any:
 	poetry run python -m pytest -xvv -r w --timeout=200
 
-test-npm:
+test-unit:
 	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
 
-test-npm-full:
+test-unit-full:
 	poetry run python -m pytest -vv  -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
 
-test-unit-full:
-	poetry run python -m pytest -vv  -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing"
+test-indexing-full:
+	make test-indexing-es-full
+	make test-indexing-not-es-full
 
-test-unit:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing"
+test-indexing-es-full:
+	poetry run python -m pytest -vv  -r w --durations=25 --timeout=300 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and es"
 
-test-one:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing" -k "${TEST_NAME}"
+test-indexing-not-es-full:
+	poetry run python -m pytest -vv  -r w --durations=25 --timeout=300 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and not es"
+
+test-indexing:
+	make test-indexing-es && make test-indexing-not-es
+
+test-indexing-es:
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and es"
+
+test-indexing-not-es:
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and not es"
 
 test-performance:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS} and ${PERF_MARKERS}"
 
 test-integrated:
-	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS) and ${INTG_MARKERS}"
+	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS} and ${INTG_MARKERS}"
+
+test-static-full:
+	poetry run python -m pytest -vv -m static
+	make lint-full
 
 test-static:
-	poetry run python -m pytest -vv -m static
-	make lint
+	poetry run python -m pytest -vv -m static && make lint
+
+TEST_NAME ?= missing_TEST_NAME_parameter
+
+test-one:
+	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS}" -k "${TEST_NAME}"
+
+REMOTE_ES = search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+REMOTE_MARKERS = ${BASE_MARKERS} and ${NORM_MARKERS} and not broken_remotely
 
 remote-test:  # Actually, we don't normally use this. Instead the GA workflow sets up two parallel tests.
-	make remote-test-unit
-	make remote-test-npm
+	make remote-test-indexing && make remote-test-unit
 
-remote-test-npm:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -xvv -r w --instafail --force-flaky --max-runs=2 --timeout=600 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and not indexing and not static" --aws-auth --durations=20 --cov src/encoded --es search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+remote-test-unit:  # Note this only does the 'not indexing' tests
+	poetry run python -m pytest -xvv -r w --timeout=600 -m "${REMOTE_MARKERS} and not indexing" --aws-auth --es ${REMOTE_ES} --instafail --force-flaky --max-runs=2 --durations=20 --cov src/encoded
 
-remote-test-unit:  # Note this does the 'indexing' tests
-	poetry run python -m pytest -xvv -r w --timeout=300 -m "not manual and not integratedx and not performance and not broken and not broken_remotely and not sloppy and indexing and not static" --aws-auth --es search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
+remote-test-indexing:  # Note this does the 'indexing' tests
+	make remote-test-indexing-es && make remote-test-indexing-not-es
+
+remote-test-indexing-es:
+	poetry run python -m pytest -xvv -r w --timeout=300 -m "${REMOTE_MARKERS} and indexing and es" --aws-auth --es ${REMOTE_ES} --cov-append
+
+remote-test-indexing-not-es:
+	poetry run python -m pytest -xvv -r w --timeout=300 -m "${REMOTE_MARKERS} and indexing and not es" --aws-auth --es ${REMOTE_ES} --cov-append
 
 update:  # updates dependencies
 	poetry update
@@ -285,9 +307,12 @@ tag-and-push-docker-production:
 	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
 	date
 
-lint:
+lint-full:
 	@flake8 deploy/ || echo "flake8 failed for deploy/"
 	@flake8 src/encoded/ || echo "flake8 failed for src/encoded"
+
+lint:
+	@flake8 deploy/ && flake8 src/encoded/
 
 help:
 	@make info

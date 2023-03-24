@@ -25,7 +25,7 @@ jobs:
     # Build matrix
     strategy:
       matrix:
-        test_type: ['UNIT', 'NPM', 'Docker']
+        test_type: ['UNIT', 'INDEXING', 'Docker']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
         python_version: ['3.8']
         node_version: ['16']
@@ -45,7 +45,7 @@ jobs:
           check-latest: false
 
       - name: Install/Link Postgres
-        if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' }}
+        if: ${{ matrix.test_type == 'UNIT' || matrix.test_type == 'INDEXING' }}
         run: |
           sudo apt-get install curl ca-certificates gnupg
           curl https://www.postgresql.org/media/keys/ACCC4CF8.asc | sudo apt-key add -
@@ -55,7 +55,7 @@ jobs:
           echo "/usr/lib/postgresql/14/bin" >> $GITHUB_PATH
           sudo ln -s /usr/lib/postgresql/14/bin/initdb /usr/local/bin/initdb
       - name: Install Deps
-        if: ${{ matrix.test_type == 'NPM' || matrix.test_type == 'UNIT' }}
+        if: ${{ matrix.test_type == 'INDEXING' || matrix.test_type == 'UNIT' }}
         run: |
           node --version
           make build
@@ -66,34 +66,34 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-1
 
-      - name: QA (NPM)
-        if: ${{ matrix.test_type == 'NPM' }}
+      - name: QA (INDEXING)
+        if: ${{ matrix.test_type == 'INDEXING' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           # The need for this old environment variable name will go away soon.
           # Once the new snovault is in, we should retain these for a little while to make sure the right
           # variable is being used, and then this can go away. -kmp 9-Mar-2021
           # I have named the ID slightly differently so we can see if the old names are in use.
-          TRAVIS_JOB_ID: cgap-npm-x-test-${{ github.run_number }}-
+          TRAVIS_JOB_ID: cgap-indexing-x-test-${{ github.run_number }}-
           # This will be the new environment variable name.
-          TEST_JOB_ID: cgap-npm-test-${{ github.run_number }}-
+          TEST_JOB_ID: cgap-indexing-test-${{ github.run_number }}-
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
           # npm test
-          make remote-test-npm
+          make remote-test-indexing
 
-      - name: Cleanup (NPM)
-        if: ${{ always() && matrix.test_type == 'NPM' }}
+      - name: Cleanup (INDEXING)
+        if: ${{ always() && matrix.test_type == 'INDEXING' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
           # The need for this old environment variable name will go away soon.
           # Once the new snovault is in, we should retain these for a little while to make sure the right
           # variable is being used, and then this can go away. -kmp 9-Mar-2021
           # I have named the ID slightly differently so we can see if the old names are in use.
-          TRAVIS_JOB_ID: cgap-npm-x-test-${{ github.run_number }}-
+          TRAVIS_JOB_ID: cgap-indexing-x-test-${{ github.run_number }}-
           # This will be the new environment variable name.
-          TEST_JOB_ID: cgap-npm-test-${{ github.run_number }}-
+          TEST_JOB_ID: cgap-indexing-test-${{ github.run_number }}-
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
         run: |
