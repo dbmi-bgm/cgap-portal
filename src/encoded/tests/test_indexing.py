@@ -36,7 +36,7 @@ from ..util import delay_rerun
 from ..verifier import verify_item
 
 
-pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.workbook]
+pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.workbook, pytest.mark.es]
 
 
 # These 4 versions are known to be compatible, older versions should not be
