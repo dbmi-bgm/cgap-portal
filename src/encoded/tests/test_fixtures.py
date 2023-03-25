@@ -7,7 +7,7 @@ from .conftest_settings import ORDER
 pytestmark = [pytest.mark.setone, pytest.mark.broken, pytest.mark.schema, pytest.mark.indexing, pytest.mark.sloppy]
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def minitestdata(app, conn):
     tx = conn.begin_nested()
 
@@ -29,7 +29,7 @@ def minitestdata(app, conn):
 
 
 
-@pytest.yield_fixture(scope='session')
+@pytest.fixture(scope='session')
 def minitestdata2(app, conn):
     tx = conn.begin_nested()
 

@@ -27,7 +27,7 @@ def test_gifo_get_args_defaults():
     assert args.full is False
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def owler():
     with mock.patch.object(gifo, 'Owler') as mocked:
         yield mocked
