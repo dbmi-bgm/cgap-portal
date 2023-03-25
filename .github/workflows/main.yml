@@ -130,9 +130,6 @@ jobs:
           # Until the next version of snovault, the following two are prudent. We can remove them soon. -kmp 9-Mar-2021
           poetry run wipe-test-indices $TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
           poetry run wipe-test-indices cgap-test-$TRAVIS_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
-          # On a one-time basis to clean up some old indexes, need to do this. Delete before merging this branch as unneeded:
-          poetry run wipe-test-indices cgap-slow-x-test search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
-          poetry run wipe-test-indices cgap-slow-test search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
         if: ${{ matrix.test_type == 'DOCKER' && matrix.node_version == '16' && matrix.python_version == '3.8' }}
