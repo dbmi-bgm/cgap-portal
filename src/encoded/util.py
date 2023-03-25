@@ -10,13 +10,15 @@ import pyramid.request
 import re
 import structlog
 import tempfile
+import time
 
 from botocore.client import Config
 from dcicutils.ecs_utils import ECSUtils
-from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity, PRINT
+from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity, PRINT, ignored
 from dcicutils.secrets_utils import assume_identity
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
+from pyramid.registry import Registry
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
@@ -145,7 +147,8 @@ def subrequest_item_creation(request: pyramid.request.Request, item_type: str, j
     # Maybe...
     # validated = json_body.copy()
     # subrequest.validated = validated
-    collection: Collection = subrequest.registry[COLLECTIONS][item_type]
+    registry: Registry = subrequest.registry  # noQA - PyCharm can't tell subrequest.registry IS a Registry
+    collection: Collection = registry[COLLECTIONS][item_type]
     check_true(subrequest.json_body, "subrequest.json_body is not properly initialized.")
     check_true(not subrequest.validated, "subrequest was unexpectedly validated already.")
     check_true(not subrequest.errors, "subrequest.errors already has errors before trying to validate.")
@@ -355,6 +358,18 @@ def beanstalk_env_from_request(request):
 
 def beanstalk_env_from_registry(registry):
     return registry.settings.get('env.name')
+
+
+def customized_delay_rerun(sleep_seconds=1):
+    def parameterized_delay_rerun(*args):
+        """ Rerun function for flaky """
+        ignored(args)
+        time.sleep(sleep_seconds)
+        return True
+    return parameterized_delay_rerun
+
+
+delay_rerun = customized_delay_rerun(sleep_seconds=1)
 
 
 def check_user_is_logged_in(request):

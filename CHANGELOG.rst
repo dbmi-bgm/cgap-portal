@@ -6,6 +6,15 @@ cgap-portal
 Change Log
 ----------
 
+
+12.10.2
+=======
+
+* Backport pytest 7.2 support from Fourfront
+* Move to poetry 1.3.2
+* Remove dependence in a pinned version of setuptools
+
+
 12.10.1
 =======
 `PR 702: VEP QC metrics fix <https://github.com/dbmi-bgm/cgap-portal/pull/702>`_

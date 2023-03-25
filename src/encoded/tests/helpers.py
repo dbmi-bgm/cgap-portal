@@ -2,9 +2,54 @@ import contextlib
 import io
 import json
 import pkg_resources
+import webtest
 
 from dcicutils.misc_utils import find_association, find_associations, ignorable
 from dcicutils.lang_utils import string_pluralize
+from snovault import DBSESSION
+from snovault.elasticsearch import create_mapping
+
+
+def make_testapp(app, *, http_accept=None, remote_user=None):
+    """
+    By default, makes a testapp with environ={"HTTP_ACCEPT": "application/json", "REMOTE_USER": "TEST"}.
+    Arguments can be used to override these defaults. An explicit None accepts the default.
+
+    ;param app:  a Pyramid app object.
+    :param http_accept: The value of HTTP_ACCEPT in the testapp's environ, or None accepting 'application/json'.
+    :param remote_user: The value of REMOTE_USER in the testapp's environ, or None accepting 'TEST'.
+    """
+    environ = {
+        'HTTP_ACCEPT': http_accept or 'application/json',
+        'REMOTE_USER': remote_user or 'TEST',
+    }
+    testapp = webtest.TestApp(app, environ)
+    return testapp
+
+
+def make_htmltestapp(app):
+    """Makes a testapp with environ={"HTTP_ACCEPT": "text/html", "REMOTE_USER": "TEST"}"""
+    return make_testapp(app, http_accept='text/html')
+
+
+def make_authenticated_testapp(app):
+    """Makes a testapp with environ={"HTTP_ACCEPT": "application/json", "REMOTE_USER": "TEST_AUTHENTICATED"}"""
+    return make_testapp(app, remote_user='TEST_AUTHENTICATED')
+
+
+def make_submitter_testapp(app):
+    """Makes a testapp with environ={"HTTP_ACCEPT": "application/json", "REMOTE_USER": "TEST_SUBMITTER"}"""
+    return make_testapp(app, remote_user='TEST_SUBMITTER')
+
+
+def make_indexer_testapp(app):
+    """Makes a testapp with environ={"HTTP_ACCEPT": "application/json", "REMOTE_USER": "INDEXER"}"""
+    return make_testapp(app, remote_user='INDEXER')
+
+
+def make_embed_testapp(app):
+    """Makes a testapp with environ={"HTTP_ACCEPT": "application/json", "REMOTE_USER": "EMBED"}"""
+    return make_testapp(app, remote_user='EMBED')
 
 
 def master_lookup(item_type, multiple=False, **attributes):
@@ -225,3 +270,35 @@ def assure_related_items_for_testing(testapp, item_dict):
         yield posted
     finally:
         _carefully_patch_related_items_for_testing(testapp=testapp, item_dict=undo_dict)
+
+
+class NoNestedCommit(BaseException):
+    """
+    This is a pseudo-error class to be used as a special control construct
+    only for the purpose of implementing begin_nested.
+    """
+    pass
+
+
+@contextlib.contextmanager  # To be moved to snovault
+def begin_nested(*, app, commit=True):
+    session = app.registry[DBSESSION]
+    connection = session.connection().connect()
+    try:
+        with connection.begin_nested():  # as tx:
+            yield
+            if not commit:
+                raise NoNestedCommit()  # Raising an error will bypass an attempt to commit
+    except NoNestedCommit:
+        pass
+
+
+@contextlib.contextmanager  # To be moved to snovault
+def local_collections(*, app, collections):
+    with begin_nested(app=app, commit=False):
+        # import pdb; pdb.set_trace()
+        # testapp = make_testapp(app)
+        # before = testapp.get('/institution/', status=[200,404]).json
+        create_mapping.run(app, collections=collections, skip_indexing=True, purge_queue=True)
+        # after = testapp.get('/institution/', status=[200,404]).json
+        yield

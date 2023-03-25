@@ -2,11 +2,12 @@ import random
 import uuid
 
 from datetime import datetime
+from dcicutils.misc_utils import ignored
 from jsonschema_serialize_fork import NO_DEFAULT
 from pyramid.path import DottedNameResolver
 from pyramid.threadlocal import get_current_request
-from snovault.schema_utils import server_default
 from snovault import COLLECTIONS  # , ROOT
+from snovault.schema_utils import server_default
 from string import digits  # , ascii_uppercase
 
 
@@ -25,11 +26,12 @@ def includeme(config):
 
 
 # XXX: This stuff is all added based on the serverDefault identifier in the schemas
-# removing it altogether will totally break our code
+#      removing it altogether will totally break our code
 
 
 @server_default
 def userid(instance, subschema):  # args required by jsonschema-serialize-fork
+    ignored(instance, subschema)
     return _userid()
 
 
@@ -43,16 +45,18 @@ def _userid():
 
 @server_default
 def now(instance, subschema):  # args required by jsonschema-serialize-fork
+    ignored(instance, subschema)
     return utc_now_str()
 
 
-def utc_now_str():
+def utc_now_str():  # TODO: Move to dcicutils.misc_utils
     # from jsonschema_serialize_fork date-time format requires a timezone
     return datetime.utcnow().isoformat() + '+00:00'
 
 
 @server_default
 def uuid4(instance, subschema):
+    ignored(instance, subschema)
     return str(uuid.uuid4())
 
 
@@ -74,6 +78,7 @@ def accession(instance, subschema):
 
 @server_default
 def userproject(instance, subschema):
+    ignored(instance, subschema)
     user = get_user_resource()
     if user == NO_DEFAULT:
         return NO_DEFAULT
@@ -85,6 +90,7 @@ def userproject(instance, subschema):
 
 @server_default
 def userinstitution(instance, subschema):
+    ignored(instance, subschema)
     user = get_user_resource()
     if user == NO_DEFAULT:
         return NO_DEFAULT
@@ -94,6 +100,7 @@ def userinstitution(instance, subschema):
 def get_userid():
     """ Wrapper for the server_default 'userid' above so it is not called through SERVER_DEFAULTS in our code """
     return _userid()
+
 
 def get_user_resource():
     request = get_current_request()
@@ -113,7 +120,8 @@ def add_last_modified(properties, **kwargs):
         Uses the above two functions to add the last_modified information to the item
         May have no effect
         Allow someone to override the request userid (none in this case) by passing in a different uuid
-        CONSIDER: `last_modified` (and `last_text_edited`) are not really 'server defaults' but rather system-managed fields.
+        CONSIDER: `last_modified` (and `last_text_edited`) are not really 'server defaults'
+                  but rather system-managed fields.
     """
 
     userid = kwargs.get("userid", None)
@@ -141,8 +149,9 @@ def add_last_modified(properties, **kwargs):
             properties[last_field_name] = last_modified
 
 
-#FDN_ACCESSION_FORMAT = (digits, digits, digits, ascii_uppercase, ascii_uppercase, ascii_uppercase)
-FDN_ACCESSION_FORMAT = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789']*7
+# FDN_ACCESSION_FORMAT = (digits, digits, digits, ascii_uppercase, ascii_uppercase, ascii_uppercase)
+FDN_ACCESSION_FORMAT = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'] * 7
+
 
 def enc_accession(accession_type):
     random_part = ''.join(random.choice(s) for s in FDN_ACCESSION_FORMAT)
