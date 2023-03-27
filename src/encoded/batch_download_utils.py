@@ -198,7 +198,7 @@ class SpreadsheetColumn:
 
     title: str
     description: str
-    to_evaluate: Union[str, Callable]
+    evaluator: Union[str, Callable]
 
     def get_title(self):
         return self.title
@@ -207,26 +207,28 @@ class SpreadsheetColumn:
         return self.description
 
     def get_field_for_item(self, item: Any) -> str:
-        if self.is_property_evaluator() and isinstance(item, JsonObject):
+        if self._is_property_evaluator() and isinstance(item, Dict):
             return self._get_field_from_item(item)
-        if self.is_callable_evaluator():
-            return self.to_evaluate(item)
+        if self._is_callable_evaluator():
+            return self.evaluator(item)
         raise ValueError(
-            f"Unable to evaluate item {item} with evaluator {self.to_evaluate}"
+            f"Unable to evaluate item {item} with evaluator {self.evaluator}"
         )
 
     def _get_field_from_item(self, item: Any) -> str:
-        return simple_path_ids(item, self.to_evaluate)
+        return get_values_for_field(item, self.evaluator)
 
-    def is_property_evaluator(self):
-        return isinstance(self.to_evaluate, str)
+    def _is_property_evaluator(self):
+        return isinstance(self.evaluator, str)
 
-    def is_callable_evaluator(self):
-        return callable(self.to_evaluate)
+    def _is_callable_evaluator(self):
+        return callable(self.evaluator)
 
 
 @dataclass(frozen=True)
 class SpreadsheetTemplate(ABC):
+
+    items_to_evaluate: Iterable[JsonObject]
 
     @abstractmethod
     def _get_headers(self) -> None:
@@ -246,25 +248,25 @@ class SpreadsheetTemplate(ABC):
 
     def _convert_column_tuples_to_spreadsheet_columns(
         self,
-        columns: Sequence[OrderedSpreadsheetColumn],
+        columns: Iterable[OrderedSpreadsheetColumn],
     ) -> List[SpreadsheetColumn]:
         return [SpreadsheetColumn(*column) for column in columns]
 
-    def yield_rows(self, items_to_evaluate: Sequence[JsonObject]) -> Iterator[Sequence[str]]:
+    def yield_rows(self) -> Iterator[Iterable[str]]:
         self._yield_headers()
         self._yield_column_rows()
-        self._yield_item_rows(items_to_evaluate)
+        self._yield_item_rows()
 
-    def _yield_headers(self) -> Iterator[Sequence[str]]:
+    def _yield_headers(self) -> Iterator[Iterable[str]]:
         for header in self._get_headers():
             yield header
 
-    def _yield_column_rows(self) -> Iterator[Sequence[str]]:
+    def _yield_column_rows(self) -> Iterator[Iterable[str]]:
         yield self._get_column_titles()
         yield self._get_column_descriptions()
 
-    def _yield_item_rows(self, items_to_evaluate: JsonObject) -> Iterator[Sequence[str]]:
-        for item in items_to_evaluate:
+    def _yield_item_rows(self) -> Iterator[Iterable[str]]:
+        for item in self.items_to_evaluate:
             yield self._get_row_for_item(item)
 
 
