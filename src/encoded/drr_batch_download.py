@@ -1,5 +1,6 @@
 from dataclasses import dataclass
-from functools import cached_property, partial
+from datetime import datetime
+from functools import partial
 from typing import (
     Any,
     Callable,
@@ -14,70 +15,212 @@ from typing import (
     Union,
 )
 
+import pytz
+from pyramid.httpexceptions import HTTPBadRequest
 from pyramid.request import Request
+from pyramid.response import Response
 from pyramid.view import view_config
-from snovault.util import debug_log
+from snovault.util import debug_log, simple_path_ids
 
-from .drr_item_models import JsonObject, VariantSample
+from .drr_item_models import JsonObject, Note, VariantSample
 from .batch_download_utils import (
+    ACCEPTABLE_FILE_FORMATS,
+    get_values_for_field,
+    human_readable_filter_block_queries,
     FilterSetSearch,
     OrderedSpreadsheetColumn,
     SpreadsheetColumn,
+    SpreadsheetFromColumnTuples,
     SpreadsheetCreationError,
     SpreadsheetGenerator,
     SpreadsheetPost,
     SpreadsheetTemplate,
 )
 from .root import CGAPRoot
+from .util import format_to_url
 
 
-CASE_SPREADSHEET_ENDPOINT = "case-search-spreadsheet"
-CASE_SPREADSHEET_URL = f"/{CASE_SPREADSHEET_ENDPOINT}/"
+CASE_SPREADSHEET_ENDPOINT = "case_search_spreadsheet"
+CASE_SPREADSHEET_URL = format_to_url(CASE_SPREADSHEET_ENDPOINT)
+VARIANT_SAMPLE_SPREADSHEET_ENDPOINT = "variant_sample_search_spreadsheet"
+VARIANT_SAMPLE_SPREADSHEET_URL = format_to_url(VARIANT_SAMPLE_SPREADSHEET_ENDPOINT)
 
 
 def includeme(config):
     config.add_route(CASE_SPREADSHEET_ENDPOINT, CASE_SPREADSHEET_URL)
+    config.add_route(VARIANT_SAMPLE_SPREADSHEET_ENDPOINT,
+                     VARIANT_SAMPLE_SPREADSHEET_URL)
     config.scan(__name__)
 
 
-@view_config(route_name=CASE_SPREADSHEET_ENDPOINT, request_method="POST")
-# Add validator here for file format?
-@debug_log
-def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Any:
-    import pdb
-
-    pdb.set_trace()
+def validate_spreadsheet_post(context: CGAPRoot, request: Request) -> None:
     post_parser = SpreadsheetPost(request)
+    file_format = post_parser.get_file_format()
+    if file_format not in ACCEPTABLE_FILE_FORMATS:
+        raise HTTPBadRequest(f"File format not acceptable: {file_format}")
+    search = post_parser.get_compound_search()
+    if not search:
+        raise HTTPBadRequest("No search parameters given")
 
 
-class VariantSampleSpreadsheet(SpreadsheetTemplate):
+@view_config(
+    route_name=VARIANT_SAMPLE_SPREADSHEET_ENDPOINT,
+    request_method="POST",
+    validators=[validate_spreadsheet_post],
+)
+@debug_log
+def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
+    import pdb; pdb.set_trace()
+    post_parser = SpreadsheetPost(request)
+    file_format = post_parser.get_file_format()
+    file_name = get_variant_sample_spreadsheet_file_name(post_parser)
+    items_for_spreadsheet = get_items_from_search(context, request, post_parser)
+    spreadsheet_rows = VariantSampleSpreadsheet(
+        items_for_spreadsheet, request=request, spreadsheet_post=post_parser
+    ).yield_rows()
+    return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
-    @cached_property
-    def _spreadsheet_columns(self) -> List[SpreadsheetColumn]:
-        column_tuples = self._get_column_tuples()
-        return self._convert_column_tuples_to_spreadsheet_columns(column_tuples)
 
-    def get_column_titles(self) -> List[str]:
-        return [column.get_title() for column in self._spreadsheet_columns]
+@view_config(
+    route_name=CASE_SPREADSHEET_ENDPOINT,
+    request_method="POST",
+    validators=[validate_spreadsheet_post],
+)
+@debug_log
+def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
+    import pdb; pdb.set_trace()
+    post_parser = SpreadsheetPost(request)
+    file_format = post_parser.get_file_format()
+    file_name = get_case_spreadsheet_file_name(post_parser)
+    items_for_spreadsheet = get_items_from_search(context, request, post_parser)
+    spreadsheet_rows = CaseSpreadsheet(items_for_spreadsheet).yield_rows()
+    return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
-    def get_column_descriptions(self) -> List[str]:
-        return [column.get_description() for column in self._spreadsheet_columns]
 
-    def get_row_for_item(self, variant_sample_properties: JsonObject) -> List[str]:
-        variant_sample = VariantSample(variant_sample_properties)
+def get_variant_sample_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
+    file_format = post_parser.get_file_format()
+    case_accession = post_parser.get_case_accession() or "case"
+    timestamp = get_timestamp()
+    return f"{case_accession}-filtering-{timestamp}.{file_format}"
+
+
+def get_timestamp():
+    now = datetime.datetime.now(pytz.utc).isoformat()[:-13]
+    return f"{now}Z"
+
+
+def get_case_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
+    pass
+
+
+def get_items_from_search(
+    context: CGAPRoot, request: Request, post_parser: SpreadsheetPost
+) -> Iterator[JsonObject]:
+    search_to_perform = post_parser.get_compound_search()
+    return FilterSetSearch(context, request, search_to_perform).get_search_results()
+
+
+def get_spreadsheet_rows(
+    spreadsheet: SpreadsheetTemplate, items_for_spreadsheet: Iterable[JsonObject]
+) -> Iterator[List[str]]:
+    return spreadsheet(items_for_spreadsheet).yield_rows()
+
+
+def get_spreadsheet_response(
+    file_name: str, spreadsheet_rows: Iterator[List[str]], file_format: str
+) -> Response:
+    return SpreadsheetGenerator(
+        file_name, spreadsheet_rows, file_format=file_format
+    ).get_streaming_response()
+
+
+class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
+
+    NOTE_FIELDS_TO_EMBED = [
+        "variant.interpretations",
+        "variant.discovery_interpretations",
+        "variant.variant_notes",
+        "variant.genes.genes_most_severe_gene.gene_notes",
+        "interpretation",
+        "discovery_interpretation",
+        "variant_notes",
+        "gene_notes",
+    ]
+
+    request: Optional[Request] = None
+    spreadsheet_post: Optional[SpreadsheetPost] = None
+
+    def _get_headers(self) -> List[List[str]]:
+        header_lines = self._get_available_header_lines()
+        return header_lines + [
+            ["## -------------------------------------------------------"]
+        ]
+
+    def _get_available_header_lines(self) -> List[List[str]]:
         result = []
-        for column in self._spreadsheet_columns():
-            if column.is_property_evaluator():
-                result.append(column.get_field_for_item(variant_sample_properties))
-            elif column.is_callable_evaluator():
-                result.append(column.get_field_for_item(variant_sample))
-            else:
-                raise SpreadsheetCreationError(
-                    "Unable to use column for evaluating item"
-                )
+        if self.spreadsheet_post:
+            result += self._get_case_accession_line()
+            result += self._get_case_title_line()
+            result += self._get_readable_filters_line()
         return result
 
-    def _get_column_tuples(self) -> Sequence[OrderedSpreadsheetColumn]:
+    def _get_case_accession_line(self) -> List[List[str]]:
+        result = []
+        case_accession = self.spreadsheet_post.get_case_accession()
+        if case_accession:
+            result.append(["#", "Case Accession:", "", case_accession])
+        return result
+
+    def _get_case_title_line(self) -> List[List[str]]:
+        result = []
+        case_title = self.spreadsheet_post.get_case_title()
+        if case_title:
+            result.append(["#", "Case Title:", "", case_title])
+        return result
+
+    def _get_readable_filters_line(self) -> List[List[str]]:
+        result = []
+        search = self.spreadsheet_post.get_compound_search()
+        if search:
+            readable_filter_blocks = human_readable_filter_block_queries(search)
+            result.append(["#", "Filters Selected:", "", readable_filter_blocks])
+        return result
+
+    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> Iterator[str]:
+        self._merge_notes(item_to_evaluate)
+        variant_sample = VariantSample(item_to_evaluate)
+        return (
+            self._evaluate_item_with_column(column, variant_sample)
+            for column in self._spreadsheet_columns
+        )
+
+    def _merge_notes(self, variant_sample_properties: JsonObject) -> None:
+        if self.request:
+            for note_field in self.NOTE_FIELDS_TO_EMBED:
+                existing_notes = simple_path_ids(variant_sample_properties, note_field)
+                for existing_note in existing_notes:
+                    self._update_note(existing_note)
+
+    def _update_note(self, note_properties: JsonObject) -> None:
+        all_note_properties = self._get_note_by_subrequest(note_properties)
+        note_properties.update(all_note_properties)
+
+    def _get_note_by_subrequest(self, note_properties: JsonObject) -> JsonObject:
+        note_identifier = Note(note_properties).get_atid()
+        return self.request.embed(note_identifier, as_user=True)
+
+    def _evaluate_item_with_column(
+        self, column: SpreadsheetColumn, variant_sample: VariantSample,
+    ) -> str:
+        if column.is_property_evaluator():
+            return column.get_field_for_item(variant_sample.get_properties())
+        if column.is_callable_evaluator():
+            return column.get_field_for_item(variant_sample)
+        raise SpreadsheetCreationError(
+            "Unable to use column for evaluating item"
+        )
+
+    def _get_column_tuples(self) -> List[OrderedSpreadsheetColumn]:
         return [
             ("ID", "URL path to the variant", "@id"),
             ("Chrom (hg38)", "Chromosome (hg38)", "variant.CHROM"),
@@ -141,7 +284,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Most severe transcript ID",
                 "Ensembl ID of transcript with worst annotation for variant",
-                self._get_most_severe_transcript_consequence_feature,
+                self._get_most_severe_transcript_feature,
             ),
             (
                 "Most severe transcript location",
@@ -194,7 +337,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "gnomADv2 exome popmax population",
                 "Population with max. allele frequency in gnomad v2 (exomes)",
-                self._get_gnomadv2_popmax_population,
+                self._get_gnomad_v2_popmax_population,
             ),
             ("GERP++", "GERP++ score", "variant.csq_gerp_rs"),
             ("CADD", "CADD score", "variant.csq_cadd_phred"),
@@ -301,7 +444,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "ACMG classification (prev)",
                 "ACMG classification for variant in previous cases",
-                self._get_own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.interpretations",
                     "classification"
                 )
@@ -309,7 +452,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "ACMG rules (prev)",
                 "ACMG rules invoked for variant in previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.interpretations",
                     "acmg"
                 )
@@ -317,7 +460,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Clinical interpretation (prev)",
                 "Clinical interpretation notes written for previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.interpretations",
                     "note_text"
                 )
@@ -325,7 +468,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Gene candidacy (prev)",
                 "Gene candidacy level selected for previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.discovery_interpretations",
                     "gene_candidacy"
                 )
@@ -333,7 +476,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Variant candidacy (prev)",
                 "Variant candidacy level selected for previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.discovery_interpretations",
                     "variant_candidacy"
                 )
@@ -341,7 +484,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Discovery notes (prev)",
                 "Gene/variant discovery notes written for previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.discovery_interpretations",
                     "note_text"
                 )
@@ -349,7 +492,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Variant notes (prev)",
                 "Additional notes on variant written for previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.variant_notes",
                     "note_text"
                 )
@@ -357,7 +500,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
             (
                 "Gene notes (prev)",
                 "Additional notes on gene written for previous cases",
-                self._own_project_note_factory(
+                self._get_note_of_same_project(
                     "variant.genes.genes_most_severe_gene.gene_notes",
                     "note_text"
                 )
@@ -394,7 +537,7 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
 
     def _get_note_of_same_project(
         self, note_property_location: str, note_property_to_retrieve: str
-    ):
+    ) -> Callable:
         note_evaluator = partial(
             self._get_note_properties,
             note_property_location=note_property_location,
@@ -405,30 +548,27 @@ class VariantSampleSpreadsheet(SpreadsheetTemplate):
     def _get_note_properties(
         self,
         variant_sample: VariantSample,
-        note_property_location="",
-        note_property_to_retrieve="",
-    ):
-        variant_sample_properties = variant_sample.get_properties()
-        note_properties = self._get_property(
-            variant_sample_properties, note_property_location
-        )
-        return self._get_property(note_properties, note_property_to_retrieve)
-
-    def _get_property(self, properties: JsonObject, property_to_get: str) -> str:
-        pass
+        note_property_location: str = "",
+        note_property_to_retrieve: str = "",
+    ) -> str:
+        result = ""
+        note = variant_sample.get_note_of_same_project(note_property_location)
+        if note:
+            result = get_values_for_field(note.get_properties(),
+                                          note_property_to_retrieve)
+        return result
 
 
 @dataclass(frozen=True)
-class CaseSpreadsheetTemplate(SpreadsheetTemplate):
+class CaseSpreadsheet(SpreadsheetFromColumnTuples):
 
-    def get_headers(self) -> None:
+    def _get_headers(self) -> None:
         pass
 
-    def get_column_titles(self) -> None:
+    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
         pass
 
-    def get_column_descriptions(self) -> None:
-        pass
-
-    def get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
-        pass
+    def _get_column_tuples(self) -> List[OrderedSpreadsheetColumn]:
+        return [
+            ("ID", "URL path to the case", "@id"),
+        ]

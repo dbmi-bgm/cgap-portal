@@ -2,6 +2,7 @@ import csv
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+from functools import cached_property
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
 )
@@ -207,9 +208,9 @@ class SpreadsheetColumn:
         return self.description
 
     def get_field_for_item(self, item: Any) -> str:
-        if self._is_property_evaluator() and isinstance(item, Dict):
+        if self.is_property_evaluator() and isinstance(item, Dict):
             return self._get_field_from_item(item)
-        if self._is_callable_evaluator():
+        if self.is_callable_evaluator():
             return self.evaluator(item)
         raise ValueError(
             f"Unable to evaluate item {item} with evaluator {self.evaluator}"
@@ -218,10 +219,10 @@ class SpreadsheetColumn:
     def _get_field_from_item(self, item: Any) -> str:
         return get_values_for_field(item, self.evaluator)
 
-    def _is_property_evaluator(self):
+    def is_property_evaluator(self):
         return isinstance(self.evaluator, str)
 
-    def _is_callable_evaluator(self):
+    def is_callable_evaluator(self):
         return callable(self.evaluator)
 
 
@@ -246,12 +247,6 @@ class SpreadsheetTemplate(ABC):
     def _get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
         pass
 
-    def _convert_column_tuples_to_spreadsheet_columns(
-        self,
-        columns: Iterable[OrderedSpreadsheetColumn],
-    ) -> List[SpreadsheetColumn]:
-        return [SpreadsheetColumn(*column) for column in columns]
-
     def yield_rows(self) -> Iterator[Iterable[str]]:
         self._yield_headers()
         self._yield_column_rows()
@@ -271,6 +266,31 @@ class SpreadsheetTemplate(ABC):
 
 
 @dataclass(frozen=True)
+class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
+
+    @abstractmethod
+    def _get_column_tuples(self) -> None:
+        pass
+
+    @cached_property
+    def _spreadsheet_columns(self) -> None:
+        column_tuples = self._get_column_tuples()
+        return self._convert_column_tuples_to_spreadsheet_columns(column_tuples)
+
+    def _get_column_titles(self) -> Iterator[str]:
+        return (column.get_title() for column in self._spreadsheet_columns)
+
+    def _get_column_descriptions(self) -> Iterator[str]:
+        return (column.get_description() for column in self._spreadsheet_columns)
+
+    def _convert_column_tuples_to_spreadsheet_columns(
+        self,
+        columns: Iterable[OrderedSpreadsheetColumn],
+    ) -> List[SpreadsheetColumn]:
+        return [SpreadsheetColumn(*column) for column in columns]
+
+
+@dataclass(frozen=True)
 class SpreadsheetPost:
 
     CASE_ACCESSION = "case_accession"
@@ -285,7 +305,7 @@ class SpreadsheetPost:
         return self.request.params
 
     def get_file_format(self) -> str:
-        return self.parameters.get(self.FILE_FORMAT, DEFAULT_FILE_FORMAT)
+        return self.parameters.get(self.FILE_FORMAT, DEFAULT_FILE_FORMAT).lower()
 
     def get_case_accession(self) -> str:
         return self.parameters.get(self.CASE_ACCESSION, "")
@@ -340,10 +360,10 @@ class FilterSetSearch:
 class SpreadsheetGenerator:
 
     file_name: str
-    rows_to_write: Iterable[Sequence[Any]]
+    rows_to_write: Iterable[Sequence[str]]
     file_format: Optional[str] = DEFAULT_FILE_FORMAT
 
-    def get_spreadsheet_response(self) -> Response:
+    def get_streaming_response(self) -> Response:
         return Response(
             app_iter=self._stream_spreadsheet(), headers=self._get_response_headers()
         )

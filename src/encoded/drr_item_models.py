@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any, Dict, List, Union
 
 
@@ -8,10 +8,15 @@ JsonObject = Dict[str, Any]
 @dataclass(frozen=True)
 class ItemProperties:
 
+    ATID = "@id"
+
     properties: JsonObject
 
     def get_properties(self) -> JsonObject:
         return self.properties
+
+    def get_atid(self) -> str:
+        return self.properties.get(self.ATID, "")
 
 
 @dataclass(frozen=True)
@@ -189,6 +194,11 @@ class Variant(ItemProperties):
         return ""
 
 
+class Note(ItemProperties):
+
+    pass
+
+
 @dataclass(frozen=True)
 class VariantSample(ItemProperties):
 
@@ -222,3 +232,6 @@ class VariantSample(ItemProperties):
 
     def get_gnomad_v2_popmax_population(self) -> str:
         return self.variant.get_gnomad_v2_popmax_population()
+
+    def get_note_of_same_project(self, note_property_location: str) -> Note:
+        return

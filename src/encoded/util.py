@@ -588,3 +588,11 @@ def transfer_properties(source, target, properties, property_replacements=None):
             if property_replacements:
                 property_name = property_replacements.get(property_name, property_name)
             target[property_name] = property_value
+
+
+def snake_case_to_kebab_case(string: str) -> str:
+    return string.replace("_", "-")
+
+
+def format_to_url(string: str) -> str:
+    return f"/{snake_case_to_kebab_case(string)}/"

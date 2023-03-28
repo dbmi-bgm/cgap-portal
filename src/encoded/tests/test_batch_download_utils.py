@@ -156,7 +156,7 @@ class TestSpreadsheetColumn:
         self, evaluator: Union[str, Callable], expected: bool
     ) -> None:
         spreadsheet_column = self.get_spreadsheet_column(evaluator=evaluator)
-        assert spreadsheet_column._is_property_evaluator() == expected
+        assert spreadsheet_column.is_property_evaluator() == expected
 
     @pytest.mark.parametrize(
         "evaluator,expected",
@@ -169,7 +169,7 @@ class TestSpreadsheetColumn:
         self, evaluator: Union[str, Callable], expected: bool
     ) -> None:
         spreadsheet_column = self.get_spreadsheet_column(evaluator=evaluator)
-        assert spreadsheet_column._is_callable_evaluator() == expected
+        assert spreadsheet_column.is_callable_evaluator() == expected
 
 
 class TestSpreadsheetPost:
