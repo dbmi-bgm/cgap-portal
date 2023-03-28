@@ -10,7 +10,7 @@ import pstats
 
 from collections import OrderedDict, deque
 from dcicutils.env_utils import default_workflow_env, is_stg_or_prd_env, prod_bucket_env
-from dcicutils.misc_utils import ignored, ignorable
+from dcicutils.misc_utils import ignored, ignorable, PRINT
 from inspect import signature
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
@@ -638,7 +638,7 @@ def trace_workflows(original_file_set_to_trace, request, options=None):
         ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
         ps.print_stats()
         output = s.getvalue()
-        print(output)
+        PRINT(output)
         return Response(
             content_type='text/plain',
             body=output

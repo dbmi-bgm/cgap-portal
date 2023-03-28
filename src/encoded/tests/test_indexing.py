@@ -12,10 +12,11 @@ import time
 import transaction
 import uuid
 
+from dcicutils.misc_utils import PRINT
 from dcicutils.qa_utils import notice_pytest_fixtures, Eventually
+# from elasticsearch.exceptions import NotFoundError
 from snovault.tools import index_n_items_for_testing, make_es_count_checker
 from snovault import DBSESSION, TYPES
-from snovault.storage import Base
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import (
     type_mapping,
@@ -25,26 +26,30 @@ from snovault.elasticsearch.create_mapping import (
 )
 from snovault.elasticsearch.indexer_utils import get_namespaced_index, compute_invalidation_scope
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
+from snovault.storage import Base
 from sqlalchemy import MetaData, func, exc
 from timeit import default_timer as timer
 from unittest import mock
 from zope.sqlalchemy import mark_changed
+# from .helpers import local_collections
+# from .datafixtures import post_if_needed
 from .. import main, loadxl
+# from ..util import delay_rerun
 from ..verifier import verify_item
 
 
 pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.es]
 
 
-# These 3 versions are known to be compatible, older versions should not be
-# used, odds are 14 can be used as well - Will Sept 13 2022
+# These 4 versions are known to be compatible, older versions should not be
+# used, odds are 15 can be used as well - Will Jan 7 2023
 POSTGRES_COMPATIBLE_MAJOR_VERSIONS = ['11', '12', '13', '14']
 
 
 def test_postgres_version(session):
     """ Tests that the local postgres is running one of the compatible versions """
     (version_info,) = session.query(func.version()).one()
-    print("version_info=", version_info)
+    PRINT("version_info=", version_info)
     assert isinstance(version_info, str)
     assert re.match("PostgreSQL (%s)([.][0-9]+)? " % '|'.join(POSTGRES_COMPATIBLE_MAJOR_VERSIONS), version_info)
 

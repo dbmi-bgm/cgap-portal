@@ -6,8 +6,6 @@ cgap-portal
 Change Log
 ----------
 
-<<<<<<< Updated upstream
-=======
 
 12.10.2
 =======
@@ -17,7 +15,6 @@ Change Log
 * Remove dependence in a pinned version of setuptools
 
 
->>>>>>> Stashed changes
 12.10.1
 =======
 `PR 702: VEP QC metrics fix <https://github.com/dbmi-bgm/cgap-portal/pull/702>`_
