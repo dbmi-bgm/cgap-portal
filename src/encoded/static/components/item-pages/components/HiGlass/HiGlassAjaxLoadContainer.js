@@ -38,15 +38,10 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
       samples: props.samples ? props.samples : null,
       higlassSvVcf: props.higlassSvVcf ? props.higlassSvVcf : null,
       higlassCnvVcf: props.higlassCnvVcf ? props.higlassCnvVcf : null,
-      cohortVariantTestResults: props.cohortVariantTestResults
-        ? props.cohortVariantTestResults
-        : null,
-      cohortGeneTestResults: props.cohortGeneTestResults
-        ? props.cohortGeneTestResults
-        : null,
-      cohortVariantDensity: props.cohortVariantDensity
-        ? props.cohortVariantDensity
-        : null,
+      cohortVariantTestResults: props.cohortVariantTestResults || null,
+      cohortGeneTestResults: props.cohortGeneTestResults || null,
+      cohortVariantDensity: props.cohortVariantDensity || null,
+      variantDetailSource: props.variantDetailSource || null,
       file: props.file ? props.file : null,
     };
     this.containerRef = React.createRef();
@@ -165,11 +160,13 @@ export class HiGlassAjaxLoadContainer extends React.PureComponent {
           cohortVariantTestResults,
           cohortGeneTestResults,
           cohortVariantDensity,
+          variantDetailSource,
         } = this.state;
         const payload = {
           cohort_variant_test_results: cohortVariantTestResults,
           cohort_gene_test_results: cohortGeneTestResults,
           cohort_density: cohortVariantDensity,
+          variant_detail_source: variantDetailSource
         };
         this.getViewconf(
           payload,

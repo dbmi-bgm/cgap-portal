@@ -6,6 +6,37 @@ cgap-portal
 Change Log
 ----------
 
+12.10.1
+=======
+`PR 702: VEP QC metrics fix <https://github.com/dbmi-bgm/cgap-portal/pull/702>`_
+
+* Fix VEP-annotated VCF recognition for updated SNV pipelines (v1.1.0)
+
+
+12.10.0
+=======
+`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+
+* Add complex relationship analysis facet for StructuralVariantSamples
+* Add samplegeno_role to StructuralVariantSample schema
+* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
+
+
+12.9.0
+======
+`PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
+
+* Improved cohort browser
+* Upgrade of Higlass to 1.12.2
+
+
+12.8.7
+======
+`PR 698: More FASTQ paired-end options <https://github.com/dbmi-bgm/cgap-portal/pull/698>`_
+
+* Allow dashes as separators for paired-end read information in FASTQ names
+
+
 12.8.6
 ======
 `PR 697: Bch case drawer <https://github.com/dbmi-bgm/cgap-portal/pull/697>`_

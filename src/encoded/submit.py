@@ -1253,7 +1253,7 @@ class SubmittedFilesParser:
 
     # Class constants
     FILE_FORMAT_FASTQ_ATID = "/file-formats/fastq/"
-    PAIRED_END_PATTERN = r"(_[rR]{number}_)|(_[rR]{number}\.)"
+    PAIRED_END_PATTERN = r"([-_][rR]{number}[-_])|([_-][rR]{number}\.)"
     PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
     PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
     FILE_NAME_REGEX = re.compile(r"^[\w+=,.@-]+$")
