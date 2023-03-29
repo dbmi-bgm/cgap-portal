@@ -7,12 +7,25 @@ Change Log
 ----------
 
 
-12.10.2
+12.10.3
 =======
 
 * Backport pytest 7.2 support from Fourfront
-* Move to poetry 1.3.2
-* Remove dependence in a pinned version of setuptools
+
+
+12.10.2
+=======
+
+* Upgrade to ``poetry 1.3.2``
+
+* Syntactically revamp the organization of the various ``Makefile`` targets related to testing,
+  and associated workflows.
+
+* Change the indexing tests in ``test_indexing.py`` to be labeled ``pytest.mark.es``
+  and use that to make sure these run separately.
+
+* Import and use from beta snovault various kinds of useful tools like ``index_n_items_for_testing``
+  and ``make_es_count_checker``.
 
 
 12.10.1

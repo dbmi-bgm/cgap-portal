@@ -150,11 +150,11 @@ def add_last_modified(properties, **kwargs):
 
 
 # FDN_ACCESSION_FORMAT = (digits, digits, digits, ascii_uppercase, ascii_uppercase, ascii_uppercase)
-FDN_ACCESSION_FORMAT = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'] * 7
+C4_ACCESSION_FORMAT = ['ABCDEFGHIJKLMNOPQRSTUVWXYZ123456789'] * 7
 
 
 def enc_accession(accession_type):
-    random_part = ''.join(random.choice(s) for s in FDN_ACCESSION_FORMAT)
+    random_part = ''.join(random.choice(s) for s in C4_ACCESSION_FORMAT)
     return ACCESSION_PREFIX + accession_type + random_part
 
 
