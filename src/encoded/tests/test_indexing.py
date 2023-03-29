@@ -12,6 +12,8 @@ import time
 import transaction
 import uuid
 
+from dcicutils.qa_utils import notice_pytest_fixtures, Eventually
+from snovault.tools import index_n_items_for_testing, make_es_count_checker
 from snovault import DBSESSION, TYPES
 from snovault.storage import Base
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
@@ -31,7 +33,7 @@ from .. import main, loadxl
 from ..verifier import verify_item
 
 
-pytestmark = [pytest.mark.working, pytest.mark.indexing]
+pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.es]
 
 
 # These 3 versions are known to be compatible, older versions should not be
@@ -53,6 +55,7 @@ TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 @pytest.yield_fixture(scope='session')
 def app(es_app_settings, request):
+    notice_pytest_fixtures(request)
     # for now, don't run with mpindexer. Add `True` to params above to do so
     # if request.param:
     #     # we disable the MPIndexer since the build runs on a small machine
@@ -68,20 +71,20 @@ def app(es_app_settings, request):
 
 
 @pytest.yield_fixture
-def setup_and_teardown(app):
+def setup_and_teardown(es_app):
     """
     Run create mapping and purge queue before tests and clear out the
     DB tables after the test
     """
 
     # BEFORE THE TEST - run create mapping for tests types and clear queues
-    create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
-    app.registry[INDEXER_QUEUE].clear_queue()
+    create_mapping.run(es_app, collections=TEST_COLLECTIONS, skip_indexing=True)
+    es_app.registry[INDEXER_QUEUE].clear_queue()
 
     yield  # run the test
 
     # AFTER THE TEST
-    session = app.registry[DBSESSION]
+    session = es_app.registry[DBSESSION]
     connection = session.connection().connect()
     meta = MetaData(bind=session.connection())
     meta.reflect()
@@ -109,32 +112,49 @@ def setup_and_teardown(app):
 @pytest.mark.slow
 @pytest.mark.flaky
 def test_indexing_simple(app, setup_and_teardown, testapp, indexer_testapp):
+    notice_pytest_fixtures(setup_and_teardown)  # unused here, but has a side-effect
+
     es = app.registry['elasticsearch']
     namespaced_ppp = get_namespaced_index(app, 'testing_post_put_patch')
     doc_count = es.count(index=namespaced_ppp).get('count')
     assert doc_count == 0
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
-    res = indexer_testapp.post_json('/index', {'record': True})
-    assert res.json['indexing_count'] == 1
+
+    index_n_items_for_testing(indexer_testapp, 1, max_tries=30)
+
+    # res = indexer_testapp.post_json('/index', {'record': True})
+    # assert res.json['indexing_count'] == 1
+
     res = testapp.post_json('/testing-post-put-patch/', {'required': ''})
     uuid = res.json['@graph'][0]['uuid']
-    res = indexer_testapp.post_json('/index', {'record': True})
-    assert res.json['indexing_count'] == 1
-    time.sleep(3)
+
+    index_n_items_for_testing(indexer_testapp, 1)
+    # res = indexer_testapp.post_json('/index', {'record': True})
+    # assert res.json['indexing_count'] == 1
+
+    Eventually.call_assertion(make_es_count_checker(2, es=es, namespaced_index=namespaced_ppp))
+
+    # time.sleep(3)
     # check es directly
-    doc_count = es.count(index=namespaced_ppp).get('count')
-    assert doc_count == 2
-    res = testapp.get('/search/?type=TestingPostPutPatch')
-    uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
-    count = 0
-    while uuid not in uuids and count < 20:
-        time.sleep(1)
+    # doc_count = es.count(index=namespaced_ppp).get('count')
+    # assert doc_count == 2
+
+    @Eventually.consistent(tries=25, wait_seconds=1)
+    def check_for_uuids():
         res = testapp.get('/search/?type=TestingPostPutPatch')
         uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
-        count += 1
-    assert res.json['total'] >= 2
-    assert uuid in uuids
+        assert res.json['total'] >= 2
+        assert uuid in uuids
+
+    # count = 0
+    # while uuid not in uuids and count < 20:
+    #     time.sleep(1)
+    #     res = testapp.get('/search/?type=TestingPostPutPatch')
+    #     uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
+    #     count += 1
+    # assert res.json['total'] >= 2
+    # assert uuid in uuids
 
     namespaced_indexing = get_namespaced_index(app, 'indexing')
     indexing_doc = es.get(index=namespaced_indexing, id='latest_indexing')
@@ -159,6 +179,7 @@ def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, 
     Do this by checking es directly before and after running mapping.
     Delete an index directly, run again to see if it recovers.
     """
+    notice_pytest_fixtures(setup_and_teardown)
     es = registry[ELASTIC_SEARCH]
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
@@ -182,6 +203,7 @@ def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, 
 
 @pytest.mark.flaky
 def test_file_processed_detailed(app, setup_and_teardown, testapp, indexer_testapp, project, institution, file_formats):
+    notice_pytest_fixtures(setup_and_teardown)
     # post file_processed
     item = {
         'institution': institution['uuid'],
@@ -247,6 +269,7 @@ def test_real_validation_error(app, setup_and_teardown, indexer_testapp, testapp
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
     """
+    notice_pytest_fixtures(setup_and_teardown)
     es = app.registry[ELASTIC_SEARCH]
     fp_body = {
         'schema_version': '3',
@@ -294,7 +317,7 @@ def test_load_and_index_perf_data(testapp, setup_and_teardown, indexer_testapp):
     it takes roughly 25 to run.
     Note: run with bin/test -s -m performance to see the prints from the test
     """
-
+    notice_pytest_fixtures(setup_and_teardown)
     insert_dir = pkg_resources.resource_filename('encoded', 'tests/data/perf-testing/')
     inserts = [f for f in os.listdir(insert_dir) if os.path.isfile(os.path.join(insert_dir, f))]
     json_inserts = {}
