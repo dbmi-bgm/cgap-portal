@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+
+12.10.3
+=======
+
+* Backport pytest 7.2 support from Fourfront
+
+
 12.10.2
 =======
 

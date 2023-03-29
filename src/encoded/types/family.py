@@ -241,7 +241,7 @@ class Family(Item):
                     continue
                 analyzed.append(an_ind)
                 if an_ind not in all_links:
-                    print('should not happen')
+                    log.error('Family.construct_links - a situation that should that not happen occurred.')
                 for a_key in primary_vectors:
                     # extend the link list with this letter
                     extend_tag = a_key[0]
