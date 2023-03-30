@@ -24,9 +24,10 @@ TEST_PROJECT_UUID = TEST_PROJECT['uuid']
 TEST_PROJECT_NAME = TEST_PROJECT['name']
 TEST_PROJECT_ID = '/projects/%s/' % TEST_PROJECT_NAME
 
-DBMI_PI = master_lookup('User', email=DBMI_INSTITUTION['pi'])
+# PI removed from DBMI institution because it conflicts with custom inserts - Will 28 Nov 2022
+DBMI_PI_EMAIL = 'dvuzman@research.bwh.harvard.edu'  # constant that does not really matter
+DBMI_PI = master_lookup('User', email=DBMI_PI_EMAIL)
 DBMI_PI_UUID = DBMI_PI['uuid']
-DBMI_PI_EMAIL = DBMI_PI['email']
 
 # This gives variable names to refer to various files in this hierarchy.
 

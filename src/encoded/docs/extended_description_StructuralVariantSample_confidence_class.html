@@ -1,0 +1,31 @@
+
+<h5>
+    Confidence classes are calculated according to fixed filters.
+</h5>
+
+<p>
+    Call confidence can be HIGH, MEDIUM, or LOW.
+</p>
+
+<p>
+    The confidence categories for structural variants (SVs) called by Manta are calculated based on the following parameters:
+    <ul>
+	    <li> <b> length </b>: The length of the call </li>
+	    <li> <b> split-reads </b>: The number of split reads supporting the call </li>
+	    <li> <b> spanning-reads </b>: The number of spanning reads supporting the call </li>
+    </ul>
+    For more details on how these parameters are used for SVs, see our extended documentation <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-2.html#confidence-classes" target="_blank">here</a>.
+</p>
+
+<p>
+    The confidence categories for copy number variants (CNVs) called by BIC-seq2 are calculated based on the following parameters:
+    <ul>
+	    <li> <b> length </b>: The length of the call </li>
+	    <li> <b> log-ratio </b>: log2(observed reads/expected reads)
+    </ul>
+    For more details on how these parameters are used for CNVs, see our extended documentation <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/CNV_germline/Pages/CNV_germline-step-part-2.html#confidence-classes" target="_blank">here</a>.
+</p>
+
+<p>
+    <b> Note </b>: Confidence categories were added to CGAP in July 2022. Calls made prior to this date will not have confidence categories.
+</p>

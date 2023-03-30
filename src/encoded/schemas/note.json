@@ -63,6 +63,38 @@
             ],
             "permission": "restricted_fields"
         },
+        "last_text_edited": {
+            "title": "Text Last Edited",
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "type": "object",
+            "additionalProperties": false,
+            "lookup": 900,
+            "properties": {
+                "date_text_edited": {
+                    "title": "Date Text Edited",
+                    "description": "Do not submit, value is assigned by the server. The date that note_text field is modified.",
+                    "type": "string",
+                    "anyOf": [
+                        {
+                            "format": "date-time"
+                        },
+                        {
+                            "format": "date"
+                        }
+                    ],
+                    "permission": "restricted_fields"
+                },
+                "text_edited_by": {
+                    "title": "Text Edited By",
+                    "description": "Do not submit, value is assigned by the server. The user that modfied note_text field.",
+                    "type": "string",
+                    "linkTo": "User",
+                    "permission": "restricted_fields"
+                }
+            }
+        },
         "associated_items": {
             "title": "Associated Items",
             "description": "Items associated with this Note",
@@ -83,6 +115,17 @@
                     }
                 }
             }
+        },
+        "is_saved_to_project": {
+            "title": "Saved to Project",
+            "type": "boolean",
+            "description": "If is saved to project, then is true.",
+            "notes": "Must be manually synced by endpoint which handles saving/removing from project, or perhaps be made into calc'd property or rev-link.",
+            "default": false,
+            "exclude_from": [
+                "FFedit-create"
+            ],
+            "permission": "restricted_fields"
         }
     },
     "facets": {},

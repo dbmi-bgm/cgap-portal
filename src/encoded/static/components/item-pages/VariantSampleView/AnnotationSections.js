@@ -466,7 +466,7 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
 /**
  * Takes in a potentially falsy (0) string or number value and if actually not present, returns fallback
  */
-function falsyZeroCheck(value, fallback) {
+export function falsyZeroCheck(value, fallback) {
     if (value || value === "0" || value === 0) {
         return value;
     }
@@ -480,7 +480,7 @@ function falsyZeroCheck(value, fallback) {
  *   We have `valueTransforms.roundLargeNumber(num, decimalPlaces = 2)` function already which can just be re-used if we paramaterize its `numberLevels`.
  *       (currently: `['', 'k', 'm', ' billion', ' trillion', ' quadrillion', ' quintillion']`)
  */
-function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
+export function shortenToSignificantDigits(numberToShorten, countDigits = 3) {
 
     if (!numberToShorten) {
         // Pass through falsy values such as "0" (doesnt need shortening) or null, false, undefined.
@@ -507,23 +507,57 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         csq_clinvar_clnsig: clinicalSignificanceFromVariant,
         csq_clinvar_clnsigconf: conflictingClinicalSignificance,
         clinvar_submission = [], // TODO - missing in data rn.
-        csq_clinvar_clnrevstat: reviewStatusFromVariant
+        csq_clinvar_clnrevstat: reviewStatusFromVariant,
+        POS,
+        CHROM
     } = variant || structural_variant;
+
+
+    const clinvarVariantSearchUrl = useMemo(function(){
+        if (!CHROM && !POS) {
+            return null;
+        }
+        let chromosome = CHROM;
+        chromosome = chromosome.toLowerCase();
+        if (chromosome === "m"){
+            chromosome = "mt";
+        }
+        return `https://www.ncbi.nlm.nih.gov/clinvar?term=((${chromosome}[Chromosome]) AND ${POS}[Base Position])`;
+    }, [ variant || structural_variant ]);
+
+
 
     const { result: { [variationID]: clinVarResult } = {} } = currentClinVarResponse || {};
     const {
         clinical_significance: {
             description: clinicalSignificanceFromClinVar,
             review_status: reviewStatusFromClinVar,
-            last_evaluated: lastEvaluatedFromClinVar
+            last_evaluated: lastEvaluatedFromClinVarRaw
         } = {}
     } = clinVarResult || {};
 
+    // Ensure that the date is valid by running through date parser
+    const lastEvaluatedFromClinVar = Date.parse(new Date(lastEvaluatedFromClinVarRaw));
+
+    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
+
+    const clinVarSearchLink = clinvarVariantSearchUrl ? (
+        <React.Fragment>
+            <i className="icon icon-search fas small"/>&nbsp;&nbsp;
+            <a href={clinvarVariantSearchUrl} target="_blank" rel="noopener noreferrer"
+                data-tip="Search ClinVar for all variants at this variant's location">
+                Variants at this location
+                { externalLinkIconAppend }
+            </a>
+        </React.Fragment>
+    ) : null;
+
     if (!variationID) {
-        // No ClinVar info available ??
+        // No ClinVar info available. Still include link to search for variant at same location, though.
         return (
-            <div className="d-flex align-items-center justify-content-center text-large h-100">
-                <h4 className="font-italic text-400 my-0 pb-08">No record in ClinVar</h4>
+            <div className="d-flex align-items-center justify-content-center h-100 flex-column">
+                { clinVarSearchLink ? <div className="my-2 flex-grow-1 w-100 text-left">{ clinVarSearchLink }</div> : null }
+                <h4 className="font-italic text-400 my-0 pb-24 flex-grow-1">No record in ClinVar</h4>
             </div>
         );
     }
@@ -532,13 +566,14 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         <React.Fragment>
 
             <div className="mb-12">
-                <label data-tip={getTipForField("csq_clinvar")} className="mr-1 mb-0">ID: </label>
+                <label data-tip={getTipForField("csq_clinvar")} className="mb-0 d-inline">ID: </label>
                 { clinvarExternalHref?
-                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer">
+                    <a href={clinvarExternalHref} target="_blank" rel="noopener noreferrer" data-tip="View this variant in ClinVar">
                         { variationID }
-                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                        { externalLinkIconAppend }
                     </a>
                     : <span>{ variationID }</span> }
+                { clinVarSearchLink ? <>&nbsp;&nbsp;|&nbsp;&nbsp;{ clinVarSearchLink }</> : null }
             </div>
 
             <div className="row mt-03">
@@ -559,7 +594,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
                 </div>
             </div>
 
-            { lastEvaluatedFromClinVar ?
+            { lastEvaluatedFromClinVar && !isNaN(lastEvaluatedFromClinVar) ?
                 <div className="row mt-03">
                     <div className="col-3">
                         <label className="mb-0">Last Evaluated: </label>

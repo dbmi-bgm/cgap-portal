@@ -112,16 +112,6 @@
             "lookup": 50,
             "internal_comment": "should this be a controlled CV with enum, or another object?"
         },
-        "paired_end": {
-            "title": "Paired End Identifier",
-            "description": "Which pair the file belongs to (if paired end library)",
-            "type": "string",
-            "lookup": 30,
-            "enum": [
-                "1",
-                "2"
-            ]
-        },
         "flowcell_details": {
             "title": "Flowcells",
             "description": "For high-throughput sequencing, the flowcells used for the sequencing of the replicate.",

@@ -1,11 +1,16 @@
 import pytest
 
-from encoded.custom_embed import ATID_PATTERN, MINIMAL_EMBEDS, FORBIDDEN_MSG
-from encoded.tests.test_permissions import (
-    deleted_user, deleted_user_testapp, bwh_institution
-)
+from dcicutils.qa_utils import notice_pytest_fixtures
 
-pytestmark = [pytest.mark.working]
+from ..custom_embed import ATID_PATTERN, MINIMAL_EMBEDS, FORBIDDEN_MSG
+
+from .test_permissions import bwh_institution, deleted_user, deleted_user_testapp
+
+
+notice_pytest_fixtures(bwh_institution, deleted_user, deleted_user_testapp)
+
+
+pytestmark = [pytest.mark.working, pytest.mark.indexing]
 
 EMBED_URL = "/embed"
 KEYS_NOT_INCLUDED = ["@context", "actions", "aggregated-items", "validation-errors"]
@@ -329,3 +334,11 @@ class TestCustomEmbed:
                 assert bgm_embed[key] == value
         for variant_sample in bgm_variant_samples:
             assert variant_sample["variant_sample_item"] == FORBIDDEN_MSG
+
+    def test_repeated_field_embed(self, testapp, file_fastq):
+        """Test retrieval of repeated field term from item."""
+        file_fastq_uuid = file_fastq["uuid"]
+        fields = ["file_format.file_format"]
+        json_params = {"ids": [file_fastq_uuid], "fields": fields}
+        admin_embed = embed_with_json_params(testapp, json_params)
+        assert admin_embed["file_format"]["file_format"] == "fastq"

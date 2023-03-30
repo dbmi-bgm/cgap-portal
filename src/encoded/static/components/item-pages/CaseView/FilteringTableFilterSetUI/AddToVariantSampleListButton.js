@@ -1,6 +1,6 @@
 'use strict';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import _ from 'underscore';
 
 import { console, ajax, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -22,8 +22,9 @@ export function AddToVariantSampleListButton(props){
         fetchVariantSampleListItem,
         isLoadingVariantSampleListItem = false,
         searchType = "VariantSample",
-        haveEditPermission = true,
-        isEditDisabled = false
+        haveCaseEditPermission = false,
+        isEditDisabled = false,
+        width
     } = props;
 
     const {
@@ -36,24 +37,29 @@ export function AddToVariantSampleListButton(props){
 
     const [ isPatchingVSL, setIsPatchingVSL ] = useState(false);
 
-    const mapSearchTypeToDisplay = { VariantSample: "Variant Sample", StructuralVariantSample: "Structural Variant Sample" };
+    const regularTitle = <React.Fragment><strong>{ selectedVariantSamples.size }</strong> selected variants</React.Fragment>;
 
-    const regularTitle = <React.Fragment>Add <strong>{ selectedVariantSamples.size }</strong> selected { mapSearchTypeToDisplay[searchType] } to Interpretation</React.Fragment>;
+    const style = useMemo(function(){
+        if (typeof width !== "number") {
+            return null;
+        }
+        return { width };
+    }, [ width ]);
 
     /** PATCH or create new VariantSampleList w. additions */
 
     if (isLoadingVariantSampleListItem) {
         return (
-            <button type="button" className="btn btn-primary" disabled>
+            <button type="button" className="btn btn-primary" style={style} disabled>
                 <span className="d-flex align-items-center">
                     <i className="icon icon-circle-notch icon-spin fas mr-1"/>
-                    Loading most recent selections...
+                    Loading selections...
                 </span>
             </button>
         );
     } else if (isPatchingVSL) {
         return (
-            <button type="button" className="btn btn-primary" disabled>
+            <button type="button" className="btn btn-primary" style={style} disabled>
                 <span className="d-flex align-items-center">
                     <i className="icon icon-circle-notch icon-spin fas mr-1"/>
                     Saving selections...
@@ -62,16 +68,16 @@ export function AddToVariantSampleListButton(props){
         );
     } else if (selectedVariantSamples.size === 0) {
         return (
-            <button type="button" className="btn btn-primary" disabled>
+            <button type="button" className="btn btn-primary" style={style} disabled>
                 <span>
-                    No {mapSearchTypeToDisplay[searchType]}s selected
+                    No selected variants
                 </span>
             </button>
         );
-    } else if (!haveEditPermission) {
+    } else if (!haveCaseEditPermission) {
         // Primary button style; is possible this Case is public
         return (
-            <button type="button" className="btn btn-primary" disabled>
+            <button type="button" className="btn btn-primary text-truncate" style={style} disabled>
                 <span data-tip="No edit permission.">
                     { regularTitle }
                 </span>
@@ -82,7 +88,7 @@ export function AddToVariantSampleListButton(props){
         // Also disable if no variantSampleListItem (and it not loading) yet an existing VSL is present.
         // Indicates lack of view permission for existing VSL (most likely no edit permission disabled for Case anyways, but permissions may change/differ in future)
         return (
-            <button type="button" className="btn btn-danger" disabled>
+            <button type="button" className="btn btn-danger text-truncate" style={style} disabled>
                 <span data-tip="Check for any errors above such as a duplicate filter block name or a change to the contents of a filter block that has been used to add a sample already. Otherwise, check user permissions.">
                     { regularTitle }
                 </span>
@@ -256,7 +262,7 @@ export function AddToVariantSampleListButton(props){
         };
 
         return (
-            <button type="button" className="btn btn-primary" onClick={onButtonClick}>
+            <button type="button" className="btn btn-primary text-truncate" style={style} onClick={onButtonClick}>
                 <span>
                     { regularTitle }
                 </span>

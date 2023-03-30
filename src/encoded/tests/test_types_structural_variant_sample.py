@@ -100,7 +100,7 @@ def test_project_specific_structural_variant_sample_genelist(
 ):
     """
     Test structural variant samples correctly matched with gene lists
-    based on gene list project. 
+    based on gene list project.
 
     If project is CGAP_CORE_PROJECT or same as variant sample project,
     the two should be associated.
@@ -170,3 +170,69 @@ def test_case_specific_structural_variant_sample_genelist(
         structural_variant_sample_post["@id"], {}, status=200
     ).json["@graph"][0]
     assert genelist_title in structural_variant_sample_patch["associated_genelists"]
+
+
+def test_display_title(testapp, x_structural_variant_sample):
+    """Test SVSample display title."""
+    display_title = x_structural_variant_sample["display_title"]
+    assert display_title == "DUP_chrX:1000-2000 (some_sample)"
+
+
+@pytest.mark.parametrize(
+    "paired_reads,expected_ref_paired_reads,expected_alt_paired_reads",
+    [
+        (None, None, None),
+        ([0, 1], 0, 1),
+        ([1, 0], 1, 0),
+    ],
+)
+def test_paired_reads_parsing(
+    testapp,
+    x_structural_variant_sample,
+    paired_reads,
+    expected_ref_paired_reads,
+    expected_alt_paired_reads,
+):
+    """Test splitting of paired_reads into reference and alternate
+    calcprops.
+    """
+    item_atid = x_structural_variant_sample["@id"]
+    if paired_reads:
+        patch_body = {"paired_reads": paired_reads}
+    else:
+        patch_body = {}
+    result = testapp.patch_json(item_atid, patch_body, status=200).json["@graph"][0]
+    reference_paired_reads = result.get("reference_paired_reads")
+    alternate_paired_reads = result.get("alternate_paired_reads")
+    assert reference_paired_reads == expected_ref_paired_reads
+    assert alternate_paired_reads == expected_alt_paired_reads
+
+
+@pytest.mark.parametrize(
+    "split_reads,expected_ref_split_reads,expected_alt_split_reads",
+    [
+        (None, None, None),
+        ([0, 1], 0, 1),
+        ([1, 0], 1, 0),
+    ],
+)
+def test_split_reads_parsing(
+    testapp,
+    x_structural_variant_sample,
+    split_reads,
+    expected_ref_split_reads,
+    expected_alt_split_reads,
+):
+    """Test splitting of split_reads into reference and alternate
+    calcprops.
+    """
+    item_atid = x_structural_variant_sample["@id"]
+    if split_reads:
+        patch_body = {"split_reads": split_reads}
+    else:
+        patch_body = {}
+    result = testapp.patch_json(item_atid, patch_body, status=200).json["@graph"][0]
+    reference_split_reads = result.get("reference_split_reads")
+    alternate_split_reads = result.get("alternate_split_reads")
+    assert reference_split_reads == expected_ref_split_reads
+    assert alternate_split_reads == expected_alt_split_reads

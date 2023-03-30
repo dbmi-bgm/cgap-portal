@@ -219,7 +219,7 @@ const DetailText = React.memo(function DetailText (props) {
             diseasesRows.push(<div className="line-item" key="end"><em>and { difference } more...</em></div>);
         }
 
-        diseasesBody = <ul>{ diseasesRows }</ul>;
+        diseasesBody = <ul className="text-capitalize">{ diseasesRows }</ul>;
     }
 
     return (

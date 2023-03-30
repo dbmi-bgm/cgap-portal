@@ -284,8 +284,7 @@ def get_es_mapping(es, es_index):
         return {}
     else:
         index = es.indices.get(es_index)
-        item_type = list(index[es_index]['mappings'].keys())[0]
-        return index[es_index]['mappings'][item_type]['properties']
+        return index[es_index]['mappings']['properties']
 
 
 def get_search_fields(request, doc_types):
@@ -338,7 +337,6 @@ def execute_search(*, es, query, index, from_, size, session_id=None):
     es_results = None
     try:
         # set timeout
-        # log.error(query['query'])  # uncomment to get queries in pytest - Will Aug 23 2021
         es_results = es.search(index=index, body=query, from_=from_, size=size, timeout='30s', preference=session_id)
     except ConnectionTimeout:
         err_exp = 'The search failed due to a timeout. Please try a different query.'
@@ -363,8 +361,8 @@ def execute_search(*, es, query, index, from_, size, session_id=None):
     return es_results
 
 
-def make_search_subreq(request, path):
-    subreq = make_subrequest(request, path)
+def make_search_subreq(request, path, **kwargs):
+    subreq = make_subrequest(request, path, **kwargs)
     if hasattr(request, "_stats"):
         subreq._stats = request._stats
     subreq.registry = request.registry

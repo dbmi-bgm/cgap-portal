@@ -16,6 +16,7 @@ import { SearchBar } from './../../browse/SearchBar';
 import { AboveTableControlsBaseCGAP } from './../../browse/AboveTableControlsBaseCGAP';
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
+import FeedbackButton from '../../item-pages/components/FeedbackButton';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -36,9 +37,11 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
         <React.Fragment>
 
             <div className="dashboard-header">
-                <div className="container-wide d-flex align-items-center">
-                    <i className="icon icon-fw icon-home fas mr-1" />
-                    <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
+                <div className="container-wide d-flex align-items-center justify-content-between">
+                    <div className="align-items-center d-flex">
+                        <i className="icon icon-fw icon-home fas mr-1" />
+                        <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
+                    </div>
                 </div>
             </div>
 
@@ -54,7 +57,6 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
 const RecentCasesTable = React.memo(function RecentCasesTable({ windowHeight, windowWidth }){
     const searchHref = (
         "/search/?type=Case"
-        + "&report.uuid!=No+value"
         + "&proband_case=true"
         + "&status!=inactive"
         + "&sort=-last_modified.date_modified"
@@ -125,13 +127,13 @@ const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props)
                     <DropdownButton variant="primary d-flex align-items-center" id="submit-new" className="px-1"
                         title={<React.Fragment><i className="icon fas icon-plus mr-1"/>Submit New...</React.Fragment>}>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
-                            Case(s)
+                            Case
                         </Dropdown.Item>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Family History">
                             Family History
                         </Dropdown.Item>
                         <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add&submissionType=Gene List">
-                            Gene List(s)
+                            Gene List
                         </Dropdown.Item>
                     </DropdownButton>
 
@@ -278,7 +280,7 @@ function ProjectSelectDropdown(props){
         <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
             title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
             variant="outline-dark" className={className}>
-            <DropdownItem eventKey={0} active={!projectFilterTerm}>
+            <DropdownItem eventKey={null} active={!projectFilterTerm}>
                 <span className="text-600">All Projects</span>
             </DropdownItem>
             { renderedOptions }

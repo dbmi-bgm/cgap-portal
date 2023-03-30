@@ -50,16 +50,14 @@ from urllib.parse import (
 )
 from ..authentication import session_properties
 from ..search.search import make_search_subreq
-from ..util import make_s3_client
+from ..util import check_user_is_logged_in, make_s3_client
 from .base import (
     Item,
     get_item_or_none,
     collection_add,
     item_edit,
     PROJECT_MEMBER_CREATE_ACL,
-    # lab_award_attribution_embed_list,
 )
-from ..util import check_user_is_logged_in
 
 
 logging.getLogger('boto3').setLevel(logging.CRITICAL)
@@ -178,6 +176,26 @@ def property_closure(request, propname, root_uuid):
     return seen
 
 
+def _build_file_embedded_list():
+    """Embedded list for File type."""
+    return [
+        # FileFormat linkTo
+        "file_format.file_format",
+
+        # File linkTo
+        "related_files.relationship_type",
+        "related_files.file.accession",
+        "related_files.file.file_format.file_format",
+
+        # QC
+        "quality_metric.@type",
+        "quality_metric.qc_list.qc_type",
+        "quality_metric.qc_list.value.uuid",
+
+        "project.lifecycle_management_active"
+    ]
+
+
 @abstract_collection(
     name='files',
     unique_key='accession',
@@ -191,20 +209,7 @@ class File(Item):
     item_type = 'file'
     base_types = ['File'] + Item.base_types
     schema = load_schema('encoded:schemas/file.json')
-    embedded_list = Item.embedded_list + [
-        # FileFormat linkTo
-        'file_format.file_format',
-
-        # File linkTo
-        'related_files.relationship_type',
-        'related_files.file.accession',
-        'related_files.file.file_format.file_format',
-
-        # QC
-        'quality_metric.@type',
-        'quality_metric.qc_list.qc_type',
-        'quality_metric.qc_list.value.uuid'
-    ]
+    embedded_list = _build_file_embedded_list()
     name_key = 'accession'
 
     @calculated_property(schema={
@@ -297,7 +302,7 @@ class File(Item):
             file_formats = []
             for xfile in extra_files:
                 # ensure a file_format (identifier for extra_file) is given and non-null
-                if not('file_format' in xfile and bool(xfile['file_format'])):
+                if not ('file_format' in xfile and bool(xfile['file_format'])):
                     continue
                 eformat = xfile['file_format']
                 if eformat.startswith('/file-formats/'):
@@ -314,7 +319,9 @@ class File(Item):
 
                 xfile['accession'] = properties.get('accession')
                 # just need a filename to trigger creation of credentials
-                xfile['filename'] = xfile['accession']
+                xfile_name = xfile.get("filename")
+                if xfile_name is None:
+                    xfile['filename'] = xfile['accession']
                 xfile['uuid'] = str(uuid)
                 # if not 'status' in xfile or not bool(xfile['status']):
                 #    xfile['status'] = properties.get('status')
@@ -567,6 +574,61 @@ class FileFastq(File):
         return self.rev_link_atids(request, "workflow_run_outputs")
 
 
+def _build_file_submitted_embedded_list():
+    """Embedded list for FileSubmitted items."""
+    return _build_file_embedded_list() + file_workflow_run_embeds + [
+        "quality_metric.overall_quality_status",
+        "quality_metric.Total Sequences",
+        "quality_metric.Sequence length",
+        "quality_metric.url",
+    ]
+
+
+@collection(
+    name="files-submitted",
+    unique_key="accession",
+    properties={
+        "title": "Submitted Files",
+        "description": "Listing of Submitted Files",
+    })
+class FileSubmitted(File):
+    """Collection for individual submitted files."""
+    item_type = 'file_submitted'
+    schema = load_schema('encoded:schemas/file_submitted.json')
+    embedded_list = _build_file_submitted_embedded_list()
+    name_key = 'accession'
+    rev = dict(File.rev, **{
+        'workflow_run_inputs': ('WorkflowRun', 'input_files.value'),
+        'workflow_run_outputs': ('WorkflowRun', 'output_files.value'),
+    })
+
+    @calculated_property(schema={
+        "title": "Input of Workflow Runs",
+        "description": "All workflow runs that this file serves as an input to",
+        "type": "array",
+        "items": {
+            "title": "Input of Workflow Run",
+            "type": ["string", "object"],
+            "linkTo": "WorkflowRun"
+        }
+    })
+    def workflow_run_inputs(self, request):
+        return self.rev_link_atids(request, "workflow_run_inputs")
+
+    @calculated_property(schema={
+        "title": "Output of Workflow Runs",
+        "description": "All workflow runs that this file serves as an output from",
+        "type": "array",
+        "items": {
+            "title": "Output of Workflow Run",
+            "type": "string",
+            "linkTo": "WorkflowRun"
+        }
+    })
+    def workflow_run_outputs(self, request):
+        return self.rev_link_atids(request, "workflow_run_outputs")
+
+
 @collection(
     name='files-processed',
     unique_key='accession',
@@ -675,7 +737,7 @@ def post_upload(context, request):
     properties = context.upgrade_properties()
     if properties['status'] not in ('uploading', 'to be uploaded by workflow', 'upload failed'):
         raise HTTPForbidden('status must be "uploading" to issue new credentials')
-    accession_or_external = properties.get('accession')
+    # accession_or_external = properties.get('accession')
     external = context.propsheets.get('external', None)
 
     if external is None:

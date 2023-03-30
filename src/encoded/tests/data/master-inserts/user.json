@@ -319,23 +319,6 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "email": "sarah_reiff@hms.harvard.edu",
-        "first_name": "Sarah",
-        "last_name": "Reiff",
-        "uuid": "834559db-a3f6-462c-81a4-f5d7e5e65707",
-        "groups": [
-            "admin"
-        ],
-        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [
-            {
-                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                "role": "developer"
-            }
-        ],
-        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
-    },
-    {
         "email": "peter_park@hms.harvard.edu",
         "first_name": "Peter",
         "last_name": "Park",
@@ -370,10 +353,10 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "email": "phil_grayson@hms.harvard.edu",
-        "first_name": "Phil",
-        "last_name": "Grayson",
-        "uuid": "3846c019-f2c7-4612-b9b1-9c1375e0c2c4",
+        "email": "victoria_stevens@hms.harvard.edu",
+        "first_name": "Victoria",
+        "last_name": "Stevens",
+        "uuid": "e34b090e-aa4e-494c-9bb3-79d0dbce0355",
         "groups": [
             "admin"
         ],
@@ -391,10 +374,16 @@
         "first_name": "Shannon",
         "last_name": "Ehmsen",
         "uuid": "c58ac2fe-fccb-4d21-992d-62a078c2dbc0",
-        "groups": ["admin"],
+        "groups": [
+            "admin"
+        ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-        "project_roles": [{"project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
-                           "role": "developer"}],
+        "project_roles": [
+            {
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                "role": "developer"
+            }
+        ],
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
@@ -413,5 +402,23 @@
             }
         ],
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
+        "email": "david_michaels@hms.harvard.edu",
+        "groups": [
+            "admin"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "timezone": "US/Eastern",
+        "last_name": "Michaels",
+        "first_name": "David",
+        "project_roles": [
+            {
+                "role": "developer",
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+        "uuid": "74fef71a-dfc1-4aa4-acc0-cedcb7ac1d68"
     }
 ]

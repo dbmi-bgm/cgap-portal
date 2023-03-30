@@ -47,6 +47,15 @@
         },
         {
             "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/submitted_files"
+        },
+        {
+            "$ref": "mixins.json#/processed_files"
+        },
+        {
+            "$ref": "mixins.json#/meta_workflow_runs"
         }
     ],
     "properties": {
@@ -54,7 +63,7 @@
             "accessionType": "SA"
         },
         "schema_version": {
-            "default": "1"
+            "default": "2"
         },
         "workup_type": {
             "title": "Workup Type",
@@ -470,45 +479,6 @@
                     "format": "date"
                 }
             ]
-        },
-        "files": {
-            "title": "Fastq Files",
-            "description": "Information about the data files associated with the sample.",
-            "type": "array",
-            "label": "test",
-            "lookup": 300,
-            "items": {
-                "title": "File",
-                "description": "File metadata.",
-                "type": "string",
-                "linkTo": "File"
-            }
-        },
-        "cram_files": {
-            "title": "CRAM Files",
-            "description": "Input alignment files.",
-            "type": "array",
-            "label": "test",
-            "lookup": 310,
-            "items": {
-                "title": "CRAM File",
-                "description": "File metadata.",
-                "type": "string",
-                "linkTo": "FileProcessed"
-            }
-        },
-        "processed_files": {
-            "title": "Processed Files",
-            "description": "Processed files that are derived from files in this sample.",
-            "type": "array",
-            "label": "test",
-            "lookup": 330,
-            "items": {
-                "title": "Processed File",
-                "description": "File metadata.",
-                "type": "string",
-                "linkTo": "FileProcessed"
-            }
         },
         "reference_files": {
             "title": "Reference Files",

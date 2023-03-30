@@ -6,11 +6,11 @@ import pytest
 
 from collections import OrderedDict
 from dcicutils import s3_utils
+from dcicutils.qa_utils import MockFileSystem
 # from rdflib import URIRef
 from unittest import mock
 from ..commands import generate_items_from_owl as gifo
 from ..commands.owltools import Owler
-from dcicutils.qa_utils import MockFileSystem
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -27,7 +27,7 @@ def test_gifo_get_args_defaults():
     assert args.full is False
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def owler():
     with mock.patch.object(gifo, 'Owler') as mocked:
         yield mocked
@@ -99,10 +99,12 @@ TEST_KEYS_FILE_CONTENTS = '{"%(key_name)s": %(key_val)s}' % {
 
 def test_connect2server_w_key_and_keyfile(connection):
     keyfile = "some.file"
+
     def mocked_open(filename, mode):
         assert filename == keyfile
         assert mode == 'r'
         return io.StringIO(TEST_KEYS_FILE_CONTENTS)
+
     with mock.patch.object(os.path, 'isfile', return_value=True):
         with mock.patch.object(io, "open", side_effect=mocked_open):
             retval = gifo.connect2server(None, keyfile=keyfile, key=TEST_KEYS_FILE_KEY)
@@ -396,8 +398,8 @@ def returned_synonyms():
     n = 4
     lists = [[], ['test_val1'], ['test_val1', 'test_val2']]
     copies = []
-    for l in lists:
-        copies.extend([l.copy() for i in range(n)])
+    for lst in lists:
+        copies.extend([lst.copy() for i in range(n)])
     return copies
 
 

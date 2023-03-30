@@ -12,6 +12,10 @@ import time
 import transaction
 import uuid
 
+from dcicutils.misc_utils import PRINT
+from dcicutils.qa_utils import notice_pytest_fixtures, Eventually
+# from elasticsearch.exceptions import NotFoundError
+from snovault.tools import index_n_items_for_testing, make_es_count_checker
 from snovault import DBSESSION, TYPES
 from snovault.elasticsearch import create_mapping, ELASTIC_SEARCH
 from snovault.elasticsearch.create_mapping import (
@@ -22,39 +26,46 @@ from snovault.elasticsearch.create_mapping import (
 )
 from snovault.elasticsearch.indexer_utils import get_namespaced_index, compute_invalidation_scope
 from snovault.elasticsearch.interfaces import INDEXER_QUEUE
-from sqlalchemy import MetaData, func
+from snovault.storage import Base
+from sqlalchemy import MetaData, func, exc
 from timeit import default_timer as timer
 from unittest import mock
 from zope.sqlalchemy import mark_changed
+# from .helpers import local_collections
+# from .datafixtures import post_if_needed
 from .. import main, loadxl
+# from ..util import delay_rerun
 from ..verifier import verify_item
 
 
-pytestmark = [pytest.mark.working, pytest.mark.indexing]
+pytestmark = [pytest.mark.working, pytest.mark.indexing, pytest.mark.es]
 
 
-POSTGRES_MAJOR_VERSION_EXPECTED = 11
+# These 4 versions are known to be compatible, older versions should not be
+# used, odds are 15 can be used as well - Will Jan 7 2023
+POSTGRES_COMPATIBLE_MAJOR_VERSIONS = ['11', '12', '13', '14']
 
 
 def test_postgres_version(session):
-
+    """ Tests that the local postgres is running one of the compatible versions """
     (version_info,) = session.query(func.version()).one()
-    print("version_info=", version_info)
+    PRINT("version_info=", version_info)
     assert isinstance(version_info, str)
-    assert re.match("PostgreSQL %s([.][0-9]+)? " % POSTGRES_MAJOR_VERSION_EXPECTED, version_info)
+    assert re.match("PostgreSQL (%s)([.][0-9]+)? " % '|'.join(POSTGRES_COMPATIBLE_MAJOR_VERSIONS), version_info)
 
 
 # subset of collections to run test on
 TEST_COLLECTIONS = ['testing_post_put_patch', 'file_processed']
 
 
-@pytest.yield_fixture(scope='session', params=[False])
+@pytest.fixture(scope='session')
 def app(es_app_settings, request):
+    notice_pytest_fixtures(request)
     # for now, don't run with mpindexer. Add `True` to params above to do so
-    if request.param:
-        # we disable the MPIndexer since the build runs on a small machine
-        # snovault should be testing the mpindexer - Will 12/12/2020
-        es_app_settings['mpindexer'] = False
+    # if request.param:
+    #     # we disable the MPIndexer since the build runs on a small machine
+    #     # snovault should be testing the mpindexer - Will 12/12/2020
+    #     es_app_settings['mpindexer'] = True
     app = main({}, **es_app_settings)
 
     yield app
@@ -64,66 +75,94 @@ def app(es_app_settings, request):
     db_session.bind.pool.dispose()
 
 
-@pytest.yield_fixture
-def setup_and_teardown(app):
+@pytest.fixture
+def setup_and_teardown(es_app):
     """
     Run create mapping and purge queue before tests and clear out the
     DB tables after the test
     """
 
     # BEFORE THE TEST - run create mapping for tests types and clear queues
-    create_mapping.run(app, collections=TEST_COLLECTIONS, skip_indexing=True)
-    app.registry[INDEXER_QUEUE].clear_queue()
+    create_mapping.run(es_app, collections=TEST_COLLECTIONS, skip_indexing=True)
+    es_app.registry[INDEXER_QUEUE].clear_queue()
 
     yield  # run the test
 
     # AFTER THE TEST
-    session = app.registry[DBSESSION]
+    session = es_app.registry[DBSESSION]
     connection = session.connection().connect()
     meta = MetaData(bind=session.connection())
     meta.reflect()
-    for table in meta.sorted_tables:
-        print('Clear table %s' % table)
-        print('Count before -->', str(connection.scalar("SELECT COUNT(*) FROM %s" % table)))
-        connection.execute(table.delete())
-        print('Count after -->', str(connection.scalar("SELECT COUNT(*) FROM %s" % table)), '\n')
+    # sqlalchemy 1.4 - use TRUNCATE instead of DELETE
+    while True:
+        try:
+            table_names = ','.join(table.name for table in reversed(Base.metadata.sorted_tables))
+            connection.execute(f'TRUNCATE {table_names} RESTART IDENTITY;')
+            break
+        except exc.OperationalError as e:
+            if 'statement timeout' in str(e):
+                continue
+            else:
+                raise
+        except exc.InternalError as e:
+            if 'current transaction is aborted' in str(e):
+                break
+            else:
+                raise
     session.flush()
-    mark_changed(session())
+    mark_changed(session())  # Has it always changed? -kmp 12-Oct-2022
     transaction.commit()
 
 
 @pytest.mark.slow
 @pytest.mark.flaky
 def test_indexing_simple(app, setup_and_teardown, testapp, indexer_testapp):
+    notice_pytest_fixtures(setup_and_teardown)  # unused here, but has a side-effect
+
     es = app.registry['elasticsearch']
     namespaced_ppp = get_namespaced_index(app, 'testing_post_put_patch')
-    doc_count = es.count(index=namespaced_ppp, doc_type='testing_post_put_patch').get('count')
+    doc_count = es.count(index=namespaced_ppp).get('count')
     assert doc_count == 0
     # First post a single item so that subsequent indexing is incremental
     testapp.post_json('/testing-post-put-patch/', {'required': ''})
-    res = indexer_testapp.post_json('/index', {'record': True})
-    assert res.json['indexing_count'] == 1
+
+    index_n_items_for_testing(indexer_testapp, 1, max_tries=30)
+
+    # res = indexer_testapp.post_json('/index', {'record': True})
+    # assert res.json['indexing_count'] == 1
+
     res = testapp.post_json('/testing-post-put-patch/', {'required': ''})
     uuid = res.json['@graph'][0]['uuid']
-    res = indexer_testapp.post_json('/index', {'record': True})
-    assert res.json['indexing_count'] == 1
-    time.sleep(3)
+
+    index_n_items_for_testing(indexer_testapp, 1)
+    # res = indexer_testapp.post_json('/index', {'record': True})
+    # assert res.json['indexing_count'] == 1
+
+    Eventually.call_assertion(make_es_count_checker(2, es=es, namespaced_index=namespaced_ppp))
+
+    # time.sleep(3)
     # check es directly
-    doc_count = es.count(index=namespaced_ppp, doc_type='testing_post_put_patch').get('count')
-    assert doc_count == 2
-    res = testapp.get('/search/?type=TestingPostPutPatch')
-    uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
-    count = 0
-    while uuid not in uuids and count < 20:
-        time.sleep(1)
+    # doc_count = es.count(index=namespaced_ppp).get('count')
+    # assert doc_count == 2
+
+    @Eventually.consistent(tries=25, wait_seconds=1)
+    def check_for_uuids():
         res = testapp.get('/search/?type=TestingPostPutPatch')
         uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
-        count += 1
-    assert res.json['total'] >= 2
-    assert uuid in uuids
+        assert res.json['total'] >= 2
+        assert uuid in uuids
+
+    # count = 0
+    # while uuid not in uuids and count < 20:
+    #     time.sleep(1)
+    #     res = testapp.get('/search/?type=TestingPostPutPatch')
+    #     uuids = [indv_res['uuid'] for indv_res in res.json['@graph']]
+    #     count += 1
+    # assert res.json['total'] >= 2
+    # assert uuid in uuids
 
     namespaced_indexing = get_namespaced_index(app, 'indexing')
-    indexing_doc = es.get(index=namespaced_indexing, doc_type='indexing', id='latest_indexing')
+    indexing_doc = es.get(index=namespaced_indexing, id='latest_indexing')
     indexing_source = indexing_doc['_source']
     assert 'indexing_count' in indexing_source
     assert 'indexing_finished' in indexing_source
@@ -138,7 +177,6 @@ def test_indexing_simple(app, setup_and_teardown, testapp, indexer_testapp):
     assert testing_ppp_settings['settings']['index']['number_of_shards'] == '1'
 
 
-@pytest.mark.skip
 @pytest.mark.flaky
 def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, elasticsearch):
     """
@@ -146,6 +184,7 @@ def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, 
     Do this by checking es directly before and after running mapping.
     Delete an index directly, run again to see if it recovers.
     """
+    notice_pytest_fixtures(setup_and_teardown)
     es = registry[ELASTIC_SEARCH]
     item_types = TEST_COLLECTIONS
     # check that mappings and settings are in index
@@ -156,7 +195,7 @@ def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, 
             item_index = es.indices.get(index=namespaced_index)
         except Exception:
             assert False
-        found_index_mapping_emb = item_index[namespaced_index]['mappings'][item_type]['properties']['embedded']
+        found_index_mapping_emb = item_index[namespaced_index]['mappings']['properties']['embedded']
         found_index_settings = item_index[namespaced_index]['settings']
         assert found_index_mapping_emb
         assert found_index_settings
@@ -169,6 +208,7 @@ def test_create_mapping_on_indexing(app, setup_and_teardown, testapp, registry, 
 
 @pytest.mark.flaky
 def test_file_processed_detailed(app, setup_and_teardown, testapp, indexer_testapp, project, institution, file_formats):
+    notice_pytest_fixtures(setup_and_teardown)
     # post file_processed
     item = {
         'institution': institution['uuid'],
@@ -234,6 +274,7 @@ def test_real_validation_error(app, setup_and_teardown, indexer_testapp, testapp
     Create an item (file-processed) with a validation error and index,
     to ensure that validation errors work
     """
+    notice_pytest_fixtures(setup_and_teardown)
     es = app.registry[ELASTIC_SEARCH]
     fp_body = {
         'schema_version': '3',
@@ -257,7 +298,7 @@ def test_real_validation_error(app, setup_and_teardown, indexer_testapp, testapp
     indexer_testapp.post_json('/index', {'record': True})
     time.sleep(2)
     namespaced_fp = get_namespaced_index(app, 'file_processed')
-    es_res = es.get(index=namespaced_fp, doc_type='file_processed', id=res['@graph'][0]['uuid'])
+    es_res = es.get(index=namespaced_fp, id=res['@graph'][0]['uuid'])
     assert len(es_res['_source'].get('validation_errors', [])) == 1
     # check that validation-errors view works
     val_err_view = testapp.get(fp_id + '@@validation-errors', status=200).json
@@ -281,7 +322,7 @@ def test_load_and_index_perf_data(testapp, setup_and_teardown, indexer_testapp):
     it takes roughly 25 to run.
     Note: run with bin/test -s -m performance to see the prints from the test
     """
-
+    notice_pytest_fixtures(setup_and_teardown)
     insert_dir = pkg_resources.resource_filename('encoded', 'tests/data/perf-testing/')
     inserts = [f for f in os.listdir(insert_dir) if os.path.isfile(os.path.join(insert_dir, f))]
     json_inserts = {}
@@ -341,19 +382,23 @@ class TestInvalidationScopeViewCGAP:
                 'target_type': target_type
             }
 
+    # source_type is the item being edited, target_type is the item we are simulating invalidation one
     @pytest.mark.parametrize('source_type, target_type, invalidated', [
-        # Test WorkflowRun (same as fourfront)
         ('FileProcessed', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['accession', 'filename', 'file_format', 'file_size']
+            DEFAULT_SCOPE + ['accession', 'file_format', 'file_size', 'filename', 'quality_metric']
          ),
         ('Software', 'WorkflowRunAwsem',
             DEFAULT_SCOPE + ['name', 'title', 'version', 'source_url']
          ),
         ('Workflow', 'WorkflowRunAwsem',
-            DEFAULT_SCOPE + ['category', 'experiment_types', 'app_name', 'title']
+            DEFAULT_SCOPE + ['app_name', 'category', 'experiment_types', 'name', 'steps.name', 'title']
          ),
-        ('WorkflowRunAwsem', 'FileProcessed',  # no link
-            DEFAULT_SCOPE
+        ('Software', 'WorkflowRunAwsem',
+            DEFAULT_SCOPE + ['name', 'version', 'title', 'source_url']
+         ),
+        ('WorkflowRunAwsem', 'FileProcessed',
+            DEFAULT_SCOPE + ['input_files.workflow_argument_name', 'output_files.workflow_argument_name', 'title',
+                             'workflow']
          ),
         # Test Case as it has the most links and thus the most ways things can go wrong
         ('VariantSample', 'Case',
@@ -368,7 +413,9 @@ class TestInvalidationScopeViewCGAP:
                              'schema_version', 'aliases', 'institution', 'project', 'individual_id', 'age',
                              'age_units', 'is_pregnancy', 'gestational_age', 'sex', 'quantity',
                              'phenotypic_features.phenotypic_feature', 'phenotypic_features.onset_age',
-                             'phenotypic_features.onset_age_units', 'disorders', 'clinic_notes', 'birth_year',
+                             'phenotypic_features.onset_age_units', 'clinic_notes', 'birth_year',
+                             'disorders.disorder', 'disorders.onset_age', 'disorders.onset_age_units',
+                             'disorders.diagnostic_confidence', 'disorders.is_primary_diagnosis',
                              'is_deceased', 'life_status', 'is_termination_of_pregnancy',
                              'is_spontaneous_abortion', 'is_still_birth', 'cause_of_death',
                              'age_at_death', 'age_at_death_units', 'is_no_children_by_choice',
@@ -377,11 +424,11 @@ class TestInvalidationScopeViewCGAP:
                              'mother', 'father', 'samples']
          ),
         ('Sample', 'Case',
-            DEFAULT_SCOPE + ['accession', 'workup_type', 'specimen_type',
-                             'specimen_accession_date', 'specimen_collection_date',
-                             'specimen_accession', 'specimen_notes', 'sequence_id',
-                             'sequencing_date', 'completed_processes', 'bam_sample_id',
-                             'indication']
+            DEFAULT_SCOPE + ['accession', 'bam_sample_id', 'completed_processes', 'files', 'indication',
+                             'last_modified.date_modified', 'last_modified.modified_by', 'other_processed_files.files',
+                             'processed_files', 'sequence_id', 'sequencing_date', 'specimen_accession',
+                             'specimen_accession_date', 'specimen_collection_date', 'specimen_notes',
+                             'specimen_type', 'workup_type']
          ),
         ('Family', 'Case',
             DEFAULT_SCOPE + ['institution', 'project', 'tags', 'last_modified.date_modified',
@@ -394,11 +441,12 @@ class TestInvalidationScopeViewCGAP:
             DEFAULT_SCOPE + ['hpo_id', 'phenotype_name']
          ),
         ('FileProcessed', 'Case',
-            DEFAULT_SCOPE + ['accession', 'quality_metric', 'file_ingestion_status',
-                             'file_type', 'variant_type']
+            DEFAULT_SCOPE + ['accession', 'file_format', 'file_ingestion_status', 'file_type',
+                             'last_modified.date_modified', 'last_modified.modified_by', 'quality_metric',
+                             'variant_type']
          ),
         ('Report', 'Case',
-            DEFAULT_SCOPE + ['accession']
+            DEFAULT_SCOPE + ['accession', 'last_modified.date_modified', 'last_modified.modified_by']
          ),
         ('FilterSet', 'Case',
             DEFAULT_SCOPE + ['notes', 'tags', 'last_modified.date_modified', 'last_modified.modified_by',
@@ -410,7 +458,7 @@ class TestInvalidationScopeViewCGAP:
          ),
         ('Project', 'Case',
             DEFAULT_SCOPE + ['name']
-         ),
+         )
     ])
     def test_invalidation_scope_view_parametrized(self, indexer_testapp, source_type, target_type, invalidated):
         """ Just call the route function - test some basic interactions.
@@ -421,5 +469,4 @@ class TestInvalidationScopeViewCGAP:
         """
         req = self.MockedRequest(indexer_testapp.app.registry, source_type, target_type)
         scope = compute_invalidation_scope(None, req)
-        print(scope['Invalidated'])
         assert sorted(scope['Invalidated']) == sorted(invalidated)

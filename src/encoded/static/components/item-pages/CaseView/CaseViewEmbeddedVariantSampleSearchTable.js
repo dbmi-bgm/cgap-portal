@@ -1,32 +1,32 @@
 'use strict';
 
-import React, { useMemo, useCallback } from 'react';
+import React, { useMemo, useCallback, useRef, useState } from 'react';
+import memoize from 'memoize-one';
 import Popover  from 'react-bootstrap/esm/Popover';
+import Overlay from 'react-bootstrap/esm/Overlay';
 import OverlayTrigger from 'react-bootstrap/esm/OverlayTrigger';
+import ReactTooltip from 'react-tooltip';
 
 import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+import { DisplayTitleColumnWrapper, flattenColumnsDefinitionsSortFields } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
+
+import { IconCheckbox } from '../../forms/IconCheckbox';
 import { EmbeddedItemSearchTable } from './../components/EmbeddedItemSearchTable';
-import { navigateChildWindow } from './../components/child-window-reuser';
+import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
+import { TechnicalReviewColumn } from './TechnicalReviewColumn';
 
 /* Used in FilteringTab */
 
-/**
- * This table is wrapped by `SelectedItemsController` in FilteringTab which passes in selected items and methods to select/deselect, as well.
- * `SelectedItemsController` is originally used for selecting multiple items in new window, e.g. for HiGlass files selection. It has some methods which are unnecessary or unused.
- */
+
+
+
+
 export function CaseViewEmbeddedVariantSampleSearchTable(props){
     const {
         // Get/reuse default colExtMap from EmbeddedItemSearchTable
         columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
-        selectedVariantSamples,
-        onSelectVariantSample,
-        savedVariantSampleIDMap = {},
-        isLoadingVariantSampleListItem,
-        currFilterSet,
-        // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
 
@@ -36,45 +36,63 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
             "display_title" : {
                 // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
                 ...originalColExtMap.display_title,
-                "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
-                "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
+                "widthMap": { 'lg' : 200, 'md' : 200, 'sm' : 180 },
                 "render": function(result, parentProps){
-                    const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+                    const { context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
                     return (
-                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
-                            selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, context, rowNumber, detailOpen, toggleDetailOpen }}>
                             <VariantSampleDisplayTitleColumn />
                         </VariantSampleDisplayTitleColumnWrapper>
                     );
                 }
-            },
-            "__matching_filter_block_names": {
-                // Is only shown when multiple filter blocks requested.
-                "noSort": true,
-                "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
-                "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
-                "render": function(result, props) {
-                    const { __matching_filter_block_names = [] } = result;
-                    if (__matching_filter_block_names.length === 0) {
-                        return null;
-                    }
-                    return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
+            }
+        };
+    }, [ originalColExtMap ]);
+
+    return <CaseViewEmbeddedVariantSampleSearchTableBase {...passProps} columnExtensionMap={columnExtensionMap} />;
+}
+
+
+export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
+    const {
+        // Get/reuse default colExtMap from EmbeddedItemSearchTable
+        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        ...passProps
+    } = props;
+
+    const columnExtensionMap = useMemo(function() {
+        return {
+            ...originalColExtMap,
+            "display_title" : {
+                // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
+                ...originalColExtMap.display_title,
+                "widthMap": { 'lg' : 230, 'md' : 200, 'sm' : 180 },
+                "render": function(result, parentProps){
+                    const { context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+                    return (
+                        <VariantSampleDisplayTitleColumnWrapper {...{ result, context, rowNumber, detailOpen, toggleDetailOpen }}>
+                            <VariantSampleDisplayTitleColumnSV />
+                        </VariantSampleDisplayTitleColumnWrapper>
+                    );
                 }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet ]);
+    }, [ originalColExtMap ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
+    return <CaseViewEmbeddedVariantSampleSearchTableBase {...passProps} columnExtensionMap={columnExtensionMap} />;
 }
 
+
 /**
- * @todo
- * Consider having this render out <CaseViewEmbeddedVariantSampleSearchTable ...props /> but just
- * have it add "structural_variant.transcript.csq_gene.display_title" & "structural_variant.size"
- * and let `VariantSampleDisplayTitleColumn` determine if it's a SV or SNV.
- * This would allow this CaseViewEmbeddedVariantSampleSearchTableSV to be less repetitive of `CaseViewEmbeddedVariantSampleSearchTable`
+ * Common interactive columns & related for both CNV and SNV Samples defined here
+ * and then wrapped by CNV|SNV-specific table.
+ * This table is wrapped by `SelectedItemsController` in FilteringTab which passes
+ * in selected items and methods to select/deselect. `SelectedItemsController` is
+ * originally used for selecting multiple items in new window, e.g. for HiGlass files
+ * selection. It has some methods which are unused here.
  */
-export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
+
+export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
     const {
         // Get/reuse default colExtMap from EmbeddedItemSearchTable
         columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
@@ -83,30 +101,58 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
         savedVariantSampleIDMap = {},
         isLoadingVariantSampleListItem,
         currFilterSet,
+        lastSavedTechnicalReview,
+        cacheSavedTechnicalReviewForVSUUID,
+        unsavedTechnicalReviewNoteTexts,
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID,
+        haveCaseEditPermission,
         // passProps includes e.g. addToBodyClassList, removeFromBodyClassList (used for FacetList / ExtendedDescriptionPopover)
         ...passProps
     } = props;
 
+    /**
+     * For Technical Review Column; perhaps should rename to be more explicit, unless re-use for other columns...
+     * @todo Potentially make this re-usable and part of shared-portal-components table, so any column can open popover easily.
+     */
+    const [ openPopoverData, setOpenPopoverData ] = useState(null);
+
+    const technicalReviewCommonProps = { setOpenPopoverData, cacheSavedTechnicalReviewForVSUUID, cacheUnsavedTechnicalReviewNoteTextForVSUUID, haveCaseEditPermission };
+    const interpretationSelectionCommonProps = { selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem };
+
     const columnExtensionMap = useMemo(function() {
         return {
             ...originalColExtMap,
-            "display_title" : {
-                // Preserve existing 'display_title' extension properties but overwrite render, minColumnWidth..
-                ...originalColExtMap.display_title,
-                "widthMap": { 'lg' : 250, 'md' : 220, 'sm' : 200 },
-                "minColumnWidth" : (originalColExtMap.display_title.minColumnWidth || 100) + 20,
-                "render": function(result, parentProps){
-                    const { href, context, rowNumber, detailOpen, toggleDetailOpen } = parentProps;
+            /** Depends on temporary/unsaved state ... */
+            "technical_review.assessment.call": {
+                "disabled": false,
+                "minColumnWidth": 90,
+                "widthMap": { 'lg' : 108, 'md' : 98, 'sm' : 90 },
+                "render": function(result, propsFromSearchTable){
+                    const { uuid: vsUUID } = result;
+                    const { rowNumber } = propsFromSearchTable;
+                    const lastSavedTechnicalReviewForResult = lastSavedTechnicalReview[vsUUID];
+                    const unsavedTechnicalReviewNoteTextForResult = unsavedTechnicalReviewNoteTexts[vsUUID];
                     return (
-                        <VariantSampleDisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen,
-                            selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }}>
-                            <VariantSampleDisplayTitleColumnSV />
-                        </VariantSampleDisplayTitleColumnWrapper>
+                        <TechnicalReviewColumn {...technicalReviewCommonProps} {...{ result, lastSavedTechnicalReviewForResult,
+                            unsavedTechnicalReviewNoteTextForResult, rowNumber }} />
                     );
                 }
             },
+            "interpretation_selection" : {
+                "disabled": false, // Is disabled:true by default in Schemas, so as to be hidden on search views not wrapped by SelectedItemsController.
+                "noSort": true,
+                "minColumnWidth": 36,
+                "widthMap": { 'lg' : 70, 'md' : 68, 'sm' : 68 },
+                "colTitle": "Move to Interpretation",
+                "render": function(result, props) {
+                    return <VariantSampleSelectionCheckbox {...interpretationSelectionCommonProps} result={result} />;
+                }
+            },
+            /**
+             * Depends on props.currFilterSet, which only available in CaseViewEmbeddedVarriantSampleSearchTable[SV]
+             * Is only shown when multiple filter blocks requested.
+             */
             "__matching_filter_block_names": {
-                // Is only shown when multiple filter blocks requested.
                 "noSort": true,
                 "widthMap": { 'lg' : 60, 'md' : 60, 'sm' : 60 },
                 "colTitle": <i className="icon icon-fw icon-object-ungroup far"/>,
@@ -117,79 +163,73 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
                     }
                     return <MatchingFilterBlockIndicesPopoverColumn {...{ currFilterSet, result }} />;
                 }
-            },
-            // TODO: Move these to variantSampleColumnExtensionMap so we don't create new functions every render (or change to isLoadingVariantSample, ...)
-            "structural_variant.transcript.csq_gene.display_title": {
-                "noSort": true, // not currently a useful or informative sort.
-                "render": function(result, props) {
-                    const { "@id": atID, structural_variant: { transcript: transcripts = [] } = {} } = result || {};
-                    const path = atID + "?annotationTab=0";
-
-                    const transcriptsDeduped = {};
-                    transcripts.forEach((transcript) => {
-                        const { csq_gene: { display_title = null } = {} } = transcript;
-                        transcriptsDeduped[display_title] = true;
-                    });
-                    const genes = Object.keys(transcriptsDeduped);
-
-                    if (genes.length <= 2) { // show comma separated
-                        return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
-                    }
-                    // show first and last gene separated by "..." with first 10 available on hover
-                    const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
-                    const tipGenes = genes.slice(0, lastItemIndex).join(", ");
-
-                    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
-                }
-            },
-            "structural_variant.gnomadg_af": {
-                "render": function(result, props) {
-                    const { structural_variant: { gnomadg_af = null, unrelated_count = null } = {} } = result || {};
-                    const { align = 'left' } = props;
-
-                    const rows = [
-                        <div className="d-block text-truncate" key="gnomadAF"><span className="text-600">gnomAD: </span>{gnomadg_af !== null ? gnomadg_af: "-"}</div>,
-                        <div className="d-block text-truncate" key="internal"><span className="text-600">Internal: </span>{unrelated_count !== null ? unrelated_count: "-"}</div>
-                    ];
-                    return <StackedRowColumn {...{ rows }} className={"text-truncate text-" + align} />;
-                }
-            },
-            "structural_variant.size": {
-                "render": function(result, props) {
-                    const { structural_variant: { size_display = null } = {} } = result || {};
-                    return size_display;
-                }
             }
         };
-    }, [ originalColExtMap, selectedVariantSamples, savedVariantSampleIDMap, isLoadingVariantSampleListItem, currFilterSet]);
+    }, [
+        originalColExtMap,
+        selectedVariantSamples,
+        savedVariantSampleIDMap,
+        isLoadingVariantSampleListItem,
+        currFilterSet,
+        lastSavedTechnicalReview,
+        unsavedTechnicalReviewNoteTexts
+    ]);
 
-    return <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />;
+    return (
+        <React.Fragment>
+            <TechnicalReviewPopoverOverlay {...{ openPopoverData, setOpenPopoverData }} />
+            <EmbeddedItemSearchTable {...passProps} {...{ columnExtensionMap }} stickyFirstColumn />
+        </React.Fragment>
+    );
 }
+
+
+/** @todo Potentially make this re-usable and part of shared-portal-components table */
+const TechnicalReviewPopoverOverlay = React.memo(function TechnicalReviewPopoverOverlay ({ openPopoverData, setOpenPopoverData }) {
+    const {
+        ref: openPopoverRef = null,
+        jsx: openPopoverJSX = null
+    } = openPopoverData || {};
+
+    const onRootClickHide = useCallback(function(e){
+        // If they clicked on another technical review column/row rule, don't close popover after switching info
+        if (e.target && e.target.getAttribute("data-technical-review") === "true") {
+            return false;
+        }
+        if (e.target && e.target.parentElement && e.target.parentElement.getAttribute("data-technical-review") === "true") {
+            return false;
+        }
+        setOpenPopoverData(null);
+    });
+
+    if (!openPopoverData) {
+        return null;
+    }
+
+    return (
+        <Overlay target={openPopoverRef} show={!!openPopoverData} transition={false} placement="bottom"
+            rootClose rootCloseEvent="click" onHide={onRootClickHide}>
+            { openPopoverJSX }
+        </Overlay>
+    );
+});
+
 
 /** Open Variant Sample in new window */
 function VariantSampleDisplayTitleColumnWrapper (props) {
-    const {
-        result, href, context, rowNumber, detailOpen, toggleDetailOpen,
-        selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem,
-        children
-    } = props;
+    const { result, href, context, rowNumber, detailOpen, toggleDetailOpen, children } = props;
 
     const onClick = useCallback(function(evt){
         evt.preventDefault();
         evt.stopPropagation(); // Avoid having event bubble up and being caught by App.js onClick.
-        const { "@id": resultAtID } = result;
-        navigateChildWindow(resultAtID);
+        const { "@id": resultAtID, uuid: resultUUID } = result;
+        navigateChildWindow(resultAtID, resultUUID);
         return false;
     }, [ result ]);
 
-    let checkbox = null;
-    if (selectedVariantSamples && onSelectVariantSample && savedVariantSampleIDMap) {
-        checkbox = <VariantSampleSelectionCheckbox {...{ selectedVariantSamples, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem }} />;
-    }
-
     return (
-        <DisplayTitleColumnWrapper {...{ result, href, context, rowNumber, detailOpen, toggleDetailOpen, onClick }}>
-            { checkbox }{ children }
+        <DisplayTitleColumnWrapper {...{ result, context, rowNumber, detailOpen, toggleDetailOpen, onClick }} link="#">
+            { children }
         </DisplayTitleColumnWrapper>
     );
 }
@@ -197,17 +237,30 @@ function VariantSampleDisplayTitleColumnWrapper (props) {
 
 /** Based mostly on SPC SelectionItemCheckbox w. minor alterations */
 export const VariantSampleSelectionCheckbox = React.memo(function VariantSampleSelectionCheckbox(props){
-    const { selectedVariantSamples, result, onSelectVariantSample, savedVariantSampleIDMap, isLoadingVariantSampleListItem = false } = props;
+    const {
+        selectedVariantSamples,
+        result,
+        onSelectVariantSample,
+        savedVariantSampleIDMap,
+        isLoadingVariantSampleListItem = false,
+        className = "mx-auto d-block my-0 text-larger"
+    } = props;
     const { "@id": resultID } = result;
     const isPrevSaved = savedVariantSampleIDMap[resultID];
     const isSelected = selectedVariantSamples.has(resultID);
-    const isChecked = isPrevSaved || isSelected;
+    const checked = isPrevSaved || isSelected;
+
+    const disabled = (
+        isLoadingVariantSampleListItem
+        || isPrevSaved
+        || !(selectedVariantSamples && onSelectVariantSample && savedVariantSampleIDMap)
+    );
 
     const onChange = useCallback(function(e){
         return onSelectVariantSample(result, true);
     }, [ onSelectVariantSample, result ]);
 
-    return <input type="checkbox" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} className="mr-2" />;
+    return <IconCheckbox {...{ checked, onChange, disabled, className }} />;
 });
 
 const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilterBlockIndicesPopoverColumn(props){
@@ -248,3 +301,4 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
         </div>
     );
 });
+

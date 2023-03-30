@@ -64,12 +64,6 @@ export function validateAllFilterSetBlockNames(savedToVSLFilterBlockQueryNameDic
  */
 export class SaveFilterSetButtonController extends React.Component {
 
-    static haveEditPermission(caseActions){
-        const result = !!(_.findWhere(caseActions, { "name" : "edit" }));
-        console.log("SaveFilterSetButtonController - have edit permission?", result);
-        return result;
-    }
-
     /**
      * Re: param `fieldsToCompare` -
      * Eventually can add 'status' to this as well, if UI to edit it added.
@@ -127,9 +121,7 @@ export class SaveFilterSetButtonController extends React.Component {
         this.saveFilterSet = _.throttle(this.saveFilterSet.bind(this), 1500);
 
         this.memoized = {
-            hasFilterSetChanged: memoize(SaveFilterSetButtonController.hasFilterSetChanged),
-            haveEditPermission: memoize(SaveFilterSetButtonController.haveEditPermission)
-
+            hasFilterSetChanged: memoize(SaveFilterSetButtonController.hasFilterSetChanged)
         };
 
         this.state = {
@@ -143,22 +135,28 @@ export class SaveFilterSetButtonController extends React.Component {
         const { currFilterSet, setIsSubmitting } = this.props;
         const { lastSavedFilterSet } = this.state;
 
+        // LastSavedFilterSet will generally be same age or older than currFilterSet, wherein currFilterSet
+        // is updated anytime that change the FilterSet UI, and lastSavedFilterSet only when is explicitly saved.
+        // This primarily is to allow to control App.isSubmitting.
+
         if (currFilterSet && !pastFilterSet) {
             // This should only occur upon initialization, as otherwise even a blank/unsaved filterset would be present.
             if (currFilterSet["@id"]) {
                 this.setState({ "lastSavedFilterSet": currFilterSet });
+                return;
             }
         }
 
-        const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
 
-        if (currFilterSet && hasFilterSetChanged) {
-            setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
-        } else {
-            // Is OK if called frequently with same value, as App is a PureComponent
-            // and won't update if state/prop value is unchanged.
-            setIsSubmitting(false);
+        if (currFilterSet && currFilterSet !== pastFilterSet) {
+            const hasFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
+            if (hasFilterSetChanged) {
+                setIsSubmitting("Leaving will cause unsaved changes to FilterSet in the \"Filtering\" tab to be lost. Proceed?");
+            } else {
+                setIsSubmitting(false);
+            }
         }
+
     }
 
     /**
@@ -255,14 +253,12 @@ export class SaveFilterSetButtonController extends React.Component {
         const { isSavingFilterSet, lastSavedFilterSet } = this.state;
         const { actions: caseActions = [] } = caseItem || {};
         const hasCurrentFilterSetChanged = this.memoized.hasFilterSetChanged(lastSavedFilterSet, currFilterSet);
-        const haveEditPermission = this.memoized.haveEditPermission(caseActions);
         const childProps = {
             ...passProps,
             currFilterSet,
             caseItem,
             isSavingFilterSet,
             hasCurrentFilterSetChanged,
-            haveEditPermission,
             saveFilterSet: this.saveFilterSet
         };
         return React.Children.map(children, function(child){
@@ -276,13 +272,13 @@ export class SaveFilterSetButtonController extends React.Component {
 export function SaveFilterSetButton(props){
     const {
         isEditDisabled,
-        haveEditPermission = true,
+        haveCaseEditPermission = true,
         saveFilterSet,
         isSavingFilterSet,
         hasCurrentFilterSetChanged,
         className = "btn btn-primary d-inline-flex align-items-center"
     } = props;
-    const disabled = isEditDisabled || isSavingFilterSet || !haveEditPermission || !hasCurrentFilterSetChanged;
+    const disabled = isEditDisabled || isSavingFilterSet || !haveCaseEditPermission || !hasCurrentFilterSetChanged;
 
     const onSaveBtnClick = useCallback(function(e){
         e.stopPropagation();
@@ -294,7 +290,7 @@ export function SaveFilterSetButton(props){
 
     return (
         <button type="button" className={className} disabled={disabled}
-            onClick={onSaveBtnClick} data-tip="Save this Case FilterSet">
+            onClick={onSaveBtnClick} data-tip="Save FilterSet for this Case">
             { isSavingFilterSet ?
                 <i className="icon icon-spin icon-circle-notch fas" />
                 : (

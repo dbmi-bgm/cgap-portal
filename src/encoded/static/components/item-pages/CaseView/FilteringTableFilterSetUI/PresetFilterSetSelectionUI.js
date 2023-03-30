@@ -11,6 +11,7 @@ import ReactTooltip from 'react-tooltip';
 import { console, ajax, JWT } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { LocalizedTime, format as formatDateTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { CountIndicator } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/FacetList/FacetTermsList';
+import { SaveFilterSetPresetButton } from './SaveFilterSetPresetButton';
 
 
 /**
@@ -216,9 +217,13 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             hasCurrentFilterSetChanged,
             isFetchingInitialFilterSetItem,
             currentCaseFilterSet,
+            originalPresetFilterSet,
+            lastSavedPresetFilterSet,
             hasFilterSetChangedFromOriginalPreset,
+            hasFilterSetChangedFromLastSavedPreset,
             isOriginalPresetFilterSetLoading,
-            refreshOriginalPresetFilterSet
+            refreshOriginalPresetFilterSet,
+            setLastSavedPresetFilterSet
         } = this.props;
         const {
             isLoadingPresets,
@@ -231,6 +236,26 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
         } = this.state;
 
         let body = null;
+
+        const savePresetDropdownProps = {
+            filterSet: currentCaseFilterSet,
+            caseItem,
+            isEditDisabled,
+            originalPresetFilterSet,
+            hasFilterSetChangedFromOriginalPreset,
+            hasFilterSetChangedFromLastSavedPreset,
+            lastSavedPresetFilterSet,
+            isOriginalPresetFilterSetLoading,
+            setLastSavedPresetFilterSet,
+        };
+
+        const savePresetDropdownCls = "btn btn-outline-primary-dark btn-sm text-truncate w-100";
+        const btnInner = <div><i className="icon icon-plus-circle fas mr-05" /> Create Preset from Current FilterSet</div>;
+        const createPresetBtn = (
+            <div className={`p-2 bg-white ${ isLoadingPresets || !presetResults || !presetResults.length ? "": "border-bottom"}`}>
+                <SaveFilterSetPresetButton {...savePresetDropdownProps} {...{ btnInner }} btnCls={savePresetDropdownCls} />
+            </div>);
+
         if (!presetResults || presetResults.length === 0){
             if (isLoadingPresets) {
                 // Only show loading indicator in body for lack of initial results.
@@ -241,13 +266,16 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                 );
             } else {
                 body = (
-                    <div className="py-4 px-3 bg-white border-bottom">
-                        <h4 className="my-0 text-400">
-                            No presets saved yet
-                        </h4>
-                        <p>
-                            Create a FilterSet and then click <em>Save As...</em> to create a preset.
-                        </p>
+                    <div>
+                        <div className="py-4 px-3 bg-white border-bottom">
+                            <h4 className="my-0 text-400">
+                                No presets saved yet
+                            </h4>
+                            <p>
+                                Create a FilterSet and then click <em>Create Preset</em> to generate a preset for your case.
+                            </p>
+                        </div>
+                        { createPresetBtn }
                     </div>
                 );
             }
@@ -267,7 +295,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
             };
             const { derived_from_preset_filterset: currentCaseDerivedFromPresetUUID = null } = currentCaseFilterSet || {};
             body = (
-                <div className="results-container border-top">
+                <div className="results-container">
                     { presetResults.map(function(presetFilterSet, idx){
                         const { uuid: thisPresetFSUUID } = presetFilterSet;
                         const isOriginOfCurrentCaseFilterSet = currentCaseDerivedFromPresetUUID === thisPresetFSUUID;
@@ -312,6 +340,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                             : null }
                     </div>
                 </div>
+                { !isLoadingPresets && presetResults && presetResults.length > 0 ? createPresetBtn: null }
                 { body }
             </div>
         );
@@ -357,7 +386,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
     const isPatchingPreset = patchingPresetResultUUID === presetFSUUID;
 
     // Separate from import (view) permission (which is implictly allowed for all presets here, else wouldnt have been returned from /search/?type=FilterSet request)
-    const haveEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
+    const havePresetFSEditPermission = !!(loadedItemView && _.findWhere(loadedItemView.actions || [], { "name": "edit" }));
 
 
     // If in uneditable state (no save permissions, duplicate blocks, etc) then don't warn.
@@ -437,7 +466,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
             </a>
         );
 
-        if (haveEditPermission) {
+        if (havePresetFSEditPermission) {
 
             // We use user's project UUID for this --
             // People may browse Core Project and want to make it preset for their own

@@ -1,0 +1,66 @@
+[
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "status": "in review",
+        "uuid": "8139d41d-f45d-4d8e-9a93-c2878e272b56",
+        "aliases": [
+            "hms-dbmi:sv_qclist"
+        ],
+        "overall_quality_status": "PASS",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcf_check",
+                "value": "8e570bc8-ffe5-426b-a564-9ecdd7e95baa"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": "hms-dbmi:sv_vcfqc"
+            }
+        ]
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "status": "in review",
+        "uuid": "456dac78-e95f-44ba-bdbc-93985db608f1",
+        "aliases": [
+            "hms-dbmi:snv_qclist"
+        ],
+        "overall_quality_status": "PASS",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcf_check",
+                "value": "8e570bc8-ffe5-426b-a564-9ecdd7e95baa"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": "hms-dbmi:snv_vcfqc"
+            }
+        ]
+    },
+    {
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "aliases": [
+            "hms-dbmi:vep_qclist"
+        ],
+        "uuid": "d31e2619-3111-4c8f-8bb5-72f5b2da9254",
+        "status": "in review",
+        "overall_quality_status": "PASS",
+        "qc_list": [
+            {
+                "qc_type": "quality_metric_vcf_check",
+                "value": "8e570bc8-ffe5-426b-a564-9ecdd7e95baa"
+            },
+            {
+                "qc_type": "quality_metric_peddyqc",
+                "value": "hms-dbmi:peddyqc"
+            },
+            {
+                "qc_type": "quality_metric_vcfqc",
+                "value": "hms-dbmi:vep_vcfqc"
+            }
+        ]
+    }
+]

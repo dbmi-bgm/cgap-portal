@@ -1,13 +1,13 @@
-from copy import (
-    copy,
-    deepcopy
-)
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest
-from botocore.exceptions import ClientError
 import uuid
+
+from botocore.exceptions import ClientError
+from copy import copy, deepcopy
+from dcicutils.misc_utils import print_error_message
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.view import view_config
 from snovault import CONNECTION
 from snovault.util import debug_log
+
 from .types.base import Item, get_item_or_none
 from .types.workflow import (
     trace_workflows,
@@ -147,7 +147,10 @@ def get_higlass_viewconf(context, request):
     higlass_viewconfig['views'][1]['tracks']['whole'][0]['x'] = variant_pos
     higlass_viewconfig['views'][1]['tracks']['whole'][1]['x'] = variant_pos + 1
 
+    # THIS NEEDS TO BE REPLACED WHEN TESTING LOCALLY
     s3_bucket = request.registry.settings.get('file_wfout_bucket')
+    #s3_bucket = "cgap-mgb-main-application-cgap-mgb-wfoutput"
+    #s3_bucket = "cgap-dbmi-main-application-cgap-dbmi-wfoutput"
 
     if requesting_tab == "bam":
 
@@ -224,12 +227,13 @@ def get_higlass_viewconf(context, request):
         sv_vcf_visibilty = request.json_body.get('sv_vcf_visibilty', None)
 
         top_tracks = higlass_viewconfig['views'][1]['tracks']['top']
-        empty_track_a = deepcopy(top_tracks[5])
-        text_track = deepcopy(top_tracks[6])
-        empty_track_b = deepcopy(top_tracks[7])
-        pileup_track = deepcopy(top_tracks[8])
-        cgap_sv_track = deepcopy(top_tracks[9])
-        gnomad_track = deepcopy(top_tracks[10])
+        empty_track_a = deepcopy(top_tracks[6]) # track height 10
+        text_track = deepcopy(top_tracks[7])
+        empty_track_b = deepcopy(top_tracks[8]) # track height 5
+        pileup_track = deepcopy(top_tracks[9])
+        cgap_sv_track = deepcopy(top_tracks[10])
+        cgap_cnv_track = deepcopy(top_tracks[11])
+        gnomad_track = deepcopy(top_tracks[12])
 
         current_viewconf = request.json_body.get('current_viewconf', None)
         original_options = {}
@@ -245,7 +249,15 @@ def get_higlass_viewconf(context, request):
 
         # Delete original tracks from the insert, replace them with adjusted data
         # from the sample data. If there is no data, we only show the sequence track
-        del top_tracks[5:]
+        del top_tracks[6:]
+
+        describing_text_track = deepcopy(text_track)
+        describing_text_track["options"]["fontSize"] = 11
+        describing_text_track["options"]["fontWeight"] = "normal"
+        describing_text_track["options"]["textColor"] = "#777777"
+        describing_text_track["options"]["backgroundColor"] = "#ffffff"
+        describing_text_track["options"]["offsetY"] = 12
+        describing_text_track["height"] = 30
 
         higlass_sv_vcf = request.json_body.get('higlass_sv_vcf', None)
         higlass_sv_vcf_presigned = None
@@ -253,6 +265,13 @@ def get_higlass_viewconf(context, request):
         if higlass_sv_vcf is not None:
             higlass_sv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf)
             higlass_sv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_sv_vcf+".tbi")
+
+        higlass_cnv_vcf = request.json_body.get('higlass_cnv_vcf', None)
+        higlass_cnv_vcf_presigned = None
+        higlass_cnv_tbi_presigned = None
+        if higlass_cnv_vcf is not None:
+            higlass_cnv_vcf_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_cnv_vcf)
+            higlass_cnv_tbi_presigned = create_presigned_url(bucket_name=s3_bucket, object_name=higlass_cnv_vcf+".tbi")
 
         for sample in samples_pedigree:
             accession = sample["sample_accession"]
@@ -289,23 +308,42 @@ def get_higlass_viewconf(context, request):
                 top_tracks.append(pileup_track_sample)
 
             if sv_vcf_visibilty[accession]:
-                empty_track_sample = deepcopy(empty_track_b)
-                empty_track_sample["uid"] = "empty_above_vcf" + accession
-                top_tracks.append(empty_track_sample)
-
-                cgap_sv_track_sample = deepcopy(cgap_sv_track)
-                cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
-                cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
-
-                cgap_sv_track_sample["uid"] = "vcf" + accession
-                if 'svcgap' in original_options:
-                    cgap_sv_track_sample['options'] = deepcopy(original_options['svcgap'])
-                    cgap_sv_track_sample['options']['dataSource'] = 'cgap'
-
-                cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
+                text_track_sample = deepcopy(describing_text_track)
+                text_track_sample["uid"] = "sv_vcf_text" + accession
+                text_track_sample["options"]["text"] = "Structural Variants called by Manta"
+                top_tracks.append(text_track_sample)
 
                 if higlass_sv_vcf_presigned is not None:
+                    cgap_sv_track_sample = deepcopy(cgap_sv_track)
+                    cgap_sv_track_sample['data']['vcfUrl'] = higlass_sv_vcf_presigned
+                    cgap_sv_track_sample['data']['tbiUrl'] = higlass_sv_tbi_presigned
+
+                    cgap_sv_track_sample["uid"] = "sv-vcf" + accession
+                    if 'cgap-sv' in original_options:
+                        cgap_sv_track_sample['options'] = deepcopy(original_options['cgap-sv'])
+                        cgap_sv_track_sample['options']['dataSource'] = 'cgap-sv'
+
+                    cgap_sv_track_sample['options']['sampleName'] = sample["sample_name"]
                     top_tracks.append(cgap_sv_track_sample)
+
+                # We are showing the track only for the proband for now, since we are not doing
+                # CNV joint calling yet.
+                if (higlass_cnv_vcf_presigned is not None) and (bam_sample_id == sample["sample_name"]):
+                    text_track_sample = deepcopy(describing_text_track)
+                    text_track_sample["uid"] = "cnv_vcf_text" + accession
+                    text_track_sample["options"]["text"] = "Copy Number Variants called by BIC-seq2"
+                    top_tracks.append(text_track_sample)
+
+                    cgap_cnv_track_sample = deepcopy(cgap_cnv_track)
+                    cgap_cnv_track_sample['data']['vcfUrl'] = higlass_cnv_vcf_presigned
+                    cgap_cnv_track_sample['data']['tbiUrl'] = higlass_cnv_tbi_presigned
+
+                    cgap_cnv_track_sample["uid"] = "cnv-vcf" + accession
+                    if 'cgap-cnv' in original_options:
+                        cgap_cnv_track_sample['options'] = deepcopy(original_options['cgap-cnv'])
+                        cgap_cnv_track_sample['options']['dataSource'] = 'cgap-cnv'
+                    cgap_cnv_track_sample['options']['sampleName'] = sample["sample_name"]
+                    top_tracks.append(cgap_cnv_track_sample)
 
         accession = "gnomad-sv"
         if accession in sv_vcf_visibilty and sv_vcf_visibilty[accession]:
@@ -340,8 +378,10 @@ def get_higlass_cohort_viewconf(context, request):
     """ Get the Higlass cohort viewconf, given the file locations on S3
     Args:
         request(obj): Http request object. Assumes request's request is JSON and contains these keys:
-            cohort_vcf_location(str) : location of the VCF file on S3
-            cohort_density_bw_location(str) : location of the density bigwig file on S3
+            cohort_variant_test_results(str) : location of the variant VCF file on S3
+            cohort_gene_test_results(str) : location of the gene VCF file on S3
+            cohort_density(str) : location of the density bigwig file on S3
+            variant_detail_source(str): location of the affected samples VCF
 
     Returns:
         A dictionary.
@@ -362,10 +402,12 @@ def get_higlass_cohort_viewconf(context, request):
             "viewconfig": None
         }
 
-    cohort_vcf_location = request.json_body.get('cohort_vcf_location', None)
-    cohort_density_bw_location = request.json_body.get('cohort_density_bw_location', None)
+    cohort_variant_test_results = request.json_body.get('cohort_variant_test_results', None)
+    cohort_gene_test_results = request.json_body.get('cohort_gene_test_results', None)
+    cohort_density = request.json_body.get('cohort_density', None)
+    variant_detail_source = request.json_body.get('variant_detail_source', None)
 
-    if not cohort_vcf_location or not cohort_density_bw_location:
+    if not cohort_variant_test_results or not cohort_density or not cohort_gene_test_results:
         return {
             "success": False,
             "errors": "Some data files have not been specified.",
@@ -377,13 +419,16 @@ def get_higlass_cohort_viewconf(context, request):
         top_tracks = view['tracks']['top']
         for track in top_tracks:
             if track['uid'] == "cohort_track":
-                vcf_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"])
-                track['data']['vcfUrl'] = vcf_url
-                tbi_url = create_presigned_url(cohort_vcf_location["bucket"], cohort_vcf_location["key"]+".tbi")
-                track['data']['tbiUrl'] = tbi_url
+                track['data']['vcfUrl'] = cohort_variant_test_results
+                track['data']['tbiUrl'] = cohort_variant_test_results + ".tbi"
+                if variant_detail_source:
+                    track['options']['variantDetailSource']['vcfUrl'] = variant_detail_source
+                    track['options']['variantDetailSource']['tbiUrl'] = variant_detail_source + ".tbi"
+            elif track['uid'] == "gene_list_track":
+                track['data']['vcfUrl'] = cohort_gene_test_results
+                track['data']['tbiUrl'] = cohort_gene_test_results + ".tbi"
             elif track['uid'] == "density_track":
-                bw_url = create_presigned_url(cohort_density_bw_location["bucket"], cohort_density_bw_location["key"])
-                track['data']['url'] = bw_url
+                track['data']['url'] = cohort_density
 
     return {
         "success": True,
@@ -405,7 +450,7 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
         params = {'Bucket': bucket_name, 'Key': object_name}
         response = s3_client.generate_presigned_url('get_object', Params=params, ExpiresIn=expiration)
     except ClientError as e:
-        print(e)
+        print_error_message(e)
         return None
 
     # The response contains the presigned URL

@@ -1,4 +1,5 @@
 import pytest
+
 from ..ingestion.vcf_utils import VCFParser, StructuralVariantVCFParser
 from ..util import resolve_file_path
 from .variant_fixtures import (  # noqa
@@ -12,12 +13,13 @@ from .variant_fixtures import (  # noqa
 
 pytestmark = [pytest.mark.working, pytest.mark.ingestion]
 TEST_VCF = resolve_file_path(
-    "annotations/GAPFII76KW2T_v0.5.5.reformat.altcounts.vcf.subset"
+    "annotations/GAPFII76KW2T_v0.5.6.reformat.altcounts.vcf.subset"
 )
 EXPECTED_ANNOTATION_FIELDS = ['comHet', 'CSQ']
 VARIANT_SCHEMA = resolve_file_path("schemas/variant.json")
 VARIANT_SAMPLE_SCHEMA = resolve_file_path("schemas/variant_sample.json")
-TEST_SV_VCF = resolve_file_path("annotations/GAPFIQHD6QAN_v0.0.4.vcf.subset")
+TEST_SV_VCF = resolve_file_path("annotations/GAPFIQHD6QAN_v0.0.6.sv.vcf.subset")
+TEST_CNV_VCF = resolve_file_path("annotations/GAPFIXRDPDK5_v0.0.6.cnv.vcf.subset")
 SV_SCHEMA = resolve_file_path("schemas/structural_variant.json")
 SV_SAMPLE_SCHEMA = resolve_file_path("schemas/structural_variant_sample.json")
 VEP_IDENTIFIER = 'transcript'
@@ -154,6 +156,7 @@ class TestIngestVCF:
         result = test_vcf.create_sample_variant_from_record(record)
         for sample in result:
             assert get_top_level_field(sample, 'GT') != '0/0'  # this VCF has one of these that should be dropped
+            assert get_top_level_field(sample, 'MQ') == 60.0
         assert result[0]['FS'] == 0.0
         assert result[0]['GT'] == '0/1'
 
@@ -225,6 +228,12 @@ def test_sv_vcf():
     return parser
 
 
+@pytest.fixture
+def test_cnv_vcf():
+    parser = StructuralVariantVCFParser(TEST_CNV_VCF, SV_SCHEMA, SV_SAMPLE_SCHEMA)
+    return parser
+
+
 class TestIngestStructuralVariantVCF():
 
     def test_build_variants(self, test_sv_vcf):
@@ -264,10 +273,10 @@ class TestIngestStructuralVariantVCF():
         assert get_transcript_field(result, 4, "csq_most_severe") is True
         assert get_transcript_field(
             result, 4, "csq_variant_5_prime_location"
-        ) == "3_UTR"
+        ) == "3_prime_UTR"
         assert get_transcript_field(
             result, 4, "csq_variant_3_prime_location"
-        ) == "3_UTR_or_Downstream"
+        ) == "3_prime_UTR_or_Downstream"
         variant_keys = result.keys()
         for key in variant_keys:
             assert "gnomadg" not in key
@@ -284,7 +293,7 @@ class TestIngestStructuralVariantVCF():
         # record 3 - Additional Transcript fields
         record = test_sv_vcf.read_next_record()
         result = test_sv_vcf.create_variant_from_record(record)
-        
+
         assert get_transcript_field(result, 0, "csq_cds_position") == "3594-4583"
         assert get_transcript_field(
             result, 0, "csq_protein_position"
@@ -304,16 +313,19 @@ class TestIngestStructuralVariantVCF():
         # record 1 - Basics + Samplegeno fields
         record = test_sv_vcf.read_next_record()
         result = test_sv_vcf.create_sample_variant_from_record(record)
-        
+
         assert len(result) == 1
         assert get_top_level_field(result[0], "GT") == "0/1"
         assert get_top_level_field(result[0], "CALL_INFO") == "NA12878_sample"
-        assert get_top_level_field(result[0], "GQ") == 43
-        assert get_top_level_field(result[0], "PL") == "158,0,40"
+        assert get_top_level_field(result[0], "GQ") == 41
+        assert get_top_level_field(result[0], "PL") == "156,0,38"
         assert not get_top_level_field(result[0], "imprecise")
         assert get_top_level_field(
             result[0], "confidence_interval_start"
         ) == [0, 1]
+        assert get_top_level_field(result[0], "confidence_class") == "HIGH"
+        assert get_top_level_field(result[0], "paired_reads") == [0, 0]
+        assert get_top_level_field(result[0], "split_reads") == [6, 6]
         sample_geno = get_top_level_field(result[0], "samplegeno")
         assert len(sample_geno) == 3
         assert sample_geno[0]["samplegeno_numgt"] == "0/0"
@@ -329,8 +341,8 @@ class TestIngestStructuralVariantVCF():
         assert sample_geno[1]["samplegeno_sampleid"] == "NA12878_sample"
         assert sample_geno[1]["samplegeno_quality"] == 48
         assert sample_geno[2]["samplegeno_numgt"] == "0/1"
-        assert sample_geno[2]["samplegeno_likelihood"] == "209,0,12"
-        
+        assert sample_geno[2]["samplegeno_likelihood"] == "185,0,13"
+
         # record 4 - Confidence intervals and Imprecise
         record = test_sv_vcf.read_next_record()
         record = test_sv_vcf.read_next_record()
@@ -340,7 +352,25 @@ class TestIngestStructuralVariantVCF():
             assert get_top_level_field(result[idx], "imprecise") is True
             assert get_top_level_field(
                 result[idx], "confidence_interval_start"
-            ) == [-236, 237]
+            ) == [-236, 236]
             assert get_top_level_field(
                 result[idx], "confidence_interval_end"
-            ) == [-136, 136]
+            ) == [-135, 136]
+            assert get_top_level_field(result[idx], "quality_score") == 15.0
+
+    def test_build_variant_samples_cnv(self, test_cnv_vcf):
+        """Test accurate processing of CNV-specific fields."""
+
+        # record 1 - BIC-seq2 fields
+        record = test_cnv_vcf.read_next_record()
+        result = test_cnv_vcf.create_sample_variant_from_record(record)
+
+        assert len(result) == 1
+        assert get_top_level_field(result[0], "bicseq2_expected_reads") == 1378.15
+        assert get_top_level_field(result[0], "bicseq2_observed_reads") == 738
+        assert get_top_level_field(
+            result[0], "bicseq2_log2_copy_ratio"
+        ) == -0.90530749918775
+        assert get_top_level_field(result[0], "bicseq2_pvalue") == 4.1426e-52
+        assert get_top_level_field(result[0], "confidence_class") == "LOW"
+        assert get_top_level_field(result[0], "quality_score") is None

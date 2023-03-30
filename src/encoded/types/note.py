@@ -1,14 +1,9 @@
-import datetime
-from snovault.util import debug_log
-from snovault import (
-    abstract_collection,
-    calculated_property,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item
-)
+# import datetime
+# from snovault.util import debug_log
+from dcicutils.misc_utils import ignorable
+from snovault import abstract_collection, calculated_property, collection, load_schema
+from .base import Item
+from ..server_defaults import add_last_modified
 
 
 @abstract_collection(
@@ -25,9 +20,34 @@ class Note(Item):
     schema = load_schema('encoded:schemas/note.json')
     embedded_list = []
 
+    def _update(self, properties, sheets=None):
+        new_note_text = properties.get("note_text", None)
+        old_note_text = None
+        try:
+            # We may not have a self.properties yet if this is a new item (e.g. from POST request)
+            # (getattr(self, properties) doesn't work here, throws exception)
+            old_note_text = self.properties.get("note_text", None)
+        except KeyError as e:
+            ignorable(e)
+            # str(e) === "''"; not sure why.
+            pass
+        if new_note_text != old_note_text:
+            # Add/update last_text_edited: { text_edited_by, date_text_edited }
+            add_last_modified(properties, field_name_portion="text_edited")
+        super(Note, self)._update(properties, sheets)
 
-
-
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Note's display title",
+        "type": "string"
+    })
+    def display_title(self, date_created):
+        try:
+            type_date = "Note from " + date_created[:10]
+            return type_date
+        # last resort, use uuid
+        except Exception:
+            return self.uuid
 
 
 @collection(
@@ -45,20 +65,6 @@ class NoteStandard(Note):
         'last_modified.date_modified',
         'last_modified.modified_by.display_title'
     ]
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "Note's display title",
-        "type": "string"
-    })
-    def display_title(self, date_created):
-        try:
-            type_date = "Note from " + date_created[:10]
-            return type_date
-        # last resort, use uuid
-        except Exception:
-            properties = self.upgrade_properties()
-            return properties.get('uuid', None)
 
 
 @collection(
@@ -131,5 +137,47 @@ class NoteDiscovery(Note):
             return type_date
         # last resort, use uuid
         except Exception:
-            properties = self.upgrade_properties()
-            return properties.get('uuid', None)
+            return self.uuid
+
+
+@collection(
+    name='notes-technical-review',
+    properties={
+        'title': 'Technical Review Note',
+        'description': 'Listing of Technical Reviews',
+    })
+class NoteTechnicalReview(Note):
+    """NoteTechnicalReview class."""
+
+    item_type = 'note_technical_review'
+    schema = load_schema('encoded:schemas/note_technical_review.json')
+    embedded_list = [
+        'last_modified.modified_by.display_title',
+        'last_text_edited.text_edited_by.display_title',
+        'review.reviewed_by.display_title'
+    ]
+
+    @calculated_property(schema={
+        "title": "Display Title",
+        "description": "Note's display title",
+        "type": "string"
+    })
+    def display_title(self, date_created):
+        assessment = self.properties.get("assessment", {})
+        call = assessment.get("call")
+        classification = assessment.get("classification")
+
+        # title_part_1 = None
+        if call is not None and classification is not None:
+            title_part_1 = "(" + ("" if call is True else "No ") + "Call) " + classification
+        else:
+            title_part_1 = "No Saved Classification"
+
+        # title_part_2 = None
+        try:
+            title_part_2 = " from " + date_created[:10]
+        except Exception:
+            title_part_2 = " - " + str(self.uuid)
+
+        return title_part_1 + title_part_2
+        

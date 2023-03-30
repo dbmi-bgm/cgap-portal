@@ -1,12 +1,8 @@
 """Collection for Variant Classifier objects."""
-from snovault import (
-    calculated_property,
-    collection,
-    load_schema,
-)
-from .base import (
-    Item
-)
+
+from snovault import collection, load_schema  # , calculated_property
+from .base import Item
+
 
 @collection(
     name='higlass-view-configs',

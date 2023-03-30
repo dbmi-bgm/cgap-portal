@@ -1,6 +1,10 @@
 import pytest
 
+from dcicutils.qa_utils import notice_pytest_fixtures
 from .variant_fixtures import test_genes, GENE_URL  # noqa (fixture)
+
+
+notice_pytest_fixtures(test_genes)
 
 
 # This uses workbook indirectly through test_genes

@@ -282,7 +282,7 @@ body.is-full-screen {
 		//line-height: 0;
 		text-align: center;
 		overflow: hidden;
-		border-top: 1px solid darken($navbar-background-color, 10%);
+		/* border-top: 1px solid darken($navbar-background-color, 10%); */
 		//@include filter-gradient(#ffffff, #f8f8f8, vertical);
 
 
@@ -296,7 +296,6 @@ body.is-full-screen {
 		}
 
 		.footer-section {
-			display: block;
 			text-align: center;
 			color: #bfbfbf;
 			padding: 15px 0px 14px;
@@ -312,13 +311,9 @@ body.is-full-screen {
 				}
 			}
 
-			a {
-				color : #b0b0b0;
-			}
-
-			a:hover, a:active {
+			>div>a:hover {
 				text-decoration: none !important;
-				color: #000000;
+				color:#ffffff;
 			}
 		}
 	}
@@ -478,9 +473,4 @@ div.dropdown.btn-group {
 }
 
 
-/**************** React Tooltips (NPM: react-tooltip) overwrite of styling *********************/
-
-body .__react_component_tooltip {
-	padding: 6px 15px;
-}
 

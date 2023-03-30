@@ -1,8 +1,8 @@
 """The type file for the workflow related items.
 """
 
-import copy
 import boto3
+import copy
 import cProfile
 import io
 import json
@@ -10,6 +10,7 @@ import pstats
 
 from collections import OrderedDict, deque
 from dcicutils.env_utils import default_workflow_env, is_stg_or_prd_env, prod_bucket_env
+from dcicutils.misc_utils import ignored, ignorable, PRINT
 from inspect import signature
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPBadRequest
 from pyramid.response import Response
@@ -17,10 +18,8 @@ from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema, CONNECTION, TYPES
 from snovault.util import debug_log
 from time import sleep
-from .base import (
-    Item,
-    # lab_award_attribution_embed_list
-)
+
+from .base import Item  # , lab_award_attribution_embed_list
 
 
 TIBANNA_CODE_NAME = 'zebra'
@@ -400,6 +399,7 @@ def trace_workflows(original_file_set_to_trace, request, options=None):
         else:
             for step_uuid, in_file_uuid in step_uuids:
                 next_params = ( step_uuid, get_model_obj(in_file_uuid), depth + 1 )
+                ignored(next_params)  # TODO: seems a very specific value to compute and throw away. is this a bug?
                 # Potentially temporary check to skip further tracing of files which we don't
                 # have WFR inputs for.
                 next_file_model_obj = get_model_obj(in_file_uuid)
@@ -638,7 +638,7 @@ def trace_workflows(original_file_set_to_trace, request, options=None):
         ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
         ps.print_stats()
         output = s.getvalue()
-        print(output)
+        PRINT(output)
         return Response(
             content_type='text/plain',
             body=output
@@ -923,8 +923,10 @@ class WorkflowMapping(Item):
 
 
 def validate_input_json(context, request):
+    ignored(context)
     input_json = request.json
     wkfl_uuid = input_json.get('workflow_uuid', 'None')
+    ignorable(wkfl_uuid)
     # if not context.get(wkfl_uuid):
     #    request.errors.add('body', None, 'workflow_uuid %s not found in the system' % wkfl_uuid)
     if not input_json.get('metadata_only'):
@@ -989,9 +991,9 @@ def pseudo_run(context, request):
 
     return res_dict
 
-
 def _wfoutput_bucket_for_env(env):
     # XXX: this function should no longer be used.
+    raise NotImplementedError("_wfoutput_bucket_for_env is a beanstalk operation that shouldn't be used.")
     return 'elasticbeanstalk-%s-wfoutput' % (prod_bucket_env(env) if is_stg_or_prd_env(env) else env)
 
 

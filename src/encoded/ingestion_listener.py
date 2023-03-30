@@ -34,13 +34,13 @@ from .ingestion.common import metadata_bundles_bucket, get_parameter, IngestionR
 from .ingestion.exceptions import UnspecifiedFormParameter, SubmissionFailure  # , BadParameter
 from .ingestion.processors import get_ingestion_processor
 from .ingestion.queue_utils import IngestionQueueManager
-from .ingestion.variant_utils import VariantBuilder, StructuralVariantBuilder
+from .ingestion.variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
 # from .types.base import get_item_or_none
 from .types.ingestion import SubmissionFolio, IngestionSubmission
 from .util import (
     resolve_file_path, gunzip_content,
     debuglog, get_trusted_email, beanstalk_env_from_request,
-    subrequest_object, register_path_content_type, vapp_for_email, vapp_for_ingestion,
+    subrequest_object, register_path_content_type, vapp_for_email,  # vapp_for_ingestion,
     SettingsKey, make_s3_client, extra_kwargs_for_s3_encrypt_key_id,
 )
 
@@ -267,6 +267,7 @@ def process_submission(*, submission_id, ingestion_type, app, bundles_bucket=Non
     try:
         email = data['email']
     except KeyError as e:
+        ignored(e)
         debuglog("Manifest data is missing 'email' field.")
         if DEBUG_SUBMISSIONS:
             pass
@@ -573,7 +574,13 @@ class IngestionListener:
                         'outputfile': formatted.name,
                         'verbose': False
                     }
-                    reformat_vcf(reformat_args)
+                    try:
+                        reformat_vcf(reformat_args)
+                    except Exception as e:
+                        log.error(f'Exception encountered in reformat script {e} - input VCF may be malformed')
+                        self.set_status(uuid, STATUS_ERROR)
+                        discard(message)
+                        continue
 
                     # Add altcounts by gene
                     # Note: you cannot pass this file object to vcf.Reader if it's in rb mode
@@ -583,7 +590,13 @@ class IngestionListener:
                         'inputfile': formatted.name,
                         'outputfile': formatted_with_alt_counts.name
                     }
-                    add_altcounts(alt_counts_args)
+                    try:
+                        add_altcounts(alt_counts_args)
+                    except Exception as e:
+                        log.error(f'Exception encountered in altcounts script {e} - input VCF may be malformed')
+                        self.set_status(uuid, STATUS_ERROR)
+                        discard(message)
+                        continue
                     parser = VCFParser(None, VARIANT_SCHEMA, VARIANT_SAMPLE_SCHEMA,
                                        reader=Reader(formatted_with_alt_counts))
                     variant_builder = VariantBuilder(self.vapp, parser, file_meta['accession'],
@@ -605,6 +618,27 @@ class IngestionListener:
                         reader=Reader(formatted_vcf),
                     )
                     variant_builder = StructuralVariantBuilder(
+                        self.vapp,
+                        parser,
+                        file_meta["accession"],
+                        project=file_meta["project"]["@id"],
+                        institution=file_meta["institution"]["@id"],
+                    )
+                elif vcf_type == "CNV":
+                    decoded_content = gunzip_content(raw_content)
+                    debuglog('Got decoded content: %s' % decoded_content[:20])
+                    formatted_vcf = tempfile.NamedTemporaryFile(
+                        mode="w+", encoding="utf-8"
+                    )
+                    formatted_vcf.write(decoded_content)
+                    formatted_vcf.seek(0)
+                    parser = StructuralVariantVCFParser(
+                        None,
+                        STRUCTURAL_VARIANT_SCHEMA,
+                        STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
+                        reader=Reader(formatted_vcf),
+                    )
+                    variant_builder = CNVBuilder(
                         self.vapp,
                         parser,
                         file_meta["accession"],

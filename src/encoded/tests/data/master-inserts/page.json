@@ -23,11 +23,10 @@
             "cgap-core:video-tutorials-page"
         ],
         "content": [
-            "e11fbe38-863d-4370-9107-b703556f15fd",
-            "e22fbe49-863d-1156-9107-b703556f15ba"
+            "cbda91c1-d898-41b5-a5e9-8a8343398cfe"
         ],
         "table-of-contents": {
-            "enabled": true,
+            "enabled": false,
             "skip-depth": 1,
             "header-depth": 4,
             "include-top-link": false

@@ -1,18 +1,18 @@
 import datetime
 import gzip
 import json
-import mock
+from unittest import mock
 import pytest
 import time
 
-from dcicutils.qa_utils import ignored
+from dcicutils.misc_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
+from ..ingestion.common import IngestionReport, IngestionError
 from ..ingestion_listener import (
     IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
     STATUS_INGESTED,
 )
-from ..ingestion.common import IngestionReport, IngestionError
 from ..util import debuglog
 
 
@@ -67,7 +67,7 @@ class IngestionQueueManagerForTesting(IngestionQueueManager):
         self.client.delete_queue(QueueUrl=self.queue_url)
 
 
-@pytest.yield_fixture(scope='function', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def fresh_ingestion_queue_manager_for_testing():
     """ Yield fixture that initializes SQS and clears all messages after the each in this module. """
     queue_manager = IngestionQueueManagerForTesting()
@@ -198,10 +198,14 @@ def test_ingestion_listener_verify_vcf_status_is_not_ingested(workbook, es_testa
 
 
 @pytest.mark.skip
-def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
+def test_ingestion_listener_run_0(workbook, es_testapp, fresh_ingestion_queue_manager_for_testing):
     """ Tests the 'run' method of ingestion listener, which will pull down and ingest a vcf file
         from the SQS queue.
     """
+    #
+    # NOTE: This (already-disabled) test had the same name as another test farther down in this file,
+    #       so "_0" was added to the test name to allow the two tests to be distinguished.
+    #
     uuid = 'cd679bdc-8691-4352-a25b-1c5f48407e9b'
     queue_manager = fresh_ingestion_queue_manager_for_testing
     queue_manager.add_uuids([uuid])
@@ -229,7 +233,7 @@ def test_ingestion_listener_run(workbook, es_testapp, fresh_ingestion_queue_mana
 
 
 def test_test_port():
-    from snovault.tests.test_postgresql_fixture import SNOVAULT_DB_TEST_PORT
+    from snovault.tests.postgresql_fixture import SNOVAULT_DB_TEST_PORT
     assert SNOVAULT_DB_TEST_PORT == 5440
 
 
@@ -259,7 +263,10 @@ def test_ingestion_report_basic(success):
 
 def mock_request_get(*args, **kwargs):
     """Mock request.get() result for SV VCF ingestion."""
+    ignored(args, kwargs)
+
     class MockContent:
+
         @property
         def content(self):
             """
@@ -277,13 +284,17 @@ def mock_request_get(*args, **kwargs):
             file_contents = file_contents.encode("utf-8")
             content = gzip.compress(file_contents)
             return content
+
     return MockContent()
+
 
 def mock_ingest_vcf(*args, **kwargs):
     """
     Mock for StructuralVariantBuilder.ingest_vcf() for SV VCF ingestion.
     """
+    ignored(args, kwargs)
     return [1, 0]
+
 
 @mock.patch("requests.get", new=mock_request_get)
 @mock.patch(
@@ -295,7 +306,7 @@ def test_ingestion_listener_run(
 ):
     """
     Test successful SV VCF recognition, read, and hand-off to ingestion
-    within the endpoint, while SV VCF ingestion tested elsewhere. 
+    within the endpoint, while SV VCF ingestion tested elsewhere.
 
     Mocks a simple gzipped VCF for reading by vcf.Reader as well as
     ingestion results to prompt patch of file indicating VCF was

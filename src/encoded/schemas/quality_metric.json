@@ -30,6 +30,16 @@
             "title": "Link to Report",
             "description": "Location of the main html file",
             "format": "uri"
+        },
+        "associated_meta_workflow_runs": {
+            "title": "Associated MetaWorkflowRuns",
+            "description": "The MetaWorkflowRuns that produced this item",
+            "type": "array",
+            "items": {
+                "title": "Associated MetaWorkflowRun",
+                "type": "string",
+                "format": "uuid"
+            }
         }
     },
     "facets": {

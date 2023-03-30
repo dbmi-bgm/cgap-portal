@@ -89,6 +89,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
         };
 
         this.hgcRef = React.createRef();
+        
     }
 
     componentDidMount(){
@@ -139,6 +140,7 @@ export class HiGlassPlainContainer extends React.PureComponent {
                       SvTrack,
                       GeneralVcfTrack,
                       CohortTrack,
+                      GeneListTrack,
                       BigwigDataFetcher
                     } = higlassDependencies;
 
@@ -191,6 +193,11 @@ export class HiGlassPlainContainer extends React.PureComponent {
                         name: 'CohortTrack',
                         track: CohortTrack,
                         config: CohortTrack.config,
+                    });
+                    higlassRegister({
+                        name: 'GeneListTrack',
+                        track: GeneListTrack,
+                        config: GeneListTrack.config,
                     });
                     higlassRegister(
                       {
@@ -260,9 +267,11 @@ export class HiGlassPlainContainer extends React.PureComponent {
 
 
 const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContainerBody(props, ref){
+    
     const { viewConfig, options, hasRuntimeError, disabled, isValidating, mounted, higlassInitialized, width, height, mountCount, placeholder, style, className, packageLockJson } = props;
     const outerKey = "mount-number-" + mountCount;
     const { dependencies: { higlass : { version: higlassVersionUsed = null } = {} } = {} } = packageLockJson || {};
+
     const { HiGlassComponent } = higlassDependencies || {};
 
     let hiGlassInstance = null;

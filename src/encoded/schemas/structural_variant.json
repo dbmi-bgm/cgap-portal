@@ -727,6 +727,16 @@
             "min": 0,
             "max": 20
         },
+        "technical_reviews": {
+            "title": "Technical Reviews",
+            "description": "Technical Reviews connected to this item",
+            "type": "array",
+            "items": {
+                "title": "Technical Review",
+                "type": "string",
+                "linkTo": "NoteTechnicalReview"
+            }
+        },
         "variant_notes": {
             "title": "Variant Notes",
             "description": "Notes related to this Variant",

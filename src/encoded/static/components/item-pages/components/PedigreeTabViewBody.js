@@ -142,10 +142,10 @@ export class PedigreeTabViewBody extends React.PureComponent {
     renderDetailPane(pedigreeVizProps){
         const {
             session, href, context, schemas,
-            PedigreeVizLibrary,
+            PedigreeVizLibrary, showAsDiseases,
             availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease
         } = this.props;
-        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease };
+        const passedDownProps = { PedigreeVizLibrary, session, href, context, schemas, availableDiseases, selectedDiseaseIdxMap, onToggleSelectedDisease, showAsDiseases };
         return <PedigreeDetailPane {...pedigreeVizProps} {...passedDownProps} />;
     }
 
@@ -225,6 +225,8 @@ export class PedigreeTabViewBody extends React.PureComponent {
             console.error("Expected `dataset` or `graphData` to be present");
         }
 
+        console.log("pedigreeviz", PedigreeVizLibrary);
+
         let body = null;
 
         if (!PedigreeVizLibrary) {
@@ -236,7 +238,8 @@ export class PedigreeTabViewBody extends React.PureComponent {
         } else if (graphData) {
             // If already have parsed graph data
             body = <PedigreeVizView {...pedigreeVizProps} {...graphData} />;
-        } else if (dataset) {
+        } else /* if (dataset) */ {
+            // TO TEST USING PedigreeViz.defaultProps.dataset, REMOVE THE IF CHECK HERE
             // If letting PedigreeViz parse on the fly (this mostly for local demo/test data)
             body = <PedigreeViz {...pedigreeVizProps} dataset={dataset} />;
         }

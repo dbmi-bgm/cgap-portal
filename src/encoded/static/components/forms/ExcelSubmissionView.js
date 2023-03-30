@@ -14,8 +14,8 @@ import { console, ajax, JWT, navigate, object, memoizedUrlParse } from '@hms-dbm
 import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 
 import { AttachmentInputController } from './attachment-input';
-
 import { PageTitleContainer, OnlyTitle, pageTitleViews } from '../PageTitleSection';
+import { useInterval } from '../util/hooks';
 
 
 
@@ -744,31 +744,15 @@ function CreatedItemsTable(props) {
     return <PartialList {...{ persistent }} className="pl-1 pt-1"/>;
 }
 
-// Custom React Hook by Dan Abramov https://overreacted.io/making-setinterval-declarative-with-react-hooks/
-function useInterval(callback, delay) {
-    const savedCallback = useRef();
 
-    // Remember the latest callback.
-    useEffect(() => {
-        savedCallback.current = callback;
-    }, [callback]);
-
-    // Set up the interval.
-    useEffect(() => {
-        function tick() {
-            savedCallback.current();
-        }
-        if (delay !== null) {
-            const id = setInterval(tick, delay);
-            return () => clearInterval(id);
-        }
-    }, [delay]);
-}
-
+/**
+ * Note: by default Poller now uses datastore=database calls - this is to avoid bugs related to the late indexing of updated submissions
+ * and should not cause performance issues since there are limited items embedded onto ingestion submission items.
+ */
 function Poller(props){
     const { context = null, setStatusIdx, onLoadedIngestionSubmission, setIsSubmitting, pushNewAlert, clearAllAlerts } = props;
     const { uuid } = context || {};
-    const getURL = "/ingestion-submissions/" + uuid;
+    const getURL = "/ingestion-submissions/" + uuid + "/?frame=object&datastore=database";
 
     const timeStarted = new Date(Date.now());
     const [ lastUpdated, setLastUpdated ] = useState(timeStarted.toLocaleTimeString('en-US'));

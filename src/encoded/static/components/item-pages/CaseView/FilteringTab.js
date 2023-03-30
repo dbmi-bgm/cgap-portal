@@ -1,6 +1,7 @@
 'use strict';
 
 import React, { useMemo, useCallback, useState, useRef } from 'react';
+import _ from 'underscore';
 import queryString from 'query-string';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -13,6 +14,7 @@ import { FilterSetController } from './FilteringTableFilterSetUI/FilterSetContro
 import { SaveFilterSetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetButton';
 import { SaveFilterSetPresetButtonController } from './FilteringTableFilterSetUI/SaveFilterSetPresetButton';
 import { CaseViewEmbeddedVariantSampleSearchTable, CaseViewEmbeddedVariantSampleSearchTableSV } from './CaseViewEmbeddedVariantSampleSearchTable';
+import { TechnicalReviewController } from './TechnicalReviewColumn';
 
 
 
@@ -35,7 +37,7 @@ const filteringTabViews = {
 export function FilteringTab(props) {
     const {
         context, windowHeight, session, schemas, isActiveDotRouterTab,
-        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        haveCaseEditPermission, setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem,
         savedVariantSampleIDMap
     } = props;
@@ -50,7 +52,7 @@ export function FilteringTab(props) {
 
     const commonProps = {
         context, windowHeight, session, schemas, isActiveDotRouterTab,
-        setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
+        haveCaseEditPermission, setIsSubmitting, variantSampleListItem, updateVariantSampleListID,
         fetchVariantSampleListItem, isLoadingVariantSampleListItem,
         savedVariantSampleIDMap
     };
@@ -69,18 +71,23 @@ export function FilteringTab(props) {
                 </div>
             </div>
             <div id="snv-filtering" className={"mt-36" + (currViewIdx === 0 ? "" : " d-none")}>
-                <SelectedItemsController isMultiselect>
-                    <SNVFilteringTabBody {...commonProps} />
-                </SelectedItemsController>
+                <TechnicalReviewController>
+                    <SelectedItemsController isMultiselect>
+                        <SNVFilteringTabBody {...commonProps} />
+                    </SelectedItemsController>
+                </TechnicalReviewController>
             </div>
             <div id="cnvsv-filtering" className={"mt-36" + (currViewIdx === 1 ? "" : " d-none")}>
-                <SelectedItemsController isMultiselect>
-                    <CNVFilteringTabBody {...commonProps} />
-                </SelectedItemsController>
+                <TechnicalReviewController>
+                    <SelectedItemsController isMultiselect>
+                        <CNVFilteringTabBody {...commonProps} />
+                    </SelectedItemsController>
+                </TechnicalReviewController>
             </div>
         </React.Fragment>
     );
 }
+
 
 const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(props) {
     const { context, currViewIdx, setCurrViewIdx } = props;
@@ -130,20 +137,27 @@ const FilteringTabTableToggle = React.memo(function FilteringTabTableToggle(prop
 });
 
 /** Pulled out into own component so can style/adjust-if-needed together w. Case Review Tab */
-export function InnerTabToggle ({ activeIdx = 0, options = [] }) {
+export function InnerTabToggle(props) {
+    const {
+        activeIdx = 0,
+        options = [],
+        cardCls = "py-2 px-1 d-flex d-md-inline-flex flex-row",
+        btnCls = "px-md-4 px-lg-5"
+    } = props;
+
     const renderedOptions = options.map(function(opt, optIdx){
         const { title, disabled, onClick, dataTip } = opt;
         return (
             <div className="px-1 flex-grow-1" data-tip={dataTip} key={optIdx}>
                 <button type="button" {...{ onClick, disabled }} aria-pressed={activeIdx === optIdx}
-                    className={"px-md-4 px-lg-5 btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link")}>
+                    className={"btn btn-" + (activeIdx === optIdx ? "primary-dark active pe-none" : "link") + " " + btnCls}>
                     { title }
                 </button>
             </div>
         );
     });
     return (
-        <div className="card py-2 px-1 d-flex d-md-inline-flex flex-row">
+        <div className={"card " + cardCls}>
             { renderedOptions }
         </div>
     );
@@ -263,6 +277,11 @@ function FilteringTabBody(props) {
         selectedItems: selectedVariantSamples,                  // passed in from SelectedItemsController
         onSelectItem: onSelectVariantSample,                    // passed in from SelectedItemsController
         onResetSelectedItems: onResetSelectedVariantSamples,    // passed in from SelectedItemsController
+        lastSavedTechnicalReview,           // passed in from TechnicalReviewController
+        cacheSavedTechnicalReviewForVSUUID, // passed in from TechnicalReviewController
+        unsavedTechnicalReviewNoteTexts,    // passed in from TechnicalReviewController
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID, // passed in from TechnicalReviewController
+        resetLastSavedTechnicalReview, // passed in from TechnicalReviewController
         variantSampleListItem,      // Passed in from VariantSampleListController (index.js, wraps `CaseInfoTabView` via its `getTabObject`)
         updateVariantSampleListID,  // Passed in from VariantSampleListController
         savedVariantSampleIDMap,    // Passed in from VariantSampleListController
@@ -277,6 +296,7 @@ function FilteringTabBody(props) {
         blankFilterSetItem,                     // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         activeFilterSetFieldName,               // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
         searchType,                             // Passed in from SNVFilteringTabBody or CNVFilteringTabBody
+        haveCaseEditPermission = false,         // Passed in from CaseView/CaseInfoTabView
         isActiveDotRouterTab = false            // Passed in from CaseView/DotRouter
     } = props;
 
@@ -329,18 +349,22 @@ function FilteringTabBody(props) {
         isLoadingVariantSampleListItem,
         selectedVariantSamples,
         isActiveDotRouterTab,
+        lastSavedTechnicalReview,
+        // haveCaseEditPermission,
         // setIsSubmitting,
         // "caseItem": context
     };
 
     const fsControllerProps = {
-        searchHrefBase, onResetSelectedVariantSamples, searchType,
+        searchHrefBase, searchType,
+        onResetSelectedVariantSamples,
+        resetLastSavedTechnicalReview,
         "excludeFacets": hideFacets,
         "ref": filterSetControllerRef
     };
 
     const embeddedTableHeaderBody = (
-        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName }} caseItem={context}>
+        <SaveFilterSetButtonController {...{ setIsSubmitting, activeFilterSetFieldName, haveCaseEditPermission }} caseItem={context}>
             <SaveFilterSetPresetButtonController>
                 <FilteringTableFilterSetUI {...fsuiProps} {...{ searchType }} />
             </SaveFilterSetPresetButtonController>
@@ -384,7 +408,7 @@ function FilteringTabBody(props) {
 
     // This maxHeight is stylistic and dependent on our view design/style
     // wherein we have minHeight of tabs set to close to windowHeight in SCSS.
-    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 178) : undefined;
+    const maxHeight = typeof windowHeight === "number" && windowHeight > 845 ? (windowHeight - 142) : undefined;
 
     // Table re-initializes upon change of key so we use it refresh table based on session.
     const searchTableKey = "session:" + session;
@@ -393,9 +417,14 @@ function FilteringTabBody(props) {
         hideFacets, maxHeight, session, onClearFiltersVirtual, isClearFiltersBtnVisible, embeddedTableHeader,
         addToBodyClassList, removeFromBodyClassList,
         selectedVariantSamples, onSelectVariantSample,
-        savedVariantSampleIDMap, // <- Will be used to make selected+disabled checkboxes
-        isLoadingVariantSampleListItem, // <- Used to disable checkboxes if VSL still loading
-        currFilterSet, // <- Used for Matching Filter Block Indices column
+        savedVariantSampleIDMap,            // <- Will be used to make selected+disabled checkboxes
+        isLoadingVariantSampleListItem,     // <- Used to disable checkboxes if VSL still loading
+        currFilterSet,                      // <- Used for Matching Filter Block Indices column
+        lastSavedTechnicalReview,           // <- Used for TechnicalReviewColumn
+        cacheSavedTechnicalReviewForVSUUID, // <- Used for TechnicalReviewColumn
+        unsavedTechnicalReviewNoteTexts,    // <- Used for TechnicalReviewColumn
+        cacheUnsavedTechnicalReviewNoteTextForVSUUID, // <- Used for TechnicalReviewColumn
+        haveCaseEditPermission,             // <- Used for TechnicalReviewColumn
         "key": searchTableKey
     };
 

@@ -4,6 +4,7 @@ import structlog
 from base64 import b64encode
 from datetime import datetime
 from dateutil.relativedelta import relativedelta
+from dcicutils.misc_utils import ignored
 from pyramid.httpexceptions import HTTPUnprocessableEntity
 from pyramid.paster import get_app
 from pyramid.view import view_config
@@ -240,7 +241,7 @@ class Family(Item):
                     continue
                 analyzed.append(an_ind)
                 if an_ind not in all_links:
-                    print('should not happen')
+                    log.error('Family.construct_links - a situation that should that not happen occurred.')
                 for a_key in primary_vectors:
                     # extend the link list with this letter
                     extend_tag = a_key[0]
@@ -288,6 +289,7 @@ class Family(Item):
             'second-cousin', 'second-cousin-once-removed(descendant)', 'second-cousin-twice-removed(descendant)',
             'family-in-law', 'extended-family', 'not-linked'
                  ]
+        ignored(roles)  # TODO: Should this in fact be ignored?
         # return a nested list of  [acc, calculated_relation, association]
         # start convert with seed roles
         Converter = {
@@ -1141,7 +1143,7 @@ def create_family_proband(testapp, xml_data, refs, ref_field, family_item,
     family_members = {}
     uuids_by_ref = {}
     proband = None
-    errors = []
+    # errors = []
     xml_type = 'people'
     item_type = 'Individual'
     for round in ['first', 'second']:

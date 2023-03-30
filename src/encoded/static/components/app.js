@@ -64,7 +64,7 @@ export default class App extends React.PureComponent {
      * @constant
      * @type {number}
      */
-    static SLOW_REQUEST_TIME = 750
+    static SLOW_REQUEST_TIME = 750;
 
     /**
      * Immediately scrolls browser viewport to current window hash or to top of page.
@@ -195,11 +195,13 @@ export default class App extends React.PureComponent {
             }
             // Avoid popState on load, see: http://stackoverflow.com/q/6421769/199100
             // We don't use WindowEventDelegator here since we intend to `useCapture` to prevent default browser handling from being triggered for this.
-            const register = window.addEventListener.bind(window, 'popstate', this.handlePopState, true);
+            const registerWindowOnPopState = () => {
+                window.addEventListener("popstate", this.handlePopState, true);
+            };
             if (window._onload_event_fired) {
-                register();
+                registerWindowOnPopState();
             } else {
-                window.addEventListener('load', setTimeout.bind(window, register));
+                window.addEventListener("load", function(){ setTimeout(registerWindowOnPopState, 10); });
             }
         } else {
             window.onhashchange = this.onHashChange;
@@ -1084,7 +1086,7 @@ export default class App extends React.PureComponent {
 
     /** Renders the entire HTML of the application. */
     render() {
-        const { context, lastCSSBuildTime, href, contextRequest } = this.props;
+        const { context, lastBuildTime, href, contextRequest } = this.props;
         const { mounted = false } = this.state;
         const hrefParts = memoizedUrlParse(href);
         const routeList = hrefParts.pathname.split("/");
@@ -1141,18 +1143,21 @@ export default class App extends React.PureComponent {
 
         const contentSecurityPolicyStr = [
             "default-src 'self'",
-            "img-src 'self' https://* data:",
+            "img-src 'self' https://* https://i.ytimg.com data:",
             "child-src blob:",
             // Allowing unsafe-eval temporarily re: 'box-intersect' dependency of some HiGlass tracks.
-            "frame-src https://www.google.com/recaptcha/",
-            "script-src 'self' https://www.google-analytics.com https://cdn.auth0.com https://hms-dbmi.auth0.com https://secure.gravatar.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'unsafe-eval'", // + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
+            "frame-src https://www.google.com/recaptcha/ https://www.youtube.com",
+            // Allow anything on https://*.auth0.com domain to allow customization of Auth0 - Will Jan 31 2023
+            "script-src 'self' https://www.google-analytics.com https://*.auth0.com https://secure.gravatar.com https://www.google.com/recaptcha/ https://www.gstatic.com/recaptcha/ 'unsafe-eval'", // + (typeof BUILDTYPE === "string" && BUILDTYPE === "quick" ? " 'unsafe-eval'" : ""),
             "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com  https://unpkg.com",
             "font-src 'self' https://fonts.gstatic.com",
             "worker-src 'self' blob:",
             "connect-src 'self' https://cgap-higlass.com https://*.s3.amazonaws.com https://rest.ensembl.org https://eutils.ncbi.nlm.nih.gov"
         ].join("; ");
+        // In future consider adding: object-src 'none'; require-trusted-types-for 'script';
+        // (from google csp eval -- Will says what we have is fine for now, though)
 
-        // `lastCSSBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
+        // `lastBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
 
         return (
             <html lang="en">
@@ -1163,17 +1168,22 @@ export default class App extends React.PureComponent {
                     <meta httpEquiv="X-UA-Compatible" content="IE=edge"/>
                     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
                     <meta name="google-site-verification" content="sia9P1_R16tk3XW93WBFeJZvlTt3h0qL00aAJd3QknU" />
+                    <meta name="robots" content="noindex"/>
                     <HTMLTitle {...{ context, currentAction, canonical, status }} />
                     <script data-prop-name="user_info" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                         __html: jsonScriptEscape(JSON.stringify(JWT.getUserInfo())) /* Kept up-to-date in browser.js */
                     }}/>
-                    <script data-prop-name="lastCSSBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastCSSBuildTime }}/>
-                    <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastCSSBuildTime || 0)} />
-                    <DeferMount><link rel="stylesheet" media="print" href={'/static/css/print.css?build=' + (lastCSSBuildTime || 0)} /></DeferMount>
+                    <script data-prop-name="lastBuildTime" type="application/json" dangerouslySetInnerHTML={{ __html: lastBuildTime }}/>
+                    <link rel="stylesheet" href={'/static/css/style.css?build=' + (lastBuildTime || 0)} />
+                    <DeferMount><link rel="stylesheet" media="print" href={'/static/css/print.css?build=' + (lastBuildTime || 0)} /></DeferMount>
                     <SEO.CurrentContext {...{ context, hrefParts, baseDomain }} />
                     <link href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:200,300,400,600,700,900,300i,400i,600i|Yrsa|Source+Code+Pro:300,400,500,600" rel="stylesheet"/>
+                    {/* Can set webpack.config.js browser build's externals "react":"React" and load via CDN but need to then allow cross-origin requests to CDN domain
+                    <script crossOrigin src="https://unpkg.com/react@17/umd/react.development.js"></script>
+                    <script crossOrigin src="https://unpkg.com/react-dom@17/umd/react-dom.development.js"></script>
+                    */}
                     <script defer type="application/javascript" src="//www.google-analytics.com/analytics.js" />
-                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastCSSBuildTime || 0)} charSet="utf-8" />
+                    <script defer type="application/javascript" src={"/static/build/bundle.js?build=" + (lastBuildTime || 0)} charSet="utf-8" />
                     <link rel="canonical" href={canonical} />
                     {/* <script data-prop-name="inline" type="application/javascript" charSet="utf-8" dangerouslySetInnerHTML={{__html: this.props.inline}}/> <-- SAVED FOR REFERENCE */}
                 </head>
@@ -1250,7 +1260,7 @@ const ContentRenderer = React.memo(function ContentRenderer(props){
     const commonContentViewProps = _.pick(props,
         // Props from App:
         'schemas', 'session', 'href', 'navigate', 'uploads', 'updateUploads', 'alerts',
-        'browseBaseState', 'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
+        'setIsSubmitting', 'isSubmitting', 'isSubmittingModalOpen', 'updateAppSessionState', 'context', 'currentAction',
         // Props from BodyElement:
         'windowWidth', 'windowHeight', 'registerWindowOnResizeHandler', 'registerWindowOnScrollHandler',
         'addToBodyClassList', 'removeFromBodyClassList', 'toggleFullScreen', 'isFullscreen',
@@ -1734,7 +1744,7 @@ class BodyElement extends React.PureComponent {
      */
     render(){
         const { onBodyClick, onBodySubmit, context, alerts, canonical, currentAction, hrefParts, slowLoad, mounted, href, session, schemas,
-            browseBaseState, updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
+            updateAppSessionState, isSubmitting, isSubmittingModalOpen } = this.props;
         const { windowWidth, windowHeight, classList, hasError, isFullscreen, testWarningPresent } = this.state;
         const { registerWindowOnResizeHandler, registerWindowOnScrollHandler, addToBodyClassList, removeFromBodyClassList, toggleFullScreen } = this;
         const overlaysContainer = this.overlaysContainerRef.current;
@@ -1759,7 +1769,7 @@ class BodyElement extends React.PureComponent {
             isFullscreen, toggleFullScreen, overlaysContainer,
             testWarningPresent, hideTestWarning: this.hideTestWarning,
             context, href, currentAction, session, schemas,
-            browseBaseState, updateAppSessionState
+            updateAppSessionState
         };
 
         const propsPassedToAllViews = {

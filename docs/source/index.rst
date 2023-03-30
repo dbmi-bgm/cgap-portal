@@ -9,18 +9,19 @@ CGAP Documentation
 
 Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim to streamline the clinical genetics workflow. The following locations are different deployments of our data portal:
 
-* `Production  <http://cgap.hms.harvard.edu/>`_ for the stable release
-* `cgapdev <http://fourfront-cgapdev.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for data model and back-end development
-* `cgaptest <http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for front-end and UX development
-* `cgapwolf <http://fourfront-cgapwolf.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for workflow development
+* `cgap-dbmi <https://cgap-dbmi.hms.harvard.edu/>`_ DBMI production account
+* `cgap-training <https://cgap-training.hms.harvard.edu/>`_ demo account for potential users
+* `cgap-devtest <https://cgap-devtest.hms.harvard.edu/>`_ general development/testing account
+* `cgap-wolf <https://cgap-wolf.hms.harvard.edu/>`_ workflow development account
 
-Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. To get started, read the following documentation on the infrastructure and how to work with the data model:
+Be warned that features are under active development and may not be stable! Visit the demo account for the best experience. To get started, read the following documentation on the infrastructure and how to work with the data model:
 
 *Infrastructure*
 
   .. toctree::
     :titlesonly:
 
+    infra_landing
     local_installation
     infrastructure_overview
     dataflow_overview

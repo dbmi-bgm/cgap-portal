@@ -1,6 +1,6 @@
 import json
 from math import inf
-from os import walk, path, getcwd
+from os import walk, path  # , getcwd
 
 '''
 This script re-orders columns and (todo) facets

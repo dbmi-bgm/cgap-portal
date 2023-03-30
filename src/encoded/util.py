@@ -10,18 +10,21 @@ import pyramid.request
 import re
 import structlog
 import tempfile
-from botocore.client import Config
+import time
 
-from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity
-from dcicutils.ecs_utils import CGAP_ECS_REGION
+from botocore.client import Config
+from dcicutils.ecs_utils import ECSUtils
+from dcicutils.misc_utils import check_true, VirtualApp, count_if, identity, PRINT, ignored
 from dcicutils.secrets_utils import assume_identity
 from io import BytesIO
 from pyramid.httpexceptions import HTTPUnprocessableEntity, HTTPForbidden, HTTPServerError
+from pyramid.registry import Registry
 from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
 from typing import Optional
+
 from .types.base import get_item_or_none
 
 
@@ -92,7 +95,7 @@ def debuglog(*args):
             nowstr = str(datetime.datetime.now())
             dateid = nowstr[:10].replace('-', '')
             with io.open(os.path.expanduser(os.path.join(DEBUGLOG, "DEBUGLOG-%s.txt" % dateid)), "a+") as fp:
-                print(nowstr, *args, file=fp)
+                PRINT(nowstr, *args, file=fp)
         except Exception:
             # There are many things that could go wrong, but none of them are important enough to fuss over.
             # Maybe it was a bad pathname? Out of disk space? Network error?
@@ -144,7 +147,8 @@ def subrequest_item_creation(request: pyramid.request.Request, item_type: str, j
     # Maybe...
     # validated = json_body.copy()
     # subrequest.validated = validated
-    collection: Collection = subrequest.registry[COLLECTIONS][item_type]
+    registry: Registry = subrequest.registry  # noQA - PyCharm can't tell subrequest.registry IS a Registry
+    collection: Collection = registry[COLLECTIONS][item_type]
     check_true(subrequest.json_body, "subrequest.json_body is not properly initialized.")
     check_true(not subrequest.validated, "subrequest was unexpectedly validated already.")
     check_true(not subrequest.errors, "subrequest.errors already has errors before trying to validate.")
@@ -171,7 +175,7 @@ def s3_output_stream(s3_client, bucket: str, key: str, s3_encrypt_key_id: Option
     This context manager allows one to write:
 
         with s3_output_stream(s3_client, bucket, key) as fp:
-            print("foo", file=fp)
+            ... fp.write("foo") ...
 
     to do output to an s3 bucket.
 
@@ -356,6 +360,18 @@ def beanstalk_env_from_registry(registry):
     return registry.settings.get('env.name')
 
 
+def customized_delay_rerun(sleep_seconds=1):
+    def parameterized_delay_rerun(*args):
+        """ Rerun function for flaky """
+        ignored(args)
+        time.sleep(sleep_seconds)
+        return True
+    return parameterized_delay_rerun
+
+
+delay_rerun = customized_delay_rerun(sleep_seconds=1)
+
+
 def check_user_is_logged_in(request):
     """ Raises HTTPForbidden if the request did not come from a logged in user. """
     for principal in request.effective_principals:
@@ -383,7 +399,7 @@ CONTENT_TYPE_SPECIAL_CASES = {
         # All other special case values should be added using register_path_content_type.
         '/metadata/',
         '/variant-sample-search-spreadsheet/',
-        r'/variant-sample-lists/[\da-z-]+/@@spreadsheet/'
+        re.compile(r'/variant-sample-lists/[\da-z-]+/@@spreadsheet/'),
     ]
 }
 
@@ -400,6 +416,9 @@ def register_path_content_type(*, path, content_type):
         CONTENT_TYPE_SPECIAL_CASES[content_type] = exceptions = []
     if path not in exceptions:
         exceptions.append(path)
+
+
+compiled_regexp_class = type(re.compile("foo.bar"))  # Hides that it's _sre.SRE_Pattern in 3.6, but re.Pattern in 3.7
 
 
 def content_type_allowed(request):
@@ -420,9 +439,11 @@ def content_type_allowed(request):
             if isinstance(path_condition, str):
                 if path_condition in request.path:
                     return True
-            else:
-                if re.match(path_condition, request.path):
+            elif isinstance(path_condition, compiled_regexp_class):
+                if path_condition.match(request.path):
                     return True
+            else:
+                raise NotImplementedError(f"Unrecognized path_condition: {path_condition}")
 
     return False
 
@@ -471,37 +492,16 @@ def vapp_for_ingestion(app=None, registry=None, context=None):
     yield make_vapp_for_ingestion(app=app, registry=registry, context=context)
 
 
-# I didn't need these for persona matching, but might in the future so am going to hold them for a little while.
-# -kmp 2-Apr-2021
-#
-# def name_matcher(name):
-#     """
-#     Given a string name, returns a predicate that returns True if given that name (in any case), and False otherwise.
-#     """
-#     return lambda n: n.lower() == name
-#
-#
-# def any_name_matcher(*names):
-#     """
-#     Given a list of string names, returns a predicate that matches those names. Given no names, it matches any name.
-#     The matcher returned is incase-sensitive.
-#     """
-#     if names:
-#         canonical_names = [name.lower() for name in names]
-#         return lambda name: name.lower() in canonical_names
-#     else:
-#         return constantly(True)
-
-
 def make_s3_client():
     s3_client_extra_args = {}
     if 'IDENTITY' in os.environ:
         identity = assume_identity()
         s3_client_extra_args['aws_access_key_id'] = key_id = identity.get('S3_AWS_ACCESS_KEY_ID')
         s3_client_extra_args['aws_secret_access_key'] = identity.get('S3_AWS_SECRET_ACCESS_KEY')
-        s3_client_extra_args['region_name'] = CGAP_ECS_REGION
+        s3_client_extra_args['region_name'] = ECSUtils.REGION
         log.warning(f"make_s3_client using S3 entity ID {key_id[:10]} arguments in `boto3 client creation call.")
         if 'ENCODED_S3_ENCRYPT_KEY_ID' in identity:
+            # This setting is required when testing locally and encrypted buckets need to be accessed.
             s3_client_extra_args['config'] = Config(signature_version='s3v4')
     else:
         log.warning(f'make_s3_client called with no identity')
@@ -533,3 +533,73 @@ def convert_integer_to_comma_string(value):
     if isinstance(value, int):
         result = format(value, ",d")
     return result
+
+
+SPACE_PATTERN = re.compile(r"[ ]+")
+
+
+def title_to_snake_case(input_string):
+    """Convert string title case (e.g. "Some Title") to snake case.
+
+    TODO: Move to dcicutils
+    
+    :param input_string: String to convert
+    :type input_string: str
+    :return: String in snake case
+    :rtype: str
+    """
+    lower_string = input_string.lower()
+    no_dash_string = lower_string.replace("-", " ").replace("_", " ")
+    no_space_string = re.sub(SPACE_PATTERN, "_", no_dash_string)
+    result = no_space_string.strip("_")
+    return result
+
+
+def get_item(request, item_atid):
+    """Get item from database via its @id.
+
+    For @ids, essentially get_item_or_none that always returns dict
+    for consistency and does not require specifying collection. Useful
+    when working within calculated properties.
+
+    NOTE: Only useful for @ids; other identifiers will NOT work as is.
+
+    :param request: Web request
+    :type request: class:`pyramid.request.Request`
+    :param item_atid: Item @id
+    :type item_atid: str
+    :return: Item in object view, if found
+    :rtype: dict
+    """
+    if isinstance(item_atid, str):
+        item_collection = item_atid.split("/")[0]
+        result = get_item_or_none(request, item_atid, item_collection)
+        if result is None:
+            log.exception(f"Could not find expected item for identifer: {item_atid}.")
+            result = {}
+    else:
+        result = {}
+    return result
+
+
+def transfer_properties(source, target, properties, property_replacements=None):
+    """Transfer dictionary properties, leaving source as is.
+
+    Also replace source keys if replacements provided.
+
+    :param source: Source with properties to transfer
+    :type source: dict
+    :param target: Target to receive properties
+    :type target: dict
+    :param properties: Keys of properties to transfer
+    :type properties: list[str]
+    :param property_replacements: Source property keys to replace,
+        mapping key --> replacement key
+    :type property_replacements: dict
+    """
+    for property_name in properties:
+        property_value = source.get(property_name)
+        if property_value is not None:
+            if property_replacements:
+                property_name = property_replacements.get(property_name, property_name)
+            target[property_name] = property_value

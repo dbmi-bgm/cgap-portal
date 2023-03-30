@@ -5,6 +5,7 @@
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO9R",
         "filename": "_6_out_pair1.bam",
+        "quality_metric": "5016cee3-f3e6-402b-9530-bf98400d498d",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi"
     },
@@ -14,6 +15,7 @@
         "file_format": "d13d06cf-218e-4f61-aaf0-91f226248b3c",
         "accession": "GAPFIFYGNO1A",
         "filename": "1_6_out_pair1.bam",
+        "quality_metric": "45cd039e-fd67-4c60-97dd-270cda13cabd",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi"
     },
@@ -48,11 +50,34 @@
         "status": "shared",
         "uuid": "6b113e31-d4dd-465a-99b2-16fb0c3928fb",
         "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
-        "accession": "GAPFIFYGNO4A",
+        "accession": "GAPFIFSV0O4A",
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "file_type": "full annotated VCF",
+        "quality_metric": "21aaf9c1-cb02-40df-b90a-ccf1d7ce84b6",
         "variant_type": "SV"
+    },
+    {
+        "status": "shared",
+        "uuid": "510e51d7-3ad7-4e22-bbec-532c830c989a",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYSNV4A",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "quality_metric": "ac30b28b-61dd-4136-b46d-9ed66a484219",
+        "file_type": "VEP-annotated VCF",
+        "variant_type": "SNV"
+    },
+    {
+        "status": "shared",
+        "uuid": "70704b45-b696-49bf-ac58-0cdece4cc0ee",
+        "file_format": "0cd4e777-a596-4927-95c8-b07716121aa5",
+        "accession": "GAPFIFYSNV4B",
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "institution": "hms-dbmi",
+        "quality_metric": "9c650173-a669-4c4f-8f42-4b50e8e88e5a",
+        "vcf_to_ingest": true,
+        "variant_type": "SNV"
     },
     {
         "status": "shared",

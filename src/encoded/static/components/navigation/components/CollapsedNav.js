@@ -16,6 +16,7 @@ import {
     BigDropdownGroupController
 } from './BigDropdown';
 import { AccountNav } from './AccountNav';
+import FeedbackButton from '../../item-pages/components/FeedbackButton';
 
 
 export const CollapsedNav = React.memo(function CollapsedNav(props){
@@ -23,7 +24,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
         context,
         href, currentAction, session, mounted,
         overlaysContainer, windowWidth, windowHeight,
-        browseBaseState, testWarningVisible,
+        testWarningVisible,
         addToBodyClassList, removeFromBodyClassList,
         schemas, updateAppSessionState
     } = props;
@@ -31,7 +32,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
     const leftNavProps = {
         context,
         windowWidth, windowHeight, href, mounted, overlaysContainer, session,
-        testWarningVisible, browseBaseState//, addToBodyClassList, removeFromBodyClassList
+        testWarningVisible, //, addToBodyClassList, removeFromBodyClassList
     };
 
     const userActionNavProps = {
@@ -47,6 +48,7 @@ export const CollapsedNav = React.memo(function CollapsedNav(props){
                 { session ?
                     <LeftNavAuthenticated {...leftNavProps} />
                     : <LeftNavGuest {...leftNavProps} /> }
+                <FeedbackButton />
                 <AccountNav {...userActionNavProps} />
             </BigDropdownGroupController>
         </NavbarCollapse>

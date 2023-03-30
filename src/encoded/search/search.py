@@ -63,6 +63,9 @@ class SearchBuilder:
     CARDINALITY_RANGE = '-3.4028E38-*'
     PAGINATION_SIZE = 10  # for ECS, 10 is much better than 25, and may even do better when lowered
     MISSING = object()
+    SEARCH_INFO_HEADER_TYPES = [
+        'Workflow'  # TODO: add types here as needed
+    ]
 
     def __init__(self, context, request, search_type=None, return_generator=False, forced_type='Search',
                  custom_aggregations=None, skip_bootstrap=False):
@@ -99,7 +102,7 @@ class SearchBuilder:
             item_type_snake_case = ''.join(['_' + c.lower() if c.isupper() else c for c in self.doc_types[0]]).lstrip('_')
             mappings = self.request.registry[STORAGE].read.mappings.get()
             if get_namespaced_index(self.request, item_type_snake_case) == self.es_index and self.es_index in mappings:
-                return mappings[self.es_index]['mappings'][item_type_snake_case]['properties']
+                return mappings[self.es_index]['mappings']['properties']
             else:  # new item was added after last cache update, get directly via API
                 return get_es_mapping(self.es, self.es_index)
         return {}
@@ -338,8 +341,12 @@ class SearchBuilder:
         Get static section (if applicable) when searching a single item type
         Note: Because we rely on 'source', if the static_section hasn't been indexed
         into Elasticsearch it will not be loaded
+
+        Only check for this if the item type is declared to have one in
+        the class constant SEARCH_INFO_HEADER_TYPES
         """
-        if (len(self.doc_types) == 1) and 'Item' not in self.doc_types:
+        if (len(self.doc_types) == 1 and 'Item' not in self.doc_types and
+                self.doc_types[0] in self.SEARCH_INFO_HEADER_TYPES):
             search_term = 'search-info-header.' + self.doc_types[0]
             # XXX: this could be cached application side as well
             try:
@@ -523,9 +530,9 @@ class SearchBuilder:
             self.query['sort'] = [{'_score': {"order": "desc"}},
                                   {'embedded.date_created.raw': {'order': 'desc', 'unmapped_type': 'keyword'},
                                    'embedded.label.raw': {'order': 'asc', 'unmapped_type': 'keyword', 'missing': '_last'}},
-                                  {'_uid': {'order': 'asc'}}
+                                  {'_id': {'order': 'asc'}}  # ES7 - _uid removed, now use _id
                 ]
-                # 'embedded.uuid.raw' (instd of _uid) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
+                # 'embedded.uuid.raw' (instd of _id) sometimes results in 400 bad request : 'org.elasticsearch.index.query.QueryShardException: No mapping found for [embedded.uuid.raw] in order to sort on'
 
             self.response['sort'] = result_sort = {'_score': {"order": "desc"}}
 
@@ -781,8 +788,7 @@ class SearchBuilder:
                 if bucket['key'] not in term_to_bucket:
                     term_to_bucket[bucket['key']] = bucket
 
-        result_facet['terms'] = sorted(list(term_to_bucket.values()),
-                                       key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
+        result_facet['terms'] = sorted(list(term_to_bucket.values()),key=lambda d: d['primary_agg_reverse_nested']['doc_count'], reverse=True)
 
     def format_facets(self, es_results):
         """
@@ -861,6 +867,7 @@ class SearchBuilder:
                     # do the below, except account for nested agg structure
                     if facet['aggregation_type'] == NESTED:
                         self.fix_and_replace_nested_doc_count(result_facet, aggregations, full_agg_name)
+                        result.append(result_facet)
                         continue
 
                     def extract_buckets(path):
@@ -1081,7 +1088,7 @@ class SearchBuilder:
         es_result = execute_search(es=self.es, query=self.query, index=self.es_index, from_=0, size=size_increment,
                                    session_id=self.search_session_id)
 
-        total_results_expected = es_result['hits'].get('total', 0)
+        total_results_expected = es_result['hits'].get('total', {}).get('value', 0)
 
         # Decrease by 1 (first es_result already happened)
         extra_requests_needed_count = math.ceil(total_results_expected / size_increment) - 1
@@ -1116,7 +1123,7 @@ class SearchBuilder:
         """
         # Response formatting
         self.response['notification'] = 'Success'
-        self.response['total'] = es_results['hits']['total']
+        self.response['total'] = es_results['hits']['total']['value']
         self.response['facets'] = self.format_facets(es_results)
         self.response['aggregations'] = self.format_extra_aggregations(es_results)
         self.response['actions'] = self.get_collection_actions()
@@ -1127,8 +1134,9 @@ class SearchBuilder:
         if self.size not in (None, 'all') and self.size < self.response['total']:
             params = [(k, v) for k, v in self.request.normalized_params.items() if k != 'limit']
             params.append(('limit', 'all'))
-            if self.context:
-                self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
+            # do not check presence of this field, as it triggers an ES len call! - Will 30 March 2022
+            # if self.context:
+            #     self.response['all'] = '%s?%s' % (self.request.resource_path(self.context), urlencode(params))
 
         # `graph` below is a generator.
         # `es_results['hits']['hits']` will contain a generator instead of list
@@ -1257,7 +1265,7 @@ def collection_view(context, request):
     return search(context, request, context.type_info.name, False, forced_type='Search')
 
 
-def get_iterable_search_results(request, search_path='/search/', param_lists=None, **kwargs):
+def get_iterable_search_results(request, search_path='/search/', param_lists=None, inherit_user=True, **kwargs):
     '''
     Loops through search results, returns 100 (or search_results_chunk_row_size) results at a time. Pass it through itertools.chain.from_iterable to get one big iterable of results.
     Potential TODO: Move to search_utils or other file, and have this (or another version of this) handle compound filter_sets.
@@ -1271,7 +1279,12 @@ def get_iterable_search_results(request, search_path='/search/', param_lists=Non
     param_lists['limit'] = ['all']
     param_lists['from'] = [0]
     param_lists['sort'] = param_lists.get('sort', 'uuid')
-    subreq = make_search_subreq(request, '{}?{}'.format(search_path, urlencode(param_lists, True)) )
+    subreq = make_search_subreq(request, '{}?{}'.format(search_path, urlencode(param_lists, True)), inherit_user=inherit_user)
+    if not inherit_user:
+        # Perform request as if an admin.
+        subreq.remote_user = "UPGRADE"
+        if 'HTTP_COOKIE' in subreq.environ:
+            del subreq.environ['HTTP_COOKIE']
     return iter_search_results(None, subreq, **kwargs)
 
 

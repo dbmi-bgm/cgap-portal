@@ -9,7 +9,8 @@
         "uuid": "c13d06cf-218e-4f61-aaf0-91f226248b2c",
         "status": "shared",
         "valid_item_types": [
-            "FileFastq"
+            "FileFastq",
+            "FileSubmitted"
         ],
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi"
@@ -51,6 +52,7 @@
             "vcf"
         ],
         "valid_item_types": [
+            "FileSubmitted",
             "FileProcessed"
         ]
     },

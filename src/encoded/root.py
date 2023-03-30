@@ -3,12 +3,12 @@ import uptime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
-from dcicutils.s3_utils import HealthPageKey  # , s3Utils
+from dcicutils.s3_utils import HealthPageKey
 from dcicutils.env_utils import infer_foursight_url_from_env
 from pyramid.decorator import reify
 from pyramid.security import ALL_PERMISSIONS, Allow, Authenticated, Deny, Everyone
 from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
-from .appdefs import APP_VERSION_REGISTRY_KEY
+from .appdefs import APP_VERSION_REGISTRY_KEY, ITEM_INDEX_ORDER
 from .schema_formats import is_accession
 from .util import SettingsKey
 
@@ -16,6 +16,7 @@ from .util import SettingsKey
 def includeme(config):
     config.include(health_check)
     config.include(item_counts)
+    config.include(type_metadata)
     config.include(submissions_page)
     config.scan(__name__)
 
@@ -57,6 +58,23 @@ def item_counts(config):
     config.add_view(counts_view, route_name='item-counts')
 
 
+def type_metadata(config):
+
+    config.add_route(
+        'type-metadata',
+        '/type-metadata'
+    )
+
+    def type_metadata_view(request):
+
+        return {
+            'index_order': ITEM_INDEX_ORDER
+        }
+
+    config.add_view(type_metadata_view, route_name='type-metadata')
+
+
+
 def uptime_info():
     try:
         return lang_utils.relative_time_string(uptime.uptime())
@@ -88,13 +106,8 @@ def health_check(config):
         response.content_type = 'application/json; charset=utf-8'
         settings = request.registry.settings
 
-        # TODO: This computation of app_url is unused. Is that a bug, or should we remove it? -kmp 4-Oct-2021
-        app_url = request.application_url
-        if not app_url.endswith('/'):
-            app_url = ''.join([app_url, '/'])
-
         env_name = settings.get('env.name')
-        foursight_url = infer_foursight_url_from_env(request, env_name)
+        foursight_url = infer_foursight_url_from_env(request=request, envname=env_name)
 
         response_dict = {
 

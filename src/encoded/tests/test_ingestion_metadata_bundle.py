@@ -1,16 +1,17 @@
 import boto3
 import botocore.exceptions
 import contextlib
-import datetime as datetime_module
+# import datetime as datetime_module
 import json
 import os
 import pytest
-import pytz
+# import pytz
 import webtest
 
 from dcicutils import qa_utils
-from dcicutils.misc_utils import constantly, file_contents
-from dcicutils.qa_utils import ignored, ControlledTime, MockBotoS3Client
+from dcicutils.misc_utils import constantly, file_contents, ignored
+from dcicutils.qa_utils import MockBotoS3Client  # , ControlledTime
+from dcicutils.s3_utils import HealthPageKey
 from unittest import mock
 from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
 from .. import ingestion_listener as ingestion_listener_module
@@ -45,10 +46,10 @@ class MockQueueManager:
 
 
 @contextlib.contextmanager
-def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test_pseudoenv, fake_tester_email, dt):
+def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test_pseudoenv, fake_tester_email):
 
     def mocked_get_trusted_email(request, context, raise_errors):
-        assert context is "Submission"
+        assert context == "Submission"
         assert raise_errors is False
         if request.remote_user == 'TEST':
             return fake_tester_email
@@ -56,26 +57,18 @@ def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test
             return None
 
     with mock.patch.object(ingestion_listener_module, "get_trusted_email", mocked_get_trusted_email):
-        with mock.patch.object(datetime_module, "datetime", dt):
-            with mock.patch.object(ingestion_listener_module, "beanstalk_env_from_request",
-                                   return_value=test_pseudoenv):
-                with mock.patch.object(qa_utils, "FILE_SYSTEM_VERBOSE", False):  # This should be a parameter but isn't
-                    with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
-                        with mock.patch.object(ingestion_listener_module, "get_queue_manager",
-                                               constantly(mocked_queue_manager)):
-                            with mock.patch.object(util_module, "subrequest_item_creation",
-                                                   expect_unreachable_in_mock("subrequest_item_creation")):
-                                yield
+        with mock.patch.object(ingestion_listener_module, "beanstalk_env_from_request",
+                               return_value=test_pseudoenv):
+            with mock.patch.object(qa_utils, "FILE_SYSTEM_VERBOSE", False):  # This should be a parameter but isn't
+                with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
+                    with mock.patch.object(ingestion_listener_module, "get_queue_manager",
+                                           constantly(mocked_queue_manager)):
+                        with mock.patch.object(util_module, "subrequest_item_creation",
+                                               expect_unreachable_in_mock("subrequest_item_creation")):
+                            yield
 
 
 def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_status=200):
-
-    class ControlledTimeWithFix(ControlledTime):
-
-        def just_utcnow(self):
-            return self.just_now().astimezone(pytz.UTC).replace(tzinfo=None)
-
-    dt = ControlledTimeWithFix()
 
     mocked_queue_manager = MockQueueManager(expected_ingestion_type='metadata_bundle')
 
@@ -85,7 +78,6 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
 
     with authorized_ingestion_simulation(mocked_queue_manager=mocked_queue_manager,
                                          mocked_s3_client=mocked_s3_client,
-                                         dt=dt,
                                          test_pseudoenv=test_pseudoenv,
                                          fake_tester_email=fake_tester_email):
 
@@ -124,7 +116,8 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
 
         s3_file_system = mocked_s3_client.s3_files.files
 
-        expected_bucket = "elasticbeanstalk-fourfront-cgaplocal-test-metadata-bundles"
+        health_json = testapp.get('/health?format=json').json
+        expected_bucket = health_json.get(HealthPageKey.METADATA_BUNDLES_BUCKET)
 
         datafile_short_name = "datafile.xlsx"
         manifest_short_name = "manifest.json"
@@ -140,7 +133,15 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
         assert s3_file_system[datafile_name] == file_contents(METADATA_BUNDLE_PATH,
                                                               binary=True)
 
-        assert json.loads(s3_file_system[manifest_name].decode('utf-8')) == {
+        def dict_mostly_equals(dict1, dict2, *, ignoring_keys):
+            most_of_dict1 = dict1.copy()
+            most_of_dict2 = dict2.copy()
+            for key in ignoring_keys:
+                most_of_dict1.pop(key, None)
+                most_of_dict2.pop(key, None)
+            return most_of_dict1 == most_of_dict2
+
+        assert dict_mostly_equals(json.loads(s3_file_system[manifest_name].decode('utf-8')), {
             "filename": METADATA_BUNDLE_PATH,
             "object_name": datafile_key,
             "submission_id": submission_guid,
@@ -153,7 +154,7 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
             "success": True,
             "message": "Uploaded successfully.",
             "s3_encrypt_key_id": None,
-            "upload_time": dt.just_utcnow().isoformat(),
+            # "upload_time": dt.just_utcnow().isoformat(),
             "parameters": {
                 "ingestion_type": ingestion_type,
                 "institution": DBMI_INSTITUTION_ID,
@@ -161,7 +162,7 @@ def check_submit_for_ingestion_authorized(testapp, mocked_s3_client, expected_st
                 "validate_only": "True",
                 "datafile": METADATA_BUNDLE_PATH,
             },
-        }
+        }, ignoring_keys=["upload_time"])
 
         # Make sure we report success from the endpoint
         assert response.status_code == 200

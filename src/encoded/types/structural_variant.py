@@ -1,6 +1,7 @@
 import io
 
 import negspy.coordinates as nc
+from pyramid.view import view_config
 from snovault import calculated_property, collection, load_schema
 
 from ..ingestion.common import CGAP_CORE_PROJECT
@@ -12,7 +13,8 @@ from .variant import (
     SHARED_VARIANT_EMBEDS,
     SHARED_VARIANT_SAMPLE_EMBEDS,
     extend_embedded_list,
-    load_extended_descriptions_in_schemas
+    load_extended_descriptions_in_schemas,
+    update_project_notes_process
 )
 
 
@@ -323,7 +325,10 @@ class StructuralVariant(Item):
     unique_key="structural_variant_sample:annotation_id",
 )
 class StructuralVariantSample(Item):
-    """Class for structural variant samples."""
+    """
+    Class for structural variant samples.
+    Should we have this inherit from VariantSample perhaps? Or maybe make a common base class?
+    """
 
     item_type = "structural_variant_sample"
     schema = load_extended_descriptions_in_schemas(
@@ -396,20 +401,23 @@ class StructuralVariantSample(Item):
         }
     )
     def display_title(self, request, CALL_INFO, structural_variant):
+        """Build display title.
+
+        This title is displayed in new tabs/windows.
+        """
+        result = CALL_INFO
         structural_variant = get_item_or_none(
             request, structural_variant, "StructuralVariant", frame="raw"
         )
-        start = convert_integer_to_comma_string(structural_variant["START"])
-        end = convert_integer_to_comma_string(structural_variant["END"])
-        structural_variant_display_title = build_structural_variant_display_title(
-            structural_variant["SV_TYPE"],
-            structural_variant["CHROM"],
-            start,
-            end,
-        )
         if structural_variant:
-            return CALL_INFO + ":" + structural_variant_display_title
-        return CALL_INFO
+            structural_variant_display_title = build_structural_variant_display_title(
+                structural_variant["SV_TYPE"],
+                structural_variant["CHROM"],
+                structural_variant["START"],
+                structural_variant["END"],
+            )
+            result = structural_variant_display_title + " (" + CALL_INFO + ")"
+        return result
 
     @calculated_property(
         schema={
@@ -423,6 +431,23 @@ class StructuralVariantSample(Item):
         result = self.rev_link_atids(request, "variant_sample_list")
         if result:
             return result[0]  # expected one list per case
+
+    @calculated_property(schema={
+        "title": "Project Technical Review",
+        "description": "The technical review saved to project for this Variant",
+        "type": "string",
+        "linkTo": "NoteTechnicalReview"
+    })
+    def project_technical_review(self, request, structural_variant=None, project=None):
+        structural_variant = get_item_or_none(request, structural_variant, 'StructuralVariant', frame='raw')
+        if structural_variant and project:
+            # project param will be in form of @id
+            for tr_uuid in structural_variant.get("technical_reviews", []):
+                # frame=object returns linkTos in form of @id, frame=raw returns them in form of UUID.
+                technical_review = get_item_or_none(request, tr_uuid, 'NoteTechnicalReview', frame='object')
+                if technical_review.get("project") == project:  # Comparing @IDs
+                    return tr_uuid
+        return None
 
     @calculated_property(
         schema={
@@ -494,9 +519,7 @@ class StructuralVariantSample(Item):
             "items": {"type": "string"},
         }
     )
-    def proband_only_inheritance_modes(
-        self, request, structural_variant, inheritance_modes=[]
-    ):
+    def proband_only_inheritance_modes(self, request, structural_variant):
         """
         Inheritance modes for proband-only cases.
 
@@ -612,3 +635,62 @@ class StructuralVariantSample(Item):
                 new_labels[role_key] = " ".join(label)  # just in case
 
         return new_labels
+
+    @calculated_property(
+        schema={
+            "title": "Reference Split Read Support",
+            "description": "Split reads where P(ref allele|read)>0.999",
+            "type": "integer",
+        }
+    )
+    def reference_split_reads(self, split_reads=None):
+        """Get reference split reads (1st item in split_reads)."""
+        if isinstance(split_reads, list) and len(split_reads) == 2:
+            return split_reads[0]
+
+    @calculated_property(
+        schema={
+            "title": "Alternate split Read Support",
+            "description": "Split reads where P(alt allele|read)>0.999",
+            "type": "integer",
+        }
+    )
+    def alternate_split_reads(self, split_reads=None):
+        """Get alternate split reads (2nd item in split_reads)."""
+        if isinstance(split_reads, list) and len(split_reads) == 2:
+            return split_reads[1]
+
+    @calculated_property(
+        schema={
+            "title": "Reference Paired Read Support",
+            "description": "Read pairs mapping consistent with reference allele",
+            "type": "integer",
+        }
+    )
+    def reference_paired_reads(self, paired_reads=None):
+        """Get reference paired reads (1st item in paired_reads)."""
+        if isinstance(paired_reads, list) and len(paired_reads) == 2:
+            return paired_reads[0]
+
+    @calculated_property(
+        schema={
+            "title": "Alternate Paired Read Support",
+            "description": "Read pairs mapping consistent with alternate allele",
+            "type": "integer",
+        }
+    )
+    def alternate_paired_reads(self, paired_reads=None):
+        """Get alternate paired reads (2nd item in paired_reads)."""
+        if isinstance(paired_reads, list) and len(paired_reads) == 2:
+            return paired_reads[1]
+
+
+@view_config(
+    name='update-project-notes',
+    context=StructuralVariantSample,
+    request_method='PATCH',
+    permission='edit'
+)
+def update_project_notes(context, request):
+    """This endpoint is used to process notes attached to this (in-context) StructuralVariantSample."""
+    return update_project_notes_process(context, request)

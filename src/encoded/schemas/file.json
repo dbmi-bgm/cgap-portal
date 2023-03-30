@@ -127,6 +127,10 @@
                 ],
                 "additionalProperties": true,
                 "properties": {
+                    "filename": {
+                        "title": "File Name",
+                        "type": "string"
+                    },
                     "file_format": {
                         "title": "File Format",
                         "type": "string",
@@ -174,6 +178,7 @@
                             "in review",
                             "obsolete",
                             "inactive",
+                            "archived",
                             "deleted"
                         ]
                     }
@@ -224,6 +229,48 @@
             "description": "A flag to indicate whether this file is subject to restricted access",
             "type": "boolean"
         },
+        "s3_lifecycle_category": {
+            "title": "S3 Lifecycle Category",
+            "description": "The lifecycle category determines how long a file remains in a certain storage class.  If set to ignore, lifecycle management will have no effect on this file",
+            "type": "string",
+            "suggested_enum": [
+                "short_term_access_long_term_archive",
+                "long_term_access_long_term_archive",
+                "long_term_access",
+                "short_term_access",
+                "long_term_archive",
+                "short_term_archive",
+                "no_storage",
+                "ignore"
+            ]
+        },
+        "s3_lifecycle_status": {
+            "title": "S3 Lifecycle Status",
+            "description": "Current S3 storage class of this object.",
+            "internal_comment": "Files in Standard and Infrequent Access are accessible without restriction. Files in Glacier and Deep Archive need to be requested and cannot be downloaded",
+            "type": "string",
+            "default": "standard",
+            "enum": [
+                "standard",
+                "infrequent access",
+                "glacier",
+                "deep archive",
+                "deleted"
+            ]
+        },
+        "s3_lifecycle_last_checked": {
+            "title": "S3 Lifecycle - last checked",
+            "description": "Date when the lifecycle status of the file was last checked",
+            "type": "string",
+            "anyOf": [
+                {
+                    "format": "date-time"
+                },
+                {
+                    "format": "date"
+                }
+            ]
+        },
         "status": {
             "title": "Status",
             "type": "string",
@@ -240,6 +287,7 @@
                 "in review",
                 "obsolete",
                 "inactive",
+                "archived",
                 "deleted"
             ]
         },
@@ -295,6 +343,36 @@
                     }
                 }
             }
+        },
+        "genome_assembly": {
+            "title": "Genome Assembly",
+            "description": "The genome assembly associated with the file",
+            "type": "string",
+            "enum": [
+                "hg19",
+                "GRCh37",
+                "GRCh38"
+            ]
+        },
+        "paired_end": {
+            "title": "Paired End Identifier",
+            "description": "Which pair the file belongs to (if paired end library)",
+            "type": "string",
+            "enum": [
+                "1",
+                "2"
+            ]
+        },
+        "variant_type": {
+            "title": "Variant Type",
+            "description": "The variant type associated with this file",
+            "comment": "Property included in meta_workflow.workflows.custom_pf_fields. Any changes here should also be made there.",
+            "type": "string",
+            "enum": [
+                "SNV",
+                "SV",
+                "CNV"
+            ]
         },
         "override_lab_name": {
             "description": "The lab that did the experiment if not the attributed Lab from whence this file",

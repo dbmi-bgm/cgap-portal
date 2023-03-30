@@ -1137,32 +1137,20 @@ i.status-indicator-dot {
 	
 	}
 
-	#case-overview-ped-link {
-		/* max-height: 336px; */
-		margin-left: 0;
-
-		// > .card {
-		// 	@include media-breakpoint-down(lg){
-		// 		margin-top: 70px;
-		// 		border-bottom-right-radius: $card-border-radius; // prev: 10px;
-		// 		border-bottom-left-radius: $card-border-radius; // prev: 10px;
-		// 	}
-		// }
-
-		div.pedigree-vis-heading {
-
-			.view-pedigree-btn {
-				background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
-				border-radius: 40px;
-				color: #fff;
-				/* border: 1px solid cornflowerblue; */
-				border: none;
-				padding: 4px 24px 3px;
-				&:hover {
-					background-color: darken($color: cornflowerblue, $amount: 7.5%);
-				}
-			}
+	#case-overview-ped-link div.pedigree-vis-heading .view-pedigree-btn,
+	.tab-section-title .view-pedigree-btn {
+		background-color: cornflowerblue; // TODO: Once settle on good color, maybe apply it to our theme under a SCSS variable for re-use. Then ctrl+find+replace.
+		border-radius: 40px;
+		color: #fff;
+		border: none;
+		padding: 4px 24px 3px;
+		&:hover {
+			background-color: darken($color: cornflowerblue, $amount: 7.5%);
 		}
+	}
+
+	#case-overview-ped-link {
+		margin-left: 0;
 
 		.pedigree-placeholder {
 			position: relative;
@@ -1606,12 +1594,13 @@ i.status-indicator-dot {
 			/* Filtering Tab Specific styles */
 			&#case-info\.filtering {
 				// Styling overrides specific to embedded search table results for Structural Variants in case filtering
-				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"] {
+				.embedded-search-container .search-view-controls-and-results[data-search-item-type="StructuralVariantSample"],
+				.embedded-search-container .search-view-controls-and-results[data-search-item-type="VariantSample"] {
 					.search-result-row.detail-closed .columns.result-table-row {
 						.search-result-column-block[data-field="display_title"][data-first-visible-column="true"] {
 							/* Temporarily removed detail expansion pane in JS col ext map until we get specs for it; adjust padding to accomodate */
 							/* important necessary to override default style (this is short term override/will be deleted soon so hopefully ok) */
-							padding-left: 18px !important;
+							padding-left: 12px !important;
 							.toggle-detail-button-container {
 								display: none;
 							}
@@ -1690,10 +1679,11 @@ i.status-indicator-dot {
 
 	.embedded-search-view-outer-container {
 
-		// (Stylistic) increase whitespace around this components/elems
+		// Stylistic adjustments
 		.above-results-table-row {
-			margin-top: 16px;
-			padding-bottom: 16px;
+			margin-top: 0px;
+			padding-bottom: 0px;
+			border-top: 1px solid $gray-300;
 		}
 
 	}
@@ -2901,4 +2891,13 @@ div.user-profile-page {
 
 	}
 
+}
+
+
+.qcm-flag[data-flag="fail"] {
+	color: rgb(178, 67, 66);
+}
+
+.qcm-flag[data-flag="warn"] {
+	color: rgb(229, 149, 69);
 }
