@@ -109,6 +109,10 @@ const optimization = {
 const webPlugins = plugins.slice(0);
 const serverPlugins = plugins.slice(0);
 
+webPlugins.push(new webpack.ProvidePlugin({
+    "process": "process/browser"
+}));
+
 // Inform our React code of what build we're on.
 // This works via a find-replace.
 webPlugins.push(new webpack.DefinePlugin({
@@ -226,7 +230,8 @@ module.exports = [
                 "buffer": false,
                 "events": false,
                 // "path": require.resolve("path-browserify"),
-                "process": "process/browser"
+                "process": require.resolve("process/browser"),
+                "util": require.resolve("util/"),
             }
         },
         //resolveLoader : resolve,
@@ -297,6 +302,10 @@ module.exports = [
             // fallback: {
             //     "zlib": false
             // }
+            fallback: {
+                "process": require.resolve("process/browser"),
+                "util": require.resolve("util/"),
+            }
         },
         //resolveLoader : resolve,
         devtool: devTool, // No way to debug/log serverside JS currently, so may as well speed up builds for now.
