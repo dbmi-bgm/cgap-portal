@@ -242,22 +242,28 @@ export default class HealthView extends React.PureComponent {
 function DetailListBody({ context: propContext, packageLockJson = null, ...passProps }){
 
     // extend context to include shared-portal-components version
-    let spcVersionUsed = null;
+    let spcDependenciesVersion = null;
+    let spcStatus;
 
     if (packageLockJson) {
-        const { dependencies: { '@hms-dbmi-bgm/shared-portal-components': { version: spcVersion = null, from: spcFrom } = {} } } = packageLockJson || {};
+        const {
+            dependencies: {  '@hms-dbmi-bgm/shared-portal-components': { version: spcVersionLong = null, from: spcFrom } = {} },
+            packages: { 'node_modules/@hms-dbmi-bgm/shared-portal-components': { version: spcInstallVersion } = {} },
+        } = packageLockJson || {};
+
         if (spcFrom && spcFrom.indexOf('#') > -1) { // e.g. github:4dn-dcic/shared-portal-components#0.0.2.70
-            [ spcVersionUsed ] = spcFrom.split('#').splice(-1);
-        } else {
-            spcVersionUsed = spcVersion || "-";
+            [ spcDependenciesVersion ] = spcFrom.split('#').splice(-1);
         }
+
+        if (spcDependenciesVersion === spcInstallVersion) { spcStatus = spcDependenciesVersion || spcVersionLong || "-"; }
+        else { spcStatus = `Ambiguous versions found. Dependencies version: ${spcDependenciesVersion}, Installed version: ${spcInstallVersion}`; }
     } else {
         // Assume is still loading
         // TODO: Maybe allow ItemDetailList to handle JSX values so can throw in spinning indicator icon here.
-        spcVersionUsed = "-";
+        spcStatus = "-";
     }
 
-    const context = { ...propContext, "spc_version": spcVersionUsed };
+    const context = { ...propContext, "spc_version": spcStatus };
 
     return (
         <ItemDetailList {...passProps} {...{ context }} hideButtons  />
