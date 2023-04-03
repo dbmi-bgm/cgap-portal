@@ -1,4 +1,5 @@
 import pytest
+import time
 
 from snovault import COLLECTIONS, TYPES
 from snovault.elasticsearch.create_mapping import (
@@ -95,6 +96,14 @@ def test_run_create_mapping_with_upgrader(mock_add_uuids, es_testapp, workbook):
     Indexer queue method mocked to check correct calls, so no items
     actually indexed/upgraded.
     """
+
+    # Indexing might be out of date here. One thing that works but is heavyweight:
+    #   from .test_static_page import wait_for_index
+    #   wait_for_index(es_testapp)
+    # Another thing that might work is just to invoke the indexer in a more lightweight way and wait.
+    es_testapp.post_json('/index', {})
+    time.sleep(2)
+
     app = es_testapp.app
     type_to_upgrade = "Document"
 

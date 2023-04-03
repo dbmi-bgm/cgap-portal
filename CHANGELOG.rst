@@ -16,6 +16,43 @@ Change Log
 * Add tissue_type property to Sample
 
 
+12.10.3
+=======
+
+* Backport pytest 7.2 support from Fourfront
+
+
+12.10.2
+=======
+
+* Upgrade to ``poetry 1.3.2``
+
+* Syntactically revamp the organization of the various ``Makefile`` targets related to testing,
+  and associated workflows.
+
+* Change the indexing tests in ``test_indexing.py`` to be labeled ``pytest.mark.es``
+  and use that to make sure these run separately.
+
+* Import and use from beta snovault various kinds of useful tools like ``index_n_items_for_testing``
+  and ``make_es_count_checker``.
+
+
+12.10.1
+=======
+`PR 702: VEP QC metrics fix <https://github.com/dbmi-bgm/cgap-portal/pull/702>`_
+
+* Fix VEP-annotated VCF recognition for updated SNV pipelines (v1.1.0)
+
+
+12.10.0
+=======
+`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+
+* Add complex relationship analysis facet for StructuralVariantSamples
+* Add samplegeno_role to StructuralVariantSample schema
+* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
+
+
 12.9.0
 ======
 `PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
