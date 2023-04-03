@@ -1,7 +1,10 @@
-from typing import List, Optional, Union
+from typing import List, Optional
 
 from snovault import (
-    abstract_collection, calculated_property, display_title_schema, load_schema
+    abstract_collection,
+    calculated_property,
+    display_title_schema,
+    load_schema,
 )
 
 from .base import Item
@@ -30,7 +33,7 @@ class Analysis(Item):
     @calculated_property(schema=display_title_schema)
     def display_title(
         self, accession: str, external_identifier: Optional[str] = None
-    ) -> Union[str, None]:
+    ) -> str:
         if external_identifier:
             result = external_identifier
         else:
