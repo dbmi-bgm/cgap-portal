@@ -1263,7 +1263,7 @@ class SampleProcessing(Item):
                     mem_acc = mem_info[a_parent].split("/")[2]
                     parents.append(mem_acc)
             temp["parents"] = parents
-            temp["sample_accession"] = sample_info["display_title"]
+            temp["sample_accession"] = sample_info["accession"]
             temp["sample_name"] = sample_info.get("bam_sample_id", "")
             if relation_infos:
                 relation_info = relation_infos[0]
