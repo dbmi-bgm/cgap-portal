@@ -76,11 +76,18 @@
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
+        "aliases": [
+            "hms-dbmi:hms008i"
+        ],
         "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
         "individual_id": "hms008i",
         "sex": "F",
-        "is_deceased": false
+        "is_deceased": false,
+        "samples": [
+            "f4bbc709-40fe-48a4-afde-8e886b571903",
+            "f4bbc709-40fe-48a4-afde-8e886b571904"
+        ]
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",

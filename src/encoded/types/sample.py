@@ -1,7 +1,8 @@
 import copy
+from typing import Optional
 
 import structlog
-from snovault import calculated_property, collection, load_schema
+from snovault import calculated_property, collection, display_title_schema, load_schema
 
 from .base import Item, get_item_or_none
 from .family import Family
@@ -39,6 +40,15 @@ class Sample(Item):
     schema = load_schema("encoded:schemas/sample.json")
     rev = {"indiv": ("Individual", "samples")}
     embedded_list = _build_sample_embedded_list()
+
+    @calculated_property(schema=display_title_schema)
+    def display_title(
+        self,
+        accession: str,
+        bam_sample_id: Optional[str] = None,
+        specimen_accession: Optional[str] = None,
+    ) -> str:
+        return specimen_accession or bam_sample_id or accession
 
     @calculated_property(
         schema={
@@ -1253,7 +1263,7 @@ class SampleProcessing(Item):
                     mem_acc = mem_info[a_parent].split("/")[2]
                     parents.append(mem_acc)
             temp["parents"] = parents
-            temp["sample_accession"] = sample_info["display_title"]
+            temp["sample_accession"] = sample_info["accession"]
             temp["sample_name"] = sample_info.get("bam_sample_id", "")
             if relation_infos:
                 relation_info = relation_infos[0]
