@@ -325,7 +325,26 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
                     defaultActiveKey={defaultAccordionState}
                     className="w-100"
                 >
-                    {!isActiveTab ? null : <CaseInfoToggle eventKey="0" {...{ caseNamedID, caseNamedTitle, caseAccession, onViewPedigreeBtnClick, currPedigreeFamily }}>Click me!</CaseInfoToggle>}
+                    {!isActiveTab ?
+                        null :
+                        <CaseInfoToggle eventKey="0">
+                            <>
+                                <div className="pt-12 pb-06">
+                                    <span>
+                                        {caseNamedTitle || caseNamedID}
+                                    </span>
+                                    <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession} stopPropagation>
+                                        {caseAccession}
+                                    </object.CopyWrapper>
+                                </div>
+                            </>
+                            <>
+                                <button type="button" className="btn btn-primary btn-sm view-pedigree-btn py-2 px-4 rounded"
+                                    onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
+                                    View Pedigree
+                                </button>
+                            </>
+                        </CaseInfoToggle>}
                     <Accordion.Collapse eventKey="0">
                         <>
                             <div className="container-wide bg-light pt-36 pb-36">
@@ -440,7 +459,7 @@ CaseInfoTabView.getTabObject = function (props) {
     };
 };
 
-function CaseInfoToggle({ eventKey, caseNamedID, caseNamedTitle, caseAccession, onViewPedigreeBtnClick, currPedigreeFamily }) {
+export function CaseInfoToggle({ children, eventKey }) {
     // Want the line to fade out shortly after animation is triggered, not before (hence not using isCurrentEventKey which would trigger immediately)
     let showLine = true;
     const decoratedOnClick = useAccordionToggle(eventKey, () => { showLine = !showLine; });
@@ -450,25 +469,18 @@ function CaseInfoToggle({ eventKey, caseNamedID, caseNamedTitle, caseAccession, 
 
     const icon = isCurrentEventKey ? "minus" : "plus";
 
+    const childrenArray = React.Children.toArray(children);
+    const { 0: firstChild = null, 1: secondChild = null } = childrenArray || [];
+
     return (
         <>
             <div className="container-wide clickable" onClick={decoratedOnClick}>
                 <h3 className="tab-section-title">
                     <div className="d-flex align-items-center">
                         <i className={`icon icon-${icon} fas mr-2 text-large`} />
-                        <div className="pt-12 pb-06">
-                            <span>
-                                {caseNamedTitle || caseNamedID}
-                            </span>
-                            <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession} stopPropagation>
-                                {caseAccession}
-                            </object.CopyWrapper>
-                        </div>
+                        { firstChild }
                     </div>
-                    <button type="button" className="btn btn-primary btn-sm view-pedigree-btn py-2 px-4 rounded"
-                        onClick={onViewPedigreeBtnClick} disabled={!currPedigreeFamily}>
-                        View Pedigree
-                    </button>
+                    {secondChild}
                 </h3>
             </div>
             {showLine && <Fade in={isCurrentEventKey}><hr className="tab-section-title-horiz-divider" /></Fade>}
