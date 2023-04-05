@@ -27,7 +27,7 @@ def check_spreadsheet_rows(result_rows, colname_to_index, row_start=0):
             "Chrom (hg19)": "1",
             "Pos (hg19)": "1962105",
             "Canonical transcript ID": "ENST00000378585",
-            "Canonical transcript location": "Exon 9/9 (3′ UTR)",
+            "Canonical transcript location": "Exon 9/9 (3' UTR)",
             "Variant Quality": "688.12",
             "Genotype Quality": "99",
             "gnomADv3 popmax population": "East Asian",
@@ -93,9 +93,9 @@ def test_filtering_tab(workbook, html_es_testapp):
 
     # All values are of type string when parsed below.
     result_rows = list(csv.reader(res.body.decode('utf-8').split('\n'), delimiter='\t'))
-    colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[6]) }
+    colname_to_index = { col_name: col_idx for col_idx, col_name in enumerate(result_rows[2]) }
 
-    check_spreadsheet_rows(result_rows, colname_to_index, row_start=6)
+    check_spreadsheet_rows(result_rows, colname_to_index, row_start=2)
 
 
 

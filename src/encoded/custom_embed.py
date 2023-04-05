@@ -26,6 +26,7 @@ KEYS_TO_IGNORE = [
 ]
 FORBIDDEN_MSG = {"error": "no view permissions"}
 DATABASE_ITEM_KEY = "@type"  # Key specific to JSON objects that are CGAP items
+REQUESTED_FIELDS = "requested_fields"
 
 
 def includeme(config):
@@ -39,11 +40,12 @@ class CustomEmbed:
     """
 
     def __init__(self, request, item, embed_props):
+        import pdb; pdb.set_trace()
         self.request = request
         self.ignored_embeds = embed_props.get("ignored_embeds", [])
         self.desired_embeds = embed_props.get("desired_embeds", [])
         self.embed_depth = embed_props.get("embed_depth", 4)
-        self.requested_fields = embed_props.get("requested_fields", [])
+        self.requested_fields = embed_props.get(REQUESTED_FIELDS, [])
 
         self.cache = {}
         self.invalid_ids = []
@@ -54,6 +56,9 @@ class CustomEmbed:
         else:
             depth = -1
             self.result = self.embed(item, depth)
+
+    def get_embedded_item(self):
+        return self.result
 
     def add_actions(self, item):
         """
@@ -380,7 +385,7 @@ def embed(context, request):
         "ignored_embeds": ignored_embeds,
         "desired_embeds": desired_embeds,
         "embed_depth": embed_depth,
-        "requested_fields": requested_fields,
+        REQUESTED_FIELDS: requested_fields,
     }
     for item_id in ids:
         item_embed = CustomEmbed(request, item_id, embed_props)

@@ -7,11 +7,12 @@ import negspy.coordinates as nc
 import os
 import pytz
 import structlog
+from typing import Iterator, List
 
 from dcicutils.misc_utils import ignorable, ignored
 from math import inf
 from pyramid.httpexceptions import HTTPBadRequest, HTTPNotModified, HTTPServerError, HTTPTemporaryRedirect
-# from pyramid.request import Request
+from pyramid.request import Request
 from pyramid.response import Response
 from pyramid.settings import asbool
 from pyramid.traversal import find_resource
@@ -22,8 +23,20 @@ from snovault.embed import make_subrequest
 from snovault.util import simple_path_ids, debug_log, IndexSettings
 from urllib.parse import parse_qs, urlparse
 
-from ..batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
+from ..batch_download_utils import (
+    stream_tsv_output,
+    convert_item_to_sheet_dict,
+    SpreadsheetPost,
+)
+from .. import custom_embed
 from ..custom_embed import CustomEmbed
+from ..drr_batch_download import (
+    VariantSampleSpreadsheet,
+    get_spreadsheet_response,
+    get_timestamp,
+    validate_spreadsheet_file_format,
+)
+from ..drr_item_models import JsonObject, VariantSampleList as VariantSampleListModel
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
 from ..search.search import get_iterable_search_results
@@ -1343,11 +1356,104 @@ def order_delete_selections(context, request):
     }
 
 
-@view_config(name='spreadsheet', context=VariantSampleList, request_method='GET',
-             permission='view')
-@debug_log
-def variant_sample_list_spreadsheet(context, request):
+VARIANT_SAMPLE_FIELDS_TO_EMBED_FOR_SPREADSHEET = [
+    "*",
+    "variant.*",
+    "variant.interpretations.*",
+    "variant.discovery_interpretations.*",
+    "variant.variant_notes.*",
+    "variant.genes.genes_most_severe_gene.gene_note.*",
+    "variant.transcript.*",
+    "variant.transcript.csq_consequence.*",
+]
 
+
+@view_config(
+    name='spreadsheet',
+    context=VariantSampleList,
+    request_method='GET',
+    permission='view',
+    validators=[validate_spreadsheet_file_format],
+)
+@debug_log
+def variant_sample_list_spreadsheet(context: VariantSampleList, request: Request):
+    import pdb; pdb.set_trace()
+    post_parser = SpreadsheetPost(request)
+    file_format = post_parser.get_file_format()
+    file_name = get_variant_sample_spreadsheet_file_name(context, post_parser)
+    items_for_spreadsheet = get_embedded_items(context, request)
+    spreadsheet_rows = VariantSampleSpreadsheet(
+        items_for_spreadsheet, spreadsheet_post=post_parser
+    ).yield_rows()
+    return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
+
+
+def get_variant_sample_spreadsheet_file_name(
+    context: VariantSampleList, spreadsheet_request: SpreadsheetPost
+) -> str:
+    file_format = spreadsheet_request.get_file_format()
+    case_title = get_case_title(context, spreadsheet_request)
+    timestamp = get_timestamp()
+    return f"{case_title}-interpretation-{timestamp}.{file_format}"
+
+
+def get_case_title(context: VariantSampleList, spreadsheet_request: SpreadsheetPost) -> str:
+    return (
+        spreadsheet_request.get_case_accession()
+        or get_associated_case(context)
+        or "case"
+    )
+
+
+def get_associated_case(context: VariantSampleList) -> str:
+    properties = get_item_properties(context)
+    return VariantSampleListModel(properties).get_associated_case_accession()
+
+
+def get_embedded_items(
+    context: VariantSampleList, request: Request
+) -> Iterator[JsonObject]:
+    variant_sample_uuids = get_variant_sample_uuids(context)
+    return (get_embedded_variant_sample(uuid, request) for uuid in variant_sample_uuids)
+
+
+def get_item_properties(context: Item) -> JsonObject:
+    return context.properties
+
+
+def get_variant_sample_uuids(context: VariantSampleList) -> List[str]:
+    variant_sample_list_properties = get_item_properties(context)
+    variant_sample_list = VariantSampleListModel(variant_sample_list_properties)
+    return variant_sample_list.get_variant_samples()
+
+
+def get_embedded_variant_sample(variant_sample_identifier: str, request: Request) -> JsonObject:
+    embedding_parameters = get_embedding_parameters()
+    return custom_embed.CustomEmbed(
+        request, variant_sample_identifier, embedding_parameters
+    ).get_embedded_item()
+
+
+def get_embedding_parameters() -> JsonObject:
+    fields_to_embed = get_fields_to_embed()
+    return {custom_embed.REQUESTED_FIELDS: fields_to_embed}
+
+
+def get_fields_to_embed() -> List[str]:
+    fields_from_spreadsheet = get_fields_to_embed_from_spreadsheet()
+    return fields_from_spreadsheet + VARIANT_SAMPLE_FIELDS_TO_EMBED_FOR_SPREADSHEET
+
+
+def get_fields_to_embed_from_spreadsheet() -> List[str]:
+    spreadsheet_columns = VariantSampleSpreadsheet.get_spreadsheet_columns()
+    return [
+        spreadsheet_column.get_evaluator()
+        for spreadsheet_column in spreadsheet_columns
+        if spreadsheet_column.is_property_evaluator()
+    ]
+
+
+def something(request, context) -> None:
     file_format = request.GET.get("file_format", None)
     case_accession = request.GET.get("case_accession", context.properties.get("created_for_case"))
 
@@ -1668,7 +1774,7 @@ def get_spreadsheet_mappings(request = None):
     ]
 
 
-def get_fields_to_embed(spreadsheet_mappings):
+def nope_get_fields_to_embed(spreadsheet_mappings):
     fields_to_embed = [
         ## Most of these are needed for columns with render/transform/custom-logic functions in place of (string) CGAP field.
         ## Keep up-to-date with any custom logic.

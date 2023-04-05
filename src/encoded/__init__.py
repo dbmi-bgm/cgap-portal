@@ -189,7 +189,7 @@ def main(global_config, **local_config):
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
-    config.include('.batch_download')
+#    config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')

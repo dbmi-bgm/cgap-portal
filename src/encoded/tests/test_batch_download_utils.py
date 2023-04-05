@@ -1,6 +1,6 @@
 import json
 from contextlib import contextmanager
-from typing import Any, Callable, Generator, Iterator, List, Optional, Sequence, Union
+from typing import Any, Callable, Generator, Iterator, List, Mapping, Optional, Sequence, Union
 from unittest import mock
 
 import pytest
@@ -69,6 +69,12 @@ def patch_get_values_for_field(**kwargs) -> Iterator[mock.MagicMock]:
         batch_download_utils_module, "get_values_for_field", **kwargs
     ) as mocked_item:
         yield mocked_item
+
+
+@contextmanager
+def patch_post_parameters(**kwargs) -> mock.PropertyMock:
+    with patch_context(SpreadsheetPost, "parameters", **kwargs) as mock_property:
+        yield mock_property
 
 
 def mock_request() -> mock.MagicMock:
@@ -376,3 +382,66 @@ class TestSpreadsheetGenerator:
             "Content-Description": "File Transfer",
             "Cache-Control": "no-store",
         }
+
+
+
+class TestSpreadsheetPost:
+
+    SOME_FILE_FORMAT = 'some_file_format'
+    SOME_CASE_ACCESSION = 'some_case_accession'
+    SOME_CASE_TITLE = 'some_case_title'
+    SOME_COMPOUND_SEARCH_REQUEST = {"foo": 'some_compound_search_request'}
+    SOME_JSON_COMPOUND_SEARCH_REQUEST = json.dumps(SOME_COMPOUND_SEARCH_REQUEST)
+    SOME_REQUEST = "request"
+
+    def spreadsheet_post(self) -> SpreadsheetPost:
+        return SpreadsheetPost(self.SOME_REQUEST)
+
+    @pytest.mark.parametrize(
+        "parameters,expected",
+        [
+            ({}, "tsv"),
+            ({SpreadsheetPost.FILE_FORMAT: SOME_FILE_FORMAT}, SOME_FILE_FORMAT),
+        ]
+    )
+    def test_get_file_format(self, parameters: Mapping, expected: str) -> None:
+        with patch_post_parameters(return_value=parameters):
+            spreadsheet_post = self.spreadsheet_post()
+            assert spreadsheet_post.get_file_format() == expected
+
+    @pytest.mark.parametrize(
+        "parameters,expected",
+        [
+            ({}, ""),
+            ({SpreadsheetPost.CASE_ACCESSION: SOME_CASE_ACCESSION}, SOME_CASE_ACCESSION),
+        ]
+    )
+    def test_get_case_accession(self, parameters, expected) -> None:
+        with patch_post_parameters(return_value=parameters):
+            spreadsheet_post = self.spreadsheet_post()
+            assert spreadsheet_post.get_case_accession() == expected
+
+    @pytest.mark.parametrize(
+        "parameters,expected",
+        [
+            ({}, ""),
+            ({SpreadsheetPost.CASE_TITLE: SOME_CASE_TITLE}, SOME_CASE_TITLE),
+        ]
+    )
+    def test_get_case_title(self, parameters, expected) -> None:
+        with patch_post_parameters(return_value=parameters):
+            spreadsheet_post = self.spreadsheet_post()
+            assert spreadsheet_post.get_case_title() == expected
+
+    @pytest.mark.parametrize(
+        "parameters,expected",
+        [
+            ({}, {}),
+            ({SpreadsheetPost.COMPOUND_SEARCH_REQUEST: SOME_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
+            ({SpreadsheetPost.COMPOUND_SEARCH_REQUEST: SOME_JSON_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
+        ]
+    )
+    def test_get_associated_compound_search(self, parameters, expected) -> None:
+        with patch_post_parameters(return_value=parameters):
+            spreadsheet_post = self.spreadsheet_post()
+            assert spreadsheet_post.get_compound_search() == expected

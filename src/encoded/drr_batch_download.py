@@ -53,11 +53,15 @@ def includeme(config):
     config.scan(__name__)
 
 
-def validate_spreadsheet_post(context: CGAPRoot, request: Request) -> None:
+def validate_spreadsheet_file_format(context: CGAPRoot, request: Request) -> None:
     post_parser = SpreadsheetPost(request)
     file_format = post_parser.get_file_format()
     if file_format not in ACCEPTABLE_FILE_FORMATS:
         raise HTTPBadRequest(f"File format not acceptable: {file_format}")
+
+
+def validate_spreadsheet_search_parameters(context: CGAPRoot, request: Request) -> None:
+    post_parser = SpreadsheetPost(request)
     search = post_parser.get_compound_search()
     if not search:
         raise HTTPBadRequest("No search parameters given")
@@ -66,11 +70,10 @@ def validate_spreadsheet_post(context: CGAPRoot, request: Request) -> None:
 @view_config(
     route_name=VARIANT_SAMPLE_SPREADSHEET_ENDPOINT,
     request_method="POST",
-    validators=[validate_spreadsheet_post],
+    validators=[validate_spreadsheet_file_format, validate_spreadsheet_search_parameters],
 )
 @debug_log
 def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
-    import pdb; pdb.set_trace()
     post_parser = SpreadsheetPost(request)
     file_format = post_parser.get_file_format()
     file_name = get_variant_sample_spreadsheet_file_name(post_parser)
@@ -84,11 +87,10 @@ def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Re
 @view_config(
     route_name=CASE_SPREADSHEET_ENDPOINT,
     request_method="POST",
-    validators=[validate_spreadsheet_post],
+    validators=[validate_spreadsheet_file_format, validate_spreadsheet_search_parameters],
 )
 @debug_log
 def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
-    import pdb; pdb.set_trace()
     post_parser = SpreadsheetPost(request)
     file_format = post_parser.get_file_format()
     file_name = get_case_spreadsheet_file_name(post_parser)
@@ -105,12 +107,12 @@ def get_variant_sample_spreadsheet_file_name(post_parser: SpreadsheetPost) -> st
 
 
 def get_timestamp():
-    now = datetime.datetime.now(pytz.utc).isoformat()[:-13]
+    now = datetime.now(pytz.utc).isoformat()[:-13]
     return f"{now}Z"
 
 
 def get_case_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
-    pass
+    return "foo.csv"
 
 
 def get_items_from_search(
@@ -134,6 +136,7 @@ def get_spreadsheet_response(
     ).get_streaming_response()
 
 
+@dataclass(frozen=True)
 class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 
     NOTE_FIELDS_TO_EMBED = [
@@ -151,10 +154,11 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
     spreadsheet_post: Optional[SpreadsheetPost] = None
 
     def _get_headers(self) -> List[List[str]]:
-        header_lines = self._get_available_header_lines()
-        return header_lines + [
-            ["## -------------------------------------------------------"]
-        ]
+        result = []
+        result += self._get_available_header_lines()
+        if result:
+            result += [["## -------------------------------------------------------"]]
+        return result
 
     def _get_available_header_lines(self) -> List[List[str]]:
         result = []
@@ -186,13 +190,13 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             result.append(["#", "Filters Selected:", "", readable_filter_blocks])
         return result
 
-    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> Iterator[str]:
+    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
         self._merge_notes(item_to_evaluate)
         variant_sample = VariantSample(item_to_evaluate)
-        return (
+        return [
             self._evaluate_item_with_column(column, variant_sample)
             for column in self._spreadsheet_columns
-        )
+        ]
 
     def _merge_notes(self, variant_sample_properties: JsonObject) -> None:
         if self.request:
@@ -220,7 +224,8 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             "Unable to use column for evaluating item"
         )
 
-    def _get_column_tuples(self) -> List[OrderedSpreadsheetColumn]:
+    @classmethod
+    def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:
         return [
             ("ID", "URL path to the variant", "@id"),
             ("Chrom (hg38)", "Chromosome (hg38)", "variant.CHROM"),
@@ -269,38 +274,47 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Canonical transcript ID",
                 "Ensembl ID of canonical transcript of gene variant is in",
-                self._get_canonical_transcript_feature,
+                cls._get_canonical_transcript_feature,
             ),
             (
                 "Canonical transcript location",
-                "Number of exon or intron variant is located in canonical transcript, out of total",
-                self._get_canonical_transcript_location,
+                (
+                    "Number of exon or intron variant is located in canonical"
+                    " transcript, out of total"
+                ),
+                cls._get_canonical_transcript_location,
             ),
             (
                 "Canonical transcript coding effect",
                 "Coding effect of variant in canonical transcript",
-                self._get_canonical_transcript_consequence_display_title,
+                cls._get_canonical_transcript_consequence_names,
             ),
             (
                 "Most severe transcript ID",
                 "Ensembl ID of transcript with worst annotation for variant",
-                self._get_most_severe_transcript_feature,
+                cls._get_most_severe_transcript_feature,
             ),
             (
                 "Most severe transcript location",
-                "Number of exon or intron variant is located in most severe transcript, out of total",
-                self._get_most_severe_transcript_location,
+                (
+                    "Number of exon or intron variant is located in most severe"
+                    " transcript, out of total"
+                ),
+                cls._get_most_severe_transcript_location,
             ),
             (
                 "Most severe transcript coding effect",
                 "Coding effect of variant in most severe transcript",
-                self._get_most_severe_transcript_consequence_display_title,
+                cls._get_most_severe_transcript_consequence_names,
             ),
             ("Inheritance modes", "Inheritance Modes of variant", "inheritance_modes"),
             ("NovoPP", "Novocaller Posterior Probability", "novoPP"),
             (
                 "Cmphet mate",
-                "Variant ID of mate, if variant is part of a compound heterozygous group",
+                (
+                    "Variant ID of mate, if variant is part of a compound heterozygous"
+                    " group"
+                ),
                 "cmphet.comhet_mate_variant",
             ),
             ("Variant Quality", "Variant call quality score", "QUAL"),
@@ -322,7 +336,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "gnomADv3 popmax population",
                 "Population with max. allele frequency in gnomad v3 (genomes)",
-                self._get_gnomad_v3_popmax_population,
+                cls._get_gnomad_v3_popmax_population,
             ),
             (
                 "gnomADv2 exome total AF",
@@ -337,7 +351,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "gnomADv2 exome popmax population",
                 "Population with max. allele frequency in gnomad v2 (exomes)",
-                self._get_gnomad_v2_popmax_population,
+                cls._get_gnomad_v2_popmax_population,
             ),
             ("GERP++", "GERP++ score", "variant.csq_gerp_rs"),
             ("CADD", "CADD score", "variant.csq_cadd_phred"),
@@ -388,17 +402,26 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             ),
             (
                 "RVIS (ExAC)",
-                "RVIS (Residual Variation Intolerance Score) genome-wide percentile from ExAC",
+                (
+                    "RVIS (Residual Variation Intolerance Score) genome-wide percentile"
+                    "from ExAC"
+                ),
                 "variant.genes.genes_most_severe_gene.rvis_exac"
             ),
             (
                 "S-het",
-                "Estimates of heterozygous selection (source: Cassa et al 2017 Nat Genet doi:10.1038/ng.3831)",
+                (
+                    "Estimates of heterozygous selection (source: Cassa et al 2017 Nat"
+                    " Genet doi:10.1038/ng.3831)"
+                ),
                 "variant.genes.genes_most_severe_gene.s_het"
             ),
             (
                 "MaxEntScan",
-                "Difference in MaxEntScan scores (Maximum Entropy based scores of splicing strength) between Alt and Ref alleles",
+                (
+                    "Difference in MaxEntScan scores (Maximum Entropy based scores of"
+                    " splicing strength) between Alt and Ref alleles"
+                ),
                 "variant.genes.genes_most_severe_maxentscan_diff"
             ),
             (
@@ -444,7 +467,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "ACMG classification (prev)",
                 "ACMG classification for variant in previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.interpretations",
                     "classification"
                 )
@@ -452,7 +475,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "ACMG rules (prev)",
                 "ACMG rules invoked for variant in previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.interpretations",
                     "acmg"
                 )
@@ -460,7 +483,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Clinical interpretation (prev)",
                 "Clinical interpretation notes written for previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.interpretations",
                     "note_text"
                 )
@@ -468,7 +491,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Gene candidacy (prev)",
                 "Gene candidacy level selected for previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.discovery_interpretations",
                     "gene_candidacy"
                 )
@@ -476,7 +499,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Variant candidacy (prev)",
                 "Variant candidacy level selected for previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.discovery_interpretations",
                     "variant_candidacy"
                 )
@@ -484,7 +507,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Discovery notes (prev)",
                 "Gene/variant discovery notes written for previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.discovery_interpretations",
                     "note_text"
                 )
@@ -492,7 +515,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Variant notes (prev)",
                 "Additional notes on variant written for previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.variant_notes",
                     "note_text"
                 )
@@ -500,59 +523,69 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "Gene notes (prev)",
                 "Additional notes on gene written for previous cases",
-                self._get_note_of_same_project(
+                cls._get_note_of_same_project(
                     "variant.genes.genes_most_severe_gene.gene_notes",
                     "note_text"
                 )
             ),
         ]
 
-    def _get_canonical_transcript_feature(self, variant_sample: VariantSample) -> str:
+    @classmethod
+    def _get_canonical_transcript_feature(cls, variant_sample: VariantSample) -> str:
         return variant_sample.get_canonical_transcript_feature()
 
-    def _get_canonical_transcript_location(self, variant_sample: VariantSample) -> str:
+    @classmethod
+    def _get_canonical_transcript_location(cls, variant_sample: VariantSample) -> str:
         return variant_sample.get_canonical_transcript_location()
 
-    def _get_canonical_transcript_consequence_display_title(
-        self, variant_sample: VariantSample
+    @classmethod
+    def _get_canonical_transcript_consequence_names(
+        cls, variant_sample: VariantSample
     ) -> str:
-        return variant_sample.get_canonical_transcript_consequence_display_title()
+        return variant_sample.get_canonical_transcript_consequence_names()
 
-    def _get_most_severe_transcript_feature(self, variant_sample: VariantSample) -> str:
+    @classmethod
+    def _get_most_severe_transcript_feature(cls, variant_sample: VariantSample) -> str:
         return variant_sample.get_most_severe_transcript_feature()
 
-    def _get_most_severe_transcript_location(self, variant_sample: VariantSample) -> str:
+    @classmethod
+    def _get_most_severe_transcript_location(cls, variant_sample: VariantSample) -> str:
         return variant_sample.get_most_severe_transcript_location()
 
-    def _get_most_severe_transcript_consequence_display_title(
-        self, variant_sample: VariantSample
+    @classmethod
+    def _get_most_severe_transcript_consequence_names(
+        cls, variant_sample: VariantSample
     ) -> str:
-        return variant_sample.get_most_severe_transcript_consequence_display_title()
+        return variant_sample.get_most_severe_transcript_consequence_names()
 
-    def _get_gnomad_v3_popmax_population(self, variant_sample: VariantSample) -> str:
+    @classmethod
+    def _get_gnomad_v3_popmax_population(cls, variant_sample: VariantSample) -> str:
         return variant_sample.get_gnomad_v3_popmax_population()
 
-    def _get_gnomad_v2_popmax_population(self, variant_sample: VariantSample) -> str:
+    @classmethod
+    def _get_gnomad_v2_popmax_population(cls, variant_sample: VariantSample) -> str:
         return variant_sample.get_gnomad_v2_popmax_population()
 
+    @classmethod
     def _get_note_of_same_project(
-        self, note_property_location: str, note_property_to_retrieve: str
+        cls, note_property_location: str, note_property_to_retrieve: str
     ) -> Callable:
         note_evaluator = partial(
-            self._get_note_properties,
+            cls._get_note_properties,
             note_property_location=note_property_location,
             note_property_to_retrieve=note_property_to_retrieve,
         )
         return note_evaluator
 
+    @classmethod
     def _get_note_properties(
-        self,
+        cls,
         variant_sample: VariantSample,
         note_property_location: str = "",
         note_property_to_retrieve: str = "",
     ) -> str:
         result = ""
-        note = variant_sample.get_note_of_same_project(note_property_location)
+        note = variant_sample.get_most_recent_note_of_same_project_from_property(note_property_location)
         if note:
             result = get_values_for_field(note.get_properties(),
                                           note_property_to_retrieve)
@@ -562,13 +595,26 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 @dataclass(frozen=True)
 class CaseSpreadsheet(SpreadsheetFromColumnTuples):
 
-    def _get_headers(self) -> None:
-        pass
+    def _get_headers(self) -> List[str]:
+        return []
 
-    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
-        pass
+    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
+        return [
+            self._evaluate_item_with_column(column, item_to_evaluate)
+            for column in self._spreadsheet_columns
+        ]
 
-    def _get_column_tuples(self) -> List[OrderedSpreadsheetColumn]:
+    def _evaluate_item_with_column(
+        self, column: SpreadsheetColumn, item_to_evaluate: JsonObject
+    ):
+        if column.is_property_evaluator():
+            return column.get_field_for_item(item_to_evaluate)
+        raise SpreadsheetCreationError(
+            "Unable to use column for evaluating item"
+        )
+
+    @classmethod
+    def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:
         return [
             ("ID", "URL path to the case", "@id"),
         ]

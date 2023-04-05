@@ -201,11 +201,14 @@ class SpreadsheetColumn:
     description: str
     evaluator: Union[str, Callable]
 
-    def get_title(self):
+    def get_title(self) -> str:
         return self.title
 
-    def get_description(self):
+    def get_description(self) -> str:
         return self.description
+
+    def get_evaluator(self) -> Union[str, Callable]:
+        return self.evaluator
 
     def get_field_for_item(self, item: Any) -> str:
         if self.is_property_evaluator() and isinstance(item, Dict):
@@ -232,33 +235,33 @@ class SpreadsheetTemplate(ABC):
     items_to_evaluate: Iterable[JsonObject]
 
     @abstractmethod
-    def _get_headers(self) -> None:
+    def _get_headers(self) -> List[List[str]]:
         pass
 
     @abstractmethod
-    def _get_column_titles(self) -> None:
+    def _get_column_titles(self) -> List[str]:
         pass
 
     @abstractmethod
-    def _get_column_descriptions(self) -> None:
+    def _get_column_descriptions(self) -> List[str]:
         pass
 
     @abstractmethod
-    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> None:
+    def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
         pass
 
     def yield_rows(self) -> Iterator[Iterable[str]]:
-        self._yield_headers()
-        self._yield_column_rows()
-        self._yield_item_rows()
+        yield from self._yield_headers()
+        yield from self._yield_column_rows()
+        yield from self._yield_item_rows()
 
     def _yield_headers(self) -> Iterator[Iterable[str]]:
         for header in self._get_headers():
             yield header
 
     def _yield_column_rows(self) -> Iterator[Iterable[str]]:
-        yield self._get_column_titles()
         yield self._get_column_descriptions()
+        yield self._get_column_titles()
 
     def _yield_item_rows(self) -> Iterator[Iterable[str]]:
         for item in self.items_to_evaluate:
@@ -268,23 +271,29 @@ class SpreadsheetTemplate(ABC):
 @dataclass(frozen=True)
 class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
 
+    @classmethod
     @abstractmethod
-    def _get_column_tuples(self) -> None:
+    def _get_column_tuples(cls) -> None:
         pass
 
     @cached_property
     def _spreadsheet_columns(self) -> None:
-        column_tuples = self._get_column_tuples()
-        return self._convert_column_tuples_to_spreadsheet_columns(column_tuples)
+        return self.get_spreadsheet_columns()
 
-    def _get_column_titles(self) -> Iterator[str]:
-        return (column.get_title() for column in self._spreadsheet_columns)
+    @classmethod
+    def get_spreadsheet_columns(cls) -> List[SpreadsheetColumn]:
+        column_tuples = cls._get_column_tuples()
+        return cls._convert_column_tuples_to_spreadsheet_columns(column_tuples)
 
-    def _get_column_descriptions(self) -> Iterator[str]:
-        return (column.get_description() for column in self._spreadsheet_columns)
+    def _get_column_titles(self) -> List[str]:
+        return [column.get_title() for column in self._spreadsheet_columns]
 
+    def _get_column_descriptions(self) -> List[str]:
+        return [column.get_description() for column in self._spreadsheet_columns]
+
+    @classmethod
     def _convert_column_tuples_to_spreadsheet_columns(
-        self,
+        cls,
         columns: Iterable[OrderedSpreadsheetColumn],
     ) -> List[SpreadsheetColumn]:
         return [SpreadsheetColumn(*column) for column in columns]
@@ -302,7 +311,7 @@ class SpreadsheetPost:
 
     @property
     def parameters(self) -> JsonObject:
-        return self.request.params
+        return self.request.params or self.request.json
 
     def get_file_format(self) -> str:
         return self.parameters.get(self.FILE_FORMAT, DEFAULT_FILE_FORMAT).lower()
