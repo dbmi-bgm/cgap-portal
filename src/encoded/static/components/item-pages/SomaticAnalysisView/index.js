@@ -1,9 +1,11 @@
 'use strict';
 
 import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
+
 import DefaultItemView from './../DefaultItemView';
-
-
+import { DotRouter, DotRouterTab } from '../components/DotRouter';
+import { SomaticAccessioningTab } from './SomaticAccessioningTab';
+import { SomaticBioinformaticsTab } from './SomaticBioinformaticsTab';
 
 
 export default class SomaticAnalysisView extends DefaultItemView {
@@ -20,7 +22,30 @@ export default class SomaticAnalysisView extends DefaultItemView {
 }
 
 const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
-    return ("This is the Somatic Analysis Info Tab View");
+    const {
+        // Passed in from App or redux
+        context,
+        href,
+        // Passed in from TabView
+        isActiveTab
+    } = props;
+
+    // TODO: determine when/if ever the accessioning tab should be disabled (fall back to "no information available, etc.")
+    const disableBioinfo = false; // TODO: determine when/if ever the bioinfo tab should be disabled
+
+    console.log("SomaticAnalysisInfoTabView props", props);
+    return (
+        <>
+            <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
+                    <SomaticAccessioningTab {...{ context, href }} />
+                </DotRouterTab>
+                <DotRouterTab dotPath=".bioinformatics" disabled={disableBioinfo} tabTitle="Bioinformatics">
+                    <SomaticBioinformaticsTab {...{ context, href }} />
+                </DotRouterTab>
+            </DotRouter>
+        </>
+    );
 });
 SomaticAnalysisInfoTabView.getTabObject = function (props) {
     return {
