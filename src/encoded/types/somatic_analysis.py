@@ -6,7 +6,22 @@ from .analysis import Analysis
 
 
 def _build_somatic_analysis_embedded_list() -> List[str]:
-    return []
+    return [
+        "samples.@id",
+        "samples.display_title",
+        "samples.tissue_type",
+        "samples.specimen_type",
+        "samples.bam_sample_id",
+        "samples.individual.@id",
+        "samples.individual.display_title",
+        "samples.individual.accession",
+        "samples.individual.sex",
+        "samples.individual.age",
+        "samples.individual.age_units",
+        "samples.individual.date_created", # TODO: Double check this is acceptable as "accession date"
+        "samples.individual.disorders.disorder.display_title",
+        "samples.individual.disorders.is_primary_diagnosis"
+    ]
 
 
 @collection(

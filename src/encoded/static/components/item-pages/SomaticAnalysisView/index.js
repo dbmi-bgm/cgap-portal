@@ -2,6 +2,7 @@
 
 import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import { Accordion } from 'react-bootstrap';
+import _ from 'underscore';
 
 import { object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
@@ -11,7 +12,7 @@ import DefaultItemView from './../DefaultItemView';
 import { SomaticAccessioningTab } from './SomaticAccessioningTab';
 import { SomaticBioinformaticsTab } from './SomaticBioinformaticsTab';
 import { CaseInfoToggle } from '../CaseView';
-import QuickPopover from '../components/QuickPopover';
+import { SomaticAnalysisStats } from './SomaticAnalysisStats';
 
 
 export default class SomaticAnalysisView extends DefaultItemView {
@@ -41,8 +42,19 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
         accession,
         display_title,
         external_identifier,
-        description
+        description,
+        actions: somaticAnalysisActions = []
     } = context;
+
+    /**
+     * Used to inform whether to show edit icons in places.
+     * Used as fallback when difficult/inperformant to determine if have edit
+     * permission for attached items such as Individual.
+     * @type {boolean}
+     */
+    const haveSAEditPermission = useMemo(function () {
+        return !!(_.findWhere(somaticAnalysisActions, { "name": "edit" }));
+    }, [context]);
 
     // TODO: determine when/if ever the accessioning tab should be disabled (fall back to "no information available, etc.")
     const disableBioinfo = false; // TODO: determine when/if ever the bioinfo tab should be disabled
@@ -95,7 +107,7 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                 <div className="card-group case-summary-card-row">
                                     {!isActiveTab ? null : (
                                         <div className="col-stats mb-2 mb-lg-0">
-                                            / / Stats will go here
+                                            <SomaticAnalysisStats {...context} {...{ haveSAEditPermission }}/>
                                         </div>
                                     )}
                                     <div id="case-overview-ped-link" className="col-pedigree-viz">
@@ -132,6 +144,7 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
         href,
         schemas
     ]);
+
     return (
         <>
             {loadingAccordion &&
