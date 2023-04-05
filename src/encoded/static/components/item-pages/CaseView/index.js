@@ -3,21 +3,23 @@
 import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
+import { Accordion, AccordionContext, Fade, useAccordionToggle } from 'react-bootstrap';
 
 import { navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/PartialList';
 import { capitalize, decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
-
 import { responsiveGridState } from './../../util/layout';
+import { flagToBootstrapClass, mapLongFormSexToLetter } from '../../util/item';
+import { usePrevious } from '../../util/hooks';
+
 import DefaultItemView from './../DefaultItemView';
+import QuickPopover from './../components/QuickPopover';
 import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
-
+import { PedigreeTabViewBody, PedigreeFullScreenBtn } from '../components/PedigreeTabViewBody';
+import { DotRouter, DotRouterTab } from '../components/DotRouter';
 import { VariantSampleListController } from './VariantSampleListController';
 import { CaseSummaryTable } from './CaseSummaryTable';
-import { FamilyAccessionStackedTable } from './../../browse/CaseDetailPane';
-import { PedigreeTabViewBody, PedigreeFullScreenBtn } from '../components/PedigreeTabViewBody';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
 import { parseFamilyIntoDataset } from './family-parsing';
 import { CurrentFamilyController, FamilyItemParser } from './CurrentFamilyController';
@@ -27,10 +29,7 @@ import { InterpretationTab, InterpretationTabController } from './Interpretation
 import { CaseReviewTab } from './CaseReviewTab';
 import { CaseReviewController, CaseReviewSelectedNotesStore } from './CaseReviewTab/CaseReviewController';
 import { getAllNotesFromVariantSample, NoteSubSelectionStateController } from './variant-sample-selection-panels';
-import QuickPopover from './../components/QuickPopover';
-import { Accordion, AccordionContext, Fade, useAccordionToggle } from 'react-bootstrap';
-import { usePrevious } from '../../util/hooks';
-import { DotRouter, DotRouterTab } from '../components/DotRouter';
+import { AccessioningTab } from './AccessioningTab';
 
 
 
@@ -480,65 +479,7 @@ function CaseInfoToggle({ eventKey, caseNamedID, caseNamedTitle, caseAccession, 
 }
 
 
-const AccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context, canonicalFamily, secondaryFamilies = [] } = props;
-    const { display_title: primaryFamilyTitle, '@id': canonicalFamilyAtID } = canonicalFamily;
-    const [isSecondaryFamiliesOpen, setSecondaryFamiliesOpen] = useState(false);
-    const secondaryFamiliesLen = secondaryFamilies.length;
 
-    const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
-        <div className="pt-2">
-            <button type="button" className="btn btn-block btn-outline-dark" onClick={function () { setSecondaryFamiliesOpen(function (currentIsSecondaryFamiliesOpen) { return !currentIsSecondaryFamiliesOpen; }); }}>
-                {!isSecondaryFamiliesOpen ? `Show ${secondaryFamiliesLen} more famil${secondaryFamiliesLen > 1 ? 'ies' : 'y'} that proband is member of` : 'Hide secondary families'}
-            </button>
-        </div>
-    );
-
-    // Using PartialList since we have it already, it hides DOM elements when collapsed.
-    // In long run maybe a differing UI might be better, idk.
-    return (
-        <React.Fragment>
-            <h1 className="row align-items-center">
-                <div className="col">
-                    <span className="text-300">Accessioning Report and History</span>
-                </div>
-                <div className="col-auto">
-                    <span className="current-case text-small text-400 m-0">Current Selection</span>
-                </div>
-            </h1>
-            <div className="tab-inner-container card">
-                <div className="card-body">
-                    <PartialList className="mb-0" open={isSecondaryFamiliesOpen}
-                        persistent={[
-                            <div key={canonicalFamilyAtID} className="primary-family">
-                                <h4 className="mt-0 mb-16 text-400">
-                                    <span className="text-300">Primary Cases from </span>
-                                    {primaryFamilyTitle}
-                                </h4>
-                                <FamilyAccessionStackedTable family={canonicalFamily} result={context}
-                                    fadeIn collapseLongLists collapseShow={1} />
-                            </div>
-                        ]}
-                        collapsible={!isSecondaryFamiliesOpen ? null :
-                            secondaryFamilies.map(function (family) {
-                                const { display_title, '@id': familyID } = family;
-                                return (
-                                    <div className="py-4 secondary-family" key={familyID}>
-                                        <h4 className="mt-0 mb-05 text-400">
-                                            <span className="text-300">Related Cases from </span>
-                                            {display_title}
-                                        </h4>
-                                        <FamilyAccessionStackedTable result={context} family={family} collapseLongLists />
-                                    </div>
-                                );
-                            })
-                        } />
-                    {viewSecondaryFamiliesBtn}
-                </div>
-            </div>
-        </React.Fragment>
-    );
-});
 
 const bioinfoPopoverContent = {
     predictedSexAndAncestry: (
@@ -587,38 +528,7 @@ const bioinfoPopoverContent = {
     )
 };
 
-const mapLongFormSexToLetter = (sex) => {
-    if (!sex) { return; }
 
-    // Ensure it's lowercase
-    const sexLower = sex.toLowerCase();
-
-    switch (sexLower) {
-        case "male":
-            return "M";
-        case "female":
-            return "F";
-        case "unknown":
-        case "undetermined":
-            return "U";
-        default:
-            // unexpected value... render as-is
-            return sex;
-    }
-};
-
-const flagToBootstrapClass = (flag) => {
-    switch (flag) {
-        case "pass":
-            return "success";
-        case "fail":
-            return "danger";
-        case "warn":
-            return "warning";
-        default:
-            return "";
-    }
-};
 
 const BioinfoStats = React.memo(function BioinfoStats(props) {
     const { canonicalFamily, caseSample = null, sampleProcessing = null, idToGraphIdentifier, relationshipMapping } = props;
