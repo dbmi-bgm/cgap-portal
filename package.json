@@ -64,7 +64,7 @@
     "higlass-clinvar": "0.2.5",
     "higlass-cohort": "0.3.3",
     "higlass-general-vcf": "0.1.2-beta.1",
-    "higlass-gnomad": "0.2.2-beta.1",
+    "higlass-gnomad": "0.2.2-beta.2",
     "higlass-orthologs": "0.2.4",
     "higlass-pileup": "1.4.1",
     "higlass-register": "^0.3.0",
