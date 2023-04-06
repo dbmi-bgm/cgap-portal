@@ -134,6 +134,7 @@ def camel_case(name):
 def test_load_schema(schema, master_mixins, registry, pattern_fields, testapp):
 
     abstract = [
+        'analysis.json',
         'file.json',
         'individual.json',
         'quality_metric.json',
