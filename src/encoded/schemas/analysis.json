@@ -37,8 +37,24 @@
     },
     "columns": {
         "display_title": {
-            "title": "Title",
+            "title": "Analysis ID",
             "order": 10
+        },
+        "samples.individual": {
+            "title": "Individual ID(s)",
+            "order": 20
+        },
+        "samples.tissue_type": {
+            "title": "Sample Types",
+            "order": 30
+        },
+        "samples.specimen_type": {
+            "title": "Sample Details",
+            "order": 50
+        },
+        "samples.workup_type": {
+            "title": "Sequencing",
+            "order": 60
         }
     }
 }
