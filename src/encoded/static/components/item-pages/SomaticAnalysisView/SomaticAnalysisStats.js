@@ -6,15 +6,14 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 
 
 export const SomaticAnalysisStats = React.memo(function SomaticAnalysisStats(props){
-    const { samples, "atID": somaticAnalysisAtID, haveSAEditPermission = false } = props;
+    const { samples, "@id": somaticAnalysisAtID, haveSAEditPermission = false } = props;
+
     const {
         0: {
             individual
         } = {}
     } = samples || [];
     const { "@id": individualAtID } = individual;
-
-    console.log("samples", samples[0].individual, individual);
 
     return (
         // Stack into one column at small window size.
