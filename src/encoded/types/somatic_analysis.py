@@ -12,7 +12,7 @@ def _build_somatic_analysis_embedded_list() -> List[str]:
         "samples.display_title",
         "samples.accession",
         "samples.specimen_collection_date",
-        "samples.preservation_type",
+        # "samples.preservation_type", # Does not actually exist right now... should at some point
         "samples.workup_type",
         "samples.tissue_type",
         "samples.specimen_type",
@@ -28,9 +28,9 @@ def _build_somatic_analysis_embedded_list() -> List[str]:
         "samples.individual.date_created", # TODO: Double check this is acceptable as "accession date"
         "samples.individual.disorders.disorder.display_title",
         "samples.individual.disorders.is_primary_diagnosis",
-        "samples.individual.family.title",
-        "samples.individual.family.family_id",
-        "samples.individual.family.accession",
+        "samples.individual.families.title",
+        "samples.individual.families.family_id",
+        "samples.individual.families.accession",
     ]
 
 
