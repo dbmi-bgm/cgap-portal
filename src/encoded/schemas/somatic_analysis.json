@@ -1,7 +1,7 @@
 {
-    "title": "Cohort Analysis",
-    "description": "Case-control analysis of samples",
-    "id": "/profiles/cohort_analysis.json",
+    "title": "Somatic Analysis",
+    "description": "Somatic analysis of samples",
+    "id": "/profiles/somatic_analysis.json",
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [
@@ -70,21 +70,11 @@
             "default": "1"
         },
         "accession": {
-            "accessionType": "CA"
+            "accessionType": "SS"
         },
-        "control_samples": {
-            "title": "Control Samples",
-            "description": "Control samples used in a cohort analysis",
-            "type": "array",
-            "items": {
-                "title": "Sample",
-                "type": "string",
-                "linkTo": "Sample"
-            }
-        },
-        "case_samples": {
-            "title": "Case Samples",
-            "description": "Case samples used in a cohort analysis",
+        "samples": {
+            "title": "Samples",
+            "description": "Samples used in the analysis",
             "type": "array",
             "items": {
                 "title": "Sample",
