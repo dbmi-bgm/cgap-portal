@@ -6,6 +6,16 @@ cgap-portal
 Change Log
 ----------
 
+13.1.0
+======
+`PR 701: Not facets <https://github.com/dbmi-bgm/cgap-portal/pull/701>`_
+
+* Upgrade SPC to v0.1.63
+* Add a new folder for storing FontAwesome v6 icons & a couple of icons for not facets
+* Update filter blocks/sets to show "excluded" fields
+* Some CGAP-specific styling for not facets
+
+
 13.0.0
 ======
 `PR 703: Somatic data model <https://github.com/dbmi-bgm/cgap-portal/pull/703>`_
@@ -73,8 +83,8 @@ Change Log
 `PR 697: Bch case drawer <https://github.com/dbmi-bgm/cgap-portal/pull/697>`_
 
 * Allows case information to be shown/hidden via a toggle
-  * Default state is dependent upon tab selected (dotPath); accessioning tab will load case info open, other tabs will keep it closed on load
-  * Add e.stopPropagation prop to the copyWrrapper, so the copy accession button doesn't trigger open/closing (requires an SPC update)
+* Default state is dependent upon tab selected (dotPath); accessioning tab will load case info open, other tabs will keep it closed on load
+* Add e.stopPropagation prop to the copyWrrapper, so the copy accession button doesn't trigger open/closing (requires an SPC update)
 * Create a utility file for storing reusable custom React hooks (+ move pre-existing ones there)
 
 
@@ -83,8 +93,8 @@ Change Log
 `PR 694: Reload login box after logging out <https://github.com/dbmi-bgm/cgap-portal/pull/694>`_
 
 * Update SPC to newest release [0.1.60](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.60)
-  * This release enables UI to use custom auth0 configurations accessed via `/auth0_config` endpoint
-  * Note: `auth0Options` may still be passed to `<LoginController>` but only values for keys not returned by `/auth0_config` are used as fallback
+* This release enables UI to use custom auth0 configurations accessed via `/auth0_config` endpoint
+* Note: `auth0Options` may still be passed to `<LoginController>` but only values for keys not returned by `/auth0_config` are used as fallback
 * Fix logout auth0 lock related bug
 
 
