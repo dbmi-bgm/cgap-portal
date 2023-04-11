@@ -62,17 +62,16 @@
         "prettier"
     ],
     "overrides": [
-        // Removed these in v1 prettier update due to incompatibility; 
-        // instead not auto-formatting static sections. Keeping for reference, in case
-        // parsing these files becomes necessary/more options available in future.
-        // {
-        //     "files" : ["./src/encoded/static/data/*.jsx"],
-        //     "rules" : {
-        //         "react/jsx-no-undef" : 0,
-        //         "semi" : 0,
-        //         "react/react-in-jsx-scope" : 0
-        //     }
-        // }
+        // Prettier isn't great at formatting these files, so we're skipping
+        // them there; doing this here to prevent annoying squigglies
+        {
+            "files" : ["./src/encoded/static/data/*.jsx"],
+            "rules" : {
+                "react/jsx-no-undef" : 0,
+                "semi" : 0,
+                "react/react-in-jsx-scope" : 0
+            }
+        }
     ],
     "settings": {
         "react": {
