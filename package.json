@@ -12,7 +12,8 @@
     "cypress:open": "node_modules/.bin/cypress open --project './deploy/post_deploy_testing' --env Auth0Client=$Auth0Client,Auth0Secret=$Auth0Secret",
     "cypress:open-local": "node_modules/.bin/cypress open --project './deploy/post_deploy_testing' --env Auth0Client=$Auth0Client,Auth0Secret=$Auth0Secret --config baseUrl=http://localhost:8000",
     "cypress:test": "node_modules/.bin/cypress run --project './deploy/post_deploy_testing' --env Auth0Client=$Auth0Client,Auth0Secret=$Auth0Secret --config videoRecording=false",
-    "cypress:test-recorded": "node_modules/.bin/cypress run --project './deploy/post_deploy_testing' --record --key $CYPRESS_KEY --env Auth0Client=$Auth0Client,Auth0Secret=$Auth0Secret"
+    "cypress:test-recorded": "node_modules/.bin/cypress run --project './deploy/post_deploy_testing' --record --key $CYPRESS_KEY --env Auth0Client=$Auth0Client,Auth0Secret=$Auth0Secret",
+    "format": "prettier-eslint --write \"{,!(node_modules)/**/}*.{js,jsx}\""
   },
   "author": "",
   "license": "MIT",
