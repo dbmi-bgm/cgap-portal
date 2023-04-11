@@ -1,0 +1,3 @@
+# Ignore deps & build files
+/node_modules/
+/src/encoded/static/build/
