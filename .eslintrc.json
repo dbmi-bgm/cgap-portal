@@ -14,14 +14,9 @@
         "prefer-const" : "error",
         "prefer-destructuring" : "warn",
         "prefer-spread" : "error",
-        "prettier/prettier":
-            ["error", {
-                "endOfLine": "lf",
-                "tabs": true,
-                "tabWidth": 4,
-                "singleQuote": true,
-                "jsxSingleQuote": false
-            }],
+        "prettier/prettier": "error",
+        // Do not add rules options for config here; it will interfere with editor extensions
+        // See: https://github.com/prettier/eslint-plugin-prettier#options
         "react/button-has-type" : "error",
         "react/destructuring-assignment" : ["warn", "always"],
         "react/display-name" : 0,
