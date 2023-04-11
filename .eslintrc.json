@@ -15,7 +15,7 @@
         "prefer-destructuring" : "warn",
         "prefer-spread" : "error",
         "prettier/prettier": "error",
-        // Do not add rules options for config here; it will interfere with editor extensions
+        // Do not add rules options for prettier config here; it will interfere with editor extensions
         // See: https://github.com/prettier/eslint-plugin-prettier#options
         "react/button-has-type" : "error",
         "react/destructuring-assignment" : ["warn", "always"],
