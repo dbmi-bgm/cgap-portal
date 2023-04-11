@@ -25,6 +25,7 @@
         "prefer-const" : "error",
         "prefer-destructuring" : "warn",
         "prefer-spread" : "error",
+        "prettier/prettier": "error",
         "react/button-has-type" : "error",
         "react/destructuring-assignment" : ["warn", "always"],
         "react/display-name" : 0,
@@ -57,19 +58,22 @@
     "parser" : "@babel/eslint-parser",
     "extends": [
         "eslint:recommended",
-        "plugin:react/recommended"
+        "plugin:react/recommended",
+        "prettier"
     ],
     "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
         "ecmaFeatures": {
             "jsx": true,
-            "classes" : true
+            "classes" : true,
+            "modules": true
         }
     },
     "plugins": [
         "react",
-        "cypress"
+        "cypress",
+        "prettier"
     ],
     "overrides": [
         {
@@ -80,5 +84,10 @@
                 "react/react-in-jsx-scope" : 0
             }
         }
-    ]
+    ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+      }
 }
