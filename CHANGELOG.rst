@@ -6,6 +6,16 @@ cgap-portal
 Change Log
 ----------
 
+
+13.1.1
+======
+`PR: 706: Improve health page spc + add higlass ver <https://github.com/dbmi-bgm/cgap-portal/pull/706>`_
+
+* Pull and compare SPC versions from package-lock.json's dependencies and packages objects in Health page
+* Display information on discrepancies/mismatches
+* Add higlass core (dependencies) version to health page
+
+
 13.1.0
 ======
 `PR 701: Not facets <https://github.com/dbmi-bgm/cgap-portal/pull/701>`_
