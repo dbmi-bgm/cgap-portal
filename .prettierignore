@@ -4,3 +4,6 @@
 
 # Ignore jsx static sections (overzealous about adding unnecessary semicolons)
 /docs/public/help/
+
+# Also ignore that help doc for embedded search tables
+/src/encoded/static/data/embedded-search-table-demo.jsx
