@@ -43,8 +43,8 @@
     },
     "parser" : "@babel/eslint-parser",
     "extends": [
-        "eslint:recommended",
         "plugin:react/recommended",
+        "eslint:recommended",
         "prettier"
     ],
     "parserOptions": {
