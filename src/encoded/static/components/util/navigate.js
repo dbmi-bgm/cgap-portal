@@ -8,22 +8,21 @@ import { navigate as originalNavigate } from '@hms-dbmi-bgm/shared-portal-compon
 
 let store = null;
 
-const navigate = function(...args){ return originalNavigate(...args); };
+const navigate = function (...args) {
+    return originalNavigate(...args);
+};
 
 // Carry over any util fxns. Then add more. Per portal.
 _.extend(navigate, originalNavigate);
 
-navigate.setNavigateFunction = function(...args){
+navigate.setNavigateFunction = function (...args) {
     // eslint-disable-next-line prefer-destructuring
     store = require('../../store').store;
     originalNavigate.setNavigateFunction(...args);
 };
 
-
 /******* PUBLIC STATIC FUNCTIONS *******/
 
 // TODO
-
-
 
 export { navigate };

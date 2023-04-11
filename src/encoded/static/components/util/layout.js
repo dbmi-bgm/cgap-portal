@@ -12,7 +12,7 @@ import { isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/componen
  * @param {number} width - Width of the current browser _window_.
  * @return {string} - Abbreviation for column/grid Bootstrap size, e.g. 'lg', 'md', 'sm', or 'xs'.
  */
-export function responsiveGridState(width = null){
+export function responsiveGridState(width = null) {
     if (typeof width !== 'number') {
         // Assumed to be null or undefined which should mean we are
         // server-side or not yet mounted.
@@ -25,7 +25,6 @@ export function responsiveGridState(width = null){
     return 'xs';
 }
 
-
 /**
  * Get the width of what a 12-column bootstrap '.container' would be in current viewport size.
  * Keep widths in sync with stylesheet, e.g.
@@ -37,13 +36,17 @@ export function responsiveGridState(width = null){
  * @param {number} [windowWidth] Optional current window width to supply.
  * @return {integer}
  */
-export function gridContainerWidth(windowWidth = null){
+export function gridContainerWidth(windowWidth = null) {
     // Subtract 20 for padding/margins.
-    switch(responsiveGridState(windowWidth)){
-        case 'xl': return 1120;
-        case 'lg': return 940;
-        case 'md': return 700;
-        case 'sm': return 520;
+    switch (responsiveGridState(windowWidth)) {
+        case 'xl':
+            return 1120;
+        case 'lg':
+            return 940;
+        case 'md':
+            return 700;
+        case 'sm':
+            return 520;
         case 'xs':
             if (isServerSide()) return 400;
             return (windowWidth || window.innerWidth) - 20;
@@ -56,11 +59,11 @@ export function gridContainerWidth(windowWidth = null){
  * print CSS stylesheet.
  * @todo Move to SPC.
  */
-export function DeferMount(props){
+export function DeferMount(props) {
     const { children, delay = 250, onMount = null } = props;
-    const [ isMounted, setIsMounted ] = useState(false);
-    useEffect(function(){
-        setTimeout(function(){
+    const [isMounted, setIsMounted] = useState(false);
+    useEffect(function () {
+        setTimeout(function () {
             setIsMounted(true);
             if (onMount) {
                 onMount();

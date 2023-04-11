@@ -1,52 +1,60 @@
 'use strict';
 
 import React from 'react';
-import { console, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import {
+    console,
+    object,
+} from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ItemFileAttachment } from './components/ItemFileAttachment';
 import DefaultItemView from './DefaultItemView';
 
-
-
 export default class DocumentView extends DefaultItemView {
-
-    getTabViewContents(){
+    getTabViewContents() {
         const initTabs = [];
         initTabs.push(DocumentViewOverview.getTabObject(this.props));
         return initTabs.concat(this.getCommonTabs()); // Add remainder of common tabs (Details, Attribution)
     }
-
 }
 
-
-const DocumentViewOverview = React.memo(function DocumentViewOverview({ context, schemas }){
-    const { "@type": [ leafItemType = "Document" ] = [] } = context || {};
+const DocumentViewOverview = React.memo(function DocumentViewOverview({
+    context,
+    schemas,
+}) {
+    const { '@type': [leafItemType = 'Document'] = [] } = context || {};
     const tips = object.tipsFromSchema(schemas, context);
     return (
         <div>
             <div className="row overview-blocks">
-                <ItemFileAttachment context={context} tips={tips} wrapInColumn="col-12 col-md-6" includeTitle btnSize="lg" itemType={leafItemType} />
+                <ItemFileAttachment
+                    context={context}
+                    tips={tips}
+                    wrapInColumn="col-12 col-md-6"
+                    includeTitle
+                    btnSize="lg"
+                    itemType={leafItemType}
+                />
             </div>
         </div>
     );
 });
-DocumentViewOverview.getTabObject = function({ context, schemas }){
+DocumentViewOverview.getTabObject = function ({ context, schemas }) {
     return {
-        'tab' : (
+        tab: (
             <React.Fragment>
-                <i className="icon icon-file-alt far icon-fw"/>
+                <i className="icon icon-file-alt far icon-fw" />
                 <span>Overview</span>
             </React.Fragment>
         ),
-        'key' : 'overview',
+        key: 'overview',
         //'disabled' : !Array.isArray(context.experiments),
-        'content' : (
+        content: (
             <div className="overflow-hidden container-wide">
                 <h3 className="tab-section-title">
                     <span>Overview</span>
                 </h3>
-                <hr className="tab-section-title-horiz-divider"/>
+                <hr className="tab-section-title-horiz-divider" />
                 <DocumentViewOverview context={context} schemas={schemas} />
             </div>
-        )
+        ),
     };
 };

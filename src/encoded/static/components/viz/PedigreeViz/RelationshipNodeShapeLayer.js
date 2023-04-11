@@ -2,26 +2,43 @@ import React from 'react';
 import memoize from 'memoize-one';
 import { relationshipTopPosition } from './layout-utilities-drawing';
 
+export const RelationshipNodeShapeLayer = React.memo(
+    function RelationshipNodeShapeLayer(props) {
+        const { relationships, dims, ...passProps } = props;
+        const halfRelationshipSize = dims.relationshipSize / 2;
+        const relationshipCircleRadius = halfRelationshipSize / 2;
+        const visibleRelationshipElements = relationships.map(function (
+            relationship,
+            idx
+        ) {
+            const partnersStr = relationship.partners
+                .map(function (p) {
+                    return p.id;
+                })
+                .join(',');
+            return (
+                <RelationshipNode
+                    key={partnersStr}
+                    {...passProps}
+                    {...{
+                        relationship,
+                        partnersStr,
+                        dims,
+                        halfRelationshipSize,
+                        relationshipCircleRadius,
+                    }}
+                />
+            );
+        });
 
-
-export const RelationshipNodeShapeLayer = React.memo(function RelationshipNodeShapeLayer(props){
-    const { relationships, dims, ...passProps } = props;
-    const halfRelationshipSize = dims.relationshipSize / 2;
-    const relationshipCircleRadius = halfRelationshipSize / 2;
-    const visibleRelationshipElements = relationships.map(function(relationship, idx){
-        const partnersStr = relationship.partners.map(function(p){ return p.id; }).join(',');
         return (
-            <RelationshipNode key={partnersStr} {...passProps}
-                {...{ relationship, partnersStr, dims, halfRelationshipSize, relationshipCircleRadius }} />
+            <g className="relationships-layer">{visibleRelationshipElements}</g>
         );
-    });
+    }
+);
 
-    return <g className="relationships-layer">{ visibleRelationshipElements }</g>;
-});
-
-
-function relationshipClassName(relationship, isSelected, isBeingHovered){
-    const classes = ["pedigree-relationship"];
+function relationshipClassName(relationship, isSelected, isBeingHovered) {
+    const classes = ['pedigree-relationship'];
     if (isBeingHovered) {
         classes.push('is-hovered-over');
     }
@@ -31,19 +48,20 @@ function relationshipClassName(relationship, isSelected, isBeingHovered){
     return classes.join(' ');
 }
 
-
 class RelationshipNode extends React.PureComponent {
-
-    constructor(props){
+    constructor(props) {
         super(props);
         this.onMouseEnter = this.onMouseEnter.bind(this);
         this.memoized = {
-            top: memoize(relationshipTopPosition)
+            top: memoize(relationshipTopPosition),
         };
     }
 
-    onMouseEnter(evt){
-        const { onNodeMouseIn, relationship: { id } } = this.props;
+    onMouseEnter(evt) {
+        const {
+            onNodeMouseIn,
+            relationship: { id },
+        } = this.props;
         evt.stopPropagation();
         onNodeMouseIn(id);
     }
@@ -62,33 +80,58 @@ class RelationshipNode extends React.PureComponent {
     onClick(evt){}
     */
 
-    render(){
+    render() {
         const {
-            relationship, partnersStr, dims, halfRelationshipSize, relationshipCircleRadius,
-            onNodeMouseLeave, selectedNode, hoveredNode, editable
+            relationship,
+            partnersStr,
+            dims,
+            halfRelationshipSize,
+            relationshipCircleRadius,
+            onNodeMouseLeave,
+            selectedNode,
+            hoveredNode,
+            editable,
         } = this.props;
-        const { id, _drawing : { xCoord, yCoord } } = relationship;
+        const {
+            id,
+            _drawing: { xCoord, yCoord },
+        } = relationship;
 
         const isSelected = selectedNode === relationship;
         const isHoveredOver = hoveredNode === relationship;
         const x = dims.graphPadding + xCoord - halfRelationshipSize;
         const y = this.memoized.top(yCoord, dims);
 
-        let groupTransform = "translate(" + x + " " + y + ")";
-        if (isHoveredOver && !isSelected){
-            groupTransform += (
-                " scale(1.1)"
-                + " translate(" + (-dims.relationshipSize * .05) + " " + (-dims.relationshipSize * .05) + ")"
-            );
+        let groupTransform = 'translate(' + x + ' ' + y + ')';
+        if (isHoveredOver && !isSelected) {
+            groupTransform +=
+                ' scale(1.1)' +
+                ' translate(' +
+                -dims.relationshipSize * 0.05 +
+                ' ' +
+                -dims.relationshipSize * 0.05 +
+                ')';
         }
 
         return (
-            <g className={relationshipClassName(relationship, isSelected, isHoveredOver)} transform={groupTransform}>
-                <circle id={id} data-node-type="relationship" data-partners={partnersStr}
-                    onMouseEnter={this.onMouseEnter} onMouseLeave={onNodeMouseLeave}
-                    r={relationshipCircleRadius} cx={halfRelationshipSize} cy={halfRelationshipSize} />
+            <g
+                className={relationshipClassName(
+                    relationship,
+                    isSelected,
+                    isHoveredOver
+                )}
+                transform={groupTransform}>
+                <circle
+                    id={id}
+                    data-node-type="relationship"
+                    data-partners={partnersStr}
+                    onMouseEnter={this.onMouseEnter}
+                    onMouseLeave={onNodeMouseLeave}
+                    r={relationshipCircleRadius}
+                    cx={halfRelationshipSize}
+                    cy={halfRelationshipSize}
+                />
             </g>
         );
     }
 }
-

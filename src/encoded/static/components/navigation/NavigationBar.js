@@ -8,7 +8,6 @@ import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/ut
 import { CGAPLogo } from './../viz/CGAPLogo';
 import { TestWarning, CollapsedNav } from './components';
 
-
 /**
  * Some of this code is deprecated and can be re-factored.
  * E.g. We use BigDropdown now for static pages menu.
@@ -19,16 +18,15 @@ import { TestWarning, CollapsedNav } from './components';
  * @todo In new user/login menu (BigDropdown style), include more stuff from profile, e.g. Gravatar photo.
  */
 export class NavigationBar extends React.PureComponent {
-
     static propTypes = {
-        'href'              : PropTypes.string,
-        'session'           : PropTypes.bool,
-        'updateAppSessionState' : PropTypes.func.isRequired,
-        'context'           : PropTypes.object,
-        'schemas'           : PropTypes.any
+        href: PropTypes.string,
+        session: PropTypes.bool,
+        updateAppSessionState: PropTypes.func.isRequired,
+        context: PropTypes.object,
+        schemas: PropTypes.any,
     };
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.closeMobileMenu = this.closeMobileMenu.bind(this);
         this.onToggleNavBar = this.onToggleNavBar.bind(this);
@@ -45,53 +43,74 @@ export class NavigationBar extends React.PureComponent {
          * @property {boolean} state.isLoadingHelpMenuTree - Whether menu tree is currently being loaded.
          */
         this.state = {
-            'mounted'               : false,
-            'mobileDropdownOpen'    : false
+            mounted: false,
+            mobileDropdownOpen: false,
         };
     }
 
     /**
      * Initializes scroll event handler & loading of help menu tree.
      */
-    componentDidMount(){
-        this.setState({ 'mounted' : true });
+    componentDidMount() {
+        this.setState({ mounted: true });
     }
 
     /**
      * Re-loads help menu tree if session (user login state) has changed.
      */
-    componentDidUpdate(prevProps, prevState){
+    componentDidUpdate(prevProps, prevState) {
         const { href, session } = this.props;
-        if ((typeof session === 'boolean' && session !== prevProps.session) || href !== prevProps.href){
+        if (
+            (typeof session === 'boolean' && session !== prevProps.session) ||
+            href !== prevProps.href
+        ) {
             this.closeMobileMenu();
         }
     }
 
-    closeMobileMenu(){
-        this.setState( ({ mobileDropdownOpen }) => {
+    closeMobileMenu() {
+        this.setState(({ mobileDropdownOpen }) => {
             if (!mobileDropdownOpen) return null;
-            return { 'mobileDropdownOpen' : false };
+            return { mobileDropdownOpen: false };
         });
     }
 
-    onToggleNavBar(open){
-        this.setState({ 'mobileDropdownOpen' : open });
+    onToggleNavBar(open) {
+        this.setState({ mobileDropdownOpen: open });
     }
 
     render() {
         const { mobileDropdownOpen, mounted } = this.state;
-        const { href, context, schemas, isFullscreen, testWarningPresent, hideTestWarning } = this.props;
+        const {
+            href,
+            context,
+            schemas,
+            isFullscreen,
+            testWarningPresent,
+            hideTestWarning,
+        } = this.props;
         const testWarningVisible = testWarningPresent & !isFullscreen; // Hidden on full screen mode.
         //const navClassName = "navbar-container" + (testWarningVisible ? ' test-warning-visible' : '');
 
         return (
             <div className="navbar-container">
-                <div id="top-nav" className="navbar-fixed-top" role="navigation">
-                    <TestWarning visible={testWarningVisible} setHidden={hideTestWarning} href={href} />
+                <div
+                    id="top-nav"
+                    className="navbar-fixed-top"
+                    role="navigation">
+                    <TestWarning
+                        visible={testWarningVisible}
+                        setHidden={hideTestWarning}
+                        href={href}
+                    />
                     <div className="navbar-inner-container">
-                        <Navbar label="main" expand="md" className="navbar-main" id="navbar-icon"
-                            onToggle={this.onToggleNavBar} expanded={mobileDropdownOpen}>
-
+                        <Navbar
+                            label="main"
+                            expand="md"
+                            className="navbar-main"
+                            id="navbar-icon"
+                            onToggle={this.onToggleNavBar}
+                            expanded={mobileDropdownOpen}>
                             <a className="navbar-brand" href="/">
                                 <CGAPLogo />
                             </a>
@@ -100,7 +119,11 @@ export class NavigationBar extends React.PureComponent {
                                 <i className="icon icon-bars icon-fw fas" />
                             </Navbar.Toggle>
 
-                            <CollapsedNav {...this.state} {...this.props} testWarningVisible={testWarningVisible} />
+                            <CollapsedNav
+                                {...this.state}
+                                {...this.props}
+                                testWarningVisible={testWarningVisible}
+                            />
                         </Navbar>
                     </div>
                 </div>

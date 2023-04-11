@@ -5,24 +5,28 @@ import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
 import { CSSTransition } from 'react-transition-group';
 import ReactTooltip from 'react-tooltip';
-import { layout, console, analytics, navigate } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import {
+    layout,
+    console,
+    analytics,
+    navigate,
+} from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import _ from 'underscore';
 
 export class BigDropdownContainer extends React.PureComponent {
-
     static defaultProps = {
-        'windowHeight' : 500,
-        'children' : <h5>HI!</h5>,
-        'introSection' : <h4>Hello World!</h4>
+        windowHeight: 500,
+        children: <h5>HI!</h5>,
+        introSection: <h4>Hello World!</h4>,
     };
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.onBackgroundClick = this.onBackgroundClick.bind(this);
         this.menuNodeRef = React.createRef();
     }
 
-    componentDidUpdate(pastProps){
+    componentDidUpdate(pastProps) {
         const { id, open } = this.props;
         const { open: pastOpen } = pastProps;
 
@@ -37,17 +41,24 @@ export class BigDropdownContainer extends React.PureComponent {
             ReactTooltip.rebuild();
 
             // Set focus to first focusable elem for accessibility.
-            setTimeout(()=>{
+            setTimeout(() => {
                 const containerSelectorStr = `.big-dropdown-menu[data-open-id=${id}]`;
-                const firstFocusableElem = document.querySelector(containerSelectorStr + " a, " + containerSelectorStr + " input");
+                const firstFocusableElem = document.querySelector(
+                    containerSelectorStr +
+                        ' a, ' +
+                        containerSelectorStr +
+                        ' input'
+                );
                 if (firstFocusableElem) {
                     firstFocusableElem.focus();
                 }
             }, 250);
 
-            analytics.event("BigDropdownContainer", "open", { eventLabel: id });
-        } else if (!open && pastOpen){
-            analytics.event("BigDropdownContainer", "close", { eventLabel: id });
+            analytics.event('BigDropdownContainer', 'open', { eventLabel: id });
+        } else if (!open && pastOpen) {
+            analytics.event('BigDropdownContainer', 'close', {
+                eventLabel: id,
+            });
         }
     }
 
@@ -57,19 +68,17 @@ export class BigDropdownContainer extends React.PureComponent {
      * Conditionally prevent click event from bubbling up past this background.
      * Makes it easier in BigDropdownGroupController to close dropdown on any click in window (outside of menu).
      */
-    onBackgroundClick(evt){
+    onBackgroundClick(evt) {
         const targetElem = (evt && evt.target) || null;
 
         const target = layout.elementIsChildOfLink(targetElem);
 
-        if (target){
+        if (target) {
             // Allow external links to the marketing site by not allowing event to bubble up to window click handler
             // in BigDropdownGroupController.
-            const targetHref = target.getAttribute('href') || target.getAttribute('data-href');
-            if (
-                targetHref &&
-                !navigate.sameOrigin(targetHref)
-            ) {
+            const targetHref =
+                target.getAttribute('href') || target.getAttribute('data-href');
+            if (targetHref && !navigate.sameOrigin(targetHref)) {
                 evt.stopPropagation();
             }
 
@@ -78,9 +87,13 @@ export class BigDropdownContainer extends React.PureComponent {
         }
 
         const targetElemCls = (targetElem && targetElem.className) || null;
-        const targetElemClassList = (targetElemCls && targetElemCls.split(' ')) || null;
+        const targetElemClassList =
+            (targetElemCls && targetElemCls.split(' ')) || null;
 
-        if (Array.isArray(targetElemClassList) && targetElemClassList.indexOf("big-dropdown-menu-background") > -1){
+        if (
+            Array.isArray(targetElemClassList) &&
+            targetElemClassList.indexOf('big-dropdown-menu-background') > -1
+        ) {
             // Clicked on semi-opaque background - close.
             // Let click event bubble up to be caught by BigDropdownGroupController window click handler and dropdown closed.
             return false;
@@ -91,7 +104,7 @@ export class BigDropdownContainer extends React.PureComponent {
         evt.preventDefault();
     }
 
-    render(){
+    render() {
         const {
             children,
             id,
@@ -109,13 +122,26 @@ export class BigDropdownContainer extends React.PureComponent {
             ...passProps
         } = this.props;
 
-        const outerCls = "big-dropdown-menu-background" + (className ? ' ' + className : "");
-        const innerCls = "big-dropdown-menu" + (open ? " is-open" : "");
-        const body = React.Children.map(children, (child) => React.cloneElement(child, passProps));
+        const outerCls =
+            'big-dropdown-menu-background' + (className ? ' ' + className : '');
+        const innerCls = 'big-dropdown-menu' + (open ? ' is-open' : '');
+        const body = React.Children.map(children, (child) =>
+            React.cloneElement(child, passProps)
+        );
         const renderedElem = (
-            <CSSTransition appear in={open || closing} classNames="big-dropdown-menu-transition" unmountOnExit mountOnEnter
-                timeout={{ appear: 0, exit: otherDropdownOpen ? 0 : 300 }} key="dropdown-transition-container" nodeRef={this.menuNodeRef}>
-                <div className={outerCls} onClick={this.onBackgroundClick} ref={this.menuNodeRef}
+            <CSSTransition
+                appear
+                in={open || closing}
+                classNames="big-dropdown-menu-transition"
+                unmountOnExit
+                mountOnEnter
+                timeout={{ appear: 0, exit: otherDropdownOpen ? 0 : 300 }}
+                key="dropdown-transition-container"
+                nodeRef={this.menuNodeRef}>
+                <div
+                    className={outerCls}
+                    onClick={this.onBackgroundClick}
+                    ref={this.menuNodeRef}
                     key="dropdown-transition-container-inner"
                     data-is-mobile-view={!isDesktopView}
                     data-is-test-warning-visible={testWarningVisible}
@@ -123,9 +149,11 @@ export class BigDropdownContainer extends React.PureComponent {
                     data-is-other-dropdown-closing={otherDropdownClosing}>
                     <div className={innerCls} data-open-id={id}>
                         <div className="container">
-                            { body }
-                            <div className="mobile-close-button" onClick={onClose}>
-                                <i className="icon icon-2x icon-times fas"/>
+                            {body}
+                            <div
+                                className="mobile-close-button"
+                                onClick={onClose}>
+                                <i className="icon icon-2x icon-times fas" />
                             </div>
                         </div>
                     </div>
@@ -133,11 +161,10 @@ export class BigDropdownContainer extends React.PureComponent {
             </CSSTransition>
         );
 
-        if (overlaysContainer){
+        if (overlaysContainer) {
             return ReactDOM.createPortal(renderedElem, overlaysContainer);
         }
 
         return renderedElem;
     }
-
 }

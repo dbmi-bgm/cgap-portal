@@ -17,29 +17,33 @@ const clinicianNoteWorkingDraftCache = {};
 const clinicianNoteSavedCache = {};
 
 export class ClinicianNotes extends React.PureComponent {
+    static initState(props) {
+        const {
+            context,
+            individual: { '@id': id, clinic_notes: propOriginalNotes = '' },
+        } = props;
 
-    static initState(props){
-        const { context, individual: { '@id' : id, clinic_notes: propOriginalNotes = "" } } = props;
-
-        if (contextForCache && context && contextForCache !== context){
+        if (contextForCache && context && contextForCache !== context) {
             // If context reference changes, then clear saved note cache.
             // Is assumed that (newer) prop.context would be most up-to-date from server.
             contextForCache = context;
-            Object.keys(clinicianNoteSavedCache).forEach(function(k){
+            Object.keys(clinicianNoteSavedCache).forEach(function (k) {
                 delete clinicianNoteSavedCache[k];
             });
         }
 
-        const originalNotes = (id && clinicianNoteSavedCache[id]) || propOriginalNotes;
-        const notes = (id && clinicianNoteWorkingDraftCache[id]) || originalNotes;
+        const originalNotes =
+            (id && clinicianNoteSavedCache[id]) || propOriginalNotes;
+        const notes =
+            (id && clinicianNoteWorkingDraftCache[id]) || originalNotes;
         return {
             originalNotes,
             notes,
-            isSaving: false
+            isSaving: false,
         };
     }
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.onChange = this.onChange.bind(this);
         this.onSave = this.onSave.bind(this);
@@ -48,14 +52,13 @@ export class ClinicianNotes extends React.PureComponent {
         this.state = ClinicianNotes.initState(props);
     }
 
-    componentDidUpdate(pastProps, pastState){
+    componentDidUpdate(pastProps, pastState) {
         const { individual: currIndv } = this.props;
         const { individual: pastIndv } = pastProps;
-        const { clinic_notes: currPropNotes = "" } = currIndv || {};
-        const { clinic_notes: pastPropNotes = "" } = pastIndv || {};
+        const { clinic_notes: currPropNotes = '' } = currIndv || {};
+        const { clinic_notes: pastPropNotes = '' } = pastIndv || {};
 
-
-        if (currIndv !== pastIndv || currPropNotes !== pastPropNotes){
+        if (currIndv !== pastIndv || currPropNotes !== pastPropNotes) {
             // We could alternatively just use unique key for ClinicianNotes instances
             this.setState(ClinicianNotes.initState(this.props));
             return;
@@ -63,97 +66,117 @@ export class ClinicianNotes extends React.PureComponent {
 
         const { notes, originalNotes } = this.state;
         const { notes: pastNotes, originalNotes: pastOrigNotes } = pastState;
-        const notesChanged = (notes !== (originalNotes || ""));
-        const pastNotesChanged = (pastNotes !== (pastOrigNotes || ""));
+        const notesChanged = notes !== (originalNotes || '');
+        const pastNotesChanged = pastNotes !== (pastOrigNotes || '');
         if (notesChanged && !pastNotesChanged) {
             ReactTooltip.rebuild();
         }
     }
 
-    onChange(e){
-        const { individual: { '@id' : id } } = this.props;
+    onChange(e) {
+        const {
+            individual: { '@id': id },
+        } = this.props;
         const notes = e.target.value;
-        if (id){
+        if (id) {
             clinicianNoteWorkingDraftCache[id] = notes;
         }
         this.setState({ notes });
     }
 
-    onSave(e){
+    onSave(e) {
         e.preventDefault();
         e.stopPropagation();
-        const { individual: { '@id' : id } } = this.props;
+        const {
+            individual: { '@id': id },
+        } = this.props;
         const { notes, isSaving: alreadyIsSaving } = this.state;
         ReactTooltip.hide();
         if (alreadyIsSaving) return;
         if (!id) {
-            console.error("No ID available");
+            console.error('No ID available');
             return;
         }
-        this.setState({ isSaving: true }, ()=>{
+        this.setState({ isSaving: true }, () => {
             ajax.load(
                 id,
-                (res)=>{
-                    console.info("Saved notes to " + id);
+                (res) => {
+                    console.info('Saved notes to ' + id);
                     console.log(res);
                     delete clinicianNoteWorkingDraftCache[id];
                     clinicianNoteSavedCache[id] = notes;
                     this.setState({
                         originalNotes: notes,
-                        isSaving: false
+                        isSaving: false,
                     });
                 },
                 'PATCH',
-                (err)=>{
+                (err) => {
                     console.error(err);
                     this.setState({ isSaving: false });
                 },
-                JSON.stringify({ clinic_notes : notes })
+                JSON.stringify({ clinic_notes: notes })
             );
         });
     }
 
-    onReset(e){
-        const { individual: { '@id' : id } } = this.props;
-        if (id){
+    onReset(e) {
+        const {
+            individual: { '@id': id },
+        } = this.props;
+        if (id) {
             delete clinicianNoteWorkingDraftCache[id];
         }
-        this.setState(function({ originalNotes }){
+        this.setState(function ({ originalNotes }) {
             return { notes: originalNotes };
         });
     }
 
-    render(){
+    render() {
         const { haveEditPermission } = this.props;
         const { notes, originalNotes, isSaving } = this.state;
-        const notesChanged = (notes !== (originalNotes || ""));
+        const notesChanged = notes !== (originalNotes || '');
 
         if (!notes && !haveEditPermission) return null;
 
         return (
             <div className="detail-row" data-describing="clinic_notes">
                 <label className="d-block">Clinical Notes</label>
-                { haveEditPermission ?
-                    <textarea value={notes} onChange={this.onChange} className={notesChanged ? "has-changed" : null}/>
-                    :
-                    <p className="read-only-notes">{ notes }</p>
-                }
-                { haveEditPermission && notesChanged ?
+                {haveEditPermission ? (
+                    <textarea
+                        value={notes}
+                        onChange={this.onChange}
+                        className={notesChanged ? 'has-changed' : null}
+                    />
+                ) : (
+                    <p className="read-only-notes">{notes}</p>
+                )}
+                {haveEditPermission && notesChanged ? (
                     <div className="save-btn-container">
-                        <button type="button" disabled={isSaving} className="btn btn-sm btn-success mt-02 mr-05" onClick={this.onSave}
+                        <button
+                            type="button"
+                            disabled={isSaving}
+                            className="btn btn-sm btn-success mt-02 mr-05"
+                            onClick={this.onSave}
                             data-tip="It may take a couple of minutes for changes to take effect">
-                            { isSaving ?
+                            {isSaving ? (
                                 <React.Fragment>
-                                    <i className="icon icon-circle-notch fas icon-spin mr-08"/>
+                                    <i className="icon icon-circle-notch fas icon-spin mr-08" />
                                     Saving
                                 </React.Fragment>
-                                : "Save" }
+                            ) : (
+                                'Save'
+                            )}
                         </button>
-                        <button type="button" disabled={isSaving} className="btn btn-sm btn-outline-dark mt-02" onClick={this.onReset}>
+                        <button
+                            type="button"
+                            disabled={isSaving}
+                            className="btn btn-sm btn-outline-dark mt-02"
+                            onClick={this.onReset}>
                             Reset
                         </button>
                     </div>
-                    : null }
+                ) : null}
             </div>
         );
     }

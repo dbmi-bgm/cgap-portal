@@ -8,19 +8,17 @@ import { BasicStaticSectionBody } from '@hms-dbmi-bgm/shared-portal-components/e
 import { OverviewHeadingContainer } from './../../item-pages/components/OverviewHeadingContainer';
 import { replaceString as replacePlaceholderString } from './../placeholders';
 
-
 /** THIS FILE NOT SHARED OR COMMON */
 export class BasicUserContentBody extends React.PureComponent {
-
-    constructor(props){
+    constructor(props) {
         super(props);
-        this.state = { 'hasError' : false, 'errorInfo' : null };
+        this.state = { hasError: false, errorInfo: null };
     }
 
-    componentDidCatch(err, info){
-        this.setState({ 'hasError' : true, 'errorInfo' : info }, ()=>{
-            var href = this.props.href;
-            if (!href){
+    componentDidCatch(err, info) {
+        this.setState({ hasError: true, errorInfo: info }, () => {
+            var { href } = this.props;
+            if (!href) {
                 var storeState = store && store.getState();
                 href = storeState && storeState.href;
             }
@@ -29,11 +27,12 @@ export class BasicUserContentBody extends React.PureComponent {
     }
 
     /** Determines the item type from the context. */
-    itemType(){
+    itemType() {
         var { context, itemType } = this.props;
         if (itemType && typeof itemType === 'string') return itemType;
-        if (!Array.isArray(context['@type'])) throw new Error('Expected an @type on context.');
-        if (context['@type'].indexOf('StaticSection') > -1){
+        if (!Array.isArray(context['@type']))
+            throw new Error('Expected an @type on context.');
+        if (context['@type'].indexOf('StaticSection') > -1) {
             return 'StaticSection';
         } else {
             // TODO: Case for JupyterNotebook (?) and/or yet-to-be-created ones.
@@ -41,9 +40,10 @@ export class BasicUserContentBody extends React.PureComponent {
         }
     }
 
-    render(){
-        var { context, markdownCompilerOptions, parentComponentType } = this.props;
-        if (this.state.hasError){
+    render() {
+        var { context, markdownCompilerOptions, parentComponentType } =
+            this.props;
+        if (this.state.hasError) {
             return (
                 <div className="error">
                     <h4>Error parsing content.</h4>
@@ -55,8 +55,12 @@ export class BasicUserContentBody extends React.PureComponent {
 
         if (itemType === 'StaticSection') {
             return (
-                <BasicStaticSectionBody content={context.content} filetype={context.filetype}
-                    markdownCompilerOptions={markdownCompilerOptions} placeholderReplacementFxn={replacePlaceholderString} />
+                <BasicStaticSectionBody
+                    content={context.content}
+                    filetype={context.filetype}
+                    markdownCompilerOptions={markdownCompilerOptions}
+                    placeholderReplacementFxn={replacePlaceholderString}
+                />
             );
         } else {
             // TODO handle @type=JupyterHub?
@@ -67,34 +71,40 @@ export class BasicUserContentBody extends React.PureComponent {
             );
         }
     }
-
 }
 
-
-
 export class ExpandableStaticHeader extends OverviewHeadingContainer {
-
     static propTypes = {
-        'context' : PropTypes.object.isRequired
+        context: PropTypes.object.isRequired,
     };
 
     static defaultProps = _.extend({}, OverviewHeadingContainer.defaultProps, {
-        'className' : 'with-background mb-1 mt-1',
-        'title'     : "Information",
-        'prependTitleIconFxn' : function prependedIcon(open, props){
+        className: 'with-background mb-1 mt-1',
+        title: 'Information',
+        prependTitleIconFxn: function prependedIcon(open, props) {
             if (!props.titleIcon) return null;
-            return <i className={"expand-icon icon icon-fw icon-" + props.titleIcon} />;
+            return (
+                <i
+                    className={
+                        'expand-icon icon icon-fw icon-' + props.titleIcon
+                    }
+                />
+            );
         },
-        'prependTitleIcon' : true
+        prependTitleIcon: true,
     });
 
-    renderInnerBody(){
+    renderInnerBody() {
         const { context, href } = this.props;
         const { open } = this.state;
 
         return (
             <div className="static-section-header pt-1 clearfix">
-                <BasicUserContentBody context={context} href={href} parentComponentType={ExpandableStaticHeader} />
+                <BasicUserContentBody
+                    context={context}
+                    href={href}
+                    parentComponentType={ExpandableStaticHeader}
+                />
             </div>
         );
     }

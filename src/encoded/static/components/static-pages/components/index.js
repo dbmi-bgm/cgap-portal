@@ -6,5 +6,8 @@
  * @module static-pages/components
  */
 
-export { BasicUserContentBody, ExpandableStaticHeader } from './BasicUserContentBody';
+export {
+    BasicUserContentBody,
+    ExpandableStaticHeader,
+} from './BasicUserContentBody';
 export { UserContentBodyList } from './UserContentBodyList';

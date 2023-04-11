@@ -11,70 +11,135 @@ import { DefaultDetailPaneComponent } from './DefaultDetailPaneComponent';
  * Maybe will handle more number options in future.
  */
 export const POSITION_DEFAULTS = {
-    individualWidth: 80,        // Should be divisible by 2 (@see `computeVisibilityGraph`)
-    individualXSpacing: 80,     // THIS MUST BE EQUAL TO OR MULTIPLE OF INDIVIDUAL WIDTH FOR TIME BEING (@see `computeVisibilityGraph`)
-    individualHeight: 80,       // This could vary I think
-    individualYSpacing: 180,    // THIS MUST BE DIVISIBLE BY 60 (or by 2, 3, 4, (& ideally - 5, 6)) (for possible `subdivisionsUsed` in finding visibilitygraph/edges) (@see `computeVisibilityGraph`)
+    individualWidth: 80, // Should be divisible by 2 (@see `computeVisibilityGraph`)
+    individualXSpacing: 80, // THIS MUST BE EQUAL TO OR MULTIPLE OF INDIVIDUAL WIDTH FOR TIME BEING (@see `computeVisibilityGraph`)
+    individualHeight: 80, // This could vary I think
+    individualYSpacing: 180, // THIS MUST BE DIVISIBLE BY 60 (or by 2, 3, 4, (& ideally - 5, 6)) (for possible `subdivisionsUsed` in finding visibilitygraph/edges) (@see `computeVisibilityGraph`)
     graphPadding: 60,
     relationshipSize: 40,
-    edgeCornerDiameter: 20
+    edgeCornerDiameter: 20,
 };
 
 export const graphTransformerDefaultProps = {
     /** @type {DatasetEntry[]} dataset - Dataset to be visualized. */
-    "dataset" : [
+    dataset: [
         {
             id: 1,
-            name: "Jack",
+            name: 'Jack',
             isProband: true,
             father: 2,
             mother: 3,
-            gender: "m",
+            gender: 'm',
             data: {
-                "notes" : "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
-                "description" : "Too many calories in the diet."
+                notes: "Likes cheeseburger and other sandwiches. Dislikes things that aren't those things.",
+                description: 'Too many calories in the diet.',
             },
             age: 42,
-            diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"],
-            carrierOfDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"],
+            diseases: ['Badfeelingitis', 'Ubercrampus', 'Blue Thumb Syndrome'],
+            carrierOfDiseases: [
+                'Green Thumbitis',
+                'BlueClues',
+                'BlueClues2',
+                'BluesClues3',
+            ],
             //asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
         },
-        { id: 2, name: "Joe", gender: "m" },
-        { id: 3, name: "Mary", gender: "f", diseases: ["Blue Thumb Syndrome", "Green Thumbitis"] },
-        { id: 4, name: "George", gender: "m", parents: [2,3], age: 45, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-        { id: 19, name: "George II", gender: "m", parents: [2,3], age: 46, carrierOfDiseases: ["Blue Thumb Syndrome"], },
-        { id: 5, name: "Patricia", gender: "f", parents: [3, 6], diseases: ["Badfeelingitis", "Ubercrampus", "Blue Thumb Syndrome"] },
+        { id: 2, name: 'Joe', gender: 'm' },
         {
-            id: 6, name: "Patrick", gender: "m", children: [5],
-            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus"]
+            id: 3,
+            name: 'Mary',
+            gender: 'f',
+            diseases: ['Blue Thumb Syndrome', 'Green Thumbitis'],
         },
         {
-            id: 7, name: "Phillip", gender: "m", children: [6],
-            carrierOfDiseases: ["Blue Thumb Syndrome", "Ubercrampus", "Green Thumbitis", "Badfeelingitis", "BlueClues", "BlueClues2", "BlueClues3"]
+            id: 4,
+            name: 'George',
+            gender: 'm',
+            parents: [2, 3],
+            age: 45,
+            carrierOfDiseases: ['Blue Thumb Syndrome'],
         },
-        { id: 8, name: "Phillipina", gender: "f", children: [6] },
-        { id: 9, name: "Josephina", gender: "f", children: [2] },
-        { id: 10, name: "Joseph", gender: "m", children: [2] },
         {
-            id: 11, name: "Max", gender: "m", parents: [],
-            asymptoticDiseases: ["Green Thumbitis", "BlueClues", "BlueClues2", "BluesClues3"]
+            id: 19,
+            name: 'George II',
+            gender: 'm',
+            parents: [2, 3],
+            age: 46,
+            carrierOfDiseases: ['Blue Thumb Syndrome'],
         },
-        { id: 12, name: "Winnie the Pooh", gender: "u", parents: [11, 5], isDeceased: true, age: 24 },
         {
-            id: 13, name: "Rutherford", gender: "m", parents: [10, 5], age: 0.3,
-            isPregnancy: true, isDeceased: true, isTerminatedPregnancy: true,
-            diseases: ["Ubercrampus", "Blue Thumb Syndrome", "Green Thumbitis"],
-            carrierOfDiseases: ["BlueClues", "BlueClues2", "BluesClues3"]
+            id: 5,
+            name: 'Patricia',
+            gender: 'f',
+            parents: [3, 6],
+            diseases: ['Badfeelingitis', 'Ubercrampus', 'Blue Thumb Syndrome'],
         },
-        { id: 14, name: "Sally", gender: "f", parents: [12, 9] },
-        { id: 15, name: "Sally2", gender: "f" },
-        { id: 16, name: "Silly", gender: "m", parents: [15, 12] },
-        { id: 17, name: "Silly2", gender: "m", parents: [15, 12] },
-        { id: 18, name: "Silly3", gender: "f", parents: [16, 14] },
+        {
+            id: 6,
+            name: 'Patrick',
+            gender: 'm',
+            children: [5],
+            carrierOfDiseases: ['Blue Thumb Syndrome', 'Ubercrampus'],
+        },
+        {
+            id: 7,
+            name: 'Phillip',
+            gender: 'm',
+            children: [6],
+            carrierOfDiseases: [
+                'Blue Thumb Syndrome',
+                'Ubercrampus',
+                'Green Thumbitis',
+                'Badfeelingitis',
+                'BlueClues',
+                'BlueClues2',
+                'BlueClues3',
+            ],
+        },
+        { id: 8, name: 'Phillipina', gender: 'f', children: [6] },
+        { id: 9, name: 'Josephina', gender: 'f', children: [2] },
+        { id: 10, name: 'Joseph', gender: 'm', children: [2] },
+        {
+            id: 11,
+            name: 'Max',
+            gender: 'm',
+            parents: [],
+            asymptoticDiseases: [
+                'Green Thumbitis',
+                'BlueClues',
+                'BlueClues2',
+                'BluesClues3',
+            ],
+        },
+        {
+            id: 12,
+            name: 'Winnie the Pooh',
+            gender: 'u',
+            parents: [11, 5],
+            isDeceased: true,
+            age: 24,
+        },
+        {
+            id: 13,
+            name: 'Rutherford',
+            gender: 'm',
+            parents: [10, 5],
+            age: 0.3,
+            isPregnancy: true,
+            isDeceased: true,
+            isTerminatedPregnancy: true,
+            diseases: ['Ubercrampus', 'Blue Thumb Syndrome', 'Green Thumbitis'],
+            carrierOfDiseases: ['BlueClues', 'BlueClues2', 'BluesClues3'],
+        },
+        { id: 14, name: 'Sally', gender: 'f', parents: [12, 9] },
+        { id: 15, name: 'Sally2', gender: 'f' },
+        { id: 16, name: 'Silly', gender: 'm', parents: [15, 12] },
+        { id: 17, name: 'Silly2', gender: 'm', parents: [15, 12] },
+        { id: 18, name: 'Silly3', gender: 'f', parents: [16, 14] },
     ],
 
     /** If true, will filter out and not display individuals who are detached from proband. */
-    "filterUnrelatedIndividuals" : false,
+    filterUnrelatedIndividuals: false,
 
     /**
      * Dimensions for drawing/layout of nodes.
@@ -83,11 +148,10 @@ export const graphTransformerDefaultProps = {
      *
      * @required
      */
-    "dimensionOpts" : Object.assign({}, POSITION_DEFAULTS),
+    dimensionOpts: Object.assign({}, POSITION_DEFAULTS),
 };
 
 export const pedigreeVizViewDefaultProps = {
-
     /**
      * Height of parent container.
      * If not defined, visualization will be unbounded and extend as
@@ -105,15 +169,14 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @optional
      */
-    "minimumHeight" : 400,
-
+    minimumHeight: 400,
 
     /**
      * Disables node selection.
      * Useful if purposely excluding `renderDetailPane`.
      * E.g. for a miniature preview view.
      */
-    "disableSelect" : false,
+    disableSelect: false,
 
     /**
      * Width of parent container.
@@ -127,14 +190,14 @@ export const pedigreeVizViewDefaultProps = {
      * NOT YET SUPPORTED.
      * If true (unsupported yet), will be able to modify and add/remove nodes.
      */
-    "editable" : false,
+    editable: false,
 
     /**
      * Callback function called upon changing of selectedNode.
      *
      * @optional
      */
-    "onNodeSelected" : function(node){
+    onNodeSelected: function (node) {
         console.log('Selected', node);
     },
 
@@ -144,8 +207,7 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {!function}
      */
-    "renderDetailPane" : null,
-
+    renderDetailPane: null,
 
     /**
      * Can supply an array of strings to color only those diseases.
@@ -153,8 +215,7 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {!string[]}
      */
-    "visibleDiseaseIdxMap": null,
-
+    visibleDiseaseIdxMap: null,
 
     /**
      * If true, will show markers such as "II - 1", "IV - 2", etc. based on generation & order.
@@ -162,7 +223,7 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {boolean}
      */
-    "showOrderBasedName" : true,
+    showOrderBasedName: true,
 
     /**
      * If true, will show diseases currently that aren't part of color-coded ones.
@@ -171,7 +232,7 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {boolean}
      */
-    "showNotes" : true,
+    showNotes: true,
 
     /**
      * Initial zoom/scale.
@@ -180,7 +241,7 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {number}
      */
-    "initialScale" : 1,
+    initialScale: 1,
 
     /**
      * If true, will zoom out the graph (if needed)
@@ -189,11 +250,9 @@ export const pedigreeVizViewDefaultProps = {
      *
      * @type {boolean}
      */
-    "zoomToExtentsOnMount" : true,
+    zoomToExtentsOnMount: true,
 
-
-    "showZoomControls" : true,
-
+    showZoomControls: true,
 
     /**
      * If when detail pane is open it reduces width or height
@@ -201,16 +260,14 @@ export const pedigreeVizViewDefaultProps = {
      * here to be used in re-setting `minScale` when pane is
      * open.
      */
-    "detailPaneOpenOffsetWidth" : 0,
-    "detailPaneOpenOffsetHeight" : 0,
-
-
-    /** Whether to allow to zoom w. mousewheel. Experimental. */
-    "enableMouseWheelZoom" : false,
-
+    detailPaneOpenOffsetWidth: 0,
+    detailPaneOpenOffsetHeight: 0,
 
     /** Whether to allow to zoom w. mousewheel. Experimental. */
-    "enablePinchZoom" : true
+    enableMouseWheelZoom: false,
+
+    /** Whether to allow to zoom w. mousewheel. Experimental. */
+    enablePinchZoom: true,
 };
 
 export const pedigreeVizDefaultProps = {
@@ -224,7 +281,7 @@ export const pedigreeVizDefaultProps = {
      * @type {!function}
      */
 
-    "renderDetailPane" : function(vizProps){
+    renderDetailPane: function (vizProps) {
         return <DefaultDetailPaneComponent {...vizProps} />;
     },
 };

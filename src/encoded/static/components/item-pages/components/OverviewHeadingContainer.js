@@ -15,91 +15,144 @@ import Collapse from 'react-bootstrap/esm/Collapse';
  * @deprecated
  */
 export class OverviewHeadingContainer extends React.Component {
-
     static propTypes = {
-        'onFinishOpen' : PropTypes.func,
-        'onStartOpen' : PropTypes.func,
-        'onFinishClose' : PropTypes.func,
-        'onStartClose' : PropTypes.func
+        onFinishOpen: PropTypes.func,
+        onStartOpen: PropTypes.func,
+        onFinishClose: PropTypes.func,
+        onStartClose: PropTypes.func,
     };
 
     static defaultProps = {
-        'className'     : 'with-background mb-3 mt-1',
-        'defaultOpen'   : true,
-        'titleElement'  : 'h4',
-        'title'         : 'Properties',
-        'prependTitleIcon' : false,
-        'prependTitleIconFxn' : function(open, props){
-            return <i className={"expand-icon icon fas icon-" + (open ? 'minus' : 'plus')} data-tip={open ? 'Collapse' : 'Expand'}/>;
-        }
+        className: 'with-background mb-3 mt-1',
+        defaultOpen: true,
+        titleElement: 'h4',
+        title: 'Properties',
+        prependTitleIcon: false,
+        prependTitleIconFxn: function (open, props) {
+            return (
+                <i
+                    className={
+                        'expand-icon icon fas icon-' + (open ? 'minus' : 'plus')
+                    }
+                    data-tip={open ? 'Collapse' : 'Expand'}
+                />
+            );
+        },
     };
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.toggle = _.throttle(this.toggle.bind(this), 500);
         this.renderInner = this.renderInner.bind(this);
         this.renderInnerBody = this.renderInnerBody.bind(this);
-        this.state = { 'open' : props.defaultOpen, 'closing' : false };
+        this.state = { open: props.defaultOpen, closing: false };
     }
 
-    toggle(){
-        this.setState(function(currState){
-            var open    = !currState.open,
-                closing = !open;
-            return { open, closing };
-        }, ()=>{
-            setTimeout(()=>{
-                this.setState(function(currState){
-                    if (!currState.open && currState.closing){
-                        return { 'closing' : false };
-                    } else if (currState.open){
-                        ReactTooltip.rebuild();
-                    }
-                    return null;
-                });
-            }, 750);
-        });
+    toggle() {
+        this.setState(
+            function (currState) {
+                var open = !currState.open,
+                    closing = !open;
+                return { open, closing };
+            },
+            () => {
+                setTimeout(() => {
+                    this.setState(function (currState) {
+                        if (!currState.open && currState.closing) {
+                            return { closing: false };
+                        } else if (currState.open) {
+                            ReactTooltip.rebuild();
+                        }
+                        return null;
+                    });
+                }, 750);
+            }
+        );
     }
 
-    renderTitle(){
-        var { title, prependTitleIcon, prependTitleIconFxn } = this.props, open = this.state.open;
+    renderTitle() {
+        var { title, prependTitleIcon, prependTitleIconFxn } = this.props,
+            { open } = this.state;
         return (
             <span>
-                { prependTitleIcon && prependTitleIconFxn ? prependTitleIconFxn(open, this.props) : null }
-                { title } &nbsp;<i className={"icon fas icon-angle-right" + (open ? ' icon-rotate-90' : '')}/>
+                {prependTitleIcon && prependTitleIconFxn
+                    ? prependTitleIconFxn(open, this.props)
+                    : null}
+                {title} &nbsp;
+                <i
+                    className={
+                        'icon fas icon-angle-right' +
+                        (open ? ' icon-rotate-90' : '')
+                    }
+                />
             </span>
         );
     }
 
-    renderInner(){
+    renderInner() {
         var { open, closing } = this.state;
         return (
             <div className="inner">
-                <hr className="tab-section-title-horiz-divider"/>
-                { open || closing ? this.renderInnerBody() : <div/> }
+                <hr className="tab-section-title-horiz-divider" />
+                {open || closing ? this.renderInnerBody() : <div />}
             </div>
         );
     }
 
-    renderInnerBody(){
-        return <div className="row overview-blocks" children={this.props.children}/>;
+    renderInnerBody() {
+        return (
+            <div
+                className="row overview-blocks"
+                children={this.props.children}
+            />
+        );
     }
 
-    render(){
-        var { title, titleElement, titleClassName, titleTip, className, onStartOpen, onStartClose, onFinishClose, onFinishOpen } = this.props,
-            open        = this.state.open,
-            titleProps  = title && titleElement && {
-                'className' : 'tab-section-title clickable with-accent' + (titleClassName ? ' ' + titleClassName : ''),
-                'onClick'   : this.toggle,
-                'data-tip'  : titleTip
-            };
+    render() {
+        var {
+                title,
+                titleElement,
+                titleClassName,
+                titleTip,
+                className,
+                onStartOpen,
+                onStartClose,
+                onFinishClose,
+                onFinishOpen,
+            } = this.props,
+            { open } = this.state,
+            titleProps = title &&
+                titleElement && {
+                    className:
+                        'tab-section-title clickable with-accent' +
+                        (titleClassName ? ' ' + titleClassName : ''),
+                    onClick: this.toggle,
+                    'data-tip': titleTip,
+                };
 
         return (
-            <div className={"overview-blocks-header" + (open ? ' is-open' : ' is-closed') + (typeof className === 'string' ? ' ' + className : '')}>
-                { title && titleElement ? React.createElement(titleElement, titleProps, this.renderTitle()) : null }
-                <Collapse in={open} onEnter={onStartOpen} onEntered={onFinishOpen} onExit={onStartClose} onExited={onFinishClose} children={this.renderInner()} />
+            <div
+                className={
+                    'overview-blocks-header' +
+                    (open ? ' is-open' : ' is-closed') +
+                    (typeof className === 'string' ? ' ' + className : '')
+                }>
+                {title && titleElement
+                    ? React.createElement(
+                          titleElement,
+                          titleProps,
+                          this.renderTitle()
+                      )
+                    : null}
+                <Collapse
+                    in={open}
+                    onEnter={onStartOpen}
+                    onEntered={onFinishOpen}
+                    onExit={onStartClose}
+                    onExited={onFinishClose}
+                    children={this.renderInner()}
+                />
             </div>
         );
     }
 }
-

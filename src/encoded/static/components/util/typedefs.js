@@ -6,8 +6,6 @@
  * @module
  */
 
-
-
 // ----------------------------------------------------------------------------
 // Common type-defs, e.g. for Item, JSONContentResponse, SearchResponse.
 
@@ -21,7 +19,6 @@
  */
 export var JSONContentResponse;
 
-
 /**
  * @typedef {JSONContentResponse} Item
  * @property {string}       @id             Identifier and/or URL to Item.
@@ -32,7 +29,6 @@ export var JSONContentResponse;
  * @property {string}       [date_created]  Date Item was added to database.
  */
 export var Item;
-
 
 /**
  * @typedef {Object} URLParts
@@ -51,10 +47,8 @@ export var Item;
  */
 export var URLParts;
 
-
 // ----------------------------------------------------------------------------
 // Item Related Type-Defs
-
 
 /**
  * @typedef {Item} StaticSection
@@ -62,7 +56,6 @@ export var URLParts;
  * @property {string}       [filetype=text] Format of the content. Could be 'md', 'html', 'text', 'code', etc.
  */
 export var StaticSection;
-
 
 /**
  * @typedef {Item} StaticPage
@@ -75,7 +68,6 @@ export var StaticSection;
  */
 export var StaticPage;
 
-
 /**
  * @typedef {Item} File
  * @property {?string} href                 URI/pathname to where File may be downloaded.
@@ -84,7 +76,6 @@ export var StaticPage;
  */
 export var File;
 
-
 /**
  * @typedef {Item} Experiment
  * @property {?File[]} files                Objects/linkTos representing File items.
@@ -92,14 +83,12 @@ export var File;
  */
 export var Experiment;
 
-
 /**
  * @typedef {Item} ExperimentSet
  * @property {?Experiment[]} experiments_in_set     Objects/linkTos representing File items.
  * @property {?File[]} processed_files              Objects/linkTos representing Processed File items.
  */
 export var ExperimentSet;
-
 
 /**
  * An object containing data to fully represent a tab of a tab view.
@@ -127,10 +116,8 @@ export var ExperimentSet;
  */
 export var TabObject;
 
-
 // ----------------------------------------------------------------------------
 // Browse/Search Related Type-Defs
-
 
 /**
  * A JSON response from the back-end that represents a search query result.
@@ -141,7 +128,6 @@ export var TabObject;
  * @property {number} total - Total number of results expected for query.
  */
 export var SearchResponse;
-
 
 /**
  * @typedef {function} ColumnDefinitionRenderFxn
@@ -158,7 +144,6 @@ export var SearchResponse;
  */
 export var ColumnDefinitionRenderFxn;
 
-
 /**
  * A JSON object which contains some properties that define a renderable column.
  *
@@ -171,11 +156,8 @@ export var ColumnDefinitionRenderFxn;
  */
 export var ColumnDefinition;
 
-
-
 // ----------------------------------------------------------------------------
 // Common-ish type-defs
-
 
 /**
  * Options to pass to the `util.navigate` function.
@@ -201,4 +183,3 @@ export var NavigateOpts;
  * @property {number} [navigateDisappearThreshold=1] - After how many navigations should this alert be automatically removed.
  */
 export var AlertObj;
-

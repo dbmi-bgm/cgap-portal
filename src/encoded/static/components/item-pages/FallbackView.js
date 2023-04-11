@@ -12,7 +12,9 @@ export default class FallbackView extends React.PureComponent {
         var { context, schemas } = this.props;
         return (
             <div className="view-item mt-25 container" id="content">
-                {typeof context.description == "string" ? <p className="description">{context.description}</p> : null}
+                {typeof context.description == 'string' ? (
+                    <p className="description">{context.description}</p>
+                ) : null}
                 <ItemDetailList context={context} schemas={schemas} />
             </div>
         );

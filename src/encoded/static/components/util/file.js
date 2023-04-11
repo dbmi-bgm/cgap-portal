@@ -7,22 +7,21 @@ import { FileDownloadButtonAuto as FileDownloadButtonAutoOriginal } from '@hms-d
 
 import { File } from './typedefs';
 
-
 /**************************
  ** Common React Classes **
  ************************/
 
 /** Uses different defaultProps.canDownloadStatuses, specific to project */
-export function FileDownloadButtonAuto(props){
+export function FileDownloadButtonAuto(props) {
     return <FileDownloadButtonAutoOriginal {...props} />;
 }
 FileDownloadButtonAuto.defaultProps = {
-    'canDownloadStatuses' : [
+    canDownloadStatuses: [
         'uploaded',
         'released',
         'replaced',
         'submission in progress',
         'released to project',
-        'archived'
-    ]
+        'archived',
+    ],
 };

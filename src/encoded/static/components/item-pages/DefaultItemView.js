@@ -9,7 +9,15 @@ import queryString from 'query-string';
 
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
-import { console, object, layout, ajax, commonFileUtil, schemaTransforms, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import {
+    console,
+    object,
+    layout,
+    ajax,
+    commonFileUtil,
+    schemaTransforms,
+    memoizedUrlParse,
+} from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { FlexibleDescriptionBox } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/FlexibleDescriptionBox';
 import { Schemas, fileUtil, typedefs } from './../util';
@@ -30,50 +38,74 @@ const { TabObject, Item } = typedefs;
  * @module {Component} item-pages/DefaultItemView
  */
 
-
-
 /**
  * Additional props we pass into ItemDetailList in all ItemViews.
  * Project-specific.
  */
 export const propsForDetailList = {
-    stickyKeys: ['accession', 'description', 'status', 'institution', 'project'],
-    excludedKeys : ['@id', 'principals_allowed', 'actions', '@context', 'display_title', 'title', 'aggregated-items'],
-    alwaysCollapsibleKeys : ['@type', 'schema_version', 'uuid', 'external_references', 'validation-errors'],
-    termTransformFxn : function(field, term, allowJSX){
+    stickyKeys: [
+        'accession',
+        'description',
+        'status',
+        'institution',
+        'project',
+    ],
+    excludedKeys: [
+        '@id',
+        'principals_allowed',
+        'actions',
+        '@context',
+        'display_title',
+        'title',
+        'aggregated-items',
+    ],
+    alwaysCollapsibleKeys: [
+        '@type',
+        'schema_version',
+        'uuid',
+        'external_references',
+        'validation-errors',
+    ],
+    termTransformFxn: function (field, term, allowJSX) {
         // Relatively special cases for when on Item PageViews
-        if (field === 'accession'){
+        if (field === 'accession') {
             return (
-                <object.CopyWrapper value={term} className="accession text-small d-inline-block" wrapperElement="span"
-                    iconProps={{ 'style' : { 'fontSize' : '0.875rem', 'marginLeft' : -3 } }}>
-                    { term }
+                <object.CopyWrapper
+                    value={term}
+                    className="accession text-small d-inline-block"
+                    wrapperElement="span"
+                    iconProps={{
+                        style: { fontSize: '0.875rem', marginLeft: -3 },
+                    }}>
+                    {term}
                 </object.CopyWrapper>
             );
         }
-        if (field === 'description'){
+        if (field === 'description') {
             return (
                 <FlexibleDescriptionBox
-                    description={ term || <em>No description provided.</em> }
+                    description={term || <em>No description provided.</em>}
                     className="item-page-heading"
                     textClassName="text-medium"
                     defaultExpanded={term.length < 600}
                     fitTo="self"
                     lineHeight={23}
                     dimensions={{
-                        'paddingWidth' : 0,
-                        'paddingHeight' : 0, // Padding-top + border-top
-                        'buttonWidth' : 30,
+                        paddingWidth: 0,
+                        paddingHeight: 0, // Padding-top + border-top
+                        buttonWidth: 30,
                         //'initialHeight' : 42
                     }}
                 />
             );
         }
-        return Schemas.Term.toName(field, term, typeof allowJSX === 'boolean' ? allowJSX : true);
-    }
+        return Schemas.Term.toName(
+            field,
+            term,
+            typeof allowJSX === 'boolean' ? allowJSX : true
+        );
+    },
 };
-
-
-
 
 /**
  * The DefaultItemView class extends React.Component to provide some helper functions to be used from an Item View page.
@@ -84,50 +116,67 @@ export const propsForDetailList = {
  * @todo Low Priority - Can refactor into a DefaultItemViewWrapper and pass in props, instead of having to extend this component (anti-pattern).
  */
 export default class DefaultItemView extends React.PureComponent {
-
-    static className(context){
+    static className(context) {
         const classes = [
             'view-detail',
             'item-page-container',
             //'container'
         ];
 
-        const { "@type": atType = [], status = null } = context;
+        const { '@type': atType = [], status = null } = context;
 
         atType.forEach(function (type) {
             classes.push('type-' + type);
         });
 
-        if (typeof status === 'string'){
-            classes.push('status-' + status.toLowerCase().replace(/ /g, '-').replace(/\(|\)/g,''));
+        if (typeof status === 'string') {
+            classes.push(
+                'status-' +
+                    status
+                        .toLowerCase()
+                        .replace(/ /g, '-')
+                        .replace(/\(|\)/g, '')
+            );
         }
 
         return classes.join(' ');
     }
 
     static propTypes = {
-        'windowWidth' : PropTypes.number,
-        'schemas' : PropTypes.object,
-        'href' : PropTypes.string,
-        'width' : PropTypes.number,
-        'context' : PropTypes.shape({
-            '@id' : PropTypes.string.isRequired,
-            'display_title' : PropTypes.string.isRequired,
-            'accession' : PropTypes.string,
-            'alternate_accessions' : PropTypes.arrayOf(PropTypes.string)
+        windowWidth: PropTypes.number,
+        schemas: PropTypes.object,
+        href: PropTypes.string,
+        width: PropTypes.number,
+        context: PropTypes.shape({
+            '@id': PropTypes.string.isRequired,
+            display_title: PropTypes.string.isRequired,
+            accession: PropTypes.string,
+            alternate_accessions: PropTypes.arrayOf(PropTypes.string),
         }),
-        'alerts' : PropTypes.arrayOf(PropTypes.shape({
-            'title' : PropTypes.string.isRequired,
-            'message' : PropTypes.oneOfType([ PropTypes.string, PropTypes.element ]),
-            'style': PropTypes.oneOf(['warning', 'success', 'danger', 'info', 'primary', 'secondary'])
-        }))
+        alerts: PropTypes.arrayOf(
+            PropTypes.shape({
+                title: PropTypes.string.isRequired,
+                message: PropTypes.oneOfType([
+                    PropTypes.string,
+                    PropTypes.element,
+                ]),
+                style: PropTypes.oneOf([
+                    'warning',
+                    'success',
+                    'danger',
+                    'info',
+                    'primary',
+                    'secondary',
+                ]),
+            })
+        ),
     };
 
     /**
      * Bind instance methods to `this` and creates an empty state object which may be extended by subclasses.
      * May be extended by sub-classes.
      */
-    constructor(props){
+    constructor(props) {
         super(props);
         this.getControllers = this.getControllers.bind(this);
         this.getCommonTabs = this.getCommonTabs.bind(this);
@@ -143,7 +192,7 @@ export default class DefaultItemView extends React.PureComponent {
         this.state = {};
 
         this.memoized = {
-            className: memoize(DefaultItemView.className)
+            className: memoize(DefaultItemView.className),
         };
 
         this.tabbedViewRef = React.createRef();
@@ -157,44 +206,72 @@ export default class DefaultItemView extends React.PureComponent {
      * @protected
      * @returns {void}
      */
-    maybeSetReplacedRedirectedAlert(){
+    maybeSetReplacedRedirectedAlert() {
         const { href, context } = this.props;
         if (!href) return;
 
         const { accession, alternate_accessions = [] } = context;
 
-        let { query : { redirected_from = null } = { redirected_from : null } } = memoizedUrlParse(href);
+        let { query: { redirected_from = null } = { redirected_from: null } } =
+            memoizedUrlParse(href);
 
-        if (Array.isArray(redirected_from)){
-            [ redirected_from ] = redirected_from;
+        if (Array.isArray(redirected_from)) {
+            [redirected_from] = redirected_from;
         }
 
-        let redirected_from_accession = redirected_from && _.filter(redirected_from.split('/'))[1];
+        let redirected_from_accession =
+            redirected_from && _.filter(redirected_from.split('/'))[1];
         // TODO use value from schemas instd of "4DN"
-        if (typeof redirected_from_accession !== 'string' || redirected_from_accession.slice(0,3) !== '4DN'){
+        if (
+            typeof redirected_from_accession !== 'string' ||
+            redirected_from_accession.slice(0, 3) !== '4DN'
+        ) {
             redirected_from_accession = null; // Unset if not in form of accession.
         }
 
-        if (redirected_from_accession && accession && alternate_accessions.indexOf(redirected_from_accession) > -1){
+        if (
+            redirected_from_accession &&
+            accession &&
+            alternate_accessions.indexOf(redirected_from_accession) > -1
+        ) {
             // Find @id of our redirected_from item.
-            ajax.load('/search/?type=Item&field=@id&field=uuid&field=accession&status=replaced&accession=' + redirected_from_accession, (r)=>{
-                const ourOldItem = _.findWhere(r['@graph'], { 'accession' : redirected_from_accession });
-                if (!ourOldItem){
-                    console.error('Couldnt find correct Item in list of results.');
-                    return;
+            ajax.load(
+                '/search/?type=Item&field=@id&field=uuid&field=accession&status=replaced&accession=' +
+                    redirected_from_accession,
+                (r) => {
+                    const ourOldItem = _.findWhere(r['@graph'], {
+                        accession: redirected_from_accession,
+                    });
+                    if (!ourOldItem) {
+                        console.error(
+                            'Couldnt find correct Item in list of results.'
+                        );
+                        return;
+                    }
+                    if (!object.itemUtil.atId(ourOldItem)) {
+                        console.error('Couldnt find @id of Item.');
+                        return;
+                    }
+                    Alerts.queue({
+                        title: 'Redirected',
+                        message: (
+                            <span>
+                                You have been redirected from{' '}
+                                <a href={ourOldItem['@id']}>
+                                    {redirected_from_accession}
+                                </a>
+                                , which this item ({context.accession})
+                                supercedes.
+                            </span>
+                        ),
+                        style: 'warning',
+                    });
+                },
+                'GET',
+                (err) => {
+                    console.error('No results found');
                 }
-                if (!object.itemUtil.atId(ourOldItem)){
-                    console.error('Couldnt find @id of Item.');
-                    return;
-                }
-                Alerts.queue({
-                    'title' : "Redirected",
-                    'message': <span>You have been redirected from <a href={ourOldItem['@id']}>{ redirected_from_accession }</a>, which this item ({ context.accession }) supercedes.</span>,
-                    'style': 'warning'
-                });
-            }, 'GET', (err)=>{
-                console.error('No results found');
-            });
+            );
         }
     }
 
@@ -206,7 +283,7 @@ export default class DefaultItemView extends React.PureComponent {
      * @public
      * @returns {void}
      */
-    componentDidMount(){
+    componentDidMount() {
         this.maybeSetReplacedRedirectedAlert();
     }
 
@@ -218,7 +295,7 @@ export default class DefaultItemView extends React.PureComponent {
      * @param {Object} props Current props sent down to view. Should be about same as in App render function.
      * @returns {TabObject[]}
      */
-    getCommonTabs(){
+    getCommonTabs() {
         const { context, schemas, windowWidth } = this.props;
         const returnArr = [];
 
@@ -226,7 +303,7 @@ export default class DefaultItemView extends React.PureComponent {
 
         // Badges, if any
         const badges = BadgesTabView.getBadgesList(context);
-        if (badges){
+        if (badges) {
             returnArr.push(BadgesTabView.getTabObject(this.props));
         }
 
@@ -240,8 +317,8 @@ export default class DefaultItemView extends React.PureComponent {
      *
      * @protected
      */
-    getDefaultTabs(){
-        return [ DetailsTabView.getTabObject(this.props) ];
+    getDefaultTabs() {
+        return [DetailsTabView.getTabObject(this.props)];
     }
 
     /**
@@ -252,13 +329,17 @@ export default class DefaultItemView extends React.PureComponent {
      * @param {string} nextKey - Key name for tab to switch to.
      * @returns {void}
      */
-    setTabViewKey(nextKey){
+    setTabViewKey(nextKey) {
         const tabbedView = this.tabbedViewRef.current;
-        if (tabbedView && typeof tabbedView.setActiveKey === 'function'){
+        if (tabbedView && typeof tabbedView.setActiveKey === 'function') {
             try {
                 tabbedView.setActiveKey(nextKey);
             } catch (e) {
-                console.warn('Could not switch TabbedView to key "' + nextKey + '", perhaps no longer supported by rc-tabs.');
+                console.warn(
+                    'Could not switch TabbedView to key "' +
+                        nextKey +
+                        '", perhaps no longer supported by rc-tabs.'
+                );
             }
         } else {
             console.error('Cannot access tabbedView.setActiveKey()');
@@ -273,7 +354,7 @@ export default class DefaultItemView extends React.PureComponent {
      * @param {Object<string,*>} [controllerProps] Props passed in from controllers, if any.
      * @returns {TabObject[]} Tab objects for this Item view/type.
      */
-    getTabViewContents(controllerProps){
+    getTabViewContents(controllerProps) {
         return this.getDefaultTabs();
     }
 
@@ -282,12 +363,12 @@ export default class DefaultItemView extends React.PureComponent {
      *
      * @returns {null} Nothing returned by default unless extended.
      */
-    itemFooter(){
+    itemFooter() {
         return null; /*<ItemFooterRow context={context} schemas={schemas} />*/
     }
 
     /** Render additional item actions */
-    additionalItemActionsContent(){
+    additionalItemActionsContent() {
         return null;
     }
 
@@ -299,7 +380,7 @@ export default class DefaultItemView extends React.PureComponent {
      *
      * @returns {React.Component[]}
      */
-    getControllers(){
+    getControllers() {
         return null;
     }
 
@@ -315,198 +396,259 @@ export default class DefaultItemView extends React.PureComponent {
     render() {
         const { context, href, alerts } = this.props;
         const titleTabObj = {
-            'className' : "title-tab",
-            'tab' : <TitleTab {..._.pick(this.props, 'schemas', 'href', 'context')} />,
-            'key' : 'item-title'
+            className: 'title-tab',
+            tab: (
+                <TitleTab
+                    {..._.pick(this.props, 'schemas', 'href', 'context')}
+                />
+            ),
+            key: 'item-title',
         };
         const menuTabObj = {
-            'className' : "menu-tab",
-            'tab' : (
-                <ItemActionsTab {..._.pick(this.props, 'schemas', 'href', 'context', 'innerOverlaysContainer', 'session')}
-                    additionalItemActionsContent={this.additionalItemActionsContent()} />
+            className: 'menu-tab',
+            tab: (
+                <ItemActionsTab
+                    {..._.pick(
+                        this.props,
+                        'schemas',
+                        'href',
+                        'context',
+                        'innerOverlaysContainer',
+                        'session'
+                    )}
+                    additionalItemActionsContent={this.additionalItemActionsContent()}
+                />
             ),
-            'key' : 'item-actions-menu',
+            key: 'item-actions-menu',
             //'onClick' : this.onItemActionsTabClick
         };
         const controllers = this.getControllers();
-        const controllersLen = (Array.isArray(controllers) && controllers.length) || 0;
+        const controllersLen =
+            (Array.isArray(controllers) && controllers.length) || 0;
         let innerBody = (
-            <InnerBody getTabViewContents={this.getTabViewContents} ref={this.tabbedViewRef}
-                {...{ href, context }} prefixTabs={[ titleTabObj ]} suffixTabs={[ menuTabObj ]} />
+            <InnerBody
+                getTabViewContents={this.getTabViewContents}
+                ref={this.tabbedViewRef}
+                {...{ href, context }}
+                prefixTabs={[titleTabObj]}
+                suffixTabs={[menuTabObj]}
+            />
         );
         if (controllersLen > 0) {
             // Create ~ `<Controller0><Controller1><Controller2><InnerBody/></Controller2></Controller1></Controller0>`
-            controllers.slice().reverse().forEach((ctrlr, i) => {
-                // Handle both instantiated & non-instantiated controllers
-                const createFxn = React.isValidElement(ctrlr) ? React.cloneElement : React.createElement;
-                innerBody = createFxn(ctrlr, i === (controllersLen - 1) ? this.props : {}, innerBody);
-            });
+            controllers
+                .slice()
+                .reverse()
+                .forEach((ctrlr, i) => {
+                    // Handle both instantiated & non-instantiated controllers
+                    const createFxn = React.isValidElement(ctrlr)
+                        ? React.cloneElement
+                        : React.createElement;
+                    innerBody = createFxn(
+                        ctrlr,
+                        i === controllersLen - 1 ? this.props : {},
+                        innerBody
+                    );
+                });
         }
         return (
             <div className={this.memoized.className(context)} id="content">
                 <div id="full-alerts-container">
                     <Alerts alerts={alerts} className="alerts" />
                 </div>
-                { innerBody }
-                { this.itemFooter() }
+                {innerBody}
+                {this.itemFooter()}
             </div>
         );
     }
 }
 
-
-const InnerBody = React.forwardRef(function InnerBody(props, ref){
-    const { getTabViewContents, href, context, prefixTabs, suffixTabs, ...controllerProps } = props;
+const InnerBody = React.forwardRef(function InnerBody(props, ref) {
+    const {
+        getTabViewContents,
+        href,
+        context,
+        prefixTabs,
+        suffixTabs,
+        ...controllerProps
+    } = props;
     return (
         <TabView
-            contents={getTabViewContents(controllerProps)} ref={ref}
-            {...{ href, context, prefixTabs, suffixTabs }} />
+            contents={getTabViewContents(controllerProps)}
+            ref={ref}
+            {...{ href, context, prefixTabs, suffixTabs }}
+        />
     );
 });
-
-
-
-
 
 /*******************************************
  ****** Helper Components & Functions ******
  *******************************************/
 
 /** Show as first 'tab' of TabView Tabs. Not clickable. */
-const TitleTab = React.memo(function TitleTab({ context, schemas }){
+const TitleTab = React.memo(function TitleTab({ context, schemas }) {
     const { display_title, accession } = context;
     const itemTypeTitle = schemaTransforms.getItemTypeTitle(context, schemas);
     let itemTitle = null;
 
     if (display_title && display_title !== accession) {
-        itemTitle = <div className="col item-title">{ display_title }</div>;
+        itemTitle = <div className="col item-title">{display_title}</div>;
     } else if (accession) {
         itemTitle = (
             <div className="col item-title">
-                <span className="accession text-small">{ accession }</span>
+                <span className="accession text-small">{accession}</span>
             </div>
         );
     }
 
     return (
         <div className="row">
-            <div className="col-auto item-type-title" data-tip="Item Type" data-place="right">
-                { itemTypeTitle }
+            <div
+                className="col-auto item-type-title"
+                data-tip="Item Type"
+                data-place="right">
+                {itemTypeTitle}
             </div>
-            { itemTitle ?
+            {itemTitle ? (
                 <div className="col-auto icon-col">
-                    <i className="icon icon-angle-right fas"/>
+                    <i className="icon icon-angle-right fas" />
                 </div>
-                : null
-            }
-            { itemTitle }
+            ) : null}
+            {itemTitle}
         </div>
     );
 });
 
-
 /** Show as last 'tab' of TabView Tabs */
 export class ItemActionsTab extends React.PureComponent {
-
     static defaultProps = {
-        'itemActionsExtras': {
-            'edit'      : {
+        itemActionsExtras: {
+            edit: {
                 description: 'Edit the properties of this Item.',
-                icon: "pencil-alt fas"
+                icon: 'pencil-alt fas',
             },
-            'create'    : {
+            create: {
                 description: 'Create a blank new Item of the same type.',
-                icon: "plus fas"
+                icon: 'plus fas',
             },
-            'clone'     : {
+            clone: {
                 description: 'Create and edit a copy of this Item.',
-                icon: "copy fas"
-            }
-        }
+                icon: 'copy fas',
+            },
+        },
     };
 
-    constructor(props){
+    constructor(props) {
         super(props);
         this.toggleOpen = this.toggleOpen.bind(this);
         this.state = {
-            open: false
+            open: false,
         };
     }
 
-    toggleOpen(evt){
+    toggleOpen(evt) {
         evt.preventDefault();
         evt.stopPropagation();
-        this.setState(function({ open }){
-            return { 'open' : !open };
+        this.setState(function ({ open }) {
+            return { open: !open };
         });
     }
 
-    render(){
-        const { innerOverlaysContainer, additionalItemActionsContent, ...passProps } = this.props;
-        const { context : { actions = [] }, session, href, itemActionsExtras } = passProps;
+    render() {
+        const {
+            innerOverlaysContainer,
+            additionalItemActionsContent,
+            ...passProps
+        } = this.props;
+        const {
+            context: { actions = [] },
+            session,
+            href,
+            itemActionsExtras,
+        } = passProps;
         const { open } = this.state;
 
-        if (!session && !additionalItemActionsContent){
+        if (!session && !additionalItemActionsContent) {
             // No context.actions available except to see JSON (hardcoded)
             // might change in future.
             // So just show view JSON action and no menu.
             return (
                 <ViewJSONAction href={href}>
-                    <div className="icon-container clickable" onClick={this.toggleOpen} data-tip="Open window showing this Item in raw JSON format.">
-                        <i className="icon icon-fw fas icon-file-code"/>
-                        <span className="text-monospace text-smaller">JSON</span>
+                    <div
+                        className="icon-container clickable"
+                        onClick={this.toggleOpen}
+                        data-tip="Open window showing this Item in raw JSON format.">
+                        <i className="icon icon-fw fas icon-file-code" />
+                        <span className="text-monospace text-smaller">
+                            JSON
+                        </span>
                     </div>
                 </ViewJSONAction>
             );
         }
 
         // Only keep actions that are defined in the descriptions
-        const filteredActions = _.filter(actions, function(action){
+        const filteredActions = _.filter(actions, function (action) {
             return typeof itemActionsExtras[action.name] !== 'undefined';
         });
 
         return (
             <React.Fragment>
-                <div className="icon-container clickable" onClick={this.toggleOpen}>
-                    <i className="icon icon-fw fas icon-bars"/>
+                <div
+                    className="icon-container clickable"
+                    onClick={this.toggleOpen}>
+                    <i className="icon icon-fw fas icon-bars" />
                     <span>Actions</span>
                 </div>
-                <SlideInPane in={open} overlaysContainer={innerOverlaysContainer} onClose={this.toggleOpen}>
-                    <ItemActionsTabMenu {...passProps} actions={filteredActions} onClose={this.toggleOpen}>
-                        { additionalItemActionsContent }
+                <SlideInPane
+                    in={open}
+                    overlaysContainer={innerOverlaysContainer}
+                    onClose={this.toggleOpen}>
+                    <ItemActionsTabMenu
+                        {...passProps}
+                        actions={filteredActions}
+                        onClose={this.toggleOpen}>
+                        {additionalItemActionsContent}
                     </ItemActionsTabMenu>
                 </SlideInPane>
             </React.Fragment>
         );
     }
-
 }
 
+const ItemActionsTabMenu = React.memo(function ItemActionsTabMenu(props) {
+    const {
+        actions,
+        itemActionsExtras,
+        href: currentPageHref,
+        onClose,
+        children,
+    } = props;
 
-const ItemActionsTabMenu = React.memo(function ItemActionsTabMenu(props){
-    const { actions, itemActionsExtras, href: currentPageHref, onClose, children } = props;
-
-    const renderedActions = actions.map(function({ name, title, profile, href }, idx){
+    const renderedActions = actions.map(function (
+        { name, title, profile, href },
+        idx
+    ) {
         const { description, icon } = itemActionsExtras[name];
         let innerTitle = (
             <React.Fragment>
-                <h5>{ title || name }</h5>
-                <span className="description">{ description }</span>
+                <h5>{title || name}</h5>
+                <span className="description">{description}</span>
             </React.Fragment>
         );
-        if (icon){
+        if (icon) {
             innerTitle = (
                 <div className="row">
                     <div className="col-auto icon-container">
-                        <i className={"icon icon-fw icon-" + icon}/>
+                        <i className={'icon icon-fw icon-' + icon} />
                     </div>
-                    <div className="col title-col">{ innerTitle }</div>
+                    <div className="col title-col">{innerTitle}</div>
                 </div>
             );
         }
         return (
             <a className="menu-option" key={name || idx} href={href}>
-                { innerTitle }
+                {innerTitle}
             </a>
         );
     });
@@ -519,42 +661,52 @@ const ItemActionsTabMenu = React.memo(function ItemActionsTabMenu(props){
         <div className="item-page-actions-menu">
             <div className="title-box row">
                 <h4 className="col">Actions</h4>
-                <div className="col-auto close-btn-container clickable" onClick={onClose}>
-                    <i className="icon icon-times fas"/>
+                <div
+                    className="col-auto close-btn-container clickable"
+                    onClick={onClose}>
+                    <i className="icon icon-times fas" />
                 </div>
             </div>
             <div className="menu-inner">
-                { renderedActions }
-                { children }
+                {renderedActions}
+                {children}
             </div>
         </div>
     );
 });
 
-function ViewJSONAction({ href, children }){
+function ViewJSONAction({ href, children }) {
     const urlParts = _.clone(memoizedUrlParse(href));
-    urlParts.search = '?' + queryString.stringify(_.extend({}, urlParts.query, { 'format' : 'json' }));
+    urlParts.search =
+        '?' +
+        queryString.stringify(_.extend({}, urlParts.query, { format: 'json' }));
     const viewUrl = url.format(urlParts);
     const onClick = (e) => {
-        if (window && window.open){
+        if (window && window.open) {
             e.preventDefault();
-            window.open(viewUrl, 'window', 'toolbar=no, menubar=no, resizable=yes, status=no, top=10, width=400');
+            window.open(
+                viewUrl,
+                'window',
+                'toolbar=no, menubar=no, resizable=yes, status=no, top=10, width=400'
+            );
         }
     };
     return React.cloneElement(children, { onClick });
 }
 
-const ViewJSONMenuOption = React.memo(function ViewJSONMenuOption({ href }){
+const ViewJSONMenuOption = React.memo(function ViewJSONMenuOption({ href }) {
     return (
         <ViewJSONAction href={href}>
             <a className="menu-option" href="#">
                 <div className="row">
                     <div className="col-auto icon-container">
-                        <i className="icon icon-fw fas icon-code"/>
+                        <i className="icon icon-fw fas icon-code" />
                     </div>
                     <div className="col title-col">
                         <h5>View as JSON</h5>
-                        <span className="description">Open raw JSON in new window.</span>
+                        <span className="description">
+                            Open raw JSON in new window.
+                        </span>
                     </div>
                 </div>
             </a>
@@ -562,69 +714,80 @@ const ViewJSONMenuOption = React.memo(function ViewJSONMenuOption({ href }){
     );
 });
 
-
-const DetailsTabView = React.memo(function DetailsTabView(props){
+const DetailsTabView = React.memo(function DetailsTabView(props) {
     return (
         <div className="container-wide">
             <h3 className="tab-section-title">
                 <span>Details</span>
             </h3>
-            <hr className="tab-section-title-horiz-divider mb-05"/>
-            <ItemDetailList {...propsForDetailList} {..._.pick(props, 'context', 'schemas', 'href')} />
+            <hr className="tab-section-title-horiz-divider mb-05" />
+            <ItemDetailList
+                {...propsForDetailList}
+                {..._.pick(props, 'context', 'schemas', 'href')}
+            />
         </div>
     );
 });
 
-DetailsTabView.getTabObject = function(props){
+DetailsTabView.getTabObject = function (props) {
     return {
-        'tab' : (
+        tab: (
             <React.Fragment>
-                <i className="icon fas icon-list icon-fw"/>
+                <i className="icon fas icon-list icon-fw" />
                 <span>Details</span>
             </React.Fragment>
         ),
-        'key' : 'details',
-        'content' : <DetailsTabView {...props} />,
-        'cache' : false
+        key: 'details',
+        content: <DetailsTabView {...props} />,
+        cache: false,
     };
 };
-
 
 /**
  * Renders out a list of ExpandableStaticHeader components to represent
  * `context.static_headers`.
  */
 
-export const StaticHeadersArea = React.memo(function StaticHeaderArea({ context }){
-    const headersFromStaticContent = _.pluck(_.filter(
-        context.static_content || [],
-        function(s){ return s.location === 'header'; }
-    ), 'content');
-    const headersToShow = _.uniq(_.filter(
-        headersFromStaticContent.concat(context.static_headers || []),
-        function(s){
-            if (!s || s.error) return false; // No view permission(s)
-            if (s.content || s.viewconfig) return true;
-            return false; // Shouldn't happen
-        }
-    ), false, object.itemUtil.atId);
+export const StaticHeadersArea = React.memo(function StaticHeaderArea({
+    context,
+}) {
+    const headersFromStaticContent = _.pluck(
+        _.filter(context.static_content || [], function (s) {
+            return s.location === 'header';
+        }),
+        'content'
+    );
+    const headersToShow = _.uniq(
+        _.filter(
+            headersFromStaticContent.concat(context.static_headers || []),
+            function (s) {
+                if (!s || s.error) return false; // No view permission(s)
+                if (s.content || s.viewconfig) return true;
+                return false; // Shouldn't happen
+            }
+        ),
+        false,
+        object.itemUtil.atId
+    );
 
     if (!headersToShow || headersToShow.length === 0) return null;
 
     return (
         <div className="static-headers-area">
-            { _.map(headersToShow, function(section, i){
+            {_.map(headersToShow, function (section, i) {
                 const { title, options = {}, name } = section;
                 return (
                     <ExpandableStaticHeader
                         title={title || 'Informational Notice ' + (i + 1)}
                         context={section}
-                        defaultOpen={options.default_open || false} key={name || i} index={i}
-                        titleIcon={options.title_icon} />
+                        defaultOpen={options.default_open || false}
+                        key={name || i}
+                        index={i}
+                        titleIcon={options.title_icon}
+                    />
                 );
             })}
             <hr />
         </div>
     );
 });
-

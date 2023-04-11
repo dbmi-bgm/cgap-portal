@@ -2,31 +2,29 @@ const path = require('path');
 const webpack = require('webpack');
 const env = process.env.NODE_ENV;
 const TerserPlugin = require('terser-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const PATHS = {
-    "static": path.resolve(__dirname, 'src/encoded/static'),
-    "build" : path.resolve(__dirname, 'src/encoded/static/build'),
+    static: path.resolve(__dirname, 'src/encoded/static'),
+    build: path.resolve(__dirname, 'src/encoded/static/build'),
 };
 
-const mode = (env === 'production' ? 'production' : 'development');
+const mode = env === 'production' ? 'production' : 'development';
 
 const plugins = [];
 
-console.log("Opened webpack.config.js with env: " + env + " & mode: " + mode);
+console.log('Opened webpack.config.js with env: ' + env + ' & mode: ' + mode);
 
 // don't include momentjs locales (large)
 plugins.push(
     new webpack.IgnorePlugin({
         resourceRegExp: /^\.\/locale$/,
-        contextRegExp: /moment$/
+        contextRegExp: /moment$/,
     })
 );
 
-
 let chunkFilename = '[name].js';
 let devTool = 'source-map'; // Default, slowest.
-
 
 if (mode === 'production') {
     // add chunkhash to chunk names for production only (it's slower)
@@ -39,7 +37,6 @@ if (mode === 'production') {
     devTool = 'inline-source-map';
 }
 
-
 const rules = [
     // Strip @jsx pragma in react-forms, which makes babel abort
     {
@@ -49,101 +46,100 @@ const rules = [
         options: {
             search: '@jsx',
             replace: 'jsx',
-        }
+        },
     },
     // add babel to load .js files as ES6 and transpile JSX
     {
         test: /\.(js|jsx)$/,
-        include: [
-            path.resolve(__dirname, 'src/encoded/static')
-        ],
+        include: [path.resolve(__dirname, 'src/encoded/static')],
         use: [
             {
-                loader: 'babel-loader'
-            }
-        ]
-    }
+                loader: 'babel-loader',
+            },
+        ],
+    },
 ];
 
 const resolve = {
-    extensions : [".webpack.js", ".web.js", ".js", ".json", '.jsx'],
+    extensions: ['.webpack.js', '.web.js', '.js', '.json', '.jsx'],
     //symlinks: false,
     //modules: [
     //    path.resolve(__dirname, '..', 'node_modules'),
     //    'node_modules'
     //]
-    alias: {}
+    alias: {},
 };
 
 // Common alias, hopefully is fix for duplicate versions of React
 // on npm version 7+ and can supersede `./setup-npm-links-for-local-development.js`.
 // @see https://blog.maximeheckel.com/posts/duplicate-dependencies-npm-link/
-spcPackageJson = require("@hms-dbmi-bgm/shared-portal-components/package.json");
+spcPackageJson = require('@hms-dbmi-bgm/shared-portal-components/package.json');
 spcPeerDependencies = spcPackageJson.peerDependencies || {};
-Object.keys(spcPeerDependencies).forEach(function(packageName) {
-    resolve.alias[packageName] = path.resolve("./node_modules/" + packageName);
+Object.keys(spcPeerDependencies).forEach(function (packageName) {
+    resolve.alias[packageName] = path.resolve('./node_modules/' + packageName);
 });
 
 // Exclusion -- higlass needs react-bootstrap 0.x but we want 1.x; can remove this line below
 // once update to higlass version w.o. react-bootstrap dependency.
-delete resolve.alias["react-bootstrap"];
+delete resolve.alias['react-bootstrap'];
 
 const optimization = {
-    minimize: mode === "production",
+    minimize: mode === 'production',
     minimizer: [
         new TerserPlugin({
-            parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
+            parallel: false, // XXX: this option causes docker build to fail - Will 2/25/2021
             sourceMap: true,
-            terserOptions:{
+            terserOptions: {
                 compress: true,
                 mangle: true,
                 output: {
-                    comments: false
-                }
-            }
-        })
-    ]
+                    comments: false,
+                },
+            },
+        }),
+    ],
 };
-
 
 const webPlugins = plugins.slice(0);
 const serverPlugins = plugins.slice(0);
 
 // Inform our React code of what build we're on.
 // This works via a find-replace.
-webPlugins.push(new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(env),
-    'SERVERSIDE' : JSON.stringify(false),
-    'BUILDTYPE' : JSON.stringify(env)
-}));
-
-serverPlugins.push(new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(env),
-    'SERVERSIDE' : JSON.stringify(true),
-    'BUILDTYPE' : JSON.stringify(env)
-}));
-
-// From https://github.com/jsdom/jsdom/issues/3042
-serverPlugins.push(
-    new webpack.IgnorePlugin(/canvas/, /jsdom$/)
+webPlugins.push(
+    new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(env),
+        SERVERSIDE: JSON.stringify(false),
+        BUILDTYPE: JSON.stringify(env),
+    })
 );
 
-if (env === 'development'){
+serverPlugins.push(
+    new webpack.DefinePlugin({
+        'process.env.NODE_ENV': JSON.stringify(env),
+        SERVERSIDE: JSON.stringify(true),
+        BUILDTYPE: JSON.stringify(env),
+    })
+);
+
+// From https://github.com/jsdom/jsdom/issues/3042
+serverPlugins.push(new webpack.IgnorePlugin(/canvas/, /jsdom$/));
+
+if (env === 'development') {
     // Skip for `npm run dev-quick` (`env === "quick"`) since takes a while
     webPlugins.push(
         new BundleAnalyzerPlugin({
-            "analyzerMode" : "static",
-            "openAnalyzer" : false,
-            "logLevel" : "warn",
-            "reportFilename" : "report-web-bundle.html"
+            analyzerMode: 'static',
+            openAnalyzer: false,
+            logLevel: 'warn',
+            reportFilename: 'report-web-bundle.html',
         })
     );
     serverPlugins.push(
         new BundleAnalyzerPlugin({
-            "analyzerMode" : "static",
-            "openAnalyzer" : false,
-            "logLevel" : "warn",
-            "reportFilename" : "report-server-renderer.html"
+            analyzerMode: 'static',
+            openAnalyzer: false,
+            logLevel: 'warn',
+            reportFilename: 'report-server-renderer.html',
         })
     );
 }
@@ -153,9 +149,9 @@ module.exports = [
     {
         mode: mode,
         entry: {
-            "bundle"    : PATHS.static + '/browser'
+            bundle: PATHS.static + '/browser',
         },
-        target: "web",
+        target: 'web',
         output: {
             path: PATHS.build,
             publicPath: '/static/build/',
@@ -171,9 +167,9 @@ module.exports = [
             filename: '[name].js',
             chunkFilename: chunkFilename,
 
-            libraryTarget: "umd",
-            library: "App",
-            umdNamedDefine: true
+            libraryTarget: 'umd',
+            library: 'App',
+            umdNamedDefine: true,
         },
         // https://github.com/hapijs/joi/issues/665
         // stub modules on client side depended on by joi (a dependency of jwt)
@@ -184,15 +180,15 @@ module.exports = [
         // },
         externals: [
             {
-                'xmlhttprequest' : '{XMLHttpRequest:XMLHttpRequest}',
-                'jsdom': '{JSDOM:{}}',
+                xmlhttprequest: '{XMLHttpRequest:XMLHttpRequest}',
+                jsdom: '{JSDOM:{}}',
                 // If load via CDN (to-do in future)
                 // 'react': 'React',
                 // 'react-dom': 'ReactDOM'
-            }
+            },
         ],
         module: {
-            rules: rules
+            rules: rules,
         },
         optimization: optimization,
         resolve: {
@@ -200,9 +196,18 @@ module.exports = [
             alias: {
                 ...resolve.alias,
                 // We could eventually put 'pedigree-viz' into own repo/project (under dif name like @hms-dbmi-bgm/react-pedigree-viz or something).
-                'pedigree-viz': path.resolve(__dirname, "./src/encoded/static/components/viz/PedigreeViz"),
-                'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js"),
-                'package-lock.json': path.resolve(__dirname, "./package-lock.json"),
+                'pedigree-viz': path.resolve(
+                    __dirname,
+                    './src/encoded/static/components/viz/PedigreeViz'
+                ),
+                'higlass-dependencies': path.resolve(
+                    __dirname,
+                    './src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js'
+                ),
+                'package-lock.json': path.resolve(
+                    __dirname,
+                    './package-lock.json'
+                ),
             },
             /**
              * From Webpack CLI:
@@ -222,7 +227,7 @@ module.exports = [
         },
         //resolveLoader : resolve,
         devtool: devTool,
-        plugins: webPlugins
+        plugins: webPlugins,
     },
     // for server-side rendering
     ///*
@@ -242,13 +247,13 @@ module.exports = [
             // server-side build since it might overwrite web bundle's code-split bundles.
             // But probably some way to append/change name of these chunks in this config.
             {
-                'd3': 'var {}',
+                d3: 'var {}',
                 // This is used during build-time only I think...
                 '@babel/register': '@babel/register',
                 'higlass-dependencies': 'var {}',
                 // These remaining /higlass/ defs aren't really necessary
                 // but probably speed up build a little bit.
-                'higlass/dist/hglib' : 'var {}',
+                'higlass/dist/hglib': 'var {}',
                 'higlass-register': 'var {}',
                 'higlass-sequence': 'var {}',
                 'higlass-transcripts': 'var {}',
@@ -260,7 +265,7 @@ module.exports = [
                 'auth0-lock': 'var {}',
                 'aws-sdk': 'var {}',
                 'package-lock.json': 'var {}',
-                'pagedjs': 'var {}',
+                pagedjs: 'var {}',
                 'pedigree-viz': 'var {}',
                 // Below - prevent some stuff in SPC from being bundled in.
                 // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js
@@ -271,7 +276,7 @@ module.exports = [
                 // We can rely on NodeJS's internal URL API, since it should match API of npm url package by design.
                 // This hopefully improves SSR performance, assuming Node has native non-JS/C code to parse this.
                 // 'url': 'commonjs2 url'
-            }
+            },
         ],
         output: {
             path: PATHS.build,
@@ -280,7 +285,7 @@ module.exports = [
             chunkFilename: chunkFilename,
         },
         module: {
-            rules
+            rules,
         },
         optimization: optimization,
         resolve: {
@@ -291,7 +296,7 @@ module.exports = [
         },
         //resolveLoader : resolve,
         devtool: devTool, // No way to debug/log serverside JS currently, so may as well speed up builds for now.
-        plugins: serverPlugins
-    }
+        plugins: serverPlugins,
+    },
     //*/
 ];
