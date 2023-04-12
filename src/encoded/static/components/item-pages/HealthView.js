@@ -88,6 +88,10 @@ export default class HealthView extends React.PureComponent {
                 title : "Foursight Bucket Prefix",
                 description : "Ecosystem-specific name prefix for this server's foursight buckets."
             },
+            'higlass_version': {
+                title : "HiGlass Version",
+                description : "Software version of HiGlass package being used."
+            },
             'identity': {
                 title : "Identity",
                 description : "An application configuration key that represents the current environment."
@@ -238,26 +242,39 @@ export default class HealthView extends React.PureComponent {
     }
 }
 
-/** Extend context to include shared-portal-components version */
+/** Extend context to include shared-portal-components and higlass versions */
 function DetailListBody({ context: propContext, packageLockJson = null, ...passProps }){
 
-    // extend context to include shared-portal-components version
-    let spcVersionUsed = null;
+    let spcDependenciesVersion = null;
+    let spcStatus;
+
+    let higlassVersion;
 
     if (packageLockJson) {
-        const { dependencies: { '@hms-dbmi-bgm/shared-portal-components': { version: spcVersion = null, from: spcFrom } = {} } } = packageLockJson || {};
+        const {
+            dependencies: {
+                '@hms-dbmi-bgm/shared-portal-components': { version: spcVersionLong = null, from: spcFrom } = {},
+                'higlass': { version: higlassDependenciesVersion } = {}
+            },
+            packages: { 'node_modules/@hms-dbmi-bgm/shared-portal-components': { version: spcInstallVersion } = {} },
+        } = packageLockJson || {};
+
+        higlassVersion = higlassDependenciesVersion;
+
         if (spcFrom && spcFrom.indexOf('#') > -1) { // e.g. github:4dn-dcic/shared-portal-components#0.0.2.70
-            [ spcVersionUsed ] = spcFrom.split('#').splice(-1);
-        } else {
-            spcVersionUsed = spcVersion || "-";
+            [ spcDependenciesVersion ] = spcFrom.split('#').splice(-1);
         }
+
+        if (spcDependenciesVersion === spcInstallVersion) { spcStatus = spcDependenciesVersion || spcVersionLong || "-"; }
+        else { spcStatus = `Ambiguous versions found. Dependencies version: ${spcDependenciesVersion}, Installed version: ${spcInstallVersion}`; }
     } else {
         // Assume is still loading
         // TODO: Maybe allow ItemDetailList to handle JSX values so can throw in spinning indicator icon here.
-        spcVersionUsed = "-";
+        spcStatus = "-";
+        higlassVersion = "-";
     }
 
-    const context = { ...propContext, "spc_version": spcVersionUsed };
+    const context = { ...propContext, "spc_version": spcStatus, "higlass_version": higlassVersion };
 
     return (
         <ItemDetailList {...passProps} {...{ context }} hideButtons  />
