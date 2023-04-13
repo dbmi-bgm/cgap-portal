@@ -127,7 +127,7 @@ export class DotRouter extends React.PureComponent {
                 const cls = "tab-router-contents" + (clsSuffix ? " " + clsSuffix : "") + (!active ? " d-none" : "");
                 allTabContents.push(
                     <div className={cls}
-                        id={dotPath} // used to be this, but doesn't seem important...? id={(prependDotPath || "") + dotPath}
+                        id={(prependDotPath || "") + dotPath}
                         data-tab-index={index} key={dotPath}>
                         <TabPaneErrorBoundary>
                             {transformedChildren}
