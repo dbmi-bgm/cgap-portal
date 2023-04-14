@@ -110,7 +110,7 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                             <SomaticAnalysisStats {...context} {...{ haveSAEditPermission }}/>
                                         </div>
                                     )}
-                                    <div id="case-overview-ped-link" className="col-pedigree-viz">
+                                    {/* <div id="case-overview-ped-link" className="col-pedigree-viz">
                                         <div className="card d-flex flex-column">
                                             <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
                                                 <div>
@@ -123,9 +123,9 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                                     View
                                                 </button>
                                             </div>
-                                            {/* / / TODO: Browser preview will go here */}
+                                            {/* / / TODO: Browser preview will go here
                                         </div>
-                                    </div>
+                                    </div> */}
                                 </div>
                             </div>
                         </>
