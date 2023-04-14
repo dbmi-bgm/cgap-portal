@@ -13,7 +13,8 @@ import {
     BigDropdownPageLoader,
     BigDropdownPageTreeMenu,
     BigDropdownPageTreeMenuIntroduction,
-    BigDropdownGroupController
+    BigDropdownGroupController,
+    BigDropdownBigLink
 } from './BigDropdown';
 import { AccountNav } from './AccountNav';
 import FeedbackButton from '../../item-pages/components/FeedbackButton';
@@ -86,8 +87,9 @@ function LeftNavAuthenticated(props){
     }, [ context ]);
     return (
         <div className="navbar-nav mr-auto">
+            <BrowseNavItem {...{ href }} {...props} />
             <a href="/cohort-analysis" className={"nav-link browse-nav-btn" + (isCohortsLinkActive ? " active" : "")}>
-                Cohorts
+                Cohort Browser
             </a>
             <a href="/search/?type=GeneList" className={"nav-link browse-nav-btn" + (isGeneListsLinkActive ? " active" : "")}>
                 GeneLists
@@ -99,7 +101,7 @@ function LeftNavAuthenticated(props){
 
 const LeftNavGuest = React.memo(function LeftNavGuest(props){
     const { href, ...passProps } = props;
-    const { pathname = "/" } = url.parse(href, false);
+    // const { pathname = "/" } = url.parse(href, false);
 
     return (
         <div className="navbar-nav mr-auto">
@@ -115,5 +117,81 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
             </a>
             */}
         </div>
+    );
+});
+
+function BrowseNavItem(props){
+    const { href, browseBaseState, ...navItemProps } = props;
+    const { active: propActive } = navItemProps || {};
+
+    // /** @see https://reactjs.org/docs/hooks-reference.html#usememo */
+    const bodyProps = useMemo(function(){
+        // Figure out if any items are active
+        const { query = {}, pathname = "/a/b/c/d/e" } = memoizedUrlParse(href);
+
+        const browseHref = "/search/?type=Item";
+        const browseByCaseHref = "/search/?type=Case";
+        const browseByAnalysisHref = "/search/?type=SomaticAnalysis";
+
+        const isSearchActive = pathname === "/search/" && query.type !== "GeneList";
+        const isBrowseByCaseActive = isSearchActive && query.type === "Case";
+        const isBrowseByAnalysisActive = isSearchActive && query.type === "Analysis";
+
+
+        const isAnyActive = (isSearchActive || isBrowseByCaseActive || isBrowseByAnalysisActive);
+        return {
+            browseHref, browseByAnalysisHref, browseByCaseHref,
+            isAnyActive, isSearchActive, isBrowseByAnalysisActive, isBrowseByCaseActive
+        };
+    }, [ href, browseBaseState ]);
+
+    const navLink = (
+        <React.Fragment>
+            <span className="text-black">Browse</span>
+        </React.Fragment>
+    );
+    const active = propActive !== false && bodyProps.isAnyActive;
+    return ( // `navItemProps` contains: href, windowHeight, windowWidth, isFullscreen, testWarning, mounted, overlaysContainer
+        <BigDropdownNavItem {...navItemProps} id="data-menu-item"
+            navItemHref={bodyProps.browseHref}
+            navItemContent={navLink}
+            active={active}>
+            <BrowseNavItemBody {...bodyProps} />
+        </BigDropdownNavItem>
+    );
+}
+
+const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
+    const {
+        browseByCaseHref,
+        browseByAnalysisHref,
+        isBrowseByCaseActive = false,
+        isBrowseByAnalysisActive = false,
+    } = props;
+    return (
+        <React.Fragment>
+
+            <BigDropdownBigLink href={browseByCaseHref} isActive={isBrowseByCaseActive} titleIcon="archive fas" className="primary-big-link">
+                <h4>Browse By Germline Case</h4>
+                <div className="description">
+                    Search All Cases on the Computational Genome Analysis Platform
+                </div>
+            </BigDropdownBigLink>
+
+            <BigDropdownBigLink href={browseByAnalysisHref} isActive={isBrowseByAnalysisActive} titleIcon="project-diagram fas" className="primary-big-link">
+                <h4>Browse By Somatic Analysis</h4>
+                <div className="description">
+                    Search All Somatic Analyses on the Computational Genome Analysis Platform
+                </div>
+            </BigDropdownBigLink>
+
+            {/* <BigDropdownBigLink href={"/search/?type=CohortAnalysis"} isActive={false} titleIcon="project-diagram fas" className="primary-big-link">
+                <h4>Browse By Cohort Analysis</h4>
+                <div className="description">
+                    Search All Cohort Analyses on the Computational Genome Analysis Platform
+                </div>
+            </BigDropdownBigLink> */}
+
+        </React.Fragment>
     );
 });
