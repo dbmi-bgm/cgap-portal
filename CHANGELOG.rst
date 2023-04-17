@@ -7,6 +7,13 @@ Change Log
 ----------
 
 
+13.1.2
+======
+`PR: 709: Sort alphabetically phenotypic features <https://github.com/dbmi-bgm/cgap-portal/pull/709>`_
+
+* Sorts (family) phenotypic features before rendering via CaseStats
+
+
 13.1.1
 ======
 `PR: 706: Improve health page spc + add higlass ver <https://github.com/dbmi-bgm/cgap-portal/pull/706>`_
