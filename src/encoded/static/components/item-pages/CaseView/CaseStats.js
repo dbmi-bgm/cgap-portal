@@ -16,7 +16,7 @@ function mapFeaturesToBadges(features = []) {
     }
 
     // Sort alphabetically
-    const sortedFeatures = features.sort((a, b) => {
+    features.sort((a, b) => {
         const { display_title: aTitle } = a;
         const { display_title: bTitle } = b;
         const aUpper = aTitle.toUpperCase();
@@ -32,7 +32,7 @@ function mapFeaturesToBadges(features = []) {
     });
 
     // Map to JSX for badges
-    return sortedFeatures.map(function(feature){
+    return features.map(function(feature){
         const { display_title = null, '@id': featureID } = feature;
         return (
             // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
