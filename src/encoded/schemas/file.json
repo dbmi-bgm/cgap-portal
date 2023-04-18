@@ -299,7 +299,7 @@
                 "type": "string",
                 "title": "Quality Metric",
                 "description": "Associated QC report",
-                "linkTo": "QualityMetricGeneric"
+                "linkTo": "QualityMetric"
             }
         },
         "quality_metric": {
