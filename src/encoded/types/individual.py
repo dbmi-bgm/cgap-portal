@@ -1,11 +1,27 @@
+from typing import List, Optional
+
 from snovault import (
     calculated_property,
     collection,
+    display_title_schema,
     load_schema,
 )
-from .base import (
-    Item
-)
+
+from .base import Item
+
+
+def _build_individual_embedded_list() -> List[str]:
+    return [
+        # Individual linkTo
+        "father.accession",
+        "father.is_deceased",
+        "father.sex",
+
+        # Individual linkTo
+        "mother.accession",
+        "mother.is_deceased",
+        "mother.sex"
+    ]
 
 
 @collection(
@@ -25,27 +41,11 @@ class Individual(Item):
         'families': ('Family', 'members'),
         'case': ('Case', 'individual')
     }
+    embedded_list = _build_individual_embedded_list()
 
-    embedded_list = [
-        # Individual linkTo
-        'father.accession',
-        'father.is_deceased',
-        'father.sex',
-
-        # Individual linkTo
-        'mother.accession',
-        'mother.is_deceased',
-        'mother.sex'
-    ]
-
-    @calculated_property(schema={
-        "title": "Display Title",
-        "description": "Individual's Identifier",
-        "type": "string"
-    })
-    def display_title(self, request, accession):
-        """ Use accession """
-        return accession
+    @calculated_property(schema=display_title_schema)
+    def display_title(self, accession: str, individual_id: Optional[str] = None) -> str:
+        return individual_id or accession
 
     @calculated_property(schema={
         "title": "Children",

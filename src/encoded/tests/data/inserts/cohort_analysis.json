@@ -6,7 +6,7 @@
         "aliases": [
             "hms-dbmi:green-thumb-cohort-analysis"
         ],
-        "title": "Analysis of the green thumb family",
+        "external_identifier": "green-thumb-cohort-analysis",
         "description": "Search for rare variants shared in individuals with green thumbs vs. those without the phenotype",
         "control_samples": [
             "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",

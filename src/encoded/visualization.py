@@ -1,13 +1,13 @@
-from copy import (
-    copy,
-    deepcopy
-)
-from pyramid.view import view_config
-from pyramid.httpexceptions import HTTPBadRequest
-from botocore.exceptions import ClientError
 import uuid
+
+from botocore.exceptions import ClientError
+from copy import copy, deepcopy
+from dcicutils.misc_utils import print_error_message
+from pyramid.httpexceptions import HTTPBadRequest
+from pyramid.view import view_config
 from snovault import CONNECTION
 from snovault.util import debug_log
+
 from .types.base import Item, get_item_or_none
 from .types.workflow import (
     trace_workflows,
@@ -450,7 +450,7 @@ def create_presigned_url(bucket_name, object_name, expiration=3600):
         params = {'Bucket': bucket_name, 'Key': object_name}
         response = s3_client.generate_presigned_url('get_object', Params=params, ExpiresIn=expiration)
     except ClientError as e:
-        print(e)
+        print_error_message(e)
         return None
 
     # The response contains the presigned URL

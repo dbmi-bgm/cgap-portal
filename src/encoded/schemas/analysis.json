@@ -1,0 +1,44 @@
+{
+    "title": "Analysis",
+    "description": "Analysis of samples",
+    "id": "/profiles/analysis.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "project",
+        "institution"
+    ],
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "accession"
+    ],
+    "additionalProperties": false,
+    "properties": {
+        "accession": {
+            "accessionType": "AN"
+        },
+        "external_identifier": {
+            "title": "External identifier",
+            "description": "External identifier for the analysis",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "Description of the analysis",
+            "type": "string"
+        }
+    },
+    "facets": {
+        "project.display_title": {
+            "title": "Project",
+            "order": 10
+        }
+    },
+    "columns": {
+        "display_title": {
+            "title": "Title",
+            "order": 10
+        }
+    }
+}

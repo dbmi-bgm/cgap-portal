@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "12.9.0"
+version = "13.1.2"
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -37,16 +37,16 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.8.1,<3.9"
-awscli = ">=1.25.36"
-boto3 = "^1.24.36"
-botocore = "^1.27.36"
+awscli = ">=1.27.79"
+boto3 = "^1.26.79"
+botocore = "^1.29.79"
 certifi = ">=2021.5.30"
 chardet = "3.0.4"
 codeguru-profiler-agent = "^1.2.4"
 colorama = "0.3.3"
-dcicpyvcf = "1.0.0"
-dcicsnovault = "^7.1.0"
-dcicutils = "^6.8.0"
+dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
+dcicsnovault = "7.3.0"
+dcicutils = "^6.10.0"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -56,10 +56,10 @@ h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. 
 humanfriendly = "^1.44.9"
 hupper = "1.5"
 idna = ">=2.10,<3"
-isodate = "0.5.4"
-jmespath = "0.9.0"
+isodate = ">=0.6.1,<1"
+jmespath = ">=0.10.0,<1"
 jsonschema_serialize_fork = "^2.1.1"
-keepalive = "0.5"
+# keepalive = ">=0.5,<1"
 loremipsum = "1.0.5"
 netaddr = ">=0.8.0,<1"
 negspy = "0.2.24"
@@ -120,13 +120,13 @@ WebOb = "^1.8.7"
 WebTest = "^2.0.35"
 WSGIProxy2 = "0.4.2"
 "zope.deprecation" = "^4.4.0"
-"zope.interface" = "^4.7.2"
+"zope.interface" = ">=4.7.2,<6"
 "zope.sqlalchemy" = "1.6"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = "^1.24.36"
-botocore-stubs = "^1.27.36"
+boto3-stubs = "^1.26.79"
+botocore-stubs = "^1.29.79"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"
@@ -139,18 +139,16 @@ flask = ">=2.0.3"
 moto = "4.0.3"
 pip-licenses = "^3.3.1"
 pipdeptree = "^2.1.0"
-# TODO: Investigate whether a major version upgrade is allowable for 'pytest', which is several versions behind.
-pytest = ">=3.10,<4"
-pytest-cov = ">=2.2.1"
-pytest-exact-fixtures = ">=0.3"
-pytest-instafail = ">=0.3.0"
-pytest-mock = ">=0.11.0"
-pytest-timeout = ">=1.0.0"
-pytest-xdist = ">=1.14"
+pytest = ">=7.2.1"
+pytest-cov = ">=4.0.0"  # ">=2.9.0"
+pytest-instafail = ">=0.4.2"
+pytest-mock = ">=3.10.0"  # ">=3.2.0"
+pytest-timeout = ">=2.1.0"  # ">=1.4.2"
+pytest-xdist = "3.1.0"  # ">=1.34.0"
 wheel = ">=0.29.0"
 
 
-# In pytest 6.0, we'll be able to use this instead of a separate pytest.ini configuration.
+# TODO: Now that we're above pytest 6.0, we can use this instead of a separate pytest.ini configuration.
 # -kmp 18-Jan-2021
 #
 # [tool.pytest.ini_options]
