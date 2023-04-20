@@ -31,7 +31,7 @@ def personas_ecosystem():
     return ecosystem
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def posted_personas_ecosystem(testapp, personas_ecosystem):
     """
     This fixture is looked up from the inserts, and then posted. It looks like:

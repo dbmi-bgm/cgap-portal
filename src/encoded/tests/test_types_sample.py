@@ -698,6 +698,12 @@ class TestFileForQc:
         "file_format": VCF_FILE_FORMAT,
         "qc_list": QcTestConstants.PEDDY_QC_LIST,
     }
+    FILE_PROCESSED_SNV_VEP_VCF_2 = {
+        "variant_type": "SNV",
+        "description": "output from VEP in VCF format",
+        "file_format": VCF_FILE_FORMAT,
+        "qc_list": QcTestConstants.PEDDY_QC_LIST,
+    }
     FILE_PROCESSED_NON_VCF = {
         "file_format": "foo",
         "file_type": "bar",
@@ -752,6 +758,7 @@ class TestFileForQc:
         [
             (FILE_PROCESSED_NON_VCF, False),
             (FILE_PROCESSED_SNV_VEP_VCF, True),
+            (FILE_PROCESSED_SNV_VEP_VCF_2, True),
         ],
     )
     def test_is_vep_vcf(self, file_item, expected):

@@ -16,6 +16,9 @@
         "uuid": "828cd4fe-ebb0-4b36-ccbb-d2e3a36ca234",
         "contact_persons" : [
             "jkrier@bwh.harvard.edu"
+        ],
+        "aliases": [
+            "hms-dbmi:bwh"
         ]
     },
     {

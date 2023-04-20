@@ -2,6 +2,11 @@
 
 port=$1
 
+if [ ! -f development.ini -o ! -f test.ini ]; then
+    echo "Correcting absence of one or more .ini files..."
+    prepare-local-dev
+fi
+
 dev_url_line=`grep 'sqlalchemy[.]url =' development.ini`
 
 dev_url=`echo "${dev_url_line}" | sed -E 's/^.* = (.*)$/\1/'`

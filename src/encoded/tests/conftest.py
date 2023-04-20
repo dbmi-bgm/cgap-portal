@@ -35,7 +35,7 @@ README:
 
 # This should work but does not seem to... various issues related to rollbacks occurring or not
 # occurring when they should/shouldn't, probably related to zsa_savepoints
-# @pytest.yield_fixture
+# @pytest.fixture
 # def external_tx(request, conn):
 #     # overridden from snovault to detect and continue from savepoint error
 #     if NO_SERVER_FIXTURES:
@@ -48,7 +48,7 @@ README:
 
 
 # hacked version
-@pytest.yield_fixture
+@pytest.fixture
 def external_tx(request, conn):
     # overridden from snovault to detect and continue from savepoint error
     if NO_SERVER_FIXTURES:
@@ -134,7 +134,7 @@ def pytest_configure():
     logging.getLogger('sqlalchemy.engine.base.Engine').addFilter(Shorten())
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def threadlocals(request, dummy_request, registry):
     notice_pytest_fixtures(request, dummy_request, registry)
     threadlocal_manager.push({'request': dummy_request, 'registry': registry})
@@ -275,6 +275,7 @@ def anon_html_es_testapp(es_app):
 @pytest.fixture(scope="session")
 def testapp(app):
     """TestApp for username TEST, accepting JSON data."""
+    # TODO: Use make_testapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST'
@@ -285,6 +286,7 @@ def testapp(app):
 @pytest.fixture
 def htmltestapp(app):
     """TestApp for TEST user, accepting text/html content."""
+    # TODO: Use make_htmltestapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'text/html',
         'REMOTE_USER': 'TEST',
@@ -296,6 +298,7 @@ def htmltestapp(app):
 @pytest.fixture(scope='session')
 def es_testapp(es_app):
     """ TestApp with ES + Postgres. Must be imported where it is needed. """
+    # TODO: Use make_testapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST',
@@ -306,6 +309,7 @@ def es_testapp(es_app):
 @pytest.fixture
 def html_es_testapp(es_app):
     """TestApp with ES + Postgres for TEST user, accepting text/html content."""
+    # TODO: Use make_htmltestapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'text/html',
         'REMOTE_USER': 'TEST',
@@ -316,6 +320,7 @@ def html_es_testapp(es_app):
 @pytest.fixture
 def authenticated_testapp(app):
     """TestApp for an authenticated, non-admin user (TEST_AUTHENTICATED), accepting JSON data."""
+    # TODO: Use make_authenticated_testapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -326,6 +331,7 @@ def authenticated_testapp(app):
 @pytest.fixture
 def authenticated_es_testapp(es_app):
     """ TestApp for authenticated non-admin user with ES """
+    # TODO: Use make_authenticated_testapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_AUTHENTICATED',
@@ -336,6 +342,7 @@ def authenticated_es_testapp(es_app):
 @pytest.fixture
 def submitter_testapp(app):
     """TestApp for a non-admin user (TEST_SUBMITTER), accepting JSON data."""
+    # TODO: Use make_submitter_testapp from .helpers
     environ = {
         'HTTP_ACCEPT': 'application/json',
         'REMOTE_USER': 'TEST_SUBMITTER',
@@ -396,6 +403,10 @@ class WorkbookCache:
         elif load_res:
             raise RuntimeError("load_all returned a true value that was not an exception.")
 
+        # There is a potential timing error here that doing
+        #    testapp.post_json('/index', {'record': True})
+        # instead would seem to 'fix', even though the record part is not strictly needed.
+        # Perhaps because it waits until done, or waits long enough, that indexing completes. -kmp 31-Jan-2023
         testapp.post_json('/index', {})
         return True
 
@@ -407,7 +418,7 @@ def workbook(es_app):
     WorkbookCache.initialize_if_needed(es_app)
 
 
-@pytest.yield_fixture
+@pytest.fixture
 def mocked_file_system():
     with MockFileSystem(auto_mirror_files_for_read=True).mock_exists_open_remove():
         yield

@@ -26,3 +26,6 @@ export const SEO = SearchEngineOptimizationUtilities;
 
 import * as acmgUtilities from './acmg';
 export const acmgUtil = acmgUtilities;
+
+import * as hookUtilities from './hooks';
+export const customHooks = hookUtilities;
