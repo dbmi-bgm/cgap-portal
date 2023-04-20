@@ -1,4 +1,9 @@
+from typing import List, Union
+
 import pytest
+from webtest.app import TestApp
+
+from .utils import get_identifier
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema]
@@ -65,3 +70,22 @@ def test_individual_case(testapp, child, a_case):
     child_res = testapp.get(child['@id']).json
     assert len(child_res.get('case', [])) == 1
     assert child_res['case'][0]['@id'] == case['@id']
+
+
+@pytest.mark.workbook
+@pytest.mark.parametrize(
+    "individual_identifier,expected",
+    [
+        ("GAPIDISC7R73", None),
+        (
+            "GAPIDISC7R74",
+            [
+                "/disorders/DD1/",
+                "/disorders/DD3/",
+            ]
+        ),
+    ]
+)
+def test_primary_disorders(individual_identifier: str, expected: Union[List[str], None], es_testapp: TestApp, workbook: None) -> None:
+    individual_properties = get_identifier(es_testapp, individual_identifier)
+    assert individual_properties.get("primary_disorders") == expected
