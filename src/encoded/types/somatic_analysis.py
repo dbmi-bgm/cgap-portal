@@ -11,7 +11,10 @@ from ..util import get_item
 
 
 def _build_somatic_analysis_embedded_list() -> List[str]:
-    return []
+    return [
+        "individual.primary_disorders.disorder_name",
+        "individual.families.family_id",
+    ]
 
 
 @collection(
