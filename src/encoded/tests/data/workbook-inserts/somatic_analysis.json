@@ -1,0 +1,22 @@
+[
+    {
+        "uuid": "7edbe9ce-8487-44ab-af2d-90cc3714aa1a",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "aliases": [
+            "hms-dbmi:somatic_analysis_no_samples"
+        ]
+    },
+    {
+        "uuid": "420dfaa5-ab09-4b92-a82b-39aba3cdc136",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "aliases": [
+            "hms-dbmi:somatic_analysis_tumor_normal"
+        ],
+        "samples": [
+            "hms-dbmi:normal_sample_3",
+            "hms-dbmi:tumor_sample_3"
+        ]
+    }
+]

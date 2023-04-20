@@ -188,6 +188,10 @@
         "accession": "GAPIDISC7R74",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
         "sex": "M",
-        "is_deceased": false
+        "is_deceased": false,
+        "samples": [
+            "hms-dbmi:normal_sample_3",
+            "hms-dbmi:tumor_sample_3"
+        ]
     }
 ]
