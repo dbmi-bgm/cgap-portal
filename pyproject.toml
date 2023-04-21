@@ -50,7 +50,8 @@ elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
 granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
-#h5py = "^3.6.0"
+h5py = "^3.8.0"
+#h5py = "2.10.0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
 # html5lib = "0.9999999"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
@@ -60,10 +61,9 @@ jmespath = ">=0.10.0,<1"
 jsonschema_serialize_fork = "^2.1.1"
 # keepalive = ">=0.5,<1"
 loremipsum = "1.0.5"
-matplotlib = "3.3.4"
 netaddr = ">=0.8.0,<1"
 negspy = "0.2.24"
-numpy = "^1.24.1"  # negspy needs it
+numpy = "^1.24.2"  # negspy needs it
 openpyxl = "^3.0.7,!=3.0.8"  # a version 3.0.8 appeared but then got withdrawn, for now just pin 3.0.7. try again later.
 passlib = "^1.7.4"
 PasteDeploy = "1.5.2"
@@ -85,7 +85,6 @@ pyramid-multiauth = ">=0.9.0,<1"
 pyramid-retry = "^1.0"
 pyramid-tm = "^2.4"
 pyramid_translogger = "^0.1"
-pysam = "^0.21.0"
 python-dateutil = "^2.8.2"
 # python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 python_magic = ">=0.4.24,<1"
