@@ -192,14 +192,14 @@
         "disorders": [
             {
                 "disorder": "DD1",
-                "is_primary_disorder": true
+                "is_primary_diagnosis": true
             },
             {
                 "disorder": "DD2"
             },
             {
                 "disorder": "DD3",
-                "is_primary_disorder": true
+                "is_primary_diagnosis": true
             }
         ],
         "samples": [

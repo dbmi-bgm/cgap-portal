@@ -110,7 +110,8 @@ class Individual(Item):
         if disorders:
             primary_disorders = set()
             for disorder_metadata in disorders:
-                if disorder_metadata.get("is_primary_disorder"):
-                    primary_disorders.add(disorder_metadata.get("disorder"))
+                disorder = disorder_metadata.get("disorder")
+                if disorder and disorder_metadata.get("is_primary_diagnosis"):
+                    primary_disorders.add(disorder)
             if primary_disorders:
                 return sorted(list(primary_disorders))
