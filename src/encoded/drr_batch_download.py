@@ -105,10 +105,9 @@ def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
 
 
 def get_variant_sample_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
-    file_format = post_parser.get_file_format()
     case_accession = post_parser.get_case_accession() or "case"
     timestamp = get_timestamp()
-    return f"{case_accession}-filtering-{timestamp}.{file_format}"
+    return f"{case_accession}-filtering-{timestamp}"
 
 
 def get_timestamp():
@@ -117,7 +116,8 @@ def get_timestamp():
 
 
 def get_case_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
-    return "foo.csv"
+    timestamp = get_timestamp()
+    return f"case_spreadsheet-filtering-{timestamp}"
 
 
 def get_items_from_search(
