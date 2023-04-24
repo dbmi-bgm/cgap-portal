@@ -37,7 +37,7 @@ from .batch_download_utils import (
     SpreadsheetTemplate,
 )
 from .root import CGAPRoot
-from .util import format_to_url
+from .util import APPLICATION_FORM_ENCODED_MIME_TYPE, format_to_url, register_path_content_type
 
 
 CASE_SPREADSHEET_ENDPOINT = "case_search_spreadsheet"
@@ -51,6 +51,11 @@ def includeme(config):
     config.add_route(VARIANT_SAMPLE_SPREADSHEET_ENDPOINT,
                      VARIANT_SAMPLE_SPREADSHEET_URL)
     config.scan(__name__)
+
+
+register_path_content_type(
+    path=CASE_SPREADSHEET_URL, content_type=APPLICATION_FORM_ENCODED_MIME_TYPE
+)
 
 
 def validate_spreadsheet_file_format(context: CGAPRoot, request: Request) -> None:
