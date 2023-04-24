@@ -17,6 +17,7 @@ import { AboveTableControlsBaseCGAP } from './../../browse/AboveTableControlsBas
 
 import { EmbeddedCaseSearchTable } from './../../item-pages/components/EmbeddedItemSearchTable';
 import FeedbackButton from '../../item-pages/components/FeedbackButton';
+import { ExportQCMSpreadsheetButton } from '../../item-pages/CaseView/ExportQCMSpreadsheetButton';
 
 
 export const UserDashboard = React.memo(function UserDashboard({ windowHeight, windowWidth }){
@@ -90,7 +91,8 @@ const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props)
         context,
         onFilter, isContextLoading, navigate,
         sortBy, sortColumns,
-        hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions
+        hiddenColumns, addHiddenColumn, removeHiddenColumn, columnDefinitions,
+        requestedCompoundFilterSet
     } = props;
     const { filters: ctxFilters = null } = context || {};
 
@@ -150,6 +152,9 @@ const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props)
                     </div>
                     <div className="d-none d-md-block col">
                         &nbsp;
+                    </div>
+                    <div className="col-12 col-md-auto">
+                        <ExportQCMSpreadsheetButton {...{ requestedCompoundFilterSet }} />
                     </div>
                     <div className="col-12 col-md-auto">
                         <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
