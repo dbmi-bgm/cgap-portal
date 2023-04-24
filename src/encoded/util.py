@@ -393,8 +393,9 @@ def check_user_is_logged_in(request):
 #
 #    -kmp 1-Sep-2020
 
+APPLICATION_FORM_ENCODED_MIME_TYPE = "application/x-www-form-urlencoded"
 CONTENT_TYPE_SPECIAL_CASES = {
-    'application/x-www-form-urlencoded': [
+    APPLICATION_FORM_ENCODED_MIME_TYPE: [
         # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
         # All other special case values should be added using register_path_content_type.
         '/metadata/',
