@@ -154,9 +154,6 @@ const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props)
                         &nbsp;
                     </div>
                     <div className="col-12 col-md-auto">
-                        <ExportQCMSpreadsheetButton {...{ requestedCompoundFilterSet }} />
-                    </div>
-                    <div className="col-12 col-md-auto">
                         <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowCasesWithReports} checked={onlyShowCasesWithReports}>
                             Show Only Cases with Reports
                         </ProjectFilterCheckbox>
@@ -165,6 +162,9 @@ const AboveCasesTableOptions = React.memo(function AboveCasesTableOptions(props)
                         <ProjectFilterCheckbox isContextLoading={isContextLoading || !context} onChange={onToggleOnlyShowProbandCases} checked={onlyShowProbandCases}>
                             Show Only Proband Cases
                         </ProjectFilterCheckbox>
+                    </div>
+                    <div className="col-12 col-md-auto pr-0">
+                        <ExportQCMSpreadsheetButton {...{ requestedCompoundFilterSet }} />
                     </div>
                 </AboveTableControlsBaseCGAP>
 
