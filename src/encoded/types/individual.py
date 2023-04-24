@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from snovault import (
     calculated_property,
@@ -8,6 +8,7 @@ from snovault import (
 )
 
 from .base import Item
+from ..util import JsonObject
 
 
 def _build_individual_embedded_list() -> List[str]:
@@ -92,3 +93,25 @@ class Individual(Item):
         rs = self.rev_link_atids(request, "case")
         if rs:
             return rs
+
+    @calculated_property(
+        schema={
+            "title": "Primary Disorders",
+            "description": "Primary disorders for the individual",
+            "type": "array",
+            "items": {
+                "title": "Primary Disorder",
+                "type": "string",
+                "linkTo": "Disorder",
+            }
+        }
+    )
+    def primary_disorders(self, disorders: Optional[List[JsonObject]] = None) -> Union[List[str], None]:
+        if disorders:
+            primary_disorders = set()
+            for disorder_metadata in disorders:
+                disorder = disorder_metadata.get("disorder")
+                if disorder and disorder_metadata.get("is_primary_diagnosis"):
+                    primary_disorders.add(disorder)
+            if primary_disorders:
+                return sorted(list(primary_disorders))
