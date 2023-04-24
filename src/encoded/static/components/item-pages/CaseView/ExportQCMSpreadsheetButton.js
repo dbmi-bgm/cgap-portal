@@ -13,9 +13,7 @@ import DropdownItem from "react-bootstrap/esm/DropdownItem";
  * and then submits form.
  */
 export const ExportQCMSpreadsheetButton = React.memo(function ExportQCMSpreadsheetButton(props){
-    const { requestedCompoundFilterSet, caseItem, disabled: propDisabled = false } = props;
-
-    const { accession: caseAccession, case_title = null } = caseItem || {};
+    const { requestedCompoundFilterSet, disabled: propDisabled = false } = props;
     const formRef = useRef(null);
     const onSelect = useCallback(function(eventKey, e){
         // input[name="file_format"]
@@ -34,8 +32,6 @@ export const ExportQCMSpreadsheetButton = React.memo(function ExportQCMSpreadshe
         <form method="POST" className="mb-0" action="/case-search-spreadsheet/" target="_blank" ref={formRef} disabled={disabled}>
             <input type="hidden" name="file_format" />
             <input type="hidden" name="compound_search_request" />
-            <input type="hidden" name="case_accession" value={caseAccession} />
-            <input type="hidden" name="case_title" value={case_title} />
             <DropdownButton variant="outline-primary" title="Export results as..." onSelect={onSelect} disabled={disabled}>
                 <DropdownItem eventKey="tsv">
                     <span className="text-600">TSV</span> spreadsheet
@@ -52,6 +48,5 @@ export const ExportQCMSpreadsheetButton = React.memo(function ExportQCMSpreadshe
 });
 ExportQCMSpreadsheetButton.propTypes = {
     disabled: PropTypes.bool,
-    caseItem: PropTypes.object,
     requestedCompoundFilterSet: PropTypes.object
 };
