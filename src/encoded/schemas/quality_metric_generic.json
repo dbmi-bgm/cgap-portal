@@ -5,6 +5,7 @@
     "$schema": "http://json-schema.org/draft-04/schema#",
     "type": "object",
     "required": [
+        "name",
         "project",
         "institution"
     ],
@@ -96,6 +97,10 @@
                     "derived_from": {
                         "type": "string",
                         "title": "Identifier for the QC value"
+                    },
+                    "tooltip": {
+                        "type": "string",
+                        "title": "Tooltip"
                     }
                 }
             }
