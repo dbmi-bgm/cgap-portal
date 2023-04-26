@@ -7,6 +7,13 @@ Change Log
 ----------
 
 
+13.2.0
+======
+`PR 710: Submitted file lifecycle policy <https://github.com/dbmi-bgm/cgap-portal/pull/710>`_
+
+* Add lifecycle policy to submitted files on submission
+
+
 13.1.2
 ======
 `PR: 709: Sort alphabetically phenotypic features <https://github.com/dbmi-bgm/cgap-portal/pull/709>`_
