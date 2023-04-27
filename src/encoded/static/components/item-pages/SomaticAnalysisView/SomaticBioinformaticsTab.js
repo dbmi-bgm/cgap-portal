@@ -17,24 +17,21 @@ export const SomaticBioinformaticsTab = React.memo(function SomaticBioinformatic
             <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Sample Quality Control Metrics (QC)</h4>
                 <SomaticBioinfoStats {...{ context }} />
-                {/* <div className="card-body">
-                    / / TODO: Bioinfo Stats Table goes here
-                </div> */}
             </div>
-            <div className="tab-inner-container card">
+            {/* <div className="tab-inner-container card">
                 <h4 className="card-header section-header py-3">Analysis Generated Files</h4>
                 <div className="card-body">
                     / / TODO: Files and Provenance Links Table goes here
                 </div>
-            </div>
+            </div> */}
         </React.Fragment>
     );
 });
 
 const SomaticBioinfoStats = React.memo(function BioinfoStats({ context }) {
-    const { samples = [] } = context;
+    const { samples = [], individual = {} } = context;
 
-    return (<SQCMAccordion {...{ samples }} />);
+    return (<SQCMAccordion {...{ samples, individual }} />);
 });
 
 
@@ -67,7 +64,7 @@ function SomaticBioinfoStatTable({ sample }) {
 }
 
 
-function SQCMAccordion({ samples = [] }) {
+function SQCMAccordion({ samples = [], individual = {} }) {
 
     if (samples.length === 0) {
         return <div className="m-4">No Samples Available</div>;
@@ -75,24 +72,26 @@ function SQCMAccordion({ samples = [] }) {
 
     return (
         <Accordion defaultActiveKey={samples[0]["@id"]} className="w-100">
-            {samples.map((sample, i) => <SQCMAccordionDrawer key={sample["@id"]} idx={i} qcmLen={samples.length} {...{ sample }} />)}
+            {samples.map((sample, i) => <SQCMAccordionDrawer key={sample["@id"]} idx={i} qcmLen={samples.length} {...{ sample, individual }} />)}
         </Accordion>
     );
 }
 
 
 function SQCMAccordionDrawer(props) {
-    const { sample, idx, qcmLen } = props || {};
+    const { sample, individual, idx, qcmLen } = props || {};
     const {
         "@id": sampleAtID,
         tissue_type: tissueType,
-        individual: { "@id": atID, display_title: individual_id, accession: individual_accession } = {},
         warn = [],
         fail = [],
         sequencing_type: sequencingType,
         bam_sample_id: sampleID,
         specimen_type: specimenType
     } = sample || {};
+    const {
+        "@id": atID, display_title: individual_id, accession: individual_accession
+    } = individual || {};
 
     const warnFlags = warn.map((flag) => <QCMFlag key={flag} type="warn" title={flag} />);
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
@@ -116,7 +115,7 @@ function SQCMAccordionDrawer(props) {
                         <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{individual_id || individual_accession}</a>
                     </div>
                     <div className="card-body px-5">
-                        <SomaticBioinfoStatTable {...{ sample }}/>
+                        <SomaticBioinfoStatTable {...{ sample, individual }}/>
                     </div>
                 </>
             </Accordion.Collapse>

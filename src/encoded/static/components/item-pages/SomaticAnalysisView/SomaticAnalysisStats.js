@@ -6,13 +6,7 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 
 
 export const SomaticAnalysisStats = React.memo(function SomaticAnalysisStats(props){
-    const { samples, "@id": somaticAnalysisAtID, haveSAEditPermission = false } = props;
-
-    const {
-        0: {
-            individual
-        } = {}
-    } = samples || [];
+    const { individual, samples, "@id": somaticAnalysisAtID, haveSAEditPermission = false } = props;
     const { "@id": individualAtID } = individual;
 
     return (
@@ -65,7 +59,7 @@ export const IndividualInfo = React.memo(function IndividualInfo({ individual })
         age = null,
         age_units = null,
         date_created = null,
-        disorders = []
+        primary_disorders = []
     } = individual || {};
 
     if (!individual) {
@@ -84,13 +78,7 @@ export const IndividualInfo = React.memo(function IndividualInfo({ individual })
         );
     }
 
-    let primaryDiagnosis = fallbackElem;
-    for (let i = 0; i < disorders.length; i++) {
-        if (disorders[i].is_primary_diagnosis) {
-            primaryDiagnosis = disorders[i].disorder.display_title;
-            break;
-        }
-    }
+    const primaryDisorders = primary_disorders.map((disorder) => disorder.disorder_name).join(", ");
 
     return (
         <React.Fragment>
@@ -106,7 +94,7 @@ export const IndividualInfo = React.memo(function IndividualInfo({ individual })
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0 mr-02">Diagnosis:&nbsp;</label>
-                <span className="text-capitalize">{primaryDiagnosis}</span>
+                <span className="text-capitalize">{primaryDisorders ? primaryDisorders: fallbackElem}</span>
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Sex (User-Submitted):&nbsp;</label>

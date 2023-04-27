@@ -13,9 +13,8 @@ import { PartialList } from '@hms-dbmi-bgm/shared-portal-components/es/component
 
 
 export const SomaticAccessioningTab = React.memo(function AccessioningTab(props) {
-    const { context, href } = props;
-    const { samples = [] } = context;
-    const { 0: { individual = null } = {} } = samples;
+    const { context = null, href } = props;
+    const { samples = [], individual = {} } = context || {};
 
     return (
         <React.Fragment>
@@ -110,7 +109,7 @@ class SomaticAccessionStackedTable extends React.PureComponent {
         const sampleAccessionTable = createSampleAccessioningTable(sample);
 
         return (
-            <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}>
+            <StackedBlock className={!isLastSample ? " border-bottom": ""} columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}>
                 { atId && workup_type ?
                     <StackedBlockName className="flex-row align-items-center justify-content-between">
                         <div className="d-flex">
@@ -128,7 +127,6 @@ class SomaticAccessionStackedTable extends React.PureComponent {
                             </a> : <span className="name-title">{ workup_type || accession }</span>}
                     </StackedBlockName>
                 }
-                {!isLastSample && <hr/>}
             </StackedBlock>
         );
     }
@@ -138,7 +136,7 @@ class SomaticAccessionStackedTable extends React.PureComponent {
      * @param {object} individual       The current row's individual item object
      */
     renderIndividualBlock() {
-        const { individual, samples: samplesFromProps = [] } = this.props;
+        const { individual, samples = [] } = this.props;
         const {
             "@id": atId = null,
             individual_id = null,
@@ -151,17 +149,6 @@ class SomaticAccessionStackedTable extends React.PureComponent {
                 } = {}
             } = [],
         } = individual || {};
-
-        const samplesForThisIndividual = samplesFromProps.filter((thisSample) => {
-            const {
-                individual: { '@id': thisIndividualAtID = null } = {}
-            } = thisSample;
-
-            if (thisIndividualAtID !== atId) {
-                return false;
-            }
-            return true;
-        });
 
         return ( // We can pass 'className={..}' to this if needed.
             <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}>
@@ -202,7 +189,7 @@ class SomaticAccessionStackedTable extends React.PureComponent {
                     </div>
                 </StackedBlockName>
                 <StackedBlockList className="libraries" title="Sequencing Libraries">
-                    { samplesForThisIndividual.map((thisSample, i) => this.renderSampleBlock(thisSample, i === samplesForThisIndividual.length-1))}
+                    { samples.map((thisSample, i) => this.renderSampleBlock(thisSample, i === samples.length-1))}
                 </StackedBlockList>
             </StackedBlock>
         );
@@ -259,7 +246,7 @@ function createSampleAccessioningTable(sample) {
         sequence_id = null,
         bam_sample_id = null,
         preservation_type = null, // TODO: Not currently present
-        sample_type = null // TODO: Need to figure out if this is right field?
+        tissue_type = null // TODO: Need to figure out if this is right field?
     } = sample || {};
 
     return (
@@ -282,16 +269,15 @@ function createSampleAccessioningTable(sample) {
             </div>
             <br/>
             <div className="accession-table w-100">
-                { sample_type &&
+                { tissue_type &&
                     <div className="row justify-content-between">
                         <div className="col accession-table-title">Sample Type</div>
-                        <div className="col-auto text-truncate">{ sample_type }</div>
+                        <div className="col-auto text-truncate">{ tissue_type }</div>
                     </div> }
-                { preservation_type &&
-                    <div className="row justify-content-between">
-                        <div className="col accession-table-title">Preservation Type</div>
-                        <div className="col-auto text-truncate">{ preservation_type }</div>
-                    </div>}
+                <div className="row justify-content-between">
+                    <div className="col accession-table-title">Preservation Type</div>
+                    <div className="col-auto text-truncate">{ preservation_type || "-" }</div>
+                </div>
                 { specimen_type &&
                     <div className="row justify-content-between">
                         <div className="col accession-table-title">Specimen Type</div>
@@ -305,4 +291,4 @@ function createSampleAccessioningTable(sample) {
             </div>
         </div>
     );
-};
+}

@@ -23,22 +23,18 @@ def _build_somatic_analysis_embedded_list() -> List[str]:
         "samples.specimen_type",
         "samples.bam_sample_id",
         "samples.sequence_id", # accessioning table only
-        "samples.individual.@id",
-        "samples.individual.individual_id",
-        "samples.individual.display_title",
-        "samples.individual.accession",
-        "samples.individual.sex",
-        "samples.individual.age",
-        "samples.individual.age_units",
-        "samples.individual.date_created", # TODO: Double check this is acceptable as "accession date"
-        "samples.individual.disorders.disorder.display_title",
-        "samples.individual.disorders.is_primary_diagnosis",
-        "samples.individual.families.title",
-        "samples.individual.families.family_id",
-        "samples.individual.families.accession",
-        # Doug's embeds
+        "individual.@id",
+        "individual.individual_id",
+        "individual.display_title",
+        "individual.accession",
+        "individual.sex",
+        "individual.age",
+        "individual.age_units",
+        "individual.date_created", # TODO: Double check this is acceptable as "accession date"
         "individual.primary_disorders.disorder_name",
+        "individual.families.title",
         "individual.families.family_id",
+        "individual.families.accession"
     ]
 
 
