@@ -57,6 +57,7 @@ VCF_FILE_ITEM = {
     "aliases": [VCF_FILE_ALIAS],
     "file_format": "/file-formats/vcf_gz/",
     "filename": VCF_FILE_PATH,
+    "s3_lifecycle_category": "long_term_access",
 }
 VCF_FILE_ITEM_WITH_GENOME_BUILD = copy.copy(VCF_FILE_ITEM)
 VCF_FILE_ITEM_WITH_GENOME_BUILD.update({"genome_assembly": GENOME_BUILD})
@@ -110,12 +111,14 @@ FASTQ_FILE_ITEMS_NO_ERRORS = [
             {"relationship_type": "paired with", "file": FASTQ_FILE_NAME_1_R2_ALIAS},
         ],
         "paired_end": "1",
+        "s3_lifecycle_category": "long_term_access",
     },
     {
         "aliases": [FASTQ_FILE_NAME_1_R2_ALIAS],
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_1_R2,
         "paired_end": "2",
+        "s3_lifecycle_category": "long_term_access",
     },
 ]
 FASTQ_ALIASES_NO_ERRORS = [FASTQ_FILE_NAME_1_R1_ALIAS, FASTQ_FILE_NAME_1_R2_ALIAS]
@@ -125,11 +128,13 @@ FASTQ_FILE_ITEMS_ERRORS = FASTQ_FILE_ITEMS_NO_ERRORS + [
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_UNMATCHED,
         "paired_end": "1",
+        "s3_lifecycle_category": "long_term_access",
     },
     {
         "aliases": [FASTQ_FILE_NAME_BAD_FORMAT_ALIAS],
         "file_format": FILE_FORMAT_FASTQ,
         "filename": FASTQ_FILE_NAME_BAD_FORMAT,
+        "s3_lifecycle_category": "long_term_access",
     },
 ]
 FASTQ_ALIASES_ERRORS = FASTQ_ALIASES_NO_ERRORS + [
