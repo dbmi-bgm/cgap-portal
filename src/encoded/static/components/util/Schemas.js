@@ -271,3 +271,11 @@ export const buildSchemaFacetDictionary = memoize(function(schemas){
     });
     return facetsByType;
 });
+
+export const pluralize = memoize(function(word = ""){
+    if (!word) { throw new Error("pluralize() needs a word!"); }
+    if (word.endsWith('ly')) return word.substring(0, word.length-1) + "ies";
+    if (word.endsWith('sis')) return word.substring(0, word.length-2) + "es";
+    if (word.endsWith('s')) return word + "es";
+    return word + "s";
+});

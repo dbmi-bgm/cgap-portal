@@ -91,9 +91,6 @@ function LeftNavAuthenticated(props){
             <a href="/cohort-analysis" className={"nav-link browse-nav-btn" + (isCohortsLinkActive ? " active" : "")}>
                 Cohort Browser
             </a>
-            {/* <a href="/search/?type=GeneList" className={"nav-link browse-nav-btn" + (isGeneListsLinkActive ? " active" : "")}>
-                GeneLists
-            </a> */}
             <HelpNavItem {...props} />
         </div>
     );
@@ -105,17 +102,7 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
 
     return (
         <div className="navbar-nav mr-auto">
-            {/*
-            <a href="/case-studies" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
-                Case Studies
-            </a>
-            */}
             <HelpNavItem {...props} />
-            {/*
-            <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
-                About
-            </a>
-            */}
         </div>
     );
 });
@@ -130,7 +117,7 @@ function BrowseNavItem(props){
         const { query = {}, pathname = "/a/b/c/d/e" } = memoizedUrlParse(href);
 
         const browseHref = "/search/?type=Item";
-        const browseByCaseHref = "/search/?type=Case";
+        const browseByCaseHref = "/search/?proband_case=true&type=Case"; // Go to proband cases from nav bar by default
         const browseBySomaticAnalysisHref = "/search/?type=SomaticAnalysis";
         const browseByGeneListHref = "/search/?type=GeneList";
         const browseByCohortAnalysisHref = "/search/?type=CohortAnalysis";

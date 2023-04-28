@@ -3,16 +3,15 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import _ from 'underscore';
-import url from 'url';
 
-import { memoizedUrlParse, schemaTransforms, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { schemaTransforms, analytics } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { SearchView as CommonSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/SearchView';
 import { DetailPaneStateCache } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/DetailPaneStateCache';
 import { columnExtensionMap } from './columnExtensionMap';
 import { CaseDetailPane } from './CaseDetailPane';
 import { Schemas } from './../util';
-import { TitleAndSubtitleBeside, PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
-import { AboveTableControlsBaseCGAP } from './AboveTableControlsBaseCGAP';
+import { PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
+import { AboveSearchViewOptions, AboveCaseSearchViewOptions, DashboardTitle, AboveTableControlsBaseCGAP } from './AboveTableControlsBaseCGAP';
 
 
 export default function SearchView (props){
@@ -138,6 +137,13 @@ export class SearchViewBody extends React.PureComponent {
     render(){
         const { isCaseSearch = false, context, currentAction, schemas } = this.props;
 
+        // Wait for schemas to load
+        let itemType;
+        if (schemas) {
+            itemType = schemaTransforms.getSchemaTypeFromSearchContext(context, schemas);
+            if (!itemType) { itemType = "Item"; }
+        }
+
         // We don't need full screen btn on CGAP as already full width.
         const passProps = _.omit(this.props, 'isFullscreen', 'toggleFullScreen', 'isCaseSearch');
 
@@ -145,12 +151,29 @@ export class SearchViewBody extends React.PureComponent {
         const facets = this.memoized.transformedFacets(context, currentAction, schemas);
         const tableColumnClassName = "results-column col";
         const facetColumnClassName = "facets-column col-auto";
-        const aboveTableComponent = <AboveTableControlsBaseCGAP />;
+
+        let aboveTableComponent;
+        let searchViewHeader = null;
+        let hideFacets = [];
+
+        if (currentAction === "add" || currentAction === "selection" || currentAction === "multiselect") {
+            aboveTableComponent = <AboveTableControlsBaseCGAP />;
+        } else if (isCaseSearch) {
+            aboveTableComponent = null;
+            searchViewHeader = <AboveCaseSearchViewOptions {...passProps} />;
+            hideFacets = ["project.display_title", "report.uuid", "proband_case"]; // TODO: implement on SPC; Currently doesn't do anything
+        } else {
+            aboveTableComponent = null;
+            searchViewHeader = <AboveSearchViewOptions {...passProps} {...{ itemType }} />;
+        }
 
         return (
-            <div className="container-wide search-page-outer-container" id="content">
-                <CommonSearchView {...passProps} {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets, aboveTableComponent }}
-                    renderDetailPane={isCaseSearch ? this.memoized.renderCaseDetailPane : null} termTransformFxn={Schemas.Term.toName} separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
+            <div className="search-page-outer-container" id="content">
+                <CommonSearchView {...passProps}
+                    {...{ columnExtensionMap, tableColumnClassName, facetColumnClassName, facets, aboveTableComponent, searchViewHeader, hideFacets }}
+                    renderDetailPane={isCaseSearch ? this.memoized.renderCaseDetailPane : null} termTransformFxn={Schemas.Term.toName}
+                    stickyFirstColumn={!!isCaseSearch}
+                    separateSingleTermFacets={false} rowHeight={90} openRowHeight={90} />
             </div>
         );
     }
@@ -177,15 +200,10 @@ const SearchViewPageTitle = React.memo(function SearchViewPageTitle(props){
     }
 
     const thisTypeTitle = schemaTransforms.getSchemaTypeFromSearchContext(context, schemas);
-    const subtitle = thisTypeTitle ? (
-        <span><small className="text-300">for</small> { thisTypeTitle }</span>
-    ) : null;
 
     return (
-        <PageTitleContainer alerts={alerts} className="container-wide">
-            <TitleAndSubtitleBeside subtitle={subtitle}>
-                Search
-            </TitleAndSubtitleBeside>
+        <PageTitleContainer alerts={alerts} className="container-wide px-0">
+            <DashboardTitle subtitle={thisTypeTitle}/>
         </PageTitleContainer>
     );
 });
