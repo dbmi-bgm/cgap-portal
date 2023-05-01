@@ -43,7 +43,7 @@ moto-setup:  # optional moto setup that must be done separately
 	@# pip install "moto[server]==1.3.7"
 	@echo "'moto[server]' not being installed here. Regular 'moto' will be installed by pyproject.toml."
 
-macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
+macpoetry-install:
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
@@ -65,11 +65,11 @@ macbuild-poetry:
 	make configure
 	make macpoetry-install
 
-build:  # builds
+build:
 	make build-poetry
 	make build-after-poetry
 
-macbuild:  # builds for Catalina
+macbuild:
 	make macbuild-poetry
 	make build-after-poetry
 
@@ -146,11 +146,6 @@ kibana-start-test:  # starts a test version of kibana (port chosen for active te
 kibana-stop:
 	scripts/kibana-stop
 
-kill:  # kills back-end processes associated with the application. Use with care.
-	pkill -f postgres &
-	pkill -f elasticsearch &
-	pkill -f moto_server &
-
 clean-python:
 	@echo -n "Are you sure? This will wipe all libraries installed on this virtualenv [y/N] " && read ans && [ $${ans:-N} = y ]
 	pip uninstall encoded
@@ -173,7 +168,6 @@ test:
 	@git log -1 --decorate | head -1
 	@date
 
-
 BASE_MARKERS = not manual and not sloppy and not static and not broken
 # Unit tests
 NORM_MARKERS = not performance and not integratedx
@@ -183,35 +177,35 @@ PERF_MARKERS = performance and not integratedx
 INTG_MARKERS = not performance and (integrated or integratedx)
 
 retest:
-	poetry run python -m pytest -vv -r w --last-failed
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -vv -r w --last-failed
 
 test-any:
-	poetry run python -m pytest -xvv -r w --timeout=200
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --timeout=200
 
 test-unit:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
 
 test-unit-full:
-	poetry run python -m pytest -vv  -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -vv  -r w --durations=25 --timeout=600 -m "${BASE_MARKERS} and ${NORM_MARKERS} and not indexing"
 
 test-indexing-full:
 	make test-indexing-es-full
 	make test-indexing-not-es-full
 
 test-indexing-es-full:
-	poetry run python -m pytest -vv  -r w --durations=25 --timeout=300 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and es"
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -vv  -r w --durations=25 --timeout=300 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and es"
 
 test-indexing-not-es-full:
-	poetry run python -m pytest -vv  -r w --durations=25 --timeout=300 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and not es"
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -vv  -r w --durations=25 --timeout=300 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and not es"
 
 test-indexing:
 	make test-indexing-es && make test-indexing-not-es
 
 test-indexing-es:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and es"
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and es"
 
 test-indexing-not-es:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and not es"
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --durations=25 --timeout=200 -m "${BASE_MARKERS} and ${NORM_MARKERS} and indexing and not es"
 
 test-performance:
 	poetry run python -m pytest -xvv -r w --timeout=200 -m "${BASE_MARKERS} and ${PERF_MARKERS}"
@@ -248,16 +242,16 @@ remote-test-unit:
 	make remote-test-indexing-not-es
 
 remote-test-not-indexing:  # Note this only does the 'not indexing' tests
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${REMOTE_MARKERS} and not indexing" --aws-auth --es ${REMOTE_ES} --instafail --force-flaky --max-runs=2 --durations=20 --cov src/encoded
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --durations=25 --timeout=600 -m "${REMOTE_MARKERS} and not indexing" --aws-auth --es ${REMOTE_ES} --instafail --force-flaky --max-runs=2 --durations=20 --cov src/encoded
 
 remote-test-indexing:
 	make remote-test-indexing-es && make remote-test-not-indexing
 
 remote-test-indexing-es:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=300 -m "${REMOTE_MARKERS} and indexing and es" --aws-auth --es ${REMOTE_ES} --cov-append
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --durations=25 --timeout=300 -m "${REMOTE_MARKERS} and indexing and es" --aws-auth --es ${REMOTE_ES} --cov-append
 
 remote-test-indexing-not-es:
-	poetry run python -m pytest -xvv -r w --durations=25 --timeout=300 -m "${REMOTE_MARKERS} and indexing and not es" --aws-auth --es ${REMOTE_ES} --cov-append
+	SQLALCHEMY_WARN_20=1 poetry run python -m pytest -xvv -r w --durations=25 --timeout=300 -m "${REMOTE_MARKERS} and indexing and not es" --aws-auth --es ${REMOTE_ES} --cov-append
 
 update:  # updates dependencies
 	poetry update
@@ -318,12 +312,18 @@ tag-and-push-docker-production:
 	docker push ${AWS_ACCOUNT}.dkr.ecr.us-east-1.amazonaws.com/${ENV_NAME}:latest
 	date
 
+kill:  # kills back-end processes associated with the application. Use with care.
+	pkill -f postgres &
+	pkill -f elasticsearch &
+	pkill -f opensearch &
+	pkill -f moto_server &
+
 lint-full:
-	@flake8 deploy/ || echo "flake8 failed for deploy/"
-	@flake8 src/encoded/ || echo "flake8 failed for src/encoded"
+	poetry run flake8 deploy/ || echo "flake8 failed for deploy/"
+	poetry run flake8 src/encoded/ || echo "flake8 failed for src/encoded/"
 
 lint:
-	@flake8 deploy/ && flake8 src/encoded/
+	poetry run flake8 deploy/ && poetry run flake8 src/encoded/
 
 help:
 	@make info
@@ -337,13 +337,13 @@ info:
 	   $(info - Use 'make clean' to clear out (non-python) dependencies.)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install.)
 	   $(info - Use 'make clear-poetry-cache' to clear the poetry pypi cache if in a bad state. (Safe, but later recaching can be slow.))
-	   $(info - Use 'make configure' to install poetry. You should not have to do this directly.)
+	   $(info - Use 'make configure' to install poetry, though 'make build' will do it automatically.)
 	   $(info - Use 'make deploy1' to spin up postgres/elasticsearch and load inserts.)
 	   $(info - Use 'make deploy2' to spin up the application server.)
 	   $(info - Use 'make deploy3' to load variants and genes.)
 	   $(info - Use 'make kibana-start' to start kibana on the default local ES port, and 'make kibana-stop' to stop it.)
 	   $(info - Use 'make kibana-start-test' to start kibana on the port being used for active testing, and 'make kibana-stop' to stop it.)
-	   $(info - Use 'make kill' to kill postgres and elasticsearch proccesses. Please use with care.)
+	   $(info - Use 'make kill' to kill postgres and opensearch proccesses. Please use with care.)
 	   $(info - Use 'make moto-setup' to install moto, for less flaky tests. Implied by 'make build'.)
 	   $(info - Use 'make npm-setup' to build the front-end. Implied by 'make build'.)
 	   $(info - Use 'make psql-dev' to start psql on data associated with an active 'make deploy1'.)
