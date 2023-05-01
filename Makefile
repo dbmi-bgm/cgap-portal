@@ -36,29 +36,20 @@ npm-setup:  # runs all front-end setup
 	make aws-ip-ranges
 
 moto-setup:  # optional moto setup that must be done separately
-	@# This setup was needed here because there was no bracket syntax in pypoetry.com.
-	@# Now that we're using a higher version of moto, and not using the server parts, we don't need this here.
-	@# It's now all done in pyproject.toml, getting a higher version as well.
-	@# This comment and this make target can go away once that's proven effective. -kmp 23-Mar-2023
-	@# pip install "moto[server]==1.3.7"
 	@echo "'moto[server]' not being installed here. Regular 'moto' will be installed by pyproject.toml."
 
 macpoetry-install:
 	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
-	@#pip install --upgrade pip==21.0.1
 	pip install --upgrade pip
-	@#pip install poetry==1.1.9  # this version is known to work. -kmp 11-Mar-2021
-	@# Pin to version 1.1.15 for now to avoid this error:
-	@#   Because encoded depends on wheel (>=0.29.0) which doesn't match any versions, version solving failed.
-	pip install poetry==1.3.2
-	pip install setuptools  # ==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
+	pip install poetry==1.4.2
+	pip install setuptools  # Allow versions after 57.5.0 now we're free of 2to3. -kmp 1-May-2023
 	pip install wheel
 ifeq ($(shell uname -s), Darwin)
 ifeq ($(shell uname -m), arm64)
-	pip install pysam=="0.21.0"
-	pip install matplotlib=="3.3.4"
+	pip install pysam=="0.21.0"      # Must be kept consistent with version pinned in pyproject.toml
+	pip install matplotlib=="3.3.4"  # Must be kept consistent with version pinned in pyproject.toml
 endif
 endif
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
