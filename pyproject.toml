@@ -77,8 +77,8 @@ plaster = "1.0"
 plaster-pastedeploy = "0.6"
 psutil = "^5.9.5"
 psycopg2-binary = "^2.9.6"
-# Does anyone care? not sure we do.
-py = ">=1.10.0"  # used by pytest, not sure if elsewhere
+# Searched for (^[ ]*(import|from)[ ]py[. ]|\bpy[.]) and found no interesting dependencies.
+# py = ">=1.11.0"  # used by pytest, not sure if elsewhere. what is the effect of this library?
 pyasn1 = "0.1.9"
 PyBrowserID = "^0.14.0"
 pycparser = "2.14"
