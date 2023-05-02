@@ -31,12 +31,12 @@ classifiers = [
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.9"
+python = ">=3.8.1,<3.10"
 awscli = ">=1.27.124"
 boto3 = "^1.26.124"
 botocore = "^1.29.124"
@@ -49,7 +49,7 @@ codeguru-profiler-agent = "^1.2.4"
 cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
-dcicsnovault = "7.3.0"
+dcicsnovault = "8.0.1.0b3"
 dcicutils = "^6.10.1"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"

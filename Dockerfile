@@ -1,7 +1,7 @@
 # CGAP-Portal (Production) Dockerfile
 
-# Debian Buster with Python 3.8.13
-FROM python:3.8.13-slim-buster
+# Debian Buster with Python 3.9.16
+FROM python:3.9.16-slim-buster
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
