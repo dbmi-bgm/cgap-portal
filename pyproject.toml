@@ -31,7 +31,6 @@ classifiers = [
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
 ]
 
@@ -49,7 +48,7 @@ codeguru-profiler-agent = "^1.2.4"
 cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
-dcicsnovault = "7.3.0"
+dcicsnovault = "^7.3.1"
 dcicutils = "^6.10.1"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
@@ -77,8 +76,8 @@ plaster = "1.0"
 plaster-pastedeploy = "0.6"
 psutil = "^5.9.5"
 psycopg2-binary = "^2.9.6"
-# Does anyone care? not sure we do.
-py = ">=1.10.0"  # used by pytest, not sure if elsewhere
+# Searched for (^[ ]*(import|from)[ ]py[. ]|\bpy[.]) and found no interesting dependencies.
+# py = ">=1.11.0"  # used by pytest, not sure if elsewhere. what is the effect of this library?
 pyasn1 = "0.1.9"
 PyBrowserID = "^0.14.0"
 pycparser = "2.14"

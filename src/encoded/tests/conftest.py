@@ -1,4 +1,4 @@
-"""py.test fixtures for Pyramid.
+"""pytest fixtures for Pyramid.
 
 http://pyramid.readthedocs.org/en/latest/narr/testing.html
 """
