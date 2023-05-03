@@ -12,6 +12,7 @@ import { CaseDetailPane } from './CaseDetailPane';
 import { Schemas } from './../util';
 import { PageTitleContainer, TitleAndSubtitleUnder, pageTitleViews, EditingItemPageTitle } from './../PageTitleSection';
 import { AboveSearchViewOptions, AboveCaseSearchViewOptions, DashboardTitle, AboveTableControlsBaseCGAP } from './AboveTableControlsBaseCGAP';
+import { getSchemaProperty } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/schema-transforms';
 
 
 export default function SearchView (props){
@@ -137,11 +138,26 @@ export class SearchViewBody extends React.PureComponent {
     render(){
         const { isCaseSearch = false, context, currentAction, schemas } = this.props;
 
-        // Wait for schemas to load
+        const hideFacets = [];
+        let projectSelectEnabled = false;
         let itemType;
+
+        // Wait for schemas to load
         if (schemas) {
             itemType = schemaTransforms.getSchemaTypeFromSearchContext(context, schemas);
-            if (!itemType) { itemType = "Item"; }
+            if (!itemType) {
+                // Pass "Item" for rendering as title
+                itemType = "Item"; }
+            else {
+                // Determine whether project dropdown should be displayed
+                const project = getSchemaProperty("project.display_title", schemas, itemType);
+                console.log("project", project);
+
+                if (project) {
+                    hideFacets.push('project.display_title');
+                    projectSelectEnabled = true;
+                }
+            }
         }
 
         // We don't need full screen btn on CGAP as already full width.
@@ -154,17 +170,16 @@ export class SearchViewBody extends React.PureComponent {
 
         let aboveTableComponent;
         let searchViewHeader = null;
-        let hideFacets = [];
 
         if (currentAction === "add" || currentAction === "selection" || currentAction === "multiselect") {
             aboveTableComponent = <AboveTableControlsBaseCGAP />;
         } else if (isCaseSearch) {
             aboveTableComponent = null;
-            searchViewHeader = <AboveCaseSearchViewOptions {...passProps} />;
-            hideFacets = ["project.display_title", "report.uuid", "proband_case"]; // TODO: implement on SPC; Currently doesn't do anything
+            searchViewHeader = <AboveCaseSearchViewOptions {...passProps} {...{ projectSelectEnabled }}/>;
+            hideFacets.concat(["report.uuid", "proband_case"]); // TODO: implement on SPC; Currently doesn't do anything
         } else {
             aboveTableComponent = null;
-            searchViewHeader = <AboveSearchViewOptions {...passProps} {...{ itemType }} />;
+            searchViewHeader = <AboveSearchViewOptions {...passProps} {...{ itemType, projectSelectEnabled }} />;
         }
 
         return (

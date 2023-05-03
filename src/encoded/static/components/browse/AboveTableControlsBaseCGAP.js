@@ -6,7 +6,7 @@ import _ from 'underscore';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 import { SearchBar } from './SearchBar';
 import { Dropdown, DropdownButton, DropdownItem } from 'react-bootstrap';
-import { pluralize } from '../util/Schemas';
+import { Term, pluralize } from '../util/Schemas';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
 
@@ -47,7 +47,7 @@ export function AboveTableControlsBaseCGAP (props) {
 export const AboveSearchViewOptions = React.memo(function AboveSearchViewOptions(props) {
     const {
         itemType, projectSelectEnabled,
-        context,
+        context, schemas,
         isContextLoading = false, // Present only on embedded search views
         navigate, onFilter,
         sortBy, sortColumns,
@@ -57,7 +57,7 @@ export const AboveSearchViewOptions = React.memo(function AboveSearchViewOptions
     const { total: totalResultCount = 0 } = context || {};
     return(
         <React.Fragment>
-            <SearchViewSubTitle {...{ itemType }} {...{ context, onFilter, isContextLoading, navigate }}
+            <SearchViewSubTitle {...{ itemType }} {...{ schemas, context, onFilter, isContextLoading, navigate, projectSelectEnabled }}
                 submitNewButton={<a href={`/search/?type=${itemType}&currentAction=add`} className="btn btn-primary"><i className="icon icon-plus fas icon-small mr-05"></i>Create New</a>} />
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide toggle-reports">
@@ -83,8 +83,8 @@ export const AboveSearchViewOptions = React.memo(function AboveSearchViewOptions
 
 export const AboveCaseSearchViewOptions = React.memo(function AboveCaseSearchViewOptions(props){
     const {
-        context,
-        onFilter,
+        context, projectSelectEnabled,
+        onFilter, schemas,
         isContextLoading = false, // Present only on embedded search views,
         navigate,
         sortBy, sortColumns,
@@ -108,7 +108,7 @@ export const AboveCaseSearchViewOptions = React.memo(function AboveCaseSearchVie
 
     return (
         <React.Fragment>
-            <SearchViewSubTitle itemType="Case" {...{ context, onFilter, isContextLoading, navigate }} submitNewButton={<CaseSearchViewSubmitNewButton />} />
+            <SearchViewSubTitle itemType="Case" {...{ schemas, context, onFilter, isContextLoading, navigate, projectSelectEnabled }} submitNewButton={<CaseSearchViewSubmitNewButton />} />
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide toggle-reports">
 
@@ -173,7 +173,7 @@ export const DashboardTitle = React.memo(function DashboardTitle(props){
 });
 
 export const SearchViewSubTitle = React.memo(function SearchViewSubTitle(props) {
-    const { itemType, projectSelectEnabled = false, submitNewButton = null, context, onFilter, isContextLoading, navigate } = props;
+    const { schemas, itemType, projectSelectEnabled = false, submitNewButton = null, context, onFilter, isContextLoading, navigate } = props;
 
     const pluralizedItemType = itemType ? pluralize(itemType) : "";
 
@@ -187,7 +187,7 @@ export const SearchViewSubTitle = React.memo(function SearchViewSubTitle(props) 
                     </h3>
                     {projectSelectEnabled &&
                         <div className="px-1">
-                            {/* <ProjectSelectDropdown embedded={true} {...{ context, onFilter, isContextLoading, navigate }} /> */}
+                            <ProjectSelectDropdown embedded={true} {...{ schemas, context, onFilter, isContextLoading, navigate }} />
                         </div>}
                 </div>
                 { submitNewButton }
@@ -244,83 +244,84 @@ class ProjectFilterCheckbox extends React.PureComponent {
 }
 
 
-// function ProjectSelectDropdown(props){
-//     const {
-//         schemas,
-//         context: searchContext,
-//         navigate: virtualNavigate,
-//         onFilter,
-//         isContextLoading = false,
-//         className
-//     } = props;
-//     const {
-//         facets: ctxFacets = [],
-//         filters: ctxFilters,
-//         "@id": ctxHref
-//     } = searchContext || {};
+function ProjectSelectDropdown(props){
+    const {
+        schemas,
+        context: searchContext,
+        navigate: virtualNavigate,
+        onFilter,
+        isContextLoading = false,
+        className
+    } = props;
+    const {
+        facets: ctxFacets = [],
+        filters: ctxFilters,
+        "@id": ctxHref
+    } = searchContext || {};
 
-//     const { projectFacet, projectFilter } = useMemo(function(){
-//         return {
-//             projectFacet: _.findWhere(ctxFacets, { "field" : "project.display_title" }) || null,
-//             projectFilter: _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null
-//         };
-//     }, [ searchContext ]);
+    const { projectFacet, projectFilter } = useMemo(function(){
+        return {
+            projectFacet: _.findWhere(ctxFacets, { "field" : "project.display_title" }) || null,
+            projectFilter: _.findWhere(ctxFilters, { "field" : "project.display_title" }) || null
+        };
+    }, [ searchContext ]);
 
-//     const { term: projectFilterTerm = null } = projectFilter || {};
-//     const { terms: facetTerms = [] } = projectFacet || {};
+    const { term: projectFilterTerm = null } = projectFilter || {};
+    const { terms: facetTerms = [] } = projectFacet || {};
 
-//     const onTermSelect = useCallback(function(evtKey, e){
-//         e.preventDefault();
-//         if (!evtKey) {
-//             if (projectFilter) {
-//                 // Un-toggle
-//                 onFilter(projectFacet, { key: projectFilter.term });
-//             }
-//         } else {
-//             if (!projectFilter || evtKey === projectFilterTerm) {
-//                 // Single toggle request
-//                 onFilter(projectFacet, { key: evtKey });
-//                 return;
-//             }
+    const onTermSelect = useCallback(function(evtKey, e){
+        console.log("selecting term, evtKey", evtKey);
+        e.preventDefault();
+        if (!evtKey) {
+            if (projectFilter) {
+                // Un-toggle
+                onFilter(projectFacet, { key: projectFilter.term });
+            }
+        } else {
+            if (!projectFilter || evtKey === projectFilterTerm) {
+                // Single toggle request
+                onFilter(projectFacet, { key: evtKey });
+                return;
+            }
 
-//             let updatedFilters = searchFilters.contextFiltersToExpSetFilters(ctxFilters, { "type" : true });
-//             // Unset existing first, then set new project filter, then perform virtual nav request.
-//             updatedFilters = searchFilters.changeFilter("project.display_title", projectFilterTerm, updatedFilters, null, true);
-//             updatedFilters = searchFilters.changeFilter("project.display_title", evtKey, updatedFilters, null, true);
-//             const updatedSearchHref = searchFilters.filtersToHref(updatedFilters, ctxHref, null, false, null);
-//             virtualNavigate(updatedSearchHref);
-//         }
-//     }, [ onFilter, projectFilter, projectFacet ]);
+            let updatedFilters = searchFilters.contextFiltersToExpSetFilters(ctxFilters, { "type" : true });
+            // Unset existing first, then set new project filter, then perform virtual nav request.
+            updatedFilters = searchFilters.changeFilter("project.display_title", projectFilterTerm, updatedFilters, null, true);
+            updatedFilters = searchFilters.changeFilter("project.display_title", evtKey, updatedFilters, null, true);
+            const updatedSearchHref = searchFilters.filtersToHref(updatedFilters, ctxHref, null, false, null);
+            virtualNavigate(updatedSearchHref);
+        }
+    }, [ onFilter, projectFilter, projectFacet ]);
 
-//     const renderedOptions = useMemo(function(){
-//         let options = null;
-//         if (!isContextLoading) {
-//             options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
-//                 if (a === "CGAP Core") return -1;
-//                 if (b === "CGAP Core") return 1;
-//                 return bDC - aDC;
-//             }).map(function(projectTermObj){
-//                 const { key: projectTerm, doc_count } = projectTermObj;
-//                 const active = projectTerm === projectFilterTerm;
-//                 return (
-//                     <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
-//                         { Term.toName("project.display_title", projectTerm) }
-//                         <small className="ml-07">({ doc_count })</small>
-//                     </DropdownItem>
-//                 );
-//             });
-//         }
-//         return options;
-//     }, [ isContextLoading, facetTerms ]);
+    const renderedOptions = useMemo(function(){
+        let options = null;
+        if (!isContextLoading) {
+            options = facetTerms.sort(function({ key: a, doc_count: aDC }, { key: b, doc_count: bDC }){
+                if (a === "CGAP Core") return -1;
+                if (b === "CGAP Core") return 1;
+                return bDC - aDC;
+            }).map(function(projectTermObj){
+                const { key: projectTerm, doc_count } = projectTermObj;
+                const active = projectTerm === projectFilterTerm;
+                return (
+                    <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
+                        { Term.toName("project.display_title", projectTerm) }
+                        <small className="ml-07">({ doc_count })</small>
+                    </DropdownItem>
+                );
+            });
+        }
+        return options;
+    }, [ isContextLoading, facetTerms ]);
 
-//     return (
-//         <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
-//             title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
-//             variant="outline-dark" className={className}>
-//             <DropdownItem eventKey={null} active={!projectFilterTerm}>
-//                 <span className="text-600">All Projects</span>
-//             </DropdownItem>
-//             { renderedOptions }
-//         </DropdownButton>
-//     );
-// }
+    return (
+        <DropdownButton disabled={isContextLoading || facetTerms.length === 0}
+            title={projectFilterTerm || "All Projects"} onSelect={onTermSelect}
+            variant="outline-dark" className={className}>
+            <DropdownItem eventKey={null} active={!projectFilterTerm}>
+                <span className="text-600">All Projects</span>
+            </DropdownItem>
+            { renderedOptions }
+        </DropdownButton>
+    );
+}
