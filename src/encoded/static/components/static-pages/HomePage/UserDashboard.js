@@ -42,6 +42,9 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
                         <a href="/search/?type=SomaticAnalysis" className="btn btn-primary ml-05 p-10">
                             <i className="fas icon icon-spinner mr-05"></i>Somatic Analyses
                         </a>
+                        <a href="/search/?type=CohortAnalysis" className="btn btn-primary ml-05 p-10">
+                            <i className="fas icon icon-project-diagram mr-05"></i>Cohort Analyses
+                        </a>
                     </div>
                 </div>
             </div>
