@@ -3,7 +3,7 @@ import pytest
 from base64 import b64encode
 from pyramid.compat import ascii_native_
 from snovault import COLLECTIONS
-from ..edw_hash import EDWHash
+from snovault.edw_hash import EDWHash
 
 
 pytestmark = [pytest.mark.working, pytest.mark.setone, pytest.mark.indexing]

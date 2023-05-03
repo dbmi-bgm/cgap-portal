@@ -63,7 +63,7 @@ AUTO_REGISTRATION_ENVS = ['cgap-training']
 
 
 def includeme(config):
-    config.include('.edw_hash')
+    config.include('snovault.edw_hash')
     setting_prefix = 'passlib.'
     passlib_settings = {
         k[len(setting_prefix):]: v

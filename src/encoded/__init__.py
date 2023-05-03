@@ -185,7 +185,9 @@ def main(global_config, **local_config):
     # Render an HTML page to browsers and a JSON document for API clients
     # config.include(add_schemas_to_html_responses)
     config.include('.renderers')
+    # config.include('snovault.authentication')
     config.include('.authentication')
+    config.include('snovault.server_defaults')
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
@@ -199,8 +201,10 @@ def main(global_config, **local_config):
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
-        config.include('.search.search')
-        config.include('.search.compound_search')  # could make enabling configurable
+        # config.include('.search.search')
+        # config.include('.search.compound_search')  # could make enabling configurable
+        config.include('snovault.search.search')
+        config.include('snovault.search.compound_search')  # could make enabling configurable
 
     # this contains fall back url, so make sure it comes just before static_resoruces
     config.include('.types.page')
