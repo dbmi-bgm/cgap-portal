@@ -82,5 +82,37 @@
                 "linkTo": "Sample"
             }
         }
+    },
+    "facets": {
+        "project.display_title": {
+            "title": "Project",
+            "order": 10
+        },
+        "samples.workup_type": {
+            "title": "Sequencing",
+            "order": 20
+        }
+    },
+    "columns": {
+        "display_title": {
+            "title": "Analysis ID",
+            "order": 10
+        },
+        "individual.display_title": {
+            "title": "Individual ID",
+            "order": 20
+        },
+        "samples.tissue_type": {
+            "title": "Sample Types",
+            "order": 30
+        },
+        "samples.specimen_type": {
+            "title": "Sample Details",
+            "order": 50
+        },
+        "samples.workup_type": {
+            "title": "Sequencing",
+            "order": 60
+        }
     }
 }

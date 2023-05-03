@@ -40,10 +40,6 @@
             "title": "Analysis ID",
             "order": 10
         },
-        "samples.individual": {
-            "title": "Individual ID(s)",
-            "order": 20
-        },
         "samples.tissue_type": {
             "title": "Sample Types",
             "order": 30
