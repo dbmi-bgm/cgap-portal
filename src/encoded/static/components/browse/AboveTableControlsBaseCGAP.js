@@ -3,6 +3,7 @@
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import memoize from 'memoize-one';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 import { SearchBar } from './SearchBar';
 import { Dropdown, DropdownButton, DropdownItem } from 'react-bootstrap';
@@ -158,19 +159,6 @@ const CaseSearchViewSubmitNewButton = React.memo(function CaseSearchViewSubmitNe
     );
 });
 
-export const DashboardTitle = React.memo(function DashboardTitle(props){
-    const { subtitle } = props;
-    return (
-        <div className="dashboard-header">
-            <div className="container-wide d-flex align-items-center justify-content-between">
-                <div className="align-items-center d-flex">
-                    <i className="icon icon-fw icon-home fas mr-1" />
-                    <h5 className="mt-0 mb-0 text-400">{subtitle} Dashboard</h5>
-                </div>
-            </div>
-        </div>
-    );
-});
 
 export const SearchViewSubTitle = React.memo(function SearchViewSubTitle(props) {
     const { schemas, itemType, projectSelectEnabled = false, submitNewButton = null, context, onFilter, isContextLoading, navigate } = props;
@@ -325,3 +313,79 @@ function ProjectSelectDropdown(props){
         </DropdownButton>
     );
 }
+
+const itemTypeToIconMap = memoize(function (itemType) {
+    switch(itemType) {
+        case "AccessKey":
+            return "key fas";
+        case "Analysis":
+        case "CohortAnalysis":
+            return "project-diagram fas";
+        case "Case":
+            return "archive fas";
+        case "Disorder":
+        case "Phenotype":
+            return "x-ray fas";
+        case "Document":
+        case "File":
+        case "FileFormat":
+            return "file fas";
+        case "Family":
+            return "users fas";
+        case "FilterSet":
+            return "filter fas";
+        case "Gene":
+        case "GeneList":
+        case "StructuralVariant":
+        case "StructuralVariantSample":
+        case "Variant":
+        case "VariantSample":
+            return "dna fas";
+        case "Image":
+            return "file-image fas";
+        case "IngestionSubmission":
+            return "file-medical-alt fas";
+        case "Institution":
+            return "hospital-alt fas";
+        case "Individual":
+            return "user-injured fas";
+        case "Note":
+            return "file-medical fas";
+        case "Page":
+        case "StaticSection":
+            return "file-code fas";
+        case "Project":
+            return "briefcase fas";
+        case "QualityMetric":
+            return "tasks fas";
+        case "Report":
+            return "briefcase-medical fas";
+        case "Sample":
+            return "vial fas";
+        case "Software":
+            return "laptop-code fas";
+        case "SomaticAnalysis":
+            return "spinner fas";
+        case "User":
+            return "user fas";
+        case "WorkflowRun":
+        case "Workflow":
+            return "network-wired fas";
+        default:
+            return "search fas";
+    }
+});
+
+export const DashboardTitle = React.memo(function DashboardTitle(props){
+    const { subtitle } = props;
+    return (
+        <div className="dashboard-header">
+            <div className="container-wide d-flex align-items-center justify-content-between">
+                <div className="align-items-center d-flex">
+                    <i className={`icon icon-fw icon-${itemTypeToIconMap(subtitle)} mr-1`} />
+                    <h5 className="mt-0 mb-0 text-400">{subtitle} Dashboard</h5>
+                </div>
+            </div>
+        </div>
+    );
+});
