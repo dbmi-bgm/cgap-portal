@@ -17,6 +17,17 @@ Change Log
 
 13.2.0
 ======
+
+* Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
+  new `@ingestion_message_handler` decorator functions; specific message handling
+  code now in `ingestion_message_handler_default.py` and `ingestion_message_handler_vcf.py`.
+* Updated poetry (from 1.1.15) to 1.2.2 (in Makefile and Dockerfile).
+* Removed isodate and keepalive from pyproject.toml.
+* Added special build steps to workaround issues on Mac M1.
+
+
+13.2.0
+======
 `PR 710: Submitted file lifecycle policy <https://github.com/dbmi-bgm/cgap-portal/pull/710>`_
 
 * Add lifecycle policy to submitted files on submission
