@@ -622,5 +622,25 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
     @classmethod
     def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:
         return [
-            ("ID", "URL path to the case", "@id"),
+            ("Case ID", "Case identifier", "case_id"),
+            ("UUID", "Unique database identifier", "uuid"),
+            ("Individual ID", "Individual identifier", "individual.individual_id"),
+            ("Individual sex", "Sex of associated individual", "individual.sex"),
+            ("Proband case", "Whether case is for a proband", "proband_case"),
+            ("Family ID", "Family identifier", "family.family_id"),
+            ("Analysis type", "Analysis type", "sample_processing.analysis_type"),
+            ("Sample ID", "Primary sample identifier", "sample.display_title"),
+            ("Sequencing", "Primary sample sequencing type", "sample.workup_type"),
+            ("QC flag", "Overall QC flag", "quality_control_flags.flag"),
+            ("Completed QC", "Completed QC steps", "quality_control_flags.completed_qcs"),
+            (
+                "QC warnings",
+                "QC steps with warning flags",
+                "sample_processing.quality_control_metrics.warn",
+            ),
+            (
+                "QC failures",
+                "QC steps with failure flags",
+                "sample_processing.quality_control_metrics.fail",
+            ),
         ]
