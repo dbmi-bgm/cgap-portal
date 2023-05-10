@@ -112,6 +112,7 @@ def get_variant_sample_spreadsheet_file_name(post_parser: SpreadsheetPost) -> st
 
 def get_timestamp():
     now = datetime.now(pytz.utc).isoformat()[:-13]
+    now = now.replace(" ", "-")
     return f"{now}Z"
 
 
