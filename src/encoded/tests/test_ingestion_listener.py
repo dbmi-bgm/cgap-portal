@@ -67,7 +67,7 @@ class IngestionQueueManagerForTesting(IngestionQueueManager):
         self.client.delete_queue(QueueUrl=self.queue_url)
 
 
-@pytest.yield_fixture(scope='function', autouse=True)
+@pytest.fixture(scope='function', autouse=True)
 def fresh_ingestion_queue_manager_for_testing():
     """ Yield fixture that initializes SQS and clears all messages after the each in this module. """
     queue_manager = IngestionQueueManagerForTesting()

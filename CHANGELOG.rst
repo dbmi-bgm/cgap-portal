@@ -6,6 +6,106 @@ cgap-portal
 Change Log
 ----------
 
+13.2.1
+======
+`PR 714: Cohort browser updates <https://github.com/dbmi-bgm/cgap-portal/pull/714>`_
+
+* Bump ``higlass-cohort`` version
+* Add ``blob:`` to ``script-src`` CSP
+* Switch to presigned links everywhere for the Cohort browser
+
+
+13.2.0
+======
+
+* Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
+  new `@ingestion_message_handler` decorator functions; specific message handling
+  code now in `ingestion_message_handler_default.py` and `ingestion_message_handler_vcf.py`.
+* Updated poetry (from 1.1.15) to 1.2.2 (in Makefile and Dockerfile).
+* Removed isodate and keepalive from pyproject.toml.
+* Added special build steps to workaround issues on Mac M1.
+
+
+13.2.0
+======
+`PR 710: Submitted file lifecycle policy <https://github.com/dbmi-bgm/cgap-portal/pull/710>`_
+
+* Add lifecycle policy to submitted files on submission
+
+
+13.1.2
+======
+`PR: 709: Sort alphabetically phenotypic features <https://github.com/dbmi-bgm/cgap-portal/pull/709>`_
+
+* Sorts (family) phenotypic features before rendering via CaseStats
+
+
+13.1.1
+======
+`PR: 706: Improve health page spc + add higlass ver <https://github.com/dbmi-bgm/cgap-portal/pull/706>`_
+
+* Pull and compare SPC versions from package-lock.json's dependencies and packages objects in Health page
+* Display information on discrepancies/mismatches
+* Add higlass core (dependencies) version to health page
+
+
+13.1.0
+======
+`PR 701: Not facets <https://github.com/dbmi-bgm/cgap-portal/pull/701>`_
+
+* Upgrade SPC to v0.1.63
+* Add a new folder for storing FontAwesome v6 icons & a couple of icons for not facets
+* Update filter blocks/sets to show "excluded" fields
+* Some CGAP-specific styling for not facets
+
+
+13.0.0
+======
+`PR 703: Somatic data model <https://github.com/dbmi-bgm/cgap-portal/pull/703>`_
+
+* Add SomaticAnalysis item
+* Add Analysis abstract collection for SomaticAnalysis and CohortAnalysis
+* Remove Cohort item
+* Add tissue_type property to Sample
+
+
+12.10.3
+=======
+
+* Backport pytest 7.2 support from Fourfront
+
+
+12.10.2
+=======
+
+* Upgrade to ``poetry 1.3.2``
+
+* Syntactically revamp the organization of the various ``Makefile`` targets related to testing,
+  and associated workflows.
+
+* Change the indexing tests in ``test_indexing.py`` to be labeled ``pytest.mark.es``
+  and use that to make sure these run separately.
+
+* Import and use from beta snovault various kinds of useful tools like ``index_n_items_for_testing``
+  and ``make_es_count_checker``.
+
+
+12.10.1
+=======
+`PR 702: VEP QC metrics fix <https://github.com/dbmi-bgm/cgap-portal/pull/702>`_
+
+* Fix VEP-annotated VCF recognition for updated SNV pipelines (v1.1.0)
+
+
+12.10.0
+=======
+`PR 700: SV complex relationship analysis <https://github.com/dbmi-bgm/cgap-portal/pull/700>`_
+
+* Add complex relationship analysis facet for StructuralVariantSamples
+* Add samplegeno_role to StructuralVariantSample schema
+* Reorder genotype-related facets for StructuralVariantSamples to match VariantSamples
+
+
 12.9.0
 ======
 `PR 699: Improved cohort browser + Higlass version bump <https://github.com/dbmi-bgm/cgap-portal/pull/699>`_
@@ -26,8 +126,8 @@ Change Log
 `PR 697: Bch case drawer <https://github.com/dbmi-bgm/cgap-portal/pull/697>`_
 
 * Allows case information to be shown/hidden via a toggle
-  * Default state is dependent upon tab selected (dotPath); accessioning tab will load case info open, other tabs will keep it closed on load
-  * Add e.stopPropagation prop to the copyWrrapper, so the copy accession button doesn't trigger open/closing (requires an SPC update)
+* Default state is dependent upon tab selected (dotPath); accessioning tab will load case info open, other tabs will keep it closed on load
+* Add e.stopPropagation prop to the copyWrrapper, so the copy accession button doesn't trigger open/closing (requires an SPC update)
 * Create a utility file for storing reusable custom React hooks (+ move pre-existing ones there)
 
 
@@ -36,8 +136,8 @@ Change Log
 `PR 694: Reload login box after logging out <https://github.com/dbmi-bgm/cgap-portal/pull/694>`_
 
 * Update SPC to newest release [0.1.60](https://github.com/4dn-dcic/shared-portal-components/releases/tag/0.1.60)
-  * This release enables UI to use custom auth0 configurations accessed via `/auth0_config` endpoint
-  * Note: `auth0Options` may still be passed to `<LoginController>` but only values for keys not returned by `/auth0_config` are used as fallback
+* This release enables UI to use custom auth0 configurations accessed via `/auth0_config` endpoint
+* Note: `auth0Options` may still be passed to `<LoginController>` but only values for keys not returned by `/auth0_config` are used as fallback
 * Fix logout auth0 lock related bug
 
 
