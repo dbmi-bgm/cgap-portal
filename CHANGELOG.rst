@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+13.2.2
+======
+
+* Remove inclusion of unused loremipsum library from pyproject.toml
+
+
 13.2.1
 ======
 `PR 714: Cohort browser updates <https://github.com/dbmi-bgm/cgap-portal/pull/714>`_
