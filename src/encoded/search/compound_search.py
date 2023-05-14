@@ -187,7 +187,7 @@ class CompoundSearchBuilder:
 
         # if we have no filter blocks, there is no context to enable flags, so
         # pass type_flag + global_flags
-        if not filter_blocks and flags:
+        if not filter_blocks and (flags or global_flags):
             if global_flags:
                 query = cls.combine_query_strings(global_flags, type_flag)
             else:
