@@ -15,7 +15,12 @@ from ..drr_batch_download import (
 from ..util import APPLICATION_FORM_ENCODED_MIME_TYPE
 
 
-def test_case_search_spreadsheet(es_testapp: TestApp, workbook: None) -> None:
+def test_case_search_spreadsheet(html_es_testapp: TestApp, es_testapp: TestApp, workbook: None) -> None:
+    """Test all fields of case search spreadsheet.
+
+    Test with both a JSON and an HTML form POST, as the latter is used
+    by front-end in production.
+    """
     case_search_compound_filterset = (
         {
             "search_type": "Case",
@@ -23,28 +28,22 @@ def test_case_search_spreadsheet(es_testapp: TestApp, workbook: None) -> None:
         }
     )
     post_body = {"compound_search_request": json.dumps(case_search_compound_filterset)}
-    response = es_testapp.post_json(
+    json_post_response = es_testapp.post_json(
         CASE_SPREADSHEET_URL,
         post_body,
         status=200,
     )
-    rows = response.body.decode().split("\n")
-    assert rows
+    json_post_rows = [row for row in json_post_response.body.decode().split("\n") if row]
 
-
-def test_case_search_spreadsheet_form_post(html_es_testapp: TestApp, workbook: None) -> None:
-    case_search_compound_filterset = (
-        {
-            "search_type": "Case",
-            "global_flags": "case_id=CASE10254-S1-C1",
-        }
-    )
-    post_body = {"compound_search_request": json.dumps(case_search_compound_filterset)}
-    response = html_es_testapp.post(
+    form_post_response = html_es_testapp.post(
         CASE_SPREADSHEET_URL,
         post_body,
         content_type=APPLICATION_FORM_ENCODED_MIME_TYPE,
         status=200,
     )
-    rows = response.body.decode().split("\n")
-    assert rows
+    form_post_rows = [row for row in form_post_response.body.decode().split("\n") if row]
+
+    assert json_post_rows == form_post_rows
+
+    rows = json_post_rows
+    assert len(rows) == 3
