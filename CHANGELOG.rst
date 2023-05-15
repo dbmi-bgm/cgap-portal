@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+13.3.0
+======
+
+* Adds `QualityMetricGeneric` type
+
+
 13.2.1
 ======
 `PR 714: Cohort browser updates <https://github.com/dbmi-bgm/cgap-portal/pull/714>`_
