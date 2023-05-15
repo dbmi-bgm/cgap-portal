@@ -21,5 +21,5 @@ class QualityMetricGeneric(QualityMetric):
         "type": "string",
         "description": "Use this link to download the QualityMetricGeneric zip archive."
     })
-    def href(self, request):
-        return f'{request.resource_path(self)}@@download'
+    def href(self, request, accession):
+        return f'{request.resource_path(self)}@@download/{accession}.zip'
