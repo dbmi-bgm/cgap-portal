@@ -950,13 +950,29 @@ class LuceneBuilder:
     @staticmethod
     def _build_terms_aggregation(query_field, facet, requested_values=None, nested=False):
         """ Builds a terms aggregation, specifically requesting counts for any selected values. """
-        agg = {
-            TERMS: {
-                'size': MAX_FACET_COUNTS,
-                'field': query_field,
-                'missing': facet.get('missing_value_replacement', 'No value')
+        if 'group_by_field' not in facet:
+            agg = {
+                TERMS: {
+                    'size': MAX_FACET_COUNTS,
+                    'field': query_field,
+                    'missing': facet.get('missing_value_replacement', 'No value')
+                }
             }
-        }
+        else :
+            agg = {
+                TERMS: {
+                    'size': MAX_FACET_COUNTS,
+                    'field': "embedded." + facet['group_by_field'] + ".raw",
+                    'missing': facet.get('missing_value_replacement', 'No value')              
+                },
+                'aggs': {
+                    "sub_terms" : {
+                            "terms" : {
+                                "field": query_field,
+                            }
+                        }
+                    }
+            }
         if requested_values:  # getall returns [], not None
             agg[TERMS]['include'] = requested_values
         if nested:

@@ -651,10 +651,6 @@ class SearchBuilder:
                 split_field = field.strip().split('.')
                 use_field = '.'.join(split_field[1:]) # e.g. "experiments_in_set.files.file_size.from"
 
-                if use_field in used_facet_fields or use_field in disabled_facet_fields:
-                    # Cancel if already in facets or is disabled (first check, before more broad check re: agg_type:stats, etc)
-                    continue
-
                 # Use the last part of the split field to get the field title
                 title_field = split_field[-1]
 
@@ -672,6 +668,9 @@ class SearchBuilder:
                 else:
                     is_object_title = False
 
+                if use_field in used_facet_fields or use_field in disabled_facet_fields or use_field in used_facet_fields:
+                    # Cancel if already in facets or is disabled (first check, before more broad check re: agg_type:stats, etc)
+                    continue
 
                 # 'terms' is the default per-term bucket aggregation for all non-schema facets
                 if self.item_type_es_mapping and find_nested_path(field, self.item_type_es_mapping):
@@ -899,6 +898,14 @@ class SearchBuilder:
                                 }
 
                     result_facet['terms'] = list(term_to_bucket.values())
+
+                    if 'group_by_field' in result_facet:
+                        for term in result_facet['terms']:
+                            if 'sub_terms' not in term:
+                                continue
+                            term['terms'] = term['sub_terms']['buckets']
+                        del result_facet['group_by_field']
+                        result_facet['has_group_by'] = True
 
                 # XXX: not clear this functions as intended - Will 2/17/2020
                 if len(aggregations[full_agg_name].keys()) > 2:
