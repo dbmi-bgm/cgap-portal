@@ -1,0 +1,174 @@
+{
+    "title": "MetaWorkflow Run Handler",
+    "description": "Schema for tracking execution of a metaworkflow handler",
+    "id": "/profiles/meta_workflow_run_handler.json",
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "project",
+        "institution",
+        "meta_workflow_handler"
+    ],
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases"
+    ],
+    "mixinProperties": [ 
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common"
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "title": {
+            "title": "Title",
+            "description": "The preferred viewable name of the metaworkflow run handler",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "A plain text description of the metaworkflow run handler",
+            "type": "string"
+        },
+        "meta_workflow_handler": {
+            "title": "MetaWorkflow Handler",
+            "description": "The metaworkflow handler associated with the metaworkflow run handler",
+            "type": "string",
+            "linkTo": "MetaWorkflowHandler" 
+        },
+        "associated_item": {
+            "title": "Associated Item",
+            "description": "Link to associated item (e.g. case, cohort, etc.) for this pipeline",
+            "type": "string",
+            "linkTo": "Item"
+        },  
+        "final_status": {
+            "title": "Final Status",
+            "type": "string",
+            "default": "pending",
+            "enum": [
+                "pending",
+                "running",
+                "completed",
+                "failed",
+                "stopped"
+            ]
+        },
+        "cost": {
+            "title": "Cost",
+            "description": "Total cost of the metaworkflow run handler (includes failed jobs)",
+            "type": "number"
+        },   
+        "meta_workflow_runs": {
+            "title": "MetaWorkflow Runs",
+            "description": "The list of metaworkflow runs with their status and output files, in sorted order",
+            "type": "array", 
+            "items": {
+                "title": "MetaWorkflow Run",
+                "description": "Individual metaworkflow run step on the metaworkflow run handler",
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                    "meta_workflow_run": {
+                        "title": "MetaWorkflow Run",
+                        "description": "Link to the corresponding metaworkflow run item",
+                        "type": "string",
+                        "linkTo": "MetaWorkflowRun"
+                    },
+                    "name": {
+                        "title": "MetaWorkflow name",
+                        "description": "Name of the corresponding metaworkflow",
+                        "type": "string"
+                    },
+                    "status": {
+                        "title": "Status",
+                        "description": "Status of the current metaworkflow run",
+                        "type": "string",
+                        "enum": [
+                            "pending",
+                            "running",
+                            "completed",
+                            "failed",
+                            "stopped"
+                        ]
+                    },
+                    "dependencies": {
+                        "title": "Dependencies",
+                        "description": "Dependencies of the current metaworkflow run",
+                        "type": "array",
+                        "items": {
+                            "title": "Dependency",
+                            "description": "A dependency of the current metaworkflow run on preexisting metaworkflow runs",
+                            "type": "string"
+                        }
+                    },
+                    "items_for_creation": {
+                        "title": "Items used for creation",
+                        "description": "List of Item linkTos that were required for this metaworkflow run's creation",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "linkTo": "Item"
+                        }
+                    },
+                    "error": {
+                        "title": "Error in creation",
+                        "description": "Error traceback arising from this metaworkflow run's creation, if applicable",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        } 
+    },
+    "facets": {
+        "meta_workflow_handler.title": { 
+            "title": "MetaWorkflow Handler"
+        },
+        "meta_workflow_handler.version": {
+            "title": "Version"
+        },
+        "final_status": {
+            "title": "Final Status"
+        }
+    },
+    "columns": { 
+        "meta_workflow_handler.title": {
+            "title": "MetaWorkflow Handler"
+        },
+        "meta_workflow_handler.version": {
+            "title": "Version"
+        },
+        "final_status": {
+            "title": "Final Status"
+        }
+    }
+}
