@@ -96,7 +96,12 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                         <object.CopyWrapper className="text-monospace mr-1" value={accession} stopPropagation>
                                             {accession}
                                         </object.CopyWrapper>
-                                        <div>What is somatic analysis? <i className="icon-info-circle icon fas" data-tip="TODO: Add info about somatic analysis"></i></div>
+                                        <div>
+                                            What is somatic analysis?
+                                            <i className="icon-info-circle icon fas"
+                                                data-tip="Identifies somatic mutations present in a sample and absent in reference normal tissue from the same individual. ">
+                                            </i>
+                                        </div>
                                     </div>
                                 </div>
                             </>
