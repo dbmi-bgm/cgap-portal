@@ -537,12 +537,14 @@ def impersonate_user(context, request):
         auth0_secret,
         algorithm=JWT_ENCODING_ALGORITHM
     )
+    # In PyJWT v1, the id_token was bytes. In v2, it's a string. This insulates us.
+    id_token_string = id_token.decode('utf-8') if isinstance(id_token, bytes) else id_token
 
     is_https = request.scheme == "https"
 
     request.response.set_cookie(
         "jwtToken",
-        value=id_token.decode('utf-8'),
+        value=id_token_string,
         domain=request.domain,
         path="/",
         httponly=True,
