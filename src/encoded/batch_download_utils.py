@@ -289,7 +289,14 @@ class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
         return [column.get_title() for column in self._spreadsheet_columns]
 
     def _get_column_descriptions(self) -> List[str]:
-        return [column.get_description() for column in self._spreadsheet_columns]
+        result = []
+        for idx, column in enumerate(self._spreadsheet_columns):
+            description = column.get_description()
+            if idx == 0:
+                result.append(f"# {description}")
+            else:
+                result.append(description)
+        return result
 
     @classmethod
     def _convert_column_tuples_to_spreadsheet_columns(

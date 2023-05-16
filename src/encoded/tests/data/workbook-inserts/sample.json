@@ -8,6 +8,7 @@
         ],
         "bam_sample_id": "Sample_ID",
         "workup_type": "WES",
+        "specimen_accession": "BRCA_proband_sample",
         "specimen_type": "peripheral_blood",
         "processed_files": [
             "hms-dbmi:sample_1_bam"

@@ -13,6 +13,7 @@ from ..batch_download_utils import (
     get_values_for_field,
     FilterSetSearch,
     SpreadsheetColumn,
+    SpreadsheetFromColumnTuples,
     SpreadsheetGenerator,
     SpreadsheetPost,
 )
@@ -382,7 +383,6 @@ class TestSpreadsheetGenerator:
             "Content-Description": "File Transfer",
             "Cache-Control": "no-store",
         }
-
 
 
 class TestSpreadsheetPost:
