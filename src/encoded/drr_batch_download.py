@@ -422,56 +422,56 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 ),
                 "variant.genes.genes_most_severe_gene.s_het"
             ),
+#            (
+#                "MaxEntScan",
+#                (
+#                    "Difference in MaxEntScan scores (Maximum Entropy based scores of"
+#                    " splicing strength) between Alt and Ref alleles"
+#                ),
+#                "variant.genes.genes_most_severe_maxentscan_diff"
+#            ),
             (
-                "MaxEntScan",
-                (
-                    "Difference in MaxEntScan scores (Maximum Entropy based scores of"
-                    " splicing strength) between Alt and Ref alleles"
-                ),
-                "variant.genes.genes_most_severe_maxentscan_diff"
-            ),
-            (
-                "ACMG classification (curr)",
+                "ACMG classification (current)",
                 "ACMG classification for variant in this case",
                 "interpretation.classification"
             ),
             (
-                "ACMG rules (curr)",
+                "ACMG rules (current)",
                 "ACMG rules invoked for variant in this case",
                 "interpretation.acmg_rules_invoked.acmg_rule_name"
             ),
             (
-                "Clinical interpretation notes (curr)",
+                "Clinical interpretation notes (current)",
                 "Clinical interpretation notes written for this case",
                 "interpretation.note_text"
             ),
             (
-                "Gene candidacy (curr)",
+                "Gene candidacy (current)",
                 "Gene candidacy level selected for this case",
                 "discovery_interpretation.gene_candidacy"
             ),
             (
-                "Variant candidacy (curr)",
+                "Variant candidacy (current)",
                 "Variant candidacy level selected for this case",
                 "discovery_interpretation.variant_candidacy"
             ),
             (
-                "Discovery notes (curr)",
+                "Discovery notes (current)",
                 "Gene/variant discovery notes written for this case",
                 "discovery_interpretation.note_text"
             ),
             (
-                "Variant notes (curr)",
+                "Variant notes (current)",
                 "Additional notes on variant written for this case",
                 "variant_notes.note_text"
             ),
             (
-                "Gene notes (curr)",
+                "Gene notes (current)",
                 "Additional notes on gene written for this case",
                 "gene_notes.note_text"
             ),
             (
-                "ACMG classification (prev)",
+                "ACMG classification (previous)",
                 "ACMG classification for variant in previous cases",
                 cls._get_note_of_same_project(
                     "variant.interpretations",
@@ -479,7 +479,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "ACMG rules (prev)",
+                "ACMG rules (previous)",
                 "ACMG rules invoked for variant in previous cases",
                 cls._get_note_of_same_project(
                     "variant.interpretations",
@@ -487,7 +487,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "Clinical interpretation (prev)",
+                "Clinical interpretation (previous)",
                 "Clinical interpretation notes written for previous cases",
                 cls._get_note_of_same_project(
                     "variant.interpretations",
@@ -495,7 +495,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "Gene candidacy (prev)",
+                "Gene candidacy (previous)",
                 "Gene candidacy level selected for previous cases",
                 cls._get_note_of_same_project(
                     "variant.discovery_interpretations",
@@ -503,7 +503,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "Variant candidacy (prev)",
+                "Variant candidacy (previous)",
                 "Variant candidacy level selected for previous cases",
                 cls._get_note_of_same_project(
                     "variant.discovery_interpretations",
@@ -511,7 +511,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "Discovery notes (prev)",
+                "Discovery notes (previous)",
                 "Gene/variant discovery notes written for previous cases",
                 cls._get_note_of_same_project(
                     "variant.discovery_interpretations",
@@ -519,7 +519,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "Variant notes (prev)",
+                "Variant notes (previous)",
                 "Additional notes on variant written for previous cases",
                 cls._get_note_of_same_project(
                     "variant.variant_notes",
@@ -527,7 +527,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 )
             ),
             (
-                "Gene notes (prev)",
+                "Gene notes (previous)",
                 "Additional notes on gene written for previous cases",
                 cls._get_note_of_same_project(
                     "variant.genes.genes_most_severe_gene.gene_notes",

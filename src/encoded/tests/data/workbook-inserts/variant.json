@@ -69,8 +69,6 @@
             }
         ]
     },
-
-
     {
         "ID": "rs142404438",
         "ALT": "A",
@@ -81,6 +79,7 @@
             {
                 "genes_most_severe_gene": "f6490485-7910-4019-a45e-02d6fb96f3a5",
                 "genes_most_severe_hgvsc": "ENST00000378585.7:c.*384G>A",
+                "genes_most_severe_hgvsp": "ENST00000378585.7:p.V>A",
                 "genes_most_severe_transcript": "ENST00000378585",
                 "genes_most_severe_consequence": "d2ca7570-10b9-4314-bc2c-fa6d276c21fb",
                 "genes_most_severe_feature_ncbi": "NM_000815.5"
@@ -139,8 +138,14 @@
         "variantClass": "SNV",
         "annotation_id": "chr1:2030666G_A",
         "spliceaiMaxds": 0,
+        "csq_clinvar": "89991",
         "csq_cadd_phred": 0.613,
         "csq_gnomadg_ac": 30,
+        "csq_gerp_rs": 5.02,
+        "csq_sift_pred": "T",
+        "csq_polyphen2_hvar_pred": "D",
+        "csq_primateai_pred": "D",
+        "csq_revel_score": 0.013,
         "csq_gnomadg_af": 0.000197078,
         "csq_gnomadg_an": 152224,
         "csq_gnomadg_ac-xx": 16,
@@ -193,6 +198,18 @@
         "csq_gnomadg_nhomalt-nfe": 0,
         "csq_gnomadg_nhomalt-oth": 0,
         "csq_gnomadg_nhomalt-sas": 0,
+        "csq_gnomade2_af": [
+            0.0002
+        ],
+        "csq_gnomade2_af_popmax": [
+            0.3
+        ],
+        "csq_gnomade2_af-sas": [
+            0.1
+        ],
+        "csq_gnomade2_af-eas": [
+            0.3
+        ],
         "csq_spliceai_pred_dp_ag": 49,
         "csq_spliceai_pred_dp_al": -37,
         "csq_spliceai_pred_dp_dg": -13,
@@ -205,6 +222,18 @@
         "csq_phylop30way_mammalian": -3.49499988555908,
         "csq_phylop100way_vertebrate": -0.352999985218048,
         "csq_phastcons100way_vertebrate": 0.0,
+        "discovery_interpretations": [
+            "1e1ea605-b3e2-4abb-8677-d647042e4fc4",
+            "e8046b1b-22a4-40fa-8558-4702dae6d822"
+        ],
+        "interpretations": [
+            "2f0557f6-7284-4a5f-976d-0f11f24567fd",
+            "de5e1c12-4c88-4a3e-a306-d37a12defa6b"
+        ],
+        "variant_notes": [
+            "0791a219-856d-41b8-bc7a-7dbbc973f848",
+            "62759f07-326a-4e94-8dd0-366741292d07"
+        ],
         "uuid": "4af362a4-4f7f-4ad9-9c80-bf1f94bc143f"
     },
     {

@@ -93,3 +93,9 @@ def test_case_search_spreadsheet(html_es_testapp: TestApp, es_testapp: TestApp, 
 
     columns = list(zip(*rows))
     assert columns == EXPECTED_CASE_SPREADSHEET_COLUMNS
+
+
+def test_variant_sample_spreadsheet_download(
+    html_es_testapp: TestApp, es_testapp: TestApp, workbook: None
+) -> None:
+
