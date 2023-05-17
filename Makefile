@@ -44,7 +44,7 @@ macpoetry-install:
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
 	pip install poetry==1.4.2
-	pip install setuptools  # Allow versions after 57.5.0 now we're free of 2to3. -kmp 1-May-2023
+	pip install setuptools
 	pip install wheel
 ifeq ($(shell uname -s), Darwin)
 ifeq ($(shell uname -m), arm64)

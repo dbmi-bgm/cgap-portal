@@ -6,10 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+
 14.0.0
 ======
 
 * Add support for Python 3.9
+
+* Remove inclusion of unused loremipsum library from pyproject.toml
 
 
 13.2.1
