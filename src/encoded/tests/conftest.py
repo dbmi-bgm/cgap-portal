@@ -22,6 +22,7 @@ from snovault.util import generate_indexer_namespace_for_testing
 from .conftest_settings import make_app_settings_dictionary
 from .. import main
 from ..loadxl import load_all
+from ..project_defs import CGAPProject
 
 
 """
@@ -31,6 +32,8 @@ README:
     * There are "app" based fixtures that rely only on postgres, "es_app" fixtures that 
       use both postgres and ES (for search/ES related testing)
 """
+
+CGAPProject.initialize_app_project(initialize_env_utils=False)
 
 
 # This should work but does not seem to... various issues related to rollbacks occurring or not

@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "13.2.0"
+version = "13.2.1.1b1"  # to become 14.0.0
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -32,10 +32,11 @@ classifiers = [
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.9"
+python = ">=3.8.1,<3.10"
 awscli = ">=1.27.124"
 boto3 = "^1.26.124"
 botocore = "^1.29.124"
@@ -48,8 +49,8 @@ codeguru-profiler-agent = "^1.2.4"
 cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
-dcicsnovault = "^7.3.1"
-dcicutils = "^6.10.1"
+dcicsnovault = "8.0.1.3b6"
+dcicutils = ">=6.10.1"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.3,<1"
@@ -81,7 +82,7 @@ psycopg2-binary = "^2.9.6"
 pyasn1 = "0.1.9"
 PyBrowserID = "^0.14.0"
 pycparser = "2.14"
-PyJWT = "1.5.3"
+PyJWT = ">=1.5.3"
 pyparsing = "^3.0.9"
 pyramid = "1.10.4"
 pyramid_localroles = ">=0.1,<1"

@@ -13,6 +13,18 @@ files = [
 ]
 
 [[package]]
+name = "async-timeout"
+version = "4.0.2"
+description = "Timeout context manager for asyncio programs"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "async-timeout-4.0.2.tar.gz", hash = "sha256:2163e1640ddb52b7a8c80d0a67a08587e5d245cc9c553a74a847056bc2976b15"},
+    {file = "async_timeout-4.0.2-py3-none-any.whl", hash = "sha256:8ca1e4fcf50d07413d66d1a5e416e42cfdf5851c981d679a09851a6853383b3c"},
+]
+
+[[package]]
 name = "aws-requests-auth"
 version = "0.4.3"
 description = "AWS signature version 4 signing process for the python requests module"
@@ -1026,21 +1038,21 @@ setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "7.3.1"
+version = "8.0.1.3b6"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
-python-versions = ">=3.8.1,<3.9"
+python-versions = ">=3.8.1,<3.10"
 files = [
-    {file = "dcicsnovault-7.3.1-py3-none-any.whl", hash = "sha256:40499cac8a4a1dceef0a113084afb4a7930c9fdd47d0ad95aa98b65f6646a619"},
-    {file = "dcicsnovault-7.3.1.tar.gz", hash = "sha256:068485eb566e12bf7a4ee9b14e14c73a0f101cf3bacb83615186c0df8a3e10f6"},
+    {file = "dcicsnovault-8.0.1.3b6-py3-none-any.whl", hash = "sha256:ccab867889538486383b075f0160cce3139db90ae47238e8a2980ab369a324e3"},
+    {file = "dcicsnovault-8.0.1.3b6.tar.gz", hash = "sha256:836026e5f622c46d851401123263ea236abb58679f494ee56c3a091197f73a98"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
-boto3 = ">=1.24.36"
-botocore = ">=1.27.36"
-dcicutils = ">=6.10.0,<7.0.0"
+boto3 = ">=1.26.124,<2.0.0"
+botocore = ">=1.19.124,<2.0.0"
+dcicutils = ">=7.0.0,<8.0.0"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -1049,9 +1061,11 @@ humanfriendly = ">=1.44.9,<2.0.0"
 jsonschema_serialize_fork = ">=2.1.1,<3.0.0"
 netaddr = ">=0.8.0,<1"
 passlib = ">=1.7.4,<2.0.0"
+pillow = ">=9.5.0,<10.0.0"
 psutil = ">=5.9.0,<6.0.0"
 psycopg2-binary = ">=2.9.1,<3.0.0"
 PyBrowserID = ">=0.10.0,<1"
+pyjwt = ">=2.6.0,<3.0.0"
 pyramid = "1.10.4"
 pyramid_localroles = ">=0.1,<1"
 pyramid-multiauth = ">=0.9.0,<1"
@@ -1063,6 +1077,7 @@ python_magic = ">=0.4.27"
 pytz = ">=2021.3"
 rdflib = ">=4.2.2,<5.0.0"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
+redis = ">=4.5.1,<5.0.0"
 rutter = ">=0.3,<1"
 simplejson = ">=3.17.6,<4.0.0"
 SPARQLWrapper = ">=1.8.5,<2.0.0"
@@ -1081,14 +1096,14 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "6.10.1"
+version = "7.4.0"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
 python-versions = ">=3.7,<3.10"
 files = [
-    {file = "dcicutils-6.10.1-py3-none-any.whl", hash = "sha256:50c380912bd29d420d07f0646a9733d52c2a667e55db9d8bc7d2d2cb0f16f9f9"},
-    {file = "dcicutils-6.10.1.tar.gz", hash = "sha256:dcfa5fa38bcc2184a5586034cbd64eb9cc72b93041cdbfd3c6cc1a5bc31a556a"},
+    {file = "dcicutils-7.4.0-py3-none-any.whl", hash = "sha256:633ca2bae03e70d0e3b2e60f49b2d906711e862fb362536b852d9b3f4f06a0d1"},
+    {file = "dcicutils-7.4.0.tar.gz", hash = "sha256:e1c02ee3dbbb2e5065e48407dc214e2476cdb4b18580aacc63cd8ecdedf6a5fb"},
 ]
 
 [package.dependencies]
@@ -1099,12 +1114,16 @@ docker = ">=4.4.4,<5.0.0"
 elasticsearch = "7.13.4"
 gitpython = ">=3.1.2,<4.0.0"
 opensearch-py = ">=2.0.1,<3.0.0"
+PyJWT = ">=2.6.0,<3.0.0"
+pyOpenSSL = ">=23.1.1,<24.0.0"
 pytz = ">=2020.4"
 PyYAML = ">=5.1,<5.5"
+redis = ">=4.5.1,<5.0.0"
 requests = ">=2.21.0,<3.0.0"
 rfc3986 = ">=1.4.0,<2.0.0"
 structlog = ">=19.2.0,<20.0.0"
 toml = ">=0.10.1,<1"
+tqdm = ">=4.65.0,<5.0.0"
 typing-extensions = ">=3.8"
 urllib3 = ">=1.26.6,<2.0.0"
 webtest = ">=2.0.34,<3.0.0"
@@ -2323,20 +2342,40 @@ files = [
 
 [[package]]
 name = "pyjwt"
-version = "1.5.3"
+version = "2.6.0"
 description = "JSON Web Token implementation in Python"
 category = "main"
 optional = false
-python-versions = "*"
+python-versions = ">=3.7"
 files = [
-    {file = "PyJWT-1.5.3-py2.py3-none-any.whl", hash = "sha256:a4e5f1441e3ca7b382fd0c0b416777ced1f97c64ef0c33bfa39daf38505cfd2f"},
-    {file = "PyJWT-1.5.3.tar.gz", hash = "sha256:500be75b17a63f70072416843dc80c8821109030be824f4d14758f114978bae7"},
+    {file = "PyJWT-2.6.0-py3-none-any.whl", hash = "sha256:d83c3d892a77bbb74d3e1a2cfa90afaadb60945205d1095d9221f04466f64c14"},
+    {file = "PyJWT-2.6.0.tar.gz", hash = "sha256:69285c7e31fc44f68a1feb309e948e0df53259d579295e6cfe2b1792329f05fd"},
 ]
 
 [package.extras]
-crypto = ["cryptography (>=1.4)"]
-flake8 = ["flake8", "flake8-import-order", "pep8-naming"]
-test = ["pytest (>3,<4)", "pytest-cov", "pytest-runner"]
+crypto = ["cryptography (>=3.4.0)"]
+dev = ["coverage[toml] (==5.0.4)", "cryptography (>=3.4.0)", "pre-commit", "pytest (>=6.0.0,<7.0.0)", "sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+docs = ["sphinx (>=4.5.0,<5.0.0)", "sphinx-rtd-theme", "zope.interface"]
+tests = ["coverage[toml] (==5.0.4)", "pytest (>=6.0.0,<7.0.0)"]
+
+[[package]]
+name = "pyopenssl"
+version = "23.1.1"
+description = "Python wrapper module around the OpenSSL library"
+category = "main"
+optional = false
+python-versions = ">=3.6"
+files = [
+    {file = "pyOpenSSL-23.1.1-py3-none-any.whl", hash = "sha256:9e0c526404a210df9d2b18cd33364beadb0dc858a739b885677bc65e105d4a4c"},
+    {file = "pyOpenSSL-23.1.1.tar.gz", hash = "sha256:841498b9bec61623b1b6c47ebbc02367c07d60e0e195f19790817f10cc8db0b7"},
+]
+
+[package.dependencies]
+cryptography = ">=38.0.0,<41"
+
+[package.extras]
+docs = ["sphinx (!=5.2.0,!=5.2.0.post0)", "sphinx-rtd-theme"]
+test = ["flaky", "pretend", "pytest (>=3.0.1)"]
 
 [[package]]
 name = "pyparsing"
@@ -2753,6 +2792,25 @@ files = [
 
 [package.dependencies]
 rdflib = "*"
+
+[[package]]
+name = "redis"
+version = "4.5.4"
+description = "Python client for Redis database and key-value store"
+category = "main"
+optional = false
+python-versions = ">=3.7"
+files = [
+    {file = "redis-4.5.4-py3-none-any.whl", hash = "sha256:2c19e6767c474f2e85167909061d525ed65bea9301c0770bb151e041b7ac89a2"},
+    {file = "redis-4.5.4.tar.gz", hash = "sha256:73ec35da4da267d6847e47f68730fdd5f62e2ca69e3ef5885c6a78a9374c3893"},
+]
+
+[package.dependencies]
+async-timeout = {version = ">=4.0.2", markers = "python_version <= \"3.11.2\""}
+
+[package.extras]
+hiredis = ["hiredis (>=1.0.0)"]
+ocsp = ["cryptography (>=36.0.1)", "pyopenssl (==20.0.1)", "requests (>=2.26.0)"]
 
 [[package]]
 name = "repoze-debug"
@@ -3642,5 +3700,5 @@ test = ["zope.testing"]
 
 [metadata]
 lock-version = "2.0"
-python-versions = ">=3.8.1,<3.9"
-content-hash = "6529d8db6a77c49fe649d9aa1038ab47dce01d359e0721a61ac064dc4dcc5610"
+python-versions = ">=3.8.1,<3.10"
+content-hash = "7dd68c124c9094858cd124a4f7369e5fa1bf53af31aa2c3e3e61271416085ca4"
