@@ -272,11 +272,11 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 "Gene symbol(s)",
                 "variant.genes.genes_most_severe_gene.display_title",
             ),
-            (
-                "Gene type",
-                "Type of Gene",
-                "variant.genes.genes_most_severe_gene.gene_biotype",
-            ),
+#            (
+#                "Gene type",
+#                "Type of Gene",
+#                "variant.genes.genes_most_severe_gene.gene_biotype",
+#            ),
             (
                 "Canonical transcript ID",
                 "Ensembl ID of canonical transcript of gene variant is in",
@@ -406,14 +406,14 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 "Loss-of-function observed/expected upper bound fraction",
                 "variant.genes.genes_most_severe_gene.oe_lof_upper"
             ),
-            (
-                "RVIS (ExAC)",
-                (
-                    "RVIS (Residual Variation Intolerance Score) genome-wide percentile"
-                    "from ExAC"
-                ),
-                "variant.genes.genes_most_severe_gene.rvis_exac"
-            ),
+#            (
+#                "RVIS (ExAC)",
+#                (
+#                    "RVIS (Residual Variation Intolerance Score) genome-wide percentile"
+#                    "from ExAC"
+#                ),
+#                "variant.genes.genes_most_severe_gene.rvis_exac"
+#            ),
             (
                 "S-het",
                 (
