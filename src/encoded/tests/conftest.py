@@ -33,7 +33,7 @@ README:
       use both postgres and ES (for search/ES related testing)
 """
 
-CGAPProject.initialize_app_project(initialize_env_utils=False)
+CGAPProject.initialize()
 
 
 # This should work but does not seem to... various issues related to rollbacks occurring or not

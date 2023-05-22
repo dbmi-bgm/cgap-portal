@@ -1,10 +1,10 @@
-from snovault.project import (
-    ProjectRegistry,
-    Project as _Project  # renamed to avoid confusing programmers using discovery into thinking this is an export
-)
+from dcicutils.project_utils import C4ProjectRegistry
+from snovault.project_defs import SnovaultProject
 
-
-@ProjectRegistry.register('encoded')
-class CGAPProject(_Project):
-    NAME = 'cgap-portal'
+@C4ProjectRegistry.register('encoded')
+class CGAPProject(SnovaultProject):
+    NAMES = {"NAME": 'cgap-portal'}
     ACCESSION_PREFIX = 'GAP'
+
+
+app_project = CGAPProject.app_project_maker()
