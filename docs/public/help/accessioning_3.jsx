@@ -54,7 +54,7 @@
         accessioning spreadsheets to the CGAP portal, called
         SubmitCGAP. The current version is still in beta. It can be
         installed by running <code>pip install submit-cgap</code>. We recommend
-        doing this inside a virtual environment running python 3.7.
+        doing this inside a virtual environment running Python 3.7, 3.8 or 3.9.
         Further instructions for submission with this method can be
         found in the <a href="https://submitcgap.readthedocs.io/en/latest/getting_started.html#family-history">SubmitCGAP documentation</a>.
         Briefly, the basic commands are as follows:
