@@ -7,4 +7,8 @@ class CGAPProject(SnovaultProject):
     ACCESSION_PREFIX = 'GAP'
 
 
-app_project = CGAPProject.app_project_maker()
+# If you get a circularity importing this from here,
+# it's OK to just copy this line into the file you were trying
+# the import for. (You'll need to import C4ProjectRegistry like above, too.)
+# -kmp 25-May-2023
+app_project = C4ProjectRegistry.app_project_maker()
