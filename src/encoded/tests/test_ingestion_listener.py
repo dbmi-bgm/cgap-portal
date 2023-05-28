@@ -8,11 +8,10 @@ import time
 from dcicutils.misc_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
-from ..ingestion.common import IngestionReport, IngestionError
-from ..ingestion_listener import (
-    IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
-    STATUS_INGESTED,
-)
+from snovault.ingestion.common import IngestionReport, IngestionError
+from snovault.ingestion.ingestion_listener_base import STATUS_INGESTED
+from ..ingestion.ingestion_listener import IngestionQueueManager, run, IngestionListener
+from ..project.ingestion import verify_vcf_file_status_is_not_ingested
 from ..util import debuglog
 
 

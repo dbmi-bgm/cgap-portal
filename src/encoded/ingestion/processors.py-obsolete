@@ -2,13 +2,13 @@ import io
 import json
 
 from dcicutils.misc_utils import ignored
-from ..ingestion.common import get_parameter
+from snovault.ingestion.common import get_parameter
 from ..util import debuglog, s3_local_file
 from ..submit import submit_metadata_bundle
 from ..submit_genelist import submit_genelist
 from ..submit_genelist import submit_variant_update
 from .exceptions import UndefinedIngestionProcessorType
-from ..types.ingestion import IngestionSubmission, SubmissionFolio
+from snovault.types.ingestion import IngestionSubmission, SubmissionFolio
 
 
 INGESTION_UPLOADERS = {}

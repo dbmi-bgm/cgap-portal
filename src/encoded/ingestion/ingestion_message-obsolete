@@ -17,6 +17,3 @@ class IngestionMessage:
 
     def is_type(self, value: str) -> bool:
         return isinstance(value, str) and self.type == value.lower()
-
-    def is_vcf(self) -> bool:
-        return self.is_type(self.TYPE_VCF)

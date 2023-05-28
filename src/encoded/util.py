@@ -3,7 +3,21 @@ import os
 import re
 import structlog
 from .types.base import get_item_or_none
-from snovault import resolve_file_path as snovault_resolve_file_path
+from snovault.util import (
+    build_s3_presigned_get_url,
+    check_user_is_logged_in,
+    convert_integer_to_comma_string,
+    deduplicate_list,
+    debuglog,
+    get_trusted_email,
+    gunzip_content,
+    make_s3_client,
+    make_vapp_for_email,
+    resolve_file_path as snovault_resolve_file_path,
+    s3_local_file,
+    SettingsKey,
+    vapp_for_email
+)
 
 # These are now moved or reused from snovault.utils (May 2023):
 # - CONTENT_TYPE_SPECIAL_CASES

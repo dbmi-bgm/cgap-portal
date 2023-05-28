@@ -1,3 +1,4 @@
+import encoded.project_defs
 import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
 import mimetypes
 import netaddr
@@ -21,7 +22,7 @@ from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
 from .appdefs import APP_VERSION_REGISTRY_KEY
-from .loadxl import load_all
+from snovault.loadxl import load_all
 
 
 # snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022
@@ -185,16 +186,16 @@ def main(global_config, **local_config):
     # Render an HTML page to browsers and a JSON document for API clients
     # config.include(add_schemas_to_html_responses)
     config.include('.renderers')
-    config.include('.authentication')
+#   config.include('.authentication')
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
     config.include('.batch_download')
-    config.include('.loadxl')
+    config.include('snovault.loadxl')
     config.include('.visualization')
-    config.include('.ingestion_listener')
+    config.include('snovault.ingestion.ingestion_listener')
     config.include('.ingestion.ingestion_message_handler_vcf')
-    config.include('.ingestion.ingestion_message_handler_default')
+    config.include('snovault.ingestion.ingestion_message_handler_default')
     config.include('.custom_embed')
 
     if 'elasticsearch.server' in config.registry.settings:
