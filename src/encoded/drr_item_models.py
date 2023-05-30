@@ -10,8 +10,6 @@ JsonObject = Dict[str, Any]
 
 @dataclass(frozen=True)
 class ItemModel:
-    # TODO: Add in equality comparison for string identifiers (?)
-
     ATID = "@id"
     PROJECT = "project"
 
