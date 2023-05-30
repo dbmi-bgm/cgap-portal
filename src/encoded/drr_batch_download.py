@@ -622,7 +622,7 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
     @classmethod
     def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:
         return [
-            ("Case ID", "Case identifier", "case_id"),
+            ("Case ID", "Case identifier", "case_title"),
             ("UUID", "Unique database identifier", "uuid"),
             ("Individual ID", "Individual identifier", "individual.individual_id"),
             ("Individual sex", "Sex of associated individual", "individual.sex"),
