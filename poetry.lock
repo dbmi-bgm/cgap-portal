@@ -1038,21 +1038,21 @@ setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "8.0.1.5b16"
+version = "8.0.1.5b17"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
 python-versions = ">=3.8.1,<3.10"
 files = [
-    {file = "dcicsnovault-8.0.1.5b16-py3-none-any.whl", hash = "sha256:46e9412ba1a5df5a67b2aadf69ac19dfbfa1dfdd23ec231504f3c969af120722"},
-    {file = "dcicsnovault-8.0.1.5b16.tar.gz", hash = "sha256:8233d3b39b8304c1802971b70938b24d5f8ec7c103368c1004e0231decfcabda"},
+    {file = "dcicsnovault-8.0.1.5b17-py3-none-any.whl", hash = "sha256:1eac4516c779dbf62ce374f928f2067b9dc0ebdb067e799a100ace2d53f92f8b"},
+    {file = "dcicsnovault-8.0.1.5b17.tar.gz", hash = "sha256:de3cd53f363db4591c6696f23b9835ab129ca7ee1327bec872dab55c68f848a2"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
 boto3 = ">=1.26.124,<2.0.0"
 botocore = ">=1.19.124,<2.0.0"
-dcicutils = "7.4.4.5b24"
+dcicutils = ">=7.4.4.5b25,<8.0.0.0"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -1096,14 +1096,14 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "7.4.4.5b24"
+version = "7.4.4.5b25"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
 python-versions = ">=3.7,<3.10"
 files = [
-    {file = "dcicutils-7.4.4.5b24-py3-none-any.whl", hash = "sha256:3a49b0dd9c09057590c47e19550945a428b587d54fdc3112233e60e888ca6903"},
-    {file = "dcicutils-7.4.4.5b24.tar.gz", hash = "sha256:dbee794c658a5095609d34b28a43ab9971c3993579428a98d73699e68548de61"},
+    {file = "dcicutils-7.4.4.5b25-py3-none-any.whl", hash = "sha256:2292b631fabc7f925a50f2fd92c143918f26d29a850e988c81e20a1239bfd3a5"},
+    {file = "dcicutils-7.4.4.5b25.tar.gz", hash = "sha256:61f7d695070b786d2c4962385b1085c3a7ad787279306920aba8842d75d80afe"},
 ]
 
 [package.dependencies]
@@ -3702,4 +3702,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.10"
-content-hash = "6cb779dc62ba35b9cc34982e68c1b2e4b06468e743577d7e6e5bd5fc72c11000"
+content-hash = "cdec3b0d605ed53b3c28d844b0b477db8c9c24f99caeafd9ab489a5e00e11cb2"
