@@ -483,7 +483,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                 "ACMG rules invoked for variant in previous cases",
                 cls._get_note_of_same_project(
                     "variant.interpretations",
-                    "acmg"
+                    "acmg_rules_invoked.acmg_rule_name"
                 )
             ),
             (

@@ -201,6 +201,7 @@ def build_variant_sample_embedded_list():
     """
     embedded_list = SHARED_VARIANT_SAMPLE_EMBEDS + [
         "cmphet.*",
+        "variant.genes.genes_most_severe_gene.gene_notes.@id",
     ]
     with io.open(resolve_file_path('schemas/variant_embeds.json'), 'r') as fd:
         extend_embedded_list(embedded_list, fd, 'variant', prefix='variant.')
