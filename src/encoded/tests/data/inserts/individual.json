@@ -81,7 +81,7 @@
         ],
         "status": "shared",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
-        "individual_id": "hms008i",
+        "individual_id": "SAM000",
         "sex": "F",
         "is_deceased": false,
         "age": 45,
@@ -97,6 +97,11 @@
                 "onset_age_units": "year",
                 "is_primary_diagnosis": true,
                 "diagnostic_confidence": "probable"
+            },
+            {
+                "disorder": "71bae2e1-4532-45cf-8fd7-958b47d7e446",
+                "onset_age": 43,
+                "onset_age_units": "year"
             }
         ]
     },

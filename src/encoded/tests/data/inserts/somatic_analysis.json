@@ -6,8 +6,8 @@
         "aliases": [
             "hms-dbmi:tumor_analysis_001"
         ],
-        "external_identifier": "tumor_analysis_001",
-        "description": "Breast cancer tumor vs. normal",
+        "external_identifier": "SAM000-TvN",
+        "description": "Breast cancer tumor vs. normal for SAM000",
         "samples": [
             "f4bbc709-40fe-48a4-afde-8e886b571903",
             "f4bbc709-40fe-48a4-afde-8e886b571904"
