@@ -7,8 +7,6 @@
             "hms-dbmi:tumor_analysis_001"
         ],
         "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
-        "external_identifier": "tumor_analysis_001",
-        "description": "Breast cancer tumor vs. normal",
         "samples": [
             "f4bbc709-40fe-48a4-afde-8e886b571903",
             "f4bbc709-40fe-48a4-afde-8e886b571904"
