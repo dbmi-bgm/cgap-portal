@@ -6,7 +6,9 @@ import _ from 'underscore';
 import memoize from 'memoize-one';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 import { SearchBar } from './SearchBar';
-import { Dropdown, DropdownButton, DropdownItem } from 'react-bootstrap';
+import Dropdown from 'react-bootstrap/esm/Dropdown';
+import DropdownButton from 'react-bootstrap/esm/DropdownButton';
+import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 import { Term, pluralize } from '../util/Schemas';
 import { Checkbox } from '@hms-dbmi-bgm/shared-portal-components/es/components/forms/components/Checkbox';
 
