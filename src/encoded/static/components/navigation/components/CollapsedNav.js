@@ -174,16 +174,16 @@ const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
             </BigDropdownBigLink>
 
             <BigDropdownBigLink href={browseBySomaticAnalysisHref} isActive={isBrowseBySomaticAnalysisActive} titleIcon="spinner fas" className="primary-big-link">
-                <h4>Browse By Somatic Analysis</h4>
+                <h4>Browse By Somatic</h4>
                 <div className="description">
                     Search All Somatic Analyses on the Computational Genome Analysis Platform
                 </div>
             </BigDropdownBigLink>
 
             <BigDropdownBigLink href={browseByCohortAnalysisHref} isActive={isBrowseByCohortAnalysisActive} titleIcon="project-diagram fas" className="primary-big-link">
-                <h4>Browse By Cohort Analysis</h4>
+                <h4>Browse By Cohort</h4>
                 <div className="description">
-                    Search All Cohort Analyses on the Computational Genome Analysis Platform
+                    Search All Cohorts on the Computational Genome Analysis Platform
                 </div>
             </BigDropdownBigLink>
 
