@@ -6,6 +6,31 @@ cgap-portal
 Change Log
 ----------
 
+13.3.0
+======
+
+* Adds `QualityMetricGeneric` type
+
+
+13.2.1
+======
+`PR 714: Cohort browser updates <https://github.com/dbmi-bgm/cgap-portal/pull/714>`_
+
+* Bump ``higlass-cohort`` version
+* Add ``blob:`` to ``script-src`` CSP
+* Switch to presigned links everywhere for the Cohort browser
+
+
+13.2.0
+======
+
+* Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
+  new `@ingestion_message_handler` decorator functions; specific message handling
+  code now in `ingestion_message_handler_default.py` and `ingestion_message_handler_vcf.py`.
+* Updated poetry (from 1.1.15) to 1.2.2 (in Makefile and Dockerfile).
+* Removed isodate and keepalive from pyproject.toml.
+* Added special build steps to workaround issues on Mac M1.
+
 
 13.2.0
 ======

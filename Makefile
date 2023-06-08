@@ -55,6 +55,12 @@ configure:  # does any pre-requisite installs
 	pip install poetry==1.3.2
 	pip install setuptools  # ==57.5.0 # this version allows 2to3, any later will break -wrr 20-Sept-2021
 	pip install wheel
+ifeq ($(shell uname -s), Darwin)
+ifeq ($(shell uname -m), arm64)
+	pip install pysam=="0.21.0"
+	pip install matplotlib=="3.3.4"
+endif
+endif
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
@@ -66,10 +72,15 @@ macbuild-poetry:
 	make macpoetry-install
 
 build:  # builds
+ifeq ($(shell uname -s), Darwin)
+	@echo "Looks like this is Mac so executing: make macbuild"
+	make macbuild
+else
 	make build-poetry
 	make build-after-poetry
+endif
 
-macbuild:  # builds for Catalina
+macbuild:  # Builds for MacOS (see: bin/macpoetry-install)
 	make macbuild-poetry
 	make build-after-poetry
 
@@ -120,7 +131,8 @@ deploy1:  # starts postgres/ES locally and loads inserts, and also starts ingest
 	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
 
 deploy1a:  # starts postgres/ES locally and loads inserts, but does not start the ingestion engine
-	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load --no_ingest
+#	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load --no_ingest
+	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
 
 deploy1b:  # starts ingestion engine separately so it can be easily stopped and restarted for debugging in foreground
 	@echo "Starting ingestion listener. Press ^C to exit." && DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` poetry run ingestion-listener development.ini --app-name app
