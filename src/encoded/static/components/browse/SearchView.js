@@ -138,7 +138,7 @@ export class SearchViewBody extends React.PureComponent {
     render(){
         const { isCaseSearch = false, context, currentAction, schemas } = this.props;
 
-        const hideFacets = [];
+        let hideFacets = [];
         let projectSelectEnabled = false;
         let itemType;
 
@@ -147,13 +147,12 @@ export class SearchViewBody extends React.PureComponent {
             itemType = schemaTransforms.getSchemaTypeFromSearchContext(context, schemas);
             if (!itemType) {
                 // Pass "Item" for rendering as title
-                itemType = "Item"; }
-            else {
+                itemType = "Item";
+            } else {
                 // Determine whether project dropdown should be displayed
                 const project = getSchemaProperty("project.display_title", schemas, itemType);
-                console.log("project", project);
 
-                if (project) {
+                if (project && project.type === "string") {
                     hideFacets.push('project.display_title');
                     projectSelectEnabled = true;
                 }
@@ -176,11 +175,13 @@ export class SearchViewBody extends React.PureComponent {
         } else if (isCaseSearch) {
             aboveTableComponent = null;
             searchViewHeader = <AboveCaseSearchViewOptions {...passProps} {...{ projectSelectEnabled }}/>;
-            hideFacets.concat(["report.uuid", "proband_case"]); // TODO: implement on SPC; Currently doesn't do anything
+            hideFacets = hideFacets.concat(["report.uuid", "proband_case"]); // TODO: implement on SPC; Currently doesn't do anything
         } else {
             aboveTableComponent = null;
             searchViewHeader = <AboveSearchViewOptions {...passProps} {...{ itemType, projectSelectEnabled }} />;
         }
+
+        console.log("CGAP hideFacets", hideFacets);
 
         return (
             <div className="search-page-outer-container" id="content">
