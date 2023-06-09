@@ -146,7 +146,7 @@ def test_search_ngram(workbook, es_testapp):
     Tests edge-ngram related behavior with simple query string
     """
     # test search beyond max-ngram, should still give one result
-    res = es_testapp.get('/search/?type=Item&q=Second+Dummy+Sub+Disorder').json
+    res = es_testapp.get('/search/?type=Disorder&q=Second+Dummy+Sub+Disorder').json
     assert len(res['@graph']) == 1
     # run search with q=Du (should get nothing since max_ngram=3)
     es_testapp.get('/search/?type=Item&q=D', status=404)

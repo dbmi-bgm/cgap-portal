@@ -201,10 +201,6 @@
                 "disorder": "DD3",
                 "is_primary_diagnosis": true
             }
-        ],
-        "samples": [
-            "hms-dbmi:normal_sample_3",
-            "hms-dbmi:tumor_sample_3"
         ]
     }
 ]
