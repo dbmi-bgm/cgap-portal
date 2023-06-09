@@ -8,10 +8,6 @@ log = structlog.getLogger(__name__)
 
 
 class CgapProjectIngestion(SnovaultProjectIngestion):
-
-    def ingestion_submission_schema_file(self):
-        return "encoded:schemas/ingestion_submission.json"
-
     def note_ingestion_enqueue_uuids_for_request(self, ingestion_type, request, uuid):
         if ingestion_type == 'vcf':
             patch_vcf_file_status(request, uuids)  # extra state management - may not be accurate, hard to get right

@@ -336,6 +336,12 @@ lint-full:
 lint:
 	@flake8 deploy/ && flake8 src/encoded/
 
+publish:
+	poetry run publish-to-pypi
+
+publish-for-ga:
+	poetry run publish-to-pypi --noconfirm
+
 help:
 	@make info
 
