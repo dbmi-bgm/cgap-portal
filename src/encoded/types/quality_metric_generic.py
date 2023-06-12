@@ -1,3 +1,4 @@
+from pyramid.request import Request
 from snovault import collection, load_schema, calculated_property
 
 from .quality_metric import QualityMetric
@@ -21,5 +22,5 @@ class QualityMetricGeneric(QualityMetric):
         "type": "string",
         "description": "Use this link to download the QualityMetricGeneric zip archive."
     })
-    def href(self, request):
+    def href(self, request: Request) -> str:
         return f'{request.resource_path(self)}@@download/{self.uuid}'
