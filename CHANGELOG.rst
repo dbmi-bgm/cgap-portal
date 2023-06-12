@@ -8,8 +8,13 @@ Change Log
 
 13.3.0
 ======
+`PR 712: Somatic analysis updates <https://github.com/dbmi-bgm/cgap-portal/pull/712>`_
 
-* Adds `QualityMetricGeneric` type
+* Add Individual linkTo on SomaticAnalysis schema
+* Add preservation method to Sample schema
+* Add primary disorders calcprop for Individual item
+* Add Individual embeds to SomaticAnalysis item
+* Update inserts for changes above
 
 
 13.2.1

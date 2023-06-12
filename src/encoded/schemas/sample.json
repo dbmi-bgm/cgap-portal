@@ -523,6 +523,22 @@
                 "Not Reported"
             ],
             "comment": "Adapted from TCGA schema: https://github.com/NCI-GDC/gdcdictionary/blob/develop/gdcdictionary/schemas/sample.yaml"
+        },
+        "preservation_method": {
+            "title": "Preservation Method",
+            "description": "Method used to preserve the sample",
+            "type": "string",
+            "enum": [
+                "Cryopreserved",
+                "FFPE",
+                "Fresh",
+                "Frozen",
+                "OCT",
+                "Snap frozen",
+                "Unknown",
+                "Not Reported"
+            ],
+            "comment": "Adapted from TCGA schema: https://github.com/NCI-GDC/gdcdictionary/blob/develop/gdcdictionary/schemas/sample.yaml"
         }
     }
 }
