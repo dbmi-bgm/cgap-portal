@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+13.4.0
+======
+`PR 711: Generic QCs <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
+
+* Create new QualityMetricGeneric item
+* Add new property for array of QualityMetric linkTos to File schema to be used for QualityMetricGeneric items
+
+
 13.3.0
 ======
 `PR 712: Somatic analysis updates <https://github.com/dbmi-bgm/cgap-portal/pull/712>`_
