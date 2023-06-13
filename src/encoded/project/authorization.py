@@ -1,6 +1,5 @@
 from snovault.project.authorization import SnovaultProjectAuthorization
 
-# XYZZY/TODO
 class CgapProjectAuthorization(SnovaultProjectAuthorization):
 
     def authorization_create_principals(self, login, user, collections):

@@ -1,7 +1,6 @@
 from pyramid.httpexceptions import HTTPUnauthorized
 from snovault.project.authentication import SnovaultProjectAuthentication
 
-# XYZZY/TODO
 class CgapProjectAuthentication(SnovaultProjectAuthentication):
 
     def login(self, context, request, *, samesite):
