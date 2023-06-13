@@ -167,28 +167,28 @@ const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
         <React.Fragment>
 
             <BigDropdownBigLink href={browseByCaseHref} isActive={isBrowseByCaseActive} titleIcon="archive fas" className="primary-big-link">
-                <h4>Browse By Germline Case</h4>
+                <h4>Browse Germline</h4>
                 <div className="description">
-                    Search All Cases on the Computational Genome Analysis Platform
+                    Search All Germline Cases on the Computational Genome Analysis Platform
                 </div>
             </BigDropdownBigLink>
 
             <BigDropdownBigLink href={browseBySomaticAnalysisHref} isActive={isBrowseBySomaticAnalysisActive} titleIcon="spinner fas" className="primary-big-link">
-                <h4>Browse By Somatic</h4>
+                <h4>Browse Somatic</h4>
                 <div className="description">
                     Search All Somatic Analyses on the Computational Genome Analysis Platform
                 </div>
             </BigDropdownBigLink>
 
             <BigDropdownBigLink href={browseByCohortAnalysisHref} isActive={isBrowseByCohortAnalysisActive} titleIcon="project-diagram fas" className="primary-big-link">
-                <h4>Browse By Cohort</h4>
+                <h4>Browse Cohorts</h4>
                 <div className="description">
                     Search All Cohorts on the Computational Genome Analysis Platform
                 </div>
             </BigDropdownBigLink>
 
             <BigDropdownBigLink href={browseByGeneListHref} isActive={isBrowseByGeneListActive} titleIcon="dna fas" className="primary-big-link">
-                <h4>Browse By Gene List</h4>
+                <h4>Browse Gene Lists</h4>
                 <div className="description">
                     Search All Gene Lists on the Computational Genome Analysis Platform
                 </div>
