@@ -1364,7 +1364,7 @@ VARIANT_SAMPLE_FIELDS_TO_EMBED_FOR_SPREADSHEET = [
     "variant.interpretations.*",
     "variant.discovery_interpretations.*",
     "variant.variant_notes.*",
-    "variant.genes.genes_most_severe_gene.gene_note.*",
+    "variant.genes.genes_most_severe_gene.gene_notes.*",
     "variant.transcript.*",
     "variant.transcript.csq_consequence.*",
 ]

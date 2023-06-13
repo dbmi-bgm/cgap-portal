@@ -40,7 +40,6 @@ class CustomEmbed:
     """
 
     def __init__(self, request, item, embed_props):
-        import pdb; pdb.set_trace()
         self.request = request
         self.ignored_embeds = embed_props.get("ignored_embeds", [])
         self.desired_embeds = embed_props.get("desired_embeds", [])

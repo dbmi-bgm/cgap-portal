@@ -76,7 +76,7 @@ def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Re
     file_format = spreadsheet_request.get_file_format()
     file_name = get_variant_sample_spreadsheet_file_name(spreadsheet_request)
     items_for_spreadsheet = get_items_from_search(context, request, spreadsheet_request)
-    spreadsheet_rows = get_variant_sample_rows(items_for_spreadsheet, request, spreadsheet_request)
+    spreadsheet_rows = get_variant_sample_rows(items_for_spreadsheet, spreadsheet_request)
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
 
