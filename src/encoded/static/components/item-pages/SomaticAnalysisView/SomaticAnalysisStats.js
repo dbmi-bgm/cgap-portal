@@ -6,8 +6,8 @@ import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 
 
 export const SomaticAnalysisStats = React.memo(function SomaticAnalysisStats(props){
-    const { individual, samples, "@id": somaticAnalysisAtID, haveSAEditPermission = false } = props;
-    const { "@id": individualAtID } = individual;
+    const { individual = null, samples, "@id": somaticAnalysisAtID, haveSAEditPermission = false } = props;
+    const { "@id": individualAtID } = individual || {};
 
     return (
         // Stack into one column at small window size.
@@ -27,7 +27,8 @@ export const SomaticAnalysisStats = React.memo(function SomaticAnalysisStats(pro
                             : null }
                     </div>
                     <div className="card-body">
-                        <IndividualInfo {...{ individual }} />
+                        { individualAtID && <IndividualInfo {...{ individual }} />}
+                        { !individualAtID && <div className="card-text mb-1 mr-06">No Individual Available</div>}
                     </div>
                 </div>
             </div>
