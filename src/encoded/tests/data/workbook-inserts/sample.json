@@ -36,27 +36,5 @@
         "processed_files": [
             "hms-dbmi:sample_2_bam"
         ]
-    },
-    {
-        "project": "hms-dbmi",
-        "institution": "hms-dbmi",
-        "uuid": "37746c5e-3e1b-46a0-9f14-023e3ae08943",
-        "aliases": [
-            "hms-dbmi:normal_sample_3"
-        ],
-        "bam_sample_id": "normal_sample_3",
-        "workup_type": "WGS",
-        "tissue_type": "Normal"
-    },
-    {
-        "project": "hms-dbmi",
-        "institution": "hms-dbmi",
-        "uuid": "d4b05f78-1b7d-4912-95fd-45474ef16f33",
-        "aliases": [
-            "hms-dbmi:tumor_sample_3"
-        ],
-        "bam_sample_id": "tumor_sample_3",
-        "workup_type": "WGS",
-        "tissue_type": "Tumor"
     }
 ]

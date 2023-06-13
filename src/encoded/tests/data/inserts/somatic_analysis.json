@@ -6,6 +6,7 @@
         "aliases": [
             "hms-dbmi:tumor_analysis_001"
         ],
+        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
         "external_identifier": "SAM000-TvN",
         "description": "Breast cancer tumor vs. normal for SAM000",
         "samples": [
@@ -20,6 +21,7 @@
         "aliases": [
             "hms-dbmi:normal_analysis_001"
         ],
+        "individual": "5ec91041-78a0-4758-abef-21c7f5fd9f78",
         "external_identifier": "normal_analysis_001",
         "description": "Normal tissue analysis",
         "samples": [
