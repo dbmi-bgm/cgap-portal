@@ -1737,18 +1737,6 @@ files = [
 ]
 
 [[package]]
-name = "loremipsum"
-version = "1.0.5"
-description = "A Lorem Ipsum text generator"
-category = "main"
-optional = false
-python-versions = "*"
-files = [
-    {file = "loremipsum-1.0.5.tar.gz", hash = "sha256:b849c69305c3f52badfe25ecc0495b991769d96cafdfd99014d17f50ee523af5"},
-    {file = "loremipsum-1.0.5.zip", hash = "sha256:a38672c145c0e0790cb40403d46bee695e5e9a0350f0643199a012a18f65449a"},
-]
-
-[[package]]
 name = "markupsafe"
 version = "2.1.2"
 description = "Safely add untrusted strings to HTML/XML markup."

@@ -11,6 +11,7 @@ import re
 import structlog
 import tempfile
 import time
+from typing import Any, Dict, Optional
 
 from botocore.client import Config
 from dcicutils.ecs_utils import ECSUtils
@@ -23,12 +24,14 @@ from snovault import COLLECTIONS, Collection
 from snovault.crud_views import collection_add as sno_collection_add
 from snovault.embed import make_subrequest
 from snovault.schema_utils import validate_request
-from typing import Optional
 
 from .types.base import get_item_or_none
 
 
 log = structlog.getLogger(__name__)
+
+
+JsonObject = Dict[str, Any]
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
 PROJECT_DIR = os.path.dirname(os.path.dirname(ENCODED_ROOT_DIR))  # two levels of hierarchy up

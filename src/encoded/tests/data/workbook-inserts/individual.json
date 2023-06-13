@@ -192,6 +192,19 @@
         ],
         "sex": "M",
         "individual_id": "BRCA proband",
-        "is_deceased": false
+        "is_deceased": false,
+        "disorders": [
+            {
+                "disorder": "DD1",
+                "is_primary_diagnosis": true
+            },
+            {
+                "disorder": "DD2"
+            },
+            {
+                "disorder": "DD3",
+                "is_primary_diagnosis": true
+            }
+        ]
     }
 ]
