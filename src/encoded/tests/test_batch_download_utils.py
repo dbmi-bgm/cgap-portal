@@ -15,7 +15,7 @@ from ..batch_download_utils import (
     SpreadsheetColumn,
     SpreadsheetFromColumnTuples,
     SpreadsheetGenerator,
-    SpreadsheetPost,
+    SpreadsheetRequest,
 )
 from ..drr_item_models import JsonObject
 from .utils import patch_context
@@ -46,9 +46,9 @@ def patch_execute_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
 
 
 @contextmanager
-def patch_spreadsheet_post_parameters(**kwargs) -> Iterator[mock.MagicMock]:
+def patch_spreadsheet_request_parameters(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.SpreadsheetPost,
+        batch_download_utils_module.SpreadsheetRequest,
         "parameters",
         new_callable=mock.PropertyMock,
         **kwargs
@@ -73,8 +73,8 @@ def patch_get_values_for_field(**kwargs) -> Iterator[mock.MagicMock]:
 
 
 @contextmanager
-def patch_post_parameters(**kwargs) -> mock.PropertyMock:
-    with patch_context(SpreadsheetPost, "parameters", **kwargs) as mock_property:
+def patch_request_parameters(**kwargs) -> mock.PropertyMock:
+    with patch_context(SpreadsheetRequest, "parameters", **kwargs) as mock_property:
         yield mock_property
 
 
@@ -179,7 +179,7 @@ class TestSpreadsheetColumn:
         assert spreadsheet_column.is_callable_evaluator() == expected
 
 
-class TestSpreadsheetPost:
+class TestSpreadsheetRequest:
 
     SOME_FILE_FORMAT = "something"
     SOME_CASE_ACCESSION = "foo"
@@ -192,12 +192,12 @@ class TestSpreadsheetPost:
         "compound_search_request": SOME_COMPOUND_SEARCH,
     }
 
-    def get_spreadsheet_post(self) -> SpreadsheetPost:
-        return SpreadsheetPost(SOME_REQUEST)
+    def get_spreadsheet_request(self) -> SpreadsheetRequest:
+        return SpreadsheetRequest(SOME_REQUEST)
 
     def test_parameters(self) -> None:
         request = mock_request()
-        spreadsheet_post = SpreadsheetPost(request)
+        spreadsheet_post = SpreadsheetRequest(request)
         assert spreadsheet_post.parameters == request.params
 
     @pytest.mark.parametrize(
@@ -208,9 +208,9 @@ class TestSpreadsheetPost:
         ],
     )
     def test_get_file_format(self, parameters: JsonObject, expected: str) -> None:
-        with patch_spreadsheet_post_parameters(return_value=parameters):
-            spreadsheet_post = self.get_spreadsheet_post()
-            assert spreadsheet_post.get_file_format() == expected
+        with patch_spreadsheet_request_parameters(return_value=parameters):
+            spreadsheet_request = self.get_spreadsheet_request()
+            assert spreadsheet_request.get_file_format() == expected
 
     @pytest.mark.parametrize(
         "parameters,expected",
@@ -220,9 +220,9 @@ class TestSpreadsheetPost:
         ],
     )
     def test_get_case_accession(self, parameters: JsonObject, expected: str) -> None:
-        with patch_spreadsheet_post_parameters(return_value=parameters):
-            spreadsheet_post = self.get_spreadsheet_post()
-            assert spreadsheet_post.get_case_accession() == expected
+        with patch_spreadsheet_request_parameters(return_value=parameters):
+            spreadsheet_request = self.get_spreadsheet_request()
+            assert spreadsheet_request.get_case_accession() == expected
 
     @pytest.mark.parametrize(
         "parameters,expected",
@@ -232,9 +232,9 @@ class TestSpreadsheetPost:
         ],
     )
     def test_get_case_title(self, parameters: JsonObject, expected: str) -> None:
-        with patch_spreadsheet_post_parameters(return_value=parameters):
-            spreadsheet_post = self.get_spreadsheet_post()
-            assert spreadsheet_post.get_case_title() == expected
+        with patch_spreadsheet_request_parameters(return_value=parameters):
+            spreadsheet_request = self.get_spreadsheet_request()
+            assert spreadsheet_request.get_case_title() == expected
 
     @pytest.mark.parametrize(
         "parameters,expected",
@@ -248,9 +248,9 @@ class TestSpreadsheetPost:
         ],
     )
     def test_get_compound_search(self, parameters: JsonObject, expected: str) -> None:
-        with patch_spreadsheet_post_parameters(return_value=parameters):
-            spreadsheet_post = self.get_spreadsheet_post()
-            assert spreadsheet_post.get_compound_search() == expected
+        with patch_spreadsheet_request_parameters(return_value=parameters):
+            spreadsheet_request = self.get_spreadsheet_request()
+            assert spreadsheet_request.get_compound_search() == expected
 
 
 class TestFilterSetSearch:
@@ -333,7 +333,7 @@ class TestSpreadsheetGenerator:
 
     def test_get_spreadsheet_response(self) -> None:
         spreadsheet_generator = self.get_spreadsheet_generator()
-        result = spreadsheet_generator.get_spreadsheet_response()
+        result = spreadsheet_generator.get_streaming_response()
         assert isinstance(result, Response)
         assert isinstance(result.app_iter, Generator)
         assert result.status_code == 200
@@ -385,7 +385,7 @@ class TestSpreadsheetGenerator:
         }
 
 
-class TestSpreadsheetPost:
+class TestSpreadsheetRequest2:
 
     SOME_FILE_FORMAT = 'some_file_format'
     SOME_CASE_ACCESSION = 'some_case_accession'
@@ -394,54 +394,54 @@ class TestSpreadsheetPost:
     SOME_JSON_COMPOUND_SEARCH_REQUEST = json.dumps(SOME_COMPOUND_SEARCH_REQUEST)
     SOME_REQUEST = "request"
 
-    def spreadsheet_post(self) -> SpreadsheetPost:
-        return SpreadsheetPost(self.SOME_REQUEST)
+    def spreadsheet_request(self) -> SpreadsheetRequest:
+        return SpreadsheetRequest(self.SOME_REQUEST)
 
     @pytest.mark.parametrize(
         "parameters,expected",
         [
             ({}, "tsv"),
-            ({SpreadsheetPost.FILE_FORMAT: SOME_FILE_FORMAT}, SOME_FILE_FORMAT),
+            ({SpreadsheetRequest.FILE_FORMAT: SOME_FILE_FORMAT}, SOME_FILE_FORMAT),
         ]
     )
     def test_get_file_format(self, parameters: Mapping, expected: str) -> None:
-        with patch_post_parameters(return_value=parameters):
-            spreadsheet_post = self.spreadsheet_post()
-            assert spreadsheet_post.get_file_format() == expected
+        with patch_request_parameters(return_value=parameters):
+            spreadsheet_request = self.spreadsheet_request()
+            assert spreadsheet_request.get_file_format() == expected
 
     @pytest.mark.parametrize(
         "parameters,expected",
         [
             ({}, ""),
-            ({SpreadsheetPost.CASE_ACCESSION: SOME_CASE_ACCESSION}, SOME_CASE_ACCESSION),
+            ({SpreadsheetRequest.CASE_ACCESSION: SOME_CASE_ACCESSION}, SOME_CASE_ACCESSION),
         ]
     )
     def test_get_case_accession(self, parameters, expected) -> None:
-        with patch_post_parameters(return_value=parameters):
-            spreadsheet_post = self.spreadsheet_post()
-            assert spreadsheet_post.get_case_accession() == expected
+        with patch_request_parameters(return_value=parameters):
+            spreadsheet_request = self.spreadsheet_request()
+            assert spreadsheet_request.get_case_accession() == expected
 
     @pytest.mark.parametrize(
         "parameters,expected",
         [
             ({}, ""),
-            ({SpreadsheetPost.CASE_TITLE: SOME_CASE_TITLE}, SOME_CASE_TITLE),
+            ({SpreadsheetRequest.CASE_TITLE: SOME_CASE_TITLE}, SOME_CASE_TITLE),
         ]
     )
     def test_get_case_title(self, parameters, expected) -> None:
-        with patch_post_parameters(return_value=parameters):
-            spreadsheet_post = self.spreadsheet_post()
-            assert spreadsheet_post.get_case_title() == expected
+        with patch_request_parameters(return_value=parameters):
+            spreadsheet_request = self.spreadsheet_request()
+            assert spreadsheet_request.get_case_title() == expected
 
     @pytest.mark.parametrize(
         "parameters,expected",
         [
             ({}, {}),
-            ({SpreadsheetPost.COMPOUND_SEARCH_REQUEST: SOME_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
-            ({SpreadsheetPost.COMPOUND_SEARCH_REQUEST: SOME_JSON_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
+            ({SpreadsheetRequest.COMPOUND_SEARCH_REQUEST: SOME_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
+            ({SpreadsheetRequest.COMPOUND_SEARCH_REQUEST: SOME_JSON_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
         ]
     )
     def test_get_associated_compound_search(self, parameters, expected) -> None:
-        with patch_post_parameters(return_value=parameters):
-            spreadsheet_post = self.spreadsheet_post()
-            assert spreadsheet_post.get_compound_search() == expected
+        with patch_request_parameters(return_value=parameters):
+            spreadsheet_request = self.spreadsheet_request()
+            assert spreadsheet_request.get_compound_search() == expected
