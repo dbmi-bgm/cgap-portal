@@ -15,9 +15,15 @@ Change Log
 * Remove inclusion of unused loremipsum library from pyproject.toml
 
 
+13.3.2
+======
+
+* Remove inclusion of unused loremipsum library from pyproject.toml (C4-1036)
+
+
 13.3.1
 ======
-`No PR: Staff-change Insert Updates`_
+*No PR: Staff-change Insert Updates*
 
 * Remove Victoria's user insert from master-inserts
 * Add Cesar's user insert to master-inserts
