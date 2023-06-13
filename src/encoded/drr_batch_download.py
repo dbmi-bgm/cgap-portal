@@ -2,17 +2,11 @@ from dataclasses import dataclass
 from datetime import datetime
 from functools import partial
 from typing import (
-    Any,
     Callable,
-    Dict,
     Iterable,
     Iterator,
     List,
-    Mapping,
     Optional,
-    Sequence,
-    Tuple,
-    Union,
 )
 
 import pytz
@@ -33,8 +27,7 @@ from .batch_download_utils import (
     SpreadsheetFromColumnTuples,
     SpreadsheetCreationError,
     SpreadsheetGenerator,
-    SpreadsheetPost,
-    SpreadsheetTemplate,
+    SpreadsheetRequest,
 )
 from .root import CGAPRoot
 from .util import APPLICATION_FORM_ENCODED_MIME_TYPE, format_to_url, register_path_content_type
@@ -59,15 +52,15 @@ register_path_content_type(
 
 
 def validate_spreadsheet_file_format(context: CGAPRoot, request: Request) -> None:
-    post_parser = SpreadsheetPost(request)
-    file_format = post_parser.get_file_format()
+    spreadsheet_request = SpreadsheetRequest(request)
+    file_format = spreadsheet_request.get_file_format()
     if file_format not in ACCEPTABLE_FILE_FORMATS:
         raise HTTPBadRequest(f"File format not acceptable: {file_format}")
 
 
 def validate_spreadsheet_search_parameters(context: CGAPRoot, request: Request) -> None:
-    post_parser = SpreadsheetPost(request)
-    search = post_parser.get_compound_search()
+    spreadsheet_request = SpreadsheetRequest(request)
+    search = spreadsheet_request.get_compound_search()
     if not search:
         raise HTTPBadRequest("No search parameters given")
 
@@ -79,13 +72,11 @@ def validate_spreadsheet_search_parameters(context: CGAPRoot, request: Request) 
 )
 @debug_log
 def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
-    post_parser = SpreadsheetPost(request)
-    file_format = post_parser.get_file_format()
-    file_name = get_variant_sample_spreadsheet_file_name(post_parser)
-    items_for_spreadsheet = get_items_from_search(context, request, post_parser)
-    spreadsheet_rows = VariantSampleSpreadsheet(
-        items_for_spreadsheet, request=request, spreadsheet_post=post_parser
-    ).yield_rows()
+    spreadsheet_request = SpreadsheetRequest(request)
+    file_format = spreadsheet_request.get_file_format()
+    file_name = get_variant_sample_spreadsheet_file_name(spreadsheet_request)
+    items_for_spreadsheet = get_items_from_search(context, request, spreadsheet_request)
+    spreadsheet_rows = get_variant_sample_rows(items_for_spreadsheet, request, spreadsheet_request)
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
 
@@ -96,16 +87,16 @@ def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Re
 )
 @debug_log
 def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
-    post_parser = SpreadsheetPost(request)
-    file_format = post_parser.get_file_format()
-    file_name = get_case_spreadsheet_file_name(post_parser)
-    items_for_spreadsheet = get_items_from_search(context, request, post_parser)
-    spreadsheet_rows = CaseSpreadsheet(items_for_spreadsheet).yield_rows()
+    spreadsheet_request = SpreadsheetRequest(request)
+    file_format = spreadsheet_request.get_file_format()
+    file_name = get_case_spreadsheet_file_name()
+    items_for_spreadsheet = get_items_from_search(context, request, spreadsheet_request)
+    spreadsheet_rows = get_case_rows(items_for_spreadsheet)
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
 
-def get_variant_sample_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
-    case_accession = post_parser.get_case_accession() or "case"
+def get_variant_sample_spreadsheet_file_name(spreadsheet_request: SpreadsheetRequest) -> str:
+    case_accession = spreadsheet_request.get_case_accession() or "case"
     timestamp = get_timestamp()
     return f"{case_accession}-filtering-{timestamp}"
 
@@ -116,22 +107,32 @@ def get_timestamp():
     return f"{now}Z"
 
 
-def get_case_spreadsheet_file_name(post_parser: SpreadsheetPost) -> str:
+def get_case_spreadsheet_file_name() -> str:
     timestamp = get_timestamp()
     return f"case_spreadsheet-filtering-{timestamp}"
 
 
 def get_items_from_search(
-    context: CGAPRoot, request: Request, post_parser: SpreadsheetPost
+    context: CGAPRoot, request: Request, spreadsheet_request: SpreadsheetRequest
 ) -> Iterator[JsonObject]:
-    search_to_perform = post_parser.get_compound_search()
+    search_to_perform = spreadsheet_request.get_compound_search()
     return FilterSetSearch(context, request, search_to_perform).get_search_results()
 
 
-def get_spreadsheet_rows(
-    spreadsheet: SpreadsheetTemplate, items_for_spreadsheet: Iterable[JsonObject]
-) -> Iterator[List[str]]:
-    return spreadsheet(items_for_spreadsheet).yield_rows()
+def get_variant_sample_rows(
+    items_for_spreadsheet: Iterable[JsonObject],
+    spreadsheet_request: SpreadsheetRequest,
+    embed_additional_items: Optional[bool] = True,
+) -> Iterator[Iterable[str]]:
+    return VariantSampleSpreadsheet(
+        items_for_spreadsheet, spreadsheet_request, embed_additional_items=embed_additional_items
+    ).yield_rows()
+
+
+def get_case_rows(
+    items_for_spreadsheet: Iterable[JsonObject],
+) -> Iterator[Iterable[str]]:
+    return CaseSpreadsheet(items_for_spreadsheet).yield_rows()
 
 
 def get_spreadsheet_response(
@@ -156,8 +157,8 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         "gene_notes",
     ]
 
-    request: Optional[Request] = None
-    spreadsheet_post: Optional[SpreadsheetPost] = None
+    spreadsheet_request: SpreadsheetRequest
+    embed_additional_items: bool = True
 
     def _get_headers(self) -> List[List[str]]:
         result = []
@@ -168,36 +169,36 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 
     def _get_available_header_lines(self) -> List[List[str]]:
         result = []
-        if self.spreadsheet_post:
-            result += self._get_case_accession_line()
-            result += self._get_case_title_line()
-            result += self._get_readable_filters_line()
+        result += self._get_case_accession_line()
+        result += self._get_case_title_line()
+        result += self._get_readable_filters_line()
         return result
 
     def _get_case_accession_line(self) -> List[List[str]]:
         result = []
-        case_accession = self.spreadsheet_post.get_case_accession()
+        case_accession = self.spreadsheet_request.get_case_accession()
         if case_accession:
             result.append(["#", "Case Accession:", "", case_accession])
         return result
 
     def _get_case_title_line(self) -> List[List[str]]:
         result = []
-        case_title = self.spreadsheet_post.get_case_title()
+        case_title = self.spreadsheet_request.get_case_title()
         if case_title:
             result.append(["#", "Case Title:", "", case_title])
         return result
 
     def _get_readable_filters_line(self) -> List[List[str]]:
         result = []
-        search = self.spreadsheet_post.get_compound_search()
+        search = self.spreadsheet_request.get_compound_search()
         if search:
             readable_filter_blocks = human_readable_filter_block_queries(search)
             result.append(["#", "Filters Selected:", "", readable_filter_blocks])
         return result
 
     def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
-        self._merge_notes(item_to_evaluate)
+        if self.embed_additional_items:
+            self._merge_notes(item_to_evaluate)
         variant_sample = VariantSample(item_to_evaluate)
         return [
             self._evaluate_item_with_column(column, variant_sample)
@@ -205,11 +206,10 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         ]
 
     def _merge_notes(self, variant_sample_properties: JsonObject) -> None:
-        if self.request:
-            for note_field in self.NOTE_FIELDS_TO_EMBED:
-                existing_notes = simple_path_ids(variant_sample_properties, note_field)
-                for existing_note in existing_notes:
-                    self._update_note(existing_note)
+        for note_field in self.NOTE_FIELDS_TO_EMBED:
+            existing_notes = simple_path_ids(variant_sample_properties, note_field)
+            for existing_note in existing_notes:
+                self._update_note(existing_note)
 
     def _update_note(self, note_properties: JsonObject) -> None:
         all_note_properties = self._get_note_by_subrequest(note_properties)
@@ -217,7 +217,8 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 
     def _get_note_by_subrequest(self, note_properties: JsonObject) -> JsonObject:
         note_identifier = Note(note_properties).get_atid()
-        return self.request.embed(note_identifier, as_user=True)
+        request = self.spreadsheet_request.get_request()
+        return request.embed(note_identifier, as_user=True)
 
     def _evaluate_item_with_column(
         self, column: SpreadsheetColumn, variant_sample: VariantSample,
@@ -601,6 +602,8 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 @dataclass(frozen=True)
 class CaseSpreadsheet(SpreadsheetFromColumnTuples):
 
+    NO_FLAG_DEFAULT = "No flag"
+
     def _get_headers(self) -> List[str]:
         return []
 
@@ -614,6 +617,8 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
         self, column: SpreadsheetColumn, item_to_evaluate: JsonObject
     ):
         if column.is_property_evaluator():
+            return column.get_field_for_item(item_to_evaluate)
+        if column.is_callable_evaluator():
             return column.get_field_for_item(item_to_evaluate)
         raise SpreadsheetCreationError(
             "Unable to use column for evaluating item"
@@ -631,7 +636,7 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
             ("Analysis type", "Analysis type", "sample_processing.analysis_type"),
             ("Sample ID", "Primary sample identifier", "sample.display_title"),
             ("Sequencing", "Primary sample sequencing type", "sample.workup_type"),
-            ("QC flag", "Overall QC flag", "quality_control_flags.flag"),
+            ("QC flag", "Overall QC flag", cls._get_qc_flag),
             ("Completed QC", "Completed QC steps", "quality_control_flags.completed_qcs"),
             (
                 "QC warnings",
@@ -644,3 +649,8 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
                 "sample_processing.quality_control_metrics.fail",
             ),
         ]
+
+    @classmethod
+    def _get_qc_flag(cls, item_to_evaluate: JsonObject) -> str:
+        qc_flag = get_values_for_field(item_to_evaluate, "quality_control_flags.flag")
+        return qc_flag or cls.NO_FLAG_DEFAULT

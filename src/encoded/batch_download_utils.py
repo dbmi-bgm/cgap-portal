@@ -307,7 +307,7 @@ class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
 
 
 @dataclass(frozen=True)
-class SpreadsheetPost:
+class SpreadsheetRequest:
 
     CASE_ACCESSION = "case_accession"
     CASE_TITLE = "case_title"
@@ -315,6 +315,9 @@ class SpreadsheetPost:
     FILE_FORMAT = "file_format"
 
     request: Request
+
+    def get_request(self) -> Request:
+        return self.request
 
     @property
     def parameters(self) -> JsonObject:

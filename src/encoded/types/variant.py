@@ -26,15 +26,16 @@ from urllib.parse import parse_qs, urlparse
 from ..batch_download_utils import (
     stream_tsv_output,
     convert_item_to_sheet_dict,
-    SpreadsheetPost,
+    SpreadsheetRequest,
 )
 from .. import custom_embed
 from ..custom_embed import CustomEmbed
 from ..drr_batch_download import (
-    VariantSampleSpreadsheet,
     get_spreadsheet_response,
     get_timestamp,
+    get_variant_sample_rows,
     validate_spreadsheet_file_format,
+    VariantSampleSpreadsheet,
 )
 from ..drr_item_models import JsonObject, VariantSampleList as VariantSampleListModel
 from ..ingestion.common import CGAP_CORE_PROJECT
@@ -1378,19 +1379,18 @@ VARIANT_SAMPLE_FIELDS_TO_EMBED_FOR_SPREADSHEET = [
 )
 @debug_log
 def variant_sample_list_spreadsheet(context: VariantSampleList, request: Request):
-    import pdb; pdb.set_trace()
-    post_parser = SpreadsheetPost(request)
-    file_format = post_parser.get_file_format()
-    file_name = get_variant_sample_spreadsheet_file_name(context, post_parser)
+    spreadsheet_request = SpreadsheetRequest(request)
+    file_format = spreadsheet_request.get_file_format()
+    file_name = get_variant_sample_spreadsheet_file_name(context, spreadsheet_request)
     items_for_spreadsheet = get_embedded_items(context, request)
-    spreadsheet_rows = VariantSampleSpreadsheet(
-        items_for_spreadsheet, spreadsheet_post=post_parser
-    ).yield_rows()
+    spreadsheet_rows = get_variant_sample_rows(
+        items_for_spreadsheet, spreadsheet_request, embed_additional_items=False
+    )
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
 
 def get_variant_sample_spreadsheet_file_name(
-    context: VariantSampleList, spreadsheet_request: SpreadsheetPost
+    context: VariantSampleList, spreadsheet_request: SpreadsheetRequest
 ) -> str:
     file_format = spreadsheet_request.get_file_format()
     case_title = get_case_title(context, spreadsheet_request)
@@ -1398,7 +1398,7 @@ def get_variant_sample_spreadsheet_file_name(
     return f"{case_title}-interpretation-{timestamp}.{file_format}"
 
 
-def get_case_title(context: VariantSampleList, spreadsheet_request: SpreadsheetPost) -> str:
+def get_case_title(context: VariantSampleList, spreadsheet_request: SpreadsheetRequest) -> str:
     return (
         spreadsheet_request.get_case_accession()
         or get_associated_case(context)

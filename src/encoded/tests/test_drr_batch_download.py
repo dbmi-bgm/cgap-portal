@@ -11,8 +11,9 @@ from .utils import patch_context
 from .. import drr_batch_download as drr_batch_download_module
 from ..drr_batch_download import (
     CASE_SPREADSHEET_URL,
-    SpreadsheetPost,
+    CaseSpreadsheet,
 )
+from ..drr_item_models import JsonObject
 from ..util import APPLICATION_FORM_ENCODED_MIME_TYPE
 
 
@@ -55,6 +56,7 @@ def parse_spreadsheet_response(response: TestResponse) -> List[List[str]]:
     return result
 
 
+@pytest.mark.workbook
 def test_case_search_spreadsheet(html_es_testapp: TestApp, es_testapp: TestApp, workbook: None) -> None:
     """Integrated test of case search spreadsheet.
 
@@ -95,7 +97,19 @@ def test_case_search_spreadsheet(html_es_testapp: TestApp, es_testapp: TestApp, 
     assert columns == EXPECTED_CASE_SPREADSHEET_COLUMNS
 
 
-def test_variant_sample_spreadsheet_download(
-    html_es_testapp: TestApp, es_testapp: TestApp, workbook: None
-) -> None:
+@pytest.mark.parametrize(
+    "to_evaluate,expected",
+    [
+        ({}, CaseSpreadsheet.NO_FLAG_DEFAULT),
+        ({"quality_control_flags": {}}, CaseSpreadsheet.NO_FLAG_DEFAULT),
+        ({"quality_control_flags": {"flag": "pass"}}, "pass"),
+    ],
+)
+def test_get_qc_flag(to_evaluate: JsonObject, expected: str) -> None:
+    result = CaseSpreadsheet._get_qc_flag(to_evaluate)
+    assert result == expected
 
+#def test_variant_sample_spreadsheet_download(
+#    html_es_testapp: TestApp, es_testapp: TestApp, workbook: None
+#) -> None:
+#
