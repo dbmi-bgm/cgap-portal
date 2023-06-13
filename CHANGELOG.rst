@@ -10,7 +10,8 @@ Change Log
 ======
 `PR 711: Generic QCs <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
 
-* Adds `QualityMetricGeneric` type
+* Create new QualityMetricGeneric item
+* Add new property for array of QualityMetric linkTos to File schema to be used for QualityMetricGeneric items
 
 
 13.3.1
