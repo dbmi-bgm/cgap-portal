@@ -188,6 +188,19 @@
         "accession": "GAPIDISC7R74",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
         "sex": "M",
-        "is_deceased": false
+        "is_deceased": false,
+        "disorders": [
+            {
+                "disorder": "DD1",
+                "is_primary_diagnosis": true
+            },
+            {
+                "disorder": "DD2"
+            },
+            {
+                "disorder": "DD3",
+                "is_primary_diagnosis": true
+            }
+        ]
     }
 ]
