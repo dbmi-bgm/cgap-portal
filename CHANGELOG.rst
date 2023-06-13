@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+13.3.1
+======
+`No PR: Staff-change Insert Updates`_
+
+* Remove Victoria's user insert from master-inserts
+* Add Cesar's user insert to master-inserts
+
+
 13.3.0
 ======
 `PR 712: Somatic analysis updates <https://github.com/dbmi-bgm/cgap-portal/pull/712>`_
