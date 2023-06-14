@@ -7,6 +7,8 @@ import pytest
 from pyramid.request import Request
 from pyramid.response import Response
 
+
+from .utils import patch_context
 from .. import batch_download_utils as batch_download_utils_module
 from ..batch_download_utils import (
     DEFAULT_FILE_FORMAT,
@@ -17,8 +19,7 @@ from ..batch_download_utils import (
     SpreadsheetGenerator,
     SpreadsheetRequest,
 )
-from ..drr_item_models import JsonObject
-from .utils import patch_context
+from ..util import JsonObject
 
 
 SOME_REQUEST = "foo"

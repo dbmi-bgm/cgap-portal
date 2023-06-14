@@ -1,7 +1,5 @@
 from typing import List
 
-from unittest import Mock
-
 from ..drr_item_models import Transcript, Variant, VariantConsequence, VariantSample
 from ..util import JsonObject
 

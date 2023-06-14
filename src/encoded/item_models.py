@@ -4,8 +4,7 @@ from typing import Any, Dict, Iterable, List, Union
 
 from snovault.util import simple_path_ids
 
-
-JsonObject = Dict[str, Any]
+from .util import JsonObject
 
 
 @dataclass(frozen=True)
