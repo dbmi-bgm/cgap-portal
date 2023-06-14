@@ -1376,7 +1376,7 @@ def variant_sample_list_spreadsheet(context: VariantSampleList, request: Request
     file_name = get_variant_sample_spreadsheet_file_name(context, spreadsheet_request)
     items_for_spreadsheet = get_embedded_items(context, request)
     spreadsheet_rows = get_variant_sample_rows(
-        items_for_spreadsheet, spreadsheet_request, embed_additional_items=False
+        items_for_spreadsheet, spreadsheet_request=spreadsheet_request, embed_additional_items=False
     )
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 

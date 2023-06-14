@@ -128,7 +128,9 @@ def get_variant_sample_rows(
     embed_additional_items: Optional[bool] = True,
 ) -> Iterator[Iterable[str]]:
     return VariantSampleSpreadsheet(
-        items_for_spreadsheet, spreadsheet_request, embed_additional_items=embed_additional_items
+        items_for_spreadsheet,
+        spreadsheet_request=spreadsheet_request,
+        embed_additional_items=embed_additional_items
     ).yield_rows()
 
 
@@ -160,8 +162,8 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         "gene_notes",
     ]
 
-    spreadsheet_request: SpreadsheetRequest
     embed_additional_items: bool = True
+    spreadsheet_request: Optional[SpreadsheetRequest] = None
 
     def _get_headers(self) -> List[List[str]]:
         result = []
@@ -172,9 +174,10 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 
     def _get_available_header_lines(self) -> List[List[str]]:
         result = []
-        result += self._get_case_accession_line()
-        result += self._get_case_title_line()
-        result += self._get_readable_filters_line()
+        if self.spreadsheet_request:
+            result += self._get_case_accession_line()
+            result += self._get_case_title_line()
+            result += self._get_readable_filters_line()
         return result
 
     def _get_case_accession_line(self) -> List[List[str]]:
@@ -200,7 +203,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         return result
 
     def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
-        if self.embed_additional_items:
+        if self.embed_additional_items and self.spreadsheet_request:
             self._merge_notes(item_to_evaluate)
         variant_sample = VariantSample(item_to_evaluate)
         return [
