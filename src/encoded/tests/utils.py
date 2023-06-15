@@ -1,3 +1,4 @@
+import inspect
 import re
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, Optional
@@ -31,12 +32,14 @@ def make_atid(uuid, item_type="sample-processing"):
 
 @contextmanager
 def patch_context(
-    object_to_patch: object,
-    attribute_to_patch: str,
+    to_patch: object,
     return_value: Optional[Any] = None,
     **kwargs,
 ) -> Iterator[mock.MagicMock]:
-    with mock.patch.object(object_to_patch, attribute_to_patch, **kwargs) as mocked_item:
+    if isinstance(to_patch, property):
+        to_patch = to_patch.fget
+    target = f"{to_patch.__module__}.{to_patch.__qualname__}"
+    with mock.patch(target, **kwargs) as mocked_item:
         if return_value is not None:
             mocked_item.return_value = return_value
         yield mocked_item

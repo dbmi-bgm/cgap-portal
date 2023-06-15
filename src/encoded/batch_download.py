@@ -7,6 +7,7 @@ from typing import (
     Iterator,
     List,
     Optional,
+    Union,
 )
 
 import pytz
@@ -106,13 +107,12 @@ def get_variant_sample_spreadsheet_file_name(spreadsheet_request: SpreadsheetReq
 
 def get_timestamp():
     now = datetime.now(pytz.utc).isoformat()[:-13]
-    now = now.replace(" ", "-")
     return f"{now}Z"
 
 
 def get_case_spreadsheet_file_name() -> str:
     timestamp = get_timestamp()
-    return f"case_spreadsheet-filtering-{timestamp}"
+    return f"case-spreadsheet-filtering-{timestamp}"
 
 
 def get_items_from_search(
@@ -151,6 +151,7 @@ def get_spreadsheet_response(
 @dataclass(frozen=True)
 class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
 
+    HEADER_SPACER_LINE = ["## -------------------------------------------------------"]
     NOTE_FIELDS_TO_EMBED = [
         "variant.interpretations",
         "variant.discovery_interpretations",
@@ -169,7 +170,7 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         result = []
         result += self._get_available_header_lines()
         if result:
-            result += [["## -------------------------------------------------------"]]
+            result += [self.HEADER_SPACER_LINE]
         return result
 
     def _get_available_header_lines(self) -> List[List[str]]:
@@ -203,15 +204,26 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         return result
 
     def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
-        if self.embed_additional_items and self.spreadsheet_request:
-            self._merge_notes(item_to_evaluate)
+        self._add_embeds(item_to_evaluate)
         variant_sample = VariantSample(item_to_evaluate)
         return [
             self._evaluate_item_with_column(column, variant_sample)
             for column in self._spreadsheet_columns
         ]
 
+    def _add_embeds(self, item_to_evaluate: JsonObject) -> None:
+        if self.embed_additional_items and self.spreadsheet_request:
+            self._merge_notes(item_to_evaluate)
+
     def _merge_notes(self, variant_sample_properties: JsonObject) -> None:
+        """Get Note information not embedded on the VariantSample, and
+        merge into existing Note in place.
+
+        Assumes the notes are embedded on the VariantSample for all
+        note fields; this will always be the case for linkTos on the
+        VariantSample, but may not be for notes on the associated
+        Variant/Gene.
+        """
         for note_field in self.NOTE_FIELDS_TO_EMBED:
             existing_notes = simple_path_ids(variant_sample_properties, note_field)
             for existing_note in existing_notes:
@@ -594,20 +606,9 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
 
     def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
         return [
-            self._evaluate_item_with_column(column, item_to_evaluate)
+            column.get_field_for_item(item_to_evaluate)
             for column in self._spreadsheet_columns
         ]
-
-    def _evaluate_item_with_column(
-        self, column: SpreadsheetColumn, item_to_evaluate: JsonObject
-    ):
-        if column.is_property_evaluator():
-            return column.get_field_for_item(item_to_evaluate)
-        if column.is_callable_evaluator():
-            return column.get_field_for_item(item_to_evaluate)
-        raise SpreadsheetCreationError(
-            "Unable to use column for evaluating item"
-        )
 
     @classmethod
     def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:

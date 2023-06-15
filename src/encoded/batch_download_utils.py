@@ -2,7 +2,7 @@ import csv
 import json
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
-from functools import cached_property
+from functools import lru_cache
 from typing import (
     Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
 )
@@ -165,11 +165,12 @@ class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
     def _get_column_tuples(cls) -> None:
         pass
 
-    @cached_property
+    @property
     def _spreadsheet_columns(self) -> None:
         return self.get_spreadsheet_columns()
 
     @classmethod
+    @lru_cache()
     def get_spreadsheet_columns(cls) -> List[SpreadsheetColumn]:
         column_tuples = cls._get_column_tuples()
         return cls._convert_column_tuples_to_spreadsheet_columns(column_tuples)

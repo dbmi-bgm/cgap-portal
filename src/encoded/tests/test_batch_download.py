@@ -1,22 +1,26 @@
 import json
 from contextlib import contextmanager
+from copy import deepcopy
 from unittest import mock
-from typing import Any, Iterable, List
+from typing import Any, Iterable, List, Optional, Union
 
 import pytest
+from pyramid.httpexceptions import HTTPBadRequest
 from webtest.app import TestApp
 from webtest.response import TestResponse
 
 from .utils import patch_context
-from .. import batch_download as batch_download_module
+from .. import batch_download as batch_download_module, batch_download_utils as batch_download_utils_module
 from ..batch_download import (
     CASE_SPREADSHEET_URL,
     VARIANT_SAMPLE_SPREADSHEET_URL,
     CaseSpreadsheet,
     VariantSampleSpreadsheet,
+    validate_spreadsheet_file_format,
+    validate_spreadsheet_search_parameters,
 )
 from ..batch_download_utils import (
-    OrderedSpreadsheetColumn, SpreadsheetColumn, SpreadsheetCreationError
+    OrderedSpreadsheetColumn, SpreadsheetColumn, SpreadsheetCreationError, SpreadsheetRequest
 )
 from ..item_models import Note, VariantSample
 from ..util import APPLICATION_FORM_ENCODED_MIME_TYPE, JsonObject
@@ -143,8 +147,7 @@ SOME_SPREADSHEET_COLUMNS = [SpreadsheetColumn(*column) for column in SOME_COLUMN
 @contextmanager
 def patch_variant_sample_spreadsheet_column_tuples(**kwargs):
     with patch_context(
-        batch_download_module.VariantSampleSpreadsheet,
-        "_get_column_tuples",
+        batch_download_module.VariantSampleSpreadsheet._get_column_tuples,
         **kwargs,
     ) as mock_get_column_tuples:
         yield mock_get_column_tuples
@@ -153,8 +156,7 @@ def patch_variant_sample_spreadsheet_column_tuples(**kwargs):
 @contextmanager
 def patch_variant_sample_spreadsheet_columns(**kwargs):
     with patch_context(
-        batch_download_module.VariantSampleSpreadsheet,
-        "_spreadsheet_columns",
+        batch_download_module.VariantSampleSpreadsheet._spreadsheet_columns,
         new_callable=mock.PropertyMock,
         **kwargs,
     ) as mock_get_columns:
@@ -162,51 +164,106 @@ def patch_variant_sample_spreadsheet_columns(**kwargs):
 
 
 @contextmanager
-def patch_evaluate_item_with_column(**kwargs):
+def patch_variant_sample_spreadsheet_evaluate_item(**kwargs):
     with patch_context(
-        batch_download_module.VariantSampleSpreadsheet,
-        "_evaluate_item_with_column",
+        batch_download_module.VariantSampleSpreadsheet._evaluate_item_with_column,
         **kwargs
     ) as mock_evaluate_item:
         yield mock_evaluate_item
 
 
 @contextmanager
-def patch_variant_sample(**kwargs):
+def patch_variant_sample_spreadsheet_get_header_lines(**kwargs: Any) -> mock.MagicMock:
     with patch_context(
-        batch_download_module,
-        "VariantSample",
+        batch_download_module.VariantSampleSpreadsheet._get_available_header_lines,
         **kwargs,
-    ) as mock_variant_sample:
-        yield mock_variant_sample
+    ) as mock_get_available_header_lines:
+        yield mock_get_available_header_lines
 
 
 @contextmanager
-def patch_get_note_properties(**kwargs):
+def patch_variant_sample_spreadsheet_add_embeds(**kwargs: Any) -> mock.MagicMock:
     with patch_context(
-        batch_download_module.VariantSampleSpreadsheet,
-        "_get_note_properties",
+        batch_download_module.VariantSampleSpreadsheet._add_embeds,
+        **kwargs,
+    ) as mock_add_embeds:
+        yield mock_add_embeds
+
+
+@contextmanager
+def patch_variant_sample_spreadsheet_get_note_by_subrequest(**kwargs: Any) -> mock.MagicMock:
+    with patch_context(
+        batch_download_module.VariantSampleSpreadsheet._get_note_by_subrequest,
+        **kwargs,
+    ) as mock_get_note_by_subrequest:
+        yield mock_get_note_by_subrequest
+
+
+@contextmanager
+def patch_variant_sample_spreadsheet_get_note_properties(**kwargs):
+    with patch_context(
+        batch_download_module.VariantSampleSpreadsheet._get_note_properties,
         **kwargs,
     ) as mock_get_note_properties:
         yield mock_get_note_properties
 
 
 @contextmanager
+def patch_variant_sample(**kwargs):
+    with patch_context(
+        batch_download_module.VariantSample,
+        **kwargs,
+    ) as mock_variant_sample:
+        yield mock_variant_sample
+
+
+@contextmanager
 def patch_get_values_for_field(**kwargs):
     with patch_context(
-        batch_download_module,
-        "get_values_for_field",
+        batch_download_module.get_values_for_field,
         **kwargs
     ) as mock_get_values_for_field:
         yield mock_get_values_for_field
 
 
+@contextmanager
+def patch_spreadsheet_request_case_accession(**kwargs: Any) -> None:
+    with patch_context(
+        batch_download_utils_module.SpreadsheetRequest.get_case_accession, **kwargs
+    ) as mock_get_case_accession:
+        yield mock_get_case_accession
+
+
+@contextmanager
+def patch_spreadsheet_request_case_title(**kwargs: Any) -> None:
+    with patch_context(
+        batch_download_utils_module.SpreadsheetRequest.get_case_title, **kwargs
+    ) as mock_get_case_title:
+        yield mock_get_case_title
+
+
+@contextmanager
+def patch_spreadsheet_request_file_format(**kwargs) -> None:
+    with patch_context(
+        batch_download_utils_module.SpreadsheetRequest.get_file_format, **kwargs
+    ) as mock_get_file_format:
+        yield mock_get_file_format
+
+
+@contextmanager
+def patch_spreadsheet_request_compound_search(**kwargs) -> None:
+    with patch_context(
+        batch_download_utils_module.SpreadsheetRequest.get_compound_search, **kwargs
+    ) as mock_get_file_format:
+        yield mock_get_file_format
+
+
+def mock_spreadsheet_request() -> mock.MagicMock:
+    return mock.create_autospec(SpreadsheetRequest, instance=True)
+
+
 def mock_variant_sample() -> mock.MagicMock:
     return mock.create_autospec(VariantSample, instance=True)
-
-
-def mock_note() -> mock.MagicMock:
-    return mock.create_autospec(Note, instance=True)
 
 
 def assert_column_tuples(column_tuples: Iterable[OrderedSpreadsheetColumn]) -> None:
@@ -234,55 +291,39 @@ def parse_spreadsheet_response(response: TestResponse) -> List[List[str]]:
     return result
 
 
-@pytest.mark.workbook
-def test_case_search_spreadsheet(html_es_testapp: TestApp, es_testapp: TestApp, workbook: None) -> None:
-    """Integrated test of case search spreadsheet.
-
-    Ensure all fields present on at least one Case included in the
-    spreadsheet.
-
-    Test with both a JSON and an HTML form POST; the latter is used by
-    front-end in production.
-    """
-    case_search_compound_filterset = {
-        "search_type": "Case", "global_flags": "case_id=CASE10254-S1-C1",
-    }
-    post_body = {"compound_search_request": json.dumps(case_search_compound_filterset)}
-    json_post_response = es_testapp.post_json(
-        CASE_SPREADSHEET_URL,
-        post_body,
-        status=200,
-    )
-    json_post_rows = parse_spreadsheet_response(json_post_response)
-
-    form_post_response = html_es_testapp.post(
-        CASE_SPREADSHEET_URL,
-        post_body,
-        content_type=APPLICATION_FORM_ENCODED_MIME_TYPE,
-        status=200,
-    )
-    form_post_rows = parse_spreadsheet_response(form_post_response)
-
-    assert json_post_rows == form_post_rows
-
-    rows = json_post_rows
-    assert len(rows) == 3
-
-    columns = list(zip(*rows))
-    assert columns == EXPECTED_CASE_SPREADSHEET_COLUMNS
+@pytest.mark.parametrize(
+    "file_format,expected_exception",
+    [
+        ("tsv", False),
+        ("csv", False),
+        ("foo", True),
+    ],
+)
+def test_validate_spreadsheet_file_format(
+    file_format: str, expected_exception: bool
+) -> None:
+    with patch_spreadsheet_request_file_format(return_value=file_format):
+        if expected_exception:
+            with pytest.raises(HTTPBadRequest):
+                validate_spreadsheet_file_format(None, None)
+        else:
+            validate_spreadsheet_file_format(None, None)
 
 
 @pytest.mark.parametrize(
-    "to_evaluate,expected",
+    "compound_search,expected_exception",
     [
-        ({}, CaseSpreadsheet.NO_FLAG_DEFAULT),
-        ({"quality_control_flags": {}}, CaseSpreadsheet.NO_FLAG_DEFAULT),
-        ({"quality_control_flags": {"flag": "pass"}}, "pass"),
-    ],
+        ("", True),
+        ("foo", False),
+    ]
 )
-def test_get_qc_flag(to_evaluate: JsonObject, expected: str) -> None:
-    result = CaseSpreadsheet._get_qc_flag(to_evaluate)
-    assert result == expected
+def test_validate_spreadsheet_search_parameters(compound_search: str, expected_exception: bool) -> None:
+    with patch_spreadsheet_request_compound_search(return_value=compound_search):
+        if expected_exception:
+            with pytest.raises(HTTPBadRequest):
+                validate_spreadsheet_search_parameters(None, None)
+        else:
+            validate_spreadsheet_search_parameters(None, None)
 
 
 @pytest.mark.workbook
@@ -368,13 +409,96 @@ def test_variant_sample_spreadsheet_download(
     assert columns == EXPECTED_VARIANT_SAMPLE_SPREADSHEET_COLUMNS
 
 
+@pytest.mark.workbook
+def test_case_search_spreadsheet(html_es_testapp: TestApp, es_testapp: TestApp, workbook: None) -> None:
+    """Integrated test of case search spreadsheet.
+
+    Ensure all fields present on at least one Case included in the
+    spreadsheet.
+
+    Test with both a JSON and an HTML form POST; the latter is used by
+    front-end in production.
+    """
+    case_search_compound_filterset = {
+        "search_type": "Case", "global_flags": "case_id=CASE10254-S1-C1",
+    }
+    post_body = {"compound_search_request": json.dumps(case_search_compound_filterset)}
+    json_post_response = es_testapp.post_json(
+        CASE_SPREADSHEET_URL,
+        post_body,
+        status=200,
+    )
+    json_post_rows = parse_spreadsheet_response(json_post_response)
+
+    form_post_response = html_es_testapp.post(
+        CASE_SPREADSHEET_URL,
+        post_body,
+        content_type=APPLICATION_FORM_ENCODED_MIME_TYPE,
+        status=200,
+    )
+    form_post_rows = parse_spreadsheet_response(form_post_response)
+
+    assert json_post_rows == form_post_rows
+
+    rows = json_post_rows
+    assert len(rows) == 3
+
+    columns = list(zip(*rows))
+    assert columns == EXPECTED_CASE_SPREADSHEET_COLUMNS
+
+
 class TestVariantSampleSpreadsheet:
 
-    SOME_VARIANT_SAMPLE_PROPERTIES = {"variant": "something"}
+    SOME_GENE_NOTE_ATID = "/foo/bar/"
+    SOME_GENE_NOTE = {"@id": SOME_GENE_NOTE_ATID, "foo": "bar"}
+    SOME_UPDATED_GENE_NOTE = {**SOME_GENE_NOTE, "fu": "bur"}
+    SOME_VARIANT_SAMPLE_PROPERTIES = {"variant": {"something": "else"}, "gene_notes": [SOME_GENE_NOTE]}
+    SOME_VARIANT_SAMPLE_PROPERTIES_WITH_UPDATED_NOTE = {
+        **SOME_VARIANT_SAMPLE_PROPERTIES, "gene_notes": [SOME_UPDATED_GENE_NOTE]
+    }
     SOME_VARIANT_SAMPLE = VariantSample(SOME_VARIANT_SAMPLE_PROPERTIES)
 
-    def get_variant_sample_spreadsheet(self) -> VariantSampleSpreadsheet:
-        return VariantSampleSpreadsheet([self.SOME_VARIANT_SAMPLE_PROPERTIES])
+    def get_variant_sample_spreadsheet(
+            self, 
+            embed_additional_items: bool = False,
+            spreadsheet_request: Optional[mock.Mock] = None,
+    ) -> VariantSampleSpreadsheet:
+        return VariantSampleSpreadsheet(
+            [self.SOME_VARIANT_SAMPLE_PROPERTIES],
+            embed_additional_items=embed_additional_items,
+            spreadsheet_request=spreadsheet_request,
+        )
+
+    @pytest.mark.parametrize(
+        "header_lines,expected",
+        [
+            ([], []),
+            ([["foo"]], [["foo"], VariantSampleSpreadsheet.HEADER_SPACER_LINE]),
+        ]
+    )
+    def test_get_headers(self, header_lines: List[List[str]], expected: List[List[str]]) -> None:
+        with patch_variant_sample_spreadsheet_get_header_lines(return_value=header_lines):
+            spreadsheet = self.get_variant_sample_spreadsheet()
+            result = spreadsheet._get_headers()
+            assert result == expected
+
+    def test_get_available_header_lines(self) -> None:
+        case_accession = case_title = "foo"
+        compound_search = {"filter_blocks": [{"search_type": "item"}]}
+        expected_filters = "<Any>"
+        with patch_spreadsheet_request_case_accession(return_value=case_accession):
+            with patch_spreadsheet_request_case_title(return_value=case_title):
+                with patch_spreadsheet_request_compound_search(return_value=compound_search):
+                    spreadsheet_request = SpreadsheetRequest(None)
+                    spreadsheet = self.get_variant_sample_spreadsheet(
+                        spreadsheet_request=spreadsheet_request
+                    )
+                    result = spreadsheet._get_available_header_lines()
+                    assert result == [
+                        ["#", "Case Accession:", "", case_accession],
+                        ["#", "Case Title:", "", case_title],
+                        ["#", "Filters Selected:", "", expected_filters],
+                    ]
 
     def test_get_column_titles(self) -> None:
         with patch_variant_sample_spreadsheet_column_tuples(
@@ -390,27 +514,58 @@ class TestVariantSampleSpreadsheet:
         ):
             spreadsheet = self.get_variant_sample_spreadsheet()
             result = spreadsheet._get_column_descriptions()
-            assert list(result) == [SOME_DESCRIPTION] * 2
+            assert list(result) == [f"# {SOME_DESCRIPTION}", SOME_DESCRIPTION]
 
     def test_get_row_for_item(self) -> None:
         expected_result_count = len(SOME_COLUMN_TUPLES)
         with patch_variant_sample_spreadsheet_columns(
             return_value=SOME_SPREADSHEET_COLUMNS
         ):
-            with patch_evaluate_item_with_column() as mock_evaluate_item_with_column:
-                with patch_variant_sample(
-                    return_value=self.SOME_VARIANT_SAMPLE
-                ):
-                    spreadsheet = self.get_variant_sample_spreadsheet()
-                    result_generator = spreadsheet._get_row_for_item(self.SOME_VARIANT_SAMPLE_PROPERTIES)
-                    result = list(result_generator)
-                    assert len(result) == expected_result_count
-                    assert len(mock_evaluate_item_with_column.call_args_list) == expected_result_count
-                    for column in SOME_SPREADSHEET_COLUMNS:
-                        mock_evaluate_item_with_column.assert_any_call(
-                            column, self.SOME_VARIANT_SAMPLE
-                        )
+            with patch_variant_sample_spreadsheet_evaluate_item() as mock_evaluate_item_with_column:
+                with patch_variant_sample_spreadsheet_add_embeds() as mock_add_embeds:
+                    with patch_variant_sample(
+                        return_value=self.SOME_VARIANT_SAMPLE
+                    ):
+                        spreadsheet = self.get_variant_sample_spreadsheet()
+                        result_generator = spreadsheet._get_row_for_item(self.SOME_VARIANT_SAMPLE_PROPERTIES)
+                        result = list(result_generator)
+                        assert len(result) == expected_result_count
+                        assert len(mock_evaluate_item_with_column.call_args_list) == expected_result_count
+                        mock_add_embeds.assert_called_once_with(self.SOME_VARIANT_SAMPLE_PROPERTIES)
+                        for column in SOME_SPREADSHEET_COLUMNS:
+                            mock_evaluate_item_with_column.assert_any_call(
+                                column, self.SOME_VARIANT_SAMPLE
+                            )
 
+    @pytest.mark.parametrize(
+        "embed_additional_items,spreadsheet_request,expected",
+        [
+            (False, None, SOME_VARIANT_SAMPLE_PROPERTIES),
+            (True, None, SOME_VARIANT_SAMPLE_PROPERTIES),
+            (False, mock_spreadsheet_request(), SOME_VARIANT_SAMPLE_PROPERTIES),
+            (True, mock_spreadsheet_request(), SOME_VARIANT_SAMPLE_PROPERTIES_WITH_UPDATED_NOTE),
+        ]
+    )
+    def test_add_embeds(
+        self, embed_additional_items: bool,
+        spreadsheet_request: Union[None, mock.Mock],
+        expected: JsonObject,
+    ) -> None:
+        with patch_variant_sample_spreadsheet_get_note_by_subrequest(
+            return_value=self.SOME_UPDATED_GENE_NOTE
+        ) as mock_get_note:
+            spreadsheet = self.get_variant_sample_spreadsheet(
+                embed_additional_items=embed_additional_items,
+                spreadsheet_request=spreadsheet_request,
+            )
+            item_to_evaluate = deepcopy(self.SOME_VARIANT_SAMPLE_PROPERTIES)
+            spreadsheet._add_embeds(item_to_evaluate)
+            assert item_to_evaluate == expected
+            if embed_additional_items and spreadsheet_request:
+                mock_get_note.assert_called_once_with(self.SOME_UPDATED_GENE_NOTE)
+            else:
+                mock_get_note.assert_not_called()
+            assert item_to_evaluate == expected
 
 
     @pytest.mark.parametrize(
@@ -464,11 +619,11 @@ class TestVariantSampleSpreadsheet:
         result = spreadsheet._get_canonical_transcript_location(variant_sample)
         assert result == variant_sample.get_canonical_transcript_location.return_value
 
-    def test_get_canonical_transcript_consequence_display_title(self) -> None:
+    def test_get_canonical_transcript_consequence_names(self) -> None:
         spreadsheet = self.get_variant_sample_spreadsheet()
         variant_sample = mock_variant_sample()
-        result = spreadsheet._get_canonical_transcript_consequence_display_title(variant_sample)
-        assert result == variant_sample.get_canonical_transcript_consequence_display_title.return_value
+        result = spreadsheet._get_canonical_transcript_consequence_names(variant_sample)
+        assert result == variant_sample.get_canonical_transcript_consequence_names.return_value
 
     def test_get_most_severe_transcript_feature(self) -> None:
         spreadsheet = self.get_variant_sample_spreadsheet()
@@ -482,12 +637,11 @@ class TestVariantSampleSpreadsheet:
         result = spreadsheet._get_most_severe_transcript_location(variant_sample)
         assert result == variant_sample.get_most_severe_transcript_location.return_value
 
-    def test_get_most_severe_transcript_consequence_display_title(self) -> None:
+    def test_get_most_severe_transcript_consequence_names(self) -> None:
         spreadsheet = self.get_variant_sample_spreadsheet()
         variant_sample = mock_variant_sample()
-        result = spreadsheet._get_most_severe_transcript_consequence_display_title(variant_sample)
-        assert result == variant_sample.get_most_severe_transcript_consequence_display_title.return_value
-
+        result = spreadsheet._get_most_severe_transcript_consequence_names(variant_sample)
+        assert result == variant_sample.get_most_severe_transcript_consequence_names.return_value
 
     def test_get_gnomad_v3_popmax_population(self) -> None:
         spreadsheet = self.get_variant_sample_spreadsheet()
@@ -505,7 +659,7 @@ class TestVariantSampleSpreadsheet:
         spreadsheet = self.get_variant_sample_spreadsheet()
         property_location = "foo"
         property_to_retrieve = "bar"
-        with patch_get_note_properties() as mock_get_note_properties:
+        with patch_variant_sample_spreadsheet_get_note_properties() as mock_get_note_properties:
             result = spreadsheet._get_note_of_same_project(property_location,
                                                              property_to_retrieve)
             assert callable(result)
@@ -519,39 +673,39 @@ class TestVariantSampleSpreadsheet:
     @pytest.mark.parametrize(
         "note_found,expected",
         [
-            (False, False), 
-            (True, True),
+            (False, ""), 
+            (True, SOME_GENE_NOTE_ATID),
         ]
     )
     def test_get_note_properties(self, note_found: bool, expected: bool) -> None:
         note_property_location = "foo"
-        note_property_to_retrieve = "bar"
-        note_property_value = "foobar"
+        note_property_to_retrieve = "@id"  # Present in SOME_GENE_NOTE
         variant_sample = mock_variant_sample()
-        note = mock_note()
         if note_found:
-            variant_sample.get_note_of_same_project.return_value = note
+            return_value = Note(self.SOME_GENE_NOTE)
         else:
-            variant_sample.get_note_of_same_project.return_value = None
-        with patch_get_values_for_field(
-            return_value=note_property_value
-        ) as mock_get_values_for_field:
-            spreadsheet = self.get_variant_sample_spreadsheet()
-            result = spreadsheet._get_note_properties(
-                variant_sample,
-                note_property_location=note_property_location,
-                note_property_to_retrieve=note_property_to_retrieve,
-            )
-            variant_sample.get_note_of_same_project.assert_called_once_with(
-                note_property_location
-            )
-            if note_found:
-                mock_get_values_for_field.assert_called_once_with(
-                    note.get_properties.return_value, note_property_to_retrieve
-                )
-            else:
-                mock_get_values_for_field.assert_not_called()
-            if expected:
-                assert result == note_property_value
-            else:
-                assert result == ""
+            return_value = None
+        get_note = variant_sample.get_most_recent_note_of_same_project_from_property
+        get_note.return_value = return_value
+        spreadsheet = self.get_variant_sample_spreadsheet()
+        result = spreadsheet._get_note_properties(
+            variant_sample,
+            note_property_location=note_property_location,
+            note_property_to_retrieve=note_property_to_retrieve,
+        )
+        get_note.assert_called_once_with(note_property_location)
+        assert result == expected
+
+
+class TestCaseSpreadsheet:
+    @pytest.mark.parametrize(
+        "to_evaluate,expected",
+        [
+            ({}, CaseSpreadsheet.NO_FLAG_DEFAULT),
+            ({"quality_control_flags": {}}, CaseSpreadsheet.NO_FLAG_DEFAULT),
+            ({"quality_control_flags": {"flag": "pass"}}, "pass"),
+        ],
+    )
+    def test_get_qc_flag(self, to_evaluate: JsonObject, expected: str) -> None:
+        result = CaseSpreadsheet._get_qc_flag(to_evaluate)
+        assert result == expected
