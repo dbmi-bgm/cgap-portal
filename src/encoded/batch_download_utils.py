@@ -34,7 +34,6 @@ FILE_FORMAT_TO_DELIMITER = {CSV_EXTENSION: ",", TSV_EXTENSION: "\t"}
 def get_values_for_field(item, field, remove_duplicates=True):
     """Copied over from 4DN / batch_download / metadata.tsv endpoint code"""
     c_value = []
-
     if remove_duplicates:
         for value in simple_path_ids(item, field):
             str_value = str(value)
@@ -43,7 +42,6 @@ def get_values_for_field(item, field, remove_duplicates=True):
     else:
         for value in simple_path_ids(item, field):
             c_value.append(str(value))
-
     return ", ".join(c_value)
 
 
@@ -104,7 +102,7 @@ class SpreadsheetColumn:
             return self._get_field_from_item(item)
         if self.is_callable_evaluator():
             return self.evaluator(item)
-        raise ValueError(
+        raise SpreadsheetCreationError(
             f"Unable to evaluate item {item} with evaluator {self.evaluator}"
         )
 
@@ -175,6 +173,13 @@ class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
         column_tuples = cls._get_column_tuples()
         return cls._convert_column_tuples_to_spreadsheet_columns(column_tuples)
 
+    @classmethod
+    def _convert_column_tuples_to_spreadsheet_columns(
+        cls,
+        columns: Iterable[OrderedSpreadsheetColumn],
+    ) -> List[SpreadsheetColumn]:
+        return [SpreadsheetColumn(*column) for column in columns]
+
     def _get_column_titles(self) -> List[str]:
         return [column.get_title() for column in self._spreadsheet_columns]
 
@@ -187,13 +192,6 @@ class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
             else:
                 result.append(description)
         return result
-
-    @classmethod
-    def _convert_column_tuples_to_spreadsheet_columns(
-        cls,
-        columns: Iterable[OrderedSpreadsheetColumn],
-    ) -> List[SpreadsheetColumn]:
-        return [SpreadsheetColumn(*column) for column in columns]
 
 
 @dataclass(frozen=True)
@@ -281,14 +279,16 @@ class SpreadsheetGenerator:
                 yield writer.writerow(row)
 
     def _get_writer(self) -> csv.writer:
-        """Using csv.writer for formatting lines, not writing to actual file here."""
+        """Use csv.writer for formatting lines, not writing to file."""
         delimiter = self._get_delimiter()
         return csv.writer(Echo(), delimiter=delimiter, quoting=csv.QUOTE_NONNUMERIC)
 
     def _get_delimiter(self) -> str:
         result = FILE_FORMAT_TO_DELIMITER.get(self.file_format)
         if result is None:
-            raise ValueError
+            raise SpreadsheetCreationError(
+                f"No known delimiter for given file format {self.file_format}"
+            )
         return result
 
     def _get_response_headers(self) -> Dict:

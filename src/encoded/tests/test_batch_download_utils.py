@@ -12,12 +12,15 @@ from .utils import patch_context
 from .. import batch_download_utils as batch_download_utils_module
 from ..batch_download_utils import (
     DEFAULT_FILE_FORMAT,
+    OrderedSpreadsheetColumn,
     get_values_for_field,
     FilterSetSearch,
     SpreadsheetColumn,
+    SpreadsheetCreationError,
     SpreadsheetFromColumnTuples,
     SpreadsheetGenerator,
     SpreadsheetRequest,
+    SpreadsheetTemplate,
 )
 from ..util import JsonObject
 
@@ -27,20 +30,18 @@ SOME_CONTEXT = "bar"
 
 
 @contextmanager
-def patch_extract_filter_set_from_search_body(**kwargs) -> Iterator[mock.MagicMock]:
+def patch_compound_search_builder_extract_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.CompoundSearchBuilder,
-        "extract_filter_set_from_search_body",
+        batch_download_utils_module.CompoundSearchBuilder.extract_filter_set_from_search_body,
         **kwargs
     ) as mocked_item:
         yield mocked_item
 
 
 @contextmanager
-def patch_execute_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
+def patch_compound_search_builder_execute_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.CompoundSearchBuilder,
-        "execute_filter_set",
+        batch_download_utils_module.CompoundSearchBuilder.execute_filter_set,
         **kwargs
     ) as mocked_item:
         yield mocked_item
@@ -49,8 +50,7 @@ def patch_execute_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
 @contextmanager
 def patch_spreadsheet_request_parameters(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.SpreadsheetRequest,
-        "parameters",
+        batch_download_utils_module.SpreadsheetRequest.parameters,
         new_callable=mock.PropertyMock,
         **kwargs
     ) as mocked_item:
@@ -58,9 +58,9 @@ def patch_spreadsheet_request_parameters(**kwargs) -> Iterator[mock.MagicMock]:
 
 
 @contextmanager
-def patch_get_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
+def patch_filter_set_search_get_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.FilterSetSearch, "_get_filter_set", **kwargs
+        batch_download_utils_module.FilterSetSearch._get_filter_set, **kwargs
     ) as mocked_item:
         yield mocked_item
 
@@ -68,15 +68,9 @@ def patch_get_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
 @contextmanager
 def patch_get_values_for_field(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module, "get_values_for_field", **kwargs
+        batch_download_utils_module.get_values_for_field, **kwargs
     ) as mocked_item:
         yield mocked_item
-
-
-@contextmanager
-def patch_request_parameters(**kwargs) -> mock.PropertyMock:
-    with patch_context(SpreadsheetRequest, "parameters", **kwargs) as mock_property:
-        yield mock_property
 
 
 def mock_request() -> mock.MagicMock:
@@ -98,7 +92,7 @@ def mock_request() -> mock.MagicMock:
     ],
 )
 def test_get_values_for_field(
-    item: Any, field: str, remove_duplicates: bool, expected: Any
+    item: JsonObject, field: str, remove_duplicates: bool, expected: str
 ) -> None:
     result = get_values_for_field(item, field, remove_duplicates=remove_duplicates)
     assert result == expected
@@ -136,7 +130,7 @@ class TestSpreadsheetColumn:
     ) -> None:
         spreadsheet_column = self.get_spreadsheet_column(evaluator=evaluator)
         if exception_expected:
-            with pytest.raises(ValueError):
+            with pytest.raises(SpreadsheetCreationError):
                 spreadsheet_column.get_field_for_item(to_evaluate)
         else:
             result = spreadsheet_column.get_field_for_item(to_evaluate)
@@ -180,6 +174,95 @@ class TestSpreadsheetColumn:
         assert spreadsheet_column.is_callable_evaluator() == expected
 
 
+class TestSpreadsheetTemplate:
+
+    SOME_ITEM_TO_EVALUATE = {"foo": "bar"}
+    ITEMS_TO_EVALUATE = [SOME_ITEM_TO_EVALUATE]
+
+    class Spreadsheet(SpreadsheetTemplate):
+
+        SOME_HEADER = ["foo", "bar"]
+        SOME_HEADERS = [SOME_HEADER]
+        SOME_COLUMN_TITLES = ["title1", "title2"]
+        SOME_COLUMN_DESCRIPTIONS = ["description1", "description2"]
+        SOME_ITEM_ROW = ["item_name", "some_property"]
+
+        def _get_headers(self) -> List[List[str]]:
+            return self.SOME_HEADERS
+
+        def _get_column_titles(self) -> List[str]:
+            return self.SOME_COLUMN_TITLES
+
+        def _get_column_descriptions(self) -> List[str]:
+            return self.SOME_COLUMN_DESCRIPTIONS
+
+        def _get_row_for_item(self, item_to_evaluate: JsonObject) -> List[str]:
+            return self.SOME_ITEM_ROW
+
+    def get_spreadsheet(self) -> Spreadsheet:
+        return self.Spreadsheet(self.ITEMS_TO_EVALUATE)
+
+    def test_yield_rows(self) -> None:
+        spreadsheet = self.get_spreadsheet()
+        result = spreadsheet.yield_rows()
+        assert isinstance(result, Generator)
+        rows = list(result)
+        assert rows == [
+            self.Spreadsheet.SOME_HEADER,
+            self.Spreadsheet.SOME_COLUMN_DESCRIPTIONS,
+            self.Spreadsheet.SOME_COLUMN_TITLES,
+            self.Spreadsheet.SOME_ITEM_ROW,
+        ]
+
+
+class TestSpreadsheetFromColumnTuples:
+
+    class Spreadsheet(SpreadsheetFromColumnTuples):
+
+        @classmethod
+        def callable_evaluator(cls, to_evaluate: Any) -> str:
+            return "foo"
+
+        SOME_TITLE_1 = "Some title"
+        SOME_TITLE_2 = "Another title"
+        SOME_DESCRIPTION_1 = "Some description"
+        SOME_DESCRIPTION_2 = "Another description"
+        SOME_COLUMN_TUPLES = [
+            (SOME_TITLE_1, SOME_DESCRIPTION_1, "Some property"),
+            (SOME_TITLE_2, SOME_DESCRIPTION_2, callable_evaluator),
+        ]
+
+        @classmethod
+        def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:
+            return cls.SOME_COLUMN_TUPLES
+
+        def _get_headers(self) -> None:
+            return
+
+        def _get_row_for_item(self) -> None:
+            return
+
+    def get_spreadsheet(self) -> Spreadsheet:
+        return self.Spreadsheet([])
+
+    def test_get_spreadsheet_columns(self) -> None:
+        spreadsheet = self.get_spreadsheet()
+        result = spreadsheet.get_spreadsheet_columns()
+        assert len(result) == 2
+        for item in result:
+            assert isinstance(item, SpreadsheetColumn)
+
+    def test_get_column_titles(self) -> None:
+        spreadsheet = self.get_spreadsheet()
+        result = spreadsheet._get_column_titles()
+        assert result == [self.Spreadsheet.SOME_TITLE_1, self.Spreadsheet.SOME_TITLE_2]
+
+    def test_get_column_descriptions(self) -> None:
+        spreadsheet = self.get_spreadsheet()
+        result = spreadsheet._get_column_descriptions()
+        assert result == [f"# {self.Spreadsheet.SOME_DESCRIPTION_1}", self.Spreadsheet.SOME_DESCRIPTION_2]
+
+
 class TestSpreadsheetRequest:
 
     SOME_FILE_FORMAT = "something"
@@ -198,8 +281,11 @@ class TestSpreadsheetRequest:
 
     def test_parameters(self) -> None:
         request = mock_request()
-        spreadsheet_post = SpreadsheetRequest(request)
-        assert spreadsheet_post.parameters == request.params
+        spreadsheet_request = SpreadsheetRequest(request)
+        assert spreadsheet_request.parameters == request.params
+
+        request.params = None
+        assert spreadsheet_request.parameters == request.json
 
     @pytest.mark.parametrize(
         "parameters,expected",
@@ -266,8 +352,8 @@ class TestFilterSetSearch:
 
     def test_get_search_results(self) -> None:
         filter_set_search = self.get_filter_set_search()
-        with patch_execute_filter_set() as mock_execute_filter_set:
-            with patch_get_filter_set() as mock_get_filter_set:
+        with patch_compound_search_builder_execute_filter_set() as mock_execute_filter_set:
+            with patch_filter_set_search_get_filter_set() as mock_get_filter_set:
                 filter_set_search.get_search_results()
                 mock_execute_filter_set.assert_called_once_with(
                     SOME_CONTEXT,
@@ -281,7 +367,7 @@ class TestFilterSetSearch:
 
     def test_get_filter_set(self) -> None:
         filter_set_search = self.get_filter_set_search()
-        with patch_extract_filter_set_from_search_body() as mock_extract_filter_set:
+        with patch_compound_search_builder_extract_filter_set() as mock_extract_filter_set:
             filter_set_search._get_filter_set()
             mock_extract_filter_set.assert_called_once_with(
                 SOME_REQUEST, self.SOME_COMPOUND_SEARCH
@@ -332,7 +418,7 @@ class TestSpreadsheetGenerator:
         else:
             return SpreadsheetGenerator(name, to_write)
 
-    def test_get_spreadsheet_response(self) -> None:
+    def test_get_streaming_response(self) -> None:
         spreadsheet_generator = self.get_spreadsheet_generator()
         result = spreadsheet_generator.get_streaming_response()
         assert isinstance(result, Response)
@@ -370,7 +456,7 @@ class TestSpreadsheetGenerator:
     ) -> None:
         spreadsheet_generator = self.get_spreadsheet_generator(file_format=file_format)
         if exception_expected:
-            with pytest.raises(ValueError):
+            with pytest.raises(SpreadsheetCreationError):
                 spreadsheet_generator._get_delimiter()
         else:
             assert spreadsheet_generator._get_delimiter() == expected
@@ -384,65 +470,3 @@ class TestSpreadsheetGenerator:
             "Content-Description": "File Transfer",
             "Cache-Control": "no-store",
         }
-
-
-class TestSpreadsheetRequest2:
-
-    SOME_FILE_FORMAT = 'some_file_format'
-    SOME_CASE_ACCESSION = 'some_case_accession'
-    SOME_CASE_TITLE = 'some_case_title'
-    SOME_COMPOUND_SEARCH_REQUEST = {"foo": 'some_compound_search_request'}
-    SOME_JSON_COMPOUND_SEARCH_REQUEST = json.dumps(SOME_COMPOUND_SEARCH_REQUEST)
-    SOME_REQUEST = "request"
-
-    def spreadsheet_request(self) -> SpreadsheetRequest:
-        return SpreadsheetRequest(self.SOME_REQUEST)
-
-    @pytest.mark.parametrize(
-        "parameters,expected",
-        [
-            ({}, "tsv"),
-            ({SpreadsheetRequest.FILE_FORMAT: SOME_FILE_FORMAT}, SOME_FILE_FORMAT),
-        ]
-    )
-    def test_get_file_format(self, parameters: Mapping, expected: str) -> None:
-        with patch_request_parameters(return_value=parameters):
-            spreadsheet_request = self.spreadsheet_request()
-            assert spreadsheet_request.get_file_format() == expected
-
-    @pytest.mark.parametrize(
-        "parameters,expected",
-        [
-            ({}, ""),
-            ({SpreadsheetRequest.CASE_ACCESSION: SOME_CASE_ACCESSION}, SOME_CASE_ACCESSION),
-        ]
-    )
-    def test_get_case_accession(self, parameters, expected) -> None:
-        with patch_request_parameters(return_value=parameters):
-            spreadsheet_request = self.spreadsheet_request()
-            assert spreadsheet_request.get_case_accession() == expected
-
-    @pytest.mark.parametrize(
-        "parameters,expected",
-        [
-            ({}, ""),
-            ({SpreadsheetRequest.CASE_TITLE: SOME_CASE_TITLE}, SOME_CASE_TITLE),
-        ]
-    )
-    def test_get_case_title(self, parameters, expected) -> None:
-        with patch_request_parameters(return_value=parameters):
-            spreadsheet_request = self.spreadsheet_request()
-            assert spreadsheet_request.get_case_title() == expected
-
-    @pytest.mark.parametrize(
-        "parameters,expected",
-        [
-            ({}, {}),
-            ({SpreadsheetRequest.COMPOUND_SEARCH_REQUEST: SOME_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
-            ({SpreadsheetRequest.COMPOUND_SEARCH_REQUEST: SOME_JSON_COMPOUND_SEARCH_REQUEST}, SOME_COMPOUND_SEARCH_REQUEST),
-        ]
-    )
-    def test_get_associated_compound_search(self, parameters, expected) -> None:
-        with patch_request_parameters(return_value=parameters):
-            spreadsheet_request = self.spreadsheet_request()
-            assert spreadsheet_request.get_compound_search() == expected

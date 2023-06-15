@@ -2,7 +2,7 @@ import json
 from contextlib import contextmanager
 from copy import deepcopy
 from unittest import mock
-from typing import Any, Iterable, List, Optional, Union
+from typing import Any, Iterable, Iterator, List, Optional, Union
 
 import pytest
 from pyramid.httpexceptions import HTTPBadRequest
@@ -145,7 +145,7 @@ SOME_SPREADSHEET_COLUMNS = [SpreadsheetColumn(*column) for column in SOME_COLUMN
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_column_tuples(**kwargs):
+def patch_variant_sample_spreadsheet_column_tuples(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._get_column_tuples,
         **kwargs,
@@ -154,7 +154,7 @@ def patch_variant_sample_spreadsheet_column_tuples(**kwargs):
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_columns(**kwargs):
+def patch_variant_sample_spreadsheet_columns(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._spreadsheet_columns,
         new_callable=mock.PropertyMock,
@@ -164,7 +164,7 @@ def patch_variant_sample_spreadsheet_columns(**kwargs):
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_evaluate_item(**kwargs):
+def patch_variant_sample_spreadsheet_evaluate_item(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._evaluate_item_with_column,
         **kwargs
@@ -173,7 +173,7 @@ def patch_variant_sample_spreadsheet_evaluate_item(**kwargs):
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_get_header_lines(**kwargs: Any) -> mock.MagicMock:
+def patch_variant_sample_spreadsheet_get_header_lines(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._get_available_header_lines,
         **kwargs,
@@ -182,7 +182,7 @@ def patch_variant_sample_spreadsheet_get_header_lines(**kwargs: Any) -> mock.Mag
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_add_embeds(**kwargs: Any) -> mock.MagicMock:
+def patch_variant_sample_spreadsheet_add_embeds(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._add_embeds,
         **kwargs,
@@ -191,7 +191,7 @@ def patch_variant_sample_spreadsheet_add_embeds(**kwargs: Any) -> mock.MagicMock
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_get_note_by_subrequest(**kwargs: Any) -> mock.MagicMock:
+def patch_variant_sample_spreadsheet_get_note_by_subrequest(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._get_note_by_subrequest,
         **kwargs,
@@ -200,7 +200,7 @@ def patch_variant_sample_spreadsheet_get_note_by_subrequest(**kwargs: Any) -> mo
 
 
 @contextmanager
-def patch_variant_sample_spreadsheet_get_note_properties(**kwargs):
+def patch_variant_sample_spreadsheet_get_note_properties(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._get_note_properties,
         **kwargs,
@@ -209,7 +209,7 @@ def patch_variant_sample_spreadsheet_get_note_properties(**kwargs):
 
 
 @contextmanager
-def patch_variant_sample(**kwargs):
+def patch_variant_sample(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSample,
         **kwargs,
@@ -218,7 +218,7 @@ def patch_variant_sample(**kwargs):
 
 
 @contextmanager
-def patch_get_values_for_field(**kwargs):
+def patch_get_values_for_field(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.get_values_for_field,
         **kwargs
@@ -227,7 +227,7 @@ def patch_get_values_for_field(**kwargs):
 
 
 @contextmanager
-def patch_spreadsheet_request_case_accession(**kwargs: Any) -> None:
+def patch_spreadsheet_request_case_accession(**kwargs: Any) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_utils_module.SpreadsheetRequest.get_case_accession, **kwargs
     ) as mock_get_case_accession:
@@ -235,7 +235,7 @@ def patch_spreadsheet_request_case_accession(**kwargs: Any) -> None:
 
 
 @contextmanager
-def patch_spreadsheet_request_case_title(**kwargs: Any) -> None:
+def patch_spreadsheet_request_case_title(**kwargs: Any) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_utils_module.SpreadsheetRequest.get_case_title, **kwargs
     ) as mock_get_case_title:
@@ -243,7 +243,7 @@ def patch_spreadsheet_request_case_title(**kwargs: Any) -> None:
 
 
 @contextmanager
-def patch_spreadsheet_request_file_format(**kwargs) -> None:
+def patch_spreadsheet_request_file_format(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_utils_module.SpreadsheetRequest.get_file_format, **kwargs
     ) as mock_get_file_format:
@@ -251,7 +251,7 @@ def patch_spreadsheet_request_file_format(**kwargs) -> None:
 
 
 @contextmanager
-def patch_spreadsheet_request_compound_search(**kwargs) -> None:
+def patch_spreadsheet_request_compound_search(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_utils_module.SpreadsheetRequest.get_compound_search, **kwargs
     ) as mock_get_file_format:
