@@ -136,6 +136,11 @@ def external_creds(bucket, key, name=None, profile_name=None):
                 })
         # In the old account, we are always passing IAM User creds so these will just work
         else:
+            # We only want IAM credentials; we disallow session tokens, which may
+            # be e.g. from Okta, which may have fewer restrictions thereby allowing
+            # someone to execute something with inappropriately elevated permissions.
+            if os.environ.get('AWS_SESSION_TOKEN'):
+                raise RuntimeError("Federated session credentials are not allowed here.")
             conn = boto3.client('sts',
                                 aws_access_key_id=os.environ.get('AWS_ACCESS_KEY_ID'),
                                 aws_secret_access_key=os.environ.get('AWS_SECRET_ACCESS_KEY'))
