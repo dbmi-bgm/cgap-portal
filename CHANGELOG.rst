@@ -7,6 +7,14 @@ Change Log
 ----------
 
 
+13.4.0
+======
+`PR 711: Generic QualityMetric <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
+
+* Add new QualityMetricGeneric item
+* Add File property for QualityMetricGeneric linkTos
+
+
 13.3.2
 ======
 
