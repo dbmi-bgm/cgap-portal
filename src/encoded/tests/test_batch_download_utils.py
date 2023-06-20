@@ -51,7 +51,6 @@ def patch_compound_search_builder_execute_filter_set(**kwargs) -> Iterator[mock.
 def patch_spreadsheet_request_parameters(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_utils_module.SpreadsheetRequest.parameters,
-        new_callable=mock.PropertyMock,
         **kwargs
     ) as mocked_item:
         yield mocked_item

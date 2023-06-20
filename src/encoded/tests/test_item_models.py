@@ -31,6 +31,14 @@ def patch_transcript_get_location_by_most_severe_consequence(**kwargs) -> Iterat
 
 
 @contextmanager
+def patch_variant_consequence_name(**kwargs) -> Iterator[mock.MagicMock]:
+    with patch_context(
+        item_models_module.VariantConsequence._name, **kwargs
+    ) as mock_consequence:
+        yield mock_consequence
+
+
+@contextmanager
 def patch_variant_get_transcripts(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         item_models_module.Variant._get_transcripts,
@@ -138,13 +146,6 @@ class TestItem:
     def test_get_project(self, item: Item, expected: JsonObject) -> None:
         assert item.get_project() == expected
 
-
-@contextmanager
-def patch_variant_consequence_name(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        item_models_module.VariantConsequence._name, new_callable=mock.PropertyMock, **kwargs
-    ) as mock_consequence:
-        yield mock_consequence
 
 
 class TestVariantConsequence:

@@ -157,7 +157,6 @@ def patch_variant_sample_spreadsheet_column_tuples(**kwargs) -> Iterator[mock.Ma
 def patch_variant_sample_spreadsheet_columns(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_module.VariantSampleSpreadsheet._spreadsheet_columns,
-        new_callable=mock.PropertyMock,
         **kwargs,
     ) as mock_get_columns:
         yield mock_get_columns
