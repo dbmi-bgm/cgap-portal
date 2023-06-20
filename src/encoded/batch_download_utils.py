@@ -4,7 +4,17 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from functools import lru_cache
 from typing import (
-    Any, Callable, Dict, Iterable, Iterator, List, Mapping, Optional, Sequence, Tuple, Union
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Tuple,
+    Union,
 )
 from urllib.parse import parse_qs
 
@@ -63,13 +73,15 @@ def human_readable_filter_block_queries(filterset_blocks_request):
                 if len(value) == 1:
                     formstr += str(value[0])
                 else:
-                    formstr += "[ " + " | ".join([ str(v) for v in value ]) + " ]"
+                    formstr += "[ " + " | ".join([str(v) for v in value]) + " ]"
                 curr_fb_q.append(formstr)
             curr_fb_str = " & ".join(curr_fb_q)
             if fb_len > 1:
                 curr_fb_str = "( " + curr_fb_str + " )"
         parsed_filter_block_qs.append(curr_fb_str)
-    return (" AND " if filterset_blocks_request.get(INTERSECT, False) else " OR ").join(parsed_filter_block_qs)
+    return (" AND " if filterset_blocks_request.get(INTERSECT, False) else " OR ").join(
+        parsed_filter_block_qs
+    )
 
 
 class Echo(object):
@@ -157,7 +169,6 @@ class SpreadsheetTemplate(ABC):
 
 @dataclass(frozen=True)
 class SpreadsheetFromColumnTuples(SpreadsheetTemplate, ABC):
-
     @classmethod
     @abstractmethod
     def _get_column_tuples(cls) -> None:
@@ -299,7 +310,7 @@ class SpreadsheetGenerator:
             ),
             "Content-Type": f"text/{self.file_format}",
             "Content-Description": "File Transfer",
-            "Cache-Control": "no-store"
+            "Cache-Control": "no-store",
         }
 
     def _get_file_name_with_extension(self) -> str:

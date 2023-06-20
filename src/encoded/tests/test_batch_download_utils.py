@@ -1,6 +1,16 @@
 import json
 from contextlib import contextmanager
-from typing import Any, Callable, Generator, Iterator, List, Mapping, Optional, Sequence, Union
+from typing import (
+    Any,
+    Callable,
+    Generator,
+    Iterator,
+    List,
+    Mapping,
+    Optional,
+    Sequence,
+    Union,
+)
 from unittest import mock
 
 import pytest
@@ -30,19 +40,22 @@ SOME_CONTEXT = "bar"
 
 
 @contextmanager
-def patch_compound_search_builder_extract_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
+def patch_compound_search_builder_extract_filter_set(
+    **kwargs,
+) -> Iterator[mock.MagicMock]:
     with patch_context(
         batch_download_utils_module.CompoundSearchBuilder.extract_filter_set_from_search_body,
-        **kwargs
+        **kwargs,
     ) as mocked_item:
         yield mocked_item
 
 
 @contextmanager
-def patch_compound_search_builder_execute_filter_set(**kwargs) -> Iterator[mock.MagicMock]:
+def patch_compound_search_builder_execute_filter_set(
+    **kwargs,
+) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.CompoundSearchBuilder.execute_filter_set,
-        **kwargs
+        batch_download_utils_module.CompoundSearchBuilder.execute_filter_set, **kwargs
     ) as mocked_item:
         yield mocked_item
 
@@ -50,8 +63,7 @@ def patch_compound_search_builder_execute_filter_set(**kwargs) -> Iterator[mock.
 @contextmanager
 def patch_spreadsheet_request_parameters(**kwargs) -> Iterator[mock.MagicMock]:
     with patch_context(
-        batch_download_utils_module.SpreadsheetRequest.parameters,
-        **kwargs
+        batch_download_utils_module.SpreadsheetRequest.parameters, **kwargs
     ) as mocked_item:
         yield mocked_item
 
@@ -215,9 +227,7 @@ class TestSpreadsheetTemplate:
 
 
 class TestSpreadsheetFromColumnTuples:
-
     class Spreadsheet(SpreadsheetFromColumnTuples):
-
         @classmethod
         def callable_evaluator(cls, to_evaluate: Any) -> str:
             return "foo"
@@ -259,7 +269,10 @@ class TestSpreadsheetFromColumnTuples:
     def test_get_column_descriptions(self) -> None:
         spreadsheet = self.get_spreadsheet()
         result = spreadsheet._get_column_descriptions()
-        assert result == [f"# {self.Spreadsheet.SOME_DESCRIPTION_1}", self.Spreadsheet.SOME_DESCRIPTION_2]
+        assert result == [
+            f"# {self.Spreadsheet.SOME_DESCRIPTION_1}",
+            self.Spreadsheet.SOME_DESCRIPTION_2,
+        ]
 
 
 class TestSpreadsheetRequest:

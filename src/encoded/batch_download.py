@@ -32,7 +32,12 @@ from .batch_download_utils import (
     SpreadsheetRequest,
 )
 from .root import CGAPRoot
-from .util import APPLICATION_FORM_ENCODED_MIME_TYPE, JsonObject, format_to_url, register_path_content_type
+from .util import (
+    APPLICATION_FORM_ENCODED_MIME_TYPE,
+    JsonObject,
+    format_to_url,
+    register_path_content_type,
+)
 
 
 log = structlog.getLogger(__name__)
@@ -45,8 +50,9 @@ VARIANT_SAMPLE_SPREADSHEET_URL = format_to_url(VARIANT_SAMPLE_SPREADSHEET_ENDPOI
 
 def includeme(config):
     config.add_route(CASE_SPREADSHEET_ENDPOINT, CASE_SPREADSHEET_URL)
-    config.add_route(VARIANT_SAMPLE_SPREADSHEET_ENDPOINT,
-                     VARIANT_SAMPLE_SPREADSHEET_URL)
+    config.add_route(
+        VARIANT_SAMPLE_SPREADSHEET_ENDPOINT, VARIANT_SAMPLE_SPREADSHEET_URL
+    )
     config.scan(__name__)
 
 
@@ -72,7 +78,10 @@ def validate_spreadsheet_search_parameters(context: CGAPRoot, request: Request) 
 @view_config(
     route_name=VARIANT_SAMPLE_SPREADSHEET_ENDPOINT,
     request_method="POST",
-    validators=[validate_spreadsheet_file_format, validate_spreadsheet_search_parameters],
+    validators=[
+        validate_spreadsheet_file_format,
+        validate_spreadsheet_search_parameters,
+    ],
 )
 @debug_log
 def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
@@ -80,14 +89,19 @@ def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Re
     file_format = spreadsheet_request.get_file_format()
     file_name = get_variant_sample_spreadsheet_file_name(spreadsheet_request)
     items_for_spreadsheet = get_items_from_search(context, request, spreadsheet_request)
-    spreadsheet_rows = get_variant_sample_rows(items_for_spreadsheet, spreadsheet_request)
+    spreadsheet_rows = get_variant_sample_rows(
+        items_for_spreadsheet, spreadsheet_request
+    )
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
 
 @view_config(
     route_name=CASE_SPREADSHEET_ENDPOINT,
     request_method="POST",
-    validators=[validate_spreadsheet_file_format, validate_spreadsheet_search_parameters],
+    validators=[
+        validate_spreadsheet_file_format,
+        validate_spreadsheet_search_parameters,
+    ],
 )
 @debug_log
 def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
@@ -99,7 +113,9 @@ def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
     return get_spreadsheet_response(file_name, spreadsheet_rows, file_format)
 
 
-def get_variant_sample_spreadsheet_file_name(spreadsheet_request: SpreadsheetRequest) -> str:
+def get_variant_sample_spreadsheet_file_name(
+    spreadsheet_request: SpreadsheetRequest,
+) -> str:
     case_accession = spreadsheet_request.get_case_accession() or "case"
     timestamp = get_timestamp()
     return f"{case_accession}-filtering-{timestamp}"
@@ -130,7 +146,7 @@ def get_variant_sample_rows(
     return VariantSampleSpreadsheet(
         items_for_spreadsheet,
         spreadsheet_request=spreadsheet_request,
-        embed_additional_items=embed_additional_items
+        embed_additional_items=embed_additional_items,
     ).yield_rows()
 
 
@@ -239,15 +255,15 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         return request.embed(note_identifier, as_user=True)
 
     def _evaluate_item_with_column(
-        self, column: SpreadsheetColumn, variant_sample: VariantSample,
+        self,
+        column: SpreadsheetColumn,
+        variant_sample: VariantSample,
     ) -> str:
         if column.is_property_evaluator():
             return column.get_field_for_item(variant_sample.get_properties())
         if column.is_callable_evaluator():
             return column.get_field_for_item(variant_sample)
-        raise SpreadsheetCreationError(
-            "Unable to use column for evaluating item"
-        )
+        raise SpreadsheetCreationError("Unable to use column for evaluating item")
 
     @classmethod
     def _get_column_tuples(cls) -> List[OrderedSpreadsheetColumn]:
@@ -378,47 +394,27 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
             (
                 "phyloP-30M",
                 "phyloP (30 Mammals) score",
-                "variant.csq_phylop30way_mammalian"
+                "variant.csq_phylop30way_mammalian",
             ),
             (
                 "phyloP-100V",
                 "phyloP (100 Vertebrates) score",
-                "variant.csq_phylop100way_vertebrate"
+                "variant.csq_phylop100way_vertebrate",
             ),
             (
                 "phastCons-100V",
                 "phastCons (100 Vertebrates) score",
-                "variant.csq_phastcons100way_vertebrate"
+                "variant.csq_phastcons100way_vertebrate",
             ),
-            (
-                "SIFT",
-                "SIFT prediction",
-                "variant.csq_sift_pred"
-            ),
-            (
-                "PolyPhen2",
-                "PolyPhen2 prediction",
-                "variant.csq_polyphen2_hvar_pred"
-            ),
-            (
-                "PrimateAI",
-                "Primate AI prediction",
-                "variant.csq_primateai_pred"
-            ),
-            (
-                "REVEL",
-                "REVEL score",
-                "variant.csq_revel_score"
-            ),
-            (
-                "SpliceAI",
-                "SpliceAI score",
-                "variant.spliceaiMaxds"
-            ),
+            ("SIFT", "SIFT prediction", "variant.csq_sift_pred"),
+            ("PolyPhen2", "PolyPhen2 prediction", "variant.csq_polyphen2_hvar_pred"),
+            ("PrimateAI", "Primate AI prediction", "variant.csq_primateai_pred"),
+            ("REVEL", "REVEL score", "variant.csq_revel_score"),
+            ("SpliceAI", "SpliceAI score", "variant.spliceaiMaxds"),
             (
                 "LOEUF",
                 "Loss-of-function observed/expected upper bound fraction",
-                "variant.genes.genes_most_severe_gene.oe_lof_upper"
+                "variant.genes.genes_most_severe_gene.oe_lof_upper",
             ),
             (
                 "S-het",
@@ -426,111 +422,99 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
                     "Estimates of heterozygous selection (source: Cassa et al 2017 Nat"
                     " Genet doi:10.1038/ng.3831)"
                 ),
-                "variant.genes.genes_most_severe_gene.s_het"
+                "variant.genes.genes_most_severe_gene.s_het",
             ),
             (
                 "ACMG classification (current)",
                 "ACMG classification for variant in this case",
-                "interpretation.classification"
+                "interpretation.classification",
             ),
             (
                 "ACMG rules (current)",
                 "ACMG rules invoked for variant in this case",
-                "interpretation.acmg_rules_invoked.acmg_rule_name"
+                "interpretation.acmg_rules_invoked.acmg_rule_name",
             ),
             (
                 "Clinical interpretation notes (current)",
                 "Clinical interpretation notes written for this case",
-                "interpretation.note_text"
+                "interpretation.note_text",
             ),
             (
                 "Gene candidacy (current)",
                 "Gene candidacy level selected for this case",
-                "discovery_interpretation.gene_candidacy"
+                "discovery_interpretation.gene_candidacy",
             ),
             (
                 "Variant candidacy (current)",
                 "Variant candidacy level selected for this case",
-                "discovery_interpretation.variant_candidacy"
+                "discovery_interpretation.variant_candidacy",
             ),
             (
                 "Discovery notes (current)",
                 "Gene/variant discovery notes written for this case",
-                "discovery_interpretation.note_text"
+                "discovery_interpretation.note_text",
             ),
             (
                 "Variant notes (current)",
                 "Additional notes on variant written for this case",
-                "variant_notes.note_text"
+                "variant_notes.note_text",
             ),
             (
                 "Gene notes (current)",
                 "Additional notes on gene written for this case",
-                "gene_notes.note_text"
+                "gene_notes.note_text",
             ),
             (
                 "ACMG classification (previous)",
                 "ACMG classification for variant in previous cases",
                 cls._get_note_of_same_project(
-                    "variant.interpretations",
-                    "classification"
-                )
+                    "variant.interpretations", "classification"
+                ),
             ),
             (
                 "ACMG rules (previous)",
                 "ACMG rules invoked for variant in previous cases",
                 cls._get_note_of_same_project(
-                    "variant.interpretations",
-                    "acmg_rules_invoked.acmg_rule_name"
-                )
+                    "variant.interpretations", "acmg_rules_invoked.acmg_rule_name"
+                ),
             ),
             (
                 "Clinical interpretation (previous)",
                 "Clinical interpretation notes written for previous cases",
-                cls._get_note_of_same_project(
-                    "variant.interpretations",
-                    "note_text"
-                )
+                cls._get_note_of_same_project("variant.interpretations", "note_text"),
             ),
             (
                 "Gene candidacy (previous)",
                 "Gene candidacy level selected for previous cases",
                 cls._get_note_of_same_project(
-                    "variant.discovery_interpretations",
-                    "gene_candidacy"
-                )
+                    "variant.discovery_interpretations", "gene_candidacy"
+                ),
             ),
             (
                 "Variant candidacy (previous)",
                 "Variant candidacy level selected for previous cases",
                 cls._get_note_of_same_project(
-                    "variant.discovery_interpretations",
-                    "variant_candidacy"
-                )
+                    "variant.discovery_interpretations", "variant_candidacy"
+                ),
             ),
             (
                 "Discovery notes (previous)",
                 "Gene/variant discovery notes written for previous cases",
                 cls._get_note_of_same_project(
-                    "variant.discovery_interpretations",
-                    "note_text"
-                )
+                    "variant.discovery_interpretations", "note_text"
+                ),
             ),
             (
                 "Variant notes (previous)",
                 "Additional notes on variant written for previous cases",
-                cls._get_note_of_same_project(
-                    "variant.variant_notes",
-                    "note_text"
-                )
+                cls._get_note_of_same_project("variant.variant_notes", "note_text"),
             ),
             (
                 "Gene notes (previous)",
                 "Additional notes on gene written for previous cases",
                 cls._get_note_of_same_project(
-                    "variant.genes.genes_most_severe_gene.gene_notes",
-                    "note_text"
-                )
+                    "variant.genes.genes_most_severe_gene.gene_notes", "note_text"
+                ),
             ),
         ]
 
@@ -589,10 +573,13 @@ class VariantSampleSpreadsheet(SpreadsheetFromColumnTuples):
         note_property_to_retrieve: str = "",
     ) -> str:
         result = ""
-        note = variant_sample.get_most_recent_note_of_same_project_from_property(note_property_location)
+        note = variant_sample.get_most_recent_note_of_same_project_from_property(
+            note_property_location
+        )
         if note:
-            result = get_values_for_field(note.get_properties(),
-                                          note_property_to_retrieve)
+            result = get_values_for_field(
+                note.get_properties(), note_property_to_retrieve
+            )
         return result
 
 
@@ -623,7 +610,11 @@ class CaseSpreadsheet(SpreadsheetFromColumnTuples):
             ("Sample ID", "Primary sample identifier", "sample.display_title"),
             ("Sequencing", "Primary sample sequencing type", "sample.workup_type"),
             ("QC flag", "Overall QC flag", cls._get_qc_flag),
-            ("Completed QC", "Completed QC steps", "quality_control_flags.completed_qcs"),
+            (
+                "Completed QC",
+                "Completed QC steps",
+                "quality_control_flags.completed_qcs",
+            ),
             (
                 "QC warnings",
                 "QC steps with warning flags",

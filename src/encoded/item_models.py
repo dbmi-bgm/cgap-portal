@@ -145,9 +145,10 @@ class Transcript:
         result = ""
         most_severe_consequence = self._get_most_severe_consequence()
         if most_severe_consequence:
-            result = self._get_location_by_most_severe_consequence(most_severe_consequence)
+            result = self._get_location_by_most_severe_consequence(
+                most_severe_consequence
+            )
         return result
-
 
     def _get_most_severe_consequence(self) -> Union[VariantConsequence, None]:
         result = None
@@ -167,7 +168,9 @@ class Transcript:
             if isinstance(item, dict)
         ]
 
-    def _get_location_by_most_severe_consequence(self, most_severe_consequence: VariantConsequence) -> str:
+    def _get_location_by_most_severe_consequence(
+        self, most_severe_consequence: VariantConsequence
+    ) -> str:
         if self._exon:
             return self._get_exon_location(most_severe_consequence)
         if self._intron:
@@ -191,7 +194,9 @@ class Transcript:
             return f"{self._distance} {self.LOCATION_DOWNSTREAM}"
         return ""
 
-    def _add_utr_suffix_if_needed(self, location: str, consequence: VariantConsequence) -> str:
+    def _add_utr_suffix_if_needed(
+        self, location: str, consequence: VariantConsequence
+    ) -> str:
         if consequence.is_three_prime_utr():
             return self._add_three_prime_utr_suffix(location)
         if consequence.is_five_prime_utr():
@@ -332,21 +337,28 @@ class Variant(Item):
             )
         return result
 
-    def _get_gnomad_v3_population_for_allele_fraction(self, allele_fraction: float) -> str:
+    def _get_gnomad_v3_population_for_allele_fraction(
+        self, allele_fraction: float
+    ) -> str:
         return self._get_gnomad_population_for_allele_fraction(
             self.GNOMAD_V3_AF_PREFIX, allele_fraction
         )
 
-    def _get_gnomad_v2_population_for_allele_fraction(self, allele_fraction: float) -> str:
+    def _get_gnomad_v2_population_for_allele_fraction(
+        self, allele_fraction: float
+    ) -> str:
         return self._get_gnomad_population_for_allele_fraction(
             self.GNOMAD_V2_AF_PREFIX, allele_fraction
         )
 
     def _get_gnomad_population_for_allele_fraction(
-        self, gnomad_af_prefix: str, allele_fraction: float 
+        self, gnomad_af_prefix: str, allele_fraction: float
     ) -> str:
         result = ""
-        for gnomad_suffix, population_name in self.GNOMAD_POPULATION_SUFFIX_TO_NAME.items():
+        for (
+            gnomad_suffix,
+            population_name,
+        ) in self.GNOMAD_POPULATION_SUFFIX_TO_NAME.items():
             population_property_name = gnomad_af_prefix + gnomad_suffix
             allele_frequency = self.properties.get(population_property_name)
             if allele_frequency == allele_fraction:
@@ -416,14 +428,16 @@ class VariantSample(Item):
         if variant:
             return variant.get_gnomad_v3_popmax_population()
         return ""
-        
+
     def get_gnomad_v2_popmax_population(self) -> str:
         variant = self._get_variant()
         if variant:
             return variant.get_gnomad_v2_popmax_population()
         return ""
 
-    def get_most_recent_note_of_same_project_from_property(self, note_property_location: str) -> Union[Note, None]:
+    def get_most_recent_note_of_same_project_from_property(
+        self, note_property_location: str
+    ) -> Union[Note, None]:
         result = None
         notes_at_location = list(
             simple_path_ids(self.properties, note_property_location)
