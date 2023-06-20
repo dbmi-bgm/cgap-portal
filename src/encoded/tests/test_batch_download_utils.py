@@ -6,7 +6,6 @@ from typing import (
     Generator,
     Iterator,
     List,
-    Mapping,
     Optional,
     Sequence,
     Union,
