@@ -6,6 +6,7 @@ export function BigDropdownBigLink(props){
         titleIcon = null,
         className = null,
         isActive = false,
+        isButton = false,
         ...passProps // Contains: `href`, `rel`, `onClick`, etc.
     } = props;
 
@@ -33,12 +34,22 @@ export function BigDropdownBigLink(props){
         );
     }
 
+    if (!isButton) {
+        return (
+            <a {...passProps} className={"big-link" + (className? " " + className : "") + (isActive? " active" : "")}>
+                <div className="row align-items-center">
+                    { iconCol }
+                    { textCol }
+                </div>
+            </a>
+        );
+    }
     return (
-        <a {...passProps} className={"big-link" + (className? " " + className : "") + (isActive? " active" : "")}>
+        <div {...passProps} className={"big-link" + (className? " " + className : "") + (isActive? " active" : "")}>
             <div className="row align-items-center">
                 { iconCol }
                 { textCol }
             </div>
-        </a>
+        </div>
     );
 }

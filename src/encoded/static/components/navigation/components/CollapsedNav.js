@@ -88,9 +88,6 @@ function LeftNavAuthenticated(props){
     return (
         <div className="navbar-nav mr-auto">
             <BrowseNavItem {...{ href }} {...props} />
-            <a href="/cohort-analysis" className={"nav-link browse-nav-btn" + (isCohortsLinkActive ? " active" : "")}>
-                Cohort Browser
-            </a>
             <HelpNavItem {...props} />
         </div>
     );
@@ -180,14 +177,25 @@ const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
                 </div>
             </BigDropdownBigLink>
 
-            <BigDropdownBigLink href={browseByCohortAnalysisHref} isActive={isBrowseByCohortAnalysisActive} titleIcon="project-diagram fas" className="primary-big-link">
-                <h4>Browse Cohorts</h4>
-                <div className="description">
-                    Search All Cohorts on the Computational Genome Analysis Platform
+            <BigDropdownBigLink href={browseByCohortAnalysisHref} isActive={isBrowseByCohortAnalysisActive} isButton titleIcon="project-diagram fas" className="primary-big-link">
+                <div className="d-flex flex-column flex-lg-row">
+                    <div className="col pl-0">
+                        <a href={browseByCohortAnalysisHref} >
+                            <h4>Browse Cohorts</h4>
+                            <div className="description">
+                                Search All Cohorts on the Computational Genome Analysis Platform
+                            </div>
+                        </a>
+                    </div>
+                    <div className="col-auto pl-0 pl-1-md">
+                        <a href="/cohort-analysis" className="curated-browsers-link btn btn-primary btn-link btn-sm mt-1">
+                            View Cohort Browser
+                        </a>
+                    </div>
                 </div>
             </BigDropdownBigLink>
 
-            <BigDropdownBigLink href={browseByGeneListHref} isActive={isBrowseByGeneListActive} titleIcon="dna fas" className="primary-big-link">
+            <BigDropdownBigLink href={browseByGeneListHref} isActive={isBrowseByGeneListActive} titleIcon="dna fas" className="primary-big-link bottom-edge-child">
                 <h4>Browse Gene Lists</h4>
                 <div className="description">
                     Search All Gene Lists on the Computational Genome Analysis Platform

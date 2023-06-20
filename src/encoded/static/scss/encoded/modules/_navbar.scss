@@ -824,37 +824,43 @@ body[data-current-action="multiselect"] {
                 }
 
                 // Same size, similar styling as intro-section
-                a.big-link {
-                    color: inherit;
+                .big-link {
+                    color: $navbar-link-color;
                     position: relative;
                     &:hover {
-                        color: #5d8a8e;
+                        color: $navbar-link-hover-color;
                         text-shadow: 0 0 0;
                         text-decoration: none;
                         &:after {
                             opacity: 1;
                         }
                     }
+                    & a {
+                        text-decoration: none;
+                    }
+                    .description,
                     > div,
                     > div > div,
                     > div > div > h3,
                     > div > div > h5,
                     > div > div > h4 {
-                        color: inherit;
+                        color: $navbar-link-color;
                     }
                     > div > div > h3,
                     > div > div > h5,
-                    > div > div > h4 {
-                        color: #eee;
+                    > div > div > h4,
+                    > div > div > div > div > a > h4 {
+                        color: $navbar-link-color;
                         display: inline-block;
                         @include after-big-link-append;
-                    }
+                    }       
                     &:hover,
                     &.active {
                         > div > div > h3,
                         > div > div > h5,
-                        > div > div > h4 {
-                            color: inherit; // Highlight color
+                        > div > div > h4,
+                        > div > div > div > div > a > h4 {
+                            color: $navbar-link-hover-color; // Highlight color
                             &:after {
                                 opacity: 1;
                             }
@@ -864,6 +870,13 @@ body[data-current-action="multiselect"] {
                         // "Browse All"
                         h4 {
                             font-weight: 600;
+                        }
+                    }
+                    .curated-browsers-link {
+                        text-decoration: none;
+                        color: $navbar-link-hover-color;
+                        &hover {
+                            color: $navbar-link-color;
                         }
                     }
                 }
