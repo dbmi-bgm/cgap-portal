@@ -7,25 +7,36 @@ from snovault.util import simple_path_ids
 from .util import JsonObject
 
 
+LinkTo = Union[str, JsonObject]
+
+
 @dataclass(frozen=True)
-class ItemModel:
+class Item:
     ATID = "@id"
     PROJECT = "project"
 
     properties: JsonObject
 
+    @property
+    def _atid(self) -> str:
+        return self.properties.get(self.ATID, "")
+
+    @property
+    def _project(self) -> LinkTo:
+        return self.properties.get(self.PROJECT, "")
+
     def get_properties(self) -> JsonObject:
         return self.properties
 
     def get_atid(self) -> str:
-        return self.properties.get(self.ATID, "")
+        return self._atid
 
-    def get_project(self) -> str:
-        return self.properties.get(self.PROJECT, "")
+    def get_project(self) -> LinkTo:
+        return self._project
 
 
 @dataclass(frozen=True)
-class VariantConsequence(ItemModel):
+class VariantConsequence(Item):
     # Schema constants
     IMPACT = "impact"
     IMPACT_HIGH = "HIGH"
@@ -40,30 +51,30 @@ class VariantConsequence(ItemModel):
     UPSTREAM_GENE_CONSEQUENCE = "upstream_gene_variant"
 
     @property
-    def impact(self) -> str:
-        return self.properties.get(self.IMPACT, "")
-
-    @property
-    def name(self) -> str:
+    def _name(self) -> str:
         return self.properties.get(self.VAR_CONSEQ_NAME, "")
 
+    @property
+    def _impact(self) -> str:
+        return self.properties.get(self.IMPACT, "")
+
     def get_name(self) -> str:
-        return self.name
+        return self._name
 
     def get_impact(self) -> str:
-        return self.impact
+        return self._impact
 
     def is_downstream(self) -> str:
-        return self.name == self.DOWNSTREAM_GENE_CONSEQUENCE
+        return self._name == self.DOWNSTREAM_GENE_CONSEQUENCE
 
     def is_upstream(self) -> str:
-        return self.name == self.UPSTREAM_GENE_CONSEQUENCE
+        return self._name == self.UPSTREAM_GENE_CONSEQUENCE
 
     def is_three_prime_utr(self) -> str:
-        return self.name == self.THREE_PRIME_UTR_CONSEQUENCE
+        return self._name == self.THREE_PRIME_UTR_CONSEQUENCE
 
     def is_five_prime_utr(self) -> str:
-        return self.name == self.FIVE_PRIME_UTR_CONSEQUENCE
+        return self._name == self.FIVE_PRIME_UTR_CONSEQUENCE
 
 
 @dataclass(frozen=True)
@@ -94,83 +105,90 @@ class Transcript:
     properties: JsonObject
 
     @property
-    def canonical(self) -> bool:
+    def _canonical(self) -> bool:
         return self.properties.get(self.CSQ_CANONICAL, False)
 
     @property
-    def most_severe(self) -> bool:
+    def _most_severe(self) -> bool:
         return self.properties.get(self.CSQ_MOST_SEVERE, False)
 
     @property
-    def exon(self) -> str:
+    def _exon(self) -> str:
         return self.properties.get(self.CSQ_EXON, "")
 
     @property
-    def intron(self) -> str:
+    def _intron(self) -> str:
         return self.properties.get(self.CSQ_INTRON, "")
 
     @property
-    def distance(self) -> str:
+    def _distance(self) -> str:
         return self.properties.get(self.CSQ_DISTANCE, "")
 
     @property
-    def feature(self) -> str:
+    def _feature(self) -> str:
         return self.properties.get(self.CSQ_FEATURE, "")
 
     @property
-    def consequences(self) -> List[VariantConsequence]:
-        return [
-            VariantConsequence(item)
-            for item in self.properties.get(self.CSQ_CONSEQUENCE, [])
-        ]
+    def _consequences(self) -> List[LinkTo]:
+        return self.properties.get(self.CSQ_CONSEQUENCE, [])
 
     def is_canonical(self) -> bool:
-        return self.canonical
+        return self._canonical
 
     def is_most_severe(self) -> bool:
-        return self.most_severe
+        return self._most_severe
 
     def get_feature(self) -> str:
-        return self.feature
+        return self._feature
 
     def get_location(self) -> str:
         result = ""
         most_severe_consequence = self._get_most_severe_consequence()
         if most_severe_consequence:
-            result = self._get_location(most_severe_consequence)
+            result = self._get_location_by_most_severe_consequence(most_severe_consequence)
         return result
+
 
     def _get_most_severe_consequence(self) -> Union[VariantConsequence, None]:
         result = None
         most_severe_rank = math.inf
-        for consequence in self.consequences:
+        for consequence in self._get_consequences():
             impact = consequence.get_impact()
             impact_rank = self.IMPACT_RANKING.get(impact, math.inf)
             if impact_rank < most_severe_rank:
+                most_severe_rank = impact_rank
                 result = consequence
         return result
 
-    def _get_location(self, most_severe_consequence: VariantConsequence) -> str:
-        result = ""
-        if self.exon:
-            result = self._get_exon_location()
-        elif self.intron:
-            result = self._get_intron_location()
-        elif self.distance:
-            result = self._get_distance_location(most_severe_consequence)
-        return self._add_utr_suffix_if_needed(result, most_severe_consequence)
+    def _get_consequences(self) -> List[VariantConsequence]:
+        return [
+            VariantConsequence(item)
+            for item in self._consequences
+            if isinstance(item, dict)
+        ]
 
-    def _get_exon_location(self) -> str:
-        return f"{self.LOCATION_EXON} {self.exon}"
+    def _get_location_by_most_severe_consequence(self, most_severe_consequence: VariantConsequence) -> str:
+        if self._exon:
+            return self._get_exon_location(most_severe_consequence)
+        if self._intron:
+            return self._get_intron_location(most_severe_consequence)
+        if self._distance:
+            return self._get_distance_location(most_severe_consequence)
+        return ""
 
-    def _get_intron_location(self) -> str:
-        return f"{self.LOCATION_INTRON} {self.intron}"
+    def _get_exon_location(self, consequence: VariantConsequence) -> str:
+        location = f"{self.LOCATION_EXON} {self._exon}"
+        return self._add_utr_suffix_if_needed(location, consequence)
+
+    def _get_intron_location(self, consequence: VariantConsequence) -> str:
+        location = f"{self.LOCATION_INTRON} {self._intron}"
+        return self._add_utr_suffix_if_needed(location, consequence)
 
     def _get_distance_location(self, consequence: VariantConsequence) -> str:
         if consequence.is_upstream():
-            return f"{self.distance} {self.LOCATION_UPSTREAM}"
+            return f"{self._distance} {self.LOCATION_UPSTREAM}"
         if consequence.is_downstream():
-            return f"{self.distance} {self.LOCATION_DOWNSTREAM}"
+            return f"{self._distance} {self.LOCATION_DOWNSTREAM}"
         return ""
 
     def _add_utr_suffix_if_needed(self, location: str, consequence: VariantConsequence) -> str:
@@ -192,11 +210,13 @@ class Transcript:
         return utr_suffix
 
     def get_consequence_names(self) -> str:
-        return ", ".join([consequence.get_name() for consequence in self.consequences])
+        return ", ".join(
+            [consequence.get_name() for consequence in self._get_consequences()]
+        )
 
 
 @dataclass(frozen=True)
-class Variant(ItemModel):
+class Variant(Item):
 
     # Schema constants
     CSQ_CANONICAL = "csq_canonical"
@@ -227,73 +247,76 @@ class Variant(ItemModel):
     }
 
     @property
-    def transcript(self) -> List[JsonObject]:
+    def _transcripts(self) -> List[JsonObject]:
         return self.properties.get(self.TRANSCRIPT, [])
 
     @property
-    def _transcripts(self) -> List[Transcript]:
-        return [Transcript(transcript) for transcript in self.transcript]
-
-    @property
-    def most_severe_location(self) -> str:
+    def _most_severe_location(self) -> str:
         return self.properties.get(self.MOST_SEVERE_LOCATION, "")
 
     @property
-    def csq_gnomadg_af_popmax(self) -> Union[float, None]:
+    def _csq_gnomadg_af_popmax(self) -> Union[float, None]:
         return self.properties.get(self.CSQ_GNOMADG_AF_POPMAX)
 
     @property
-    def csq_gnomade2_af_popmax(self) -> Union[float, None]:
+    def _csq_gnomade2_af_popmax(self) -> Union[float, None]:
         return self.properties.get(self.CSQ_GNOMADE2_AF_POPMAX)
 
-    @property
-    def _canonical_transcript(self) -> Union[None, Transcript]:
-        for transcript in self._transcripts:
+    def get_most_severe_location(self) -> str:
+        return self._most_severe_location
+
+    def _get_transcripts(self) -> List[Transcript]:
+        return [Transcript(transcript) for transcript in self._transcripts]
+
+    def _get_canonical_transcript(self) -> Union[Transcript, None]:
+        for transcript in self._get_transcripts():
             if transcript.is_canonical():
                 return transcript
 
-    @property
-    def _most_severe_transcript(self) -> Union[None, Transcript]:
-        for transcript in self._transcripts:
+    def _get_most_severe_transcript(self) -> Union[Transcript, None]:
+        for transcript in self._get_transcripts():
             if transcript.is_most_severe():
                 return transcript
 
-    def get_most_severe_location(self) -> str:
-        return self.most_severe_location
-
     def get_canonical_transcript_feature(self) -> str:
-        if self._canonical_transcript:
-            return self._canonical_transcript.get_feature()
+        canonical_transcript = self._get_canonical_transcript()
+        if canonical_transcript:
+            return canonical_transcript.get_feature()
         return ""
 
     def get_most_severe_transcript_feature(self) -> str:
-        if self._most_severe_transcript:
-            return self._most_severe_transcript.get_feature()
+        most_severe_transcript = self._get_most_severe_transcript()
+        if most_severe_transcript:
+            return most_severe_transcript.get_feature()
         return ""
 
     def get_canonical_transcript_consequence_names(self) -> str:
-        if self._canonical_transcript:
-            return self._canonical_transcript.get_consequence_names()
+        canonical_transcript = self._get_canonical_transcript()
+        if canonical_transcript:
+            return canonical_transcript.get_consequence_names()
         return ""
 
     def get_most_severe_transcript_consequence_names(self) -> str:
-        if self._most_severe_transcript:
-            return self._most_severe_transcript.get_consequence_names()
+        most_severe_transcript = self._get_most_severe_transcript()
+        if most_severe_transcript:
+            return most_severe_transcript.get_consequence_names()
         return ""
 
     def get_canonical_transcript_location(self) -> str:
-        if self._canonical_transcript:
-            return self._canonical_transcript.get_location()
+        canonical_transcript = self._get_canonical_transcript()
+        if canonical_transcript:
+            return canonical_transcript.get_location()
         return ""
 
     def get_most_severe_transcript_location(self) -> str:
-        if self._most_severe_transcript:
-            return self._most_severe_transcript.get_location()
+        most_severe_transcript = self._get_most_severe_transcript()
+        if most_severe_transcript:
+            return most_severe_transcript.get_location()
         return ""
 
     def get_gnomad_v3_popmax_population(self) -> str:
         result = ""
-        gnomad_v3_af_popmax = self.csq_gnomadg_af_popmax
+        gnomad_v3_af_popmax = self._csq_gnomadg_af_popmax
         if gnomad_v3_af_popmax:
             result = self._get_gnomad_v3_population_for_allele_fraction(
                 gnomad_v3_af_popmax
@@ -302,7 +325,7 @@ class Variant(ItemModel):
 
     def get_gnomad_v2_popmax_population(self) -> str:
         result = ""
-        gnomad_v2_af_popmax = self.csq_gnomade2_af_popmax
+        gnomad_v2_af_popmax = self._csq_gnomade2_af_popmax
         if gnomad_v2_af_popmax:
             result = self._get_gnomad_v2_population_for_allele_fraction(
                 gnomad_v2_af_popmax
@@ -331,44 +354,74 @@ class Variant(ItemModel):
                 break
         return result
 
-class Note(ItemModel):
 
+@dataclass(frozen=True)
+class Note(Item):
     pass
 
 
 @dataclass(frozen=True)
-class VariantSample(ItemModel):
+class VariantSample(Item):
 
     # Schema constants
     VARIANT = "variant"
 
     @property
-    def variant(self) -> Variant:
-        return Variant(self.properties.get(self.VARIANT, {}))
+    def _variant(self) -> LinkTo:
+        return self.properties.get(self.VARIANT, "")
+
+    def _get_variant(self) -> Union[Variant, None]:
+        if isinstance(self._variant, dict):
+            return Variant(self._variant)
+        return
 
     def get_canonical_transcript_feature(self) -> str:
-        return self.variant.get_canonical_transcript_feature()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_canonical_transcript_feature()
+        return ""
 
     def get_canonical_transcript_location(self) -> str:
-        return self.variant.get_canonical_transcript_location()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_canonical_transcript_location()
+        return ""
 
     def get_canonical_transcript_consequence_names(self) -> str:
-        return self.variant.get_canonical_transcript_consequence_names()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_canonical_transcript_consequence_names()
+        return ""
 
     def get_most_severe_transcript_feature(self) -> str:
-        return self.variant.get_most_severe_transcript_feature()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_most_severe_transcript_feature()
+        return ""
 
     def get_most_severe_transcript_location(self) -> str:
-        return self.variant.get_most_severe_transcript_location()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_most_severe_transcript_location()
+        return ""
 
     def get_most_severe_transcript_consequence_names(self) -> str:
-        return self.variant.get_most_severe_transcript_consequence_names()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_most_severe_transcript_consequence_names()
+        return ""
 
     def get_gnomad_v3_popmax_population(self) -> str:
-        return self.variant.get_gnomad_v3_popmax_population()
-
+        variant = self._get_variant()
+        if variant:
+            return variant.get_gnomad_v3_popmax_population()
+        return ""
+        
     def get_gnomad_v2_popmax_population(self) -> str:
-        return self.variant.get_gnomad_v2_popmax_population()
+        variant = self._get_variant()
+        if variant:
+            return variant.get_gnomad_v2_popmax_population()
+        return ""
 
     def get_most_recent_note_of_same_project_from_property(self, note_property_location: str) -> Union[Note, None]:
         result = None
@@ -392,27 +445,45 @@ class VariantSample(ItemModel):
 
 
 @dataclass(frozen=True)
-class VariantSampleList(ItemModel):
+class VariantSampleListSelection:
+
+    VARIANT_SAMPLE_ITEM = "variant_sample_item"
+
+    properties: JsonObject
+
+    @property
+    def _variant_sample(self) -> LinkTo:
+        return self.properties.get(self.VARIANT_SAMPLE_ITEM, "")
+
+    def get_variant_sample(self) -> LinkTo:
+        return self._variant_sample
+
+
+@dataclass(frozen=True)
+class VariantSampleList(Item):
 
     CREATED_FOR_CASE = "created_for_case"
     VARIANT_SAMPLES = "variant_samples"
-    VARIANT_SAMPLE_ITEM = "variant_sample_item"
 
     @property
-    def created_for_case(self) -> str:
+    def _created_for_case(self) -> str:
         return self.properties.get(self.CREATED_FOR_CASE, "")
 
     @property
-    def variant_samples(self) -> List[JsonObject]:
+    def _variant_sample_selections(self) -> List[LinkTo]:
         return self.properties.get(self.VARIANT_SAMPLES, [])
 
     def get_associated_case_accession(self) -> str:
-        return self.created_for_case
+        return self._created_for_case
 
-    def get_variant_samples(self) -> List[str]:
-        result = []
-        for item in self.variant_samples:
-            variant_sample_item = item.get(self.VARIANT_SAMPLE_ITEM)
-            if variant_sample_item:
-                result.append(variant_sample_item)
-        return result
+    def _get_variant_sample_selections(self) -> List[VariantSampleListSelection]:
+        return [
+            VariantSampleListSelection(variant_sample_selection)
+            for variant_sample_selection in self._variant_sample_selections
+        ]
+
+    def get_variant_samples(self) -> List[LinkTo]:
+        return [
+            variant_sample_selection.get_variant_sample()
+            for variant_sample_selection in self._get_variant_sample_selections()
+        ]

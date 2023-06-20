@@ -1,4 +1,3 @@
-import inspect
 import re
 from contextlib import contextmanager
 from typing import Any, Dict, Iterator, Optional
@@ -30,17 +29,23 @@ def make_atid(uuid, item_type="sample-processing"):
     return f"/{pluralize(item_type)}/{uuid}/"
 
 
+AN_UNLIKELY_RETURN_VALUE = "unlikely return value"
+
+
 @contextmanager
 def patch_context(
     to_patch: object,
-    return_value: Optional[Any] = None,
+    return_value: Any = AN_UNLIKELY_RETURN_VALUE,
     **kwargs,
 ) -> Iterator[mock.MagicMock]:
     if isinstance(to_patch, property):
         to_patch = to_patch.fget
+        new_callable = mock.PropertyMock
+    else:
+        new_callable = mock.MagicMock
     target = f"{to_patch.__module__}.{to_patch.__qualname__}"
-    with mock.patch(target, **kwargs) as mocked_item:
-        if return_value is not None:
+    with mock.patch(target, new_callable=new_callable, **kwargs) as mocked_item:
+        if return_value != AN_UNLIKELY_RETURN_VALUE:
             mocked_item.return_value = return_value
         yield mocked_item
 
