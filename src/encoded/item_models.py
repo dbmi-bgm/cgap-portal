@@ -1,6 +1,6 @@
 import math
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Union
+from typing import Iterable, List, Union
 
 from snovault.util import simple_path_ids
 
