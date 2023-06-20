@@ -15,6 +15,10 @@ import { CaseInfoToggle } from '../CaseView';
 import { SomaticAnalysisStats } from './SomaticAnalysisStats';
 
 
+/**
+ * Might be able to create a more generic view for cases/somatic analyses items, but need the UX for this to be
+ * solidified before we can figure out
+ */
 export default class SomaticAnalysisView extends DefaultItemView {
 
     getTabViewContents(controllerProps = {}) {
@@ -98,7 +102,7 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                         </object.CopyWrapper>
                                         <div>
                                             What is somatic analysis?
-                                            <i className="icon-info-circle icon fas"
+                                            <i className="icon-info-circle icon fas ml-05"
                                                 data-tip="Identifies somatic mutations present in a sample and absent in reference normal tissue from the same individual. ">
                                             </i>
                                         </div>
