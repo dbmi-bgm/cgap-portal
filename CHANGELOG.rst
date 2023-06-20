@@ -6,17 +6,28 @@ cgap-portal
 Change Log
 ----------
 
+13.4.1
+======
+`PR : Somatic CGAP UI V1 <>`_
+
+* [WIP]
+
 13.4.0
 ======
-`PR 711: Generic QCs <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
+`PR 711: Generic QualityMetric <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
 
-* Create new QualityMetricGeneric item
-* Add new property for array of QualityMetric linkTos to File schema to be used for QualityMetricGeneric items
+* Add new QualityMetricGeneric item
+* Add File property for QualityMetricGeneric linkTos
+
+
+13.3.2
+======
+
+* Remove inclusion of unused loremipsum library from pyproject.toml (C4-1036)
 
 
 13.3.1
 ======
-`No PR: Staff-change Insert Updates`_
 
 * Remove Victoria's user insert from master-inserts
 * Add Cesar's user insert to master-inserts
