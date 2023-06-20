@@ -1371,6 +1371,7 @@ VARIANT_SAMPLE_FIELDS_TO_EMBED_FOR_SPREADSHEET = [
 )
 @debug_log
 def variant_sample_list_spreadsheet(context: VariantSampleList, request: Request):
+    """Download spreadsheet for VariantSamples in VariantSampleList."""
     spreadsheet_request = SpreadsheetRequest(request)
     file_format = spreadsheet_request.get_file_format()
     file_name = get_variant_sample_spreadsheet_file_name(context, spreadsheet_request)

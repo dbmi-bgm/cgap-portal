@@ -61,6 +61,7 @@ register_path_content_type(
 
 
 def validate_spreadsheet_file_format(context: CGAPRoot, request: Request) -> None:
+    """Validate file format is accepted."""
     spreadsheet_request = SpreadsheetRequest(request)
     file_format = spreadsheet_request.get_file_format()
     if file_format not in ACCEPTABLE_FILE_FORMATS:
@@ -68,6 +69,7 @@ def validate_spreadsheet_file_format(context: CGAPRoot, request: Request) -> Non
 
 
 def validate_spreadsheet_search_parameters(context: CGAPRoot, request: Request) -> None:
+    """Validate search parameters provided."""
     spreadsheet_request = SpreadsheetRequest(request)
     search = spreadsheet_request.get_compound_search()
     if not search:
@@ -84,6 +86,7 @@ def validate_spreadsheet_search_parameters(context: CGAPRoot, request: Request) 
 )
 @debug_log
 def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
+    """Download spreadsheet for VariantSamples from search."""
     spreadsheet_request = SpreadsheetRequest(request)
     file_format = spreadsheet_request.get_file_format()
     file_name = get_variant_sample_spreadsheet_file_name(spreadsheet_request)
@@ -104,6 +107,7 @@ def variant_sample_search_spreadsheet(context: CGAPRoot, request: Request) -> Re
 )
 @debug_log
 def case_search_spreadsheet(context: CGAPRoot, request: Request) -> Response:
+    """Download spreadsheet for Cases from search."""
     spreadsheet_request = SpreadsheetRequest(request)
     file_format = spreadsheet_request.get_file_format()
     file_name = get_case_spreadsheet_file_name()
