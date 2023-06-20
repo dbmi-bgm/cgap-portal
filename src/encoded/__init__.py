@@ -189,14 +189,13 @@ def main(global_config, **local_config):
     config.include('.server_defaults')
     config.include('.root')
     config.include('.types')
-#    config.include('.batch_download')
+    config.include('.batch_download')
     config.include('.loadxl')
     config.include('.visualization')
     config.include('.ingestion_listener')
     config.include('.ingestion.ingestion_message_handler_vcf')
     config.include('.ingestion.ingestion_message_handler_default')
     config.include('.custom_embed')
-    config.include('.batch_download')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
