@@ -53,6 +53,43 @@
     "properties": {
         "schema_version": {
             "default": "1"
+        },
+        "coverage": {
+            "title": "Coverage",
+            "description": "Average read coverage",
+            "type": "string"
+        },
+        "sample": {
+            "title": "Sample",
+            "description": "Associated sample",
+            "type": "string"
+        },
+        "mapping stats": {
+            "title": "Mapping statistics",
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "read length": {
+                    "title": "Read Length",
+                    "type": "integer"
+                },
+                "total reads": {
+                    "title": "Total Reads",
+                    "type": "integer"
+                },
+                "one mate mapped": {
+                    "title": "One Mate Mapped",
+                    "type": "integer"
+                },
+                "both mates mapped": {
+                    "title": "Both Mates Mapped",
+                    "type": "integer"
+                },
+                "neither mate mapped": {
+                    "title": "Neither Mate Mapped",
+                    "type": "integer"
+                }
+            }
         }
     },
     "facets": {
