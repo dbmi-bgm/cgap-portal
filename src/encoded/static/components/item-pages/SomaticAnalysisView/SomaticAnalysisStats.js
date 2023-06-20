@@ -133,7 +133,7 @@ export const SampleSummaryInfo = React.memo(function SampleSummaryInfo({ samples
                 const appendLine = i !== samples.length - 1;
 
                 return (
-                    <>
+                    <React.Fragment key={atID}>
                         <div className="card-text mb-1 text-capitalize">
                             <label className="mb-0">{tissue_type} Sample:&nbsp;</label>
                             { specimen_type || fallbackElem }
@@ -145,7 +145,7 @@ export const SampleSummaryInfo = React.memo(function SampleSummaryInfo({ samples
                                 : fallbackElem }
                         </div>
                         {appendLine && <hr/>}
-                    </>
+                    </React.Fragment>
                 );
             })}
         </React.Fragment>
