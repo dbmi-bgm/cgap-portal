@@ -890,7 +890,7 @@ body[data-current-action="multiselect"] {
                             position: relative;
 							@include after-big-link-append;
 							&:hover {
-								color: #5d8a8e;
+								color: $navbar-link-hover-color;
 								text-shadow: 0 0 0;
 								text-decoration: none;
 								&:after {
@@ -931,7 +931,7 @@ body[data-current-action="multiselect"] {
                                 //border: 1px solid transparent;
                                 display: inline-block;
                                 color: #333;
-                                color: #fff;
+                                color: $navbar-link-color;
                                 font-weight: 500;
                                 padding: 8px 0 6px 0;
                                 //margin-left: -12px;
@@ -939,12 +939,12 @@ body[data-current-action="multiselect"] {
                                 border-radius: 2px;
                                 //margin-bottom: -1px;
                                 &:hover {
-                                    border-color: #5d8a8e; 
+                                    border-color: $navbar-link-hover-color; 
                                     //background-color: #e7e7e7;
                                     //color: #fff;
                                     text-decoration: none;
                                     color: #000;
-                                    color: #5d8a8e; 
+                                    color: $navbar-link-hover-color; 
                                     text-shadow: 0 0 0;
                                 }
                                 > * {
@@ -1003,7 +1003,7 @@ body[data-current-action="multiselect"] {
                         > a.level-2-title {
                             //color: #333;
                             position: relative;
-                            color: #eee;
+                            color: $navbar-link-color;
                             font-weight: 400;
                             padding: 5px 10px 4px;
                             margin-bottom: -4px;
@@ -1011,14 +1011,13 @@ body[data-current-action="multiselect"] {
                             z-index: 2;
                             &:hover {
                                 z-index: 5;
-                                background-color: #5d8a8e;
-                                color: #fff;
+                                background-color: $primary;
+                                color: $navbar-link-hover-color;
                                 text-decoration: none;
                             }
                             &.active {
                                 z-index: 1;
-                                //background-color: #34959d;
-                                color: #fff;
+                                color: $navbar-link-active-color;
                                 font-weight: 600;
                                 text-decoration: none;
                                 background-color: #484848;
