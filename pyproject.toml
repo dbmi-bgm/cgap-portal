@@ -141,7 +141,6 @@ flake8 = ">=6.0.0"
 flaky = ">=3.7.0"
 # flask only for moto[server]
 # flask = ">=2.0.3"
-loremipsum = "1.0.5"  # GPL licensed, but this is dev-only, used only in one occasional script
 # Upon removal of moto[server] we seem to be able to tolerate newer moto versions
 moto = "4.0.3"
 pip-licenses = "^3.5.5"
