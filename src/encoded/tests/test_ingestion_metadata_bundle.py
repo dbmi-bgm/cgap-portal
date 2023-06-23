@@ -14,7 +14,7 @@ from dcicutils.qa_utils import MockBotoS3Client  # , ControlledTime
 from dcicutils.s3_utils import HealthPageKey
 from unittest import mock
 from .data import DBMI_PROJECT_ID, DBMI_PROJECT, DBMI_INSTITUTION_ID, DBMI_INSTITUTION, METADATA_BUNDLE_PATH, DBMI_PI
-from ..ingestion import ingestion_listener as ingestion_listener_module
+from snovault.ingestion import ingestion_listener as ingestion_listener_module
 from .. import util as util_module
 from .helpers import assure_related_items_for_testing
 

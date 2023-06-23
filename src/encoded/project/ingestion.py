@@ -1,4 +1,6 @@
 from snovault.project.ingestion import SnovaultProjectIngestion
+import json
+from pyramid.request import Request
 import structlog
 from pyramid.httpexceptions import HTTPNotFound, HTTPMovedPermanently
 from snovault.ingestion.ingestion_listener_base import STATUS_INGESTED, STATUS_QUEUED
@@ -8,7 +10,7 @@ log = structlog.getLogger(__name__)
 
 
 class CgapProjectIngestion(SnovaultProjectIngestion):
-    def note_ingestion_enqueue_uuids_for_request(self, ingestion_type, request, uuid):
+    def note_ingestion_enqueue_uuids_for_request(self, ingestion_type, request, uuids):
         if ingestion_type == 'vcf':
             patch_vcf_file_status(request, uuids)  # extra state management - may not be accurate, hard to get right
 

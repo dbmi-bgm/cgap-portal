@@ -18,6 +18,9 @@ from snovault.util import (
     SettingsKey,
     vapp_for_email
 )
+from snovault.embed import (
+    subrequest_item_creation
+)
 
 # These are now moved or reused from snovault.utils (May 2023):
 # - CONTENT_TYPE_SPECIAL_CASES
