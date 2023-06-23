@@ -15,4 +15,4 @@ class CgapProject(CgapProjectAccessKey,
                   CgapProjectLoadxl,
                   SnovaultProject):
     NAMES = {'NAME': APPLICATION_NAME, 'PYPI_NAME': APPLICATION_PYPROJECT_NAME}
-    ACCESSION_PREFIX = "4DN"
+    ACCESSION_PREFIX = "GAP"
