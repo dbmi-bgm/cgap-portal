@@ -49,6 +49,7 @@ ITEM_INDEX_ORDER = [
     'QualityMetricVcfcheck',
     'QualityMetricVcfqc',
     'QualityMetricPeddyqc',
+    'QualityMetricGeneric',
     'TrackingItem',
     'Software',
     'Sample',
