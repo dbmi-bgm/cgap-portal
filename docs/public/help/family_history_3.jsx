@@ -46,7 +46,7 @@
         SubmitCGAP. The current version is still in beta. It can be
         installed by running `pip install submit-cgap`. We
         recommend doing this inside a virtual environment running
-        python 3.7. Further instructions for submission with this
+        Python 3.7, 3.8 or 3.9. Further instructions for submission with this
         method can be found in the <a href="https://submitcgap.readthedocs.io/en/latest/getting_started.html#family-history">SubmitCGAP documentation</a>.
     </p>
 

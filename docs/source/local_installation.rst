@@ -11,11 +11,13 @@ Legacy Instructions
 
 The following instructions are for running a CGAP deployment with macOS and homebrew.
 
-Note that as of summer 2021, these instructions are out of date. Please refer to the Docker setup. There are no guarantees the legacy instructions will work from this point forward.
+Note that as of summer 2021, these instructions are out of date. Please refer to the Docker setup.
+There are no guarantees the legacy instructions will work from this point forward.
 
-CGAP is known to work with Python 3.7.x and 3.8.x and will not work with Python 3.9 or greater.
-If part of the HMS team, it is recommended to use a high patch version, such as Python 3.8.13,
-since that's what we try to do with our servers, but any version of 3.8 should work if you
+CGAP is known to work with 3.8.1 through 3.9.x and will not work with Python 3.10 or greater.
+If part of the HMS team, it is recommended to use a high patch version, such as Python 3.9.16,
+since that's what we try to do with our servers, but any version of 3.8.x (starting with 3.8.1)
+or any version of 3.9.x should work if you
 find you are unable to install that particular patch version.
 It is best practice to create a fresh Python
 virtualenv using one of these versions before proceeding to the following steps.

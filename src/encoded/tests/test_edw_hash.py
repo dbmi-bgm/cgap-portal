@@ -1,6 +1,6 @@
 import pytest
 
-from ..edw_hash import EDWHash
+from snovault.edw_hash import EDWHash
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]

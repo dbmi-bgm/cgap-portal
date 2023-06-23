@@ -7,8 +7,17 @@ Change Log
 ----------
 
 
+14.0.0
+======
+
+* Add support for Python 3.9
+
+* Remove inclusion of unused loremipsum library from pyproject.toml
+
+
 13.4.0
 ======
+
 `PR 711: Generic QualityMetric <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
 
 * Add new QualityMetricGeneric item
