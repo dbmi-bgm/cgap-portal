@@ -1,6 +1,8 @@
 import os
 import pytest
 
+from dcicutils.license_utils import C4InfrastructureLicenseChecker
+
 from dcicutils.qa_checkers import ChangeLogChecker, DebuggingArtifactChecker
 from .conftest_settings import REPOSITORY_ROOT_DIR
 
@@ -30,3 +32,8 @@ def test_utils_debugging_artifacts_print():
                                        filter_patterns=['print'],
                                        if_used='warning')
     checker.check_for_debugging_patterns()
+
+
+@pytest.mark.static
+def test_license_compatibility():
+    C4InfrastructureLicenseChecker.validate()
