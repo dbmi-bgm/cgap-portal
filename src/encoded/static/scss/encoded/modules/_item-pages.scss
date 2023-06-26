@@ -890,10 +890,10 @@ i.status-indicator-dot {
 			display: inline-block;
 			> .link {
 				@include user-select(none);
-				color: #008066; // temporary?
+				color: #3F9067;
 				cursor:pointer;
 				&:hover {
-					color: #008066;
+					color: #3F9067;
 					text-shadow : 0 0 0;
 				}
 			}
