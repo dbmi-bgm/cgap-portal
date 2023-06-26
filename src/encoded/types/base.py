@@ -36,6 +36,7 @@ from snovault.crud_views import (
     item_edit as sno_item_edit,
 )
 from snovault.interfaces import CONNECTION
+from snovault.types.base import get_item_or_none
 from typing import Any, List, Tuple, Union
 # from ..schema_formats import is_accession
 from ..server_defaults import get_userid, add_last_modified
@@ -52,48 +53,6 @@ from .acl import (
     ONLY_ADMIN_VIEW_ACL,
     PROJECT_MEMBER_CREATE_ACL
 )
-
-
-def get_item_or_none(request, value, itype=None, frame='object'):
-    """
-    Return the view of an item with given frame. Can specify different types
-    of `value` for item lookup
-
-    Args:
-        request: the current Request
-        value (str): String item identifier or a dict containing @id/uuid
-        itype (str): Optional string collection name for the item (e.g. /file-formats/)
-        frame (str): Optional frame to return. Defaults to 'object'
-
-    Returns:
-        dict: given view of the item or None on failure
-    """
-    item = None
-
-    if isinstance(value, dict):
-        if 'uuid' in value:
-            value = value['uuid']
-        elif '@id' in value:
-            value = value['@id']
-
-    svalue = str(value)
-
-    # Below case is for UUIDs & unique_keys such as accessions, but not @ids
-    if not svalue.startswith('/') and not svalue.endswith('/'):
-        svalue = '/' + svalue + '/'
-        if itype is not None:
-            svalue = '/' + itype + svalue
-
-    # Request.embed will attempt to get from ES for frame=object/embedded
-    # If that fails, get from DB. Use '@@' syntax instead of 'frame=' because
-    # these paths are cached in indexing
-    try:
-        item = request.embed(svalue, '@@' + frame)
-    except Exception:
-        pass
-
-    # could lead to unexpected errors if == None
-    return item
 
 
 def set_namekey_from_title(properties):  # TODO: I'm not sure this is used anywhere. -kmp 25-Sep-2022
