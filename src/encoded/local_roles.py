@@ -111,6 +111,8 @@ class LocalRolesAuthorizationPolicy(object):
         self.wrapped_policy = wrapped_policy
 
     def permits(self, context, principals, permission):
+        if "ingestion" in str(context).lower():
+            import pdb ; pdb.set_trace()
         principals = local_principals(context, principals)
         result = self.wrapped_policy.permits(context, principals, permission)
         if DEBUG_PERMISSIONS:

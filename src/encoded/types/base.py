@@ -138,6 +138,7 @@ class AbstractCollection(snovault.AbstractCollection):
 
 
 class Collection(snovault.Collection, AbstractCollection):
+#class Collection(snovault.types.base.Collection, AbstractCollection):
     """smth."""
 
     def __init__(self, *args, **kw):

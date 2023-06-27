@@ -167,6 +167,10 @@ class TestingLinkTarget(Item):
     ],
 )
 class TestingPostPutPatch(Item):
+
+    def __acl__(self):
+        return [(Allow, 'group.submitter', ['add', 'edit', 'view']),]
+
     item_type = 'testing_post_put_patch'
     schema = {
         'required': ['required'],
