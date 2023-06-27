@@ -1,6 +1,6 @@
 # Considation of ACL related definitions.
-from pyramid.security import Allow, Authenticated, Deny, Everyone
-from snovault.types.acl import Acl, DELETED_ACL, ONLY_ADMIN_VIEW_ACL
+from pyramid.security import Allow, Authenticated, Deny, Everyone  # noqa: F401 (imported but unused)
+from snovault.types.acl import Acl, DELETED_ACL, ONLY_ADMIN_VIEW_ACL  # noqa: F401 (imported but unused)
 
 """ This acl allows item creation; it should be overwritten with an empty
     list in Item types a project member user should not be able to create

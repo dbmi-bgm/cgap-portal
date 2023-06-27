@@ -5,7 +5,7 @@ http://pyramid.readthedocs.org/en/latest/narr/testing.html
 
 # import datetime as datetime_module
 import logging
-# import os
+import os
 import pkg_resources
 import pytest
 import webtest
@@ -117,6 +117,14 @@ def es_app_settings(wsgi_server_host_port, elasticsearch_server, postgresql_serv
 
 
 def pytest_configure():
+
+    # Added 2023-06-27 to fix test_auth0.test_jwt_is_stateless_so_doesnt_actually_need_login
+    # which does not want the Auth0Secret environment variable to be set; don't think this
+    # really should be set for any tests; and just for completeness also unset other
+    # related environment variable, Auth0Client.
+    os.environ.pop('Auth0Secret', None)
+    os.environ.pop('Auth0Client', None)
+
     logging.basicConfig(format='%(message)s')
     logging.getLogger('sqlalchemy.engine').setLevel(logging.WARNING)
 

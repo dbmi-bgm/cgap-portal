@@ -1,4 +1,4 @@
-import encoded.project_defs
+import encoded.project_defs  # noqa: F401 (imported but unused)
 import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
 import mimetypes
 import netaddr

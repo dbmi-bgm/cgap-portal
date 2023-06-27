@@ -1,5 +1,5 @@
-import base64
-from snovault.authentication import (
+import base64  # noqa: F401 (imported but unused)
+from snovault.authentication import (  # noqa: F401 (imported but unused)
     Auth0AuthenticationPolicy,
     basic_auth_check,
     BasicAuthAuthenticationPolicy,
