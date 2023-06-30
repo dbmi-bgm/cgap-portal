@@ -6,6 +6,11 @@ cgap-portal
 Change Log
 ----------
 
+13.4.1
+======
+* 2023-06-26
+* Added user load to deployment task in deploy/docket/production/entrypoint_deployment.py,
+  along with the current higlass_view_config load.
 
 13.4.0
 ======
