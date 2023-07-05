@@ -2,6 +2,7 @@
 import os
 import re
 import structlog
+from typing import Any, Dict, Optional
 from .types.base import get_item_or_none
 from snovault.util import (  # noqa: F401 (imported but unused)
     build_s3_presigned_get_url,
@@ -23,41 +24,12 @@ from snovault.embed import (  # noqa: F401 (imported but unused)
     subrequest_item_creation
 )
 
-# These are now moved or reused from snovault.utils (May 2023):
-# - CONTENT_TYPE_SPECIAL_CASES
-# - register_path_content_type
-# - content_type_allowed
-# - gunzip_content
-# - deduplicate_list
-# - debuglog
-# - make_vapp_for_email
-# - vapp_for_email
-# - make_vapp_for_ingestion
-# - vapp_for_ingestion
-# - _app_from_clues
-# - make_s3_client
-# - build_s3_presigned_get_url
-# - convert_integer_to_comma_string
-# - ENCODED_ROOT_DIR
-# - resolve_file_path
-# - subrequest_object
-# - subrequest_item_creation
-# - s3_output_stream
-# - s3_local_file
-# - s3_input_stream
-# - check_user_is_logged_in
-# - create_empty_s3_file
-# - get_trusted_email
-# - beanstalk_env_from_request
-# - beanstalk_env_from_registry
-# - customized_delay_rerun
-# - delay_rerun
-# - customized_delay_rerun
-# - SettingsKey
-# - ExtraArgs
-# - extra_kwargs_for_s3_encrypt_key_id
-
 log = structlog.getLogger(__name__)
+
+
+Dict
+JsonObject = Dict[str, Any]
+
 ENCODED_ROOT_DIR = os.path.dirname(__file__)
 PROJECT_DIR = os.path.dirname(os.path.dirname(ENCODED_ROOT_DIR))  # two levels of hierarchy up
 

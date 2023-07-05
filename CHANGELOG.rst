@@ -6,6 +6,45 @@ cgap-portal
 Change Log
 ----------
 
+13.4.1
+======
+* 2023-06-26
+* Added user load to deployment task in deploy/docket/production/entrypoint_deployment.py,
+  along with the current higlass_view_config load.
+
+13.4.0
+======
+`PR 711: Generic QualityMetric <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
+
+* Add new QualityMetricGeneric item
+* Add File property for QualityMetricGeneric linkTos
+
+
+13.3.2
+======
+
+* Remove inclusion of unused loremipsum library from pyproject.toml (C4-1036)
+
+
+13.3.1
+======
+*No PR: Staff-change Insert Updates*
+
+* Remove Victoria's user insert from master-inserts
+* Add Cesar's user insert to master-inserts
+
+
+13.3.0
+======
+`PR 712: Somatic analysis updates <https://github.com/dbmi-bgm/cgap-portal/pull/712>`_
+
+* Add Individual linkTo on SomaticAnalysis schema
+* Add preservation method to Sample schema
+* Add primary disorders calcprop for Individual item
+* Add Individual embeds to SomaticAnalysis item
+* Update inserts for changes above
+
+
 13.2.1
 ======
 `PR 714: Cohort browser updates <https://github.com/dbmi-bgm/cgap-portal/pull/714>`_
