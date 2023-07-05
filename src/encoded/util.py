@@ -2,7 +2,7 @@
 import os
 import re
 import structlog
-from typing import Any, Dict, Optional
+from typing import Any, Dict
 from .types.base import get_item_or_none
 from snovault.util import (  # noqa: F401 (imported but unused)
     build_s3_presigned_get_url,
