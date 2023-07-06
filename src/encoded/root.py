@@ -1,5 +1,6 @@
 import sys
 import uptime
+import datetime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
@@ -11,6 +12,8 @@ from snovault import Root, calculated_property, root, COLLECTIONS, STORAGE
 from .appdefs import APP_VERSION_REGISTRY_KEY, ITEM_INDEX_ORDER
 from .schema_formats import is_accession
 from .util import SettingsKey
+
+LOADED_TIME = str(datetime.datetime.now())
 
 
 def includeme(config):
@@ -141,6 +144,7 @@ def health_check(config):
             h.TIBANNA_CWLS_BUCKET: settings.get(s.TIBANNA_CWLS_BUCKET),
             h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
             h.UPTIME: uptime_info(),
+            "loaded": LOADED_TIME,  # added for debugging purposes
             h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
 
         }
