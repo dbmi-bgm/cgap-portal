@@ -6,11 +6,27 @@ cgap-portal
 Change Log
 ----------
 
+13.5.1
+======
+`PR 707: Somatic CGAP UI V1 <https://github.com/dbmi-bgm/cgap-portal/pull/707>`_
+
+* SomaticAnalysis, Case, Search Item View updates for Somatic
+* Update higlass-transcripts
+
+13.5.0
+======
+`PR 574: Webpack 5 Update <https://github.com/dbmi-bgm/cgap-portal/pull/574>`_
+
+* Update Webpack to Webpack 5 (polyfills, ugh)
+* Update HiGlass versions to resolve webpack related issues
+
+
 13.4.1
 ======
-`PR : Somatic CGAP UI V1 <>`_
+* 2023-06-26
+* Added user load to deployment task in deploy/docket/production/entrypoint_deployment.py,
+  along with the current higlass_view_config load.
 
-* [WIP]
 
 13.4.0
 ======
