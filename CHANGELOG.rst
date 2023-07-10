@@ -11,6 +11,7 @@ Change Log
 `PR 707: Somatic CGAP UI V1 <https://github.com/dbmi-bgm/cgap-portal/pull/707>`_
 
 * SomaticAnalysis, Case, Search Item View updates for Somatic
+* Update SPC to 0.1.66
 * Update higlass-general-vcf to 0.1.4
 
 
