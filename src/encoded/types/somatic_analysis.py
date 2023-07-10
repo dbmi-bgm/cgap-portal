@@ -7,8 +7,29 @@ from .analysis import Analysis
 
 def _build_somatic_analysis_embedded_list() -> List[str]:
     return [
+        # My embeds (TODO: delete once switch to doug's) Required for Somatic Analysis Item Page UI
+        "samples.@id",
+        "samples.display_title",
+        "samples.accession",
+        "samples.specimen_collection_date",
+        # "samples.preservation_type", # Does not actually exist right now... should at some point
+        "samples.workup_type",
+        "samples.tissue_type",
+        "samples.specimen_type",
+        "samples.bam_sample_id",
+        "samples.sequence_id", # accessioning table only
+        "individual.@id",
+        "individual.individual_id",
+        "individual.display_title",
+        "individual.accession",
+        "individual.sex",
+        "individual.age",
+        "individual.age_units",
+        "individual.date_created", # TODO: Double check this is acceptable as "accession date"
         "individual.primary_disorders.disorder_name",
+        "individual.families.title",
         "individual.families.family_id",
+        "individual.families.accession"
     ]
 
 
