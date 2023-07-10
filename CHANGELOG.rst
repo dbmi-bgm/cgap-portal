@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+13.5.1
+======
+
+* Update nginx signing key and import method to fix Docker build
+
+
 13.5.0
 ======
 `PR 574: Webpack 5 Update <https://github.com/dbmi-bgm/cgap-portal/pull/574>`_
