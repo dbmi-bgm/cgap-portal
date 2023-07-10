@@ -1,0 +1,18 @@
+[
+    {
+        "uuid": "1e1ea605-b3e2-4abb-8677-d647042e4fc4",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "gene_candidacy": "Strong candidate",
+        "variant_candidacy": "Moderate candidate",
+        "note_text": "This gene is a real discovery!"
+    },
+    {
+        "uuid": "e8046b1b-22a4-40fa-8558-4702dae6d822",
+        "project": "cgap-core",
+        "institution": "hms-dbmi",
+        "gene_candidacy": "Moderate candidate",
+        "variant_candidacy": "Weak candidate",
+        "note_text": "This gene is not a real discovery..."
+    }
+]

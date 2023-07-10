@@ -187,7 +187,11 @@
         "status": "shared",
         "accession": "GAPIDISC7R74",
         "uuid": "5ec91041-78a0-4758-abef-21c7f5fd9f26",
+        "samples": [
+            "hms-dbmi:sample_1"
+        ],
         "sex": "M",
+        "individual_id": "BRCA proband",
         "is_deceased": false,
         "disorders": [
             {

@@ -1,20 +1,16 @@
 import json
-# import os
 import urllib.parse
 
 from pyramid.httpexceptions import HTTPBadRequest
-# from pyramid.request import Request
 from pyramid.view import view_config
 from snovault import TYPES
-# from snovault.embed import make_subrequest
 from snovault.util import debug_log
-
-from ..types.base import get_item_or_none
-from ..types.filter_set import FLAGS, FILTER_BLOCKS
 
 from .lucene_builder import LuceneBuilder
 from .search import SearchBuilder, search as single_query_search
 from .search_utils import execute_search, build_sort_dicts, make_search_subreq
+from ..types.base import get_item_or_none
+from ..types.filter_set import FLAGS, FILTER_BLOCKS
 
 
 def includeme(config):
@@ -29,6 +25,7 @@ class CompoundSearchBuilder:
 
         Entry point is "execute_filter_set".
     """
+    ALL = 'all'
     TYPE = 'search_type'
     ID = '@id'
     QUERY = 'query'
@@ -190,7 +187,7 @@ class CompoundSearchBuilder:
 
         # if we have no filter blocks, there is no context to enable flags, so
         # pass type_flag + global_flags
-        if not filter_blocks and flags:
+        if not filter_blocks and (flags or global_flags):
             if global_flags:
                 query = cls.combine_query_strings(global_flags, type_flag)
             else:
@@ -353,6 +350,12 @@ def build_query(context, request):
     return builder.query
 
 
+GLOBAL_FLAGS = "global_flags"
+INTERSECT = "intersect"
+FROM = "from"
+LIMIT = "limit"
+
+
 @view_config(route_name='compound_search', request_method='POST', permission='search')
 @debug_log
 def compound_search(context, request):
@@ -407,16 +410,16 @@ def compound_search(context, request):
     body = json.loads(request.body)
 
     filter_set = CompoundSearchBuilder.extract_filter_set_from_search_body(request, body)
-    global_flags = body.get('global_flags', None)
-    intersect = True if body.get('intersect', False) else False
+    global_flags = body.get(GLOBAL_FLAGS, None)
+    intersect = True if body.get(INTERSECT, False) else False
 
     # Disabled for time being to allow test(s) to pass. Not sure whether to add Project to FilterSet schema 'search_type' enum.
     # if filter_set.get(CompoundSearchBuilder.TYPE) not in request.registry[TYPES]["FilterSet"].schema["properties"][CompoundSearchBuilder.TYPE]["enum"]:
     #    raise HTTPBadRequest("Passed bad {} body param: {}".format(CompoundSearchBuilder.TYPE, filter_set.get(CompoundSearchBuilder.TYPE)))
 
-    from_ = body.get('from', 0)
-    limit = body.get('limit', 10)  # pagination size 10 works better with ECS
-    if limit == "all":
+    from_ = body.get(FROM, 0)
+    limit = body.get(LIMIT, 10)  # pagination size 10 works better with ECS
+    if limit == CompoundSearchBuilder.ALL:
         raise HTTPBadRequest("compound_search does not support limit=all at this time.")
     if limit > 1000:
         limit = 1000

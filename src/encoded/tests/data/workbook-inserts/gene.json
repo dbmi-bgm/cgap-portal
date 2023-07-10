@@ -91,7 +91,7 @@
         "prev_name": [
             "gamma-aminobutyric acid (GABA) A receptor, delta"
         ],
-        "rvis_exac": -0.52053282,
+        "rvis_exac": 0.000601,
         "spos_hg19": 1950780,
         "alias_name": [
             "GABA(A) receptor, delta"
@@ -173,6 +173,10 @@
         ],
         "trait_association_gwas_pmid": [
             "26426971~26426971"
+        ],
+        "gene_notes": [
+            "62759f07-326a-4e94-8dd0-366741292d07",
+            "0791a219-856d-41b8-bc7a-7dbbc973f848"
         ],
         "uuid": "f6490485-7910-4019-a45e-02d6fb96f3a5"
     },

@@ -1,0 +1,14 @@
+[
+    {
+        "uuid": "62759f07-326a-4e94-8dd0-366741292d07",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "note_text": "What a note"
+    },
+    {
+        "uuid": "0791a219-856d-41b8-bc7a-7dbbc973f848",
+        "project": "cgap-core",
+        "institution": "hms-dbmi",
+        "note_text": "What a poor note"
+    }
+]

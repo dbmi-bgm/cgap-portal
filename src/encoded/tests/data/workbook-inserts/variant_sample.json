@@ -56,9 +56,29 @@
                     "Heterozygous"
                 ],
                 "sample_id": "SAM10254-S1"
+            },
+            {
+                "role": "mother",
+                "labels": [
+                    "Homozygous alternate"
+                ]
+            },
+            {
+                "role": "father",
+                "labels": [
+                    "Heterozygous"
+                ]
             }
         ],
-        "inheritance_modes": [],
+	"novoPP": 0.5,
+	"cmphet": [
+		{"comhet_mate_variant": "chr11:1016779G>A"}
+	],
+        "inheritance_modes": ["paternal dominant"],
+	"interpretation": "ab5e1c89-4c88-4a3e-a306-d37a12defd8b",
+	"discovery_interpretation": "1e1ea605-b3e2-4abb-8677-d647042e4fc4",
+	"variant_notes": "62759f07-326a-4e94-8dd0-366741292d07",
+	"gene_notes": "62759f07-326a-4e94-8dd0-366741292d07",
         "uuid": "e43be20e-5dda-4db2-bb23-8c103323fc0f",
         "date_created": "2021-09-20T00:00:00.000000+00:00"
     },

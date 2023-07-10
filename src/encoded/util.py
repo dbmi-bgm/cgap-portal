@@ -396,8 +396,9 @@ def check_user_is_logged_in(request):
 #
 #    -kmp 1-Sep-2020
 
+APPLICATION_FORM_ENCODED_MIME_TYPE = "application/x-www-form-urlencoded"
 CONTENT_TYPE_SPECIAL_CASES = {
-    'application/x-www-form-urlencoded': [
+    APPLICATION_FORM_ENCODED_MIME_TYPE: [
         # Single legacy special case to allow us to POST to metadata TSV requests via form submission.
         # All other special case values should be added using register_path_content_type.
         '/metadata/',
@@ -606,3 +607,11 @@ def transfer_properties(source, target, properties, property_replacements=None):
             if property_replacements:
                 property_name = property_replacements.get(property_name, property_name)
             target[property_name] = property_value
+
+
+def snake_case_to_kebab_case(string: str) -> str:
+    return string.replace("_", "-")
+
+
+def format_to_url(string: str) -> str:
+    return f"/{snake_case_to_kebab_case(string)}/"
