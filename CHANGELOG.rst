@@ -12,6 +12,21 @@ Change Log
 * Migrating ingestion (et.al.) code to snovault.
 
 
+13.5.2
+======
+`PR 707: Somatic CGAP UI V1 <https://github.com/dbmi-bgm/cgap-portal/pull/707>`_
+
+* SomaticAnalysis, Case, Search Item View updates for Somatic
+* Update SPC to 0.1.66
+* Update higlass-general-vcf to 0.1.4
+
+
+13.5.1
+======
+
+* Update nginx signing key and import method to fix Docker build
+
+
 13.5.0
 ======
 `PR 574: Webpack 5 Update <https://github.com/dbmi-bgm/cgap-portal/pull/574>`_
@@ -43,7 +58,6 @@ Change Log
 
 13.3.1
 ======
-*No PR: Staff-change Insert Updates*
 
 * Remove Victoria's user insert from master-inserts
 * Add Cesar's user insert to master-inserts
