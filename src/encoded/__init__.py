@@ -135,7 +135,7 @@ def main(global_config, **local_config):
     settings['auth0.domain'] = settings.get('auth0.domain', os.environ.get('Auth0Domain', DEFAULT_AUTH0_DOMAIN))
     settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
     settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
-    xyzzy_original_auth0_allowed_connections = settings['auth0.allowed_connections']
+    xyzzy_original_auth0_allowed_connections = settings.get('auth0.allowed_connections')
     settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
                                                          os.environ.get('Auth0AllowedConnections',
                                                                         DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
