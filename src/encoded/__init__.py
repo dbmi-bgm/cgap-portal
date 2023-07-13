@@ -138,6 +138,12 @@ def main(global_config, **local_config):
     settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
                                                          os.environ.get('Auth0AllowedConnections',
                                                                         DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
+    xyzzy_auth0_allowed_connections = None
+    try:
+        xyzzy_auth0_allowed_connections = settings['auth0.allowed_connections'].split(",")
+    except Exception as e:
+        xyzzy_auth0_allowed_connections = "ERROR: " + str(e)
+
     settings['auth0.options'] = {
         'auth': {
             'sso': False,
@@ -148,7 +154,8 @@ def main(global_config, **local_config):
                 'prompt': 'select_account'
             }
         },
-        'allowedConnections': settings['auth0.allowed_connections']
+        'allowedConnections': settings['auth0.allowed_connections'],
+        'xyzzy_auth0_allowed_connections': xyzzy_auth0_allowed_connections
     }
     # set google reCAPTCHA keys
     # TODO propagate from GAC
