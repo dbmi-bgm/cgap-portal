@@ -112,7 +112,6 @@ def main(global_config, **local_config):
     This function returns a Pyramid WSGI application.
     """
 
-    import pdb ; pdb.set_trace()
     settings = global_config
     settings.update(local_config)
 
