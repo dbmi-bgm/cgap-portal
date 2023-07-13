@@ -112,6 +112,7 @@ def main(global_config, **local_config):
     This function returns a Pyramid WSGI application.
     """
 
+    import pdb ; pdb.set_trace()
     settings = global_config
     settings.update(local_config)
 
@@ -135,18 +136,14 @@ def main(global_config, **local_config):
     settings['auth0.domain'] = settings.get('auth0.domain', os.environ.get('Auth0Domain', DEFAULT_AUTH0_DOMAIN))
     settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
     settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
-    xyzzy_original_auth0_allowed_connections = settings.get('auth0.allowed_connections')
-    settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
+    settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',
                                                          os.environ.get('Auth0AllowedConnections',
                                                                         DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
-    if isinstance(settings['auth0.allowed_connections']):
-        settings['auth0.allowed_connections'] = settings['auth0.allowed_connections'].split(",")
 
-    xyzzy_auth0_allowed_connections = None
-    try:
-        xyzzy_auth0_allowed_connections = settings['auth0.allowed_connections'].split(",")
-    except Exception as e:
-        xyzzy_auth0_allowed_connections = "ERROR: " + str(e)
+    # Comma separated string (typically in GAC e.g. ENCODED_AUTH0_ALLOWED_CONNECTIONS),
+    # e.g.: google-oauth2,github,hms-it,partners (changed July 2023).
+    if isinstance(settings['auth0.allowed_connections'], str):
+        settings['auth0.allowed_connections'] = settings['auth0.allowed_connections'].split(",")
 
     settings['auth0.options'] = {
         'auth': {
@@ -158,15 +155,7 @@ def main(global_config, **local_config):
                 'prompt': 'select_account'
             }
         },
-        'allowedConnections': settings['auth0.allowed_connections'],
-        'xyzzydebug': {
-            'Auth0AllowedConnections': os.environ.get('Auth0AllowedConnections'),
-            'AUTH0_ALLOWED_CONNECTIONS': os.environ.get('AUTH0_ALLOWED_CONNECTIONS'),
-            'ENCODED_AUTH0_ALLOWED_CONNECTIONS': os.environ.get('ENCODED_AUTH0_ALLOWED_CONNECTIONS'),
-            'DEFAULT_AUTH0_ALLOWED_CONNECTIONS': DEFAULT_AUTH0_ALLOWED_CONNECTIONS,
-            'xyzzy_original_auth0_allowed_connections': xyzzy_original_auth0_allowed_connections,
-            'xyzzy_auth0_allowed_connections': xyzzy_auth0_allowed_connections
-        }
+        'allowedConnections': settings['auth0.allowed_connections']
     }
     # set google reCAPTCHA keys
     # TODO propagate from GAC
