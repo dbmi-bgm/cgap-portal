@@ -139,6 +139,9 @@ def main(global_config, **local_config):
     settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
                                                          os.environ.get('Auth0AllowedConnections',
                                                                         DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
+    if isinstance(settings['auth0.allowed_connections']):
+        settings['auth0.allowed_connections'] = settings['auth0.allowed_connections'].split(",")
+
     xyzzy_auth0_allowed_connections = None
     try:
         xyzzy_auth0_allowed_connections = settings['auth0.allowed_connections'].split(",")
