@@ -145,11 +145,7 @@ def health_check(config):
             h.TIBANNA_CWLS_BUCKET: settings.get(s.TIBANNA_CWLS_BUCKET),
             h.TIBANNA_OUTPUT_BUCKET: settings.get(s.TIBANNA_OUTPUT_BUCKET),
             h.UPTIME: uptime_info(),
-            h.UTILS_VERSION: settings.get(s.UTILS_VERSION),
-            # Added for debugging purposes 7/2023
-            "xyzzydebug": {"loaded": LOADED_TIME,
-                      "ENCODED_AUTH0_ALLOWED_CONNECTIONS": os.environ.get("ENCODED_AUTH0_ALLOWED_CONNECTIONS"),
-                      "Auth0AllowedConnections": os.environ.get("Auth0AllowedConnections")}
+            h.UTILS_VERSION: settings.get(s.UTILS_VERSION)
         }
 
         return response_dict
