@@ -13,6 +13,10 @@ from ..submit_genelist import submit_genelist, submit_variant_update
 log = structlog.getLogger(__name__)
 
 
+def includeme(config):
+    config.scan(__name__)
+
+
 @ingestion_processor('genelist')
 def handle_genelist(submission: SubmissionFolio):
 

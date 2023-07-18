@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "13.5.2.1b5"  # To become 13.6.0
+version = "13.5.2.1b6"  # To become 13.6.0
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -49,7 +49,7 @@ codeguru-profiler-agent = "^1.2.4"
 cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
-dcicsnovault = "8.2.0.1b42"
+dcicsnovault = "8.2.0.1b43"
 #dcicutils = "^7.4.0"
 #dcicutils = "7.4.4.5b21"
 dcicutils = "^7.5.0"
@@ -213,7 +213,8 @@ verify-item = "encoded.commands.verify_item:main"
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
 gene-table-intake = "encoded.commands.gene_table_intake:main"
 ingest-vcf = "encoded.commands.ingest_vcf:main"
-ingestion-listener = "encoded.ingestion.ingestion_listener:main"
+#ingestion-listener = "encoded.ingestion.ingestion_listener:main"
+ingestion-listener = "snovault.ingestion.ingestion_listener:main"
 reformat-vcf = "encoded.commands.reformat_vcf:main"
 variant-table-intake = "encoded.commands.variant_table_intake:main"
 
