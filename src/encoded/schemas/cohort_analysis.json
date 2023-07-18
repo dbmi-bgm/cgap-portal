@@ -92,5 +92,11 @@
                 "linkTo": "Sample"
             }
         }
+    },
+    "columns": {
+        "samples.individual": {
+            "title": "Individual ID(s)",
+            "order": 20
+        }
     }
 }

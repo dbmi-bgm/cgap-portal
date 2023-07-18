@@ -1,8 +1,7 @@
 const path = require('path');
 const webpack = require('webpack');
 const env = process.env.NODE_ENV;
-const TerserPlugin = require('terser-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const PATHS = {
     "static": path.resolve(__dirname, 'src/encoded/static'),
@@ -29,14 +28,20 @@ let devTool = 'source-map'; // Default, slowest.
 
 
 if (mode === 'production') {
-    // add chunkhash to chunk names for production only (it's slower)
+    // do NOT generate source maps in production -- adds to the size of the bundle
+    devTool = false;
+    console.log("Not generating source maps for production bundle...");
+} else if (env == 'quick') {
+    // removed eval from 'quick' builds; see: https://webpack.js.org/plugins/terser-webpack-plugin/#note-about-source-maps
+    // This, unfortunately, means that quick builds will be slower than they used to be
+    // If they end up being TOO slow, we can not generate sourcemaps on "quick" builds, potentially
+    devTool = 'inline-source-map';
+    console.log("Generating inline source maps for quicker build...");
+} else if (env === 'development') {
+    // add chunkhash to chunk names for development only (it's slower)
     chunkFilename = '[name].[chunkhash].js';
     devTool = 'source-map';
-} else if (env === 'quick') {
-    // `eval` is fastest but doesn't abide by production Content-Security-Policy, so we check for env=="quick" in app.js to adjust the CSP accordingly.
-    devTool = 'eval';
-} else if (env === 'development') {
-    devTool = 'inline-source-map';
+    console.log("Generating named chunked source maps for easier debugging...");
 }
 
 
@@ -91,17 +96,21 @@ delete resolve.alias["react-bootstrap"];
 const optimization = {
     minimize: mode === "production",
     minimizer: [
-        new TerserPlugin({
-            parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
-            // sourceMap: true,
-            terserOptions:{
-                compress: true,
-                mangle: true,
-                output: {
-                    comments: false
+        // Syntax for pulling module from webpack 5: https://stackoverflow.com/questions/66343602/use-latest-terser-webpack-plugin-with-webpack5
+        (compiler) => {
+            const TerserPlugin = require('terser-webpack-plugin');
+            new TerserPlugin({
+                parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
+                terserOptions:{
+                    compress: true,
+                    mangle: true,
+                    output: {
+                        comments: false
+                    },
+                    sourceMap: mode !== "production" // not generating for prod anymore
                 }
-            }
-        })
+            }).apply(compiler);
+        }
     ]
 };
 
@@ -116,7 +125,6 @@ webPlugins.push(new webpack.ProvidePlugin({
 // Inform our React code of what build we're on.
 // This works via a find-replace.
 webPlugins.push(new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(env),
     'process.version': JSON.stringify(process.version),
     'process.platform': JSON.stringify(process.platform),
     'SERVERSIDE' : JSON.stringify(false),
@@ -124,7 +132,6 @@ webPlugins.push(new webpack.DefinePlugin({
 }));
 
 serverPlugins.push(new webpack.DefinePlugin({
-    'process.env.NODE_ENV': JSON.stringify(env),
     'SERVERSIDE' : JSON.stringify(true),
     'BUILDTYPE' : JSON.stringify(env)
 }));
@@ -236,7 +243,8 @@ module.exports = [
         },
         //resolveLoader : resolve,
         devtool: devTool,
-        plugins: webPlugins
+        plugins: webPlugins,
+        // profile: true
     },
     // for server-side rendering
     ///*
@@ -314,7 +322,8 @@ module.exports = [
         },
         //resolveLoader : resolve,
         devtool: devTool, // No way to debug/log serverside JS currently, so may as well speed up builds for now.
-        plugins: serverPlugins
+        plugins: serverPlugins,
+        // profile: true
     }
     //*/
 ];
