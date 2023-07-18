@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const env = process.env.NODE_ENV;
 const TerserPlugin = require('terser-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const PATHS = {
     "static": path.resolve(__dirname, 'src/encoded/static'),
@@ -232,11 +232,14 @@ module.exports = [
                 // "path": require.resolve("path-browserify"),
                 "process": require.resolve("process/browser"),
                 "util": require.resolve("util/"),
+                "react-dom/client": require.resolve("react-dom"),
+                "auth0-lock": require.resolve("auth0-lock")
             }
         },
         //resolveLoader : resolve,
         devtool: devTool,
-        plugins: webPlugins
+        plugins: webPlugins,
+        // profile: true
     },
     // for server-side rendering
     ///*
@@ -276,7 +279,7 @@ module.exports = [
                 'higlass-cohort': 'var {}',
                 'higlass-bigwig-datafetcher': 'var {}',
                 'higlass-multivec': 'var {}',
-                'auth0-lock': 'var {}',
+                // 'auth0-lock': 'var {}',
                 'aws-sdk': 'var {}',
                 'package-lock.json': 'var {}',
                 'pagedjs': 'var {}',
@@ -310,11 +313,14 @@ module.exports = [
             fallback: {
                 "process": require.resolve("process/browser"),
                 "util": require.resolve("util/"),
+                "react-dom/client": require.resolve("react-dom"), // Auth0Lock is on React 18, expecting react-dom import in different syntax
+                "auth0-lock": require.resolve("auth0-lock")
             }
         },
         //resolveLoader : resolve,
         devtool: devTool, // No way to debug/log serverside JS currently, so may as well speed up builds for now.
-        plugins: serverPlugins
+        plugins: serverPlugins,
+        // profile: true
     }
     //*/
 ];
