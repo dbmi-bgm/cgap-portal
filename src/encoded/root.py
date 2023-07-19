@@ -13,8 +13,6 @@ from .appdefs import APP_VERSION_REGISTRY_KEY, ITEM_INDEX_ORDER
 from .schema_formats import is_accession
 from .util import SettingsKey
 
-LOADED_TIME = str(datetime.datetime.now())
-
 
 def includeme(config):
     config.include(health_check)
