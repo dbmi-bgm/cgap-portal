@@ -29,7 +29,7 @@ from snovault.loadxl import load_all
 CGAP_STATIC_MAX_AGE = 1800
 # default trace_rate for sentry
 # tune this to get more data points when analyzing performance
-SENTRY_TRACE_RATE = .1
+SENTRY_TRACE_RATE = 0.1
 DEFAULT_AUTH0_DOMAIN = 'hms-dbmi.auth0.com'
 DEFAULT_AUTH0_ALLOWED_CONNECTIONS = 'github,google-oauth2,partners,hms-it'
 
