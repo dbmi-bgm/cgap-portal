@@ -9,7 +9,8 @@
         ],
         "coverage": "5x",
         "mapping stats": {
-            "total reads": 123456789
+            "total reads": 123456789,
+			"read length": 151
         },
         "sample": "Sample_ID",
         "overall_quality_status": "PASS"
