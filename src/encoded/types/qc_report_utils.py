@@ -1,4 +1,5 @@
 from __future__ import annotations
+
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
 from typing import Callable, Dict, Iterable, List, Mapping, Optional, Union
@@ -252,16 +253,14 @@ class QcFlagger(ABC):
 def get_latest_file_with_quality_metric(
     files: Iterable[File],
     evaluator: Callable
-) -> List[File]:
-    result = []
+) -> Union[File, None]:
     for file in reversed(files):
         if evaluator(file) and file.get_quality_metric():
-            result.append(file)
-            break
-    return result
+            return file
+    return
 
 
-def get_latest_bam_with_quality_metric(files: Iterable[File]) -> List[File]:
+def get_latest_bam_with_quality_metric(files: Iterable[File]) -> Union[File, None]:
     return get_latest_file_with_quality_metric(files, is_bam)
 
 
@@ -311,10 +310,28 @@ class NestedQualityControlMetric(QualityControlMetric):
     link: Optional[str] = None
     completed_qc_step: Optional[str] = None
 
+    def get_flag(self) -> str:
+        return self.flag or ""
+
+    def get_completed_qc_step(self) -> str:
+        return self.completed_qc_step or ""
+
     def get_formatted_metric(self) -> JsonObject:
         if self.title and self.value:
             return self._get_formatted_metric()
         return {}
+
+    def _get_formatted_metric(self) -> JsonObject:
+        nested_properties = self._get_nested_properties()
+        return {self.title: nested_properties}
+
+    def _get_nested_properties(self) -> JsonObject:
+        result = {QcConstants.VALUE: self.value}
+        if self.flag:
+            result[QcConstants.FLAG] = self.flag
+        if self.link:
+            result[QcConstants.LINK] = self.link
+        return result
 
     def update(
         self,
@@ -335,18 +352,6 @@ class NestedQualityControlMetric(QualityControlMetric):
             )
         return self
 
-
-    def _get_formatted_metric(self) -> JsonObject:
-        nested_properties = self._get_nested_properties()
-        return {self.title: nested_properties}
-
-    def _get_nested_properties(self) -> JsonObject:
-        result = {QcConstants.VALUE: self.value}
-        if self.flag:
-            result[QcConstants.FLAG] = self.flag
-        if self.link:
-            result[QcConstants.LINK] = self.link
-        return result
 
 
 def get_quality_control_metrics(
@@ -512,27 +517,33 @@ def get_qc_metrics_with_quality_metric_data(
 
 
 def get_qc_metric_titles_for_link(quality_metric: QualityMetric) -> List[str]:
-    if has_peddy_qc(quality_metric):
+    if is_qc_list_with_peddy_qc(quality_metric):
         return [QcConstants.PREDICTED_ANCESTRY, QcConstants.PREDICTED_SEX]
     return []
 
 
 def get_link_from_quality_metric(quality_metric: QualityMetric) -> str:
-    if has_peddy_qc(quality_metric):
-        return get_quality_metric_download_link(quality_metric)
+    if is_qc_list_with_peddy_qc(quality_metric):
+        return get_peddy_qc_download_link_from_qc_list(quality_metric)
     return ""
 
 
-def has_peddy_qc(quality_metric: QualityMetric) -> bool:
-    qc_list = quality_metric.get_qc_list()
-    for child_quality_metric in qc_list:
-        if child_quality_metric.is_peddy_qc_type():
-            return True
+def is_qc_list_with_peddy_qc(quality_metric: QualityMetric) -> bool:
+    if quality_metric.is_qc_list_type() and get_peddy_qc_from_qc_list(quality_metric):
+        return True
     return False
 
 
-def get_quality_metric_download_link(quality_metric: QualityMetric) -> str:
-    return f"{quality_metric.get_at_id()}@@download"
+def get_peddy_qc_from_qc_list(quality_metric: QualityMetric) -> Union[QualityMetric, None]:
+    for child_quality_metric in quality_metric.get_qc_list_quality_metrics():
+        if child_quality_metric.is_peddy_qc_type():
+            return child_quality_metric
+    return
+
+
+def get_peddy_qc_download_link_from_qc_list(quality_metric: QualityMetric) -> str:
+    peddy_qc = get_peddy_qc_from_qc_list(quality_metric)
+    return f"{peddy_qc.get_at_id()}@@download"
 
 
 def get_updated_qc_metrics_with_link(
@@ -824,7 +835,7 @@ def get_matched_qc_metrics_by_sample(
     for quality_control_metric in quality_control_metrics:
         sample_id = quality_control_metric.get_sample_id()
         sample_qc_metrics = sample_id_to_qc_metrics.get(sample_id)
-        if sample_qc_metrics:
+        if sample_qc_metrics is not None:
             sample_qc_metrics.append(quality_control_metric)
     return sample_id_to_qc_metrics
 
@@ -856,11 +867,11 @@ def get_sorted_unique_items(items: Iterable[str]) -> List[str]:
 
 def get_all_completed_qc_steps(quality_control_metrics: List[QualityControlMetric]) -> List[str]:
     return [
-        quality_control_metric.get_qc_step()
+        quality_control_metric.get_completed_qc_step()
         for quality_control_metric in quality_control_metrics
         if (
             isinstance(quality_control_metric, NestedQualityControlMetric)
-            and quality_control_metric.get_qc_step()
+            and quality_control_metric.get_completed_qc_step()
         )
     ]
 
@@ -923,16 +934,20 @@ def get_sorted_and_formatted_quality_control_metrics(
     result = []
     sorted_sample_ids = sorted(qc_metrics_per_sample.keys())
     for sample_id in sorted_sample_ids:
-        quality_control_metrics = qc_metrics_per_sample.get(sample_id)
-        result.append(get_formatted_quality_control_metrics(quality_control_metrics))
+        formatted_quality_control_metrics = get_formatted_quality_control_metrics(
+            sample_id, qc_metrics_per_sample
+        )
+        if formatted_quality_control_metrics:
+            result.append(formatted_quality_control_metrics)
     return result
 
 
 def get_formatted_quality_control_metrics(
-    quality_control_metrics: List[QualityControlMetric]
+    sample_id: str,
+    qc_metrics_per_sample: Mapping[str, List[QualityControlMetric]],
 ) -> JsonObject:
     result = {}
-    for quality_control_metric in quality_control_metrics:
+    for quality_control_metric in qc_metrics_per_sample.get(sample_id, []):
         result.update(quality_control_metric.get_formatted_metric())
     return result
 

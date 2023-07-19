@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Iterable, List, Union
+from typing import List, Union
 
-from dcicutils.item_models import SubembeddedProperty
+from dcicutils.item_model_utils import LinkTo, NestedProperty
 from snovault.item_models import PortalItem
 
 from .util import JsonObject
-
-
-LinkTo = Union[str, JsonObject]
 
 
 # def _get_link_as_item_class_if_embedded(
@@ -42,14 +39,14 @@ class Item(PortalItem):
         return self.properties.get(self.INSTITUTION, "")
 
     def get_project(self) -> LinkTo:
-        return self._get_link(self._project, Item)
+        return self._get_link_to(self._project, Item)
 
     def get_institution(self) -> LinkTo:
-        return self._get_link(self._institution, Item)
+        return self._get_link_to(self._institution, Item)
 
 
 @dataclass(frozen=True)
-class QualityMetricSummary(SubembeddedProperty):
+class QualityMetricSummary(NestedProperty):
 
     SAMPLE = "sample"
     TITLE = "title"
@@ -85,6 +82,7 @@ class QualityMetric(Item):
     QC_TYPE = "qc_type"
     TITLE = "title"
     TYPE_PEDDY_QC = "QualityMetricPeddyqc"
+    TYPE_QC_LIST = "QualityMetricQclist"
     VALUE = "value"
 
     @property
@@ -92,17 +90,29 @@ class QualityMetric(Item):
         return self.properties.get(self.QUALITY_METRIC_SUMMARY, [])
 
     @property
-    def _qc_list(self) -> List[LinkTo]:
+    def _qc_list(self) -> List[JsonObject]:
         return self.properties.get(self.QC_LIST, [])
 
     def get_quality_metric_summaries(self) -> List[QualityMetricSummary]:
         return [QualityMetricSummary(item) for item in self._quality_metric_summary]
 
     def get_qc_list(self) -> List[Union[QualityMetric, str]]:
-        return self._get_links(self._qc_list, QualityMetric)
+        return self._qc_list
+
+    def get_qc_list_types(self) -> List[str]:
+        return [qc.get(self.QC_TYPE) for qc in self._qc_list]
+
+    def _get_qc_list_values(self) -> List[LinkTo]:
+        return [qc.get(self.VALUE) for qc in self._qc_list]
+
+    def get_qc_list_quality_metrics(self) -> List[QualityMetric]:
+        return self._get_link_tos(self._get_qc_list_values(), QualityMetric)
 
     def is_peddy_qc_type(self) -> bool:
-        return self.TYPE_PEDDY_QC in self._type
+        return self.TYPE_PEDDY_QC in self._types
+
+    def is_qc_list_type(self) -> bool:
+        return self.TYPE_QC_LIST in self._types
 
 
 @dataclass(frozen=True)
@@ -167,10 +177,10 @@ class File(Item):
         return self.properties.get(self.FILE_FORMAT, "")
 
     def _get_file_format(self) -> Union[FileFormat, None]:
-        return self._get_link(self._file_format, FileFormat)
+        return self._get_link_to(self._file_format, FileFormat)
 
     def get_quality_metric(self) -> Union[QualityMetric, None]:
-        return self._get_link(self._quality_metric, QualityMetric)
+        return self._get_link_to(self._quality_metric, QualityMetric)
 
     def _is_vcf(self) -> bool:
         result = False
@@ -245,10 +255,10 @@ class Sample(Item):
         return self.properties.get(self.INDIVIDUAL, "")
 
     def get_processed_files(self) -> List[File]:
-        return self._get_links(self._processed_files, File)
+        return self._get_link_tos(self._processed_files, File)
 
     def get_individual(self) -> Union[Individual, None]:
-        return self._get_link(self._individual, Individual)
+        return self._get_link_to(self._individual, Individual)
 
     def is_wgs(self) -> bool:
         return self._workup_type == self.WORKUP_TYPE_WGS
@@ -310,10 +320,10 @@ class SampleProcessing(Item):
         return self.properties.get(self.SAMPLES, [])
 
     def get_processed_files(self) -> List[Union[File, str]]:
-        return self._get_links(self._processed_files, File)
+        return self._get_link_tos(self._processed_files, File)
 
     def get_samples(self) -> List[Union[Sample, str]]:
-        return self._get_links(self._samples, Sample)
+        return self._get_link_tos(self._samples, Sample)
 
 
 @dataclass(frozen=True)
@@ -326,4 +336,4 @@ class SomaticAnalysis(Item):
         return self.properties.get(self.SAMPLES, [])
 
     def get_samples(self) -> List[Union[Sample, str]]:
-        return self._get_links(self._samples, Sample)
+        return self._get_link_tos(self._samples, Sample)

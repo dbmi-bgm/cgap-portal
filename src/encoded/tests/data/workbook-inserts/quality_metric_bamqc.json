@@ -7,7 +7,7 @@
         "aliases": [
             "hms-dbmi:sample_1_bamqc"
         ],
-        "coverage": "30x",
+        "coverage": "5x",
         "mapping stats": {
             "total reads": 123456789
         },

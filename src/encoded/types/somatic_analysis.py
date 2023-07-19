@@ -183,15 +183,13 @@ def get_desired_fields() -> List[str]:
 
 
 def get_somatic_analysis_files_for_qc(somatic_analysis: SomaticAnalysisModel) -> List[File]:
-    result = []
+    files = []
     samples = somatic_analysis.get_samples()
     for sample in samples:
-        result += get_sample_files_for_qc(sample)
-    return result
+        files += get_sample_files_for_qc(sample)
+    return [file for file in files if file]
 
 
 def get_sample_files_for_qc(sample: Sample) -> List[File]:
-    result = []
     processed_files = sample.get_processed_files()
-    result += get_latest_bam_with_quality_metric(processed_files)
-    return result
+    return [get_latest_bam_with_quality_metric(processed_files)]
