@@ -1093,21 +1093,21 @@ setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "8.0.1"
+version = "7.3.0.0b1"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
 python-versions = ">=3.8.1,<3.9"
 files = [
-    {file = "dcicsnovault-8.0.1-py3-none-any.whl", hash = "sha256:1bf60c2ab97d9edb500cb27fb3486f0557b2b40c40feb1f992bcde14ab6b0c16"},
-    {file = "dcicsnovault-8.0.1.tar.gz", hash = "sha256:ad7998e6ef4f5a34467e19eabec7d53692ce9ed6470b6dea1cd75db2a03fdead"},
+    {file = "dcicsnovault-7.3.0.0b1-py3-none-any.whl", hash = "sha256:f43ef98c97126078b7366f29fce89652381d2484507b783259292cf4466f4594"},
+    {file = "dcicsnovault-7.3.0.0b1.tar.gz", hash = "sha256:c2b5d0589f3df2e7e4c7d2fb0af95e5e5dd30053d2fc68a2070df7376e80254e"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
 boto3 = ">=1.24.36"
 botocore = ">=1.27.36"
-dcicutils = ">=7.0.0,<8.0.0"
+dcicutils = ">=7.5.0,<8.0.0"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
 future = ">=0.15.2,<1"
@@ -1125,13 +1125,11 @@ pyramid-multiauth = ">=0.9.0,<1"
 pyramid-retry = ">=1.0,<2.0"
 pyramid-tm = ">=2.5,<3.0"
 pyramid-translogger = ">=0.1,<0.2"
-pytest-redis = ">=2.0.0,<3.0.0"
 python-dateutil = ">=2.8.2,<3.0.0"
 python_magic = ">=0.4.27"
 pytz = ">=2021.3"
 rdflib = ">=4.2.2,<5.0.0"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
-redis = ">=4.5.1,<5.0.0"
 rutter = ">=0.3,<1"
 simplejson = ">=3.17.6,<4.0.0"
 SPARQLWrapper = ">=1.8.5,<2.0.0"
@@ -1285,7 +1283,7 @@ files = [
 name = "exceptiongroup"
 version = "1.1.2"
 description = "Backport of PEP 654 (exception groups)"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1618,7 +1616,7 @@ testing = ["flufl.flake8", "importlib-resources (>=1.3)", "packaging", "pyfakefs
 name = "iniconfig"
 version = "2.0.0"
 description = "brain-dead simple config-ini parsing"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -1888,21 +1886,6 @@ files = [
 ]
 
 [[package]]
-name = "mirakuru"
-version = "2.5.1"
-description = "Process executor (not only) for tests."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "mirakuru-2.5.1-py3-none-any.whl", hash = "sha256:0a16f897841741f8cd784f790e54d74e61456ba36be9cb9de731b49e2e7a45dc"},
-    {file = "mirakuru-2.5.1.tar.gz", hash = "sha256:5a60d641fa92c8bfcd383f6e52f7a0bf3f081da0467fc6e3e6a3f6b3e3e47a7b"},
-]
-
-[package.dependencies]
-psutil = {version = ">=4.0.0", markers = "sys_platform != \"cygwin\""}
-
-[[package]]
 name = "moto"
 version = "4.0.3"
 description = "A library that allows your python tests to easily mock out the boto library"
@@ -2056,7 +2039,7 @@ kerberos = ["requests-kerberos"]
 name = "packaging"
 version = "23.1"
 description = "Core utilities for Python packages"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2254,7 +2237,7 @@ testing = ["pytest", "pytest-cov"]
 name = "pluggy"
 version = "1.2.0"
 description = "plugin and hook calling mechanisms for python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2265,18 +2248,6 @@ files = [
 [package.extras]
 dev = ["pre-commit", "tox"]
 testing = ["pytest", "pytest-benchmark"]
-
-[[package]]
-name = "port-for"
-version = "0.7.1"
-description = "Utility that helps with local TCP ports management. It can find an unused TCP localhost port and remember the association."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "port-for-0.7.1.tar.gz", hash = "sha256:e0f3b8d7ec8bdc388c14d88bdbab8d6441c8081ed2bdec7847b38ca6d1563f23"},
-    {file = "port_for-0.7.1-py3-none-any.whl", hash = "sha256:8abdaa1a7810281b0cecf718a6319da5f8538fdae3a5101d1e9afd54da0baf8c"},
-]
 
 [[package]]
 name = "psutil"
@@ -2673,7 +2644,7 @@ files = [
 name = "pytest"
 version = "7.4.0"
 description = "pytest: simple powerful testing with Python"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -2743,27 +2714,6 @@ pytest = ">=5.0"
 
 [package.extras]
 dev = ["pre-commit", "pytest-asyncio", "tox"]
-
-[[package]]
-name = "pytest-redis"
-version = "2.4.0"
-description = "Redis fixtures and fixture factories for Pytest."
-category = "main"
-optional = false
-python-versions = ">=3.7"
-files = [
-    {file = "pytest-redis-2.4.0.tar.gz", hash = "sha256:8a07520abed3cd341e8da1793059aa5717b02e56c43e7c76435db682cede10aa"},
-    {file = "pytest_redis-2.4.0-py3-none-any.whl", hash = "sha256:3cf00ad3f7241e38ce6f1bcb66af11b91956a889f1e216cfc026e81aa638a4e7"},
-]
-
-[package.dependencies]
-mirakuru = "*"
-port-for = ">=0.6.0"
-pytest = ">=6.2.0"
-redis = "*"
-
-[package.extras]
-tests = ["mock", "pytest-cov", "pytest-xdist"]
 
 [[package]]
 name = "pytest-timeout"
@@ -3440,7 +3390,7 @@ files = [
 name = "tomli"
 version = "2.0.1"
 description = "A lil' TOML parser"
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
@@ -3861,4 +3811,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.9"
-content-hash = "3ce606196b024f6042b4b3693cb33df01ad5b598f6f087e54278c9be0bd49985"
+content-hash = "121546c38661373d919ce02160a2890fa706ed39f755706561c1598b16d88d2e"
