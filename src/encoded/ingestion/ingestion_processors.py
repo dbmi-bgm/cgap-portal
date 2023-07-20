@@ -1,11 +1,11 @@
 import io
 import json
+import structlog
 from dcicutils.misc_utils import ignored
 from snovault.util import debuglog, s3_local_file
 from snovault.ingestion.common import get_parameter
 from snovault.ingestion.ingestion_processors import ingestion_processor
 from snovault.types.ingestion import SubmissionFolio
-import structlog
 from ..submit import submit_metadata_bundle
 from ..submit_genelist import submit_genelist, submit_variant_update
 

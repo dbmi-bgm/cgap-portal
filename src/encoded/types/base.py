@@ -6,7 +6,7 @@ import string
 # from datetime import date
 # from functools import lru_cache
 # from jsonschema_serialize_fork import NO_DEFAULT
-from pyramid.security import (  # noqa: F401 (imported but unused)
+from pyramid.security import (
     # ALL_PERMISSIONS,
     Allow,
     Authenticated,
@@ -18,6 +18,7 @@ from pyramid.security import (  # noqa: F401 (imported but unused)
 from pyramid.view import (
     view_config,
 )
+from dcicutils.misc_utils import exported
 # from pyramid.httpexceptions import HTTPUnprocessableEntity
 from snovault.util import debug_log
 # import snovault default post / patch stuff so we can overwrite it in this file
@@ -36,13 +37,11 @@ from snovault.crud_views import (
     item_edit as sno_item_edit,
 )
 from snovault.interfaces import CONNECTION
-from snovault.types.base import get_item_or_none  # noqa: F401 (imported but unused)
-from typing import Any, List, Tuple, Union  # noqa: F401 (imported but unused)
+from snovault.types.base import get_item_or_none
 # from ..schema_formats import is_accession
 from ..server_defaults import get_userid, add_last_modified
 
-
-from .acl import (  # noqa: F401 (imported but unused)
+from .acl import (
     ALLOW_AUTHENTICATED_VIEW_ACL,
     ALLOW_EVERYONE_VIEW_ACL,
     ALLOW_OWNER_EDIT_ACL,
@@ -51,6 +50,15 @@ from .acl import (  # noqa: F401 (imported but unused)
     ALLOW_PROJECT_MEMBER_VIEW_ACL,
     DELETED_ACL,
     ONLY_ADMIN_VIEW_ACL,
+    PROJECT_MEMBER_CREATE_ACL
+)
+
+exported(
+    Allow,
+    Authenticated,
+    Deny,
+    Everyone,
+    get_item_or_none,
     PROJECT_MEMBER_CREATE_ACL
 )
 
