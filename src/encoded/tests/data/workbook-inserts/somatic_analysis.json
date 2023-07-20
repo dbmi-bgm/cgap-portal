@@ -1,0 +1,16 @@
+[
+    {
+        "uuid": "e92d1201-24ca-49c5-86c6-80184c1ad4ce",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi"
+    },
+    {
+        "uuid": "bb3df3d6-ec3a-4eb2-8094-2e171de66fa8",
+        "project": "hms-dbmi",
+        "institution": "hms-dbmi",
+        "samples": [
+            "hms-dbmi:sample_1",
+            "hms-dbmi:sample_2"
+        ]
+    }
+]

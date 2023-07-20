@@ -329,18 +329,41 @@ class QualityMetricBamqc(QualityMetric):
 
     @calculated_property(schema=QC_SUMMARY_SCHEMA)
     def quality_metric_summary(self, request):
-        qc = self.properties
-        qc_summary = []
-
-        qc_summary.append({"title": "Total Reads",
-                           "sample": qc.get("sample"),
-                           "value": str(qc.get("mapping stats", {}).get("total reads")),
-                           "numberType": "integer"})
-        qc_summary.append({"title": "Coverage",
-                           "sample": qc.get("sample"),
-                           "value": qc.get("coverage"),
-                           "numberType": "string"})
-        return qc_summary
+        result = []
+        sample = self.properties.get("sample")
+        coverage = self.properties.get("coverage")
+        mapping_stats = self.properties.get("mapping stats", {})
+        total_reads = mapping_stats.get("total reads")
+        read_length = mapping_stats.get("read length")
+        if sample:
+            if total_reads is not None:
+                result.append(
+                    {
+                       "title": "Total Reads",
+                       "sample": sample,
+                       "value": str(total_reads),
+                       "numberType": "integer"
+                    }
+                )
+            if coverage:
+                result.append(
+                   {
+                       "title": "Coverage",
+                       "sample": sample,
+                       "value": coverage,
+                       "numberType": "string"
+                    }
+                )
+            if read_length is not None:
+                result.append(
+                    {
+                        "title": "Read Length",
+                        "sample": sample,
+                        "value": str(read_length),
+                        "numberType": "integer"
+                    }
+                )
+        return result
 
 
 @collection(

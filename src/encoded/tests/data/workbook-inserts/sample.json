@@ -7,7 +7,7 @@
             "hms-dbmi:sample_1"
         ],
         "bam_sample_id": "Sample_ID",
-        "workup_type": "WES",
+        "workup_type": "WGS",
         "specimen_type": "peripheral_blood",
         "processed_files": [
             "hms-dbmi:sample_1_bam"
