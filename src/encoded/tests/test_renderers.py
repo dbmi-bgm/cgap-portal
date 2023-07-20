@@ -6,8 +6,8 @@ from dcicutils.misc_utils import filtered_warnings
 from dcicutils.qa_utils import MockResponse
 from pyramid.testing import DummyRequest
 from unittest import mock
-from .. import renderers
-from ..renderers import (
+from snovault import renderers
+from snovault.renderers import (
     best_mime_type, should_transform, MIME_TYPES_SUPPORTED, MIME_TYPE_DEFAULT,
     MIME_TYPE_JSON, MIME_TYPE_HTML, MIME_TYPE_LD_JSON, MIME_TYPE_TRIAGE_MODE,
 )

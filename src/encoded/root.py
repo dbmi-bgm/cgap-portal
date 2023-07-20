@@ -1,6 +1,5 @@
 import sys
 import uptime
-import datetime
 
 from collections import OrderedDict
 from dcicutils import lang_utils
