@@ -3,6 +3,7 @@ import os
 import re
 import structlog
 from typing import Any, Dict
+from dcicutils.misc_utils import exported
 from .types.base import get_item_or_none
 from snovault.util import (  # noqa: F401 (imported but unused)
     build_s3_presigned_get_url,
@@ -23,11 +24,24 @@ from snovault.util import (  # noqa: F401 (imported but unused)
 from snovault.embed import (  # noqa: F401 (imported but unused)
     subrequest_item_creation
 )
+exported(
+    build_s3_presigned_get_url,
+    check_user_is_logged_in,
+    convert_integer_to_comma_string,
+    deduplicate_list,
+    debuglog,
+    DEBUGLOG,
+    get_trusted_email,
+    gunzip_content,
+    make_s3_client,
+    make_vapp_for_email,
+    s3_local_file,
+    SettingsKey,
+    vapp_for_email
+)
 
 log = structlog.getLogger(__name__)
 
-
-Dict
 JsonObject = Dict[str, Any]
 
 ENCODED_ROOT_DIR = os.path.dirname(__file__)

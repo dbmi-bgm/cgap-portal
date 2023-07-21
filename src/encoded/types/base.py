@@ -41,7 +41,7 @@ from snovault.types.base import get_item_or_none
 # from ..schema_formats import is_accession
 from ..server_defaults import get_userid, add_last_modified
 
-from .acl import (
+from ..acl import (
     ALLOW_AUTHENTICATED_VIEW_ACL,
     ALLOW_EVERYONE_VIEW_ACL,
     ALLOW_OWNER_EDIT_ACL,
