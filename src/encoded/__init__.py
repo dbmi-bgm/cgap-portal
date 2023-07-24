@@ -202,6 +202,7 @@ def main(global_config, **local_config):
     config.include('.ingestion.ingestion_message_handler_vcf')
     config.include('.ingestion.ingestion_message_handler_default')
     config.include('.custom_embed')
+    config.include('.pipeline_view')
 
     if 'elasticsearch.server' in config.registry.settings:
         config.include('snovault.elasticsearch')
