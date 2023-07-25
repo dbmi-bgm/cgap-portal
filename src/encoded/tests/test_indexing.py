@@ -33,8 +33,8 @@ from unittest import mock
 from zope.sqlalchemy import mark_changed
 # from .helpers import local_collections
 # from .datafixtures import post_if_needed
-from .. import main, loadxl
-# from ..util import delay_rerun
+from snovault import loadxl
+from .. import main
 from ..verifier import verify_item
 
 
