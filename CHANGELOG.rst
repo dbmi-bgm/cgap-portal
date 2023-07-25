@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-13.6.0
+14.0.0
 ======
 * July 2023
 * Migrating ingestion (et.al.) code to snovault.
