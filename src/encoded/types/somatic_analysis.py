@@ -127,32 +127,45 @@ class SomaticAnalysis(Analysis):
         schema={
             "title": "Quality Control Metrics",
             "description": "Select quality control metrics for associated samples",
-            "type": "array",
-            "items": {
-                "title": "Sample Quality Control Metrics",
-                "description": "Quality control metrics for associated sample",
-                "type": "object",
-                "additionalProperties": False,
-                "properties": SOMATIC_ANALYSIS_QC_METRICS_SCHEMA_PROPERTIES,
+            "type": "object",
+            "properties": {
+                "samples": {
+                    "title": "Sample Quality Control Metrics",
+                    "description": "Quality control metrics for associated sample",
+                    "type": "object",
+                    "properties": SOMATIC_ANALYSIS_QC_METRICS_SCHEMA_PROPERTIES,
+                },
+                "summary": QC_SUMMARY_SCHEMA,
             },
         }
     )
-    def quality_control_metrics(self, request: Request) -> List[JsonObject]:
+    def quality_control_metrics(self, request: Request) -> Union[JsonObject, None]:
         somatic_analysis = SomaticAnalysisModel(
             self.properties, request=request, fetch_links=True
         )
-        return get_somatic_analysis_quality_control_metrics(somatic_analysis)
-
-    @calculated_property(schema=QC_SUMMARY_SCHEMA)
-    def quality_control_flags(self, request: Request) -> Union[JsonObject, None]:
-        quality_control_metrics = self.quality_control_metrics(request)
+        quality_control_metrics = get_somatic_analysis_quality_control_metrics(
+            somatic_analysis
+        )
         if quality_control_metrics:
             quality_control_metrics_summary = get_quality_control_metrics_summary(
                 quality_control_metrics
             )
-            if quality_control_metrics_summary:
-                return quality_control_metrics_summary
+            return {
+                "samples": quality_control_metrics,
+                "summary": quality_control_metrics_summary,
+            }
         return
+
+#    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+#    def quality_control_flags(self, request: Request) -> Union[JsonObject, None]:
+#        quality_control_metrics = self.quality_control_metrics(request)
+#        if quality_control_metrics:
+#            quality_control_metrics_summary = get_quality_control_metrics_summary(
+#                quality_control_metrics
+#            )
+#            if quality_control_metrics_summary:
+#                return quality_control_metrics_summary
+#        return
         
 
 
