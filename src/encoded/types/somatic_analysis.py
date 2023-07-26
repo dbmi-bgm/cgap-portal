@@ -1,4 +1,4 @@
-from typing import List, Iterable, Optional
+from typing import List, Iterable, Optional, Union
 
 from pyramid.request import Request
 from snovault import calculated_property, collection, load_schema
@@ -6,9 +6,11 @@ from snovault import calculated_property, collection, load_schema
 from .analysis import Analysis
 from .qc_report_utils import (
     QC_FLAG_SCHEMA,
+    QC_SUMMARY_SCHEMA,
     QC_VALUE_SCHEMA,
     get_latest_bam_with_quality_metric,
     get_quality_control_metrics,
+    get_quality_control_metrics_summary,
     QcConstants,
     QcFlagger,
 )
@@ -140,6 +142,18 @@ class SomaticAnalysis(Analysis):
             self.properties, request=request, fetch_links=True
         )
         return get_somatic_analysis_quality_control_metrics(somatic_analysis)
+
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_control_flags(self, request: Request) -> Union[JsonObject, None]:
+        quality_control_metrics = self.quality_control_metrics(request)
+        if quality_control_metrics:
+            quality_control_metrics_summary = get_quality_control_metrics_summary(
+                quality_control_metrics
+            )
+            if quality_control_metrics_summary:
+                return quality_control_metrics_summary
+        return
+        
 
 
 class SomaticAnalysisQcFlagger(QcFlagger):

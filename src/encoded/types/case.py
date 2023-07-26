@@ -1,12 +1,16 @@
+from typing import Optional
+
+from pyramid.request import Request
 from snovault import (
     calculated_property,
     collection,
     load_schema,
 )
 from snovault.util import IndexSettings
+
 from .base import Item, get_item_or_none
-from .sample import QcConstants
-from ..util import get_item
+from .qc_report_utils import QC_SUMMARY_SCHEMA, QcConstants, get_quality_control_metrics_summary
+from ..util import JsonObject, get_item
 
 
 def _build_family_embeds(*, base_path):
@@ -640,56 +644,21 @@ class Case(Item):
             title = "{} {} - in {}".format(ind_id, analysis, pro_id)
         return title
 
-    @calculated_property(
-        schema={
-            "title": "QC Flags",
-            "description": "Quality control flags",
-            "type": "object",
-            "properties": {
-                QcConstants.FLAG: {
-                    "title": "Overall Flag",
-                    "description": "Overall QC flag",
-                    "type": "string",
-                    "enum": [
-                        QcConstants.FLAG_PASS,
-                        QcConstants.FLAG_WARN,
-                        QcConstants.FLAG_FAIL,
-                    ],
-                },
-                QcConstants.FLAG_WARN: {
-                    "title": "Warn Flags",
-                    "description": "Number of warn flags",
-                    "type": "integer",
-                },
-                QcConstants.FLAG_FAIL: {
-                    "title": "Fail Flags",
-                    "description": "Number of fail flags",
-                    "type": "integer",
-                },
-                QcConstants.COMPLETED_QCS: {
-                    "title": "Completed QCs",
-                    "description": "Completed QC steps",
-                    "type": "array",
-                    "items": {
-                        "title": "Completed QC",
-                        "description": "Completed QC step",
-                        "type": "string",
-                    },
-                },
-            },
-        }
-    )
-    def quality_control_flags(self, request, sample_processing=None):
+    @calculated_property(schema=QC_SUMMARY_SCHEMA)
+    def quality_control_flags(self, request: Request, sample_processing: Optional[str] = None) -> JsonObject:
         """Gather and count QC flags from SampleProcessing."""
-        result = None
         if sample_processing:
             sample_processing_item = get_item(request, sample_processing)
             quality_control_metrics = sample_processing_item.get(
                 "quality_control_metrics", []
             )
-            qc_metrics_collector = CaseQcMetricsCollector(quality_control_metrics)
-            result = qc_metrics_collector.get_quality_control_flags()
-        return result
+            if quality_control_metrics:
+                quality_control_metrics_summary = get_quality_control_metrics_summary(
+                    quality_control_metrics
+                )
+                if quality_control_metrics_summary:
+                    return quality_control_metrics_summary
+        return
 
 
 class CaseQcMetricsCollector:

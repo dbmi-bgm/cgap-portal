@@ -603,7 +603,7 @@ def test_quality_control_flags(es_testapp, workbook):
     case_two_samples = es_testapp.get(case_two_samples_atid, status=200).json
     assert case_two_samples.get("quality_control_flags") == {
         "flag": "fail",
-        "fail": 3,
+        "fail": 2,
         "warn": 3,
         "completed_qcs": ["BAM", "SNV", "SV"],
     }

@@ -1,3 +1,4 @@
+import pytest
 from webtest.app import TestApp
 
 from .utils import get_identifier
@@ -24,6 +25,7 @@ SOMATIC_QC_METRICS_SAMPLE_2 = {
 }
 
 
+@pytest.mark.workbook
 def test_quality_control_metrics(es_testapp: TestApp, workbook: None) -> None:
     somatic_analysis_without_samples_uuid = "e92d1201-24ca-49c5-86c6-80184c1ad4ce"
     somatic_analysis_two_samples_with_bams_uuid = "bb3df3d6-ec3a-4eb2-8094-2e171de66fa8"

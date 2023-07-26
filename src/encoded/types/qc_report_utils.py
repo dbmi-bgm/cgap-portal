@@ -13,28 +13,6 @@ from ..util import JsonObject, title_to_snake_case
 log = structlog.getLogger(__name__)
 
 
-QC_VALUE_SCHEMA = {
-    "title": "Value",
-    "description": "Value for this QC metric",
-    "type": "string",
-}
-QC_FLAG_SCHEMA = {
-    "title": "QC Flag",
-    "description": "Flag for this QC value",
-    "type": "string",
-    "enum": [
-        "pass",
-        "warn",
-        "fail",
-    ],
-}
-QC_LINK_SCHEMA = {
-    "title": "QC Link",
-    "description": "Link for this QC metric",
-    "type": "string",
-}
-
-
 class QcConstants:
 
     ANCESTRY = "ancestry"
@@ -68,6 +46,64 @@ class QcConstants:
     VALUE = "value"
 
 
+QC_VALUE_SCHEMA = {
+    "title": "Value",
+    "description": "Value for this QC metric",
+    "type": "string",
+}
+QC_FLAG_SCHEMA = {
+    "title": "QC Flag",
+    "description": "Flag for this QC value",
+    "type": "string",
+    "enum": [
+        QcConstants.FLAG_PASS,
+        QcConstants.FLAG_WARN,
+        QcConstants.FLAG_FAIL,
+    ],
+}
+QC_LINK_SCHEMA = {
+    "title": "QC Link",
+    "description": "Link for this QC metric",
+    "type": "string",
+}
+QC_SUMMARY_SCHEMA = {
+    "title": "QC Flags",
+    "description": "Quality control flags",
+    "type": "object",
+    "properties": {
+        QcConstants.FLAG: {
+            "title": "Overall Flag",
+            "description": "Overall QC flag",
+            "type": "string",
+            "enum": [
+                QcConstants.FLAG_PASS,
+                QcConstants.FLAG_WARN,
+                QcConstants.FLAG_FAIL,
+            ],
+        },
+        QcConstants.FLAG_WARN: {
+            "title": "Warn Flags",
+            "description": "Number of warn flags",
+            "type": "integer",
+        },
+        QcConstants.FLAG_FAIL: {
+            "title": "Fail Flags",
+            "description": "Number of fail flags",
+            "type": "integer",
+        },
+        QcConstants.COMPLETED_QCS: {
+            "title": "Completed QCs",
+            "description": "Completed QC steps",
+            "type": "array",
+            "items": {
+                "title": "Completed QC",
+                "description": "Completed QC step",
+                "type": "string",
+            },
+        },
+    },
+}
+ 
 
 class QcFlagger(ABC):
     """Evaluate QC values for appropriate flags."""
@@ -273,7 +309,7 @@ class QualityControlMetric(ABC):
 
     sample_id: str
     title: str
-    value: str
+    value: Union[str, List[str]]
 
     @abstractmethod
     def get_formatted_metric(self) -> JsonObject:
@@ -285,13 +321,12 @@ class QualityControlMetric(ABC):
     def get_title(self) -> str:
         return self.title
 
-    def get_value(self) -> str:
+    def get_value(self) -> Union[str, List[str]]:
         return self.value
 
-    def update(self, title: Optional[str] = None, **kwargs) -> QualityControlMetric:
-        if title:
-            return QualityControlMetric(self.sample_id, title, self.value)
-        return self
+    @abstractmethod
+    def update(self) -> QualityControlMetric:
+        pass
 
 
 @dataclass(frozen=True)
@@ -301,6 +336,11 @@ class FlatQualityControlMetric(QualityControlMetric):
         if self.title and self.value:
             return {self.title: self.value}
         return {}
+
+    def update(self, title: Optional[str] = None, **kwargs) -> FlatQualityControlMetric:
+        if title:
+            return FlatQualityControlMetric(self.sample_id, title, self.value)
+        return self
 
 
 @dataclass(frozen=True)
@@ -360,12 +400,11 @@ def get_quality_control_metrics(
     qc_flagger: QcFlagger,
     desired_fields: Iterable[str],
 ) -> Union[List[JsonObject], None]:
-    qc_metrics_without_flags = get_qc_metrics_without_flags(files, samples, desired_fields)
-    qc_metrics_with_flags = get_qc_metrics_with_flags(
-        qc_metrics_without_flags, samples, qc_flagger
+    qc_metrics = get_qc_metrics(
+        files, samples, qc_flagger, desired_fields
     )
     qc_metrics_per_sample = get_qc_metrics_per_sample(
-        samples, qc_metrics_with_flags, desired_fields
+        samples, qc_metrics, desired_fields
     )
     quality_control_metrics = get_sorted_and_formatted_quality_control_metrics(
         qc_metrics_per_sample
@@ -373,6 +412,83 @@ def get_quality_control_metrics(
     if quality_control_metrics:
         return quality_control_metrics
     return
+
+
+def get_qc_metrics(
+    files: Iterable[File],
+    samples: Iterable[Sample],
+    qc_flagger: QcFlagger,
+    desired_fields: Iterable[str],
+) -> List[QualityControlMetric]:
+    qc_metrics_without_flags = get_qc_metrics_without_flags(
+        files, samples, desired_fields
+    )
+    return get_qc_metrics_with_flags(qc_metrics_without_flags, samples, qc_flagger)
+
+
+def get_qc_metrics_with_flags(
+    qc_metrics_without_flags: Iterable[QualityControlMetric],
+    samples: Iterable[Sample],
+    qc_flagger: QcFlagger,
+) -> List[QualityControlMetric]:
+    sample_ids_to_samples = get_sample_ids_to_samples(samples)
+    return [
+        get_qc_metric_with_flag(qc_metric, sample_ids_to_samples, qc_flagger)
+        for qc_metric in qc_metrics_without_flags
+    ]
+
+
+def get_sample_ids_to_samples(samples: Iterable[Sample]) -> Dict[str, Sample]:
+    return {sample.get_bam_sample_id(): sample for sample in samples}
+
+
+def get_qc_metric_with_flag(
+    qc_metric: QualityControlMetric,
+    sample_ids_to_samples: Mapping[str, Sample],
+    qc_flagger: QcFlagger,
+) -> QualityControlMetric:
+    if isinstance(qc_metric, NestedQualityControlMetric):
+        return get_nested_qc_metric_with_flag(qc_metric, sample_ids_to_samples, qc_flagger)
+    return qc_metric
+
+
+def get_nested_qc_metric_with_flag(
+    qc_metric: NestedQualityControlMetric,
+    sample_ids_to_samples: Mapping[str, Sample],
+    qc_flagger: QcFlagger,
+) -> NestedQualityControlMetric:
+    sample = get_sample_for_qc_metric(qc_metric, sample_ids_to_samples)
+    if sample:
+        return get_nested_qc_metric_with_flag_update(qc_metric, sample, qc_flagger)
+    return qc_metric
+
+
+def get_sample_for_qc_metric(
+    qc_metric: QualityControlMetric,
+    sample_ids_to_samples: Mapping[str, Sample],
+) -> Union[Sample, None]:
+    return sample_ids_to_samples.get(qc_metric.get_sample_id())
+
+
+def get_nested_qc_metric_with_flag_update(
+    qc_metric: NestedQualityControlMetric,
+    sample: Sample,
+    qc_flagger: QcFlagger,
+) -> NestedQualityControlMetric:
+    flag = get_flag_for_qc_metric(qc_metric, sample, qc_flagger)
+    if flag:
+        return get_updated_qc_metric(qc_metric, flag=flag)
+    return qc_metric
+
+
+def get_flag_for_qc_metric(
+    qc_metric: NestedQualityControlMetric,
+    sample: Sample,
+    qc_flagger: QcFlagger,
+) -> NestedQualityControlMetric:
+    title = qc_metric.get_title()
+    value = qc_metric.get_value()
+    return qc_flagger.get_flag(title, value, sample=sample)
 
 
 def get_qc_metrics_without_flags(
@@ -432,13 +548,13 @@ def get_qc_metrics_with_completed_qc_step(
     qc_metrics: Iterable[QualityControlMetric],
     file: File,
 ) -> List[QualityControlMetric]:
-    completed_qc_step = get_completed_qc_step(file)
+    completed_qc_step = get_completed_qc_step_from_file(file)
     if completed_qc_step:
         return get_updated_qc_metrics(qc_metrics, completed_qc_step=completed_qc_step)
     return qc_metrics
 
 
-def get_completed_qc_step(file: File) -> str:
+def get_completed_qc_step_from_file(file: File) -> str:
     if file.is_bam():
         return QcConstants.COMPLETED_QC_BAM
     if file.is_snv_final_vcf():
@@ -452,7 +568,14 @@ def get_updated_qc_metrics(
     qc_metrics: Iterable[QualityControlMetric],
     **kwargs,
 ) -> List[QualityControlMetric]:
-    return [qc_metric.update(**kwargs) for qc_metric in qc_metrics]
+    return [get_updated_qc_metric(qc_metric, **kwargs) for qc_metric in qc_metrics]
+
+
+def get_updated_qc_metric(
+    qc_metric: QualityControlMetric,
+    **kwargs,
+) -> QualityControlMetric:
+    return qc_metric.update(**kwargs)
 
 
 def get_qc_metrics_with_title_updates(
@@ -577,7 +700,7 @@ def is_title_for_link(
 
 
 def get_qc_metrics_from_quality_metric_summaries(
-    quality_metric_summaries: Iterable[QualityMetricSummary],
+    quality_metric_summaries: Iterable[QualityControlMetricSummary],
     desired_fields: Iterable[str],
 ) -> List[NestedQualityControlMetric]:
     result = []
@@ -590,7 +713,7 @@ def get_qc_metrics_from_quality_metric_summaries(
     return result
 
 def get_qc_metric_from_quality_metric_summary(
-    quality_metric_summary: QualityMetricSummary,
+    quality_metric_summary: QualityControlMetricSummary,
     desired_fields: Iterable[str],
 ) -> Union[QualityControlMetric, None]:
     if is_desired_quality_metric_summary(quality_metric_summary, desired_fields):
@@ -598,7 +721,7 @@ def get_qc_metric_from_quality_metric_summary(
 
 
 def is_desired_quality_metric_summary(
-    quality_metric_summary: QualityMetricSummary,
+    quality_metric_summary: QualityControlMetricSummary,
     desired_fields: Iterable[str],
 ) -> bool:
     if get_title_from_quality_metric_summary(quality_metric_summary) in desired_fields:
@@ -606,12 +729,12 @@ def is_desired_quality_metric_summary(
     return False
 
 
-def get_title_from_quality_metric_summary(quality_metric_summary: QualityMetricSummary) -> str:
+def get_title_from_quality_metric_summary(quality_metric_summary: QualityControlMetricSummary) -> str:
     return title_to_snake_case(quality_metric_summary.get_title())
 
 
 def get_nested_qc_metric_from_quality_metric_summary(
-    quality_metric_summary: QualityMetricSummary,
+    quality_metric_summary: QualityControlMetricSummary,
 ) -> NestedQualityControlMetric:
     sample_id = quality_metric_summary.get_sample()
     title = get_title_from_quality_metric_summary(quality_metric_summary)
@@ -746,69 +869,6 @@ def get_individual_accession_qc_metric(
     return FlatQualityControlMetric(
         sample_id, QcConstants.INDIVIDUAL_ACCESSION, individual.get_accession()
     )
-
-
-def get_qc_metrics_with_flags(
-    qc_metrics_without_flags: Iterable[QualityControlMetric],
-    samples: Iterable[Sample],
-    qc_flagger: QcFlagger,
-) -> List[QualityControlMetric]:
-    sample_ids_to_samples = get_sample_ids_to_samples(samples)
-    return [
-        get_qc_metric_with_flag(qc_metric, sample_ids_to_samples, qc_flagger)
-        for qc_metric in qc_metrics_without_flags
-    ]
-
-
-def get_sample_ids_to_samples(samples: Iterable[Sample]) -> Dict[str, Sample]:
-    return {sample.get_bam_sample_id(): sample for sample in samples}
-
-
-def get_qc_metric_with_flag(
-    qc_metric: QualityControlMetric,
-    sample_ids_to_samples: Mapping[str, Sample],
-    qc_flagger: QcFlagger,
-) -> QualityControlMetric:
-    if isinstance(qc_metric, NestedQualityControlMetric):
-        return get_nested_qc_metric_with_flag(qc_metric, sample_ids_to_samples, qc_flagger)
-    return qc_metric
-
-
-def get_nested_qc_metric_with_flag(
-    qc_metric: QualityControlMetric,
-    sample_ids_to_samples: Mapping[str, Sample],
-    qc_flagger: QcFlagger,
-) -> NestedQualityControlMetric:
-    sample = get_sample_for_qc_metric(qc_metric, sample_ids_to_samples)
-    if sample:
-        return get_nested_qc_metric_with_flag_update(qc_metric, sample, qc_flagger)
-    return qc_metric
-
-
-def get_sample_for_qc_metric(
-    qc_metric: QualityControlMetric,
-    sample_ids_to_samples: Mapping[str, Sample],
-) -> Union[Sample, None]:
-    return sample_ids_to_samples.get(qc_metric.get_sample_id())
-
-
-def get_nested_qc_metric_with_flag_update(
-    qc_metric: QualityControlMetric,
-    sample: Sample,
-    qc_flagger: QcFlagger,
-) -> NestedQualityControlMetric:
-    flag = get_flag_for_qc_metric(qc_metric, sample, qc_flagger)
-    return qc_metric.update(flag=flag)
-
-
-def get_flag_for_qc_metric(
-    qc_metric: QualityControlMetric,
-    sample: Sample,
-    qc_flagger: QcFlagger,
-) -> NestedQualityControlMetric:
-    title = qc_metric.get_title()
-    value = qc_metric.get_value()
-    return qc_flagger.get_flag(title, value, sample=sample)
 
 
 def get_qc_metrics_per_sample(
@@ -953,278 +1013,200 @@ def get_formatted_quality_control_metrics(
 
 
 #@dataclass(frozen=True)
-#class QualityControlMetricsFromFile:
-#
-#    samples: Iterable[Sample]
-#    file: File
-#    qc_flagger: QcFlagger
-#    desired_fields: Iterable[str]
-#
-#    @cached_property
-#    def _sample_ids_to_samples(self) -> Dict[str, Sample]:
-#        return {sample.get_bam_sample_id(): sample for sample in self.samples}
-#
-#    def get_metrics(self) -> List[QualityControlMetric]:
-#        result = []
-#        for quality_metric_summary in self.quality_metric.get_quality_metric_summaries():
-#            qc_metric = self._get_qc_metric_from_quality_metric_summary(
-#                quality_metric_summary
-#            )
-#            if qc_metric:
-#                result.append(qc_metric)
-#        return result
-#
-#    def _get_qc_metric_from_quality_metric_summary(
-#        self,
-#        quality_metric_summary: QualityMetricSummary,
-#    ) -> Union[QualityControlMetric, None]:
-#        if self._is_desired_quality_metric_summary(quality_metric_summary):
-#            return self._get_nested_qc_metric_from_quality_metric_summary(
-#                quality_metric_summary
-#            )
-#        return
-#
-#    def _is_desired_quality_metric_summary(self, quality_metric_summary: QualityMetricSummary) -> bool:
-#        title = self._get_title_from_quality_metric_summary(quality_metric_summary)
-#        if title in self.desired_fields:
-#            return True
-#        return False
-#
-#    def _get_title_from_quality_metric_summary(self, quality_metric_summary: QualityMetricSummary) -> str:
-#        return title_to_snake_case(quality_metric_summary.get_title())
-#
-#    def _get_nested_qc_metric_from_quality_metric_summary(
-#        self,
-#        quality_metric_summary: QualityMetricSummary,
-#    ) -> NestedQualityControlMetric:
-#        sample_id = quality_metric_summary.get_sample()
-#        title = self._get_title_from_quality_metric_summary(quality_metric_summary)
-#        value = quality_metric_summary.get_value()
-#        flag = self._get_flag_for_qc_value(title, value, sample_id)
-#        link = self._get_link_from_quality_metric(title)
-#        return NestedQualityControlMetric(
-#            sample_id, title, value, flag=flag, link=link
-#        )
-#
-#    def _get_flag_for_qc_value(self, title: str, value: str, sample_id: str) -> Union[str, None]:
-#        sample = self._sample_ids_to_samples.get(sample_id)
-#        if sample:
-#            return self.qc_flagger.get_flag(title, value, sample=sample)
-#        return
-#
-#    def _get_link_from_quality_metric(self, qc_metric_title: str) -> Union[str, None]:
-#        if qc_metric_title in self.PEDDY_QC_LINKS:
-#            return self._get_peddy_qc_link()
-#        return
-#
-#    def _get_peddy_qc_link(self) -> Union[str, None]:
-#        for child_quality_metric in self.quality_metric.get_qc_list():
-#            if child_quality_metric.is_peddy_qc():
-#                return self._get_download_link(child_quality_metric)
-#
-#    def _get_download_link(self, quality_metric: QualityMetric) -> str:
-#        return f"{quality_metric.get_atid()}@@download"
-#
-#
-#@dataclass(frozen=True)
-#class QualityControlMetricsFromSample:
-#
-#    sample: Sample
-#    desired_fields: Iterable[str]
-#
-#    @property
-#    def individual(self) -> Individual:
-#        return self.sample.get_individual()
-#
-#    @property
-#    def sample_id(self) -> str:
-#        return self.sample.get_bam_sample_id()
-#
-#    def get_metrics(self) -> List[QualityControlMetric]:
-#        return self._get_individual_qc_metrics() + self._get_sample_qc_metrics()
-#
-#    def _get_individual_qc_metrics(self) -> List[QualityControlMetric]:
-#        result = []
-#        if QcConstants.SEX in self.desired_fields:
-#            result.append(self._get_individual_sex())
-#        if QcConstants.INDIVIDUAL_ID in self.desired_fields:
-#            result.append(self._get_individual_id())
-#        if QcConstants.ANCESTRY in self.desired_fields:
-#            result.append(self._get_individual_ancestry())
-#        if QcConstants.INDIVIDUAL_ACCESSION in self.desired_fields:
-#            result.append(self._get_individual_accession())
-#        return result
-#
-#    def _get_individual_sex(self) -> NestedQualityControlMetric:
-#        return NestedQualityControlMetric(
-#            self.sample_id, QcConstants.SEX, self.individual.get_sex()
-#        )
-#    def _get_individual_id(self) -> FlatQualityControlMetric:
-#        return FlatQualityControlMetric(
-#            self.sample_id, QcConstants.INDIVIDUAL_ID, self.individual.get_identifier()
-#        )
-#
-#    def _get_individual_ancestry(self) -> NestedQualityControlMetric:
-#        return NestedQualityControlMetric(
-#            self.sample_id, QcConstants.ANCESTRY, self.individual.get_ancestry()
-#        )
-#
-#    def _get_individual_accession(self) -> FlatQualityControlMetric:
-#        return FlatQualityControlMetric(
-#            self.sample_id, QcConstants.INDIVIDUAL_ACCESSION, self.individual.get_accession()
-#        )
-#
-#    def _get_sample_qc_metrics(self) -> List[QualityControlMetric]:
-#        result = []
-#        if QcConstants.BAM_SAMPLE_ID in self.desired_fields:
-#            result.append(self._get_sample_bam_sample_id())
-#        if QcConstants.SPECIMEN_TYPE in self.desired_fields:
-#            result.append(self._get_sample_specimen_type())
-#        if QcConstants.SEQUENCING_TYPE in self.desired_fields:
-#            result.append(self._get_sample_sequencing_type())
-#        return result
-#
-#    def _get_sample_bam_sample_id(self) -> FlatQualityControlMetric:
-#        return FlatQualityControlMetric(
-#            self.sample_id, QcConstants.BAM_SAMPLE_ID, self.sample_id
-#        )
-#
-#    def _get_sample_specimen_type(self) -> FlatQualityControlMetric:
-#        return FlatQualityControlMetric(
-#            self.sample_id, QcConstants.SPECIMEN_TYPE, self.sample.get_specimen_type()
-#        )
-#
-#    def _get_sample_sequencing_type(self) -> FlatQualityControlMetric:
-#        return FlatQualityControlMetric(
-#            self.sample_id, QcConstants.SEQUENCING_TYPE, self.sample.get_workup_type()
-#        )
-        
-       
-
-#    def _get_desired_field_from_quality_metric_summary(self, quality_metric_summary: QualityMetricSummary) -> JsonObject:
-#        title = self._get_metric_title(quality_metric_summary)
-#        if title in self.desired_fields:
-#            return self._get_field_for_quality_metric_summary(title, quality_metric_summary)
-#        return {}
-#
-#    def _get_field_for_quality_metric_summary(self, quality_metric_summary: QualityMetricSummary) -> JsonObject:
-#        value = quality_metric_summary.get_value()
-#        if value:
-#            return self._get_formatted_field(quality_metric_summary)
-#        return {}
-#
-#    def _get_formatted_field_for_quality_metric_summary(self, quality_metric_summary: QualityMetricSummary) -> JsonObject:
-#        return {
-#            self._get_metric_title(quality_metric_summary): {
-#                **self._get_value(quality_metric_summary),
-#                **self._get_flag(quality_metric_summary),
-#                **self._get_link(quality_metric_summary),
-#            }
-#        }
-#
-#    def _get_metric_title(self, quality_metric_summary: QualityMetricSummary) -> str:
-#        return title_to_snake_case(quality_metric_summary.get_title())
-#
-#    def _get_value(self, quality_metric_summary: QualityMetricSummary) -> JsonObject:
-#        return {VALUE: quality_metric_summary.get_value()}
-#
-#    def _get_flag(self, quality_metric_summary: QualityMetricSummary) -> JsonObject:
-#        flag = self.qc_flagger.get_flag_for_quality_metric_summary(
-#            quality_metric_summary, sample=self.sample
-#        )
-#        if flag:
-#            return {FLAG: flag}
-#        return {}
-#
-#    def _get_link(self, quality_metric_summary: QualityMetricSummary) -> JsonObject:
-#        title = self._get_metric_title(quality_metric_summary)
-#        parent_quality_metric = quality_metric_summary.get_parent_item()
-#        if self.is_title_for_link(title) and parent_quality_metric:
-#            return self._get_link_from_quality_metric(quality_metric_summary)
-#        return {}
-#
-#    def _get_link_from_quality_metric(
-#
-#
-#def get_quality_control_metrics(
-#    quality_metrics: Iterable[QualityMetric],
-#    qc_flagger: QcFlagger,
-#    sample: Sample,
-#) -> List[QualityMetricSummary]:
-#    result = []
-#    for quality_metric in quality_metrics:
-#        result += quality_metric.get_quality_metric_summaries()
-#    return result
-#
-#
-#def get_sample_quality_control_metrics(
-#    samples: Iterable[Sample],
-#    quality_metric_summaries: Iterable[QualityMetricSummary],
-#    qc_flagger: QcFlagger,
-#    desired_fields: Iterable[str],
-#) -> List[JsonObject]:
-#    result = []
-#    sample_id_to_quality_metric_summaries = get_quality_metric_summaries_per_sample()
-#    for sample in samples:
-#        sample_id = sample.get_bam_sample_id()
-#        quality_metric_summaries = sample_id_to_quality_metric_summaries.get(sample_id, [])
-#        result.append(
-#            SampleQualityControlMetrics(
-#                sample, quality_metric_summaries, qc_flagger, desired_fields
-#            )
-#        )
-#    return result
-#
-#
-#@dataclass(frozen=True)
 #class SampleQualityControlMetrics:
 #
-#    sample: Sample
-#    quality_metric_summaries: Iterable[QualityMetricSummary]
-#    qc_flagger: QcFlagger
-#    desired_fields: List[str]
+#    properties: JsonObject
 #
-#    def get_quality_control_metrics(self) -> JsonObject:
-#        sample_fields = self._get_fields_from_sample()
-#        quality_metric_summary_fields = self._get_fields_from_quality_metric_summaries()
-#        return {**sample_fields, **quality_metric_summary_fields}
+#    @property
+#    def _sample_id(self) -> str:
+#        return self.properties.get(QcConstants.BAM_SAMPLE_ID, "")
 #
-#    def _get_fields_from_sample(self) -> JsonObject:
-#        return {
-#            **self._get_bam_sample_id_if_desired(),
-#            **self._get_sequencing_type_if_desired(),
-#            **self._get_specimen_type_if_desired(),
-#            **self._get_sex_if_desired(),
-#            **self._get_ancestry_if_desired(),
-#            **self._get_individual_accession_if_desired(),
-#            **self._get_individual_id_if_desired(),
-#        }
+#    @property
+#    def _warn_flags(self) -> List[str]:
+#        return self.properties.get(QcConstants.FLAG_WARN, [])
 #
-#    def _get_bam_sample_id_if_desired(self) -> JsonObject:
-#        return self._get_formatted_field_if_desired_and_value_exists(
-#            BAM_SAMPLE_ID, sample.get_bam_sample_id()
-#        )
+#    @property
+#    def _fail_flags(self) -> List[str]:
+#        return self.properties.get(QcConstants.FLAG_FAIL, [])
 #
-#    def _get_sequencing_type_if_desired(self) -> JsonObject:
-#        return self._get_formatted_field_if_desired_and_value_exists(
-#            SEQUENCING_TYPE, sample.get_workup_type()
-#        )
+#    @property
+#    def _completed_qc_steps(self) -> List[str]:
+#        return self.properties.get(QcConstants.COMPLETED_QC_STEPS, [])
 #
-#    def _get_formatted_field_if_desired_and_value_exists(
-#        self, title: str, value: str
-#    ) -> JsonObject:
-#        if title in self.desired_fields and value:
-#            return {title: value}
-#        return {}
+#    def get_warn_flag_count(self) -> int:
+#        return len(self._warn_flags)
 #
-#    def _get_fields_from_quality_metric_summaries(self) -> JsonObject:
-#        result = {}
-#        for quality_metric_summary in self.quality_metric_summaries:
-#            result.update(
-#                self._get_desired_field_from_quality_metric_summary(
-#                    quality_metric_summary
-#                )
-#            )
-#        return result
+#    def get_fail_flag_count(self) -> int:
+#        return len(self._fail_flags)
 #
+#    def get_completed_qc_steps(self) -> List[str]:
+#        return self._completed_qc_steps
 #
+#    def has_pass_flag(self) -> bool:
+#
+#    def get_nested_qc_metrics(self) -> List[QualityControlMetric]:
+#        result = []
+#        for key, value in self.properties.items():
+#            nested_qc_metric = get_nested_qc_metric(key, value)
+
+
+@dataclass(frozen=True)
+class QualityControlMetricSummary:
+
+    title: str
+    value: Union[str, List[str], int]
+
+    def get_formatted_summary(self) -> JsonObject:
+        return {self.title: self.value}
+
+
+def get_quality_control_metrics_summary(
+    samples_formatted_qc_metrics: Iterable[JsonObject]
+) -> JsonObject:
+    quality_control_metrics = get_qc_metrics_from_formatted_metrics(samples_formatted_qc_metrics)
+    qc_metrics_summaries = get_qc_metric_summaries(quality_control_metrics)
+    return get_formatted_quality_control_metrics_summary(qc_metrics_summaries)
+
+
+def get_qc_metrics_from_formatted_metrics(samples_formatted_qc_metrics: Iterable[JsonObject]) -> List[QualityControlMetric]:
+    result = []
+    for sample_formatted_qc_metrics in samples_formatted_qc_metrics:
+        result += get_qc_metrics_for_sample(sample_formatted_qc_metrics)
+    return result
+
+
+def get_qc_metrics_for_sample(sample_formatted_qc_metrics: JsonObject) -> List[QualityControlMetric]:
+    sample_id = get_sample_id_from_qc_metrics(sample_formatted_qc_metrics)
+    return [
+        get_qc_metric(sample_id, qc_metric_title, qc_metric_value)
+        for qc_metric_title, qc_metric_value in sample_formatted_qc_metrics.items()
+    ]
+
+
+def get_sample_id_from_qc_metrics(sample_formatted_qc_metrics: JsonObject) -> str:
+    return sample_formatted_qc_metrics.get(QcConstants.BAM_SAMPLE_ID, "")
+
+
+def get_qc_metric(sample_id: str, qc_metric_title: str, qc_metric_value: Union[str, List[str], JsonObject]) -> QualityControlMetric:
+    if isinstance(qc_metric_value, dict):
+        return get_nested_quality_control_metric(sample_id, qc_metric_title, qc_metric_value)
+    return get_flat_quality_control_metric(sample_id, qc_metric_title, qc_metric_value)
+
+
+def get_nested_quality_control_metric(sample_id: str, qc_metric_title: str, qc_metric_value: JsonObject) -> NestedQualityControlMetric:
+    value = qc_metric_value.get(QcConstants.VALUE)
+    flag = qc_metric_value.get(QcConstants.FLAG)
+    return NestedQualityControlMetric(sample_id, qc_metric_title, value, flag=flag)
+
+
+def get_flat_quality_control_metric(sample_id: str, qc_metric_title: str, qc_metric_value: Union[str, List[str]]) -> FlatQualityControlMetric:
+    return FlatQualityControlMetric(sample_id, qc_metric_title, qc_metric_value)
+
+
+def get_qc_metric_summaries(qc_metrics: Iterable[QualityControlMetric]) -> List[QualityControlMetricSummary]:
+    possible_summaries = get_possible_qc_metric_summaries(qc_metrics)
+    return [summary for summary in possible_summaries if summary]
+
+
+def get_possible_qc_metric_summaries(qc_metrics: Iterable[QualityControlMetric]) -> List[Union[QualityControlMetricSummary, None]]:
+    return [
+        get_warn_flag_summary(qc_metrics),
+        get_fail_flag_summary(qc_metrics),
+        get_overall_flag_summary(qc_metrics),
+        get_completed_qc_steps_summary(qc_metrics),
+    ]
+
+
+def get_warn_flag_summary(qc_metrics: Iterable[QualityControlMetric]) -> QualityControlMetricSummary:
+    warn_count = get_flag_count(qc_metrics, QcConstants.FLAG_WARN)
+    return QualityControlMetricSummary(QcConstants.FLAG_WARN, warn_count)
+
+
+def get_fail_flag_summary(qc_metrics: Iterable[QualityControlMetric]) -> QualityControlMetricSummary:
+    fail_count = get_flag_count(qc_metrics, QcConstants.FLAG_FAIL)
+    return QualityControlMetricSummary(QcConstants.FLAG_FAIL, fail_count)
+
+
+def get_flag_count(qc_metrics: Iterable[QualityControlMetric], flag_to_count: str) -> int:
+    flag_count = 0
+    for qc_metric in qc_metrics:
+        if has_flag_to_count(qc_metric, flag_to_count):
+            flag_count += 1
+    return flag_count
+
+
+def has_flag_to_count(qc_metric: QualityControlMetric, flag_to_count: str) -> bool:
+    flag = get_flag(qc_metric)
+    if flag == flag_to_count:
+        return True
+    return False
+
+
+def get_flag(qc_metric: QualityControlMetric) -> Union[str, None]:
+    if isinstance(qc_metric, NestedQualityControlMetric):
+        return qc_metric.get_flag()
+    return
+
+
+def get_overall_flag_summary(qc_metrics: Iterable[QualityControlMetric]) -> Union[QualityControlMetricSummary, None]:
+    worst_flag = get_worst_flag(qc_metrics)
+    if worst_flag:
+        return QualityControlMetricSummary(QcConstants.FLAG, worst_flag)
+    return
+
+
+def get_worst_flag(qc_metrics: Iterable[QualityControlMetric]) -> str:
+    all_flags = get_all_flags(qc_metrics)
+    return get_worst_flag_from_all_flags(all_flags)
+
+
+def get_all_flags(qc_metrics: Iterable[QualityControlMetric]) -> List[str]:
+    result = []
+    for qc_metric in qc_metrics:
+        flag = get_flag(qc_metric)
+        if flag:
+            result.append(flag)
+    return result
+
+
+def get_worst_flag_from_all_flags(flags: Iterable[str]) -> str:
+    if QcConstants.FLAG_FAIL in flags:
+        return QcConstants.FLAG_FAIL
+    if QcConstants.FLAG_WARN in flags:
+        return QcConstants.FLAG_WARN
+    if QcConstants.FLAG_PASS in flags:
+        return QcConstants.FLAG_PASS
+    return ""
+
+
+def get_completed_qc_steps_summary(qc_metrics: Iterable[QualityControlMetric]) -> Union[QualityControlMetricSummary, None]:
+    completed_qc_steps = get_completed_qc_steps(qc_metrics)
+    if completed_qc_steps:
+        return QualityControlMetricSummary(QcConstants.COMPLETED_QCS, completed_qc_steps)
+    return
+
+
+def get_completed_qc_steps(qc_metrics: Iterable[QualityControlMetric]) -> List[str]:
+    completed_qc_steps = get_completed_qc_steps_from_metrics(qc_metrics)
+    return get_sorted_unique_items(completed_qc_steps)
+
+
+def get_completed_qc_steps_from_metrics(qc_metrics: Iterable[QualityControlMetric]) -> List[str]:
+    result = []
+    for qc_metric in qc_metrics:
+        if is_completed_qc_step_metric(qc_metric):
+            result += qc_metric.get_value()
+    return result
+
+
+def is_completed_qc_step_metric(qc_metric: QualityControlMetric) -> bool:
+    return qc_metric.get_title() == QcConstants.COMPLETED_QCS
+
+
+def get_formatted_quality_control_metrics_summary(
+    qc_metric_summaries: Iterable[QualityControlMetricSummary]
+) -> JsonObject:
+    result = {}
+    for qc_metric_summary in qc_metric_summaries:
+        result.update(qc_metric_summary.get_formatted_summary())
+    return result
