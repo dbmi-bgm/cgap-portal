@@ -8,11 +8,10 @@ import time
 from dcicutils.misc_utils import ignored
 from uuid import uuid4
 from pyramid.testing import DummyRequest
-from ..ingestion.common import IngestionReport, IngestionError
-from ..ingestion_listener import (
-    IngestionQueueManager, run, IngestionListener, verify_vcf_file_status_is_not_ingested,
-    STATUS_INGESTED,
-)
+from snovault.ingestion.common import IngestionReport, IngestionError
+from snovault.ingestion.ingestion_listener_base import STATUS_INGESTED
+from snovault.ingestion.ingestion_listener import IngestionQueueManager, run, IngestionListener
+from ..project.ingestion import verify_vcf_file_status_is_not_ingested
 from ..util import debuglog
 
 
@@ -88,7 +87,7 @@ def test_ingestion_queue_manager_basic(fresh_ingestion_queue_manager_for_testing
     assert queue_manager.env_name.startswith(MockedEnv.MOCKED_ENV_PREFIX)
     assert queue_manager.env_name[len(MockedEnv.MOCKED_ENV_PREFIX)].isdigit()
     # The queue name will have a suffix attached.
-    assert queue_manager.queue_name == queue_manager.env_name + queue_manager.BUCKET_EXTENSION
+    assert queue_manager.queue_name == queue_manager.env_name + queue_manager.QUEUE_NAME_EXTENSION
 
     # This has to be done after the above, so that there's not a gap between fixture creation and testing its name.
     # This tests that each call gets a new name.
