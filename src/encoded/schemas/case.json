@@ -150,12 +150,6 @@
             "exclude_from": [
                 "FFedit-create"
             ]
-        },
-        "note": {
-            "title": "Note",
-            "description": "Notes for this case",
-            "type": "string",
-            "linkTo": "NoteStandard"
         }
     },
     "facets": {
@@ -333,19 +327,6 @@
                 {
                     "field": "report.last_modified.date_modified",
                     "title": "Report Last Modified Date"
-                }
-            ]
-        },
-        "notes": {
-            "title": "Notes",
-            "sort_fields": [
-                {
-                    "field": "note.last_text_edited.date_text_edited",
-                    "title": "Last Edit Date"
-                },
-                {
-                    "field": "note.last_text_edited.text_edited_by.display_title",
-                    "title": "Last Edit User"
                 }
             ]
         }
