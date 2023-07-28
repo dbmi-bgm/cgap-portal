@@ -6,6 +6,11 @@ cgap-portal
 Change Log
 ----------
 
+14.0.1
+======
+* Update Higlass SV view config
+
+
 14.0.0
 ======
 * July 2023
