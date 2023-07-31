@@ -270,6 +270,10 @@ def test_changelogs(testapp, registry):
             assert res.content_type == 'text/markdown'
 
 
+# 2023-07-17: Disable this test ...
+# We used to generate variant schemas based on an excel sheet but we stopped doing that a
+# while ago and just make direct changes, this test is remnant of the old way of doing things.
+@pytest.mark.skip('Obsolete test')
 @pytest.mark.parametrize('schema', SCHEMA_FILES)
 def test_facets_and_columns_orders(schema, testapp):
     """This tests depends on Python 3.6's ordered dicts"""

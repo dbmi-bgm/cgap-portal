@@ -17,9 +17,12 @@ if [[ `uname -o` == "Darwin" && `uname -m` == "arm64" ]] ; then
     # /System/Volumes/Preboot/Cryptexes/OS/.../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/tabix.cpython-38-darwin.so
     # (no such file), .../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/tabix.cpython-38-darwin.so
     # (mach-o file, but is an incompatible architecture (have x86_64, need arm64))
-    #
     pip uninstall -y pytabix
     pip install pytabix
+    # For some reason installing psycopg2 via poetry gets
+    # the x86_64 so file but via pip install the correct arm64 one.
+    pip uninstall -y psycopg2 psycopg2-binary
+    pip install psycopg2 psycopg2-binary
     echo "Done with post poetry install special installs for Mac M1."
 fi
 

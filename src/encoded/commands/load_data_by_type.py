@@ -53,7 +53,7 @@ def main(simulated_args=None):
     env = app.registry.settings.get('env.name', '')
 
     allow_prod = args.prod
-    load_data_by_type = DottedNameResolver().resolve("encoded.loadxl:load_data_by_type")
+    load_data_by_type = DottedNameResolver().resolve("snovault.loadxl:load_data_by_type")
 
     if load_data_should_proceed(env, allow_prod):
         load_data_by_type(app, args.indir, args.overwrite, args.itype)

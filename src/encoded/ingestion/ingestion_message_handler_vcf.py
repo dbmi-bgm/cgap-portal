@@ -5,23 +5,27 @@ from dcicutils.misc_utils import PRINT
 from vcf import Reader
 from ..commands.reformat_vcf import runner as reformat_vcf
 from ..commands.add_altcounts_by_gene import main as add_altcounts
-from ..ingestion_listener import IngestionListener
-from ..util import (gunzip_content, debuglog)
-from .ingestion_listener_base import (
-    VARIANT_SCHEMA,
-    VARIANT_SAMPLE_SCHEMA,
+from snovault.ingestion.ingestion_listener import IngestionListener
+from ..util import (gunzip_content, debuglog, resolve_file_path)
+from snovault.ingestion.ingestion_listener_base import (
     STATUS_INGESTED,
     STATUS_DISABLED,
     STATUS_ERROR,
-    STATUS_IN_PROGRESS,
-    STRUCTURAL_VARIANT_SCHEMA,
-    STRUCTURAL_VARIANT_SAMPLE_SCHEMA,
+    STATUS_IN_PROGRESS
 )
-from .ingestion_message import IngestionMessage
-from .ingestion_message_handler_decorator import ingestion_message_handler
+from snovault.ingestion.ingestion_message import IngestionMessage
+from snovault.ingestion.ingestion_message_handler_decorator import ingestion_message_handler
 from .vcf_utils import VCFParser, StructuralVariantVCFParser
 from .variant_utils import CNVBuilder, StructuralVariantBuilder, VariantBuilder
 
+
+TYPE_VCF = "vcf"
+VARIANT_SCHEMA = resolve_file_path('./schemas/variant.json')
+VARIANT_SAMPLE_SCHEMA = resolve_file_path('./schemas/variant_sample.json')
+STRUCTURAL_VARIANT_SCHEMA = resolve_file_path("./schemas/structural_variant.json")
+STRUCTURAL_VARIANT_SAMPLE_SCHEMA = resolve_file_path(
+    "./schemas/structural_variant_sample.json"
+)
 
 log = structlog.getLogger(__name__)
 
@@ -30,7 +34,7 @@ def includeme(config):
     pass
 
 
-@ingestion_message_handler(ingestion_type=IngestionMessage.TYPE_VCF)
+@ingestion_message_handler(ingestion_type=TYPE_VCF)
 def ingestion_message_handler_vcf(message: IngestionMessage, listener: IngestionListener) -> bool:
     """
     This is the part of listener.IngestionListener.run function which handles a

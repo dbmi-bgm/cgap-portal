@@ -1,7 +1,7 @@
 import pytest
 
-from ..ingestion.common import get_parameter
-from ..ingestion.exceptions import MissingParameter, BadParameter
+from snovault.ingestion.common import get_parameter
+from snovault.ingestion.exceptions import MissingParameter, BadParameter
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
