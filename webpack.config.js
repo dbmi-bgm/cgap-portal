@@ -111,8 +111,6 @@ const serverPlugins = plugins.slice(0);
 
 webPlugins.push(new webpack.ProvidePlugin({
     "process": "process/browser",
-}));
-webPlugins.push(new webpack.ProvidePlugin({
     Buffer: ['buffer', 'Buffer'],
 }));
 
