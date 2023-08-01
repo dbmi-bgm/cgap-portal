@@ -8,13 +8,11 @@ export const CaseNotesColumn = ({ note }) => {
   const [isSaved, setIsSaved] = useState(true);
   const [noteText, setNoteText] = useState(note.note_text ?? "no notes");
   return (
-    <div className="d-flex flex-row">
-      <div>
-        <button>
-          <i className="icon text-larger icon-fw icon-sticky-note far text-muted"></i>
+    <div className="case-notes">
+        <button className="case-notes-button">
+          <i className="icon text-larger icon-fw icon-sticky-note fas text-muted"></i>
         </button>
-      </div>
-      <div>{noteText}</div>
+      <p className="case-notes-text">{noteText}</p>
     </div>
   );
 };
