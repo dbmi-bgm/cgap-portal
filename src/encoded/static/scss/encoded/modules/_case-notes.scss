@@ -1,0 +1,28 @@
+/**
+* File contains styles for the CaseNotesColumn component, which renders the
+* note property of Case Items.
+*
+* Imported into ../../style.scss (scss/encoded/styles.scss)
+*/
+.search-result-column-block[data-field="notes"] {
+    .case-notes {
+        display: flex;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+
+        &-button {
+            height: auto;
+            margin: auto;
+            background-color: transparent;
+            border: none;
+        }
+        &-text {
+            width: 100%;
+            margin: auto 10px auto auto;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+    }
+}
