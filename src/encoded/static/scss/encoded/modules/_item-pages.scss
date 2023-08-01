@@ -578,6 +578,17 @@ h3.submission-subtitle {
 		background-color: #812423;
 	}
 
+	// Identifiers for saved and unsaved states of CaseView comments
+	// Saved note gray
+	&[data-status="saved"]:before {
+		color: #6C757D;
+	}
+	// Unsaved note red
+	&[data-status="unsaved"]:before {
+		color: #C41700;
+	}
+
+
 	// Bright Red
 	&[data-status="deleted"]:before,						// Applicable to Item.status
 	&[data-status="upload failed"]:before,					// Applicable to File.status
@@ -616,7 +627,39 @@ h3.submission-subtitle {
 	}
 }
 
+// Styles for the status indicators note (note) and required fields (dot)
+div.status-indicators {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
 
+	&>.status-indicator {
+		margin: auto;
+		display: flex;
+
+		&-note {
+			position: relative;
+			&::before {
+				font-size: 10px;
+				display: inline-block;
+				position: relative;
+			}
+		}
+		&-dot {
+			position: relative;
+			&:before {
+				content: "";
+				width: 9px;
+				height : 9px;
+				display: inline-block;
+				position: relative;
+				border-radius: 50%;
+			}
+		}
+		@include statusColorStyles;
+	}
+}
+// Fallback for only required fields (dot) styles
 i.status-indicator-dot {
 	display: inline-block;
 	position: relative;
@@ -631,6 +674,7 @@ i.status-indicator-dot {
 
 	@include statusColorStyles;
 }
+
 
 
 @mixin acmgColorStyles {
