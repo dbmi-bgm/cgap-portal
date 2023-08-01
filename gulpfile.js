@@ -246,19 +246,13 @@ const build = gulp.series(
     doWebpack
 );
 
-const buildQuick = gulp.series(
-    cleanBuildDirectory,
-    setQuick,
-    doWebpack
-);
-
 
 //gulp.task('dev', devSlow);
+//gulp.task('build-quick', buildQuick);
 gulp.task('default', devQuick);
 gulp.task('dev-quick', devQuick);
 gulp.task('dev-analyzed', devAnalyzed);
 gulp.task('build', build);
-gulp.task('build-quick', buildQuick);
 
 gulp.task('build-scss', (done) => doSassBuild(done, {}));
 gulp.task('build-scss-dev', (done) => {
@@ -270,4 +264,3 @@ gulp.task('build-scss-dev', (done) => {
         { outputStyle : 'expanded' }
     );
 });
-
