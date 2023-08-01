@@ -119,7 +119,8 @@ const webPlugins = plugins.slice(0);
 const serverPlugins = plugins.slice(0);
 
 webPlugins.push(new webpack.ProvidePlugin({
-    "process": "process/browser"
+    "process": "process/browser",
+    Buffer: ['buffer', 'Buffer'],
 }));
 
 // Inform our React code of what build we're on.
@@ -234,7 +235,7 @@ module.exports = [
                 "zlib": false,
                 "stream": require.resolve("stream-browserify"),
                 "crypto": false,
-                "buffer": false,
+                "buffer": require.resolve('buffer/'),
                 "events": false,
                 // "path": require.resolve("path-browserify"),
                 "process": require.resolve("process/browser"),
