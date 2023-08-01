@@ -1,0 +1,776 @@
+{
+  "forked_at": "2016-05-03T14:29:15-04:00",
+  "pre_fork_contributors_by_name": {
+    "aditin14": {
+      "emails": [
+        "aditin14@stanford.edu",
+        "aditin14@users.noreply.github.com"
+      ],
+      "names": [
+        "aditin14"
+      ]
+    },
+    "An Doan": {
+      "emails": [
+        "hongan@stanford.edu"
+      ],
+      "names": [
+        "An Doan"
+      ]
+    },
+    "Ben Hitz": {
+      "emails": [
+        "hitz@genome.stanford.edu",
+        "hitz@stanford.edu"
+      ],
+      "names": [
+        "Ben Hitz"
+      ]
+    },
+    "Bonita Lam": {
+      "emails": [
+        "bonitarlam@gmail.com"
+      ],
+      "names": [
+        "Bonita Lam",
+        "bonitalam"
+      ]
+    },
+    "Casey Litton": {
+      "emails": [
+        "caseylitton@gmail.com",
+        "clitton@stanford.edu"
+      ],
+      "names": [
+        "Casey Litton",
+        "caseylitton"
+      ]
+    },
+    "Cherry Lab Build User": {
+      "emails": [
+        "build@demo-a.encodedcc.org"
+      ],
+      "names": [
+        "Cherry Lab Build User"
+      ]
+    },
+    "Chloe Tanlimco": {
+      "emails": [
+        "chloe@DN0a22f25d.SUNet",
+        "chloetlc@yahoo.com"
+      ],
+      "names": [
+        "Chloe Tanlimco"
+      ]
+    },
+    "Cricket Alicia Sloan": {
+      "emails": [
+        "cricket@DN52es07.SUNet",
+        "cricket@cricket-thunder.stanford.edu",
+        "cricket@ferman.local",
+        "cricketsloan@gmail.com",
+        "cricketsloan@stanford.edu"
+      ],
+      "names": [
+        "Cricket Alicia Sloan",
+        "Cricket Sloan",
+        "cricketsloan"
+      ]
+    },
+    "David Glick": {
+      "emails": [
+        "david.glick@plone.org",
+        "david@glicksoftware.com"
+      ],
+      "names": [
+        "David Glick"
+      ]
+    },
+    "Diane Trout": {
+      "emails": [
+        "diane@ghic.org"
+      ],
+      "names": [
+        "Diane Trout"
+      ]
+    },
+    "emro": {
+      "emails": [
+        "emmaruthoneill@gmail.com"
+      ],
+      "names": [
+        "emro"
+      ]
+    },
+    "ENCODE Admin": {
+      "emails": [
+        "encoded@demo-a.encodedcc.org"
+      ],
+      "names": [
+        "ENCODE Admin"
+      ]
+    },
+    "esther": {
+      "emails": [
+        "esther@DN0a22f572.SUNet",
+        "esther@DN525uhq.SUNet",
+        "esther@genome.stanford.edu"
+      ],
+      "names": [
+        "esther"
+      ]
+    },
+    "Esther C": {
+      "emails": [
+        "etchan@stanford.edu"
+      ],
+      "names": [
+        "Esther",
+        "Esther C",
+        "estherc"
+      ]
+    },
+    "Eurie Hong": {
+      "emails": [
+        "eurie@spritz.local",
+        "euriehong@stanford.edu"
+      ],
+      "names": [
+        "Eurie Hong"
+      ]
+    },
+    "Forrest Tanaka": {
+      "emails": [
+        "forrest@forrest-tanaka.com",
+        "ftanaka@icloud.com",
+        "fytanaka@staNFORD.EDU",
+        "fytanaka@stanford.edu"
+      ],
+      "names": [
+        "Forrest Tanaka"
+      ]
+    },
+    "GregRR": {
+      "emails": [
+        "greg@brewsession.com",
+        "gregroe@stanford.edu"
+      ],
+      "names": [
+        "GregRR"
+      ]
+    },
+    "gto389": {
+      "emails": [
+        "gto389ho@gmail.com"
+      ],
+      "names": [
+        "Chris",
+        "gto389"
+      ]
+    },
+    "Ian Whaling": {
+      "emails": [
+        "78115078+ian-whaling@users.noreply.github.com"
+      ],
+      "names": [
+        "Ian Whaling"
+      ]
+    },
+    "Idan Gabdank": {
+      "emails": [
+        "gabdank@stanford.edu",
+        "gabdank@users.noreply.github.com"
+      ],
+      "names": [
+        "Idan Gabdank",
+        "idan"
+      ]
+    },
+    "Ingrid Youngworth": {
+      "emails": [
+        "iay@stanford.edu"
+      ],
+      "names": [
+        "Ingrid Youngworth",
+        "iyoungworth"
+      ]
+    },
+    "J. Seth Strattan": {
+      "emails": [
+        "jseth@stanford.edu"
+      ],
+      "names": [
+        "J. Seth Strattan"
+      ]
+    },
+    "jason Hilton": {
+      "emails": [
+        "jahilton@stanford.edu"
+      ],
+      "names": [
+        "jahilton",
+        "jason Hilton"
+      ]
+    },
+    "Jean Davidson": {
+      "emails": [
+        "jean2@stanford.edu"
+      ],
+      "names": [
+        "Jean Davidson"
+      ]
+    },
+    "jenjou": {
+      "emails": [
+        "42983888+jenjou@users.noreply.github.com"
+      ],
+      "names": [
+        "jenjou"
+      ]
+    },
+    "Jennifer Zamanian": {
+      "emails": [
+        "jlz@stanford.edu"
+      ],
+      "names": [
+        "Jennifer Zamanian"
+      ]
+    },
+    "Jessica Au": {
+      "emails": [
+        "jessica.au10@gmail.com"
+      ],
+      "names": [
+        "Jessica Au"
+      ]
+    },
+    "Jin wook Lee": {
+      "emails": [
+        "leepc12@gmail.com"
+      ],
+      "names": [
+        "Jin wook Lee"
+      ]
+    },
+    "jlzamanian": {
+      "emails": [
+        "46795339+jlzamanian@users.noreply.github.com"
+      ],
+      "names": [
+        "jlzamanian"
+      ]
+    },
+    "JMDavidson": {
+      "emails": [
+        "Jeanmdavidson@gmail.com"
+      ],
+      "names": [
+        "JMDavidson"
+      ]
+    },
+    "Kalpana Karra": {
+      "emails": [
+        "kkarra@stanford.edu"
+      ],
+      "names": [
+        "Kalpana Karra"
+      ]
+    },
+    "KAndreeva": {
+      "emails": [
+        "99761866+KAndreeva@users.noreply.github.com"
+      ],
+      "names": [
+        "KAndreeva"
+      ]
+    },
+    "Karen Dalton": {
+      "emails": [
+        "kd@karend.net",
+        "kdalton@stanford.edu"
+      ],
+      "names": [
+        "Karen Dalton"
+      ]
+    },
+    "Karthik Kalyanaraman": {
+      "emails": [
+        "reach.kkarthik@gmail.com"
+      ],
+      "names": [
+        "Karthik Kalyanaraman",
+        "kakaly"
+      ]
+    },
+    "Kate Rosenbloom": {
+      "emails": [
+        "kate@dn52esjr.sunet",
+        "kate@dnab42125a.stanford.edu",
+        "kate@soe.ucsc.edu"
+      ],
+      "names": [
+        "Kate Rosenbloom"
+      ]
+    },
+    "Kathrina Casapao Onate": {
+      "emails": [
+        "kconate@stanford.edu"
+      ],
+      "names": [
+        "Kathrina Casapao Onate"
+      ]
+    },
+    "Katrin Leinweber": {
+      "emails": [
+        "9948149+katrinleinweber@users.noreply.github.com"
+      ],
+      "names": [
+        "Katrin Leinweber"
+      ]
+    },
+    "keenangraham": {
+      "emails": [
+        "keenangraham@gmail.com",
+        "keenangraham@stanford.edu",
+        "ksgraham@stanford.edu"
+      ],
+      "names": [
+        "keenangraham"
+      ]
+    },
+    "Khine Lin": {
+      "emails": [
+        "khzlin@stanford.edu"
+      ],
+      "names": [
+        "Khine Lin"
+      ]
+    },
+    "khzlin": {
+      "emails": [
+        "42584448+khzlin@users.noreply.github.com"
+      ],
+      "names": [
+        "khzlin"
+      ]
+    },
+    "Kriti": {
+      "emails": [
+        "kriti@DN0a22f4a0.SUNet",
+        "kriti@DN0a22f50f.SUNet",
+        "kriti@DN0a22f66c.SUNet",
+        "kriti@DN0a22f794.SUNet",
+        "kriti@admins-MacBook-Pro.local",
+        "kriti@sparge.stanford.edu",
+        "kriti@kimera-adapter.stanford.edu",
+        "kritijn21@gmail.com"
+      ],
+      "names": [
+        "Kriti",
+        "kriti",
+        "Kriti Jain",
+        "kjain21"
+      ]
+    },
+    "Laurence Rowe": {
+      "emails": [
+        "l@lrowe.co.uk",
+        "laurence@lrowe.co.uk",
+        "lrowe@stanford.edu"
+      ],
+      "names": [
+        "Laurence Rowe"
+      ]
+    },
+    "Meenakshi Kagda": {
+      "emails": [
+        "mkagd001@ucr.edu"
+      ],
+      "names": [
+        "Meenakshi Kagda"
+      ]
+    },
+    "Mingjie Li": {
+      "emails": [
+        "44071821+mingjiecn@users.noreply.github.com"
+      ],
+      "names": [
+        "Mingjie Li"
+      ]
+    },
+    "Nikhil Reddy": {
+      "emails": [
+        "Nikhil@angus.local",
+        "nikhilrp@stanford.edu"
+      ],
+      "names": [
+        "Nikhil",
+        "Nikhil Reddy",
+        "nikhilRP",
+        "nikhilrp"
+      ]
+    },
+    "ottojolanki": {
+      "emails": [
+        "ojolanki@stanford.edu"
+      ],
+      "names": [
+        "ottojolanki"
+      ]
+    },
+    "Paul Sud": {
+      "emails": [
+        "41386393+p-sud@users.noreply.github.com",
+        "41386393+paul-sud@users.noreply.github.com",
+        "paulsud@stanford.edu"
+      ],
+      "names": [
+        "Paul Sud",
+        "p-sud"
+      ]
+    },
+    "Pedro Henrique Ribeiro de Assis": {
+      "emails": [
+        "pedroh2306@gmail.com"
+      ],
+      "names": [
+        "Pedro Henrique Ribeiro de Assis"
+      ]
+    },
+    "Philip Adenekan": {
+      "emails": [
+        "zoldello@gmail.com"
+      ],
+      "names": [
+        "Phil",
+        "Philip Adenekan"
+      ]
+    },
+    "Rojeen Farkhoor": {
+      "emails": [
+        "rojeen.farkhoor@gmail.com",
+        "rojeen@DN0a22f172.SUNet",
+        "rojeen@DN0a22f625.SUNet",
+        "rojeen@DN0a22f75b.SUNet",
+        "rojeen@DN525ujv.SUNet",
+        "rojeen@DN525uto.SUNet",
+        "rojeen@DN525v12.SUNet"
+      ],
+      "names": [
+        "Rojeen Farkhoor"
+      ]
+    },
+    "tdreszer": {
+      "emails": [
+        "tdreszer@users.noreply.github.com"
+      ],
+      "names": [
+        "tdreszer"
+      ]
+    },
+    "Tim Dreszer": {
+      "emails": [
+        "tdreszer@stanford.org"
+      ],
+      "names": [
+        "Tim Dreszer"
+      ]
+    },
+    "TimDreszer": {
+      "emails": [
+        "tdreszer@DN52esnq.SUNet",
+        "tdreszer@terium.local"
+      ],
+      "names": [
+        "TimDreszer"
+      ]
+    },
+    "Ulugbek Baymuradov": {
+      "emails": [
+        "ulugbekbk@gmail.com"
+      ],
+      "names": [
+        "Ulugbek Baymuradov"
+      ]
+    },
+    "Venkat Malladi": {
+      "emails": [
+        "vmalladi@stanford.edu",
+        "vsmalladi@gmail.com"
+      ],
+      "names": [
+        "Venkat Malladi"
+      ]
+    },
+    "weiweizhong2018": {
+      "emails": [
+        "39782942+weiweizhong2018@users.noreply.github.com"
+      ],
+      "names": [
+        "weiweizhong2018"
+      ]
+    },
+    "Yunhai Luo": {
+      "emails": [
+        "yunhail@stanford.edu"
+      ],
+      "names": [
+        "Yunhai Luo"
+      ]
+    },
+    "zmyers23": {
+      "emails": [
+        "31746721+zmyers23@users.noreply.github.com"
+      ],
+      "names": [
+        "zmyers23"
+      ]
+    }
+  },
+  "contributors_by_name": {
+    "Alexander Balashov": {
+      "emails": [
+        "alex.balashov@gmail.com",
+        "alex@MBI-PP-L10227.local",
+        "alexander_balashov@hms.harvard.edu"
+      ],
+      "names": [
+        "Alex",
+        "Alex Balashov",
+        "Alexander Balashov"
+      ]
+    },
+    "Alexander Veit": {
+      "emails": [
+        "53857412+alexander-veit@users.noreply.github.com"
+      ],
+      "names": [
+        "Alexander Veit"
+      ]
+    },
+    "Andy Schroeder": {
+      "emails": [
+        "andrew_schroeder@hms.harvard.edu"
+      ],
+      "names": [
+        "Andy Schroeder",
+        "aschroed"
+      ]
+    },
+    "Bianca Morris": {
+      "emails": [
+        "Bianca_Morris@hms.harvard.edu",
+        "bianca_morris@hms.harvard.edu"
+      ],
+      "names": [
+        "Bianca Morris"
+      ]
+    },
+    "Burak Han Alver": {
+      "emails": [
+        "burak_alver@hms.harvard.edu"
+      ],
+      "names": [
+        "Burak Alver",
+        "Burak Han Alver"
+      ]
+    },
+    "Carl Vitzthum": {
+      "emails": [
+        "carl.vitzthum@gmail.com",
+        "carl_vitzthum@hms.harvard.edu"
+      ],
+      "names": [
+        "Carl Vitzthum",
+        "carlvitzthum"
+      ]
+    },
+    "Chad Serrant": {
+      "emails": [
+        "chad_serrant@hms.harvard.edu",
+        "therealchadius@gmail.com"
+      ],
+      "names": [
+        "Chad Serrant",
+        "Chadius"
+      ]
+    },
+    "Dana Vuzman": {
+      "emails": [
+        "danavuzman@gmail.com"
+      ],
+      "names": [
+        "Dana Vuzman"
+      ]
+    },
+    "David Michaels": {
+      "emails": [
+        "david_michaels@hms.harvard.edu",
+        "105234079+dmichaels-harvard@users.noreply.github.com"
+      ],
+      "names": [
+        "David Michaels",
+        "dmichaels-harvard"
+      ]
+    },
+    "dbmi": {
+      "emails": [
+        "dbmi@MBI-ADMI-L01800.local"
+      ],
+      "names": [
+        "dbmi"
+      ]
+    },
+    "dependabot[bot]": {
+      "emails": [
+        "49699333+dependabot[bot]@users.noreply.github.com"
+      ],
+      "names": [
+        "dependabot[bot]"
+      ]
+    },
+    "Douglas Rioux": {
+      "emails": [
+        "douglas_rioux@hms.harvard.edu",
+        "drioux@DRioux-MBP.local",
+        "58236592+drio18@users.noreply.github.com"
+      ],
+      "names": [
+        "Douglas Rioux",
+        "drio18"
+      ]
+    },
+    "Eric Berg": {
+      "emails": [
+        "Eric_Berg@hms.harvard.edu"
+      ],
+      "names": [
+        "Eric Berg"
+      ]
+    },
+    "Jeremy Johnson": {
+      "emails": [
+        "jeremy.johnson@hms.harvard.edu",
+        "jeremy@softwork.com.my",
+        "jeremy@softworks.com.my",
+        "jeremy_johnson@hms.harvard.edu"
+      ],
+      "names": [
+        "Jeremy Johnson",
+        "j1z0"
+      ]
+    },
+    "Kent M Pitman": {
+      "emails": [
+        "netsettler@users.noreply.github.com",
+        "kent_pitman@hms.harvard.edu"
+      ],
+      "names": [
+        "Kent Pitman",
+        "Kent M Pitman"
+      ]
+    },
+    "Koray K\u0131rl\u0131": {
+      "emails": [
+        "KorayKirli@users.noreply.github.com",
+        "koray_kirli@hms.harvard.edu",
+        "koraykirli@gmail.com"
+      ],
+      "names": [
+        "Koray K\u0131rl\u0131"
+      ]
+    },
+    "Luisa Mercado": {
+      "emails": [
+        "42242797+Lmercadom@users.noreply.github.com",
+        "luisa_mercado@hms.harvard.edu"
+      ],
+      "names": [
+        "Lmercadom",
+        "Luisa Mercado"
+      ]
+    },
+    "Michele Berselli": {
+      "emails": [
+        "berse@MacBook-Pro.local"
+      ],
+      "names": [
+        "Michele Berselli"
+      ]
+    },
+    "Sarah Reiff": {
+      "emails": [
+        "sarah_reiff@hms.harvard.edu",
+        "sbreiff@gmail.com"
+      ],
+      "names": [
+        "Sarah",
+        "Sarah Reiff"
+      ]
+    },
+    "Serkan Utku \u00d6zt\u00fcrk": {
+      "emails": [
+        "utku.ozturk@karyasmd.com",
+        "49978017+utku-ozturk@users.noreply.github.com"
+      ],
+      "names": [
+        "Serkan Utku \u00d6zt\u00fcrk",
+        "utku-ozturk"
+      ]
+    },
+    "Shannon Ehmsen": {
+      "emails": [
+        "72619398+shannonehmsen@users.noreply.github.com"
+      ],
+      "names": [
+        "Shannon Ehmsen"
+      ]
+    },
+    "Soo Lee": {
+      "emails": [
+        "duplexa@gmail.com"
+      ],
+      "names": [
+        "Soo Lee",
+        "SooLee",
+        "soolee"
+      ]
+    },
+    "Travis": {
+      "emails": [
+        "travis@builder.com"
+      ],
+      "names": [
+        "Travis"
+      ]
+    },
+    "U\u011fur \u00c7amo\u011flu": {
+      "emails": [
+        "ugur.camoglu@karyasmd.com"
+      ],
+      "names": [
+        "U\u011fur \u00c7amo\u011flu",
+        "ugur-camoglu"
+      ]
+    },
+    "Victoria Stevens": {
+      "emails": [
+        "43185675+vstevensf@users.noreply.github.com",
+        "victoria_stevens@hms.harvard.edu"
+      ],
+      "names": [
+        "Victoria Stevens",
+        "vstevensf"
+      ]
+    },
+    "William Ronchetti": {
+      "emails": [
+        "wrr33@cornell.edu"
+      ],
+      "names": [
+        "Will Ronchetti",
+        "William Ronchetti"
+      ]
+    }
+  }
+}

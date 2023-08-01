@@ -10,6 +10,8 @@ import transaction
 from botocore.exceptions import ClientError
 from copy import deepcopy
 from dcicutils.ecr_utils import CGAP_ECR_REGION
+from dcicutils.misc_utils import override_environ, PRINT
+from dcicutils.secrets_utils import assume_identity
 from pyramid.httpexceptions import (
     HTTPForbidden,
     HTTPTemporaryRedirect,
@@ -20,8 +22,6 @@ from pyramid.settings import asbool
 from pyramid.threadlocal import get_current_request
 from pyramid.traversal import resource_path
 from pyramid.view import view_config
-from dcicutils.secrets_utils import assume_identity
-from dcicutils.misc_utils import override_environ
 from snovault import (
     AfterModified,
     BeforeModified,
@@ -350,7 +350,7 @@ class File(Item):
                     bname = old_creds['bucket']
                     conn.delete_object(Bucket=bname, Key=old_creds['key'])
                 except Exception as e:
-                    print(e)
+                    PRINT(e)
 
         # update self first to ensure 'related_files' are stored in self.properties
         super(File, self)._update(properties, sheets)
@@ -483,7 +483,7 @@ class File(Item):
                 try:
                     xff_uuid = str(xfile_format.uuid)
                 except AttributeError:
-                    print("Can't find required format uuid for %s" % eformat)
+                    PRINT("Can't find required format uuid for %s" % eformat)
                     continue
                 extra_creds = self.propsheets.get('external' + xff_uuid)
                 extra['upload_credentials'] = extra_creds['upload_credentials']

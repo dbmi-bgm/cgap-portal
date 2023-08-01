@@ -182,7 +182,7 @@ def test_collection_post(testapp):
         'first_name': 'first',
         'last_name': 'last'
     }
-    return testapp.post_json('/user', item, status=201)
+    testapp.post_json('/user', item, status=201)
 
 
 def test_collection_post_bad_json(testapp):

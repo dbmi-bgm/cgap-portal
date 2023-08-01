@@ -1,4 +1,4 @@
-from dcicutils.misc_utils import ignored
+from dcicutils.misc_utils import ignored, PRINT
 from functools import wraps
 from snovault import TYPES
 # TODO: Production code should not rely on tests.
@@ -10,13 +10,13 @@ from .tests.test_schemas import compute_master_mixins, test_load_schema
 def verifier(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        print("running tests " + func.__name__)
+        PRINT("running tests " + func.__name__)
         try:
             res = func(*args, **kwargs)
         except Exception as e:
-            print("test failed with exception " + str(e.args))
+            PRINT("test failed with exception " + str(e.args))
         else:
-            print("success")
+            PRINT("success")
             return res
     return wrapper
 
