@@ -5,7 +5,7 @@ cgap-portal
 ----------
 Change Log
 ----------
-14.0.1
+14.0.3
 ======
 `PR 732: Fix for LinkTo items in ItemDetailPane <https://github.com/dbmi-bgm/cgap-portal/pull/732>`_
 
