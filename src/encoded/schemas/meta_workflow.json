@@ -113,6 +113,19 @@
                         "description": "Name of the workflow, unique within the meta workflow",
                         "type": "string"
                     },
+                    "shards": {
+                        "title": "Shards",
+                        "type": "array",
+                        "minItems": 1,
+                        "items": {
+                            "type": "array",
+                            "minItems": 1,
+                            "items": {
+                                "type": "string",
+                                "minLength": 1
+                            }
+                        }
+                    },
                     "workflow": {
                         "title": "Workflow",
                         "description": "Link to the workflow item",
@@ -173,6 +186,10 @@
                                 "gather": {
                                     "title": "Gather",
                                     "description": "The input dimension increase from multiple runs of the source workflow (default: not set)",
+                                    "type": "integer"
+                                },
+                                "gather_input": {
+                                    "title": "Gather Input",
                                     "type": "integer"
                                 },
                                 "extra_dimension": {
