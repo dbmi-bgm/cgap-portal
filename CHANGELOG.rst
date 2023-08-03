@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+14.0.2
+======
+* Polyfill buffer
+* Upgrade higlass-bigwig-datafetcher and gmod/tabix
+
+
 14.0.1
 ======
 * Update Higlass SV view config
