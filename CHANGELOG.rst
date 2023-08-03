@@ -8,6 +8,8 @@ Change Log
 
 14.0.3
 ======
+`PR 743: Purge permissions fix <https://github.com/dbmi-bgm/cgap-portal/pull/743>`_
+
 * Update set_user_info_property to true to allow admins to purge items
 
 
