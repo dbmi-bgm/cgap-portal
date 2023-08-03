@@ -6,6 +6,11 @@ cgap-portal
 Change Log
 ----------
 
+14.0.3
+======
+* Update set_user_info_property to true to allow admins to purge items
+
+
 14.0.2
 ======
 * Polyfill buffer
