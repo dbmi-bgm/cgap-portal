@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+14.1.1
+======
+`PR 743: Purge permissions fix <https://github.com/dbmi-bgm/cgap-portal/pull/743>`_
+
+* Update set_user_info_property to true to allow admins to purge items
+* Bring in updated snovault to fix impersonation bug
+
+
 14.1.0
 ======
 `PR 739: Bm babel updates <https://github.com/dbmi-bgm/cgap-portal/pull/739>`_
