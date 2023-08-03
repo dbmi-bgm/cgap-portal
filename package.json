@@ -62,7 +62,7 @@
     "@gmod/vcf": "^5.0.6",
     "@hms-dbmi-bgm/react-workflow-viz": "0.1.5",
     "@hms-dbmi-bgm/shared-portal-components": "git+https://github.com/4dn-dcic/shared-portal-components#0.1.66",
-    "auth0-lock": "^11.33.0",
+    "auth0-lock": "^12.1.0",
     "buffer": "^6.0.3",
     "d3": "^5.16.0",
     "date-fns": "^2.28.0",
