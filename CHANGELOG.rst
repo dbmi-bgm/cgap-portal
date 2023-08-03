@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+14.1.0
+======
+`PR 739: Bm babel updates <https://github.com/dbmi-bgm/cgap-portal/pull/739>`_
+
+* Add and update a bunch of babel-related dependencies to match Fourfront and SMaHT
+* Update babel config to make use of new plugins
+
+
 14.0.2
 ======
 * Polyfill buffer
