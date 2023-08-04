@@ -1,10 +1,10 @@
-import pytest
-# import webtest
+from typing import Any, Dict
 
-# from datetime import date
-# from urllib.parse import urlencode
-# from ..types.institution import Institution
+import pytest
+from webtest.app import TestApp
+
 from .datafixtures import remote_user_testapp
+from .utils import get_identifier_path
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working, pytest.mark.schema]
@@ -461,3 +461,9 @@ def test_public_item_wo_project_can_be_posted_by_project_member(bgm_user_testapp
     # need to have a uniquename
     to_post['name'] = 'another section name'
     bgm_user_testapp.post_json('/static_section', to_post, status=201)
+
+
+def test_admin_can_purge(testapp: TestApp, file: Dict[str, Any]) -> None:
+    file_path = get_identifier_path(file.get("uuid"))
+    testapp.patch_json(file_path, {"status": "deleted"}, status=200)
+    testapp.delete_json(f"{file_path}/?purge=True", {}, status=200)

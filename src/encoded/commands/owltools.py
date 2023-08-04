@@ -76,7 +76,7 @@ def sortUriListByName(uri_list):
 
 def isBlankNode(aClass):
     ''' Checks for an RDF blank node '''
-    if type(aClass) == BNode:
+    if type(aClass) is BNode:
         return True
     else:
         return False

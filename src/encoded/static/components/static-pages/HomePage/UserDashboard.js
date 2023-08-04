@@ -36,7 +36,7 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
                         What type of analysis would you like to do?
                     </div>
                     <div className="mt-2 w-100 d-flex">
-                        <a href="/search/?type=Case" className="btn btn-primary p-10">
+                        <a href="/search/?type=Case&proband_case=true" className="btn btn-primary p-10">
                             <i className="fas icon icon-archive mr-05"></i>Germline
                         </a>
                         <a href="/search/?type=SomaticAnalysis" className="btn btn-primary ml-05 p-10">
