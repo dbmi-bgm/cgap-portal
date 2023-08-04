@@ -76,11 +76,11 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         <div className="top-row">
           <span className="col-topleft">{topLeft}</span>
           <div className="status-indicators">
-            {/* Note status for cases with notes */}
-            { note && (
+            {/* Note status for cases with notes, checks if note_text exists with words */}
+            { note && note.note_text.length > 0 && (
               <i
                 className="status-indicator status-indicator-note icon-sticky-note far"
-                data-status={"saved"}
+                data-status={"note-saved"}
                 data-tip={
                   noteStatusTip ||
                   Schemas.Term.toName("noteStatus", noteStatusTip)
@@ -163,6 +163,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         statusTip = "Case exists, but some linked item is missing: Family, Individual, or Sample Processing.";
     }
 
+    // const noteStatus = "saved";
     let noteStatusTip = null;
     if (note) {
       noteStatusTip = "Notes are available for this case."
