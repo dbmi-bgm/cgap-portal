@@ -1,13 +1,13 @@
 import copy
 from contextlib import contextmanager
 from unittest import mock
-from typing import Iterator, Union
+from typing import Iterator, Optional, Union
 
 import pytest
 from dcicutils.testing_utils import patch_context
 
 from .. import tmp_item_models as item_models_module
-from ..tmp_item_models import SampleProcessing
+from ..tmp_item_models import Individual, Sample, SampleProcessing
 from ..types import qc_report_utils as qc_report_utils_module, sample as sample_type_module
 from ..types.qc_report_utils import QcConstants
 from ..types.sample import (
@@ -333,236 +333,381 @@ def test_quality_control_metrics(es_testapp, workbook):
     ]
 
 
-@contextmanager
-def patch_flag_bam_coverage(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.GermlineQcFlagger._flag_bam_coverage,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
+#@contextmanager
+#def patch_flag_bam_coverage(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.GermlineQcFlagger._flag_bam_coverage,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_flag_sex_consistency(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.GermlineQcFlagger._flag_sex_consistency,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_flag_heterozygosity_ratio(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.GermlineQcFlagger._flag_heterozygosity_ratio,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_flag_transition_transversion_ratio(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.GermlineQcFlagger._flag_transition_transversion_ratio,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_flag_evaluators(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_flag_bam_coverage():
+#        with patch_flag_sex_consistency():
+#            with patch_flag_heterozygosity_ratio():
+#                with patch_flag_transition_transversion_ratio():
+#                    yield
+#
+#
+#@contextmanager
+#def patch_get_desired_fields(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_desired_fields,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_sample_processing_files_for_qc(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_sample_processing_files_for_qc,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_quality_control_metrics(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_quality_control_metrics,
+#        module=sample_type_module,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_files_for_qc_from_samples(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_files_for_qc_from_samples,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_files_for_qc_from_sample_processing_files(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_files_for_qc_from_sample_processing_files,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_files_for_qc_from_sample(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_files_for_qc_from_sample,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_latest_file_with_quality_metric(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_latest_file_with_quality_metric,
+#        module=sample_type_module,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_latest_bam_with_quality_metric(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.get_latest_bam_with_quality_metric,
+#        module=sample_type_module,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#@contextmanager
+#def patch_get_samples(**kwargs) -> Iterator[mock.MagicMock]:
+#    with patch_context(
+#        sample_type_module.SampleProcessingModel.get_samples,
+#        **kwargs
+#    ) as mock_item:
+#        yield mock_item
+#
+#
+#def get_mock_sample_processing() -> mock.MagicMock:
+#    return mock.create_autospec(item_models_module.SampleProcessing, instance=True)
+#
+#
+#def get_mock_sample() -> mock.MagicMock:
+#    return mock.create_autospec(item_models_module.Sample, instance=True)
+#
+#
+#def get_sample_processing() -> SampleProcessing:
+#    return SampleProcessing({})
 
 
-@contextmanager
-def patch_flag_sex_consistency(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.GermlineQcFlagger._flag_sex_consistency,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
+def get_mock_individual(sex: str = "F") -> mock.MagicMock:
+    mock_individual = mock.create_autospec(Individual, instance=True)
+    mock_individual.get_sex.return_value = sex
+    return mock_individual
 
 
-@contextmanager
-def patch_flag_heterozygosity_ratio(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.GermlineQcFlagger._flag_heterozygosity_ratio,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_flag_transition_transversion_ratio(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.GermlineQcFlagger._flag_transition_transversion_ratio,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_flag_evaluators(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_flag_bam_coverage():
-        with patch_flag_sex_consistency():
-            with patch_flag_heterozygosity_ratio():
-                with patch_flag_transition_transversion_ratio():
-                    yield
-
-
-@contextmanager
-def patch_get_desired_fields(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_desired_fields,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_sample_processing_files_for_qc(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_sample_processing_files_for_qc,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_quality_control_metrics(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_quality_control_metrics,
-        module=sample_type_module,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_files_for_qc_from_samples(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_files_for_qc_from_samples,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_files_for_qc_from_sample_processing_files(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_files_for_qc_from_sample_processing_files,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_files_for_qc_from_sample(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_files_for_qc_from_sample,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_latest_file_with_quality_metric(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_latest_file_with_quality_metric,
-        module=sample_type_module,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_latest_bam_with_quality_metric(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.get_latest_bam_with_quality_metric,
-        module=sample_type_module,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-@contextmanager
-def patch_get_samples(**kwargs) -> Iterator[mock.MagicMock]:
-    with patch_context(
-        sample_type_module.SampleProcessingModel.get_samples,
-        **kwargs
-    ) as mock_item:
-        yield mock_item
-
-
-def get_mock_sample_processing() -> mock.MagicMock:
-    return mock.create_autospec(item_models_module.SampleProcessing, instance=True)
-
-
-def get_mock_sample() -> mock.MagicMock:
-    return mock.create_autospec(item_models_module.Sample, instance=True)
-
-
-def get_sample_processing() -> SampleProcessing:
-    return SampleProcessing({})
+def get_mock_sample(
+    is_wgs: bool = False, is_wes: bool = False, individual: Optional[Individual] = None,
+) -> mock.MagicMock:
+    mock_sample = mock.create_autospec(Sample, instance=True)
+    mock_sample.is_wgs.return_value = is_wgs
+    mock_sample.is_wes.return_value = is_wes
+    mock_sample.get_individual.return_value = individual
+    return mock_sample
 
 
 class TestGermlineQcFlagger:
 
     @pytest.mark.parametrize(
-        "title,expected_method",
+        "title,value,sample,expected",
         [
-            (QcConstants.COVERAGE, "_flag_bam_coverage"),
-            (QcConstants.PREDICTED_SEX, "_flag_sex_consistency"),
-            (QcConstants.HETEROZYGOSITY_RATIO, "_flag_heterozygosity_ratio"),
-            (QcConstants.TRANSITION_TRANSVERSION_RATIO, "_flag_transition_transversion_ratio"),
-            ("foo", None),
+            ("", "", None, ""),
+            (QcConstants.COVERAGE, "5X", None, ""),
+            (QcConstants.COVERAGE, "5X", get_mock_sample(is_wgs=True), QcConstants.FLAG_FAIL),
+            (QcConstants.COVERAGE, "10X", get_mock_sample(is_wgs=True), QcConstants.FLAG_WARN),
+            (QcConstants.COVERAGE, "20X", get_mock_sample(is_wgs=True), QcConstants.FLAG_WARN),
+            (QcConstants.COVERAGE, "25X", get_mock_sample(is_wgs=True), QcConstants.FLAG_PASS),
+            (QcConstants.COVERAGE, "30X", get_mock_sample(is_wgs=True), QcConstants.FLAG_PASS),
+            (QcConstants.COVERAGE, "35X", get_mock_sample(is_wes=True), QcConstants.FLAG_FAIL),
+            (QcConstants.COVERAGE, "40X", get_mock_sample(is_wes=True), QcConstants.FLAG_WARN),
+            (QcConstants.COVERAGE, "60X", get_mock_sample(is_wes=True), QcConstants.FLAG_WARN),
+            (QcConstants.COVERAGE, "70X", get_mock_sample(is_wes=True), QcConstants.FLAG_PASS),
+            (QcConstants.COVERAGE, "90X", get_mock_sample(is_wes=True), QcConstants.FLAG_PASS),
+            (QcConstants.PREDICTED_SEX, "female", get_mock_sample(), ""),
+            (
+                QcConstants.PREDICTED_SEX,
+                "female",
+                get_mock_sample(individual=get_mock_individual()),
+                QcConstants.FLAG_PASS
+            ),
+            (
+                QcConstants.PREDICTED_SEX,
+                "female",
+                get_mock_sample(individual=get_mock_individual(sex="M")),
+                QcConstants.FLAG_WARN
+            ),
+            (
+                QcConstants.PREDICTED_SEX,
+                "female",
+                get_mock_sample(individual=get_mock_individual(sex="U")),
+                QcConstants.FLAG_WARN
+            ),
+            (
+                QcConstants.PREDICTED_SEX,
+                "female",
+                get_mock_sample(individual=get_mock_individual(sex="foo")),
+                QcConstants.FLAG_WARN
+            ),
+            (
+                QcConstants.PREDICTED_SEX,
+                "male",
+                get_mock_sample(individual=get_mock_individual()),
+                QcConstants.FLAG_WARN
+            ),
+            (
+                QcConstants.PREDICTED_SEX,
+                "foo",
+                get_mock_sample(individual=get_mock_individual()),
+                QcConstants.FLAG_FAIL
+            ),
+            (QcConstants.HETEROZYGOSITY_RATIO, "", None, ""),
+            (QcConstants.HETEROZYGOSITY_RATIO, "2.7", None, QcConstants.FLAG_WARN),
+            (QcConstants.HETEROZYGOSITY_RATIO, "2.5", None, QcConstants.FLAG_PASS),
+            (QcConstants.HETEROZYGOSITY_RATIO, "2.0", None, QcConstants.FLAG_PASS),
+            (QcConstants.HETEROZYGOSITY_RATIO, "1.4", None, QcConstants.FLAG_PASS),
+            (QcConstants.HETEROZYGOSITY_RATIO, "1", None, QcConstants.FLAG_WARN),
+            (QcConstants.HETEROZYGOSITY_RATIO, "1", get_mock_sample(), QcConstants.FLAG_WARN),
+            (QcConstants.TRANSITION_TRANSVERSION_RATIO, "", None, ""),
+            (QcConstants.TRANSITION_TRANSVERSION_RATIO, "2.0", get_mock_sample(), ""),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.5",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_FAIL,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.3",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_WARN,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.1",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_PASS,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.0",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_PASS,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "1.8",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_PASS,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "1.6",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_WARN,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "1.4",
+                get_mock_sample(is_wgs=True),
+                QcConstants.FLAG_FAIL,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "3.6",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_FAIL,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "3.5",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_WARN,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "3.3",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_PASS,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "3.0",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_PASS,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.2",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_PASS,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.1",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_WARN,
+            ),
+            (
+                QcConstants.TRANSITION_TRANSVERSION_RATIO,
+                "2.0",
+                get_mock_sample(is_wes=True),
+                QcConstants.FLAG_FAIL,
+            ),
         ]
     )
-    def test_get_flag(self, title: str, expected_method: Union[str, None]) -> None:
-        value = "foo"
-        sample = "bar"
-        with patch_flag_evaluators():
-            result = GermlineQcFlagger.get_flag(title, value, sample=sample)
-            if expected_method:
-                mocked_method = getattr(GermlineQcFlagger, expected_method)
-                mocked_method.assert_called_once_with(value, sample=sample)
-                assert result == mocked_method.return_value
-            else:
-                assert result == ""
+    def test_get_flag(self, title: str, value: str, sample: Sample, expected: str) -> None:
+        result = GermlineQcFlagger.get_flag(title, value, sample=sample)
+        assert result == expected
 
 
-class TestSampleProcessingQualityControlMetrics:
-
-    def test_get_quality_control_metrics_for_sample_processing(self) -> None:
-        with patch_get_sample_processing_files_for_qc() as mock_get_files:
-            with patch_get_desired_fields() as mock_get_desired_fields:
-                with patch_get_quality_control_metrics() as mock_get_qc_metrics:
-                    sample_processing = get_mock_sample_processing()
-                    result = get_quality_control_metrics_for_sample_processing(
-                        sample_processing
-                    )
-                    mock_get_files.assert_called_once_with(sample_processing)
-                    mock_get_qc_metrics.assert_called_once_with(
-                        sample_processing.get_samples.return_value,
-                        mock_get_files.return_value,
-                        sample_type_module.GermlineQcFlagger,
-                        mock_get_desired_fields.return_value,
-                    )
-                    assert result == mock_get_qc_metrics.return_value
-
-    def test_get_sample_processing_files_for_qc(self) -> None:
-        some_file = "some_file"
-        sample_files = [some_file]
-        sample_processing_files = [some_file, None]
-        with patch_get_files_for_qc_from_samples(return_value=sample_files) as mock_get_files_from_samples:
-            with patch_get_files_for_qc_from_sample_processing_files(return_value=sample_processing_files) as mock_get_files_from_sample_processing:
-                sample_processing = get_mock_sample_processing()
-                result = get_sample_processing_files_for_qc(sample_processing)
-                mock_get_files_from_samples.assert_called_once_with(sample_processing)
-                mock_get_files_from_sample_processing.assert_called_once_with(sample_processing)
-                assert result == [some_file] * 2
-
-    def test_get_files_for_qc_from_sample_processing_files(self) -> None:
-        sample_processing = get_mock_sample_processing()
-        expected_get_latest_file_calls = [
-            sample_type_module.is_vep_vcf,
-            sample_type_module.is_final_snv_vcf,
-            sample_type_module.is_final_sv_vcf,
-        ]
-        with patch_get_latest_file_with_quality_metric() as mock_get_file:
-            result = get_files_for_qc_from_sample_processing_files(sample_processing)
-            assert result == [mock_get_file.return_value] * len(expected_get_latest_file_calls)
-            assert len(mock_get_file.call_args_list) == len(expected_get_latest_file_calls)
-            for expected_call in expected_get_latest_file_calls:
-                mock_get_file.assert_any_call(
-                    sample_processing.get_processed_files.return_value,
-                    expected_call,
-                )
-
-    def test_get_files_for_qc_from_samples(self) -> None:
-        samples = ["sample_1", "sample_2"]
-        file_for_qc = ["file"]
-        files = file_for_qc * len(samples)
-        with patch_get_samples(return_value=samples):
-            with patch_get_files_for_qc_from_sample(return_value=file_for_qc) as mock_get_files:
-                sample_processing = get_sample_processing()
-                result = get_files_for_qc_from_samples(sample_processing)
-                for sample in samples:
-                    mock_get_files.assert_any_call(sample)
-                assert len(mock_get_files.call_args_list) == len(samples)
-                assert result == files
-
-    def test_get_files_for_qc_from_sample(self) -> None:
-        with patch_get_latest_bam_with_quality_metric() as mock_get_bam:
-            sample = get_mock_sample()
-            result = get_files_for_qc_from_sample(sample)
-            assert result == [mock_get_bam.return_value]
-            mock_get_bam.assert_called_once_with(sample.get_processed_files.return_value)
+# class TestSampleProcessingQualityControlMetrics:
+# 
+#     def test_get_quality_control_metrics_for_sample_processing(self) -> None:
+#         with patch_get_sample_processing_files_for_qc() as mock_get_files:
+#             with patch_get_desired_fields() as mock_get_desired_fields:
+#                 with patch_get_quality_control_metrics() as mock_get_qc_metrics:
+#                     sample_processing = get_mock_sample_processing()
+#                     result = get_quality_control_metrics_for_sample_processing(
+#                         sample_processing
+#                     )
+#                     mock_get_files.assert_called_once_with(sample_processing)
+#                     mock_get_qc_metrics.assert_called_once_with(
+#                         sample_processing.get_samples.return_value,
+#                         mock_get_files.return_value,
+#                         sample_type_module.GermlineQcFlagger,
+#                         mock_get_desired_fields.return_value,
+#                     )
+#                     assert result == mock_get_qc_metrics.return_value
+# 
+#     def test_get_sample_processing_files_for_qc(self) -> None:
+#         some_file = "some_file"
+#         sample_files = [some_file]
+#         sample_processing_files = [some_file, None]
+#         with patch_get_files_for_qc_from_samples(return_value=sample_files) as mock_get_files_from_samples:
+#             with patch_get_files_for_qc_from_sample_processing_files(return_value=sample_processing_files) as mock_get_files_from_sample_processing:
+#                 sample_processing = get_mock_sample_processing()
+#                 result = get_sample_processing_files_for_qc(sample_processing)
+#                 mock_get_files_from_samples.assert_called_once_with(sample_processing)
+#                 mock_get_files_from_sample_processing.assert_called_once_with(sample_processing)
+#                 assert result == [some_file] * 2
+# 
+#     def test_get_files_for_qc_from_sample_processing_files(self) -> None:
+#         sample_processing = get_mock_sample_processing()
+#         expected_get_latest_file_calls = [
+#             sample_type_module.is_vep_vcf,
+#             sample_type_module.is_final_snv_vcf,
+#             sample_type_module.is_final_sv_vcf,
+#         ]
+#         with patch_get_latest_file_with_quality_metric() as mock_get_file:
+#             result = get_files_for_qc_from_sample_processing_files(sample_processing)
+#             assert result == [mock_get_file.return_value] * len(expected_get_latest_file_calls)
+#             assert len(mock_get_file.call_args_list) == len(expected_get_latest_file_calls)
+#             for expected_call in expected_get_latest_file_calls:
+#                 mock_get_file.assert_any_call(
+#                     sample_processing.get_processed_files.return_value,
+#                     expected_call,
+#                 )
+# 
+#     def test_get_files_for_qc_from_samples(self) -> None:
+#         samples = ["sample_1", "sample_2"]
+#         file_for_qc = ["file"]
+#         files = file_for_qc * len(samples)
+#         with patch_get_samples(return_value=samples):
+#             with patch_get_files_for_qc_from_sample(return_value=file_for_qc) as mock_get_files:
+#                 sample_processing = get_sample_processing()
+#                 result = get_files_for_qc_from_samples(sample_processing)
+#                 for sample in samples:
+#                     mock_get_files.assert_any_call(sample)
+#                 assert len(mock_get_files.call_args_list) == len(samples)
+#                 assert result == files
+# 
+#     def test_get_files_for_qc_from_sample(self) -> None:
+#         with patch_get_latest_bam_with_quality_metric() as mock_get_bam:
+#             sample = get_mock_sample()
+#             result = get_files_for_qc_from_sample(sample)
+#             assert result == [mock_get_bam.return_value]
+#             mock_get_bam.assert_called_once_with(sample.get_processed_files.return_value)

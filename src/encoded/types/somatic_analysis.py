@@ -1,4 +1,5 @@
-from typing import List, Iterable, Optional, Union
+from itertools import chain
+from typing import List, Iterable, Iterator, Optional, Union
 
 from pyramid.request import Request
 from snovault import calculated_property, collection, load_schema
@@ -129,13 +130,13 @@ class SomaticAnalysis(Analysis):
             "description": "Select quality control metrics for associated samples",
             "type": "object",
             "properties": {
-                "samples": {
+                QcConstants.SAMPLES: {
                     "title": "Sample Quality Control Metrics",
                     "description": "Quality control metrics for associated sample",
                     "type": "object",
                     "properties": SOMATIC_ANALYSIS_QC_METRICS_SCHEMA_PROPERTIES,
                 },
-                "summary": QC_SUMMARY_SCHEMA,
+                QcConstants.SUMMARY: QC_SUMMARY_SCHEMA,
             },
         }
     )
@@ -151,22 +152,10 @@ class SomaticAnalysis(Analysis):
                 quality_control_metrics
             )
             return {
-                "samples": quality_control_metrics,
-                "summary": quality_control_metrics_summary,
+                QcConstants.SAMPLES: quality_control_metrics,
+                QcConstants.SUMMARY: quality_control_metrics_summary,
             }
         return
-
-#    @calculated_property(schema=QC_SUMMARY_SCHEMA)
-#    def quality_control_flags(self, request: Request) -> Union[JsonObject, None]:
-#        quality_control_metrics = self.quality_control_metrics(request)
-#        if quality_control_metrics:
-#            quality_control_metrics_summary = get_quality_control_metrics_summary(
-#                quality_control_metrics
-#            )
-#            if quality_control_metrics_summary:
-#                return quality_control_metrics_summary
-#        return
-        
 
 
 class SomaticAnalysisQcFlagger(QcFlagger):
@@ -209,14 +198,11 @@ def get_desired_fields() -> List[str]:
     return SOMATIC_ANALYSIS_QC_METRICS_SCHEMA_PROPERTIES.keys()
 
 
-def get_somatic_analysis_files_for_qc(somatic_analysis: SomaticAnalysisModel) -> List[File]:
-    files = []
+def get_somatic_analysis_files_for_qc(somatic_analysis: SomaticAnalysisModel) -> Iterator[File]:
     samples = somatic_analysis.get_samples()
-    for sample in samples:
-        files += get_sample_files_for_qc(sample)
-    return [file for file in files if file]
+    return chain.from_iterable(get_sample_files_for_qc(sample) for sample in samples)
 
 
-def get_sample_files_for_qc(sample: Sample) -> List[File]:
+def get_sample_files_for_qc(sample: Sample) -> Iterator[File]:
     processed_files = sample.get_processed_files()
-    return [get_latest_bam_with_quality_metric(processed_files)]
+    return get_latest_bam_with_quality_metric(processed_files)

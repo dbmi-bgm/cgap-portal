@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import Callable, Iterable, List, Optional, Union
+from itertools import chain
+from typing import Callable, Iterable, Iterator, List, Optional, Union
 
 import structlog
 from pyramid.request import Request
@@ -450,7 +451,7 @@ class SampleProcessing(Item):
             },
         }
     )
-    def quality_control_metrics(self, request: Request) -> List[JsonObject]:
+    def quality_control_metrics(self, request: Request) -> Union[List[JsonObject], None]:
         """Calculate QC metrics for associated samples."""
         sample_processing = get_sample_processing_model(self.properties, request)
         return get_quality_control_metrics_for_sample_processing(sample_processing)
@@ -511,23 +512,23 @@ def get_desired_fields() -> List[str]:
     return SAMPLE_PROCESSING_QC_METRICS_SCHEMA_PROPERTIES.keys()
 
 
-def get_sample_processing_files_for_qc(sample_processing: SampleProcessing) -> List[File]:
-    files = []
-    files += get_files_for_qc_from_sample_processing_files(sample_processing)
-    files += get_files_for_qc_from_samples(sample_processing)
-    return [file for file in files if file]
+def get_sample_processing_files_for_qc(sample_processing: SampleProcessing) -> Iterator[File]:
+    return chain(
+        get_files_for_qc_from_sample_processing_files(sample_processing),
+        get_files_for_qc_from_samples(sample_processing),
+    )
 
 
-def get_files_for_qc_from_sample_processing_files(sample_processing: SampleProcessing) -> List[File]:
+def get_files_for_qc_from_sample_processing_files(sample_processing: SampleProcessing) -> Iterator[File]:
     processed_files = sample_processing.get_processed_files()
-    return [
+    return chain(
         get_latest_vep_vcf_with_quality_metric(processed_files),
         get_latest_final_snv_vcf_with_quality_metric(processed_files),
         get_latest_final_sv_vcf_with_quality_metric(processed_files),
-    ]
+    )
 
 
-def get_latest_vep_vcf_with_quality_metric(files: Iterable[File]) -> Union[File, None]:
+def get_latest_vep_vcf_with_quality_metric(files: Iterable[File]) -> Iterator[File]:
     return get_latest_file_with_quality_metric(files, is_vep_vcf)
 
 
@@ -535,7 +536,7 @@ def is_vep_vcf(file: File) -> bool:
     return file.is_vep_output_snv_vcf()
 
 
-def get_latest_final_snv_vcf_with_quality_metric(files: Iterable[File]) -> Union[File, None]:
+def get_latest_final_snv_vcf_with_quality_metric(files: Iterable[File]) -> Iterator[File]:
     return get_latest_file_with_quality_metric(files, is_final_snv_vcf)
 
 
@@ -543,7 +544,7 @@ def is_final_snv_vcf(file: File) -> bool:
     return file.is_snv_final_vcf()
 
 
-def get_latest_final_sv_vcf_with_quality_metric(files: Iterable[File]) -> Union[File, None]:
+def get_latest_final_sv_vcf_with_quality_metric(files: Iterable[File]) -> Iterator[File]:
     return get_latest_file_with_quality_metric(files, is_final_sv_vcf)
 
 
@@ -551,14 +552,11 @@ def is_final_sv_vcf(file: File) -> bool:
     return file.is_sv_final_vcf()
 
 
-def get_files_for_qc_from_samples(sample_processing: SampleProcessing) -> List[File]:
-    result = []
+def get_files_for_qc_from_samples(sample_processing: SampleProcessing) -> Iterator[File]:
     samples = sample_processing.get_samples()
-    for sample in samples:
-        result += get_files_for_qc_from_sample(sample)
-    return result
+    return chain.from_iterable(get_files_for_qc_from_sample(sample) for sample in samples)
 
 
-def get_files_for_qc_from_sample(sample: Sample) -> List[Union[File, None]]:
+def get_files_for_qc_from_sample(sample: Sample) -> Iterator[File]:
     processed_files = sample.get_processed_files()
-    return [get_latest_bam_with_quality_metric(processed_files)]
+    return get_latest_bam_with_quality_metric(processed_files)
