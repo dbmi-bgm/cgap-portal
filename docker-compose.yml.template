@@ -69,18 +69,3 @@ services:
     depends_on:
       - db
       #- es
-
-# TODO: This is not yet fully setup.
-# Need to fix up entrypoint scripts to call make deploy1a for ingester in docker.
-# ingester:
-#   build: .
-#   container_name: ingester
-#   command: "/home/nginx/cgap-portal/entrypoint_ingester.sh"
-#   environment:
-#     # Default to caller's environment
-#     AWS_ACCESS_KEY_ID:
-#     AWS_SECRET_ACCESS_KEY:
-#     GLOBAL_ENV_BUCKET:
-#     Auth0Client:
-#     Auth0Secret:
-#     application_type: "local"  # use local entrypoint

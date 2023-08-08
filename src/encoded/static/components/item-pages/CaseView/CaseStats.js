@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import _ from 'underscore';
-import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Schemas } from './../../util';
 
 

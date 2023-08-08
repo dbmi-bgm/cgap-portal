@@ -129,19 +129,19 @@ export class HiGlassPlainContainer extends React.PureComponent {
                 ).then((loadedDeps) =>{
                     higlassDependencies = loadedDeps;
                     const {
-                        higlassRegister,
-                        SequenceTrack,
-                        TranscriptsTrack,
-                        ClinvarTrack,
-                        TextTrack,
-                        OrthologsTrack,
-                        PileupTrack,
-                        GnomadTrack,
-                        SvTrack,
-                        GeneralVcfTrack,
-                        CohortTrack,
-                        GeneListTrack,
-                        BigwigDataFetcher
+                      higlassRegister,
+                      SequenceTrack,
+                      TranscriptsTrack,
+                      ClinvarTrack,
+                      TextTrack,
+                      OrthologsTrack,
+                      PileupTrack,
+                      GnomadTrack,
+                      SvTrack,
+                      GeneralVcfTrack,
+                      CohortTrack,
+                      GeneListTrack,
+                      BigwigDataFetcher
                     } = higlassDependencies;
 
                     higlassRegister({

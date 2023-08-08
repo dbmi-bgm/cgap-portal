@@ -1,3 +1,5 @@
+
+
 /**********************/
 /**** Search Table ****/
 /**********************/
@@ -10,163 +12,169 @@ $cgap-search-sticky-header-top-offset: 39px;
 
 $search-results-above-results-row-height: 42px;
 $search-results-edge-background-color: #e2e2e2;
-$search-results-edge-shadow-color: rgba(0, 0, 0, 0.5);
+$search-results-edge-shadow-color : rgba(0,0,0,0.5);
 $search-results-result-row-height: 80px; /* +9px margin bottom +1px border bottom = 90px rowHeight. */
 $search-results-header-row-height: 52px; /* 46px is existing default for both result and header height. */
 @import "./../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/search-view-table.scss";
 
 // Extensions to shared-portal-components searchview table(s):
 .search-result-row .result-table-row .search-result-column-block {
-  .inner {
-    a.adv-block-link {
-      color: $body-color;
 
-      &:hover {
-        color: $link-hover-color;
-        h4,
-        h5,
-        h6 {
-          color: $link-hover-color;
-          text-decoration: underline;
-        }
-      }
-    }
+	.inner {
 
-    .multi-field-cell {
-      /* Is usually a child of adv-block-link, but not necessarily (if no link needed). */
-      flex: 1 1 0px;
-      width: 100%;
+		a.adv-block-link {
+			color: $body-color;
 
-      .top-row {
-        display: flex;
-        justify-content: space-between;
-        .col-topleft {
-          @include text-truncate();
-        }
-      }
-      .top-row,
-      .col-date {
-        line-height: 20px;
-        white-space: nowrap;
-        @include text-truncate();
-      }
-      .col-main {
-        margin: 0;
-        font-weight: 400;
-        /*
+			&:hover {
+				color: $link-hover-color;
+				h4, h5, h6 {
+					color: $link-hover-color;
+					text-decoration: underline;
+				}
+			}
+
+		}
+
+		.multi-field-cell {
+			/* Is usually a child of adv-block-link, but not necessarily (if no link needed). */
+			flex: 1 1 0px;
+			width: 100%;
+
+			.top-row {
+				display: flex;
+				justify-content: space-between;
+				.col-topleft {
+					@include text-truncate();
+				}
+			}
+			.top-row,
+			.col-date {
+				line-height: 20px;
+				white-space: nowrap;
+				@include text-truncate();
+			}
+			.col-main {
+				margin: 0;
+				font-weight: 400;
+				/*
 				Given we have a 80px row height, we increase this from default (~30px) for visual appeal.
 				We could also use flex+flex-grow to increase this up to available space in row height, but
 				setting explicit min-height instead allows to make quicker fine-tuning. Can change more later.
 				*/
-        min-height: 34px;
-        display: flex;
-        align-items: center;
-        > span {
-          flex-grow: 1;
-          text-align: center;
-          width: 100%;
-          @include text-truncate();
-        }
-      }
-      .col-topleft {
-        font-size: 0.75em;
-      }
-      .col-date {
-        text-align: center;
-      }
-    }
-  }
+				min-height: 34px;
+				display: flex;
+				align-items: center;
+				> span {
+					flex-grow: 1;
+					text-align: center;
+					width: 100%;
+					@include text-truncate();
+				}
+			}
+			.col-topleft {
+				font-size: 0.75em;
+			}
+			.col-date {
+				text-align: center;
+			}
+		}
+	}
 
-  &[data-field="display_title"] {
-    .inner {
-      > .title-block {
-        white-space: normal; /* Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows. */
-      }
-    }
-  }
+	&[data-field="display_title"] {
+		.inner {
+			> .title-block {
+				white-space: normal; /* Allow to wrap by default (overrides SPC's default white-space: nowrap;) since we have tall-ish rows. */
+			}
+		}
+	}
 
-  /* Styling overrides specific to search results of type Case */
-  .search-view-controls-and-results[data-search-item-type="Case"] & {
-    &[data-first-visible-column] .inner > .title-block {
-      max-height: none;
-    }
 
-    &[data-field="display_title"] > .inner .multi-field-cell .col-main,
-    &[data-field="individual"] > .inner .multi-field-cell .col-main {
-      /* Uppercase Individual's Identifier */
-      text-transform: uppercase;
-    }
-  }
+	/* Styling overrides specific to search results of type Case */
+	.search-view-controls-and-results[data-search-item-type="Case"] & {
 
-  &[data-field="status"] {
-    > .inner {
-      /* Overrides SPC's search-view-table.scss text-align: left */
-      text-align: center !important;
-      i.status-indicator-dot {
-        margin-left: 4px;
-        margin-right: 2px;
-      }
-    }
-  }
-  &[data-field="lab.display_title"],
-  &[data-field="track_and_facet_info.lab_name"] {
-    > .inner {
-      text-align: left;
-    }
-    i.user-icon {
-      cursor: help;
-      margin-right: 5px;
-    }
-  }
-  &[data-field="display_title"] {
-    .expset-checkbox {
-      margin-right: 15px;
-      margin-top: -1px;
-      display: inline-block;
-      vertical-align: text-top;
-    }
-    .mono-text,
-    .text-monospace {
-      letter-spacing: 0.5px;
-    }
-    img.in-search-table-title-image {
-      margin-top: -10px;
-      margin-bottom: -8px;
-      border-radius: 4px;
-      margin-right: 10px;
-      filter: saturate(0.3);
-      transition: filter 0.2s, opacity 0.2s;
-      opacity: 0.85;
-    }
-    &:hover {
-      img.in-search-table-title-image {
-        filter: none;
-        opacity: 1;
-      }
-    }
-  }
-  &[data-field="experiments_in_set.experiment_categorizer.combined"] {
-    > .inner {
-      position: relative;
-      text-overflow: none;
-      white-space: normal;
-      div.exp-categorizer-cell {
-        text-align: left;
+		&[data-first-visible-column] .inner > .title-block {
+			max-height: none;
+		}
 
-        > small {
-          position: relative;
-          top: -9px;
-          font-weight: 500;
-        }
-        > div {
-          position: relative;
-          top: -8px;
-          width: 100%;
-        }
-      }
-    }
-  }
+		&[data-field="display_title"] > .inner .multi-field-cell .col-main,
+		&[data-field="individual"] > .inner .multi-field-cell .col-main {
+			/* Uppercase Individual's Identifier */
+			text-transform: uppercase;
+		}
+	}
+	
+	&[data-field="status"] {
+		> .inner {
+			/* Overrides SPC's search-view-table.scss text-align: left */
+			text-align: center !important;
+			i.status-indicator-dot {
+				margin-left: 4px;
+				margin-right: 2px;
+			}
+		}
+	}
+	&[data-field="lab.display_title"],
+	&[data-field="track_and_facet_info.lab_name"]{
+		> .inner {
+			text-align: left;
+		}
+		i.user-icon {
+			cursor: help;
+			margin-right: 5px;
+		}
+	}
+	&[data-field="display_title"]{
+		.expset-checkbox {
+			margin-right: 15px;
+			margin-top: -1px;
+			display: inline-block;
+			vertical-align: text-top;
+		}
+		.mono-text,
+		.text-monospace {
+			letter-spacing: 0.5px;
+		}
+		img.in-search-table-title-image {
+			margin-top: -10px;
+			margin-bottom: -8px;
+			border-radius: 4px;
+			margin-right: 10px;
+			filter: saturate(0.3);
+			transition: filter .2s, opacity .2s;
+			opacity: 0.85;
+		}
+		&:hover {
+			img.in-search-table-title-image {
+				filter: none;
+				opacity: 1;
+			}
+		}
+	}
+	&[data-field="experiments_in_set.experiment_categorizer.combined"]{
+		> .inner {
+			position: relative;
+			text-overflow: none;
+			white-space: normal;
+			div.exp-categorizer-cell {
+				text-align: left;
+
+				> small {
+					position: relative;
+					top: -9px;
+					font-weight: 500;
+				}
+				> div {
+					position: relative;
+					top: -8px;
+					width: 100%;
+				}
+			}
+
+		}
+	}
 }
+
+
 
 /*** FACETS CONTAINER STICKY ***/
 
@@ -175,31 +183,32 @@ $facetlist-omitted-term-color: #901414;
 
 @import "../../../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/facet-list.scss";
 
+
+
 .search-view-controls-and-results .facets-container {
-  background-color: #fff;
+	background-color: #fff;
 }
+
 
 /** Btn vertical alignment (probably temporary) **/
 .above-results-table-row {
-  margin-top: 0;
-  min-height: 0;
-  padding-bottom: 0;
+	margin-top: 5px;
 
-  .right-buttons {
-    > button.btn {
-      display: inline-flex;
-      align-items: center;
-      @extend .fixed-height;
-    }
-  }
+	.right-buttons {
+		> button.btn {
+			display: inline-flex;
+			align-items: center;
+			@extend .fixed-height;
+		}
+	}
 
-  // .search-result-config-panel {
-  // 	> .inner {
-  // 		.panel-title {
-  // 			background-color: #fff;;
-  // 		}
-  // 	}
-  // }
+	// .search-result-config-panel {
+	// 	> .inner {
+	// 		.panel-title {
+	// 			background-color: #fff;;
+	// 		}
+	// 	}
+	// }
 }
 
 /************************************************
@@ -207,154 +216,169 @@ $facetlist-omitted-term-color: #901414;
 *************************************************/
 
 body[data-pathname="/search/"]:not([data-current-action="add"]) {
-  #application,
-  #layout {
-    // Possible todo: switch this to appBackgroundColor param (base.scss) or parameterize according to final design.
-    background-color: #f5f5f5;
-  }
+	#application,
+	#layout {
+		// Possible todo: switch this to appBackgroundColor param (base.scss) or parameterize according to final design.
+		background-color: #f5f5f5;
+	}
 }
 
 /** Applies to both embedded search views and /search/ page views **/
 /** Here we give the facetlist a predefined max width of 320px for larger screen sizes **/
 .search-page-container,
 .embedded-search-container {
-  > div.search-view-controls-and-results.row {
-    @include navbar-fixed-position {
-      flex-wrap: nowrap;
-    }
 
-    .results-column {
-      min-width: 0;
-    }
+	> div.search-view-controls-and-results.row {
 
-    .facets-column {
-      @include navbar-static-position {
-        width: 100%;
-      }
+		@include navbar-fixed-position {
+			flex-wrap: nowrap;
+		}
 
-      @include navbar-fixed-position {
-        width: 320px;
-      }
+		.results-column {
+			min-width: 0;
+		}
 
-      // Align header height with $search-results-header-row-height.
-      .facets-container.with-header-bg .facets-header {
-        height: $search-results-header-row-height;
-      }
-    }
-  }
+		.facets-column {
+			
+			@include navbar-static-position {
+				width: 100%;
+			}
+	
+			@include navbar-fixed-position {
+				width: 320px;
+			}
+
+			// Align header height with $search-results-header-row-height.
+			.facets-container.with-header-bg .facets-header {
+				height: $search-results-header-row-height;
+			}
+
+		}
+
+	}
+
 }
 
-.search-results-outer-container
-  .search-results-container
-  .shadow-border-layer
-  > .edge-scroll-button {
-  background-color: #d2e3f1;
-  transition: background-color 0.35s;
-  &:hover {
-    background-color: #acc2d5;
-  }
+.search-results-outer-container .search-results-container .shadow-border-layer > .edge-scroll-button {
+	background-color: #d2e3f1;
+	transition: background-color .35s;
+	&:hover {
+		background-color: #acc2d5;
+	}
 }
+
 
 /** Applies to only /search/ page views **/
 .search-page-container {
-  > div.search-view-controls-and-results.row {
-    margin-left: 1em;
-    margin-right: 1em;
 
-    .facets-column {
-      /** The following changes the position of facets-container to be stickied to top of browser on /search/ pages **/
+	> div.search-view-controls-and-results.row {
 
-      .facets-container {
-        position: -webkit-sticky;
-        position: sticky;
-        top: 0px;
+		.facets-column {
 
-        margin-bottom: 20px;
+			/** The following changes the position of facets-container to be stickied to top of browser on /search/ pages **/
+	
+			.facets-container {
+				position: -webkit-sticky;
+				position: sticky;
+				top: 0px;
 
-        @include navbar-fixed-position {
-          top: $cgap-search-sticky-header-top-offset;
-          margin-bottom: 0px;
-        }
+				margin-bottom: 20px;
+				
+				@include navbar-fixed-position {
+					top: $cgap-search-sticky-header-top-offset;
+					margin-bottom: 0px;
+				}
+	
+				body.scrolled-past-160 & {
+	
+					margin-bottom: 0px;
+					padding-bottom: 0 !important;
+				
+					.facets-body {
+						max-height: 90vh;
+						// 86 = 40 nav + 52 facet-list-header + 50px footer
+						max-height: calc(100vh - 142px);
+						overflow-y: auto;
+						overflow-x: hidden;
+	
+						&::-webkit-scrollbar {
+							width: 6px;
+							height: 6px;
+							background-color: transparent;
+						}
+	
+						&::-webkit-scrollbar-thumb {
+							background-color: #aaa;
+							border-radius: 3px;
+						}
+	
+						&::-webkit-scrollbar-track {
+							margin-right: -1px;
+						}
+	
+					}
+				}
+	
+			}
+	
+		}
+	}
 
-        body.scrolled-past-160 & {
-          margin-bottom: 0px;
-          padding-bottom: 0 !important;
+	.search-results-outer-container {
 
-          .facets-body {
-            max-height: 90vh;
-            // 86 = 40 nav + 52 facet-list-header + 50px footer
-            max-height: calc(100vh - 142px);
-            overflow-y: auto;
-            overflow-x: hidden;
+		.search-headers-row {
+			position: sticky;
+			top: 0px;
+			@include navbar-fixed-position {
+				top: $cgap-search-sticky-header-top-offset;
+			}
+		}
 
-            &::-webkit-scrollbar {
-              width: 6px;
-              height: 6px;
-              background-color: transparent;
-            }
+	}
 
-            &::-webkit-scrollbar-thumb {
-              background-color: #aaa;
-              border-radius: 3px;
-            }
-
-            &::-webkit-scrollbar-track {
-              margin-right: -1px;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  .search-results-outer-container {
-    .search-headers-row {
-      position: sticky;
-      top: 0px;
-      @include navbar-fixed-position {
-        top: $cgap-search-sticky-header-top-offset;
-      }
-    }
-  }
 }
+
 
 /*** Result row styling ***/
 
+
 .search-results-container .react-infinite-container .search-result-row {
-  border-bottom: 1px solid #00000015;
-  box-shadow: 0 1px 5px -2px #0002;
-  margin-bottom: 9px;
 
-  // Re-style result row re: CGAP styling/theming/branding.
-  > .columns.result-table-row > .search-result-column-block > .inner {
-    // Along with margin-bottom & border, aligned to `rowHeight` in SearchView.js.
-    height: $search-results-result-row-height; // = 80px (+9px margin bottom +1px border bottom = 90px rowHeight);
-  }
+	border-bottom: 1px solid #00000015;
+	box-shadow: 0 1px 5px -2px #0002;
+	margin-bottom: 9px;
 
-  > .columns.result-table-row
-    > .search-result-column-block[data-field="display_title"] {
-    padding-left: 45px !important;
+	// Re-style result row re: CGAP styling/theming/branding.
+	> .columns.result-table-row > .search-result-column-block > .inner {
+		// Along with margin-bottom & border, aligned to `rowHeight` in SearchView.js.
+		height: $search-results-result-row-height; // = 80px (+9px margin bottom +1px border bottom = 90px rowHeight);
+	}
 
-    .toggle-detail-button-container {
-      top: 0;
-      bottom: 0;
-      > button {
-        width: 45px !important;
-        border-radius: 0;
-      }
-    }
-  }
+	> .columns.result-table-row > .search-result-column-block[data-field="display_title"] {
+		padding-left: 45px !important;
 
-  .result-table-detail-container {
-    .result-table-detail {
-      > .close-button-container {
-        /* Becomes width 31px with margin of 7px on both sides (self-margin-left+nth-child(2)margin-left) ==> adds up the 45px width on toggle-detail-button-container */
-        /* And then re-using the 10px gap from .close-button-container margin-right.*/
-        width: 31px;
-      }
-      > *:nth-child(2) {
-        margin-left: 7px;
-      }
-    }
-  }
+		.toggle-detail-button-container {
+			top: 0;
+			bottom: 0;
+			> button {
+				width: 45px !important;
+				border-radius: 0;
+			}
+		}
+	}
+
+	.result-table-detail-container {
+		.result-table-detail {
+	
+			> .close-button-container {
+				/* Becomes width 31px with margin of 7px on both sides (self-margin-left+nth-child(2)margin-left) ==> adds up the 45px width on toggle-detail-button-container */
+				/* And then re-using the 10px gap from .close-button-container margin-right.*/
+				width: 31px;
+			}
+			> *:nth-child(2) {
+				margin-left: 7px;
+			}
+		}
+	}
+
 }

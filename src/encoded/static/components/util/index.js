@@ -29,7 +29,3 @@ export const acmgUtil = acmgUtilities;
 
 import * as hookUtilities from './hooks';
 export const customHooks = hookUtilities;
-
-// Shared utilities for item pages (Case, VariantSample, SomaticAnalysis, etc.)
-import * as itemUtilities from './item';
-export const itemUtil = itemUtilities;

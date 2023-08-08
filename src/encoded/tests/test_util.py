@@ -24,7 +24,6 @@ from ..util import (
     transfer_properties,
 )
 from .. import util as util_module
-from snovault import util as snovault_util_module
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -184,7 +183,7 @@ def test_debuglog():
 
             mock_expanduser.side_effect = mocked_expanduser
 
-            with mock.patch.object(snovault_util_module, "datetime", dt):
+            with mock.patch.object(datetime, "datetime", dt):
 
                 real_open = io.open
 
@@ -202,14 +201,14 @@ def test_debuglog():
 
                     mock_open.side_effect = mocked_open
 
-                    with mock.patch.object(snovault_util_module, 'DEBUGLOG', ""):
+                    with mock.patch.object(util_module, 'DEBUGLOG', ""):
 
                         debuglog("test 1")
                         debuglog("test 2")
 
                         assert not os.path.exists(filename)
 
-                    with mock.patch.object(snovault_util_module, 'DEBUGLOG', fake_homedir):
+                    with mock.patch.object(util_module, 'DEBUGLOG', fake_homedir):
 
                         debuglog("test 1")
 
@@ -224,7 +223,7 @@ def test_debuglog():
                             "2010-07-04 12:30:00.020000 test 2\n"
                         )
 
-                    with mock.patch.object(snovault_util_module, 'DEBUGLOG', "~"):
+                    with mock.patch.object(util_module, 'DEBUGLOG', "~"):
 
                         debuglog("test 3")
 

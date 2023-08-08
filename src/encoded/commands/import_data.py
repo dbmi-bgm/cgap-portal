@@ -30,7 +30,7 @@ from pyramid import paster
 from dcicutils.misc_utils import TestApp
 from wsgiproxy.proxies import ALLOWED_METHODS
 from urllib.parse import urlparse
-from snovault import loadxl
+from .. import loadxl
 
 
 EPILOG = __doc__

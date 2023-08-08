@@ -1,26 +1,18 @@
 
 module.exports = function(api){
-    const modulesEnabled = api.env("test");
-    api.cache.using(function(){ return process.env.NODE_ENV; });
+    api.cache(true);
     return {
         "presets" : [
-            // We don't need to convert import/export statements unless in test/Jest environment (as Webpack will handle later; not converting here preserves code-splitting).
+            // We don't need to convert import/export statements.
             // @see https://stackoverflow.com/questions/63563485/how-can-i-preserve-dynamic-import-statements-with-babel-preset-env
-            [ "@babel/preset-env", { "modules": modulesEnabled ? "auto" : false } ],
+            [ "@babel/preset-env", { "modules": false } ],
             "@babel/preset-react",
         ],
         "plugins": [
             "@babel/plugin-syntax-dynamic-import",
             "@babel/plugin-proposal-object-rest-spread",
             "@babel/plugin-proposal-class-properties",
-            "babel-plugin-minify-dead-code-elimination",
-            ["@babel/plugin-proposal-decorators", { "legacy": true }],
-            ["@babel/transform-async-to-generator", {
-                "module": "bluebird",
-                "method": "coroutine"
-            }],
-            ["@babel/plugin-proposal-pipeline-operator", { "proposal": "minimal" }],
-            ["@babel/plugin-transform-runtime"],
+            "babel-plugin-minify-dead-code-elimination"
         ],
         "comments": true
     };

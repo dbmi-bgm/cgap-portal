@@ -13,8 +13,7 @@ import {
     BigDropdownPageLoader,
     BigDropdownPageTreeMenu,
     BigDropdownPageTreeMenuIntroduction,
-    BigDropdownGroupController,
-    BigDropdownBigLink
+    BigDropdownGroupController
 } from './BigDropdown';
 import { AccountNav } from './AccountNav';
 import FeedbackButton from '../../item-pages/components/FeedbackButton';
@@ -87,7 +86,12 @@ function LeftNavAuthenticated(props){
     }, [ context ]);
     return (
         <div className="navbar-nav mr-auto">
-            <BrowseNavItem {...{ href }} {...props} />
+            <a href="/cohort-analysis" className={"nav-link browse-nav-btn" + (isCohortsLinkActive ? " active" : "")}>
+                Cohorts
+            </a>
+            <a href="/search/?type=GeneList" className={"nav-link browse-nav-btn" + (isGeneListsLinkActive ? " active" : "")}>
+                GeneLists
+            </a>
             <HelpNavItem {...props} />
         </div>
     );
@@ -95,113 +99,21 @@ function LeftNavAuthenticated(props){
 
 const LeftNavGuest = React.memo(function LeftNavGuest(props){
     const { href, ...passProps } = props;
-    // const { pathname = "/" } = url.parse(href, false);
+    const { pathname = "/" } = url.parse(href, false);
 
     return (
         <div className="navbar-nav mr-auto">
+            {/*
+            <a href="/case-studies" className={"nav-link" + (pathname === "/case-studies" ? " active" : "")}>
+                Case Studies
+            </a>
+            */}
             <HelpNavItem {...props} />
+            {/*
+            <a href="/about" className={"nav-link" + (pathname === "/about" ? " active" : "")}>
+                About
+            </a>
+            */}
         </div>
-    );
-});
-
-function BrowseNavItem(props){
-    const { href, browseBaseState, ...navItemProps } = props;
-    const { active: propActive } = navItemProps || {};
-
-    // /** @see https://reactjs.org/docs/hooks-reference.html#usememo */
-    const bodyProps = useMemo(function(){
-        // Figure out if any items are active
-        const { query = {}, pathname = "/a/b/c/d/e" } = memoizedUrlParse(href);
-
-        const browseHref = "/search/?type=Item";
-        const browseByCaseHref = "/search/?proband_case=true&type=Case"; // Go to proband cases from nav bar by default
-        const browseBySomaticAnalysisHref = "/search/?type=SomaticAnalysis";
-        const browseByGeneListHref = "/search/?type=GeneList";
-        const browseByCohortAnalysisHref = "/search/?type=CohortAnalysis";
-
-        const isSearchActive = pathname === "/search/";
-        const isBrowseByCaseActive = isSearchActive && query.type === "Case";
-        const isBrowseByCohortAnalysisActive = isSearchActive && query.type === "CohortAnalysis";
-        const isBrowseBySomaticAnalysisActive = isSearchActive && query.type === "SomaticAnalysis";
-        const isBrowseByGeneListActive = isSearchActive && query.type === "GeneList";
-
-        const isAnyActive = (isSearchActive || isBrowseByCaseActive || isBrowseByCohortAnalysisActive || isBrowseByGeneListActive || isBrowseBySomaticAnalysisActive);
-        return {
-            browseHref, browseBySomaticAnalysisHref, browseByCaseHref, browseByCohortAnalysisHref, browseByGeneListHref,
-            isAnyActive, isSearchActive, isBrowseByCaseActive, isBrowseByCohortAnalysisActive, isBrowseByGeneListActive,
-            isBrowseBySomaticAnalysisActive
-        };
-    }, [ href, browseBaseState ]);
-
-    const navLink = (
-        <React.Fragment>
-            <span className="text-black">Browse</span>
-        </React.Fragment>
-    );
-    const active = propActive !== false && bodyProps.isAnyActive;
-    return ( // `navItemProps` contains: href, windowHeight, windowWidth, isFullscreen, testWarning, mounted, overlaysContainer
-        <BigDropdownNavItem {...navItemProps} id="data-menu-item"
-            navItemHref={bodyProps.browseHref}
-            navItemContent={navLink}
-            active={active}>
-            <BrowseNavItemBody {...bodyProps} />
-        </BigDropdownNavItem>
-    );
-}
-
-const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
-    const {
-        browseByCaseHref,
-        browseBySomaticAnalysisHref,
-        browseByCohortAnalysisHref,
-        browseByGeneListHref,
-        isBrowseByCaseActive = false,
-        isBrowseByCohortAnalysisActive = false,
-        isBrowseBySomaticAnalysisActive = false,
-        isBrowseByGeneListActive = false
-    } = props;
-    return (
-        <React.Fragment>
-
-            <BigDropdownBigLink href={browseByCaseHref} isActive={isBrowseByCaseActive} titleIcon="archive fas" className="primary-big-link">
-                <h4>Browse Germline</h4>
-                <div className="description">
-                    Search All Germline Cases on the Computational Genome Analysis Platform
-                </div>
-            </BigDropdownBigLink>
-
-            <BigDropdownBigLink href={browseBySomaticAnalysisHref} isActive={isBrowseBySomaticAnalysisActive} titleIcon="spinner fas" className="primary-big-link">
-                <h4>Browse Somatic</h4>
-                <div className="description">
-                    Search All Somatic Analyses on the Computational Genome Analysis Platform
-                </div>
-            </BigDropdownBigLink>
-
-            <BigDropdownBigLink href={browseByCohortAnalysisHref} isActive={isBrowseByCohortAnalysisActive} isButton titleIcon="project-diagram fas" className="primary-big-link">
-                <div className="d-flex flex-column flex-lg-row">
-                    <div className="col pl-0">
-                        <a href={browseByCohortAnalysisHref} >
-                            <h4>Browse Cohorts</h4>
-                            <div className="description">
-                                Search All Cohorts on the Computational Genome Analysis Platform
-                            </div>
-                        </a>
-                    </div>
-                    <div className="col-auto pl-0 pl-1-md">
-                        <a href="/cohort-analysis" className="curated-browsers-link btn btn-primary btn-link btn-sm mt-1">
-                            View Cohort Browser
-                        </a>
-                    </div>
-                </div>
-            </BigDropdownBigLink>
-
-            <BigDropdownBigLink href={browseByGeneListHref} isActive={isBrowseByGeneListActive} titleIcon="dna fas" className="primary-big-link bottom-edge-child">
-                <h4>Browse Gene Lists</h4>
-                <div className="description">
-                    Search All Gene Lists on the Computational Genome Analysis Platform
-                </div>
-            </BigDropdownBigLink>
-
-        </React.Fragment>
     );
 });

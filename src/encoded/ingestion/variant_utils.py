@@ -3,14 +3,13 @@ import os
 import json
 import structlog
 from tqdm import tqdm
-from snovault.ingestion.common import IngestionReport
 from ..inheritance_mode import InheritanceMode
 from ..server_defaults import add_last_modified
-from snovault.loadxl import LOADXL_USER_UUID
+from ..loadxl import LOADXL_USER_UUID
 from ..types.variant import build_variant_display_title, ANNOTATION_ID_SEP, build_variant_sample_annotation_id
 from ..types.structural_variant import build_structural_variant_display_title
 from ..util import resolve_file_path
-from .common import CGAP_CORE_PROJECT, CGAP_CORE_INSTITUTION
+from .common import CGAP_CORE_PROJECT, CGAP_CORE_INSTITUTION, IngestionReport
 
 
 log = structlog.getLogger(__name__)

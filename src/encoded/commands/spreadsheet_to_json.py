@@ -9,7 +9,7 @@ import argparse
 import json
 import os.path
 
-from snovault import loadxl
+from .. import loadxl
 
 EPILOG = __doc__
 

@@ -48,10 +48,8 @@ RUN apt-get update && apt-get upgrade -y && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
     nvm alias default v${NODE_VERSION} && \
-    curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
-
-# Install nginx
-RUN bash /install_nginx.sh && \
+    curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json && \
+    bash /install_nginx.sh && \
     chown -R nginx:nginx /opt/venv && \
     mkdir -p /home/nginx/cgap-portal && \
     mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \

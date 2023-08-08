@@ -49,7 +49,6 @@ content_views.register(HomePage,                    'HomePage');
 
 content_views.register(DefaultItemView,             'Item');
 content_views.register(CaseView,                    'Case');
-content_views.register(SomaticAnalysisView,         'SomaticAnalysis');
 content_views.register(ReportView,                  'Report');
 content_views.register(VariantSampleView,           'VariantSample');
 content_views.register(StructuralVariantSampleView, 'StructuralVariantSample');
@@ -83,6 +82,5 @@ content_views.fallback = function () {
 };
 
 import App from './app';
-import SomaticAnalysisView from './item-pages/SomaticAnalysisView';
 
 export default App;

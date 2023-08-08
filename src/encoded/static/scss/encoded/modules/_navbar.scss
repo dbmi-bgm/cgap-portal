@@ -824,43 +824,37 @@ body[data-current-action="multiselect"] {
                 }
 
                 // Same size, similar styling as intro-section
-                .big-link {
-                    color: $navbar-link-color;
+                a.big-link {
+                    color: inherit;
                     position: relative;
                     &:hover {
-                        color: $navbar-link-hover-color;
+                        color: #5d8a8e;
                         text-shadow: 0 0 0;
                         text-decoration: none;
                         &:after {
                             opacity: 1;
                         }
                     }
-                    & a {
-                        text-decoration: none;
-                    }
-                    .description,
                     > div,
                     > div > div,
                     > div > div > h3,
                     > div > div > h5,
                     > div > div > h4 {
-                        color: $navbar-link-color;
+                        color: inherit;
                     }
                     > div > div > h3,
                     > div > div > h5,
-                    > div > div > h4,
-                    > div > div > div > div > a > h4 {
-                        color: $navbar-link-color;
+                    > div > div > h4 {
+                        color: #eee;
                         display: inline-block;
                         @include after-big-link-append;
-                    }       
+                    }
                     &:hover,
                     &.active {
                         > div > div > h3,
                         > div > div > h5,
-                        > div > div > h4,
-                        > div > div > div > div > a > h4 {
-                            color: $navbar-link-hover-color; // Highlight color
+                        > div > div > h4 {
+                            color: inherit; // Highlight color
                             &:after {
                                 opacity: 1;
                             }
@@ -870,13 +864,6 @@ body[data-current-action="multiselect"] {
                         // "Browse All"
                         h4 {
                             font-weight: 600;
-                        }
-                    }
-                    .curated-browsers-link {
-                        text-decoration: none;
-                        color: $navbar-link-hover-color;
-                        &hover {
-                            color: $navbar-link-color;
                         }
                     }
                 }
@@ -890,7 +877,7 @@ body[data-current-action="multiselect"] {
                             position: relative;
 							@include after-big-link-append;
 							&:hover {
-								color: $navbar-link-hover-color;
+								color: #5d8a8e;
 								text-shadow: 0 0 0;
 								text-decoration: none;
 								&:after {
@@ -931,7 +918,7 @@ body[data-current-action="multiselect"] {
                                 //border: 1px solid transparent;
                                 display: inline-block;
                                 color: #333;
-                                color: $navbar-link-color;
+                                color: #fff;
                                 font-weight: 500;
                                 padding: 8px 0 6px 0;
                                 //margin-left: -12px;
@@ -939,12 +926,12 @@ body[data-current-action="multiselect"] {
                                 border-radius: 2px;
                                 //margin-bottom: -1px;
                                 &:hover {
-                                    border-color: $navbar-link-hover-color; 
+                                    border-color: #5d8a8e; 
                                     //background-color: #e7e7e7;
                                     //color: #fff;
                                     text-decoration: none;
                                     color: #000;
-                                    color: $navbar-link-hover-color; 
+                                    color: #5d8a8e; 
                                     text-shadow: 0 0 0;
                                 }
                                 > * {
@@ -1003,7 +990,7 @@ body[data-current-action="multiselect"] {
                         > a.level-2-title {
                             //color: #333;
                             position: relative;
-                            color: $navbar-link-color;
+                            color: #eee;
                             font-weight: 400;
                             padding: 5px 10px 4px;
                             margin-bottom: -4px;
@@ -1011,13 +998,14 @@ body[data-current-action="multiselect"] {
                             z-index: 2;
                             &:hover {
                                 z-index: 5;
-                                background-color: $primary;
-                                color: $navbar-link-hover-color;
+                                background-color: #5d8a8e;
+                                color: #fff;
                                 text-decoration: none;
                             }
                             &.active {
                                 z-index: 1;
-                                color: $navbar-link-active-color;
+                                //background-color: #34959d;
+                                color: #fff;
                                 font-weight: 600;
                                 text-decoration: none;
                                 background-color: #484848;

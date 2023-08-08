@@ -1017,7 +1017,7 @@ class SearchBuilder:
             type_infos = [self.request.registry[TYPES][t] for t in self.doc_types if t != 'Item']
             for ti in type_infos:
                 # We use `type` instead of `isinstance` since we don't want to catch subclasses.
-                if type(ti) is AbstractTypeInfo:
+                if type(ti) == AbstractTypeInfo:
                     any_abstract_types = True
                     break
 

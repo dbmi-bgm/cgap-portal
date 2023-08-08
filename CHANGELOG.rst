@@ -6,73 +6,6 @@ cgap-portal
 Change Log
 ----------
 
-14.1.2
-======
-* Fix for Germline case button link (ensure it points to proband-only cases)
-
-
-14.1.1
-======
-`PR 743: Purge permissions fix <https://github.com/dbmi-bgm/cgap-portal/pull/743>`_
-
-* Update set_user_info_property to true to allow admins to purge items
-* Bring in updated snovault to fix impersonation bug
-
-
-14.1.0
-======
-`PR 739: Bm babel updates <https://github.com/dbmi-bgm/cgap-portal/pull/739>`_
-
-* Add and update a bunch of babel-related dependencies to match Fourfront and SMaHT
-* Update babel config to make use of new plugins
-
-
-14.0.2
-======
-* Polyfill buffer
-* Upgrade higlass-bigwig-datafetcher and gmod/tabix
-
-
-14.0.1
-======
-* Update Higlass SV view config
-
-
-14.0.0
-======
-* July 2023
-* Migrating ingestion (et.al.) code to snovault.
-
-
-13.5.2
-======
-`PR 707: Somatic CGAP UI V1 <https://github.com/dbmi-bgm/cgap-portal/pull/707>`_
-
-* SomaticAnalysis, Case, Search Item View updates for Somatic
-* Update SPC to 0.1.66
-* Update higlass-general-vcf to 0.1.4
-
-
-13.5.1
-======
-
-* Update nginx signing key and import method to fix Docker build
-
-
-13.5.0
-======
-`PR 574: Webpack 5 Update <https://github.com/dbmi-bgm/cgap-portal/pull/574>`_
-
-* Update Webpack to Webpack 5 (polyfills, ugh)
-* Update HiGlass versions to resolve webpack related issues
-
-
-13.4.1
-======
-* 2023-06-26
-* Added user load to deployment task in deploy/docket/production/entrypoint_deployment.py,
-  along with the current higlass_view_config load.
-
 
 13.4.0
 ======
@@ -90,6 +23,7 @@ Change Log
 
 13.3.1
 ======
+*No PR: Staff-change Insert Updates*
 
 * Remove Victoria's user insert from master-inserts
 * Add Cesar's user insert to master-inserts

@@ -24,8 +24,6 @@ if [ -n "${INITIAL_DEPLOYMENT}" ]; then
 else
     # Patch higlass_view_config items on every deploy from the master-inserts directory as they have to be in sync with the code
     poetry run load-data-by-type production.ini --app-name app --prod --overwrite --indir master-inserts --itype higlass_view_config
-    # Added user load 2023-06-26.
-    poetry run load-data-by-type production.ini --app-name app --prod --overwrite --indir master-inserts --itype user
 fi
 
 # Load access keys

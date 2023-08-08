@@ -16,7 +16,7 @@ import { default as SvTrack } from 'higlass-sv/es/SvTrack';
 import { default as GeneralVcfTrack } from 'higlass-general-vcf/es/GeneralVcfTrack';
 import { default as CohortTrack } from 'higlass-cohort/es/CohortTrack';
 import { default as GeneListTrack } from 'higlass-cohort/es/GeneListTrack';
-import { BigwigDataFetcher } from 'higlass-bigwig-datafetcher';
+import { default as BigwigDataFetcher } from 'higlass-bigwig-datafetcher/es/BigwigDataFetcher';
 
 export {
     HiGlassComponent,

@@ -10,12 +10,11 @@ import { basicColumnExtensionMap,
     DisplayTitleColumnWrapper,
     DisplayTitleColumnDefault,
     DisplayTitleColumnUser } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
-
 import { Schemas, typedefs } from './../util';
-import { generateRelationshipMapping, sortAndAddRolePropsToQCMs } from '../util/item';
+
 import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtensionMap, VariantSampleDisplayTitleColumn } from './variantSampleColumnExtensionMap';
 import QuickPopover from '../item-pages/components/QuickPopover';
-import { QCMFlag } from '../item-pages/components/QCM';
+import { generateRelationshipMapping, QCMFlag, sortAndAddRolePropsToQCMs } from '../item-pages/CaseView';
 import { CurrentFamilyController, findCanonicalFamilyIndex } from '../item-pages/CaseView/CurrentFamilyController';
 
 // eslint-disable-next-line no-unused-vars

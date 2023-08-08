@@ -5,7 +5,7 @@ import pytest
 from pkg_resources import resource_filename
 from tempfile import NamedTemporaryFile
 from unittest import mock
-from snovault import loadxl
+from .. import loadxl
 from ..commands.run_upgrader_on_inserts import get_inserts
 from ..commands.load_data import load_data_should_proceed
 
