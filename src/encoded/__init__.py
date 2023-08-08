@@ -1,3 +1,4 @@
+import encoded.project_defs  # noqa: F401 (imported but unused)
 import logging  # not used in Fourfront, but used in CGAP? -kmp 8-Apr-2020
 import mimetypes
 import netaddr
@@ -14,21 +15,21 @@ from codeguru_profiler_agent import Profiler
 from sentry_sdk.integrations.pyramid import PyramidIntegration
 from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from pyramid.config import Configurator
-from .local_roles import LocalRolesAuthorizationPolicy
+from snovault.local_roles import LocalRolesAuthorizationPolicy
 from pyramid.settings import asbool
 from snovault.app import session, json_from_path, configure_dbsession, changelogs
 from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
 from .appdefs import APP_VERSION_REGISTRY_KEY
-from .loadxl import load_all
+from snovault.loadxl import load_all
 
 
 # snovault.app.STATIC_MAX_AGE (8 seconds) is WAY too low for /static and /profiles - Will March 15 2022
 CGAP_STATIC_MAX_AGE = 1800
 # default trace_rate for sentry
 # tune this to get more data points when analyzing performance
-SENTRY_TRACE_RATE = .1
+SENTRY_TRACE_RATE = 0.1
 DEFAULT_AUTH0_DOMAIN = 'hms-dbmi.auth0.com'
 DEFAULT_AUTH0_ALLOWED_CONNECTIONS = 'github,google-oauth2,partners,hms-it'
 
@@ -134,9 +135,15 @@ def main(global_config, **local_config):
     settings['auth0.domain'] = settings.get('auth0.domain', os.environ.get('Auth0Domain', DEFAULT_AUTH0_DOMAIN))
     settings['auth0.client'] = settings.get('auth0.client', os.environ.get('Auth0Client'))
     settings['auth0.secret'] = settings.get('auth0.secret', os.environ.get('Auth0Secret'))
-    settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',  # comma separated string
+    settings['auth0.allowed_connections'] = settings.get('auth0.allowed_connections',
                                                          os.environ.get('Auth0AllowedConnections',
                                                                         DEFAULT_AUTH0_ALLOWED_CONNECTIONS).split(','))
+
+    # Comma separated string (typically in GAC e.g. ENCODED_AUTH0_ALLOWED_CONNECTIONS),
+    # e.g.: google-oauth2,github,hms-it,partners (changed July 2023).
+    if isinstance(settings['auth0.allowed_connections'], str):
+        settings['auth0.allowed_connections'] = settings['auth0.allowed_connections'].split(",")
+
     settings['auth0.options'] = {
         'auth': {
             'sso': False,
@@ -184,17 +191,19 @@ def main(global_config, **local_config):
 
     # Render an HTML page to browsers and a JSON document for API clients
     # config.include(add_schemas_to_html_responses)
-    config.include('.renderers')
-    config.include('.authentication')
-    config.include('.server_defaults')
+    config.include('snovault.renderers')
+#   config.include('.authentication')
+#    config.include('.server_defaults')
+    config.include('snovault.server_defaults')
     config.include('.root')
     config.include('.types')
     config.include('.batch_download')
-    config.include('.loadxl')
+    config.include('snovault.loadxl')
     config.include('.visualization')
-    config.include('.ingestion_listener')
+    config.include('snovault.ingestion.ingestion_listener')
     config.include('.ingestion.ingestion_message_handler_vcf')
-    config.include('.ingestion.ingestion_message_handler_default')
+    config.include('snovault.ingestion.ingestion_message_handler_default')
+    config.include('.ingestion.ingestion_processors')
     config.include('.custom_embed')
 
     if 'elasticsearch.server' in config.registry.settings:

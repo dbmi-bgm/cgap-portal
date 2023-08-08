@@ -33,7 +33,8 @@
         "specimen_type": "resection",
         "workup_type": "WGS",
         "preservation_method": "FFPE",
-        "tissue_type": "Tumor"
+        "tissue_type": "Tumor",
+        "specimen_collection_date": "2019-03-06"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
@@ -45,7 +46,8 @@
         "specimen_type": "peripheral blood",
         "workup_type": "WGS",
         "preservation_method": "Fresh",
-        "tissue_type": "Normal"
+        "tissue_type": "Normal",
+        "specimen_collection_date": "2019-03-06"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
