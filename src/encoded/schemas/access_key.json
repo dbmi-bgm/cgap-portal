@@ -21,7 +21,6 @@
     "type": "object",
     "properties": {
         "schema_version": {
-            "type": "string",
             "default": "1"
         },
         "status": {
