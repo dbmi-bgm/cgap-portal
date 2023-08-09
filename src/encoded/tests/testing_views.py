@@ -153,7 +153,7 @@ class TestingLinkTarget(Item):
         "type": "array",
         "items": {
             "type": ['string', 'object'],
-            "linkTo": "TestingLinkSourceSno",
+            "linkTo": "TestingLinkSource",
         },
     })
     def reverse(self, request):
