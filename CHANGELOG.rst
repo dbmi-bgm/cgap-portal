@@ -5,6 +5,13 @@ cgap-portal
 ----------
 Change Log
 ----------
+
+14.1.4
+======
+
+* Bump cohort browser version
+
+
 14.1.3
 ======
 `PR 732: Fix for LinkTo items in ItemDetailPane <https://github.com/dbmi-bgm/cgap-portal/pull/732>`_
@@ -12,6 +19,7 @@ Change Log
 * Updated python dependencies (pyyaml and cython)
 * Bump SPC with conditional for nested object arrays (without corresponding childKeys values)
 * Update SPC to 0.1.68b2
+
 
 14.1.2
 ======
