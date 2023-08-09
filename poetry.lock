@@ -75,18 +75,18 @@ requests = ">=0.14.0"
 
 [[package]]
 name = "awscli"
-version = "1.29.20"
+version = "1.29.22"
 description = "Universal Command Line Environment for AWS."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "awscli-1.29.20-py3-none-any.whl", hash = "sha256:b16051677855917c8f023ac65e5671b2e874da8a3d1f3408f17364477ebf1225"},
-    {file = "awscli-1.29.20.tar.gz", hash = "sha256:7ad3b6a90267443bad65ede7effe825fd5a5aad937229931db30141c6081f549"},
+    {file = "awscli-1.29.22-py3-none-any.whl", hash = "sha256:031ce6bcb58fa4f8817dd94043a64af0174f82a3d5df7abf4d511120e8b8398e"},
+    {file = "awscli-1.29.22.tar.gz", hash = "sha256:2a289197a51ba5cde621fc197efc17871cdf3034132d053d8d0af3e5cb338d13"},
 ]
 
 [package.dependencies]
-botocore = "1.31.20"
+botocore = "1.31.22"
 colorama = ">=0.2.5,<0.4.5"
 docutils = ">=0.10,<0.17"
 PyYAML = ">=3.10,<6.1"
@@ -226,18 +226,18 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.28.20"
+version = "1.28.22"
 description = "The AWS SDK for Python"
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "boto3-1.28.20-py3-none-any.whl", hash = "sha256:a654d57e3882e7fd2c1260d604a44364a2fed00da4f52faf37e5901e71145df1"},
-    {file = "boto3-1.28.20.tar.gz", hash = "sha256:e3c2e8e55c17af6671a5332d6ab4635ad9793c80d0ac6d78af7b30a994d0681b"},
+    {file = "boto3-1.28.22-py3-none-any.whl", hash = "sha256:0c1c1d19232018ac49fd2c0a94aa0b802f5d222e89448ff50734626bce454b32"},
+    {file = "boto3-1.28.22.tar.gz", hash = "sha256:af1ce129f462cdc8dfb1a1c559d7ed725e51344fb0ae4a56d9453196bf416555"},
 ]
 
 [package.dependencies]
-botocore = ">=1.31.20,<1.32.0"
+botocore = ">=1.31.22,<1.32.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.6.0,<0.7.0"
 
@@ -246,14 +246,14 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.28.20"
-description = "Type annotations for boto3 1.28.20 generated with mypy-boto3-builder 7.17.2"
+version = "1.28.22"
+description = "Type annotations for boto3 1.28.22 generated with mypy-boto3-builder 7.17.2"
 category = "dev"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "boto3-stubs-1.28.20.tar.gz", hash = "sha256:21050c5dc37a8f34dfe7ed8b1b12d1fd9ff187eaf4bd9bfa187585e07e6b6b76"},
-    {file = "boto3_stubs-1.28.20-py3-none-any.whl", hash = "sha256:e08cc66bf744e12cbdcbcd64ab520900ee5fc61c22bceefe08a2f04cdb1d5c0c"},
+    {file = "boto3-stubs-1.28.22.tar.gz", hash = "sha256:c6183e305e4d8754a9d6e06c58e9746d0451ebad840e6c2a7edfb94efee2bd7d"},
+    {file = "boto3_stubs-1.28.22-py3-none-any.whl", hash = "sha256:626b5cd9629152b7c5994774bc3f0d9a6e7b63d3bb85cb61cc3c3a4f0585c3d8"},
 ]
 
 [package.dependencies]
@@ -297,7 +297,7 @@ backup-gateway = ["mypy-boto3-backup-gateway (>=1.28.0,<1.29.0)"]
 backupstorage = ["mypy-boto3-backupstorage (>=1.28.0,<1.29.0)"]
 batch = ["mypy-boto3-batch (>=1.28.0,<1.29.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.28.0,<1.29.0)"]
-boto3 = ["boto3 (==1.28.20)", "botocore (==1.31.20)"]
+boto3 = ["boto3 (==1.28.22)", "botocore (==1.31.22)"]
 braket = ["mypy-boto3-braket (>=1.28.0,<1.29.0)"]
 budgets = ["mypy-boto3-budgets (>=1.28.0,<1.29.0)"]
 ce = ["mypy-boto3-ce (>=1.28.0,<1.29.0)"]
@@ -621,14 +621,14 @@ xray = ["mypy-boto3-xray (>=1.28.0,<1.29.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.31.20"
+version = "1.31.22"
 description = "Low-level, data-driven core of boto 3."
 category = "main"
 optional = false
 python-versions = ">= 3.7"
 files = [
-    {file = "botocore-1.31.20-py3-none-any.whl", hash = "sha256:be51c5352162700e7beb0aa27af394adbbf86f8e7a2ca0c437d448d0a7b2bdfb"},
-    {file = "botocore-1.31.20.tar.gz", hash = "sha256:485ef175cd011ebc965f4577d8cc02a226c46bd608dd2bb75ce6938328cff0fd"},
+    {file = "botocore-1.31.22-py3-none-any.whl", hash = "sha256:b91025ca1a16b13ae662bdb46e7c16d2c53619df23bf3583a43791519da14870"},
+    {file = "botocore-1.31.22.tar.gz", hash = "sha256:d193ab0742ddc4af3a3994af4ec993acf5ac75460f298880fe869765e7bc578d"},
 ]
 
 [package.dependencies]
@@ -641,14 +641,14 @@ crt = ["awscrt (==0.16.26)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.31.20"
+version = "1.31.22"
 description = "Type annotations and code completion for botocore"
 category = "dev"
 optional = false
 python-versions = ">=3.7,<4.0"
 files = [
-    {file = "botocore_stubs-1.31.20-py3-none-any.whl", hash = "sha256:4608756e770398104e5577b9dbc90654c2bebf39d72aaf28536933dabe5eaf0b"},
-    {file = "botocore_stubs-1.31.20.tar.gz", hash = "sha256:4aa97c672a9ce162363bf177d003bd715c06a86f9fb69353515cc1ea00b4f163"},
+    {file = "botocore_stubs-1.31.22-py3-none-any.whl", hash = "sha256:8866b230ff65e4e99c8d9fb86ea687846eaf711f9fe921cfed21dcf5f0829041"},
+    {file = "botocore_stubs-1.31.22.tar.gz", hash = "sha256:46af1440a3d14d89bc10d6e5f2da0b87b139641b160b3b7bb673d2e83eba668c"},
 ]
 
 [package.dependencies]
@@ -1186,14 +1186,14 @@ xlrd = ">=1.0.0,<2.0.0"
 
 [[package]]
 name = "dcicutils"
-version = "7.7.0"
+version = "7.7.1"
 description = "Utility package for interacting with the 4DN Data Portal and other 4DN resources"
 category = "main"
 optional = false
 python-versions = ">=3.7,<3.10"
 files = [
-    {file = "dcicutils-7.7.0-py3-none-any.whl", hash = "sha256:bbc6be71a6241641e8fba3827d02a5210b6aafd12381e95a4a2abf57e804ce12"},
-    {file = "dcicutils-7.7.0.tar.gz", hash = "sha256:dd1e028f1c36a0ee9b5972f5d16d8c9bc53c8d80ece69f8ebd73dd2225842448"},
+    {file = "dcicutils-7.7.1-py3-none-any.whl", hash = "sha256:f22ed1a58cd53876b682e55726f9e416ba0903e3b5d9f95f4aa1a74d2e96b830"},
+    {file = "dcicutils-7.7.1.tar.gz", hash = "sha256:04cc948db45d93bfe2e0e6569502c863211f0c633b7fe8d10cc28a9f72e62397"},
 ]
 
 [package.dependencies]
@@ -3694,21 +3694,21 @@ files = [
 
 [[package]]
 name = "tqdm"
-version = "4.65.0"
+version = "4.66.0"
 description = "Fast, Extensible Progress Meter"
 category = "main"
 optional = false
 python-versions = ">=3.7"
 files = [
-    {file = "tqdm-4.65.0-py3-none-any.whl", hash = "sha256:c4f53a17fe37e132815abceec022631be8ffe1b9381c2e6e30aa70edc99e9671"},
-    {file = "tqdm-4.65.0.tar.gz", hash = "sha256:1871fb68a86b8fb3b59ca4cdd3dcccbc7e6d613eeed31f4c332531977b89beb5"},
+    {file = "tqdm-4.66.0-py3-none-any.whl", hash = "sha256:39d459c7140b7890174e69d4d68d6291bc774a55b4bc5d93c0b760798ac5a03e"},
+    {file = "tqdm-4.66.0.tar.gz", hash = "sha256:cc6e7e52202d894e66632c5c8a9330bd0e3ff35d2965c93ca832114a3d865362"},
 ]
 
 [package.dependencies]
 colorama = {version = "*", markers = "platform_system == \"Windows\""}
 
 [package.extras]
-dev = ["py-make (>=0.1.0)", "twine", "wheel"]
+dev = ["pytest (>=6)", "pytest-cov", "pytest-timeout", "pytest-xdist"]
 notebook = ["ipywidgets (>=6)"]
 slack = ["slack-sdk"]
 telegram = ["requests"]
@@ -4136,4 +4136,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.8.1,<3.10"
-content-hash = "88bf54a2ddd32e77e8df092264ae01f3b014ddce4220797314e9ad3e097daee8"
+content-hash = "6eaf2f318a2a163e20a34eda1a1d87324c03b5fc673e4d2850ee25cb2f750632"
