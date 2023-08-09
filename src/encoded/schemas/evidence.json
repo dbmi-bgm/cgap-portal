@@ -1,8 +1,8 @@
 {
     "title": "Association Evidence",
     "description": "Contains links to items that have associations by some evidence and the information about the evidence",
-    "id": "/profiles/evidence.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/evidence.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "object_item",

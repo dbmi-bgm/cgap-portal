@@ -63,7 +63,7 @@ def test_post_invalid_samples(testapp, sample_no_project):
 
 def test_post_valid_patch_error(testapp, sample_one):
     res = testapp.post_json("/sample", sample_one, status=201).json["@graph"][0]
-    testapp.patch_json(res["@id"], {"date_received": "12-3-2003"}, status=422)
+    testapp.patch_json(res["@id"], {"date_received": "somethingtrash"}, status=422)
     testapp.patch_json(res["@id"], {"project": "does_not_exist"}, status=422)
 
 

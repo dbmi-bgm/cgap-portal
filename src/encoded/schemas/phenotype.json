@@ -1,8 +1,8 @@
 {
     "title": "Phenotype",
     "description": "We should get this from HPO or something --- https://hpo.jax.org/app/download/ontology",
-    "id": "/profiles/phenotype.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/phenotype.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "phenotype_name",

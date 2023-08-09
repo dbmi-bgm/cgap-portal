@@ -1,8 +1,8 @@
 {
     "title": "Note",
     "description": "Schema for note items",
-    "id": "/profiles/note.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/note.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "project",

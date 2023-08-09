@@ -258,7 +258,7 @@ class TestingDependencies(Item):
     item_type = 'testing_dependencies'
     schema = {
         'type': 'object',
-        'dependencies': {
+        'dependentRequired': {
             'dep1': ['dep2'],
             'dep2': ['dep1'],
         },

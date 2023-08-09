@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+14.2.0
+======
+
+* Removes ``jsonschema_serialize_fork``, updating schema format version
+
+
 14.1.2
 ======
 * Fix for Germline case button link (ensure it points to proband-only cases)
