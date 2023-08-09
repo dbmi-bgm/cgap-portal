@@ -73,7 +73,7 @@
     "higlass": "1.12.2",
     "higlass-bigwig-datafetcher": "0.2.0",
     "higlass-clinvar": "0.2.5",
-    "higlass-cohort": "0.3.4",
+    "higlass-cohort": "0.3.5",
     "higlass-general-vcf": "0.1.4",
     "higlass-gnomad": "0.2.4",
     "higlass-orthologs": "0.2.4",
