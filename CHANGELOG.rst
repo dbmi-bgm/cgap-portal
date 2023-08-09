@@ -5,6 +5,15 @@ cgap-portal
 ----------
 Change Log
 ----------
+
+14.2.0
+======
+`PR 746: Bm node18 upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/746>`_
+
+* Update Docker's MakeFile to use Node version 18.17.0
+* Update Github workflows to use Node version 18.17.0
+
+
 14.1.3
 ======
 `PR 732: Fix for LinkTo items in ItemDetailPane <https://github.com/dbmi-bgm/cgap-portal/pull/732>`_
@@ -12,6 +21,7 @@ Change Log
 * Updated python dependencies (pyyaml and cython)
 * Bump SPC with conditional for nested object arrays (without corresponding childKeys values)
 * Update SPC to 0.1.68b2
+
 
 14.1.2
 ======
