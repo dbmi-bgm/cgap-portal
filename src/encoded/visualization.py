@@ -426,6 +426,8 @@ def get_higlass_cohort_viewconf(context, request):
                 if variant_detail_source:
                     track['options']['variantDetailSource']['vcfUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=variant_detail_source)
                     track['options']['variantDetailSource']['tbiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=variant_detail_source+".tbi")
+                else:
+                    del track['options']['variantDetailSource']
             elif track['uid'] == "gene_list_track":
                 track['data']['vcfUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_gene_test_results)
                 track['data']['tbiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_gene_test_results+".tbi")

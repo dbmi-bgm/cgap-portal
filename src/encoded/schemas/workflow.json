@@ -316,12 +316,12 @@
                         }
                     },
                     "secondary_file_formats": {
-                        "title": "secondary file formats",
-                        "description": "formats for secondary files",
+                        "title": "Secondary File Formats",
+                        "description": "Formats for secondary files",
                         "type": "array",
                         "items": {
-                            "title": "secondary_file_format",
-                            "description": "formats for secondary file",
+                            "title": "Secondary File Format",
+                            "description": "Format for secondary file",
                             "type": "string",
                             "linkTo": "FileFormat"
                         }
