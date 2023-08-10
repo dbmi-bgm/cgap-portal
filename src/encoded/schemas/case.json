@@ -337,7 +337,7 @@
             ]
         },
         "notes": {
-            "title": "Notes",
+            "title": "Case Notes",
             "sort_fields": [
                 {
                     "field": "note.last_text_edited.date_text_edited",
