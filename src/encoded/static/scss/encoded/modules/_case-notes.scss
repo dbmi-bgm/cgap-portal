@@ -17,6 +17,18 @@
             margin: auto auto auto 10px;
             background-color: transparent;
             border: none;
+            padding:0;
+
+            .icon-sticky-note {
+                margin: 2px;
+            }
+
+            &:focus {
+                border-radius: .25rem;
+                outline: 0;
+                box-shadow: 0 0 0 0.2rem rgba(27, 117, 185, 0.25);
+                transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            }
 
 
             .status-indicator-dot {
