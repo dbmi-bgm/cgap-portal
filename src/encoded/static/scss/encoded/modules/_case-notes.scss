@@ -4,6 +4,19 @@
 *
 * Imported into ../../style.scss (scss/encoded/styles.scss)
 */
+
+.search-headers-row {
+    & > .headers-columns-overflow-container > .columns {
+        & > .search-headers-column-block[data-field="notes"] {
+            & > .inner {
+                & > .column-title {
+                    text-align: left;
+                    margin-left: 20px;
+                }
+            }
+        }
+    }
+}
 .search-result-column-block[data-field="notes"] {
     .case-notes {
         display: flex;
@@ -14,12 +27,13 @@
 
         &-button {
             height: auto;
-            margin: auto auto auto 10px;
+            margin: auto auto auto 30px;
             background-color: transparent;
             border: none;
             padding:0;
 
             .icon-sticky-note {
+                font-size: 27px;
                 margin: 2px;
             }
 
@@ -49,4 +63,20 @@
             overflow: hidden;
         }
     }
+}
+
+
+
+/** Some additional styles for the popover */
+.popover[data-popover-category="notes"]{
+    width: 307px;
+
+    & > .popover-header {
+        margin-top: 0;
+    }
+
+    & > .popover-body > button {
+        margin-top: 8px;
+    }
+
 }
