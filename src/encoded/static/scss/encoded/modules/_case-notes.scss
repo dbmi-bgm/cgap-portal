@@ -51,13 +51,13 @@
                 &::before {
                     position: absolute;
                     top: 0px;
-                    right: 0px;
+                    right: 3px;
                 }
             }
         }
         &-text {
             width: 100%;
-            margin: auto 10px auto auto;
+            margin: auto 10px auto 4px;
             white-space: nowrap;
             text-overflow: ellipsis;
             overflow: hidden;
@@ -75,8 +75,20 @@
         margin-top: 0;
     }
 
-    & > .popover-body > button {
-        margin-top: 8px;
-    }
+    & > .popover-body {
+        padding-top: 4px;
 
+        & > button {
+           margin-top: 8px;
+        }
+
+        & > .last-saved {
+            color: #9FA7AE;
+            margin-bottom: 2px;
+        }
+
+        & > .form-control {
+            font-size: 0.8rem;
+        }
+    }
 }
