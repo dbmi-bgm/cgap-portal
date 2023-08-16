@@ -181,7 +181,6 @@ class TestingPostPutPatch(Item):
             "schema_version": {
                 "type": "string",
                 "pattern": "^\\d+(\\.\\d+)*$",
-                "requestMethod": [],
                 "default": "1",
             },
             "uuid": {
