@@ -29,6 +29,6 @@ class CgapProjectAuthentication(SnovaultProjectAuthentication):
         request.set_property(get_user_info, "user_info", True)
 
     @staticmethod
-    def env_allows_auto_registration(env_name):
+    def env_allows_auto_registration(env_name):  # noQA argument usage more specific
         """ Restrict registration to the auto registration envs """
         return env_name in AUTO_REGISTRATION_ENVS
