@@ -1,8 +1,8 @@
 {
     "title": "Sample",
     "description": "A sample from an individual",
-    "id": "/profiles/sample.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/sample.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "project",

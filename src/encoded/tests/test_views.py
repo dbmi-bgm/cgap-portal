@@ -4,7 +4,7 @@ import pkg_resources
 import pytest
 
 from base64 import b64encode
-from jsonschema_serialize_fork import Draft4Validator
+from snovault.schema_validation import Draft202012Validator
 from pyramid.compat import ascii_native_
 from urllib.parse import urlparse
 from dcicutils.misc_utils import TestApp
@@ -297,7 +297,7 @@ def test_jsonld_term(testapp):
 @pytest.mark.parametrize('item_type', [k for k in TYPE_LENGTH if k != 'access_key'])
 def test_profiles(testapp, item_type):
     res = testapp.get('/profiles/%s.json' % item_type).maybe_follow(status=200)
-    errors = Draft4Validator.check_schema(res.json)
+    errors = Draft202012Validator.check_schema(res.json)
     assert not errors
 
 

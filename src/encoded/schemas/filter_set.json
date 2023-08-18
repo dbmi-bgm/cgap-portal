@@ -1,8 +1,8 @@
 {
     "title": "Filter Set",
     "description": "Filter Set for encapsulating multiple queries",
-    "id": "/profiles/filter_set.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/filter_set.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",

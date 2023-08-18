@@ -1,8 +1,8 @@
 {
     "title": "Gene Annotation Field",
     "description": "Schema for submitting a gene annotation field",
-    "id": "/profiles/gene_annotation_field.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/gene_annotation_field.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "field_name",

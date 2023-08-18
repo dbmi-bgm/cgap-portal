@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",
@@ -46,7 +46,7 @@
     ],
     "title": "Genes",
     "description": "Schema for Genes",
-    "id": "/profiles/gene.json",
+    "$id": "/profiles/gene.json",
     "properties": {
         "status": {
             "default": "shared"
