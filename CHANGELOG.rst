@@ -12,7 +12,7 @@ Change Log
 * Removes ``jsonschema_serialize_fork``, updating schema format version
 * Refactors registration restriction to customization in ``project/authentication.py``
 
-  
+
 14.1.4
 ======
 

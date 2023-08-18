@@ -342,8 +342,8 @@ def test_patch_delete_fields_restricted_fields_submitter(content, testapp, submi
     url = content['@id']
     res = testapp.get(url)
     assert res.json['protected'] == 'protected default'
-    # res1 = submitter_testapp.patch_json(url + "?delete_fields=protected", {}, status=200)
-    # assert res1.json['@graph'][0]['protected'] == 'protected default'
+    res1 = submitter_testapp.patch_json(url + "?delete_fields=protected", {}, status=200)
+    assert res1.json['@graph'][0]['protected'] == 'protected default'
 
     # submitter cannot change value
     submitter_testapp.patch_json(url, {'protected': 'protected new'}, status=422)
