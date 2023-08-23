@@ -2775,11 +2775,22 @@ def parse_exception(e, aliases):
             for error in resp_dict["errors"]
         ]
         for error in resp_list:
-            # if error is caused by linkTo to item not submitted yet but in aliases list,
-            # remove that error
+            # If this error is caused by a linkTo, in snovault/schema_utils.py, to an
+            # item not yet submitted but is in the aliases list, then remove/ignore the error.
+            # Example error: Schema: related_files.0.file - 'cgap-core:f1_R2.fastq.gz' not found
             if "not found" in error and error.split("'")[1] in aliases:
                 continue
             else:
+                # If this error is caused by a KeyError in normalize_link, in snovault/schema_validation.py,
+                # but the item is in the aliases list, then remove/ignore the error. 
+                # Example error: Schema: related_files.0 - Unable to resolve link: cgap-core:f1_R2.fastq.gz
+                # Added: 2023-08-23
+                resolve_link_error_pattern = r"^.*Unable to resolve link:\s*(.*)$"
+                resolve_link_error_match = re.search(resolve_link_error_pattern, error)
+                if resolve_link_error_match:
+                    resolve_link_error_item = resolve_link_error_match.group(1)
+                    if resolve_link_error_item in aliases:
+                        continue
                 if error.startswith("Schema: "):
                     error = error[8:]
                 if error.index("- ") > 0:
