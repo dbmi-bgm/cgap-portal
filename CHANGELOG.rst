@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+14.2.1
+======
+
+* Fix in ``parse_exception`` in ``submit.py`` to catch/ignore additional/new
+  error message from ``normalize_links`` in ``snovault/schema_validation.py``;
+  manifested as error from ``submit-metadata``.
+
+
 14.2.0
 ======
 
