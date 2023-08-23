@@ -5,7 +5,8 @@ cgap-portal
 ----------
 Change Log
 ----------
-14.0.3
+
+14.2.1
 ======
 `PR 723: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
 
