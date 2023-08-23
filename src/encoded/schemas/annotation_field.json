@@ -1,8 +1,8 @@
 {
     "title": "Annotation Field",
     "description": "Schema for submitting an annotation field",
-    "id": "/profiles/annotation_field.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/annotation_field.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "field_name",

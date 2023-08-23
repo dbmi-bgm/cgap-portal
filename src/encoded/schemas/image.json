@@ -1,8 +1,8 @@
 {
     "title": "Image",
     "description": "Image file and caption.",
-    "id": "/profiles/image.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/image.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",

@@ -13,6 +13,49 @@ Change Log
 * Changed green color for links to a less fluorescent green
 
 
+14.2.0
+======
+
+* Removes ``jsonschema_serialize_fork``, updating schema format version
+* Refactors registration restriction to customization in ``project/authentication.py``
+
+
+14.1.4
+======
+
+* Bump cohort browser version
+
+
+14.1.3
+======
+`PR 732: Fix for LinkTo items in ItemDetailPane <https://github.com/dbmi-bgm/cgap-portal/pull/732>`_
+
+* Updated python dependencies (pyyaml and cython)
+* Bump SPC with conditional for nested object arrays (without corresponding childKeys values)
+* Update SPC to 0.1.68b2
+
+
+14.1.2
+======
+* Fix for Germline case button link (ensure it points to proband-only cases)
+
+
+14.1.1
+======
+`PR 743: Purge permissions fix <https://github.com/dbmi-bgm/cgap-portal/pull/743>`_
+
+* Update set_user_info_property to true to allow admins to purge items
+* Bring in updated snovault to fix impersonation bug
+
+
+14.1.0
+======
+`PR 739: Bm babel updates <https://github.com/dbmi-bgm/cgap-portal/pull/739>`_
+
+* Add and update a bunch of babel-related dependencies to match Fourfront and SMaHT
+* Update babel config to make use of new plugins
+
+
 14.0.2
 ======
 * Polyfill buffer

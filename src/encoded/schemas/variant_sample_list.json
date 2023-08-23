@@ -1,8 +1,8 @@
 {
     "title": "Variant Sample List",
     "description": "List of Variant Samples Saved to a Case",
-    "id": "/profiles/variant_sample_list.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/variant_sample_list.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",

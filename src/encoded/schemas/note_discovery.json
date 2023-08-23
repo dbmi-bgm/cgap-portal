@@ -1,8 +1,8 @@
 {
     "title": "Discovery Note",
     "description": "Note containing a gene/variant discovery-oriented interpretation of a VariantSample, Variant, or Gene",
-    "id": "/profiles/note_discovery.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/note_discovery.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",
