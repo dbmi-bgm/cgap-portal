@@ -50,7 +50,9 @@ cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
 dcicsnovault = "^10.0.2"
-dcicutils = "^7.7.0"
+dcicutils = "7.10.0.1b1"
+#dcicutils = "7.8.0.2b2"
+#dcicutils = "^7.7.0"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -88,7 +90,8 @@ python-dateutil = "^2.8.2"
 # python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 python_magic = ">=0.4.24,<1"
 pytz = ">=2021.3"
-PyYAML = "5.3.1"
+PyYAML = "^6.0.1"
+#PyYAML = "5.3.1"
 rdflib = "^4.2.2"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
 # repoze.debug is needed to use pyramid.pserve - Will Feb 17 2022
@@ -122,7 +125,6 @@ WSGIProxy2 = "0.4.2"
 "zope.deprecation" = "^4.4.0"
 "zope.interface" = ">=4.7.2,<6"
 "zope.sqlalchemy" = "1.6"
-pyyaml = "5.3.1"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
