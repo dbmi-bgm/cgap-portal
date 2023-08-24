@@ -6,12 +6,16 @@ cgap-portal
 Change Log
 ----------
 
-14.2.1
+14.3.0
 ======
 
 * Fix in ``parse_exception`` in ``submit.py`` to catch/ignore additional/new
   error message from ``normalize_links`` in ``snovault/schema_validation.py``;
   manifested as error from ``submit-metadata``.
+* Added generate-local-access-key script (from snovault) to pyproject.toml;
+  orignally created for smaht-portal since early in development no way to
+  create an access-key normally using the UI; but generall useful/convenient.
+* Removed types/access_key.py and schemas/access_key.json as the ones in snovault are sufficient.
 
 
 14.2.0
