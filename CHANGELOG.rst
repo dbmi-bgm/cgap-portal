@@ -8,10 +8,10 @@ Change Log
 
 14.2.1
 ======
-`PR 723: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
 
-* Fixed bug occurring in collapsible text box
-* Changed green color for links to a less fluorescent green
+* Fix in ``parse_exception`` in ``submit.py`` to catch/ignore additional/new
+  error message from ``normalize_links`` in ``snovault/schema_validation.py``;
+  manifested as error from ``submit-metadata``.
 
 
 14.2.0
