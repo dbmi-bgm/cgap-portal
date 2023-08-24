@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+14.2.2
+======
+`PR 741: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
+
+* Fixed bug occurring in collapsible text box
+* Changed green color for links to a less fluorescent green
+
+
 14.2.1
 ======
 
