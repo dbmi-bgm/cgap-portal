@@ -13,6 +13,7 @@ Change Log
   orignally created for smaht-portal since early in development no way to
   create an access-key normally using the UI; but generall useful/convenient.
 * Removed types/access_key.py and schemas/access_key.json as the ones in snovault are sufficient.
+* Changed pyyaml version to 6.0.
 
 
 14.2.1
