@@ -468,8 +468,7 @@ export const columnExtensionMap = {
       "title": "Case Notes",
       'widthMap' : { 'lg' : 420, 'md' : 375, 'sm' : 300 },
       render: function renderNotesColumn(result, parentPropt) {
-        const { note } = result;
-        return <CaseNotesColumn note={note} />;
+        return <CaseNotesColumn result={result}/>;
       },
     },
 };
