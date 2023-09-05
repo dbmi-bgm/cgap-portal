@@ -1,8 +1,8 @@
 {
     "title": "MetaWorkflow",
     "description": "Schema for a meta workflow that connects a set of computational analysis workflows",
-    "id": "/profiles/meta_workflow.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/meta_workflow.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "title",

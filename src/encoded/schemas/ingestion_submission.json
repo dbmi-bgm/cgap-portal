@@ -1,8 +1,8 @@
 {
     "title": "Ingestion Submission",
     "description": "Schema for metadata related to ingestion requests submitted to CGAP.",
-    "id": "/profiles/ingestion_submission.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/ingestion_submission.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "ingestion_type",

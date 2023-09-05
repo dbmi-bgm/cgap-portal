@@ -1,5 +1,5 @@
 from dcicutils.misc_utils import ignored
-from jsonschema_serialize_fork import NO_DEFAULT
+from snovault.schema_validation import NO_DEFAULT
 from snovault.schema_utils import server_default
 from snovault.server_defaults import (  # noqa: F401 (imported but unused)
     add_last_modified,

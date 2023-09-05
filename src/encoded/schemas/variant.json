@@ -1,5 +1,5 @@
 {
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",
@@ -17,7 +17,7 @@
     "additionalProperties": false,
     "title": "Variants",
     "description": "Schema for variants",
-    "id": "/profiles/variant.json",
+    "$id": "/profiles/variant.json",
     "mixinProperties": [
         {
             "$ref": "mixins.json#/schema_version"

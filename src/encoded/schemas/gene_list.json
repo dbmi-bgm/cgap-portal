@@ -1,8 +1,8 @@
 {
     "title": "Gene List",
     "description": "Groups of genes that are relevant for a disease or condition",
-    "id": "/profiles/gene_list.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/gene_list.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "institution",
