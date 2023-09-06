@@ -14,12 +14,11 @@
    :target: https://cgap-portal.readthedocs.io/en/latest/
    :alt: Documentation Status
 
-.. image:: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiMWtFYjJTeXkzcXZVYkpmbkd3VUlOQ0pSTnlLRGloVENJcitGS1g1RTV1THgxQkc3M2tDY0NFUFUxOXRBeS92dUNtbXdRZU5YWEkzbUhaMm1lUlNDZ2NZPSIsIml2UGFyYW1ldGVyU3BlYyI6Ijl6OUZkY3JvaWlyZDduUnEiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
-   :alt: CodeBuild Status
-
 
 Welcome to CGAP!
 ================
+
+CGAP is the Computational Genome Analysis Platform.
 
 We are a team of scientists, clinicians, and developers
 who aim to streamline the clinical genetics workflow.
@@ -37,7 +36,7 @@ who aim to streamline the clinical genetics workflow.
 * CGAP is an open source system under continuous development.
   For documentation, see
   `the CGAP Portal page at ReadTheDocs
-   <https://cgap-portal.readthedocs.io/en/latest/>`_.
+  <https://cgap-portal.readthedocs.io/en/latest/>`_.
 
 * For information about governance and other policies, see
   `the CGAP Governance repository
@@ -49,19 +48,19 @@ Repository Structure
 
 These are some important files and directories you might want to be aware of:
 
-    * ``.github/workflows/`` contains Github Action Workflows
-    * ``bin/`` contains a few legacy scripts, though most are in ``scripts/``
-    * ``deploy/docker`` contains containerization related scripts/configuration
-    * ``docs/ contains`` documentation
-    * ``scripts/`` contains misc scripts
-    * ``src/encoded/`` where the code is
-    * ``.dockerignore`` specifies paths ignored by the Dockerfile
-    * ``Dockerfile`` contains the Docker build instructions for the cgap-portal - see ``docker-production.rst``
-    * ``Makefile`` contains macros for common build operations - see ``make info``
-    * ``docker-compose.yml`` builds the new local deployment - see ``docker-local.rst``
-    * ``package.json`` and ``package-lock.json`` specify the front-end dependencies
-    * ``pyproject.toml`` and ``poetry.lock`` specify the back-end dependencies
-    * ``setup_eb.py`` performs final installation setup
+* ``.dockerignore`` specifies paths ignored by the Dockerfile
+* ``.github/workflows/`` contains Github Action Workflows
+* ``bin/`` contains a few legacy scripts, though most are in ``scripts/``
+* ``deploy/docker`` contains containerization related scripts/configuration
+* ``docker-compose.yml`` builds the new local deployment (see ``docker-local.rst``)
+* ``Dockerfile`` contains the Docker build instructions for the cgap-portal (see ``docker-production.rst``)
+* ``docs/ contains`` documentation
+* ``Makefile`` contains macros for common build operations (see ``make info``)
+* ``package.json`` and ``package-lock.json`` specify the front-end dependencies
+* ``pyproject.toml`` and ``poetry.lock`` specify the back-end dependencies
+* ``scripts/`` contains misc scripts
+* ``setup_eb.py`` performs final installation setup
+* ``src/encoded/`` where the code is
 
 
 Navigating core functionality (src/encoded/)
@@ -70,16 +69,16 @@ Navigating core functionality (src/encoded/)
 Top level files are modules that make up the core functionality of the back-end. Some modules differ greatly from or do
 not even exist in fourfront. Directories are outlined below.
 
-    * ``annotations/`` contains mapping table and ingestion related metadata
-    * ``commands/`` contains Python commands that can be run on the system from the command line
-    * ``docs/`` contains ReadTheDocs documentation
-    * ``ingestion/`` contains ingestion related code, such as mapping table intake and VCF processing
-    * ``schemas/`` contains the metadata schemas
-    * ``search/`` contains the search/filter_set APIs
-    * ``static/`` contains front-end code
-    * ``tests/`` contains back-end unit tests and insert data
-    * ``types/`` contains metadata type definitions
-    * ``upgrade/`` contains collection schema version upgraders
+* ``annotations/`` contains mapping table and ingestion related metadata
+* ``commands/`` contains Python commands that can be run on the system from the command line
+* ``docs/`` contains ReadTheDocs documentation
+* ``ingestion/`` contains ingestion related code, such as mapping table intake and VCF processing
+* ``schemas/`` contains the metadata schemas
+* ``search/`` contains the search/filter_set APIs
+* ``static/`` contains front-end code
+* ``tests/`` contains back-end unit tests and insert data
+* ``types/`` contains metadata type definitions
+* ``upgrade/`` contains collection schema version upgraders
 
 
 Related Repositories
@@ -88,10 +87,10 @@ Related Repositories
 Note that ``cgap-portal`` is bound on supporting functionality
 in numerous libaries, but importantly:
 
-    * **dcicsnovault**
-      [`pypi library <https://pypi.org/project/dcicsnovault/>`_]
-      [`source repo <https://github.com/4dn-dcic/snovault>`_]
+* **dcicsnovault**
+  [`pypi library <https://pypi.org/project/dcicsnovault/>`_]
+  [`source repo <https://github.com/4dn-dcic/snovault>`_]
 
-    * **dcicutils**
-      [`pypi library <https://pypi.org/project/dcicutils/>`_]
-      [`source repo <https://github.com/4dn-dcic/utils>`_]
+* **dcicutils**
+  [`pypi library <https://pypi.org/project/dcicutils/>`_]
+  [`source repo <https://github.com/4dn-dcic/utils>`_]
