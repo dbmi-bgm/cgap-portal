@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+14.2.3
+======
+
+* Update README.rst
+
+
 14.2.2
 ======
 `PR 741: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
