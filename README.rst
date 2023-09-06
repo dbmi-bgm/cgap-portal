@@ -14,7 +14,7 @@
    :target: https://cgap-portal.readthedocs.io/en/latest/
    :alt: Documentation Status
 
-.. image:: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVjRJaE5DeHE3a0tjcGcwb01FaDZvSU5Id056amkwazV0UWlJM29IaEM2VWVlMm5INjhKS1dMVTRCMVAwSVl0RmFJR05zOHVHZUFrWStKdzBaV0VKZm04PSIsIml2UGFyYW1ldGVyU3BlYyI6Im1mMVFVOW10dFltQ2dLQkIiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
+.. image:: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiMWtFYjJTeXkzcXZVYkpmbkd3VUlOQ0pSTnlLRGloVENJcitGS1g1RTV1THgxQkc3M2tDY0NFUFUxOXRBeS92dUNtbXdRZU5YWEkzbUhaMm1lUlNDZ2NZPSIsIml2UGFyYW1ldGVyU3BlYyI6Ijl6OUZkY3JvaWlyZDduUnEiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
    :alt: CodeBuild Status
 
 
@@ -79,7 +79,7 @@ not even exist in fourfront. Directories are outlined below.
     * ``static/`` contains front-end code
     * ``tests/`` contains back-end unit tests and insert data
     * ``types/`` contains metadata type definitions
-    * ``upgrade/`` contains collection schema version upgraders - are not functioning as intended currently
+    * ``upgrade/`` contains collection schema version upgraders
 
 
 Related Repositories
