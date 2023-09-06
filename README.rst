@@ -3,38 +3,56 @@
 ========================
 
 .. image:: https://github.com/dbmi-bgm/cgap-portal/actions/workflows/main.yml/badge.svg
+   :target: https://github.com/dbmi-bgm/cgap-portal/actions
+   :alt: Build Status
+
+.. image:: https://coveralls.io/repos/github/dbmi-bgm/cgap-portal/badge.svg
+    :target: https://coveralls.io/github/dbmi-bgm/cgap-portal
+    :alt: Coverage Percentage
 
 .. image:: https://readthedocs.org/projects/cgap-portal/badge/?version=latest
+   :target: https://cgap-portal.readthedocs.io/en/latest/
+   :alt: Documentation Status
 
 .. image:: https://codebuild.us-east-1.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiVjRJaE5DeHE3a0tjcGcwb01FaDZvSU5Id056amkwazV0UWlJM29IaEM2VWVlMm5INjhKS1dMVTRCMVAwSVl0RmFJR05zOHVHZUFrWStKdzBaV0VKZm04PSIsIml2UGFyYW1ldGVyU3BlYyI6Im1mMVFVOW10dFltQ2dLQkIiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=master
+   :alt: CodeBuild Status
 
 
-Welcome to CGAP! We are a team of scientists, clinicians, and developers who aim to streamline the clinical genetics workflow. The following locations are different deployments of our data portal:
+Welcome to CGAP!
+================
 
-* `Production  <http://cgap.hms.harvard.edu/>`_ for the stable release
-* `cgapdev <http://fourfront-cgapdev.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for data model and back-end development
-* `cgaptest <http://fourfront-cgaptest.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for front-end and UX development
-* `cgapwolf <http://fourfront-cgapwolf.9wzadzju3p.us-east-1.elasticbeanstalk.com/>`_ for workflow development
+We are a team of scientists, clinicians, and developers
+who aim to streamline the clinical genetics workflow.
 
-Be warned that features are under active development and may not be stable! Visit the production deployment for the best experience. For installation and more information on getting started, see our `documentation page <https://cgap-portal.readthedocs.io/en/latest/index.html>`_.
+* For useful information about CGAP's features,
+  see `the CGAP informational site <https://cgap.hms.harvard.edu>`_.
 
-Note that at this time, CGAP is operating in hybrid model where some environments are deployed to AWS ElasticBeanstalk and others are deployed to AWS Elastic Container Service. The BS deployments are referred to as "legacy deployments" and the ECS deployments are referred to as "alpha deployments".
+* CGAP is orchestrated technology capable of being easily deployed
+  in hospital setting. Our flagship site is
+  `CGAP-MGB <https://cgap-mgb.hms.harvard.edu">`_.
 
-For information on how to run CGAP with Docker, see `here. <./docs/source/docker-local.rst>`_
+  For information on how to set your hospital up to use this technology,
+  `contact us <mailto:cgap-support@hms-dbmi.atlassian.net>`_.
 
-For information on CGAP-Docker in production, see `here. <./docs/source/docker-production.rst>`_
+* CGAP is an open source system under continuous development.
+  For documentation, see
+  `the CGAP Portal page at ReadTheDocs
+   <https://cgap-portal.readthedocs.io/en/latest/>`_.
 
-Navigating this Repository
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+* For information about governance and other policies, see
+  `the CGAP Governance repository
+  <https://github.com/dbmi-bgm/cgap-governance>`_.
 
-Important directories/files are outlined below.
+
+Repository Structure
+--------------------
+
+These are some important files and directories you might want to be aware of:
 
     * ``.github/workflows/`` contains Github Action Workflows
-    * ``.ebextensions/`` contains the Elastic Beanstalk provisioning scripts
-    * ``bin/`` contains the few remaining executables
+    * ``bin/`` contains a few legacy scripts, though most are in ``scripts/``
     * ``deploy/docker`` contains containerization related scripts/configuration
     * ``docs/ contains`` documentation
-    * ``parts/`` contains WSGI entry points for the Beanstalk setup
     * ``scripts/`` contains misc scripts
     * ``src/encoded/`` where the code is
     * ``.dockerignore`` specifies paths ignored by the Dockerfile
@@ -45,8 +63,9 @@ Important directories/files are outlined below.
     * ``pyproject.toml`` and ``poetry.lock`` specify the back-end dependencies
     * ``setup_eb.py`` performs final installation setup
 
-Navigating src/encoded/
-^^^^^^^^^^^^^^^^^^^^^^^
+
+Navigating core functionality (src/encoded/)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Top level files are modules that make up the core functionality of the back-end. Some modules differ greatly from or do
 not even exist in fourfront. Directories are outlined below.
@@ -61,3 +80,18 @@ not even exist in fourfront. Directories are outlined below.
     * ``tests/`` contains back-end unit tests and insert data
     * ``types/`` contains metadata type definitions
     * ``upgrade/`` contains collection schema version upgraders - are not functioning as intended currently
+
+
+Related Repositories
+~~~~~~~~~~~~~~~~~~~~
+
+Note that ``cgap-portal`` is bound on supporting functionality
+in numerous libaries, but importantly:
+
+    * **dcicsnovault**
+      [`pypi library <https://pypi.org/project/dcicsnovault/>`_]
+      [`source repo <https://github.com/4dn-dcic/snovault>`_]
+
+    * **dcicutils**
+      [`pypi library <https://pypi.org/project/dcicutils/>`_]
+      [`source repo <https://github.com/4dn-dcic/utils>`_]
