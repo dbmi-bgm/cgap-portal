@@ -6,12 +6,47 @@ cgap-portal
 Change Log
 ----------
 
-14.2.0
+14.3.0
 ======
 `PR 746: Bm node18 upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/746>`_
 
 * Update Docker's MakeFile to use Node version 18.17.0
 * Update Github workflows to use Node version 18.17.0
+
+
+14.2.3
+======
+
+* Update README.rst
+
+
+14.2.2
+======
+`PR 741: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
+
+* Fixed bug occurring in collapsible text box
+* Changed green color for links to a less fluorescent green
+
+
+14.2.1
+======
+
+* Fix in ``parse_exception`` in ``submit.py`` to catch/ignore additional/new
+  error message from ``normalize_links`` in ``snovault/schema_validation.py``;
+  manifested as error from ``submit-metadata``.
+
+
+14.2.0
+======
+
+* Removes ``jsonschema_serialize_fork``, updating schema format version
+* Refactors registration restriction to customization in ``project/authentication.py``
+
+
+14.1.4
+======
+
+* Bump cohort browser version
 
 
 14.1.3

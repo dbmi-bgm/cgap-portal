@@ -1,8 +1,8 @@
 {
     "title": "Standard Note",
     "description": "Schema for standard note items",
-    "id": "/profiles/note_standard.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/note_standard.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "project",

@@ -1,8 +1,8 @@
 {
     "title": "Variant Consequence",
     "description": "Consequence of a Variant - particularly in terms of consequence to transcript",
-    "id": "/profiles/variant_consequence.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/variant_consequence.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "var_conseq_name",

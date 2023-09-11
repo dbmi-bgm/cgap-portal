@@ -1,8 +1,8 @@
 {
     "title": "NoteTechnicalReview",
     "description": "Schema for technical review of variants.",
-    "id": "/profiles/note_technical_review.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/note_technical_review.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "identifyingProperties": [
         "uuid",

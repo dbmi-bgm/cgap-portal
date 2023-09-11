@@ -1,7 +1,7 @@
 {
     "title": "Project",
-    "id": "/profiles/project.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/project.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "required": [
         "name",
         "title"

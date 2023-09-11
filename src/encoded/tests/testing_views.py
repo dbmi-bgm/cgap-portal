@@ -153,7 +153,7 @@ class TestingLinkTarget(Item):
         "type": "array",
         "items": {
             "type": ['string', 'object'],
-            "linkTo": "TestingLinkSourceSno",
+            "linkTo": "TestingLinkSource",
         },
     })
     def reverse(self, request):
@@ -181,7 +181,6 @@ class TestingPostPutPatch(Item):
             "schema_version": {
                 "type": "string",
                 "pattern": "^\\d+(\\.\\d+)*$",
-                "requestMethod": [],
                 "default": "1",
             },
             "uuid": {
@@ -258,7 +257,7 @@ class TestingDependencies(Item):
     item_type = 'testing_dependencies'
     schema = {
         'type': 'object',
-        'dependencies': {
+        'dependentRequired': {
             'dep1': ['dep2'],
             'dep2': ['dep1'],
         },

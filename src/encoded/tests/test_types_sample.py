@@ -28,7 +28,7 @@ def sample_one(project, institution):
         "project": project["@id"],
         "institution": institution["@id"],
         "specimen_type": "peripheral blood",
-        "date_received": "2018-12-1",
+        "date_received": "2018-12-01",
     }
 
 
@@ -38,7 +38,7 @@ def sample_two(project, institution):
         "project": project["@id"],
         "institution": institution["@id"],
         "specimen_type": "saliva",
-        "date_received": "2015-12-7",
+        "date_received": "2015-12-07",
     }
 
 
@@ -48,7 +48,7 @@ def sample_no_project(institution, MIndividual):
         "project": "does not exist",
         "institution": institution["@id"],
         "specimen_type": "tissue",
-        "date_received": "2015-12-7",
+        "date_received": "2015-12-07",
     }
 
 
