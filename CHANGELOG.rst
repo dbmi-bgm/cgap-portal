@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+14.3.0
+======
+`PR 746: Bm node18 upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/746>`_
+
+* Update Docker's MakeFile to use Node version 18.17.0
+* Update Github workflows to use Node version 18.17.0
+
+
 14.2.3
 ======
 
