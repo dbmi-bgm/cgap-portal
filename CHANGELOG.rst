@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+14.3.1
+======
+`PR 753: Auth0 Symlink Bugfix <https://github.com/dbmi-bgm/cgap-portal/pull/753>`_
+
+* Fix broken auth0-lock when symlinking SPC on local deployment
+
+
 14.3.0
 ======
 `PR 746: Bm node18 upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/746>`_
