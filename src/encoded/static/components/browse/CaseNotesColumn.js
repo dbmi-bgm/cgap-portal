@@ -4,12 +4,13 @@
  *        - Should the note be removed?
  *        - Should the note's text simply be empty?
  *   - Handle latency of note item PATCH
+ *        - datastore=database
  *        - Use local storage to cache the new string while server updates
  *        - Show warning detailing that it will take a few minutes to update
  *   - Show Red outline icon in the column header when changes are unsaved
  */
 
-import React, { useState, useRef, useEffect, forwardRef } from "react";
+import React, { useState, forwardRef } from "react";
 import { Popover, OverlayTrigger } from "react-bootstrap";
 import { LocalizedTime } from "@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
@@ -24,23 +25,20 @@ const CaseNotesPopover = forwardRef(({
   ...popoverProps
 }, ref) => {
 
-  // Information about last saved note
-  const last_text_edited = note?.last_text_edited ?? null;
-  const text_edited_by = last_text_edited?.text_edited_by ?? null;
-  const prevDate = last_text_edited?.date_text_edited ?? "";
-  const prevEditor = text_edited_by?.display_title ?? "";
-  
+  const prevDate = lastSavedText.date;
+  const prevEditor = lastSavedText.user;
+
   return (
     <Popover data-popover-category="notes" placement="bottom" {...popoverProps} ref={ref}>
       <Popover.Title as="h3">Case Notes</Popover.Title>
       <Popover.Content>
         {
-          last_text_edited ?
+          lastSavedText.date ?
             <p className="last-saved small">
               Last Saved: <LocalizedTime 
                 timestamp={prevDate} 
                 formatType="date-time-sm" 
-              /> by {prevEditor}
+              /> { prevEditor && `by ${prevEditor}` }
             </p>
             :
             null
@@ -55,9 +53,13 @@ const CaseNotesPopover = forwardRef(({
           type="button" 
           className="btn btn-primary mr-04 w-100"
           onClick={() => handleNoteSave(currentText) }
-          disabled={lastSavedText === currentText ? "disabled" : "" }
+          disabled={lastSavedText.text === currentText ? "disabled" : "" }
         >
-          {lastSavedText === currentText ? "Note saved - edit note to save again" : "Save Note" }
+          {/* <i className="icon icon-spin icon-circle-notch fas" /> */}
+          {
+            // Prevent showing "Note saved..." message if no note exists
+            (lastSavedText.text === currentText) && (lastSavedText.date === "") ? "Note saved - edit note to save again" : "Save Note" 
+          }
         </button>
       </Popover.Content>
     </Popover>
@@ -89,14 +91,17 @@ const CaseNotesButton = ({
     }
   >
     <button className="case-notes-button">
-      <i className={`icon text-larger icon-fw icon-sticky-note ${ lastSavedText === "" ? 'far' : 'fas' } text-muted`}></i>
+      <i className={`icon text-larger icon-fw icon-sticky-note ${ lastSavedText.text === "" ? 'far' : 'fas' } text-muted`}></i>
       {
-        currentText !== lastSavedText && <i
-          className="status-indicator-dot"
-          data-status={"note-dot-unsaved"}
-          data-tip={"Unsaved changes on this note."}
-          data-html
-        />
+        currentText === lastSavedText.text ?
+          null
+          :
+          <i
+            className="status-indicator-dot"
+            data-status={"note-dot-unsaved"}
+            data-tip={"Unsaved changes on this note."}
+            data-html
+          />
       }
     </button>
   </OverlayTrigger>
@@ -112,8 +117,16 @@ const CaseNotesButton = ({
  * [lastSavedText] to the empty string.
  */
 export const CaseNotesColumn = ({ result }) => {
-  const [lastSavedText, setLastSavedText] = useState(result?.note?.note_text ?? "");
-  const [currentText, setCurrentText] = useState(lastSavedText);
+  // Initial state passed to children
+  const [lastSavedText, setLastSavedText] = useState({
+    text: result?.note?.note_text ?? "",
+    date: result?.note?.last_text_edited?.date_text_edited ?? null,
+    user: result?.note?.last_text_edited?.text_edited_by?.display_title ?? "",
+    userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? ""
+  });
+
+  const [currentText, setCurrentText] = useState(lastSavedText.text);
+
 
   const caseID = result['@id'];
   const noteID = result?.note ? result.note['@id'] : "";
@@ -133,6 +146,8 @@ export const CaseNotesColumn = ({ result }) => {
      * 3. A note has been added, and it has text.
      */
 
+
+
     // if (currentText !== "") {
       let payload = {
         "note_text": currentText,
@@ -141,10 +156,12 @@ export const CaseNotesColumn = ({ result }) => {
       }
       
       /**
-       * IF: the last saved text is the empty string, POST a new note and
-       * PATCH it to this case
+       * IF: the last saved text is the empty string, 
+       * 1. POST a new note
+       * 2. PATCH the corresponding case to link to the new note
       */
       if (noteID === "") {
+        // 1.POST a new note
         ajax.promise("/notes-standard/", "POST", {}, JSON.stringify(payload)).then((res) => {
           // Save the note item into the corresponding project
           const newNoteId = res['@graph'][0]['@id'];
@@ -153,12 +170,25 @@ export const CaseNotesColumn = ({ result }) => {
             throw new Error("No note-standard @ID returned.");
           }
           else {
-            // Patch the current case to link to this note item
+
+
+            // 2. PATCH the corresponding case to link to the new note
             ajax.promise(caseID, "PATCH", {}, JSON.stringify({
               "note": "" + newNoteId
-            })).then((res) => {
-              if (res.status === "success") {
-                setLastSavedText(currentText)
+            })).then((patchRes) => {
+
+              if (patchRes.status === "success") {
+
+                // If the user has the same uuid (after extracting the uuid), don't change the user field
+                const new_userId = res['@graph'][0]?.last_text_edited.text_edited_by.split("/")[2];
+                let new_user = (lastSavedText.userId === new_userId) ? lastSavedText.user : "";
+
+                setLastSavedText({
+                  text: currentText,
+                  date: res['@graph'][0].last_text_edited.date_text_edited,
+                  user: new_user,
+                  userId: new_userId
+                });
               }
             });
           }
@@ -170,9 +200,18 @@ export const CaseNotesColumn = ({ result }) => {
       else {
         ajax.promise(noteID, "PATCH", {}, JSON.stringify({
           "note_text": currentText
-        })).then((res) => {
-          if (res.status === "success") {
-            setLastSavedText(currentText)
+        })).then((patchRes) => {
+          if (patchRes.status === "success") {
+            // If the user has the same uuid (after extracting the uuid), don't change the user field
+            const new_userId = patchRes['@graph'][0].last_text_edited.text_edited_by.split("/")[2];
+            let new_user = (lastSavedText.userId === new_userId) ? lastSavedText.user : new_userId;
+
+            setLastSavedText({
+              text: patchRes['@graph'][0].note_text,
+              date: patchRes['@graph'][0].last_text_edited.date_text_edited,
+              user: new_user,
+              userId: new_userId
+            });
           }
         }).catch((e) => {
           console.log("Error: ", e);
@@ -192,7 +231,7 @@ export const CaseNotesColumn = ({ result }) => {
         setCurrentText={setCurrentText}
       />
       {/* Render either empty string or note.note_text */}
-      <p className="case-notes-text">{lastSavedText}</p> 
+      <p className="case-notes-text">{lastSavedText.text}</p> 
     </div>
   );
 };
