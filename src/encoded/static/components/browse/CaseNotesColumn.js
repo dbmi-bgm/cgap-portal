@@ -10,7 +10,7 @@
  *   - Show Red outline icon in the column header when changes are unsaved
  */
 
-import React, { useState, forwardRef } from "react";
+import React, { useState, useRef, forwardRef } from "react";
 import { Popover, OverlayTrigger } from "react-bootstrap";
 import { LocalizedTime } from "@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
@@ -22,6 +22,7 @@ const CaseNotesPopover = forwardRef(({
   handleNoteSave,
   currentText,
   setCurrentText,
+  buttonRef,
   ...popoverProps
 }, ref) => {
 
@@ -52,13 +53,17 @@ const CaseNotesPopover = forwardRef(({
         <button 
           type="button" 
           className="btn btn-primary mr-04 w-100"
+          ref={buttonRef}
           onClick={() => handleNoteSave(currentText) }
           disabled={lastSavedText.text === currentText ? "disabled" : "" }
         >
           {/* <i className="icon icon-spin icon-circle-notch fas" /> */}
           {
             // Prevent showing "Note saved..." message if no note exists
-            (lastSavedText.text === currentText) && (lastSavedText.date === "") ? "Note saved - edit note to save again" : "Save Note" 
+            lastSavedText.date ? 
+              lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
+              :
+              "Save Note"
           }
         </button>
       </Popover.Content>
@@ -74,7 +79,8 @@ const CaseNotesButton = ({
   lastSavedText, 
   handleNoteSave, 
   currentText, 
-  setCurrentText
+  setCurrentText,
+  buttonRef
 }) => (
   <OverlayTrigger 
     trigger="click"  
@@ -87,6 +93,7 @@ const CaseNotesButton = ({
         handleNoteSave={handleNoteSave}
         currentText={currentText}
         setCurrentText={setCurrentText}
+        buttonRef={buttonRef}
       />
     }
   >
@@ -126,29 +133,39 @@ export const CaseNotesColumn = ({ result }) => {
   });
 
   const [currentText, setCurrentText] = useState(lastSavedText.text);
+  
+  // Create a ref to pass down to the "save" button
+  const buttonRef = useRef(null);
 
 
   const caseID = result['@id'];
   const noteID = result?.note ? result.note['@id'] : "";
 
   /**
-   * Function for patching the note item for using the current value 
-   * in the textarea box, and triggering the rerender of the component.
+   * handleNoteSave executes a request to update the NOTE and CASE
+   * associate with this component.
+   * 
+   * If there is no note attached to this case:
+   *    - Executes a POST request for NOTE
+   *    - Executes a PATCH request for CASE to link to NOTE
+   * If there is an exisitng note:
+   *    - Executes a PATCH request for NOTE to update the text
+   * If there is an existing note AND [currentText] is the empty string
+   *    - Executes a DELETE request for the NOTE item attached
+   * 
+   * Note: The save button who triggers this function is enabled iff
+   * [currentText] !== [lastSavedText.text]
    */
   const handleNoteSave = () => {
+    // Replace button text with loader until the request completes (re-render)
+    buttonRef.current.innerHTML = `<i class="icon icon-spin icon-circle-notch fas" />`;
+
     /**
-     * There are three cases to consider:
-     * 1. No note has NOT been added, thus there is nothing to render
-     * 2. A note has been added, but it is currently the empty string
-     *    - When a user attempts to PATCH a note with an empty string, 
-     *      the existing note should be modified instead of deleting
-     *      the attached note altogether.
-     * 3. A note has been added, and it has text.
+     * This the current text in the textarea input is not 
+     * the empty string, which should be dealt with separately
      */
+    if (currentText !== "") {
 
-
-
-    // if (currentText !== "") {
       let payload = {
         "note_text": currentText,
         "project": result.project['@id'],
@@ -170,7 +187,6 @@ export const CaseNotesColumn = ({ result }) => {
             throw new Error("No note-standard @ID returned.");
           }
           else {
-
 
             // 2. PATCH the corresponding case to link to the new note
             ajax.promise(caseID, "PATCH", {}, JSON.stringify({
@@ -217,7 +233,27 @@ export const CaseNotesColumn = ({ result }) => {
           console.log("Error: ", e);
         });
       }
-    // }
+    }
+    /** 
+     * [currentText] is the empty string and we should delete the note item
+     * that is attached to this case item
+     * 
+     * TODO: remove the link to the note with [noteId] on the case
+    */
+    else {
+      ajax.promise(noteID, "DELETE", {}, JSON.stringify()).then((deleteRes) => {
+        if (deleteRes.status === "success") {
+          setLastSavedText({
+            text: "",
+            date: "",
+            user: "",
+            userId: ""
+          });
+        }
+      }).catch((e) => {
+        console.log("Error: ", e);
+      });
+    }
   }
 
   return (
@@ -229,6 +265,7 @@ export const CaseNotesColumn = ({ result }) => {
         handleNoteSave={handleNoteSave}
         currentText={currentText}
         setCurrentText={setCurrentText}
+        buttonRef={buttonRef}
       />
       {/* Render either empty string or note.note_text */}
       <p className="case-notes-text">{lastSavedText.text}</p> 
