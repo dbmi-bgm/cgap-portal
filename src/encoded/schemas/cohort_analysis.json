@@ -1,8 +1,8 @@
 {
     "title": "Cohort Analysis",
     "description": "Case-control analysis of samples",
-    "id": "/profiles/cohort_analysis.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/cohort_analysis.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "project",
@@ -91,6 +91,12 @@
                 "type": "string",
                 "linkTo": "Sample"
             }
+        }
+    },
+    "columns": {
+        "samples.individual": {
+            "title": "Individual ID(s)",
+            "order": 20
         }
     }
 }

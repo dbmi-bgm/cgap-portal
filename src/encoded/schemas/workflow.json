@@ -1,8 +1,8 @@
 {
     "title": "Workflow",
     "description": "Schema for submitting a computational analysis workflow that is composed of analysis step(s).",
-    "id": "/profiles/workflow.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/workflow.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "title",
@@ -316,12 +316,12 @@
                         }
                     },
                     "secondary_file_formats": {
-                        "title": "secondary file formats",
-                        "description": "formats for secondary files",
+                        "title": "Secondary File Formats",
+                        "description": "Formats for secondary files",
                         "type": "array",
                         "items": {
-                            "title": "secondary_file_format",
-                            "description": "formats for secondary file",
+                            "title": "Secondary File Format",
+                            "description": "Format for secondary file",
                             "type": "string",
                             "linkTo": "FileFormat"
                         }

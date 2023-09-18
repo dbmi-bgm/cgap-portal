@@ -1,8 +1,8 @@
 {
     "title": "Meta Workflow Run",
     "description": "Schema for submitting metadata on the meta workflow executation and tracking",
-    "id": "/profiles/meta_workflow_run.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/meta_workflow_run.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "meta_workflow",

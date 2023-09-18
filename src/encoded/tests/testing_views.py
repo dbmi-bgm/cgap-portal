@@ -153,20 +153,25 @@ class TestingLinkTarget(Item):
         "type": "array",
         "items": {
             "type": ['string', 'object'],
-            "linkTo": "TestingLinkSourceSno",
+            "linkTo": "TestingLinkSource",
         },
     })
     def reverse(self, request):
         return self.rev_link_atids(request, "reverse")
 
 
+TESTING_POST_PUT_PATCH_ACL = [(Allow, 'group.submitter', ['add', 'edit', 'view'])]
+
+
 @collection(
     'testing-post-put-patch',
-    acl=[
-        (Allow, 'group.submitter', ['add', 'edit', 'view']),
-    ],
+    acl=TESTING_POST_PUT_PATCH_ACL
 )
 class TestingPostPutPatch(Item):
+
+    def __acl__(self):
+        return TESTING_POST_PUT_PATCH_ACL
+
     item_type = 'testing_post_put_patch'
     schema = {
         'required': ['required'],
@@ -176,7 +181,6 @@ class TestingPostPutPatch(Item):
             "schema_version": {
                 "type": "string",
                 "pattern": "^\\d+(\\.\\d+)*$",
-                "requestMethod": [],
                 "default": "1",
             },
             "uuid": {
@@ -253,7 +257,7 @@ class TestingDependencies(Item):
     item_type = 'testing_dependencies'
     schema = {
         'type': 'object',
-        'dependencies': {
+        'dependentRequired': {
             'dep1': ['dep2'],
             'dep2': ['dep1'],
         },

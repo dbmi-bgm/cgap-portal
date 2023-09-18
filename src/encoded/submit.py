@@ -1226,37 +1226,39 @@ class SubmittedFilesParser:
     """Class to manage File item creation during submission."""
 
     # Schema constants
-    FILES = "files"
+    AT_ID = "@id"
     ALIASES = "aliases"
-    SAMPLES = "samples"
-    FAMILIES = "families"
-    RELATED_FILES = "related_files"
-    RELATIONSHIP_TYPE = "relationship_type"
-    PAIRED_WITH = "paired with"
-    FILE = "file"
-    FILE_FORMAT = "file_format"
-    EXTRA_FILE_FORMATS = "extrafile_formats"
-    FILE_NAME = "filename"
     EXTRA_FILES = "extra_files"
-    STANDARD_FILE_EXTENSION = "standard_file_extension"
-    OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
+    EXTRA_FILE_FORMATS = "extrafile_formats"
+    FAMILIES = "families"
+    FILE = "file"
+    FILES = "files"
+    FILE_FORMAT = "file_format"
+    FILE_NAME = "filename"
     GENOME_ASSEMBLY = "genome_assembly"
-    VARIANT_TYPE = "variant_type"
+    OTHER_ALLOWED_EXTENSIONS = "other_allowed_extensions"
     PAIRED_END = "paired_end"
     PAIRED_END_1 = "1"
     PAIRED_END_2 = "2"
-    AT_ID = "@id"
+    PAIRED_WITH = "paired with"
+    RELATED_FILES = "related_files"
+    RELATIONSHIP_TYPE = "relationship_type"
+    S3_LIFECYCLE_CATEGORY = "s3_lifecycle_category"
+    SAMPLES = "samples"
+    STANDARD_FILE_EXTENSION = "standard_file_extension"
+    VARIANT_TYPE = "variant_type"
 
     # Spreadsheet constants
-    GENOME_BUILD = "genome_build"
     CASE_FILES = "case_files"
+    GENOME_BUILD = "genome_build"
 
     # Class constants
     FILE_FORMAT_FASTQ_ATID = "/file-formats/fastq/"
+    FILE_NAME_REGEX = re.compile(r"^[\w+=,.@-]+$")
+    LIFECYCLE_POLICY = "long_term_access"
     PAIRED_END_PATTERN = r"([-_][rR]{number}[-_])|([_-][rR]{number}\.)"
     PAIRED_END_1_REGEX = re.compile(PAIRED_END_PATTERN.format(number=1))
     PAIRED_END_2_REGEX = re.compile(PAIRED_END_PATTERN.format(number=2))
-    FILE_NAME_REGEX = re.compile(r"^[\w+=,.@-]+$")
 
     def __init__(self, virtualapp, project_name):
         """Initialize class and set attributes.
@@ -1387,6 +1389,7 @@ class SubmittedFilesParser:
                 self.ALIASES: [file_alias],
                 self.FILE_FORMAT: file_format_atid,
                 self.FILE_NAME: submitted_file_name,
+                self.S3_LIFECYCLE_CATEGORY: self.LIFECYCLE_POLICY,
             }
             if genome_build:
                 file_properties[self.GENOME_ASSEMBLY] = genome_build
@@ -2772,11 +2775,22 @@ def parse_exception(e, aliases):
             for error in resp_dict["errors"]
         ]
         for error in resp_list:
-            # if error is caused by linkTo to item not submitted yet but in aliases list,
-            # remove that error
+            # If this error is caused by a linkTo, in snovault/schema_utils.py, to an
+            # item not yet submitted but is in the aliases list, then remove/ignore the error.
+            # Example error: Schema: related_files.0.file - 'cgap-core:f1_R2.fastq.gz' not found
             if "not found" in error and error.split("'")[1] in aliases:
                 continue
             else:
+                # If this error is caused by a KeyError in normalize_link, in snovault/schema_validation.py,
+                # but the item is in the aliases list, then remove/ignore the error. 
+                # Example error: Schema: related_files.0 - Unable to resolve link: cgap-core:f1_R2.fastq.gz
+                # Added: 2023-08-23
+                resolve_link_error_pattern = r"^.*Unable to resolve link:\s*(.*)$"
+                resolve_link_error_match = re.search(resolve_link_error_pattern, error)
+                if resolve_link_error_match:
+                    resolve_link_error_item = resolve_link_error_match.group(1)
+                    if resolve_link_error_item in aliases:
+                        continue
                 if error.startswith("Schema: "):
                     error = error[8:]
                 if error.index("- ") > 0:

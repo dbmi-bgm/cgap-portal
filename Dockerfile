@@ -21,7 +21,7 @@ ENV NGINX_USER=nginx \
     PIP_DISABLE_PIP_VERSION_CHECK=on \
     PIP_DEFAULT_TIMEOUT=100 \
     NVM_VERSION=v0.39.1 \
-    NODE_VERSION=16.14.0
+    NODE_VERSION=18.17.0
 
 # Configure Python3.7 venv
 ENV VIRTUAL_ENV=/opt/venv
@@ -43,13 +43,15 @@ RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates build-essential \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
     pip install --upgrade pip && \
-    pip install poetry==1.3.2 && \
+    pip install poetry==1.4.2 && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
     nvm alias default v${NODE_VERSION} && \
-    curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json && \
-    bash /install_nginx.sh && \
+    curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+
+# Install nginx
+RUN bash /install_nginx.sh && \
     chown -R nginx:nginx /opt/venv && \
     mkdir -p /home/nginx/cgap-portal && \
     mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \

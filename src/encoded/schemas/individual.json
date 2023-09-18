@@ -1,7 +1,7 @@
 {
     "title": "Individual",
-    "id": "/profiles/individual.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/individual.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "sex"
@@ -100,6 +100,7 @@
             "type": "array",
             "lookup": 40,
             "uniqueItems": true,
+            "additionalProperties": false,
             "items": {
                 "title": "Phenotypic Feature Info",
                 "type": "object",
@@ -136,6 +137,7 @@
             "title": "Disorders",
             "type": "array",
             "uniqueItems": true,
+            "additionalProperties": false,
             "items": {
                 "title": "Disorder Info",
                 "type": "object",

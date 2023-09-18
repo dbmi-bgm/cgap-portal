@@ -1,8 +1,8 @@
 {
     "title": "Somatic Analysis",
     "description": "Somatic analysis of samples",
-    "id": "/profiles/somatic_analysis.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/somatic_analysis.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "project",
@@ -72,6 +72,12 @@
         "accession": {
             "accessionType": "SS"
         },
+        "individual": {
+            "title": "Individual",
+            "description": "Individual for the analysis",
+            "type": "string",
+            "linkTo": "Individual"
+        },
         "samples": {
             "title": "Samples",
             "description": "Samples used in the analysis",
@@ -81,6 +87,38 @@
                 "type": "string",
                 "linkTo": "Sample"
             }
+        }
+    },
+    "facets": {
+        "project.display_title": {
+            "title": "Project",
+            "order": 10
+        },
+        "samples.workup_type": {
+            "title": "Sequencing",
+            "order": 20
+        }
+    },
+    "columns": {
+        "display_title": {
+            "title": "Analysis ID",
+            "order": 10
+        },
+        "individual.display_title": {
+            "title": "Individual ID",
+            "order": 20
+        },
+        "samples.tissue_type": {
+            "title": "Sample Types",
+            "order": 30
+        },
+        "samples.specimen_type": {
+            "title": "Sample Details",
+            "order": 50
+        },
+        "samples.workup_type": {
+            "title": "Sequencing",
+            "order": 60
         }
     }
 }

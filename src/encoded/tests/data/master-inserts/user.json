@@ -353,10 +353,10 @@
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     },
     {
-        "email": "victoria_stevens@hms.harvard.edu",
-        "first_name": "Victoria",
-        "last_name": "Stevens",
-        "uuid": "e34b090e-aa4e-494c-9bb3-79d0dbce0355",
+        "email": "cesar_ferreyra-mansilla@hms.harvard.edu",
+        "first_name": "Cesar",
+        "last_name": "Ferreyra",
+        "uuid": "90a33c84-6b17-4f96-be54-f8cb0458ee67",
         "groups": [
             "admin"
         ],
@@ -420,5 +420,22 @@
         ],
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
         "uuid": "74fef71a-dfc1-4aa4-acc0-cedcb7ac1d68"
+    },
+    {
+        "email": "ozturkutku@gmail.com",
+        "first_name": "Serkan Utku",
+        "last_name": "Öztürk",
+        "uuid": "42cd3586-0ae7-43bd-9d9c-14a03572e3ad",
+        "groups": [
+            "admin"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [
+            {
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                "role": "developer"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     }
 ]

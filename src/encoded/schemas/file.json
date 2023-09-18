@@ -1,8 +1,8 @@
 {
     "title": "Data File",
     "description": "Schema for submitting metadata for a data file.",
-    "id": "/profiles/file.json",
-    "$schema": "http://json-schema.org/draft-04/schema#",
+    "$id": "/profiles/file.json",
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
     "type": "object",
     "required": [
         "file_format",
@@ -290,6 +290,17 @@
                 "archived",
                 "deleted"
             ]
+        },
+        "quality_metrics": {
+            "type": "array",
+            "title": "Quality Metrics",
+            "description": "Associated QC reports",
+            "items": {
+                "type": "string",
+                "title": "Quality Metric",
+                "description": "Associated QC report",
+                "linkTo": "QualityMetric"
+            }
         },
         "quality_metric": {
             "notes": "This could be a single Quality Metric or a 'container' Quality Metric item that contains a list of QualityMetrics in its 'qc_list' property.",

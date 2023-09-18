@@ -6,6 +6,198 @@ cgap-portal
 Change Log
 ----------
 
+14.3.1
+======
+`PR 753: Auth0 Symlink Bugfix <https://github.com/dbmi-bgm/cgap-portal/pull/753>`_
+
+* Fix broken auth0-lock when symlinking SPC on local deployment
+
+
+14.3.0
+======
+`PR 746: Bm node18 upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/746>`_
+
+* Update Docker's MakeFile to use Node version 18.17.0
+* Update Github workflows to use Node version 18.17.0
+
+
+14.2.3
+======
+
+* Update README.rst
+
+
+14.2.2
+======
+`PR 741: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
+
+* Fixed bug occurring in collapsible text box
+* Changed green color for links to a less fluorescent green
+
+
+14.2.1
+======
+
+* Fix in ``parse_exception`` in ``submit.py`` to catch/ignore additional/new
+  error message from ``normalize_links`` in ``snovault/schema_validation.py``;
+  manifested as error from ``submit-metadata``.
+
+
+14.2.0
+======
+
+* Removes ``jsonschema_serialize_fork``, updating schema format version
+* Refactors registration restriction to customization in ``project/authentication.py``
+
+
+14.1.4
+======
+
+* Bump cohort browser version
+
+
+14.1.3
+======
+`PR 732: Fix for LinkTo items in ItemDetailPane <https://github.com/dbmi-bgm/cgap-portal/pull/732>`_
+
+* Updated python dependencies (pyyaml and cython)
+* Bump SPC with conditional for nested object arrays (without corresponding childKeys values)
+* Update SPC to 0.1.68b2
+
+
+14.1.2
+======
+* Fix for Germline case button link (ensure it points to proband-only cases)
+
+
+14.1.1
+======
+`PR 743: Purge permissions fix <https://github.com/dbmi-bgm/cgap-portal/pull/743>`_
+
+* Update set_user_info_property to true to allow admins to purge items
+* Bring in updated snovault to fix impersonation bug
+
+
+14.1.0
+======
+`PR 739: Bm babel updates <https://github.com/dbmi-bgm/cgap-portal/pull/739>`_
+
+* Add and update a bunch of babel-related dependencies to match Fourfront and SMaHT
+* Update babel config to make use of new plugins
+
+
+14.0.2
+======
+* Polyfill buffer
+* Upgrade higlass-bigwig-datafetcher and gmod/tabix
+
+
+14.0.1
+======
+* Update Higlass SV view config
+
+
+14.0.0
+======
+* July 2023
+* Migrating ingestion (et.al.) code to snovault.
+
+
+13.5.2
+======
+`PR 707: Somatic CGAP UI V1 <https://github.com/dbmi-bgm/cgap-portal/pull/707>`_
+
+* SomaticAnalysis, Case, Search Item View updates for Somatic
+* Update SPC to 0.1.66
+* Update higlass-general-vcf to 0.1.4
+
+
+13.5.1
+======
+
+* Update nginx signing key and import method to fix Docker build
+
+
+13.5.0
+======
+`PR 574: Webpack 5 Update <https://github.com/dbmi-bgm/cgap-portal/pull/574>`_
+
+* Update Webpack to Webpack 5 (polyfills, ugh)
+* Update HiGlass versions to resolve webpack related issues
+
+
+13.4.1
+======
+* 2023-06-26
+* Added user load to deployment task in deploy/docket/production/entrypoint_deployment.py,
+  along with the current higlass_view_config load.
+
+
+13.4.0
+======
+`PR 711: Generic QualityMetric <https://github.com/dbmi-bgm/cgap-portal/pull/711>`_
+
+* Add new QualityMetricGeneric item
+* Add File property for QualityMetricGeneric linkTos
+
+
+13.3.2
+======
+
+* Remove inclusion of unused loremipsum library from pyproject.toml (C4-1036)
+
+
+13.3.1
+======
+
+* Remove Victoria's user insert from master-inserts
+* Add Cesar's user insert to master-inserts
+
+
+13.3.0
+======
+`PR 712: Somatic analysis updates <https://github.com/dbmi-bgm/cgap-portal/pull/712>`_
+
+* Add Individual linkTo on SomaticAnalysis schema
+* Add preservation method to Sample schema
+* Add primary disorders calcprop for Individual item
+* Add Individual embeds to SomaticAnalysis item
+* Update inserts for changes above
+
+
+13.2.1
+======
+`PR 714: Cohort browser updates <https://github.com/dbmi-bgm/cgap-portal/pull/714>`_
+
+* Bump ``higlass-cohort`` version
+* Add ``blob:`` to ``script-src`` CSP
+* Switch to presigned links everywhere for the Cohort browser
+
+
+13.2.0
+======
+
+* Refactored `IngestionListener.run` in `ingestion_listener.py` to use the
+  new `@ingestion_message_handler` decorator functions; specific message handling
+  code now in `ingestion_message_handler_default.py` and `ingestion_message_handler_vcf.py`.
+* Updated poetry (from 1.1.15) to 1.2.2 (in Makefile and Dockerfile).
+* Removed isodate and keepalive from pyproject.toml.
+* Added special build steps to workaround issues on Mac M1.
+
+
+13.2.0
+======
+`PR 710: Submitted file lifecycle policy <https://github.com/dbmi-bgm/cgap-portal/pull/710>`_
+
+* Add lifecycle policy to submitted files on submission
+
+
+13.1.2
+======
+`PR: 709: Sort alphabetically phenotypic features <https://github.com/dbmi-bgm/cgap-portal/pull/709>`_
+
+* Sorts (family) phenotypic features before rendering via CaseStats
+
 
 13.1.1
 ======

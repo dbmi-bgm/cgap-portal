@@ -2,7 +2,7 @@ const path = require('path');
 const webpack = require('webpack');
 const env = process.env.NODE_ENV;
 const TerserPlugin = require('terser-webpack-plugin');
-const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
 
 const PATHS = {
     "static": path.resolve(__dirname, 'src/encoded/static'),
@@ -81,7 +81,10 @@ const resolve = {
 spcPackageJson = require("@hms-dbmi-bgm/shared-portal-components/package.json");
 spcPeerDependencies = spcPackageJson.peerDependencies || {};
 Object.keys(spcPeerDependencies).forEach(function(packageName) {
-    resolve.alias[packageName] = path.resolve("./node_modules/" + packageName);
+    // Make exception for auth0-lock, which seems to break in Webpack 5 if loaded from SPC peer deps
+    if (packageName !== 'auth0-lock') {
+        resolve.alias[packageName] = path.resolve("./node_modules/" + packageName);
+    }
 });
 
 // Exclusion -- higlass needs react-bootstrap 0.x but we want 1.x; can remove this line below
@@ -93,7 +96,7 @@ const optimization = {
     minimizer: [
         new TerserPlugin({
             parallel: false,  // XXX: this option causes docker build to fail - Will 2/25/2021
-            sourceMap: true,
+            // sourceMap: true,
             terserOptions:{
                 compress: true,
                 mangle: true,
@@ -109,10 +112,17 @@ const optimization = {
 const webPlugins = plugins.slice(0);
 const serverPlugins = plugins.slice(0);
 
+webPlugins.push(new webpack.ProvidePlugin({
+    "process": "process/browser",
+    Buffer: ['buffer', 'Buffer'],
+}));
+
 // Inform our React code of what build we're on.
 // This works via a find-replace.
 webPlugins.push(new webpack.DefinePlugin({
     'process.env.NODE_ENV': JSON.stringify(env),
+    'process.version': JSON.stringify(process.version),
+    'process.platform': JSON.stringify(process.platform),
     'SERVERSIDE' : JSON.stringify(false),
     'BUILDTYPE' : JSON.stringify(env)
 }));
@@ -125,7 +135,10 @@ serverPlugins.push(new webpack.DefinePlugin({
 
 // From https://github.com/jsdom/jsdom/issues/3042
 serverPlugins.push(
-    new webpack.IgnorePlugin(/canvas/, /jsdom$/)
+    new webpack.IgnorePlugin({
+        resourceRegExp: /canvas/,
+        contextRegExp: /jsdom$/
+    })
 );
 
 if (env === 'development'){
@@ -202,7 +215,7 @@ module.exports = [
                 // We could eventually put 'pedigree-viz' into own repo/project (under dif name like @hms-dbmi-bgm/react-pedigree-viz or something).
                 'pedigree-viz': path.resolve(__dirname, "./src/encoded/static/components/viz/PedigreeViz"),
                 'higlass-dependencies': path.resolve(__dirname, "./src/encoded/static/components/item-pages/components/HiGlass/higlass-dependencies.js"),
-                'package-lock.json': path.resolve(__dirname, "./package-lock.json"),
+                'package-lock.json': path.resolve(__dirname, "./package-lock.json")
             },
             /**
              * From Webpack CLI:
@@ -214,11 +227,16 @@ module.exports = [
              * If you don't want to include a polyfill, you can use an empty module like this:
              *   resolve.fallback: { "zlib": false }
              */
-            // fallback: {
-            //     "zlib": false
-            //      TODO: Upgrade to webpack v5.
-            //      TODO: polyfill some, update some to other libs, & exclude rest
-            // }
+            fallback: {
+                "zlib": false,
+                "stream": require.resolve("stream-browserify"),
+                "crypto": false,
+                "buffer": require.resolve('buffer/'),
+                "events": false,
+                // "path": require.resolve("path-browserify"),
+                "process": require.resolve("process/browser"),
+                "util": require.resolve("util/"),
+            }
         },
         //resolveLoader : resolve,
         devtool: devTool,
@@ -234,7 +252,7 @@ module.exports = [
         target: 'node',
         // make sure compiled modules can use original __dirname
         node: {
-            __dirname: true,
+            __dirname: true
         },
         externals: [
             // Anything which is not to be used server-side may be excluded
@@ -256,6 +274,11 @@ module.exports = [
                 'higlass-text': 'var {}',
                 'higlass-orthologs': 'var {}',
                 'higlass-pileup': 'var {}',
+                'higlass-gnomad': 'var {}',
+                'higlass-sv': 'var {}',
+                'higlass-general-vcf': 'var {}',
+                'higlass-cohort': 'var {}',
+                'higlass-bigwig-datafetcher': 'var {}',
                 'higlass-multivec': 'var {}',
                 'auth0-lock': 'var {}',
                 'aws-sdk': 'var {}',
@@ -266,7 +289,7 @@ module.exports = [
                 // These keys are literally matched against the string values, not actual path contents, hence why is "../util/aws".. it exactly what within SPC/SubmissionView.js
                 // We can clean up and change to 'aws-utils' in here in future as well and alias it to spc/utils/aws. But this needs to be synchronized with SPC and 4DN.
                 // We could have some 'ssr-externals.json' file in SPC (letting it define its own, per own version) and merge it into here.
-                // 'aws-utils': 'empty-module',
+                // 'aws-utils': 'var {}',
                 '../util/aws': 'var {}',
                 // We can rely on NodeJS's internal URL API, since it should match API of npm url package by design.
                 // This hopefully improves SSR performance, assuming Node has native non-JS/C code to parse this.
@@ -288,6 +311,10 @@ module.exports = [
             // fallback: {
             //     "zlib": false
             // }
+            fallback: {
+                "process": require.resolve("process/browser"),
+                "util": require.resolve("util/"),
+            }
         },
         //resolveLoader : resolve,
         devtool: devTool, // No way to debug/log serverside JS currently, so may as well speed up builds for now.

@@ -1,3 +1,29 @@
 #!/bin/bash
 
+echo "Begin Mac specific build script (bin/macpoetry-install)."
+
 CFLAGS="-I$(brew --prefix zlib)/include" LDFLAGS="-L$(brew --prefix zlib)/lib" poetry install
+
+if [[ `uname -o` == "Darwin" && `uname -m` == "arm64" ]] ; then
+    echo "Some post poetry install special installs for Mac M1."
+    #
+    # These worked around Mac M1 issues (after the build) running (at least) make deploy1a.
+    # Without this uninstall/install of pytabix we get an error similar to the following on
+    # make deploy1a on Mac M1 (Feb 2023); pip install --upgrade pytabix will not do the trick:
+    # File .../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/granite/lib/shared_functions.py, line 20, in <module>
+    # ImportError: dlopen(.../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/tabix.cpython-38-darwin.so, 0x0002):
+    # tried: .../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/tabix.cpython-38-darwin.so
+    # (mach-o file, but is an incompatible architecture (have x86_64, need arm64)),
+    # /System/Volumes/Preboot/Cryptexes/OS/.../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/tabix.cpython-38-darwin.so
+    # (no such file), .../.pyenv/versions/3.8.13/envs/cg-3.8.13/lib/python3.8/site-packages/tabix.cpython-38-darwin.so
+    # (mach-o file, but is an incompatible architecture (have x86_64, need arm64))
+    pip uninstall -y pytabix
+    pip install pytabix
+    # For some reason installing psycopg2 via poetry gets
+    # the x86_64 so file but via pip install the correct arm64 one.
+    pip uninstall -y psycopg2 psycopg2-binary
+    pip install psycopg2 psycopg2-binary
+    echo "Done with post poetry install special installs for Mac M1."
+fi
+
+echo "End Mac specific build script (bin/macpoetry-install)."

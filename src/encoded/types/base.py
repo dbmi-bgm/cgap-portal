@@ -5,7 +5,6 @@ import string
 
 # from datetime import date
 # from functools import lru_cache
-# from jsonschema_serialize_fork import NO_DEFAULT
 from pyramid.security import (
     # ALL_PERMISSIONS,
     Allow,
@@ -18,6 +17,7 @@ from pyramid.security import (
 from pyramid.view import (
     view_config,
 )
+from dcicutils.misc_utils import exported
 # from pyramid.httpexceptions import HTTPUnprocessableEntity
 from snovault.util import debug_log
 # import snovault default post / patch stuff so we can overwrite it in this file
@@ -36,106 +36,30 @@ from snovault.crud_views import (
     item_edit as sno_item_edit,
 )
 from snovault.interfaces import CONNECTION
-from typing import Any, List, Tuple, Union
+from snovault.types.base import get_item_or_none
 # from ..schema_formats import is_accession
 from ..server_defaults import get_userid, add_last_modified
 
+from ..acl import (
+    ALLOW_AUTHENTICATED_VIEW_ACL,
+    ALLOW_EVERYONE_VIEW_ACL,
+    ALLOW_OWNER_EDIT_ACL,
+    ALLOW_PROJECT_MEMBER_ADD_ACL,
+    ALLOW_PROJECT_MEMBER_EDIT_ACL,
+    ALLOW_PROJECT_MEMBER_VIEW_ACL,
+    DELETED_ACL,
+    ONLY_ADMIN_VIEW_ACL,
+    PROJECT_MEMBER_CREATE_ACL
+)
 
-Acl = List[Tuple[Any, Any, Union[str, List[str]]]]
-
-# Item acls
-# TODO (C4-332): consolidate all acls into one place - i.e. their own file
-ONLY_ADMIN_VIEW_ACL: Acl = [
-    (Allow, 'group.admin', ['view', 'edit']),
-    (Allow, 'group.read-only-admin', ['view']),
-    (Allow, 'remoteuser.INDEXER', ['view']),
-    (Allow, 'remoteuser.EMBED', ['view']),
-    (Deny, Everyone, ['view', 'edit'])
-]
-
-""" This acl allows item creation; it should be overwritten with an empty
-    list in Item types a project member user should not be able to create
-    likely worthwhile to review and set it up in the opposite way as there
-    will probably be more items than a regular user shouldn't create
-    this gets added to the Collection class __init__
-"""
-PROJECT_MEMBER_CREATE_ACL: Acl = [
-    (Allow, 'group.project_editor', 'add'),
-    (Allow, 'group.project_editor', 'create'),
-]
-
-# this is for pages that should be visible to public
-ALLOW_EVERYONE_VIEW_ACL: Acl = [
-    (Allow, Everyone, 'view'),
-] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
-
-# view for shared items - add a status for common cgap items
-# not sure if we want project members to have create on these?
-ALLOW_AUTHENTICATED_VIEW_ACL: Acl = [
-    (Allow, Authenticated, 'view'),
-] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
-
-ALLOW_PROJECT_MEMBER_EDIT_ACL: Acl = [
-    (Allow, 'role.project_editor', ['view', 'edit']),
-] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
-
-
-ALLOW_PROJECT_MEMBER_VIEW_ACL: Acl = [
-    (Allow, 'role.project_editor', 'view'),
-] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
-
-DELETED_ACL: Acl = [
-    (Deny, Everyone, 'visible_for_edit')
-] + ONLY_ADMIN_VIEW_ACL
-
-ALLOW_PROJECT_MEMBER_ADD_ACL: Acl = PROJECT_MEMBER_CREATE_ACL
-
-# Used for 'draft' status
-ALLOW_OWNER_EDIT: Acl = [
-    (Allow, 'role.owner', ['view', 'edit']),
-] + ONLY_ADMIN_VIEW_ACL + PROJECT_MEMBER_CREATE_ACL
-
-
-def get_item_or_none(request, value, itype=None, frame='object'):
-    """
-    Return the view of an item with given frame. Can specify different types
-    of `value` for item lookup
-
-    Args:
-        request: the current Request
-        value (str): String item identifier or a dict containing @id/uuid
-        itype (str): Optional string collection name for the item (e.g. /file-formats/)
-        frame (str): Optional frame to return. Defaults to 'object'
-
-    Returns:
-        dict: given view of the item or None on failure
-    """
-    item = None
-
-    if isinstance(value, dict):
-        if 'uuid' in value:
-            value = value['uuid']
-        elif '@id' in value:
-            value = value['@id']
-
-    svalue = str(value)
-
-    # Below case is for UUIDs & unique_keys such as accessions, but not @ids
-    if not svalue.startswith('/') and not svalue.endswith('/'):
-        svalue = '/' + svalue + '/'
-        if itype is not None:
-            svalue = '/' + itype + svalue
-
-    # Request.embed will attempt to get from ES for frame=object/embedded
-    # If that fails, get from DB. Use '@@' syntax instead of 'frame=' because
-    # these paths are cached in indexing
-    try:
-        item = request.embed(svalue, '@@' + frame)
-    except Exception:
-        pass
-
-    # could lead to unexpected errors if == None
-    return item
+exported(
+    Allow,
+    Authenticated,
+    Deny,
+    Everyone,
+    get_item_or_none,
+    PROJECT_MEMBER_CREATE_ACL
+)
 
 
 def set_namekey_from_title(properties):  # TODO: I'm not sure this is used anywhere. -kmp 25-Sep-2022
@@ -260,7 +184,7 @@ class Item(snovault.Item):
         # Everyone can view - restricted to specific items via schemas.
         'public': ALLOW_EVERYONE_VIEW_ACL,
         # Only creator can view - restricted to specific items via schemas.
-        'draft': ALLOW_OWNER_EDIT
+        'draft': ALLOW_OWNER_EDIT_ACL
     }
     FACET_ORDER_OVERRIDE = {}  # empty by default
 

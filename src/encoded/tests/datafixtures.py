@@ -468,7 +468,7 @@ def child_sample_2(testapp, project, institution, proband_2_bam):
         "status": "shared",
         "processed_files": [proband_2_bam['@id']],
         "workup_type": "WGS",
-    }   
+    }
     return testapp.post_json("/sample", item).json["@graph"][0]
 
 
@@ -764,7 +764,7 @@ def sample_f(testapp, project, institution, female_individual):
         'project': project['@id'],
         'institution': institution['@id'],
         'specimen_type': 'saliva',
-        'date_received': '2015-12-7'
+        'date_received': '2015-12-07'
     }
     return testapp.post_json('/sample', data).json['@graph'][0]
 
@@ -1640,7 +1640,7 @@ def sv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_sv_vcfqc):
         "qc_list": [
             {
                 "qc_type": "quality_metric_vcf_check",
-                "value": qc_vcfcheck["@id"], 
+                "value": qc_vcfcheck["@id"],
             },
             {
                 "qc_type": "quality_metric_vcfqc",
@@ -1718,7 +1718,7 @@ def snv_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_snv_vcfqc):
         "qc_list": [
             {
                 "qc_type": "quality_metric_vcf_check",
-                "value": qc_vcfcheck["@id"], 
+                "value": qc_vcfcheck["@id"],
             },
             {
                 "qc_type": "quality_metric_vcfqc",
@@ -1869,7 +1869,7 @@ def vep_vcf_qc_list(testapp, project, institution, qc_vcfcheck, qc_peddyqc,
         "qc_list": [
             {
                 "qc_type": "quality_metric_vcf_check",
-                "value": qc_vcfcheck["@id"], 
+                "value": qc_vcfcheck["@id"],
             },
             {
                 "qc_type": "quality_metric_peddyqc",

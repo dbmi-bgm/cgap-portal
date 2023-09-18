@@ -2,18 +2,36 @@
 
 import React, { useMemo } from 'react';
 import _ from 'underscore';
-import { LocalizedTime, formatPublicationDate } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
+import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { Schemas } from './../../util';
 
 
 /**
- * Returns an array of phenotypic features styled as an unordered list of Bootstrap badges.
+ * Returns an alphabetically sorted array of phenotypic features styled as an unordered list of Bootstrap badges.
  * @param {Array} features An array of phenotypic features items
  */
 function mapFeaturesToBadges(features = []) {
     if (features.length === 0) {
         return <em>None</em>;
     }
+
+    // Sort alphabetically
+    features.sort((a, b) => {
+        const { display_title: aTitle } = a;
+        const { display_title: bTitle } = b;
+        const aUpper = aTitle.toUpperCase();
+        const bUpper = bTitle.toUpperCase();
+
+        if (aUpper < bUpper) {
+            return -1;
+        }
+        if (aUpper > bUpper) {
+            return 1;
+        }
+        return 0;
+    });
+
+    // Map to JSX for badges
     return features.map(function(feature){
         const { display_title = null, '@id': featureID } = feature;
         return (

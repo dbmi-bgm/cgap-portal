@@ -378,10 +378,10 @@ def get_higlass_cohort_viewconf(context, request):
     """ Get the Higlass cohort viewconf, given the file locations on S3
     Args:
         request(obj): Http request object. Assumes request's request is JSON and contains these keys:
-            cohort_variant_test_results(str) : location of the variant VCF file on S3
-            cohort_gene_test_results(str) : location of the gene VCF file on S3
-            cohort_density(str) : location of the density bigwig file on S3
-            variant_detail_source(str): location of the affected samples VCF
+            cohort_variant_test_results(str) : object id of the variant VCF file on S3
+            cohort_gene_test_results(str) : object id of the gene VCF file on S3
+            cohort_density(str) : object id of the density bigwig file on S3
+            variant_detail_source(str): object id of the affected samples VCF
 
     Returns:
         A dictionary.
@@ -393,6 +393,8 @@ def get_higlass_cohort_viewconf(context, request):
     viewconf_uuid = "b87c03bb-6c14-496c-9826-896257ae783f"
     default_higlass_viewconf = get_item_or_none(request, viewconf_uuid)
     higlass_viewconfig = default_higlass_viewconf["viewconfig"] if default_higlass_viewconf else None
+
+    s3_bucket = request.registry.settings.get('file_wfout_bucket')
 
     # If no view config could be found, fail
     if not higlass_viewconfig:
@@ -413,22 +415,24 @@ def get_higlass_cohort_viewconf(context, request):
             "errors": "Some data files have not been specified.",
             "viewconfig": None
         }
-
+    
     views = higlass_viewconfig['views']
     for view in views:
         top_tracks = view['tracks']['top']
         for track in top_tracks:
             if track['uid'] == "cohort_track":
-                track['data']['vcfUrl'] = cohort_variant_test_results
-                track['data']['tbiUrl'] = cohort_variant_test_results + ".tbi"
+                track['data']['vcfUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_variant_test_results)
+                track['data']['tbiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_variant_test_results+".tbi")
                 if variant_detail_source:
-                    track['options']['variantDetailSource']['vcfUrl'] = variant_detail_source
-                    track['options']['variantDetailSource']['tbiUrl'] = variant_detail_source + ".tbi"
+                    track['options']['variantDetailSource']['vcfUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=variant_detail_source)
+                    track['options']['variantDetailSource']['tbiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=variant_detail_source+".tbi")
+                else:
+                    del track['options']['variantDetailSource']
             elif track['uid'] == "gene_list_track":
-                track['data']['vcfUrl'] = cohort_gene_test_results
-                track['data']['tbiUrl'] = cohort_gene_test_results + ".tbi"
+                track['data']['vcfUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_gene_test_results)
+                track['data']['tbiUrl'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_gene_test_results+".tbi")
             elif track['uid'] == "density_track":
-                track['data']['url'] = cohort_density
+                track['data']['url'] = create_presigned_url(bucket_name=s3_bucket, object_name=cohort_density)
 
     return {
         "success": True,

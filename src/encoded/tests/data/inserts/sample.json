@@ -28,16 +28,26 @@
         "institution": "hms-dbmi",
         "status": "shared",
         "uuid": "f4bbc709-40fe-48a4-afde-8e886b571903",
-        "bam_sample_id": "test003_sample",
-	"tissue_type": "Tumor"
+        "bam_sample_id": "SAM000-T-WGS",
+        "specimen_accession": "SAM000-T",
+        "specimen_type": "resection",
+        "workup_type": "WGS",
+        "preservation_method": "FFPE",
+        "tissue_type": "Tumor",
+        "specimen_collection_date": "2019-03-06"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
         "institution": "hms-dbmi",
         "status": "shared",
         "uuid": "f4bbc709-40fe-48a4-afde-8e886b571904",
-        "bam_sample_id": "test003_normal_sample",
-        "tissue_type": "Tumor"
+        "bam_sample_id": "SAM000-N-WGS",
+        "specimen_accession": "SAM000-N",
+        "specimen_type": "peripheral blood",
+        "workup_type": "WGS",
+        "preservation_method": "Fresh",
+        "tissue_type": "Normal",
+        "specimen_collection_date": "2019-03-06"
     },
     {
         "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
