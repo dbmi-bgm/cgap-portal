@@ -9,23 +9,22 @@ import { console } from '@hms-dbmi-bgm/shared-portal-components/es/components/ut
 import { WorkflowNodeElement } from './WorkflowNodeElement';
 import { WorkflowDetailPane } from './WorkflowDetailPane';
 
+
+
 /**
  * @module
  * @deprecated - Remove or re-implement, use MetaWorkflowRunView. Provenance graph on-the-fly tracing is deprecated.
  */
 
-export function getNodesInfo(steps) {
-    const { nodes } = parseAnalysisSteps(steps, {
-        showReferenceFiles: true,
-        showIndirectFiles: true,
+export function getNodesInfo(steps){
+    const { nodes } = parseAnalysisSteps(steps, { 'showReferenceFiles' : true, 'showIndirectFiles' : true });
+    const anyReferenceFileNodes = _.any(nodes, function(n){
+        return (n.nodeType === 'output' && n.meta && n.meta.in_path === false);
     });
-    const anyReferenceFileNodes = _.any(nodes, function (n) {
-        return n.nodeType === 'output' && n.meta && n.meta.in_path === false;
+    const anyIndirectFileNodes = _.any(nodes, function(n){
+        return (n.ioType === 'reference file');
     });
-    const anyIndirectFileNodes = _.any(nodes, function (n) {
-        return n.ioType === 'reference file';
-    });
-    const anyGroupNodes = _.any(nodes, function (n) {
+    const anyGroupNodes = _.any(nodes, function(n){
         return n.nodeType === 'input-group' || n.nodeType === 'output-group';
     });
     return { anyReferenceFileNodes, anyIndirectFileNodes, anyGroupNodes };
@@ -33,42 +32,40 @@ export function getNodesInfo(steps) {
 
 /** Holds options for displaying provenance graph(s) */
 export class ProvenanceGraphOptionsStateController extends React.PureComponent {
+
     static rowSpacingTitleMap = {
         // todo - rename internal stuff in workflow lib
-        compact: 'Centered',
-        stacked: 'Stacked',
-        wide: 'Spread',
+        "compact" : "Centered",
+        "stacked" : "Stacked",
+        "wide" : "Spread"
     };
 
     static defaultProps = {
-        isNodeCurrentContext: function (node, context) {
-            return false;
-        },
-        graphSteps: null,
+        'isNodeCurrentContext' : function(node, context){ return false; },
+        'graphSteps' : null,
     };
 
     static propTypes = {
-        height: PropTypes.number,
+        height : PropTypes.number,
         windowWidth: PropTypes.number,
         toggleAllRuns: PropTypes.func.isRequired,
         includeAllRunsInSteps: PropTypes.bool,
         isLoadingGraphSteps: PropTypes.bool,
         isNodeCurrentContext: PropTypes.func.isRequired,
         graphSteps: PropTypes.array,
-        children: PropTypes.node.isRequired,
+        children: PropTypes.node.isRequired
     };
 
-    constructor(props) {
+    constructor(props){
         super(props);
         this.handleParsingOptChange = this.handleParsingOptChange.bind(this);
-        this.handleRowSpacingTypeSelect =
-            this.handleRowSpacingTypeSelect.bind(this);
+        this.handleRowSpacingTypeSelect = this.handleRowSpacingTypeSelect.bind(this);
         this.renderNodeElement = this.renderNodeElement.bind(this);
         this.renderDetailPane = this.renderDetailPane.bind(this);
         this.isNodeCurrentContext = this.isNodeCurrentContext.bind(this);
 
         this.memoized = {
-            getNodesInfo: memoize(getNodesInfo),
+            getNodesInfo: memoize(getNodesInfo)
         };
 
         this.state = {
@@ -76,71 +73,59 @@ export class ProvenanceGraphOptionsStateController extends React.PureComponent {
                 showReferenceFiles: true,
                 showParameters: false,
                 showIndirectFiles: false,
-                parseBasicIO: false,
+                parseBasicIO: false
             },
-            rowSpacingType: 'stacked',
+            rowSpacingType: "stacked"
         };
     }
 
-    handleParsingOptChange(evt) {
-        const key = evt.target.getAttribute('name');
+    handleParsingOptChange(evt){
+        const key = evt.target.getAttribute("name");
         console.log('evt', evt, key);
         if (!key) return false;
-        this.setState(function ({ parsingOptions: prevOpts }) {
-            const nextOpts = { ...prevOpts, [key]: !prevOpts[key] };
-            return { parsingOptions: nextOpts };
+        this.setState(function({ parsingOptions : prevOpts }){
+            const nextOpts = { ...prevOpts, [key] : !prevOpts[key] };
+            return { parsingOptions : nextOpts  };
         });
     }
 
-    handleRowSpacingTypeSelect(nextValue, evt) {
+    handleRowSpacingTypeSelect(nextValue, evt){
         if (!nextValue) return false;
         this.setState({ rowSpacingType: nextValue });
     }
 
-    renderNodeElement(node, graphProps) {
+    renderNodeElement(node, graphProps){
         const { windowWidth, schemas } = this.props;
-        return (
-            <WorkflowNodeElement
-                {...graphProps}
-                schemas={schemas}
-                windowWidth={windowWidth}
-                node={node}
-            />
-        );
+        return <WorkflowNodeElement {...graphProps} schemas={schemas} windowWidth={windowWidth} node={node}/>;
     }
 
-    renderDetailPane(node, graphProps) {
+    renderDetailPane(node, graphProps){
         const { context, schemas } = this.props;
-        return (
-            <WorkflowDetailPane
-                {...graphProps}
-                {...{ context, node, schemas }}
-            />
-        );
+        return <WorkflowDetailPane {...graphProps} {...{ context, node, schemas }} />;
     }
 
     /** Classes which extend this should override this. */
-    isNodeCurrentContext(node) {
+    isNodeCurrentContext(node){
         const { context, isNodeCurrentContext } = this.props;
-        if (typeof isNodeCurrentContext !== 'function') {
-            console.error('No function to determine if is current context.');
+        if (typeof isNodeCurrentContext !== 'function'){
+            console.error("No function to determine if is current context.");
         }
         return isNodeCurrentContext(node, context);
     }
 
-    render() {
+
+    render(){
         const { children, graphSteps, ...otherProps } = this.props;
         const { parsingOptions: origParseOpts } = this.state;
-        const { anyReferenceFileNodes, anyIndirectFileNodes, anyGroupNodes } =
-            this.memoized.getNodesInfo(graphSteps);
+        const { anyReferenceFileNodes, anyIndirectFileNodes, anyGroupNodes } = this.memoized.getNodesInfo(graphSteps);
         const parsingOptionsForControls = { ...origParseOpts };
         const parsingOptsForGraph = { ...origParseOpts };
-        if (!anyReferenceFileNodes) {
+        if (!anyReferenceFileNodes){
             parsingOptionsForControls.showReferenceFiles = null;
             parsingOptsForGraph.showReferenceFiles = false;
             //delete parsingOptions.showReferenceFiles;
         }
-        if (!anyIndirectFileNodes) {
+        if (!anyIndirectFileNodes){
             parsingOptionsForControls.showIndirectFiles = null;
             parsingOptsForGraph.showIndirectFiles = false;
         }
@@ -153,14 +138,13 @@ export class ProvenanceGraphOptionsStateController extends React.PureComponent {
             anyGroupNodes,
             parsingOptionsForControls,
             parsingOptsForGraph,
-            onParsingOptChange: this.handleParsingOptChange,
+            onParsingOptChange:     this.handleParsingOptChange,
             onRowSpacingTypeSelect: this.handleRowSpacingTypeSelect,
-            renderNodeElement: this.renderNodeElement,
-            renderDetailPane: this.renderDetailPane,
-            isNodeCurrentContext: this.isNodeCurrentContext,
+            renderNodeElement:      this.renderNodeElement,
+            renderDetailPane:       this.renderDetailPane,
+            isNodeCurrentContext:   this.isNodeCurrentContext
         };
-        return React.Children.map(children, (child) =>
-            React.cloneElement(child, passProps)
-        );
+        return React.Children.map(children, (child) => React.cloneElement(child, passProps));
     }
+
 }

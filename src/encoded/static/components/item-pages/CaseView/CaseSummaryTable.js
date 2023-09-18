@@ -8,23 +8,26 @@ import { Schemas } from './../../util';
 import { LocalizedTime } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime';
 import { capitalizeSentence } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
-function hasViewPermisison({ '@id': itemID, display_title }) {
+
+
+function hasViewPermisison({ '@id' : itemID, display_title }) {
     return itemID && display_title;
 }
 
+
 /** @param {Object} props - Contents of a family sub-embedded object. */
-export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
+export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const { idToGraphIdentifier = {}, sampleProcessing = [], family } = props;
     const {
         original_pedigree = null,
         relationships = [],
         members = [],
-        proband: { '@id': probandID } = {},
+        proband: { '@id' : probandID } = {},
     } = family || {};
 
-    console.log('case summary props', props);
+    console.log("case summary props", props);
 
-    if (members.length === 0) {
+    if (members.length === 0){
         return (
             <div className="processing-summary">
                 <em>No members available.</em>
@@ -33,40 +36,40 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
     }
 
     const h2ColumnOrder = [
-        'individual',
-        'sample',
-        'assayType',
-        'rawFiles',
-        'processingType',
-        'processedFiles',
+        "individual",
+        "sample",
+        "assayType",
+        "rawFiles",
+        "processingType",
+        "processedFiles",
     ];
 
     const originalNumCols = h2ColumnOrder.length; // store # of columns before any multisample columns are added
 
     const columnTitles = {
-        sample: (
+        'sample' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-vial fas mr-05 align-middle" />
+                <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
                 <span className="d-none d-lg-inline ml-05">Sample</span>
             </React.Fragment>
         ),
-        individual: (
+        'individual' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-user fas mr-05 align-middle" />
+                <i className="icon icon-fw icon-user fas mr-05 align-middle"/>
                 <span className="d-none d-lg-inline ml-05">Individual</span>
             </React.Fragment>
         ),
-        assayType: 'Assay Type',
-        rawFiles: (
+        'assayType' : "Assay Type",
+        'rawFiles' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-code fas mr-05 align-middle" />
+                <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
                 Sequencing
             </React.Fragment>
         ),
-        processingType: 'Processing Type',
-        processedFiles: (
+        'processingType' : "Processing Type",
+        'processedFiles' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle" />
+                <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
                 Pipeline
             </React.Fragment>
         ),
@@ -78,24 +81,17 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
         const { relationship = null, sex = null, individual = null } = item;
         relationshipMapping[individual] = { sex, relationship };
     });
-    console.log('relationshipMapping', relationshipMapping);
+    console.log("relationshipMapping", relationshipMapping);
 
     const sampleProcessingData = {}; // maps sample analysis UUIDs to sample IDs to file data Objects for MSAs and samples
 
     let hasMSA = false; // if there is at least one sample processing object to render (w/2 samples in family)
     let hasCombinedMSA = false; // if there is also a combined MSA (for rendering last row only when there's a combined VCF)
     // add multisample analysis column data to column order/titles and data object
-    sampleProcessing.forEach(function (sp) {
-        const {
-            uuid,
-            processed_files = [],
-            completed_processes = [],
-            samples = [],
-            sample_processed_files = [],
-        } = sp;
+    sampleProcessing.forEach(function(sp){
+        const { uuid, processed_files = [], completed_processes = [], samples = [], sample_processed_files = [] } = sp;
         // TODO: If processed_files.length !== spProcFilesWithPermission.length, maybe inform user about this?
-        const spProcFilesWithPermission =
-            processed_files.filter(hasViewPermisison);
+        const spProcFilesWithPermission = processed_files.filter(hasViewPermisison);
 
         function pushColumn(title) {
             // adds a column to the end of the column order and to the column titles map
@@ -106,28 +102,21 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
 
         if (spProcFilesWithPermission.length > 0) {
             // add column titles with a flag & some embedded data for identifying column by UUID & rendering pipeline title
-            pushColumn(`~MSA|${completed_processes[0]}|${uuid}`);
+            pushColumn(`~MSA|${ completed_processes[0] }|${ uuid }`);
 
             sampleProcessingData[uuid] = {};
-            sampleProcessingData[uuid]['MSA'] = generateFileDataObject(
-                spProcFilesWithPermission
-            ); // populate with multisample analysis objects
+            sampleProcessingData[uuid]["MSA"] = generateFileDataObject(spProcFilesWithPermission); // populate with multisample analysis objects
 
             // populate with per sample data (no files)
-            samples.forEach(function (sample) {
-                const { accession = '' } = sample;
+            samples.forEach(function(sample){
+                const { accession = "" } = sample;
                 sampleProcessingData[uuid][accession] = true;
             });
 
             // populate with per sample data (files) (override any previously set)
-            sample_processed_files.forEach(function (set) {
-                const {
-                    sample: { accession = '' } = {},
-                    processed_files: procFiles = [],
-                } = set;
-                sampleProcessingData[uuid][accession] = generateFileDataObject(
-                    procFiles.filter(hasViewPermisison)
-                );
+            sample_processed_files.forEach(function(set){
+                const { sample : { accession = "" } = {}, processed_files: procFiles = [] } = set;
+                sampleProcessingData[uuid][accession] = generateFileDataObject(procFiles.filter(hasViewPermisison));
             });
             hasMSA = true;
         }
@@ -135,14 +124,15 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
         if (spProcFilesWithPermission.length > 0) {
             hasCombinedMSA = true;
         }
+
     });
 
     function hasMSAFlag(string) {
-        return string.substring(0, 5) === '~MSA|';
+        return string.substring(0,5) === "~MSA|";
     }
 
     function getUUIDFromMSATitle(string) {
-        return string.split('|')[2];
+        return string.split("|")[2];
     }
 
     const rows = [];
@@ -182,23 +172,19 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
             const {
                 display_title: filename,
                 quality_metric = {},
-                '@id': fileUrl,
+                "@id": fileUrl
             } = file;
 
             const {
-                overall_quality_status = '',
+                overall_quality_status = "",
                 qc_list = [],
-                '@id': qmId,
+                "@id": qmId,
             } = quality_metric;
 
             let qmUrl = qmId + '/@@download'; // send to @@download instead of url (deprecated for standalone QCs) - Will Jan 24 2022
-            const extension =
-                filename.substring(
-                    filename.indexOf('.') + 1,
-                    filename.length
-                ) || filename; // assuming the display_title property remains the filename
+            const extension = filename.substring(filename.indexOf('.')+1, filename.length) || filename; // assuming the display_title property remains the filename
 
-            let fileOverallQuality = 'PASS';
+            let fileOverallQuality = "PASS";
             let hasQm = true;
             let numFail = 0; // using these instead of quality value, since quality value can be extracted from numFail and numWarns (1 source of truth)
             let numWarn = 0;
@@ -208,16 +194,13 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
                 qmUrl = qmId; // if qc_list item, link to that metadata item (instead of @@download)
                 // loop through all of the quality metrics and count the number of failures and warnings for this file
                 qc_list.forEach((qm) => {
-                    const {
-                        value: { overall_quality_status = null },
-                    } = qm;
-                    if (overall_quality_status === 'FAIL') {
+                    const { value : { overall_quality_status = null } } = qm;
+                    if (overall_quality_status === "FAIL") {
                         numFail++;
-                        fileOverallQuality = 'FAIL';
-                    } else if (overall_quality_status === 'WARN') {
+                        fileOverallQuality = "FAIL";
+                    } else if (overall_quality_status === "WARN") {
                         numWarn++;
-                        fileOverallQuality =
-                            fileOverallQuality === 'FAIL' ? 'FAIL' : 'WARN';
+                        fileOverallQuality = (fileOverallQuality === "FAIL" ? "FAIL" : "WARN");
                     }
                 });
             } else {
@@ -226,9 +209,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
                     numWarn = -1;
                     hasQm = false;
                 } else {
-                    if (overall_quality_status === 'FAIL') {
+                    if (overall_quality_status === "FAIL") {
                         numFail++;
-                    } else if (overall_quality_status === 'WARN') {
+                    } else if (overall_quality_status === "WARN") {
                         numWarn++;
                     }
                 }
@@ -240,17 +223,16 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
                 numWarn,
                 hasQm,
                 fileUrl,
-                qmUrl,
+                qmUrl
             };
 
             function shouldUpdateOverallQuality(currOverall, newStatus) {
-                const newFailing = newStatus === 'FAIL';
-                const newWarning = newStatus === 'WARN';
-                if (
-                    (currOverall === 'PASS' && newFailing) ||
-                    (currOverall === 'PASS' && newWarning) ||
-                    (currOverall === 'WARN' && newFailing) ||
-                    (newStatus && !currOverall)
+                const newFailing = newStatus === "FAIL";
+                const newWarning = newStatus === "WARN";
+                if (currOverall === "PASS" && newFailing ||
+                    currOverall === "PASS" && newWarning ||
+                    currOverall === "WARN" && newFailing ||
+                    newStatus && !currOverall
                 ) {
                     return true;
                 }
@@ -259,13 +241,9 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
 
             // check to see if there's currently a property in allFiles with key
             if (allFiles.hasOwnProperty(extension)) {
+
                 // check if should update overall Quality Status on update
-                if (
-                    shouldUpdateOverallQuality(
-                        allFiles[extension].overall,
-                        fileOverallQuality
-                    )
-                ) {
+                if (shouldUpdateOverallQuality(allFiles[extension].overall, fileOverallQuality)) {
                     // update accordingly
                     allFiles[extension].overall = fileOverallQuality;
                 }
@@ -276,7 +254,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
                 // generate a new object in allFiles object;
                 allFiles[extension] = {
                     overall: fileOverallQuality,
-                    files: [fileObject],
+                    files: [fileObject]
                 };
             }
         });
@@ -299,86 +277,63 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
                 return;
             }
 
-            const tooltips = calcTooltips(
-                files[0].hasQm,
-                files[0].numWarn,
-                files[0].numFail
-            );
+            const tooltips = calcTooltips(files[0].hasQm, files[0].numWarn, files[0].numFail);
 
             // if there's a single quality metric, link the item itself
             renderArr.push(
-                files[0] ? (
+                files[0] ?
                     <span className="ellipses" key={`span-${ext}`}>
-                        {statusToIcon(overallQuality)}
-                        <a
-                            href={files[0].fileUrl || ''}
+                        { statusToIcon(overallQuality)}
+                        <a href={files[0].fileUrl || ""}
                             rel="noopener noreferrer"
                             target="_blank"
                             data-tip={tooltips[0]}>
-                            {ext.toUpperCase()}
+                            { ext.toUpperCase() }
                         </a>
-                        {files[0].hasQm ? (
-                            <a
-                                href={files[0].qmUrl || ''}
+                        { files[0].hasQm ?
+                            <a href={files[0].qmUrl || ""}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                className={`${statusToTextClass(
-                                    overallQuality
-                                )} qc-status-${files[0].status}`}
+                                className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
                                 data-tip={tooltips[1]}>
                                 <sup>QC</sup>
                             </a>
-                        ) : null}
+                            : null }
                     </span>
-                ) : null
+                    : null
             );
-        } else if (files) {
-            // otherwise create a list with linked #s
+        } else if (files) { // otherwise create a list with linked #s
             renderArr.push(
                 <span className="ellipses" key={`span-multi-${ext}`}>
-                    {statusToIcon(overallQuality)} {ext.toUpperCase()}({' '}
-                    {files.map(function (file, i) {
-                        const {
-                            hasQm = false,
-                            numWarn = -1,
-                            numFail = -1,
-                            quality,
-                            qmUrl = '',
-                            status,
-                            fileUrl = '',
-                        } = file;
-                        const tooltips = calcTooltips(hasQm, numWarn, numFail);
+                    { statusToIcon(overallQuality) } { ext.toUpperCase() }
+                    (   {
+                        files.map(function(file, i){
+                            const { hasQm = false, numWarn = -1, numFail = -1, quality, qmUrl = "", status, fileUrl = "" } = file;
+                            const tooltips = calcTooltips(hasQm, numWarn, numFail);
 
-                        return (
-                            <React.Fragment key={`${ext}-${fileUrl}`}>
-                                <a
-                                    href={fileUrl}
-                                    rel="noopener noreferrer"
-                                    target="_blank"
-                                    className={`${statusToTextClass(quality)}`}
-                                    data-tip={tooltips[0]}>
-                                    {i + 1}
-                                </a>
-                                {hasQm ? (
-                                    <a
-                                        href={qmUrl}
-                                        rel="noopener noreferrer"
-                                        target="_blank"
-                                        className={`${statusToTextClass(
-                                            getFileQuality(numFail, numWarn)
-                                        )} qc-status-${status}`}
-                                        data-tip={tooltips[1]}>
-                                        <sup>QC</sup>
+                            return (
+                                <React.Fragment key={`${ext}-${fileUrl}`}>
+                                    <a href={ fileUrl } rel="noopener noreferrer" target="_blank"
+                                        className={`${statusToTextClass(quality)}`} data-tip={tooltips[0]}>
+                                        {i + 1}
                                     </a>
-                                ) : null}
-                                {
-                                    // if the last item, don't add a comma
-                                    i === files.length - 1 ? null : ', '
-                                }
-                            </React.Fragment>
-                        );
-                    })}{' '}
-                    )
+                                    { hasQm ?
+                                        <a href={qmUrl}
+                                            rel="noopener noreferrer"
+                                            target="_blank"
+                                            className={`${statusToTextClass(
+                                                getFileQuality(numFail, numWarn))} qc-status-${status}`}
+                                            data-tip={tooltips[1]}>
+                                            <sup>QC</sup>
+                                        </a>
+                                        : null }
+                                    { // if the last item, don't add a comma
+                                        (i === files.length - 1 ?  null : ', ')
+                                    }
+                                </React.Fragment>
+                            );
+                        })
+                    }   )
                 </span>
             );
         }
@@ -390,16 +345,14 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
      * @param {string} status (PASS|FAIL|WARN)
      * @return {JSX object} containing a fontawesome icon (or nothing, in the case of invalid input)
      */
-    function statusToIcon(status) {
+    function statusToIcon(status){
         switch (status) {
-            case 'PASS':
-                return <i className="icon icon-check fas text-success mr-05" />;
-            case 'FAIL':
-                return <i className="icon icon-times fas text-danger mr-05" />;
-            case 'WARN':
-                return (
-                    <i className="icon icon-exclamation-triangle fas text-warning mr-05" />
-                );
+            case "PASS":
+                return <i className="icon icon-check fas text-success mr-05"/>;
+            case "FAIL":
+                return <i className="icon icon-times fas text-danger mr-05"/>;
+            case "WARN":
+                return <i className="icon icon-exclamation-triangle fas text-warning mr-05"/>;
             default:
                 return null;
         }
@@ -411,13 +364,13 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
      * @return {string} Bootstrap text color class
      */
     function statusToTextClass(status) {
-        switch (status) {
-            case 'PASS':
-                return '';
-            case 'FAIL':
-                return 'text-danger';
-            case 'WARN':
-                return 'text-warning';
+        switch(status) {
+            case "PASS":
+                return "";
+            case "FAIL":
+                return "text-danger";
+            case "WARN":
+                return "text-warning";
             default:
                 return null;
         }
@@ -432,12 +385,12 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
      */
     function getFileQuality(numFail, numWarn) {
         if (numFail) {
-            return 'FAIL';
+            return "FAIL";
         }
         if (numWarn) {
-            return 'WARN';
+            return "WARN";
         }
-        return 'PASS';
+        return "PASS";
     }
 
     /**
@@ -450,11 +403,11 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
      * @return {array} Index [0] is the file level tooltip (only relevant if there is no QM), and index [1] is the QC level tooltip.
      */
     function calcTooltips(hasQm, warns, fails) {
-        let qmExistsTip = '';
-        let warnFailTip = '';
+        let qmExistsTip = "";
+        let warnFailTip = "";
 
         if (!hasQm) {
-            qmExistsTip += 'This file has no quality metrics.';
+            qmExistsTip += "This file has no quality metrics.";
         }
         if (warns > 0) {
             warnFailTip += `${warns} QM(s) with Warnings `;
@@ -468,61 +421,46 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
     // Gather rows from family.members - 1 per sample (or individual, if no sample).
     // todo: consider moving this block to Case index; we're already doing a pass to figure out
     // how many individual have samples there... so it might make sense to move this
-    members.forEach(function (individual) {
+    members.forEach(function(individual){
         const {
             accession = null,
             display_title: indvDisplayTitle = null,
             individual_id = null,
-            '@id': indvId,
+            '@id' : indvId,
             error = null,
-            samples = [],
+            samples = []
         } = individual;
 
-        if (!indvDisplayTitle || !indvId) {
+        if (!indvDisplayTitle || !indvId){
             membersWithoutViewPermissions.push(individual);
             return;
         }
 
-        if (samples.length === 0) {
+        if (samples.length === 0){
             membersWithoutSamples.push(individual);
             return;
         }
 
-        const isProband = probandID && probandID === indvId;
+        const isProband = (probandID && probandID === indvId);
         const genID = idToGraphIdentifier[indvId];
 
         // Assign roles to the individual
-        const infoObj =
-            relationshipMapping[accession] ||
-            relationshipMapping[indvDisplayTitle];
-        const role = infoObj['relationship'] || null;
-        const sex = infoObj['sex'] || null;
-        console.log('id from graph', indvId, genID);
+        const infoObj = relationshipMapping[accession] || relationshipMapping[indvDisplayTitle];
+        const role = infoObj["relationship"] || null;
+        const sex = infoObj["sex"] || null;
+        console.log("id from graph", indvId, genID);
 
         const indvLink = (
-            <div className={`${genID ? 'text-truncate' : ''}`}>
-                {isProband ? (
-                    <span className="font-weight-bold d-block">Proband</span>
-                ) : null}
-                {role && role !== 'proband' ? (
-                    <span className="d-block font-weight-semibold text-capitalize">
-                        {role}
-                    </span>
-                ) : null}
-                {genID ? (
-                    <span className="text-serif text-small gen-identifier d-block text-center">
-                        {genID}
-                    </span>
-                ) : null}
-                <a href={indvId} className="accession d-block">
-                    {individual_id || indvDisplayTitle}
-                </a>
-            </div>
-        );
+            <div className={`${genID ? "text-truncate" : ""}`}>
+                { isProband ? <span className="font-weight-bold d-block">Proband</span> : null}
+                { (role && role !== "proband") ? <span className="d-block font-weight-semibold text-capitalize">{role}</span> : null}
+                { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
+                <a href={indvId} className="accession d-block">{ individual_id || indvDisplayTitle }</a>
+            </div>);
 
-        samples.forEach(function (sample, sampleIdx) {
+        samples.forEach(function(sample, sampleIdx){
             const {
-                '@id': samplePath = '',
+                '@id' : samplePath = "",
                 display_title: sampleTitle,
                 error: sampleErr = null,
                 files = [],
@@ -531,64 +469,47 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
                 specimen_type = null,
                 specimen_collection_date = null,
                 specimen_notes = null,
-                workup_type: assayType,
-                analysis_type = null,
+                workup_type : assayType,
+                analysis_type = null
             } = sample;
 
-            const [, , sampleID] = samplePath.split('/');
+            const [ , , sampleID ] = samplePath.split("/");
 
-            if (!sampleTitle || !samplePath) {
+            if (!sampleTitle || !samplePath){
                 rows.push({
-                    individual: indvLink,
+                    individual : indvLink,
                     isProband,
-                    sample: <em>{sampleErr || 'No view permissions'}</em>,
-                    sampleIdx,
+                    sample : <em>{ sampleErr || "No view permissions" }</em>,
+                    sampleIdx
                 });
                 return;
             } else {
                 rows.push({
-                    individual: indvLink,
+                    individual : indvLink,
                     isProband,
                     sample: (
                         <React.Fragment>
                             <span className="d-block">
-                                {capitalizeSentence(specimen_type)}
-                                {specimen_notes ? (
-                                    <span
-                                        className="text-primary"
-                                        data-tip={specimen_notes}>
-                                        *
-                                    </span>
-                                ) : (
-                                    ''
-                                )}
+                                { capitalizeSentence(specimen_type) }
+                                { specimen_notes ? <span className="text-primary" data-tip={ specimen_notes }>*</span>: "" }
                             </span>
-                            {specimen_collection_date ? (
+                            { specimen_collection_date ?
                                 <span data-tip="Specimen Collection Date">
-                                    <i className="mr-03 icon icon-fw icon-syringe fas text-secondary" />
-                                    <LocalizedTime
-                                        timestamp={specimen_collection_date}
-                                    />
+                                    <i className="mr-03 icon icon-fw icon-syringe fas text-secondary"/>
+                                    <LocalizedTime timestamp={specimen_collection_date} />
                                 </span>
-                            ) : null}
-                            <a href={samplePath} className="accession d-block">
-                                {sampleTitle}
-                            </a>
+                                : null }
+                            <a href={samplePath} className="accession d-block">{ sampleTitle }</a>
                         </React.Fragment>
                     ),
                     individualGroup,
                     sampleId: sampleID,
                     sampleGroup,
-                    processedFiles: generateFileDataObject(
-                        processed_files.filter(hasViewPermisison)
-                    ),
-                    rawFiles: generateFileDataObject(
-                        files.filter(hasViewPermisison)
-                    ),
+                    processedFiles: generateFileDataObject(processed_files.filter(hasViewPermisison)),
+                    rawFiles: generateFileDataObject(files.filter(hasViewPermisison)),
                     sampleIdx,
-                    processingType:
-                        analysis_type || completed_processes[0] || null,
-                    assayType,
+                    processingType: analysis_type || completed_processes[0] || null,
+                    assayType
                 });
             }
             sampleGroup++;
@@ -597,116 +518,94 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
     });
 
     const membersWithoutSamplesLen = membersWithoutSamples.length;
-    const membersWithoutViewPermissionsLen =
-        membersWithoutViewPermissions.length;
+    const membersWithoutViewPermissionsLen = membersWithoutViewPermissions.length;
 
-    const renderedSummary =
-        membersWithoutSamplesLen + membersWithoutViewPermissionsLen > 0 ? (
-            <div className="processing-summary mt-04 px-3">
-                {membersWithoutSamplesLen > 0 ? (
-                    <p className="my-0">
-                        <span className="text-600">
-                            {membersWithoutSamplesLen}
-                        </span>{' '}
-                        members without samples.
-                    </p>
-                ) : null}
-                {membersWithoutViewPermissionsLen > 0 ? (
-                    <p className="my-0">
-                        <span className="text-600">
-                            {membersWithoutViewPermissionsLen}
-                        </span>{' '}
-                        members without view permissions.
-                    </p>
-                ) : null}
-            </div>
-        ) : null;
+    const renderedSummary = (membersWithoutSamplesLen + membersWithoutViewPermissionsLen) > 0 ? (
+        <div className="processing-summary mt-04 px-3">
+            { membersWithoutSamplesLen > 0 ?
+                <p className="my-0">
+                    <span className="text-600">{ membersWithoutSamplesLen }</span> members without samples.
+                </p>
+                : null }
+            { membersWithoutViewPermissionsLen > 0 ?
+                <p className="my-0">
+                    <span className="text-600">{ membersWithoutViewPermissionsLen }</span> members without view permissions.
+                </p>
+                : null }
+        </div>
+    ) : null;
 
-    if (rows.length === 0) {
+    if (rows.length === 0){
         return renderedSummary;
     }
 
     // sort so that proband is on top, then it's ordered by individuals, then by samples of the same individual
-    const sortedRows = _(rows)
-        .chain()
-        .sortBy(function (row) {
-            return row.sampleGroup;
-        })
-        .sortBy(function (row) {
-            return row.individualGroup;
-        })
-        .reverse()
-        .sortBy(function (row) {
-            return row.isProband;
-        })
-        .value()
-        .reverse();
+    const sortedRows = _(rows).chain().sortBy(function(row) {
+        return row.sampleGroup;
+    }).sortBy(function(row) {
+        return row.individualGroup;
+    }).reverse().sortBy(function(row) {
+        return row.isProband;
+    }).value().reverse();
 
     let isEven = false; // Toggle on individual change
     let currIndvGroup = null; // Individual Group #
-    const renderedRows = sortedRows.map(function (row, rowIdx) {
-        const { isProband = false, sampleIdx, sampleId, individualGroup } = row;
-        const rowCols = h2ColumnOrder.map(function (colName) {
-            let colVal = row[colName] || ' - ';
+    const renderedRows = sortedRows.map(function(row, rowIdx) {
 
-            if (colName === 'processedFiles' || colName === 'rawFiles') {
+        const {
+            isProband = false,
+            sampleIdx,
+            sampleId,
+            individualGroup
+        } = row;
+        const rowCols = h2ColumnOrder.map(function(colName) {
+
+            let colVal = row[colName] || " - ";
+
+            if (colName === "processedFiles" || colName === "rawFiles"){
                 const fileData = row[colName];
                 const extensions = Object.keys(fileData);
                 let renderArr = [];
 
-                extensions.forEach(function (ext) {
+                extensions.forEach(function(ext){
                     const jsx = convertFileObjectToJSX(fileData[ext], ext);
                     renderArr = renderArr.concat(jsx);
                 });
 
                 colVal = (
                     <div className="qcs-container text-truncate">
-                        {renderArr}
+                        { renderArr }
                     </div>
                 );
-            } else if (hasMSAFlag(colName)) {
-                // if a multisample analysis object
-                const [, , uuid] = colName.split('|');
-                const allFileObjects =
-                    sampleProcessingData[uuid][sampleId] || {};
+            } else if (hasMSAFlag(colName)) { // if a multisample analysis object
+                const [,, uuid] = colName.split("|");
+                const allFileObjects = sampleProcessingData[uuid][sampleId] || {};
 
                 if (allFileObjects === true) {
-                    console.log('exts, allFileObjects,', allFileObjects);
-                    colVal = (
-                        <div className="qcs-container text-truncate">
-                            <i className="icon icon-arrow-alt-circle-down fas"></i>{' '}
-                            Included in VCF{' '}
-                        </div>
-                    );
+                    console.log("exts, allFileObjects,", allFileObjects);
+                    colVal = <div className="qcs-container text-truncate"><i className="icon icon-arrow-alt-circle-down fas"></i> Included in VCF </div>;
                 } else {
                     const extensions = Object.keys(allFileObjects);
-                    console.log('exts, extensions,', extensions);
+                    console.log("exts, extensions,", extensions);
 
                     let renderArr = [];
-                    extensions.forEach(function (ext) {
-                        const jsx = convertFileObjectToJSX(
-                            allFileObjects[ext],
-                            ext
-                        );
+                    extensions.forEach(function(ext){
+                        const jsx = convertFileObjectToJSX(allFileObjects[ext], ext);
                         renderArr = renderArr.concat(jsx);
                     });
 
                     colVal = (
                         <div className="qcs-container text-truncate">
-                            {renderArr.length > 0 ? renderArr : '-'}
+                            { renderArr.length > 0 ? renderArr : '-' }
                         </div>
                     );
                 }
             }
 
             return (
-                <td
-                    key={colName}
-                    data-for-column={colName}
-                    className={
-                        typeof row[colName] !== 'undefined' ? 'has-value' : null
-                    }>
-                    {colVal}
+                <td key={colName} data-for-column={colName}
+                    className={typeof row[colName] !== 'undefined' ? "has-value" : null}>
+                    { colVal }
                 </td>
             );
         });
@@ -717,167 +616,132 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props) {
             isEven = !isEven;
         }
 
-        const rowCls =
-            'sample-row' +
-            (isProband ? ' is-proband' : isEven ? ' is-even' : '');
-
-        return (
-            <tr key={rowIdx} className={rowCls} data-sample-index={sampleIdx}>
-                {rowCols}
-            </tr>
+        const rowCls = (
+            "sample-row" +
+            (isProband ? " is-proband" :  (isEven ? " is-even" : ""))
         );
+
+        return <tr key={rowIdx} className={rowCls} data-sample-index={sampleIdx}>{ rowCols }</tr>;
     });
 
     const finalRow = hasMSA ? (
         <tr>
-            {h2ColumnOrder.map((colName) => {
-                let colVal;
-                const hasValue = hasMSAFlag(colName);
-                if (hasMSAFlag(colName)) {
-                    const fileObjects =
-                        sampleProcessingData[getUUIDFromMSATitle(colName)]
-                            .MSA || {};
-                    const extensions = Object.keys(fileObjects);
+            {
+                h2ColumnOrder.map((colName) => {
+                    let colVal;
+                    const hasValue = hasMSAFlag(colName);
+                    if (hasMSAFlag(colName)) {
+                        const fileObjects = sampleProcessingData[getUUIDFromMSATitle(colName)].MSA || {};
+                        const extensions = Object.keys(fileObjects);
 
-                    let renderArr = [];
-                    extensions.forEach((ext) => {
-                        // generate new jsx
-                        const jsx = convertFileObjectToJSX(
-                            fileObjects[ext],
-                            ext
+                        let renderArr = [];
+                        extensions.forEach((ext) => {
+                            // generate new jsx
+                            const jsx = convertFileObjectToJSX(fileObjects[ext], ext);
+                            renderArr = renderArr.concat(jsx);
+                        });
+
+                        colVal = (
+                            <div className="qcs-container text-truncate">
+                                { renderArr.length > 0 ? renderArr : '-' }
+                            </div>
                         );
-                        renderArr = renderArr.concat(jsx);
-                    });
-
-                    colVal = (
-                        <div className="qcs-container text-truncate">
-                            {renderArr.length > 0 ? renderArr : '-'}
-                        </div>
+                    } else {
+                        colVal = null;
+                    }
+                    return (
+                        <td key={colName} data-for-column={colName}
+                            className={ hasValue ? "has-value" : null}>
+                            { colVal }
+                        </td>
                     );
-                } else {
-                    colVal = null;
-                }
-                return (
-                    <td
-                        key={colName}
-                        data-for-column={colName}
-                        className={hasValue ? 'has-value' : null}>
-                        {colVal}
-                    </td>
-                );
-            })}
-        </tr>
-    ) : null;
+                })
+            }
+        </tr>) : null ;
 
     const renderedTable = (
         <div className="processing-summary-table-container">
             <table className="processing-summary-table">
                 <thead>
-                    {hasMSA ? (
+                    { hasMSA ?
                         <tr>
-                            {
-                                // note: currently assumes that any cols after those set in ColumnTitles are MSAs
+                            { // note: currently assumes that any cols after those set in ColumnTitles are MSAs
                                 <React.Fragment>
-                                    <th
-                                        colSpan={originalNumCols}
-                                        className="hidden-th"
-                                    />
-                                    <th
-                                        colSpan={
-                                            Object.keys(columnTitles).length -
-                                            originalNumCols
-                                        }>
-                                        Multi Sample Analysis
-                                    </th>
-                                </React.Fragment>
-                            }
-                        </tr>
-                    ) : null}
+                                    <th colSpan={originalNumCols} className="hidden-th"/>
+                                    <th colSpan={ Object.keys(columnTitles).length - originalNumCols }>Multi Sample Analysis</th>
+                                </React.Fragment>}
+                        </tr> : null}
                     <tr>
-                        {h2ColumnOrder.map(function (colName, colIdx) {
+                        { h2ColumnOrder.map(function(colName, colIdx){
                             const title = columnTitles[colName];
                             // if flagged as a multiSampleAnalysis column, parse it for the appropriate data
-                            if (
-                                typeof title === 'string' &&
-                                hasMSAFlag(title)
-                            ) {
-                                const titleArr = title.split('|'); // if there isn't a proper title (undefined) for column, numbers based on index
-                                return (
-                                    <th key={`msa ${titleArr[2]}`}>
-                                        {titleArr[1] !== 'undefined'
-                                            ? titleArr[1]
-                                            : 'Joint Call'}
-                                    </th>
-                                );
+                            if (typeof title === "string" && hasMSAFlag(title)) {
+                                const titleArr = title.split("|"); // if there isn't a proper title (undefined) for column, numbers based on index
+                                return <th key={`msa ${titleArr[2]}`}>{ titleArr[1] !== 'undefined' ? titleArr[1] : "Joint Call"}</th>;
                             }
-                            return <th key={colName}>{title}</th>;
-                        })}
+                            return <th key={colName}>{ title }</th>;
+                        }) }
                     </tr>
                 </thead>
-                <tbody>{renderedRows}</tbody>
-                {hasCombinedMSA ? <tfoot>{finalRow}</tfoot> : null}
+                <tbody>
+                    { renderedRows }
+                </tbody>
+                { hasCombinedMSA ?  <tfoot>{ finalRow }</tfoot>: null }
             </table>
         </div>
     );
 
     return (
         <React.Fragment>
-            {renderedSummary}
-            {renderedTable}
+            { renderedSummary }
+            { renderedTable }
         </React.Fragment>
     );
 });
-CaseSummaryTable.propTypes = {
-    // todo: update with required fields
-    clinic_notes: PropTypes.string,
-    family_phenotypic_features: PropTypes.arrayOf(
-        PropTypes.shape({
-            '@id': PropTypes.string,
-            '@type': PropTypes.arrayOf(PropTypes.string),
-            display_title: PropTypes.string,
-            principals_allowed: PropTypes.object,
-            uuid: PropTypes.string,
-        })
-    ),
-    idToGraphIdentifier: PropTypes.object,
-    idx: PropTypes.number,
-    isCurrentFamily: PropTypes.bool,
-    family: PropTypes.shape({
-        members: PropTypes.arrayOf(
-            PropTypes.shape({
-                '@id': PropTypes.string,
-                '@type': PropTypes.arrayOf(PropTypes.string),
-                accession: PropTypes.string,
-                age_at_death_units: PropTypes.string,
-                age_units: PropTypes.string,
-                display_title: PropTypes.string,
-                father: PropTypes.object,
-                is_deceased: PropTypes.bool,
-                is_infertile: PropTypes.bool,
-                is_no_children_by_choice: PropTypes.bool,
-                is_pregnancy: PropTypes.bool,
-                is_spontaneous_abortion: PropTypes.bool,
-                is_still_birth: PropTypes.bool,
-                is_termination_of_pregnancy: PropTypes.bool,
-                mother: PropTypes.object,
-                principals_allowed: PropTypes.object,
-                sex: PropTypes.string,
-                status: PropTypes.string,
-                uuid: PropTypes.string,
-            })
-        ),
-        original_pedigree: PropTypes.object,
-        proband: PropTypes.object,
-        family_phenotypic_features: PropTypes.arrayOf(
-            PropTypes.shape({
-                '@id': PropTypes.string,
-                '@type': PropTypes.arrayOf(PropTypes.string),
-                display_title: PropTypes.string,
-                principals_allowed: PropTypes.object,
-                uuid: PropTypes.string,
-            })
-        ),
+CaseSummaryTable.propTypes = { // todo: update with required fields
+    "clinic_notes" : PropTypes.string,
+    "family_phenotypic_features" : PropTypes.arrayOf(PropTypes.shape({
+        "@id": PropTypes.string,
+        "@type": PropTypes.arrayOf(PropTypes.string),
+        "display_title": PropTypes.string,
+        "principals_allowed": PropTypes.object,
+        "uuid": PropTypes.string
+    })),
+    "idToGraphIdentifier" : PropTypes.object,
+    "idx" : PropTypes.number,
+    "isCurrentFamily" : PropTypes.bool,
+    "family": PropTypes.shape({
+        "members" : PropTypes.arrayOf(PropTypes.shape({
+            "@id" : PropTypes.string,
+            "@type" : PropTypes.arrayOf(PropTypes.string),
+            "accession" : PropTypes.string,
+            "age_at_death_units" : PropTypes.string,
+            "age_units" : PropTypes.string,
+            "display_title" : PropTypes.string,
+            "father" : PropTypes.object,
+            "is_deceased" : PropTypes.bool,
+            "is_infertile" : PropTypes.bool,
+            "is_no_children_by_choice" : PropTypes.bool,
+            "is_pregnancy" : PropTypes.bool,
+            "is_spontaneous_abortion" : PropTypes.bool,
+            "is_still_birth" : PropTypes.bool,
+            "is_termination_of_pregnancy" : PropTypes.bool,
+            "mother" : PropTypes.object,
+            "principals_allowed" : PropTypes.object,
+            "sex" : PropTypes.string,
+            "status" : PropTypes.string,
+            "uuid" : PropTypes.string
+        })),
+        "original_pedigree" : PropTypes.object,
+        "proband" : PropTypes.object,
+        "family_phenotypic_features" : PropTypes.arrayOf(PropTypes.shape({
+            "@id": PropTypes.string,
+            "@type": PropTypes.arrayOf(PropTypes.string),
+            "display_title": PropTypes.string,
+            "principals_allowed": PropTypes.object,
+            "uuid": PropTypes.string
+        })),
     }),
-    sampleProcessing: PropTypes.arrayOf(PropTypes.object),
-    timestamp: PropTypes.string,
+    "sampleProcessing": PropTypes.arrayOf(PropTypes.object),
+    "timestamp" : PropTypes.string
 };

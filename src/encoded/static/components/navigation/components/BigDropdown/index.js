@@ -1,10 +1,7 @@
 'use strict';
 
 export { BigDropdownContainer } from './BigDropdownContainer';
-export {
-    BigDropdownPageTreeMenu,
-    BigDropdownPageTreeMenuIntroduction,
-} from './BigDropdownPageTreeMenu';
+export { BigDropdownPageTreeMenu, BigDropdownPageTreeMenuIntroduction } from './BigDropdownPageTreeMenu';
 export { BigDropdownPageLoader } from './BigDropdownPageLoader';
 export { BigDropdownNavItem } from './BigDropdownNavItem';
 export { BigDropdownGroupController } from './BigDropdownGroupController';

@@ -32,5 +32,5 @@ export {
     GeneralVcfTrack,
     CohortTrack,
     GeneListTrack,
-    BigwigDataFetcher,
+    BigwigDataFetcher
 };

@@ -26,47 +26,30 @@ import PropTypes from 'prop-types';
  */
 
 export const graphTransformerPropTypes = {
-    dataset: PropTypes.arrayOf(
-        PropTypes.exact({
-            id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-                .isRequired,
-            name: PropTypes.string,
-            gender: PropTypes.oneOf([
-                'm',
-                'M',
-                'male',
-                'f',
-                'F',
-                'female',
-                'u',
-                'U',
-                'undetermined',
-            ]).isRequired,
-            age: PropTypes.number,
-            diseases: PropTypes.arrayOf(PropTypes.string),
-            carrierOfDiseases: PropTypes.arrayOf(PropTypes.string),
-            asymptoticDiseases: PropTypes.arrayOf(PropTypes.string),
-            isProband: PropTypes.bool,
-            isDeceased: PropTypes.bool,
-            isConsultand: PropTypes.bool,
-            isPregnancy: PropTypes.bool,
-            isStillBirth: PropTypes.bool,
-            isSpontaneousAbortion: PropTypes.bool,
-            isTerminatedPregnancy: PropTypes.bool,
-            isEctopic: PropTypes.bool,
-            data: PropTypes.object,
-            parents: PropTypes.arrayOf(
-                PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-            ),
-            children: PropTypes.arrayOf(
-                PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-            ),
-            mother: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-            father: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-        })
-    ),
+    dataset: PropTypes.arrayOf(PropTypes.exact({
+        'id'                : PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+        'name'              : PropTypes.string,
+        'gender'            : PropTypes.oneOf(["m", "M", "male", "f", "F", "female", "u", "U", "undetermined"]).isRequired,
+        'age'               : PropTypes.number,
+        'diseases'          : PropTypes.arrayOf(PropTypes.string),
+        'carrierOfDiseases' : PropTypes.arrayOf(PropTypes.string),
+        'asymptoticDiseases': PropTypes.arrayOf(PropTypes.string),
+        'isProband'         : PropTypes.bool,
+        'isDeceased'        : PropTypes.bool,
+        'isConsultand'      : PropTypes.bool,
+        'isPregnancy'       : PropTypes.bool,
+        'isStillBirth'      : PropTypes.bool,
+        'isSpontaneousAbortion' : PropTypes.bool,
+        'isTerminatedPregnancy' : PropTypes.bool,
+        'isEctopic'         : PropTypes.bool,
+        'data'              : PropTypes.object,
+        'parents'           : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
+        'children'          : PropTypes.arrayOf(PropTypes.oneOfType([ PropTypes.string, PropTypes.number ])),
+        'mother'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+        'father'            : PropTypes.oneOfType([ PropTypes.string, PropTypes.number ]),
+    })),
     dimensionOpts: PropTypes.objectOf(PropTypes.number),
-    filterUnrelatedIndividuals: PropTypes.bool,
+    filterUnrelatedIndividuals: PropTypes.bool
 };
 
 export const pedigreeVizViewPropTypes = {
@@ -81,5 +64,5 @@ export const pedigreeVizViewPropTypes = {
 
 export const pedigreeVizPropTypes = {
     ...graphTransformerPropTypes,
-    ...pedigreeVizViewPropTypes,
+    ...pedigreeVizViewPropTypes
 };

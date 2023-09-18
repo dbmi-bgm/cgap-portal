@@ -6,20 +6,17 @@ import _ from 'underscore';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 import { SearchBar } from './SearchBar';
 
+
 /** Adjusts the right buttons for more CGAP-specific theming */
-export function AboveTableControlsBaseCGAP(props) {
+export function AboveTableControlsBaseCGAP (props) {
     const {
         context, // search context
         children: propChildren,
         navigate,
-        isContextLoading = false, // Present only on embedded search views
+        isContextLoading = false // Present only on embedded search views
     } = props;
-    const panelMap =
-        AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(props);
-    panelMap.multiColumnSort.body = React.cloneElement(
-        panelMap.multiColumnSort.body,
-        { size: 'sm', variant: 'outline-dark' }
-    );
+    const panelMap = AboveTableControlsBase.getCustomColumnSelectorPanelMapDefinition(props);
+    panelMap.multiColumnSort.body = React.cloneElement(panelMap.multiColumnSort.body, { "size": "sm", "variant": "outline-dark" });
 
     //const { context, currentAction, isFullscreen, windowWidth, toggleFullScreen, sortBy } = props;
     const { total: totalResultCount = 0 } = context || {};
@@ -34,9 +31,8 @@ export function AboveTableControlsBaseCGAP(props) {
                 </div>
                 <div className="col-12 col-md">
                     <span className="text-400" id="results-count">
-                        {totalResultCount}
-                    </span>{' '}
-                    Results
+                        { totalResultCount }
+                    </span> Results
                 </div>
             </React.Fragment>
         );

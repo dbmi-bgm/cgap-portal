@@ -1,5 +1,7 @@
+
+
 /** @deprecated */
-export function orderObjectGraph2(objectGraph, relationships = null) {
+export function orderObjectGraph2(objectGraph, relationships = null){
     const rootPermutations = computePossibleParentlessPermutations(objectGraph);
     const leafPermutations = computePossibleChildlessPermutations(objectGraph);
 
@@ -11,19 +13,20 @@ export function orderObjectGraph2(objectGraph, relationships = null) {
     //const orderingPermutations = createOrderingPermutations(orderingInitial);
     //const orderingPermutationsLen = orderingPermutations.length;
 
+
     console.log(
         'PERMUTATIONS',
         leafPermutations,
-        rootPermutations
+        rootPermutations,
         //orderingInitial,
         //orderingPermutations
     );
 
-    function checkCrossings(order) {
+    function checkCrossings(order){
         const edgeCrossings = countEdgeCrossings(order);
         //console.log("ORDER", order, edgeCrossings);
-        if (edgeCrossings < bestCrossings) {
-            bestOrder = order; //copyOrder(order, objectGraph, memoized);
+        if (edgeCrossings < bestCrossings){
+            bestOrder = order;//copyOrder(order, objectGraph, memoized);
             bestCrossings = edgeCrossings;
             //console.log("ISBEST");
         }
@@ -37,128 +40,93 @@ export function orderObjectGraph2(objectGraph, relationships = null) {
     //const probandBasedOrdering = initOrderingSimple(objectGraph, memoized);
     //checkCrossings(probandBasedOrdering);
 
-    if (bestCrossings !== 0) {
-        for (i = 0; i < rootPermutations.length; i++) {
-            const orderBFS = initOrdering(
-                objectGraph,
-                rootPermutations[i],
-                'children',
-                false
-            );
+    if (bestCrossings !== 0){
+        for (i = 0; i < rootPermutations.length; i++){
+            const orderBFS = initOrdering(objectGraph, rootPermutations[i], "children", false);
             checkCrossings(orderBFS);
             if (bestCrossings === 0) break;
-            const orderDFS = initOrdering(
-                objectGraph,
-                rootPermutations[i],
-                'children',
-                true
-            );
+            const orderDFS = initOrdering(objectGraph, rootPermutations[i], "children", true);
             checkCrossings(orderDFS);
             if (bestCrossings === 0) break;
         }
     }
 
-    if (bestCrossings !== 0) {
-        for (i = 0; i < leafPermutations.length; i++) {
-            const orderBFS = initOrdering(
-                objectGraph,
-                leafPermutations[i],
-                'parents',
-                false
-            );
+    if (bestCrossings !== 0){
+        for (i = 0; i < leafPermutations.length; i++){
+            const orderBFS = initOrdering(objectGraph, leafPermutations[i], "parents", false);
             checkCrossings(orderBFS);
             if (bestCrossings === 0) break;
-            const orderDFS = initOrdering(
-                objectGraph,
-                leafPermutations[i],
-                'parents',
-                true
-            );
+            const orderDFS = initOrdering(objectGraph, leafPermutations[i], "parents", true);
             checkCrossings(orderDFS);
             if (bestCrossings === 0) break;
         }
     }
 
-    console.log(
-        'BEST ORDER1',
-        Object.assign({}, bestOrder),
-        bestCrossings,
-        objectGraph
-    );
+    console.log("BEST ORDER1", Object.assign({}, bestOrder), bestCrossings, objectGraph);
 
     improveOrder(bestOrder, bestCrossings);
     heuristicallyAdjustOrder(bestOrder);
 
     // Save final order to nodes so we don't need order object anymore
     const { seenOrderInIndex, orderByHeightIndex } = bestOrder;
-    objectGraph.forEach(function (indv) {
+    objectGraph.forEach(function(indv){
         indv._drawing.orderInHeightIndex = seenOrderInIndex[indv.id];
     });
     relationships = relationships || getRelationships(objectGraph);
-    relationships.forEach(function (r) {
+    relationships.forEach(function(r){
         r._drawing.orderInHeightIndex = seenOrderInIndex[r.id];
     });
 
     // Assign order-based-name
     const heightIndicesCount = orderByHeightIndex.length;
-    orderByHeightIndex.forEach(function (nodesInRow, hi) {
-        const generationRomanNumeral = numberToRomanNumeral(
-            heightIndicesCount - hi
-        );
-        nodesInRow.reduce(function (currNum, n) {
-            if (isRelationshipNode(n)) return currNum;
-            n.orderBasedName = '' + generationRomanNumeral + ' – ' + currNum;
+    orderByHeightIndex.forEach(function(nodesInRow, hi){
+        const generationRomanNumeral = numberToRomanNumeral(heightIndicesCount - hi);
+        nodesInRow.reduce(function(currNum, n){
+            if ( isRelationshipNode(n) ) return currNum;
+            n.orderBasedName = "" + generationRomanNumeral + " – " + currNum;
             if (n.isProband) {
                 // Append "p" if proband
-                n.orderBasedName += 'p';
+                n.orderBasedName += "p";
             }
             currNum++;
             return currNum;
         }, 1);
     });
 
-    console.log('BEST ORDER2', bestOrder, bestCrossings, objectGraph);
+    console.log("BEST ORDER2", bestOrder, bestCrossings, objectGraph);
 
     return { objectGraph, relationships, ...bestOrder };
 }
 
-function initOrdering(
-    objectGraph,
-    startIndividuals = null,
-    direction = 'children',
-    stack = false,
-    memoized = {}
-) {
+function initOrdering(objectGraph, startIndividuals = null, direction = "children", stack = false, memoized = {}){
     const q = startIndividuals.slice(0);
-    if (!stack) {
+    if (!stack){
         q.reverse();
     }
 
     const orderByHeightIndex = []; // 2D
-    const maxHeightIndex = (memoized.getMaxHeightIndex || getMaxHeightIndex)(
-        objectGraph
-    );
-    for (let i = 0; i <= maxHeightIndex; i++) {
+    const maxHeightIndex = (memoized.getMaxHeightIndex || getMaxHeightIndex)(objectGraph);
+    for (let i = 0; i <= maxHeightIndex; i++){
         orderByHeightIndex[i] = [];
     }
 
-    function addToQ(indv) {
-        if (stack) {
+    function addToQ(indv){
+        if (stack){
             q.push(indv);
         } else {
             q.unshift(indv);
         }
     }
 
-    function countAncestors(indvNode) {
+    function countAncestors(indvNode){
         const seenA = {};
         const aQ = [indvNode];
         let count = 0;
-        while (aQ.length) {
+        while (aQ.length){
             const currA = aQ.pop();
             if (seenA[currA.id]) continue;
-            if (currA._parentalRelationship) {
-                currA._parentalRelationship.partners.forEach(function (p) {
+            if (currA._parentalRelationship){
+                currA._parentalRelationship.partners.forEach(function(p){
                     aQ.unshift(p);
                 });
             }
@@ -167,7 +135,7 @@ function initOrdering(
         return count;
     }
 
-    function sortByAncestorCount(a, b) {
+    function sortByAncestorCount(a,b){
         const count = countAncestors(b) - countAncestors(a);
         if (count !== 0) return count;
         if (a.gender === 'male') return -1;
@@ -175,15 +143,15 @@ function initOrdering(
         return 0;
     }
 
-    function countDescendants(indvNode) {
+    function countDescendants(indvNode){
         const seenD = {};
         const dQ = [indvNode];
         let count = 0;
-        while (dQ.length) {
+        while (dQ.length){
             const currD = dQ.pop();
             if (seenD[currD.id]) continue;
-            (currD._maritalRelationships || []).forEach(function (mr) {
-                (mr.children || []).forEach(function (child) {
+            (currD._maritalRelationships || []).forEach(function(mr){
+                (mr.children || []).forEach(function(child){
                     dQ.unshift(child);
                 });
             });
@@ -192,87 +160,71 @@ function initOrdering(
         return count;
     }
 
-    function sortByDescendantCount(a, b) {
+    function sortByDescendantCount(a,b){
         return countDescendants(b) - countDescendants(a);
     }
 
     const orderAssignedDebugList = [];
 
-    function assignOrder(node) {
-        const {
-            id,
-            _drawing: { heightIndex },
-        } = node;
+    function assignOrder(node){
+        const { id, _drawing : { heightIndex } } = node;
         const orderAssignedInIndex = orderByHeightIndex[heightIndex].length;
         seenOrderInIndex[id] = orderAssignedInIndex;
         orderByHeightIndex[heightIndex].push(node);
-        orderAssignedDebugList.push({
-            id: node.name || node.id,
-            h: heightIndex,
-            o: orderAssignedInIndex,
-        });
+        orderAssignedDebugList.push({ 'id': node.name || node.id, 'h' : heightIndex, 'o' : orderAssignedInIndex });
         //console.log("DIRECT", direction, stack, id, heightIndex, orderAssignedInIndex, q.map(function(item){ return item.id; }));
     }
 
     const seenOrderInIndex = {};
     const seenIndvs = [];
     // eslint-disable-next-line no-constant-condition
-    while (true) {
-        while (q.length) {
+    while (true){
+        while (q.length){
             const node = q.pop();
             const {
                 id,
-                _drawing: { heightIndex },
+                _drawing : { heightIndex },
                 _maritalRelationships = [],
                 _parentalRelationship = null,
                 children = [],
-                partners = [],
+                partners = []
             } = node;
 
-            if (typeof seenOrderInIndex[id] !== 'undefined') continue;
+            if (typeof seenOrderInIndex[id] !== "undefined") continue;
 
             assignOrder(node);
 
-            if (isRelationshipNode(node)) {
-                if (direction === 'parents' && partners) {
-                    partners
-                        .sort(sortByAncestorCount)
-                        .sort(sortPartnersByGender)
-                        .forEach(addToQ);
-                } else if (direction === 'children' && children) {
+            if (isRelationshipNode(node)){
+                if (direction === "parents" && partners){
+                    partners.sort(sortByAncestorCount).sort(sortPartnersByGender).forEach(addToQ);
+                } else if (direction === "children" && children){
                     children.sort(sortByDescendantCount).forEach(addToQ);
                 }
             } else {
                 seenIndvs.push(node);
-                if (direction === 'parents' && _parentalRelationship) {
-                    const [firstParentPartner, ...otherParentPartners] = (
-                        _parentalRelationship.partners || []
-                    )
+                if (direction === "parents" && _parentalRelationship){
+                    const [ firstParentPartner, ...otherParentPartners ] = (_parentalRelationship.partners || [])
                         .sort(sortByAncestorCount)
                         .sort(sortPartnersByGender);
-                    if (firstParentPartner) {
+                    if (firstParentPartner){
                         addToQ(firstParentPartner);
                     }
                     addToQ(_parentalRelationship);
                     otherParentPartners.forEach(addToQ);
-                } else if (direction === 'children' && _maritalRelationships) {
+
+                } else if (direction === "children" && _maritalRelationships){
                     _maritalRelationships.forEach(addToQ);
                 }
             }
+
         }
-        if (seenIndvs.length === objectGraph.length) {
+        if (seenIndvs.length === objectGraph.length){
             break;
         } else {
             // Have Individuals not connected to proband
-            console.error(
-                'Unconnected individuals found',
-                seenOrderInIndex,
-                objectGraph
-            );
-            for (let i = 0; i < objectGraph.length; i++) {
-                if (
-                    typeof seenOrderInIndex[objectGraph[i].id] === 'undefined'
-                ) {
+            console.error("Unconnected individuals found", seenOrderInIndex, objectGraph);
+            for (let i = 0; i < objectGraph.length; i++){
+                if (typeof seenOrderInIndex[objectGraph[i].id] === 'undefined'){
                     q.push(objectGraph[i]);
                     break;
                 }
@@ -285,44 +237,28 @@ function initOrdering(
     return { orderByHeightIndex, seenOrderInIndex };
 }
 
-export function computePossibleParentlessPermutations(objectGraph, skip = {}) {
+export function computePossibleParentlessPermutations(objectGraph, skip={}){
     const parentlessIndividuals = getParentlessIndividuals(objectGraph);
     const seen = {};
     const buckets = [];
-    console.log('PARENTLESSINDVDS', parentlessIndividuals);
-    parentlessIndividuals.forEach(function (indv) {
+    console.log("PARENTLESSINDVDS", parentlessIndividuals);
+    parentlessIndividuals.forEach(function(indv){
         if (seen[indv.id] || skip[indv.id]) return;
         const nextBucket = [];
         nextBucket.push(indv);
         seen[indv.id] = true;
 
         // grouping: place parents which are only connected to the same relationship in the same bucket
-        if (
-            indv._maritalRelationships.length === 1 &&
-            !seen[indv._maritalRelationships[0].id] &&
-            !skip[indv._maritalRelationships[0].id]
-        ) {
-            const otherPartners = indv._maritalRelationships[0].partners.filter(
-                function (partner) {
-                    return (
-                        partner.id !== indv.id &&
-                        partner._parentReferences.length === 0 &&
-                        partner._maritalRelationships.length === 1
-                    );
-                }
-            );
-            if (
-                otherPartners.length + 1 ===
-                indv._maritalRelationships[0].partners.length
-            ) {
+        if (indv._maritalRelationships.length === 1 && !seen[indv._maritalRelationships[0].id] && !skip[indv._maritalRelationships[0].id]){
+            const otherPartners = indv._maritalRelationships[0].partners.filter(function(partner){
+                return partner.id !== indv.id && partner._parentReferences.length === 0 && partner._maritalRelationships.length === 1;
+            });
+            if (otherPartners.length + 1 === indv._maritalRelationships[0].partners.length){
                 nextBucket.push(indv._maritalRelationships[0]);
                 seen[indv._maritalRelationships.id] = true;
-                otherPartners.forEach(function (oP) {
-                    if (!seen[oP.id]) {
-                        if (
-                            oP._parentReferences.length === 0 &&
-                            oP._maritalRelationships.length === 1
-                        ) {
+                otherPartners.forEach(function(oP){
+                    if (!seen[oP.id]){
+                        if (oP._parentReferences.length === 0 && oP._maritalRelationships.length === 1){
                             nextBucket.push(oP);
                             seen[oP.id] = true;
                         }
@@ -334,69 +270,70 @@ export function computePossibleParentlessPermutations(objectGraph, skip = {}) {
         buckets.push(nextBucket);
     });
 
-    console.log('ROOTBUCKETS', buckets);
+    console.log("ROOTBUCKETS", buckets);
 
     return permutate2DArray1Dimension(buckets);
 }
 
-export function computePossibleChildlessPermutations(objectGraph, skip = {}) {
+export function computePossibleChildlessPermutations(objectGraph, skip={}){
     const leafIndividuals = getChildlessIndividuals(objectGraph);
     const leafSiblingsObj = getChildlessSiblings(leafIndividuals);
     const idMap = indvListToMap(objectGraph);
     const seen = {};
     const buckets = [];
 
-    Object.keys(leafSiblingsObj).forEach(function (leafIndvID) {
+
+    Object.keys(leafSiblingsObj).forEach(function(leafIndvID){
         const siblings = leafSiblingsObj[leafIndvID];
-        const bucket = [idMap[leafIndvID], ...siblings];
+        const bucket = [ idMap[leafIndvID], ...siblings ];
         buckets.push(bucket);
-        bucket.forEach(function (indv) {
+        bucket.forEach(function(indv){
             seen[indv.id] = true;
         });
     });
 
-    leafIndividuals.forEach(function (indv) {
+    leafIndividuals.forEach(function(indv){
         if (seen[indv.id] || skip[indv.id]) return;
         buckets.push([indv]);
     });
 
-    console.log('LEAF BUCKETS', buckets);
+    console.log("LEAF BUCKETS", buckets);
 
     return permutate2DArray1Dimension(buckets);
 }
 
-export function permutate2DArray1Dimension(arr) {
+export function permutate2DArray1Dimension(arr){
     return permutateArray(arr).map(flattenBuckets);
 }
 
-function improveOrder(order, initCrossings) {
+function improveOrder(order, initCrossings){
     const { orderByHeightIndex, seenOrderInIndex } = order;
 
     let bestCrossings = initCrossings;
     let iterations = 0;
     let improved = true;
 
-    while (improved) {
+    while (improved){
         iterations++;
         if (iterations > 10) break;
         improved = false;
-        orderByHeightIndex.forEach(function (nodesInRow, hi) {
+        orderByHeightIndex.forEach(function(nodesInRow, hi){
             const rowLen = nodesInRow.length;
             let i, nextCrossings;
-            for (i = 1; i < rowLen; i++) {
+            for (i = 1; i < rowLen; i++){
                 swapOrder(nodesInRow, seenOrderInIndex, i, i - 1);
                 nextCrossings = countEdgeCrossings(order);
                 //console.log(nextCrossings, bestCrossings);
-                if (nextCrossings < bestCrossings) {
+                if (nextCrossings < bestCrossings){
                     bestCrossings = nextCrossings;
                     //console.log("swapped", hi, i, i-1, seenOrderInIndex, orderByHeightIndex);
                     improved = true;
                 } else {
                     swapOrder(nodesInRow, seenOrderInIndex, i, i - 1);
-                    if (i - 2 >= 0) {
+                    if (i - 2 >= 0){
                         swapOrder(nodesInRow, seenOrderInIndex, i, i - 2);
                         nextCrossings = countEdgeCrossings(order);
-                        if (nextCrossings < bestCrossings) {
+                        if (nextCrossings < bestCrossings){
                             bestCrossings = nextCrossings;
                             //console.log("swapped", hi, i, i-2, seenOrderInIndex, orderByHeightIndex);
                             improved = true;
@@ -407,54 +344,45 @@ function improveOrder(order, initCrossings) {
                 }
             }
         });
+
     }
 }
 
-function heuristicallyAdjustOrder(order) {
+function heuristicallyAdjustOrder(order){
     const { orderByHeightIndex, seenOrderInIndex } = order;
 
-    orderByHeightIndex.forEach(function (nodesInRow, hi) {
+    orderByHeightIndex.forEach(function(nodesInRow, hi){
         const rowLen = nodesInRow.length;
         // Swap parents so male is first, if next to each other and no parents on at least 1.
-        for (let i = 0; i < rowLen; i++) {
-            const nodeSet = nodesInRow.slice(i, i + 3);
+        for (let i = 0; i < rowLen; i++){
+            const nodeSet = nodesInRow.slice(i, i+3);
             if (nodeSet.length < 3) continue;
-            const [leftNode, centerNode, rightNode] = nodeSet;
-            if (leftNode.gender === 'male' || isRelationshipNode(leftNode)) {
+            const [ leftNode, centerNode, rightNode ] = nodeSet;
+            if (leftNode.gender === "male" || isRelationshipNode(leftNode)){
                 continue;
             }
-            if (rightNode.gender !== 'male' || isRelationshipNode(rightNode)) {
+            if (rightNode.gender !== "male" || isRelationshipNode(rightNode)){
                 continue;
             }
-            if (
-                leftNode._maritalRelationships.length > 1 ||
-                rightNode._maritalRelationships.length > 1
-            ) {
+            if (leftNode._maritalRelationships.length > 1 || rightNode._maritalRelationships.length > 1){
                 continue;
             }
-            if (
-                leftNode._parentalRelationship &&
-                rightNode._parentalRelationship
-            ) {
+            if (leftNode._parentalRelationship && rightNode._parentalRelationship){
                 continue;
             }
-            if (
-                !isRelationshipNode(centerNode) ||
-                centerNode.partners.indexOf(leftNode) === -1 ||
-                centerNode.partners.indexOf(rightNode) === -1
-            ) {
+            if (!isRelationshipNode(centerNode) || centerNode.partners.indexOf(leftNode) === -1 || centerNode.partners.indexOf(rightNode) === -1){
                 continue;
             }
-            swapOrder(nodesInRow, seenOrderInIndex, i, i + 2);
+            swapOrder(nodesInRow, seenOrderInIndex, i, i+2);
         }
 
         // Sort adjacent childless children
         const groups = [];
         let currGroup = [];
         let currGroupStartIdx = null;
-        for (let i = 0; i < rowLen; i++) {
+        for (let i = 0; i < rowLen; i++){
             const node = nodesInRow[i];
-            if (currGroup.length === 0) {
+            if (currGroup.length === 0){
                 if (isRelationshipNode(node)) continue;
                 if (!node._parentalRelationship) continue;
                 if (node._maritalRelationships.length > 0) continue;
@@ -462,15 +390,13 @@ function heuristicallyAdjustOrder(order) {
                 currGroupStartIdx = i;
                 continue;
             }
-            if (
-                isRelationshipNode(node) ||
+            if (isRelationshipNode(node) ||
                 !node._parentalRelationship ||
-                node._parentalRelationship !==
-                    currGroup[0]._parentalRelationship ||
+                node._parentalRelationship !== currGroup[0]._parentalRelationship ||
                 node._maritalRelationships.length > 0
-            ) {
-                if (currGroup.length > 1) {
-                    groups.push([currGroup, currGroupStartIdx]);
+            ){
+                if (currGroup.length > 1){
+                    groups.push([currGroup, currGroupStartIdx ]);
                 }
                 currGroup = [];
                 currGroupStartIdx = null;
@@ -479,11 +405,11 @@ function heuristicallyAdjustOrder(order) {
             }
             currGroup.push(node);
         }
-        if (currGroup.length > 1) {
-            groups.push([currGroup, currGroupStartIdx]);
+        if (currGroup.length > 1){
+            groups.push([currGroup, currGroupStartIdx ]);
         }
         //console.log("GROUPS", groups);
-        groups.forEach(function ([nodeSet, startIdx]) {
+        groups.forEach(function([ nodeSet, startIdx ]){
             const nodesLen = nodeSet.length;
             const nextSet = nodeSet.sort(sortChildrenByAge);
             nodesInRow.splice(startIdx, nodesLen, ...nextSet);
@@ -491,7 +417,7 @@ function heuristicallyAdjustOrder(order) {
     });
 }
 
-function swapOrder(row, seenOrderInIndex, i1, i2) {
+function swapOrder(row, seenOrderInIndex, i1, i2){
     const temp = row[i1];
     row[i1] = row[i2];
     row[i2] = temp;
@@ -499,9 +425,9 @@ function swapOrder(row, seenOrderInIndex, i1, i2) {
     seenOrderInIndex[row[i2].id] = i2;
 }
 
-export function flattenBuckets(arr) {
-    return arr.reduce(function (retList, itemOrList, idx) {
-        if (Array.isArray(itemOrList)) {
+export function flattenBuckets(arr){
+    return arr.reduce(function(retList, itemOrList, idx){
+        if (Array.isArray(itemOrList)){
             return retList.concat(itemOrList);
         }
         retList.push(itemOrList);
@@ -513,67 +439,51 @@ export function flattenBuckets(arr) {
  * Must have `_drawing.heightIndex` already.
  * @deprecated
  */
-export function getParentlessPartners(objectGraph, memoized = {}) {
+export function getParentlessPartners(objectGraph, memoized = {}){
     const rootlessPartners = {};
     const idMap = (memoized.indvListToMap || indvListToMap)(objectGraph);
-    const parentlessIndividuals = (
-        memoized.getParentlessIndividuals || getParentlessIndividuals
-    )(objectGraph);
-    parentlessIndividuals.forEach(function (parentlessIndv) {
+    const parentlessIndividuals = (memoized.getParentlessIndividuals || getParentlessIndividuals)(objectGraph);
+    parentlessIndividuals.forEach(function(parentlessIndv){
         const { _childReferences, _drawing } = parentlessIndv;
-        const otherParentIDSet = _childReferences.reduce(function (
-            allParentIDs,
-            child
-        ) {
-            child._parentReferences.forEach(function (parent) {
-                if (parent.id !== parentlessIndv.id) {
+        const otherParentIDSet = _childReferences.reduce(function(allParentIDs, child){
+            child._parentReferences.forEach(function(parent){
+                if (parent.id !== parentlessIndv.id){
                     allParentIDs.add(parent.id);
                 }
             });
             return allParentIDs;
-        },
-        new Set());
-        const otherParents = [...otherParentIDSet].map(function (pID) {
-            return idMap[pID];
-        });
-        const otherParentsHeightIndices = otherParents.map(function (oP) {
-            return oP._drawing.heightIndex;
-        });
-        for (let i = 0; i < otherParentsHeightIndices.length; i++) {
-            if (otherParents[i]._drawing.heightIndex !== _drawing.heightIndex) {
+        }, new Set());
+        const otherParents = [...otherParentIDSet].map(function(pID){ return idMap[pID]; });
+        const otherParentsHeightIndices = otherParents.map(function(oP){ return oP._drawing.heightIndex; });
+        for (let i = 0; i < otherParentsHeightIndices.length; i++){
+            if (otherParents[i]._drawing.heightIndex !== _drawing.heightIndex){
                 return; // continue/skip for ordering purposes
             }
         }
 
-        otherParents.forEach(function (oP) {
+        otherParents.forEach(function(oP){
             const { _parentReferences } = oP;
-            if (_parentReferences.length > 0) {
+            if (_parentReferences.length > 0){
                 rootlessPartners[oP.id] = rootlessPartners[oP.id] || [];
                 rootlessPartners[oP.id].push(parentlessIndv);
             }
         });
+
     });
     // TODO: ensure it works
     return rootlessPartners;
 }
 
-export function getChildlessSiblings(leafIndividuals) {
+export function getChildlessSiblings(leafIndividuals){
     const leafSiblings = {};
     const seen = {};
-    leafIndividuals.forEach(function (indv) {
+    leafIndividuals.forEach(function(indv){
         const { id, _parentalRelationship = null } = indv;
         if (seen[id]) return;
-        if (
-            _parentalRelationship &&
-            _parentalRelationship.children.length >= 2
-        ) {
+        if (_parentalRelationship && _parentalRelationship.children.length >= 2){
             leafSiblings[id] = [];
-            _parentalRelationship.children.forEach(function (sibling) {
-                if (
-                    sibling.id === id ||
-                    sibling._maritalRelationships.length > 0
-                )
-                    return;
+            _parentalRelationship.children.forEach(function(sibling){
+                if (sibling.id === id || sibling._maritalRelationships.length > 0) return;
                 leafSiblings[id].push(sibling);
                 seen[sibling.id] = true;
             });
@@ -582,7 +492,8 @@ export function getChildlessSiblings(leafIndividuals) {
     return leafSiblings;
 }
 
-export function permutateArray(arr, from = 0, permutations = []) {
+
+export function permutateArray(arr, from = 0, permutations = []){
     const len = arr.length;
     if (from === len - 1) {
         permutations.push(arr.slice(0));
@@ -606,34 +517,32 @@ export function permutateArray(arr, from = 0, permutations = []) {
 }
 
 /** Individuals with no parents defined */
-export function getParentlessIndividuals(objectGraph) {
-    return objectGraph
-        .filter(function (individual) {
-            if (!individual.parents || individual.parents.length === 0) {
-                return true;
-            }
-            return false;
-        })
-        .sort(function (a, b) {
-            if (a.gender === 'male' && b.gender !== 'male') return -1;
-            if (a.gender !== 'male' && b.gender === 'male') return 1;
-            return 0;
-        });
+export function getParentlessIndividuals(objectGraph){
+    return objectGraph.filter(function(individual){
+        if (!individual.parents || individual.parents.length === 0){
+            return true;
+        }
+        return false;
+    }).sort(function(a,b){
+        if (a.gender === 'male' && b.gender !== 'male') return -1;
+        if (a.gender !== 'male' && b.gender === 'male') return 1;
+        return 0;
+    });
 }
 
 /** Individuals with no children defined */
-export function getChildlessIndividuals(objectGraph) {
-    return objectGraph.filter(function (individual) {
-        if (!individual.children || individual.children.length === 0) {
+export function getChildlessIndividuals(objectGraph){
+    return objectGraph.filter(function(individual){
+        if (!individual.children || individual.children.length === 0){
             return true;
         }
         return false;
     });
 }
 
-export function indvListToMap(list) {
+export function indvListToMap(list){
     const idMap = {};
-    list.forEach(function (indv) {
+    list.forEach(function(indv){
         idMap[indv.id] = indv;
     });
     return idMap;

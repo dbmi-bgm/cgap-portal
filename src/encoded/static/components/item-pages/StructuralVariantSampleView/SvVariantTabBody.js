@@ -1,39 +1,26 @@
 'use strict';
 
 import React, { useMemo, useState, useCallback } from 'react';
-import _ from 'underscore';
+import _ from "underscore";
 import DropdownButton from 'react-bootstrap/esm/DropdownButton';
 import DropdownItem from 'react-bootstrap/esm/DropdownItem';
 
-import {
-    console,
-    schemaTransforms,
-} from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
-import {
-    ClinVarSection,
-    getClinvarInfo,
-    standardizeGnomadValue,
-} from '../VariantSampleView/AnnotationSections';
+import { console, schemaTransforms } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ClinVarSection, getClinvarInfo, standardizeGnomadValue } from '../VariantSampleView/AnnotationSections';
 
-export const SvVariantTabBody = React.memo(function SvVariantTabBody({
-    context,
-    schemas,
-}) {
-    const [showingTable, setShowingTable] = useState('SV'); // Currently only "SV" allowed; more will be added in future
 
-    const onSelectShowingTable = useCallback(function (evtKey, e) {
+export const SvVariantTabBody = React.memo(function SvVariantTabBody({ context, schemas }) {
+    const [ showingTable, setShowingTable ] = useState("SV"); // Currently only "SV" allowed; more will be added in future
+
+    const onSelectShowingTable = useCallback(function(evtKey, e){
         e.stopPropagation();
         setShowingTable(evtKey);
         return;
     });
 
-    const titleDict = useMemo(function () {
+    const titleDict = useMemo(function(){
         return {
-            SV: (
-                <React.Fragment>
-                    gnomAD <span className="text-400">SV</span>
-                </React.Fragment>
-            ),
+            "SV": <React.Fragment>gnomAD <span className="text-400">SV</span></React.Fragment>,
         };
     });
 
@@ -62,73 +49,52 @@ export const SvVariantTabBody = React.memo(function SvVariantTabBody({
 });
 
 const SVGnomADTable = React.memo(function SVGnomADTable(props) {
-    const { context, schemas, prefix = 'gnomadg' } = props;
+    const { context, schemas, prefix = "gnomadg" } = props;
     const { structural_variant } = context;
 
     const fallbackElem = <em data-tip="Not Available"> - </em>;
 
     const {
-        [prefix + '_ac']: gnomad_ac,
-        [prefix + '_af']: gnomad_af,
-        [prefix + '_an']: gnomad_an,
+        [prefix + "_ac"]: gnomad_ac,
+        [prefix + "_af"]: gnomad_af,
+        [prefix + "_an"]: gnomad_an,
     } = structural_variant;
 
     const populationsAncestryList = [
         // Todo: eventually collect from schemas?
-        ['afr', 'African-American/African'],
-        ['eas', 'East Asian'],
-        ['eur', 'European'],
-        ['oth', 'Other Ancestry'],
+        ["afr", "African-American/African"],
+        ["eas", "East Asian"],
+        ["eur", "European"],
+        ["oth", "Other Ancestry"]
     ];
 
     const ancestryRowData = _.sortBy(
-        populationsAncestryList.map(function ([popStr, populationTitle]) {
+        populationsAncestryList.map(function([popStr, populationTitle]){
             const {
-                [prefix + '_ac-' + popStr]: alleleCount,
-                [prefix + '_af-' + popStr]: alleleFreq,
-                [prefix + '_an-' + popStr]: alleleNum,
+                [prefix + "_ac-" + popStr]: alleleCount,
+                [prefix + "_af-" + popStr]: alleleFreq,
+                [prefix + "_an-" + popStr]: alleleNum,
             } = structural_variant;
-            return {
-                popStr,
-                populationTitle,
-                alleleCount,
-                alleleFreq,
-                alleleNum,
-            };
+            return { popStr, populationTitle, alleleCount, alleleFreq, alleleNum };
         }),
-        function ({ alleleFreq }) {
+        function({ alleleFreq }){
             return -alleleFreq;
         }
     );
-    const ancestryTableRows = ancestryRowData.map(function ({
-        popStr,
-        populationTitle,
-        alleleCount,
-        alleleFreq,
-        alleleNum,
-        homozygoteNum,
-    }) {
+    const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
         return (
             <tr key={populationTitle}>
-                <td className="text-600 text-left">{populationTitle}</td>
-                <td>{standardizeGnomadValue(alleleCount)}</td>
-                <td>{standardizeGnomadValue(alleleNum)}</td>
-                <td className="text-left">
-                    {alleleFreq === 0
-                        ? '0.0000'
-                        : standardizeGnomadValue(alleleFreq)}
-                </td>
+                <td className="text-600 text-left">{ populationTitle }</td>
+                <td>{ standardizeGnomadValue(alleleCount) }</td>
+                <td>{ standardizeGnomadValue(alleleNum) }</td>
+                <td className="text-left">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
             </tr>
         );
     });
 
-    function getTipForField(field, itemType = 'StructuralVariantSample') {
+    function getTipForField(field, itemType = "StructuralVariantSample"){
         if (!schemas) return null;
-        const schemaProperty = schemaTransforms.getSchemaProperty(
-            field,
-            schemas,
-            itemType
-        );
+        const schemaProperty = schemaTransforms.getSchemaProperty(field, schemas, itemType);
         return (schemaProperty || {}).description || null;
     }
 
@@ -139,30 +105,18 @@ const SVGnomADTable = React.memo(function SVGnomADTable(props) {
                     <th className="text-left">Population</th>
                     <th>
                         Allele Count
-                        <i
-                            className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={getTipForField(
-                                'structural_variant.' + prefix + '_ac'
-                            )}
-                        />
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={getTipForField("structural_variant." + prefix + "_ac")} />
                     </th>
                     <th>
                         Allele Number
-                        <i
-                            className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={getTipForField(
-                                'structural_variant.' + prefix + '_an'
-                            )}
-                        />
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={getTipForField("structural_variant." + prefix + "_an")} />
                     </th>
                     <th className="text-left">
                         Allele Frequency
-                        <i
-                            className="icon icon-info-circle fas icon-fw ml-05"
-                            data-tip={getTipForField(
-                                'structural_variant.' + prefix + '_af'
-                            )}
-                        />
+                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                            data-tip={getTipForField("structural_variant." + prefix + "_af")} />
                     </th>
                 </tr>
             </thead>
@@ -173,7 +127,7 @@ const SVGnomADTable = React.memo(function SVGnomADTable(props) {
                     <td>{gnomad_an || fallbackElem}</td>
                     <td className="text-left">{gnomad_af || fallbackElem}</td>
                 </tr>
-                {ancestryTableRows}
+                { ancestryTableRows }
             </tbody>
         </table>
     );

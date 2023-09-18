@@ -8,19 +8,10 @@ import { color as d3Color } from 'd3-color';
 import { interpolateRgb } from 'd3-interpolate';
 import { scaleOrdinal } from 'd3-scale';
 import { schemeCategory10 } from 'd3-scale-chromatic';
-import {
-    treemap as d3Treemap,
-    treemapResquarify,
-    hierarchy as d3Hierarchy,
-} from 'd3-hierarchy';
+import { treemap as d3Treemap, treemapResquarify, hierarchy as d3Hierarchy } from 'd3-hierarchy';
 import _ from 'underscore';
 
-import {
-    ajax,
-    navigate,
-    JWT,
-    memoizedUrlParse,
-} from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { ajax, navigate, JWT, memoizedUrlParse } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { ItemDetailList } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/ItemDetailList';
 import { Term } from './../util/Schemas';
 import { gridContainerWidth } from './../util/layout';
@@ -35,285 +26,225 @@ import { PackageLockLoader } from './../util/package-lock-loader';
  * @extends {React.Component}
  */
 export default class HealthView extends React.PureComponent {
-    static notFinishedIndexing(db_es_total) {
-        return db_es_total &&
-            (db_es_total.indexOf('< DB has') > -1 ||
-                db_es_total.indexOf('loading') > -1)
-            ? true
-            : false;
+
+    static notFinishedIndexing(db_es_total){
+        return db_es_total && (db_es_total.indexOf('< DB has') > -1 || db_es_total.indexOf('loading') > -1) ? true : false;
     }
 
-    static termTransformFxn(field, term) {
-        if (field === 'foursight' && term && term.slice(0, 4) === 'http') {
-            return (
-                <a href={term} target="_blank" rel="noopener noreferrer">
-                    {term}
-                </a>
-            );
+    static termTransformFxn(field, term){
+        if (field === "foursight" && term && term.slice(0,4) === "http") {
+            return <a href={term} target="_blank" rel="noopener noreferrer">{ term }</a>;
         }
         return Term.toName(field, term, true);
     }
 
     static propTypes = {
-        href: PropTypes.string,
+        'href' : PropTypes.string
     };
 
     static defaultProps = {
-        excludedKeys: [
-            ...ItemDetailList.Detail.defaultProps.excludedKeys,
-            'content',
-        ],
-        keyTitleDescriptionMapConfig: {
-            application_bucket_prefix: {
-                title: 'Application Bucket Prefix',
-                description:
-                    "Ecosystem-specific name prefix for this server's application buckets.",
+        "excludedKeys" : [ ...ItemDetailList.Detail.defaultProps.excludedKeys, 'content' ],
+        "keyTitleDescriptionMapConfig" : {
+            'application_bucket_prefix' : {
+                title : "Application Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's application buckets."
             },
-            aggregations: {
-                title: 'Aggregations',
-                description: 'Aggregations of ES-indexed data.',
+            'aggregations' : {
+                title : 'Aggregations',
+                description : "Aggregations of ES-indexed data."
             },
-            beanstalk_app_version: {
-                title: 'Beanstalk App Version',
-                description:
-                    "Unique descriptive identifier for this app's ElasticBeanstalk source bundle.",
+            'beanstalk_app_version': {
+                title : "Beanstalk App Version",
+                description : "Unique descriptive identifier for this app's ElasticBeanstalk source bundle."
             },
-            beanstalk_env: {
-                title: 'Beanstalk Environment',
-                description:
-                    'Which Elastic Beanstalk environment this instance running on.',
+            'beanstalk_env' : {
+                title : "Beanstalk Environment",
+                description : "Which Elastic Beanstalk environment this instance running on."
             },
-            blob_bucket: {
-                title: 'Blob Bucket',
-                description: 'Name of S3 bucket used for blob data.',
+            'blob_bucket' : {
+                title : "Blob Bucket",
+                description : "Name of S3 bucket used for blob data."
             },
-            content: {
-                title: 'Extra Information',
+            'content' : {
+                title : "Extra Information"
             },
-            database: {
-                title: 'Database Location',
-                description: 'URI used to connect to the back-end PgSQL DB.',
+            'database' : {
+                title : "Database Location",
+                description : "URI used to connect to the back-end PgSQL DB."
             },
-            elasticsearch: {
-                title: 'ElasticSearch Location',
-                description: 'URI used to connect to the back-end ES instance.',
+            'elasticsearch' : {
+                title : "ElasticSearch Location",
+                description : "URI used to connect to the back-end ES instance."
             },
-            file_upload_bucket: {
-                title: 'File Upload Bucket',
-                description: 'Where uploaded files are stored.',
+            'file_upload_bucket' : {
+                title : "File Upload Bucket",
+                description : "Where uploaded files are stored."
             },
-            foursight: {
-                title: 'Foursight',
-                description: 'URI of corresponding Foursight page.',
+            'foursight' : {
+                title : "Foursight",
+                description : "URI of corresponding Foursight page."
             },
-            foursight_bucket_prefix: {
-                title: 'Foursight Bucket Prefix',
-                description:
-                    "Ecosystem-specific name prefix for this server's foursight buckets.",
+            'foursight_bucket_prefix' : {
+                title : "Foursight Bucket Prefix",
+                description : "Ecosystem-specific name prefix for this server's foursight buckets."
             },
-            higlass_version: {
-                title: 'HiGlass Version',
-                description: 'Software version of HiGlass package being used.',
+            'higlass_version': {
+                title : "HiGlass Version",
+                description : "Software version of HiGlass package being used."
             },
-            identity: {
-                title: 'Identity',
-                description:
-                    'An application configuration key that represents the current environment.',
+            'identity': {
+                title : "Identity",
+                description : "An application configuration key that represents the current environment."
             },
-            indexer: {
-                title: 'Indexer',
-                description:
-                    'Whether this server processes indexing requests at all.',
+            'indexer' : {
+                title : "Indexer",
+                description : "Whether this server processes indexing requests at all."
             },
-            index_server: {
-                title: 'Index Server',
-                description: 'Whether this server is only for indexing.',
+            'index_server' : {
+                title : "Index Server",
+                description : "Whether this server is only for indexing."
             },
-            load_data: {
-                title: 'Loaded Data',
-                description:
-                    'Data which was loaded into database on initialization or boot.',
+            'load_data' : {
+                title : "Loaded Data",
+                description : "Data which was loaded into database on initialization or boot."
             },
-            metadata_bundles_bucket: {
-                title: 'MetaData Bundles Bucket',
-                description: 'Name of S3 bucket used for metadata bundles.',
+            'metadata_bundles_bucket' : {
+                title: "MetaData Bundles Bucket",
+                description : "Name of S3 bucket used for metadata bundles."
             },
-            namespace: {
-                title: 'Namespace',
-                description:
-                    "The ElasticSearch namespace to use. This is often the same as the Beanstalk Environment, but don't rely on that.",
+            'namespace': {
+                title : "Namespace",
+                description : "The ElasticSearch namespace to use. This is often the same as the Beanstalk Environment, but don't rely on that."
             },
-            ontology_updated: {
-                title: 'Ontology Last Updated',
-                description: 'Last time ontologies were updated.',
+            'ontology_updated' : {
+                title : 'Ontology Last Updated',
+                description : "Last time ontologies were updated."
             },
-            processed_file_bucket: {
-                title: 'Processed File Bucket',
-                description:
-                    'Name of S3 bucket used for workflow output files from processing steps.',
+            'processed_file_bucket' : {
+                title : 'Processed File Bucket',
+                description : "Name of S3 bucket used for workflow output files from processing steps."
             },
-            project_version: {
-                title: 'Project Version',
-                description: "Software version for this portal's software.",
+            'project_version': {
+                title : "Project Version",
+                description : "Software version for this portal's software."
             },
-            python_version: {
-                title: 'Python Version',
-                description: 'Software version of Python used by this portal.',
+            'python_version': {
+                title : "Python Version",
+                description : "Software version of Python used by this portal.",
             },
-            spc_version: {
-                title: 'Shared Portal Components Version',
-                description:
-                    'Software version of shared-portal-components package being used.',
+            'spc_version': {
+                title : "Shared Portal Components Version",
+                description : "Software version of shared-portal-components package being used."
             },
-            snovault_version: {
-                title: 'Snovault Version',
-                description: 'Software version of dcicsnovault being used.',
+            'snovault_version': {
+                title : "Snovault Version",
+                description : "Software version of dcicsnovault being used."
             },
-            s3_encrypt_key_id: {
-                title: 'S3 Encrypt Key Id',
-                description:
-                    'Name of key whose value is the encrypt key for uploaded file data stored on S3.',
+            's3_encrypt_key_id': {
+                title : "S3 Encrypt Key Id",
+                description : "Name of key whose value is the encrypt key for uploaded file data stored on S3."
             },
-            system_bucket: {
-                title: 'System Bucket',
-                description: 'Name of S3 Bucket used for system data.',
+            'system_bucket' : {
+                title : 'System Bucket',
+                description : "Name of S3 Bucket used for system data."
             },
-            tibanna_cwls_bucket: {
-                title: 'Tibanna CWLs Bucket',
-                description: 'Name of S3 bucket used for tibanna CWL files.',
+            'tibanna_cwls_bucket': {
+                title : "Tibanna CWLs Bucket",
+                description : "Name of S3 bucket used for tibanna CWL files."
             },
-            tibanna_output_bucket: {
-                title: 'Tibanna Output Bucket',
-                description: 'Name of S3 bucket used for tibanna output.',
+            'tibanna_output_bucket': {
+                title : "Tibanna Output Bucket",
+                description : "Name of S3 bucket used for tibanna output."
             },
-            uptime: {
-                title: 'Uptime',
-                description: 'How long this server has been running.',
+            'uptime': {
+                title : 'Uptime',
+                description : "How long this server has been running."
             },
-            utils_version: {
-                title: 'Utils Version',
-                description: 'Software version of dcicutils being used.',
+            'utils_version': {
+                title : "Utils Version",
+                description : "Software version of dcicutils being used."
             },
         },
-        keyTitleDescriptionMapCounts: {
-            db_es_total: {
-                title: 'DB and ES Counts',
-                description:
-                    'Total counts of items in database and elasticsearch.',
+        "keyTitleDescriptionMapCounts" : {
+            'db_es_total' : {
+                title : "DB and ES Counts",
+                description : "Total counts of items in database and elasticsearch."
             },
-            db_es_compare: {
-                title: 'DB and ES Counts by Type',
-                description:
-                    'Counts of items in database and elasticsearch for each doc_type index.',
-            },
-        },
+            'db_es_compare' : {
+                title : "DB and ES Counts by Type",
+                description : "Counts of items in database and elasticsearch for each doc_type index."
+            }
+        }
     };
 
-    constructor(props) {
+    constructor(props){
         super(props);
         this.getCounts = _.throttle(this.getCounts.bind(this), 1000);
         this.state = {
-            db_es_total: null,
-            db_es_compare: null,
-            mounted: false,
+            'db_es_total' : null,
+            'db_es_compare' : null,
+            'mounted' : false
         };
     }
 
-    componentDidMount() {
-        this.setState({ mounted: true });
+    componentDidMount(){
+        this.setState({ 'mounted' : true });
     }
 
     /** We only allow this to be called manually, and if are admin, to minimize load on ES */
-    getCounts() {
-        this.setState(
-            {
-                db_es_total: 'loading...',
-                db_es_compare: 'loading...',
-            },
-            () => {
-                ajax.load(
-                    '/counts?format=json',
-                    (resp) => {
-                        this.setState({
-                            db_es_total: resp.db_es_total,
-                            db_es_compare: resp.db_es_compare,
-                        });
-                    },
-                    'GET',
-                    (resp) => {
-                        this.setState({
-                            error: resp.error || resp.message,
-                            db_es_total: null,
-                            db_es_compare: null,
-                        });
-                    }
-                );
-            }
-        );
+    getCounts(){
+        this.setState({
+            'db_es_total' : "loading...",
+            'db_es_compare' : "loading..."
+        }, ()=>{
+            ajax.load('/counts?format=json', (resp)=>{
+                this.setState({
+                    'db_es_total' : resp.db_es_total,
+                    'db_es_compare': resp.db_es_compare,
+                });
+            }, 'GET', (resp)=>{
+                this.setState({
+                    'error' : resp.error || resp.message,
+                    'db_es_total' : null,
+                    'db_es_compare': null
+                });
+            });
+        });
     }
 
     render() {
-        const {
-            context,
-            schemas,
-            session,
-            windowWidth,
-            href,
-            keyTitleDescriptionMapConfig,
-            keyTitleDescriptionMapCounts,
-            excludedKeys,
-        } = this.props;
+        const { context, schemas, session, windowWidth, href, keyTitleDescriptionMapConfig, keyTitleDescriptionMapCounts, excludedKeys } = this.props;
         const { db_es_compare, db_es_total, mounted } = this.state;
         const { description } = context;
-        const notYetLoaded = db_es_compare === null && db_es_total === null;
+        const notYetLoaded = (db_es_compare === null && db_es_total === null);
         const width = gridContainerWidth(windowWidth);
 
         return (
             <div className="view-item container" id="content">
-                <hr />
+
+                <hr/>
 
                 <h3 className="text-400 mb-2 mt-3">Configuration</h3>
 
-                {typeof description === 'string' ? (
-                    <p className="description">{description}</p>
-                ) : null}
+                { typeof description === "string" ? <p className="description">{ description }</p> : null }
 
                 <PackageLockLoader>
-                    <DetailListBody
-                        {...{ excludedKeys, context }}
-                        keyTitleDescriptionMap={keyTitleDescriptionMapConfig}
-                        termTransformFxn={HealthView.termTransformFxn}
-                    />
+                    <DetailListBody {...{ excludedKeys, context }} keyTitleDescriptionMap={keyTitleDescriptionMapConfig} termTransformFxn={HealthView.termTransformFxn} />
                 </PackageLockLoader>
 
-                <DatabaseCountsInfo
-                    {...{
-                        notYetLoaded,
-                        excludedKeys,
-                        schemas,
-                        db_es_compare,
-                        db_es_total,
-                        session,
-                        mounted,
-                        context,
-                        width,
-                        keyTitleDescriptionMapCounts,
-                    }}
-                    getCounts={this.getCounts}
-                />
+                <DatabaseCountsInfo {...{ notYetLoaded, excludedKeys, schemas, db_es_compare, db_es_total, session, mounted, context, width, keyTitleDescriptionMapCounts }}
+                    getCounts={this.getCounts} />
 
-                <br />
+                <br/>
+
             </div>
         );
     }
 }
 
 /** Extend context to include shared-portal-components and higlass versions */
-function DetailListBody({
-    context: propContext,
-    packageLockJson = null,
-    ...passProps
-}) {
+function DetailListBody({ context: propContext, packageLockJson = null, ...passProps }){
+
     let spcDependenciesVersion = null;
     let spcStatus;
 
@@ -322,75 +253,47 @@ function DetailListBody({
     if (packageLockJson) {
         const {
             dependencies: {
-                '@hms-dbmi-bgm/shared-portal-components': {
-                    version: spcVersionLong = null,
-                    from: spcFrom,
-                } = {},
-                higlass: { version: higlassDependenciesVersion } = {},
+                '@hms-dbmi-bgm/shared-portal-components': { version: spcVersionLong = null, from: spcFrom } = {},
+                'higlass': { version: higlassDependenciesVersion } = {}
             },
-            packages: {
-                'node_modules/@hms-dbmi-bgm/shared-portal-components': {
-                    version: spcInstallVersion,
-                } = {},
-            },
+            packages: { 'node_modules/@hms-dbmi-bgm/shared-portal-components': { version: spcInstallVersion } = {} },
         } = packageLockJson || {};
 
         higlassVersion = higlassDependenciesVersion;
 
-        if (spcFrom && spcFrom.indexOf('#') > -1) {
-            // e.g. github:4dn-dcic/shared-portal-components#0.0.2.70
-            [spcDependenciesVersion] = spcFrom.split('#').splice(-1);
+        if (spcFrom && spcFrom.indexOf('#') > -1) { // e.g. github:4dn-dcic/shared-portal-components#0.0.2.70
+            [ spcDependenciesVersion ] = spcFrom.split('#').splice(-1);
         }
 
-        if (spcDependenciesVersion === spcInstallVersion) {
-            spcStatus = spcDependenciesVersion || spcVersionLong || '-';
-        } else {
-            spcStatus = `Ambiguous versions found. Dependencies version: ${spcDependenciesVersion}, Installed version: ${spcInstallVersion}`;
-        }
+        if (spcDependenciesVersion === spcInstallVersion) { spcStatus = spcDependenciesVersion || spcVersionLong || "-"; }
+        else { spcStatus = `Ambiguous versions found. Dependencies version: ${spcDependenciesVersion}, Installed version: ${spcInstallVersion}`; }
     } else {
         // Assume is still loading
         // TODO: Maybe allow ItemDetailList to handle JSX values so can throw in spinning indicator icon here.
-        spcStatus = '-';
-        higlassVersion = '-';
+        spcStatus = "-";
+        higlassVersion = "-";
     }
 
-    const context = {
-        ...propContext,
-        spc_version: spcStatus,
-        higlass_version: higlassVersion,
-    };
+    const context = { ...propContext, "spc_version": spcStatus, "higlass_version": higlassVersion };
 
-    return <ItemDetailList {...passProps} {...{ context }} hideButtons />;
+    return (
+        <ItemDetailList {...passProps} {...{ context }} hideButtons  />
+    );
 }
 
-const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props) {
-    const {
-        notYetLoaded,
-        excludedKeys,
-        schemas,
-        db_es_compare,
-        db_es_total,
-        session,
-        mounted,
-        context,
-        width,
-        getCounts,
-        keyTitleDescriptionMapCounts,
-    } = props;
+const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props){
+    const { notYetLoaded, excludedKeys, schemas, db_es_compare, db_es_total, session, mounted, context, width, getCounts, keyTitleDescriptionMapCounts } = props;
     const userGroups = (session && JWT.getUserGroups()) || null;
 
-    if (!userGroups || userGroups.indexOf('admin') === -1) {
+    if (!userGroups || userGroups.indexOf("admin") === -1) {
         return null;
     }
 
     if (notYetLoaded) {
         return (
-            <button
-                type="button"
-                className="btn btn-block btn-lg btn-outline-dark refresh-counts-button btn-block mt-2"
+            <button type="button" className="btn btn-block btn-lg btn-outline-dark refresh-counts-button btn-block mt-2"
                 onClick={getCounts}>
-                <i className="icon icon-fw fas icon-sync mr-08" />
-                Get Database Counts
+                <i className="icon icon-fw fas icon-sync mr-08"/>Get Database Counts
             </button>
         );
     }
@@ -400,14 +303,14 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props) {
     if (db_es_total === 'loading...') {
         btnTitle = (
             <React.Fragment>
-                <i className="icon icon-fw fas icon-sync icon-spin mr-08" />
+                <i className="icon icon-fw fas icon-sync icon-spin mr-08"/>
                 Fetching Database Counts
             </React.Fragment>
         );
     } else {
         btnTitle = (
             <React.Fragment>
-                <i className="icon icon-fw fas icon-sync mr-08" />
+                <i className="icon icon-fw fas icon-sync mr-08"/>
                 Refresh Counts
             </React.Fragment>
         );
@@ -417,28 +320,19 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props) {
         <React.Fragment>
             <h3 className="text-400 mb-2 mt-3">Database Counts</h3>
 
-            <button
-                type="button"
-                className="btn btn-outline-dark refresh-counts-button btn-block mt-2"
-                onClick={getCounts}
-                disabled={db_es_total === 'loading...'}>
-                {btnTitle}
+            <button type="button" className="btn btn-outline-dark refresh-counts-button btn-block mt-2"
+                onClick={getCounts} disabled={db_es_total === 'loading...'}>
+                { btnTitle }
             </button>
 
-            <ItemDetailList
-                {...{ excludedKeys, schemas }}
-                context={{ db_es_compare, db_es_total }}
-                hideButtons
-                keyTitleDescriptionMap={keyTitleDescriptionMapCounts}
-            />
+            <ItemDetailList {...{ excludedKeys, schemas }} context={{ db_es_compare, db_es_total }} hideButtons keyTitleDescriptionMap={keyTitleDescriptionMapCounts} />
 
-            <HealthChart
-                {...{ db_es_compare, mounted, session, context, width }}
-                height={600}
-            />
+            <HealthChart {...{ db_es_compare, mounted, session, context, width }} height={600} />
+
         </React.Fragment>
     );
 });
+
 
 /**
  * This is a React wrapper around a D3 visualization.
@@ -449,137 +343,98 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props) {
  * TO THE DOM AND LET D3 ONLY CALCULATE DIMENSIONS.
  */
 class HealthChart extends React.PureComponent {
-    static es_compare_to_d3_hierarchy(es_compare) {
+
+    static es_compare_to_d3_hierarchy(es_compare){
         if (!es_compare || typeof es_compare !== 'object') return null;
         return {
-            name: 'Indexing Status',
-            children: _.filter(
-                _.map(
-                    _.pairs(es_compare),
-                    function ([itemType, compareString]) {
-                        if (itemType === 'ontology_term') return null;
-                        const dbCount = parseInt(compareString.slice(4));
-                        const esCount = parseInt(
-                            compareString.slice(11 + (dbCount + '').length)
-                        );
-                        return {
-                            name: itemType,
-                            children: [
-                                { name: 'Indexed', size: esCount },
-                                {
-                                    name: 'Left to Index',
-                                    size: dbCount - esCount,
-                                },
-                            ],
-                        };
-                    }
-                )
-            ),
+            'name' : 'Indexing Status',
+            'children' : _.filter(_.map(_.pairs(es_compare), function([ itemType, compareString ]){
+                if (itemType === 'ontology_term') return null;
+                const dbCount = parseInt(compareString.slice(4));
+                const esCount = parseInt(compareString.slice(11 + (dbCount + '').length));
+                return {
+                    'name': itemType,
+                    'children': [
+                        { 'name': 'Indexed', 'size': esCount },
+                        { 'name': 'Left to Index', 'size': dbCount - esCount }
+                    ]
+                };
+            }))
         };
     }
 
     static defaultProps = {
-        mounted: false,
+        'mounted' : false,
     };
 
-    constructor(props) {
+    constructor(props){
         super(props);
         this.svgRef = React.createRef();
     }
 
-    componentDidUpdate(pastProps, pastState) {
+    componentDidUpdate(pastProps, pastState){
         this.drawTreeMap();
         this.transitionSize();
-        setTimeout(function () {
-            ReactTooltip.rebuild();
-        }, 1000);
+        setTimeout(function(){ ReactTooltip.rebuild(); }, 1000);
     }
 
-    transition(d3Selection) {
-        d3Selection
-            .transition()
+    transition(d3Selection){
+        d3Selection.transition()
             .duration(750)
-            .attr('transform', function (d) {
-                return 'translate(' + d.x0 + ',' + d.y0 + ')';
-            })
-            .select('rect')
-            .attr('width', function (d) {
-                return d.x1 - d.x0;
-            })
-            .attr('height', function (d) {
-                return d.y1 - d.y0;
-            });
+            .attr('transform', function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
+            .select("rect")
+            .attr("width", function(d) { return d.x1 - d.x0; })
+            .attr("height", function(d) { return d.y1 - d.y0; });
     }
 
-    transitionSize() {
+    transitionSize(){
         const { mounted } = this.props;
         if (!mounted) return null;
-        const svg =
-            this.svgRef && this.svgRef.current && d3Select(this.svgRef.current);
-        svg.selectAll('g')
-            .transition()
+        const svg = this.svgRef && this.svgRef.current && d3Select(this.svgRef.current);
+        svg.selectAll('g').transition()
             .duration(750)
-            .attr('transform', function (d) {
-                return 'translate(' + d.x0 + ',' + d.y0 + ')';
+            .attr('transform', function(d) {
+                return "translate(" + d.x0 + "," + d.y0 + ")";
             })
-            .attr('data-tip', function (d) {
-                return (
-                    '<span class="text-500">' +
-                    d.parent.data.name +
-                    '</span><br/>' +
-                    d.data.size +
-                    ' Items (' +
-                    parseInt((d.data.size / (d.parent.value || 1)) * 10000) /
-                        100 +
-                    '%)<br/>Status: ' +
-                    d.data.name
-                );
+            .attr("data-tip", function(d){
+                return '<span class="text-500">' + d.parent.data.name + "</span><br/>" + d.data.size + ' Items (' + (parseInt((d.data.size / (d.parent.value || 1)) * 10000) / 100) + '%)<br/>Status: ' + d.data.name;
             })
-            .select('rect')
-            .attr('width', function (d) {
+            .select("rect")
+            .attr("width", function(d) {
                 return d.x1 - d.x0;
             })
-            .attr('height', function (d) {
+            .attr("height", function(d) {
                 return d.y1 - d.y0;
             });
     }
 
-    drawTreeMap() {
+    drawTreeMap(){
         const { width, height, mounted, db_es_compare } = this.props;
-        const dataToShow =
-            HealthChart.es_compare_to_d3_hierarchy(db_es_compare);
+        const dataToShow = HealthChart.es_compare_to_d3_hierarchy(db_es_compare);
 
         if (!dataToShow || !mounted) return null;
 
-        const svg =
-            this.svgRef && this.svgRef.current && d3Select(this.svgRef.current);
+        const svg = this.svgRef && this.svgRef.current && d3Select(this.svgRef.current);
         function fader(color) {
-            return interpolateRgb(color, '#fff')(0.2);
+            return interpolateRgb(color, "#fff")(0.2);
         }
 
         const colorFallback = scaleOrdinal(schemeCategory10.map(fader));
 
-        function colorStatus(origColor, status) {
+        function colorStatus(origColor, status){
             let d3ColorUsed;
-            if (['deleted', 'Left to Index'].indexOf(status) > -1) {
+            if (['deleted', 'Left to Index'].indexOf(status) > -1){
                 d3ColorUsed = d3Color(origColor);
                 return d3ColorUsed.darker(1);
             }
-            if (['upload failed'].indexOf(status) > -1) {
-                return interpolateRgb(origColor, 'rgb(222, 82, 83)')(0.6);
+            if (['upload failed'].indexOf(status) > -1){
+                return interpolateRgb(origColor, "rgb(222, 82, 83)")(0.6);
             }
-            if (
-                [
-                    'released to lab',
-                    'released to project',
-                    'in review by lab',
-                    'in review by project',
-                ].indexOf(status) > -1
-            ) {
+            if (['released to lab', 'released to project', 'in review by lab', 'in review by project'].indexOf(status) > -1){
                 d3ColorUsed = d3Color(origColor);
                 return d3ColorUsed.darker(0.5);
             }
-            if (['uploaded', 'released', 'current'].indexOf(status) > -1) {
+            if (['uploaded', 'released', 'current'].indexOf(status) > -1){
                 d3ColorUsed = d3Color(origColor);
                 return d3ColorUsed.brighter(0.25);
             }
@@ -593,20 +448,13 @@ class HealthChart extends React.PureComponent {
             .paddingInner(1);
 
         const root = d3Hierarchy(dataToShow)
-            .eachBefore(function (d) {
-                d.data.id =
-                    (d.parent ? d.parent.data.id + '.' : '') + d.data.name;
-            })
-            .sum(function (d) {
-                return d.size;
-            })
-            .sort(function (a, b) {
-                return b.height - a.height || b.value - a.value;
-            });
+            .eachBefore(function(d) {d.data.id = (d.parent ? d.parent.data.id + "." : "") + d.data.name; })
+            .sum(function(d){ return d.size; })
+            .sort(function(a, b) { return b.height - a.height || b.value - a.value; });
 
         treemap(root);
 
-        const cell = svg.selectAll('g').data(root.leaves(), function (n) {
+        const cell = svg.selectAll("g").data(root.leaves(), function(n){
             return n.data.id;
         });
 
@@ -614,110 +462,57 @@ class HealthChart extends React.PureComponent {
 
         const enteringCells = cell.enter();
 
-        const enteringCellGroups = enteringCells
-            .append('g')
+        const enteringCellGroups = enteringCells.append("g")
             .attr('class', 'treemap-rect-elem')
-            .attr('transform', function (d) {
-                return 'translate(' + d.x0 + ',' + d.y0 + ')';
-            })
-            .attr('data-tip', function (d) {
-                return (
-                    '<span class="text-500">' +
-                    d.parent.data.name +
-                    '</span><br/>' +
-                    d.data.size +
-                    ' Items (' +
-                    parseInt((d.data.size / (d.parent.value || 1)) * 10000) /
-                        100 +
-                    '%)<br/>Status: ' +
-                    d.data.name
-                );
-            })
-            .attr('data-html', function (d) {
-                return true;
-            })
-            .on('click', function (d) {
+            .attr("transform", function(d) { return "translate(" + d.x0 + "," + d.y0 + ")"; })
+            .attr("data-tip", function(d){ return '<span class="text-500">' + d.parent.data.name + "</span><br/>" + d.data.size + ' Items (' + (parseInt((d.data.size / (d.parent.value || 1)) * 10000) / 100) + '%)<br/>Status: ' + d.data.name; })
+            .attr("data-html", function(d){ return true; })
+            .on("click", function(d) {
                 navigate('/search/?type=' + d.parent.data.name);
             })
-            .attr('data-effect', function (d) {
-                return 'float';
-            });
+            .attr("data-effect", function(d){ return 'float'; });
 
-        enteringCellGroups
-            .append('rect')
-            .attr('id', function (d) {
-                return d.data.id.replace(/ /g, '_');
-            })
-            .attr('width', function (d) {
-                return d.x1 - d.x0;
-            })
-            .attr('height', function (d) {
-                return d.y1 - d.y0;
-            })
-            .attr('fill', function (d) {
-                return colorStatus(
-                    colorFallback(d.parent.data.name),
-                    d.data.name
-                );
-            });
+        enteringCellGroups.append("rect")
+            .attr("id", function(d) { return d.data.id.replace(/ /g, '_'); })
+            .attr("width", function(d) { return d.x1 - d.x0; })
+            .attr("height", function(d) { return d.y1 - d.y0; })
+            .attr("fill", function(d) { return colorStatus(colorFallback(d.parent.data.name), d.data.name); });
 
-        enteringCellGroups
-            .append('clipPath')
-            .attr('id', function (d) {
-                return 'clip-' + d.data.id.replace(/ /g, '_');
-            })
-            .append('use')
-            .attr('xlink:href', function (d) {
-                return '#' + d.data.id.replace(/ /g, '_');
-            });
+        enteringCellGroups.append("clipPath")
+            .attr("id", function(d) { return "clip-" + d.data.id.replace(/ /g, '_'); })
+            .append("use")
+            .attr("xlink:href", function(d) { return "#" + d.data.id.replace(/ /g, '_'); });
 
-        enteringCellGroups
-            .append('text')
-            .attr('clip-path', function (d) {
-                return 'url(#clip-' + d.data.id.replace(/ /g, '_') + ')';
-            })
+        enteringCellGroups.append("text")
+            .attr("clip-path", function(d) { return "url(#clip-" + d.data.id.replace(/ /g, '_') + ")"; })
             .attr('class', 'title-text')
-            .selectAll('tspan')
-            .data(function (d) {
-                return _.map(
-                    d.parent.data.name.split(/(?=[_][^_])/g),
-                    function (s) {
-                        return s.replace(/(_)/g, '');
-                    }
-                );
-            })
-            .enter()
-            .append('tspan')
-            .attr('x', 4)
-            .attr('y', function (d, i) {
-                return 13 + i * 10;
-            })
-            .text(function (d) {
-                return d;
-            });
+            .selectAll("tspan")
+            .data(function(d) { return _.map(d.parent.data.name.split(/(?=[_][^_])/g), function(s){ return s.replace(/(_)/g, ''); }); })
+            .enter().append("tspan")
+            .attr("x", 4)
+            .attr("y", function(d, i) { return 13 + i * 10; })
+            .text(function(d) { return d; });
     }
 
-    render() {
+    render(){
         const { width, height, mounted } = this.props;
 
         if (!mounted) return null;
 
         return (
             <div>
-                <h5 className="text-400 mt-2 pull-right mb-0">
-                    <em>Excluding OntologyTerm</em>
-                </h5>
+                <h5 className="text-400 mt-2 pull-right mb-0"><em>Excluding OntologyTerm</em></h5>
                 <h3 className="text-400 mb-2 mt-3">Types in ElasticSearch</h3>
-                <style
-                    dangerouslySetInnerHTML={{
-                        __html:
-                            '.treemap-rect-elem { cursor: pointer; }' +
-                            '.treemap-rect-elem .title-text { fill: rgba(0,0,0,0.5); font-size: 0.75rem; }' +
-                            '.treemap-rect-elem:hover .title-text { fill: #000; }',
-                    }}
-                />
+                <style dangerouslySetInnerHTML={{
+                    __html : (
+                        '.treemap-rect-elem { cursor: pointer; }' +
+                        '.treemap-rect-elem .title-text { fill: rgba(0,0,0,0.5); font-size: 0.75rem; }' +
+                        '.treemap-rect-elem:hover .title-text { fill: #000; }'
+                    )
+                }}/>
                 <svg width={width} height={height} ref={this.svgRef} />
             </div>
         );
+
     }
 }
