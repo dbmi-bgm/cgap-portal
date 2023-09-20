@@ -57,7 +57,6 @@ const CaseNotesPopover = forwardRef(({
           onClick={() => handleNoteSave(currentText) }
           disabled={lastSavedText.text === currentText ? "disabled" : "" }
         >
-          {/* <i className="icon icon-spin icon-circle-notch fas" /> */}
           {
             // Prevent showing "Note saved..." message if no note exists
             lastSavedText.date ? 
@@ -125,11 +124,34 @@ const CaseNotesButton = ({
  */
 export const CaseNotesColumn = ({ result }) => {
   // Initial state passed to children
-  const [lastSavedText, setLastSavedText] = useState({
-    text: result?.note?.note_text ?? "",
-    date: result?.note?.last_text_edited?.date_text_edited ?? null,
-    user: result?.note?.last_text_edited?.text_edited_by?.display_title ?? "",
-    userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? ""
+  const [lastSavedText, setLastSavedText] = useState((newNote) => {
+    
+    // If new note information is being provided
+    if (newNote) {
+      return {
+        text: newNote?.text ?? "",
+        date: newNote?.date ?? null,
+        user: newNote?.user ?? "",
+        userId: newNote?.userId ?? ""
+      }
+    }
+    // If there is a note item attached to this case with deleted status
+    else if (result?.note?.status === "deleted") {
+      return {
+        text: "",
+        date: null,
+        user: "",
+        userId: ""
+      }
+    } 
+
+    // Otherwise return whatever is received from [result]
+    return {
+      text: result?.note?.note_text ?? "",
+      date: result?.note?.last_text_edited?.date_text_edited ?? null,
+      user: result?.note?.last_text_edited?.text_edited_by?.display_title ?? "",
+      userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? ""
+    }
   });
 
   const [currentText, setCurrentText] = useState(lastSavedText.text);
@@ -139,7 +161,8 @@ export const CaseNotesColumn = ({ result }) => {
 
 
   const caseID = result['@id'];
-  const noteID = result?.note ? result.note['@id'] : "";
+  const caseUUID = result.uuid;
+  const noteID = result.note ? result.note['@id'] : "";
 
   /**
    * handleNoteSave executes a request to update the NOTE and CASE
@@ -212,15 +235,17 @@ export const CaseNotesColumn = ({ result }) => {
           console.log("Error: ", e)
         })
       }
-      // ELSE: There is alrady a Note item linked, so simply modify its text
+      // ELSE: There is alrady a Note item linked, so simply modify its
+      // text and/or status
       else {
         ajax.promise(noteID, "PATCH", {}, JSON.stringify({
-          "note_text": currentText
+          "note_text": currentText,
+          "status": "current"
         })).then((patchRes) => {
           if (patchRes.status === "success") {
             // If the user has the same uuid (after extracting the uuid), don't change the user field
             const new_userId = patchRes['@graph'][0].last_text_edited.text_edited_by.split("/")[2];
-            let new_user = (lastSavedText.userId === new_userId) ? lastSavedText.user : new_userId;
+            let new_user = (lastSavedText.userId === new_userId) ? lastSavedText.user : "";
 
             setLastSavedText({
               text: patchRes['@graph'][0].note_text,
@@ -241,8 +266,16 @@ export const CaseNotesColumn = ({ result }) => {
      * TODO: remove the link to the note with [noteId] on the case
     */
     else {
+      // DELETE request for the note
+      /**
+       * Currently (9/18/2023), I will "DELETE" the note attached,
+       * setting the status to deleted, then making sure that no
+       * note is shown
+       */
       ajax.promise(noteID, "DELETE", {}, JSON.stringify()).then((deleteRes) => {
         if (deleteRes.status === "success") {
+          // Replace button text with loader until the request completes (re-render)
+          buttonRef.current.innerHTML = `Save Note`;
           setLastSavedText({
             text: "",
             date: "",
@@ -260,7 +293,7 @@ export const CaseNotesColumn = ({ result }) => {
     <div className="case-notes">
       {/* Render Notes Button */}
       <CaseNotesButton
-        note={result.note}
+        note={result?.note}
         lastSavedText={lastSavedText}
         handleNoteSave={handleNoteSave}
         currentText={currentText}
