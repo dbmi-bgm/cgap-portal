@@ -77,7 +77,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
           <span className="col-topleft">{topLeft}</span>
           <div className="status-indicators">
             {/* Note status for cases with notes, checks if note_text exists with words */}
-            { note && note.note_text.length > 0 && (
+            { note && (note.status!=="deleted") && (note.note_text.length > 0) && (
               <i
                 className="status-indicator status-indicator-note icon-sticky-note far"
                 data-status={"note-saved"}
@@ -467,7 +467,7 @@ export const columnExtensionMap = {
     notes: {
       "title": "Case Notes",
       'widthMap' : { 'lg' : 420, 'md' : 375, 'sm' : 300 },
-      render: function renderNotesColumn(result, parentPropt) {
+      render: function renderNotesColumn(result) {
         return <CaseNotesColumn result={result}/>;
       },
     },
