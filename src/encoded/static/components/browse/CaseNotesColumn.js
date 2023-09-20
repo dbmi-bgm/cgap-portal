@@ -10,7 +10,7 @@
  *   - Show Red outline icon in the column header when changes are unsaved
  */
 
-import React, { useState, useRef, forwardRef } from "react";
+import React, { useState, useRef, useEffect, forwardRef } from "react";
 import { Popover, OverlayTrigger } from "react-bootstrap";
 import { LocalizedTime } from "@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
@@ -49,21 +49,22 @@ const CaseNotesPopover = forwardRef(({
           rows={5} 
           defaultValue={currentText}
           onChange={(e) => setCurrentText(e.target.value)}
-        ></textarea>
+          ></textarea>
+          { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
         <button 
           type="button" 
           className="btn btn-primary mr-04 w-100"
           ref={buttonRef}
           onClick={() => handleNoteSave(currentText) }
           disabled={lastSavedText.text === currentText ? "disabled" : "" }
-        >
+          >
           {
             // Prevent showing "Note saved..." message if no note exists
             lastSavedText.date ? 
               lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
               :
               "Save Note"
-          }
+            }
         </button>
       </Popover.Content>
     </Popover>
@@ -132,7 +133,8 @@ export const CaseNotesColumn = ({ result }) => {
         text: newNote?.text ?? "",
         date: newNote?.date ?? null,
         user: newNote?.user ?? "",
-        userId: newNote?.userId ?? ""
+        userId: newNote?.userId ?? "",
+        warining: newNote?.warning
       }
     }
     // If there is a note item attached to this case with deleted status
@@ -141,7 +143,7 @@ export const CaseNotesColumn = ({ result }) => {
         text: "",
         date: null,
         user: "",
-        userId: ""
+        userId: "",
       }
     } 
 
@@ -150,7 +152,8 @@ export const CaseNotesColumn = ({ result }) => {
       text: result?.note?.note_text ?? "",
       date: result?.note?.last_text_edited?.date_text_edited ?? null,
       user: result?.note?.last_text_edited?.text_edited_by?.display_title ?? "",
-      userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? ""
+      userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? "",
+      warning: ""
     }
   });
 
@@ -158,6 +161,14 @@ export const CaseNotesColumn = ({ result }) => {
   
   // Create a ref to pass down to the "save" button
   const buttonRef = useRef(null);
+
+
+  // Update the color of the indicator if there are unsaved changes
+  useEffect(() => {
+    let noteIndicator = document.querySelector(`i.status-indicator-note[data-title="${result.display_title}"]`);
+    noteIndicator?.setAttribute('data-status', currentText === lastSavedText.text ? 'note-saved' : 'note-unsaved');
+
+  },[currentText, lastSavedText.text])
 
 
   const caseID = result['@id'];
@@ -226,7 +237,8 @@ export const CaseNotesColumn = ({ result }) => {
                   text: currentText,
                   date: res['@graph'][0].last_text_edited.date_text_edited,
                   user: new_user,
-                  userId: new_userId
+                  userId: new_userId,
+                  warning: "Please allow the system a few minutes to reflect these changes."
                 });
               }
             });
@@ -251,7 +263,8 @@ export const CaseNotesColumn = ({ result }) => {
               text: patchRes['@graph'][0].note_text,
               date: patchRes['@graph'][0].last_text_edited.date_text_edited,
               user: new_user,
-              userId: new_userId
+              userId: new_userId,
+              warning: "Please allow the system a few minutes to reflect these changes."
             });
           }
         }).catch((e) => {
@@ -274,13 +287,15 @@ export const CaseNotesColumn = ({ result }) => {
        */
       ajax.promise(noteID, "DELETE", {}, JSON.stringify()).then((deleteRes) => {
         if (deleteRes.status === "success") {
+          
           // Replace button text with loader until the request completes (re-render)
           buttonRef.current.innerHTML = `Save Note`;
           setLastSavedText({
             text: "",
             date: "",
             user: "",
-            userId: ""
+            userId: "",
+            warning: "Please allow the system a few minutes to reflect these changes."
           });
         }
       }).catch((e) => {
