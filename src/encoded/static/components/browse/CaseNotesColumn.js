@@ -50,7 +50,6 @@ const CaseNotesPopover = forwardRef(({
           defaultValue={currentText}
           onChange={(e) => setCurrentText(e.target.value)}
           ></textarea>
-          { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
         <button 
           type="button" 
           className="btn btn-primary mr-04 w-100"
@@ -61,11 +60,12 @@ const CaseNotesPopover = forwardRef(({
           {
             // Prevent showing "Note saved..." message if no note exists
             lastSavedText.date ? 
-              lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
-              :
-              "Save Note"
-            }
+            lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
+            :
+            "Save Note"
+          }
         </button>
+        { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
       </Popover.Content>
     </Popover>
   )
@@ -165,14 +165,22 @@ export const CaseNotesColumn = ({ result }) => {
 
   // Update the color of the indicator if there are unsaved changes
   useEffect(() => {
-    let noteIndicator = document.querySelector(`i.status-indicator-note[data-title="${result.display_title}"]`);
-    noteIndicator?.setAttribute('data-status', currentText === lastSavedText.text ? 'note-saved' : 'note-unsaved');
+    // Select the status indicator HTML element using case's display title
+    const noteIndicator = document.querySelector(`i.status-indicator-note[data-title="${result.display_title}"]`);
+    noteIndicator.classList.add('icon-sticky-note')
 
+    // [currentText] is empty string (note is null or deleted), hide indicator
+    if (currentText === "" && currentText === lastSavedText.text) {
+      noteIndicator?.setAttribute('data-status', 'note-unset');
+    }
+    // [currentText] not empty, contains saved or unsaved text
+    else {
+      noteIndicator?.setAttribute('data-status', currentText === lastSavedText.text ? 'note-saved' : 'note-unsaved');
+    }
   },[currentText, lastSavedText.text])
 
 
   const caseID = result['@id'];
-  const caseUUID = result.uuid;
   const noteID = result.note ? result.note['@id'] : "";
 
   /**

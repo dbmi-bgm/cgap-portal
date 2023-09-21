@@ -77,10 +77,10 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
           <span className="col-topleft">{topLeft}</span>
           <div className="status-indicators">
             {/* Note status for cases with notes, checks if note_text exists with words */}
-            { note && (note.status !== "deleted") && (note.note_text.length > 0) && (
+            { titleTip && (
               <i
-                className="status-indicator status-indicator-note icon-sticky-note far"
-                data-status={"note-saved"}
+                className="status-indicator status-indicator-note far"
+                data-status={ note === null ? "note-unset" : "note-saved" }
                 data-title={titleTip}
                 data-tip={
                   noteStatusTip ||

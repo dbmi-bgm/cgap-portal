@@ -578,14 +578,16 @@ h3.submission-subtitle {
 		background-color: #812423;
 	}
 
-	// Identifiers for saved and unsaved states of CaseView comments
-	// Saved note gray
+	// Identifiers for saved and unsaved states of CaseView comments hidden by default
 	&[data-status="note-saved"]:before {
 		color: #6C757D;
 	}
 	// Unsaved note red
 	&[data-status="note-unsaved"]:before {
 		color: #C41700;
+	}
+	&[data-status="note-unset"]:before {
+		display: none;
 	}
 	&[data-status="note-dot-unsaved"]:before {
 		background-color: #C41700;
