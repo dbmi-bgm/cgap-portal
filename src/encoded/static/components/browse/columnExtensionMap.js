@@ -43,7 +43,6 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         status,
         statusTip = null,
         note,
-        noteStatusTip,
         mainTitle = null,
         dateTitle = "Created:",
         bottom = null,
@@ -82,10 +81,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 className="status-indicator status-indicator-note far"
                 data-status={ note === null ? "note-unset" : "note-saved" }
                 data-title={titleTip}
-                data-tip={
-                  noteStatusTip ||
-                  Schemas.Term.toName("noteStatus", noteStatusTip)
-                }
+                data-tip="Notes are available for this case"
                 data-html
               />
             )}
@@ -164,15 +160,9 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         statusTip = "Case exists, but some linked item is missing: Family, Individual, or Sample Processing.";
     }
 
-    // const noteStatus = "saved";
-    let noteStatusTip = null;
-    if (note) {
-      noteStatusTip = "Notes are available for this case."
-    }
-
 
     return (
-        <MultiLevelColumn {...{ date, status, statusTip, note, noteStatusTip, titleTip }}
+        <MultiLevelColumn {...{ date, status, statusTip, note, titleTip }}
             titleTipDelayShow={750}
             dateTitle="Accession Date:" topLeft={<span className="accession text-muted">{ accession }</span>}
             mainTitle={

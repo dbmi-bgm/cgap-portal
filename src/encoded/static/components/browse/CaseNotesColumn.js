@@ -1,21 +1,14 @@
-/**
- * TODO:
- *   - Handle case where user deletes existing text, and saves it.
- *        - Should the note be removed?
- *        - Should the note's text simply be empty?
- *   - Handle latency of note item PATCH
- *        - datastore=database
- *        - Use local storage to cache the new string while server updates
- *        - Show warning detailing that it will take a few minutes to update
- *   - Show Red outline icon in the column header when changes are unsaved
- */
-
 import React, { useState, useRef, useEffect, forwardRef } from "react";
 import { Popover, OverlayTrigger } from "react-bootstrap";
 import { LocalizedTime } from "@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 
 
+/**
+ * React-Boostrap (v1.6.7, Bootstrap 4.6 syntax) Popover component containing
+ * the main user actions, such as the "save" button and the textarea element 
+ * where users add note text.
+ */
 const CaseNotesPopover = forwardRef(({
   note,
   lastSavedText,
@@ -26,6 +19,7 @@ const CaseNotesPopover = forwardRef(({
   ...popoverProps
 }, ref) => {
 
+  // Information on the previous note, defaults to null/empty.
   const prevDate = lastSavedText.date;
   const prevEditor = lastSavedText.user;
 
@@ -58,7 +52,7 @@ const CaseNotesPopover = forwardRef(({
           disabled={lastSavedText.text === currentText ? "disabled" : "" }
           >
           {
-            // Prevent showing "Note saved..." message if no note exists
+            // Show "Save Note" on unsaved changes OR no previous note exists
             lastSavedText.date ? 
             lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
             :
@@ -72,7 +66,9 @@ const CaseNotesPopover = forwardRef(({
 });
 
 /**
- * Button for toggling the Case Notes Popover
+ * React-Boostrap (v1.6.7, Bootstrap 4.6 syntax) Overlay Trigger component.
+ * This component serves as the button for toggling the [CaseNotesPopover].
+ * Shows red indicator when [currentText] === [lastSavedText.text]
  */
 const CaseNotesButton = ({
   note, 
@@ -176,8 +172,9 @@ export const CaseNotesColumn = ({ result }) => {
     // [currentText] not empty, contains saved or unsaved text
     else {
       noteIndicator?.setAttribute('data-status', currentText === lastSavedText.text ? 'note-saved' : 'note-unsaved');
+      noteIndicator?.setAttribute('data-tip', currentText === lastSavedText.text ? 'Notes are available for this case.' : 'There are unsaved changes to the case notes.');
     }
-  },[currentText, lastSavedText.text])
+  },[currentText, lastSavedText.text]);
 
 
   const caseID = result['@id'];
