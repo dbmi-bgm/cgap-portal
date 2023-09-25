@@ -6,6 +6,17 @@ cgap-portal
 Change Log
 ----------
 
+14.3.2
+======
+`PR 737: Add notes for Case items <https://github.com/dbmi-bgm/cgap-portal/pull/737>`_
+
+* Adds functionality for POSTing and PATCHing Note Items linked to Case Items
+* Reveals new "Notes" column in columnExtensionMap
+* New "notes available" indicator in search headers column
+* New textarea popup component (CaseNotesColumn.js) for text input
+* New SCSS module (_case-notes.scss) for styling the above
+
+
 14.3.1
 ======
 `PR 753: Auth0 Symlink Bugfix <https://github.com/dbmi-bgm/cgap-portal/pull/753>`_
