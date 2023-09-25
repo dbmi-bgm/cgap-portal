@@ -114,10 +114,11 @@ const CaseNotesButton = ({
 /**
  * Top-level component for rendering the Case Notes column. Props passed down 
  * from columnExtensionMap.
- * @param {Object} result the current result that this column cell belongs to
+ * @param {Object} result the current search result that corresponds to this
+ * case (the row whose render method calls this component)
  * 
  * Note: Items with no link to a note item (no "note" field in [result]) set
- * [lastSavedText] to the empty string.
+ * [lastSavedText] to the empty string by default.
  */
 export const CaseNotesColumn = ({ result }) => {
   // Initial state passed to children
@@ -280,19 +281,14 @@ export const CaseNotesColumn = ({ result }) => {
     /** 
      * [currentText] is the empty string and we should delete the note item
      * that is attached to this case item
-     * 
-     * TODO: remove the link to the note with [noteId] on the case
     */
     else {
-      // DELETE request for the note
       /**
-       * Currently (9/18/2023), I will "DELETE" the note attached,
-       * setting the status to deleted, then making sure that no
-       * note is shown
+       * Send DELETE request for the note attached, setting the status
+       * to "deleted", then making sure that no note is shown on rerender
        */
       ajax.promise(noteID, "DELETE", {}, JSON.stringify()).then((deleteRes) => {
         if (deleteRes.status === "success") {
-          
           // Replace button text with loader until the request completes (re-render)
           buttonRef.current.innerHTML = `Save Note`;
           setLastSavedText({

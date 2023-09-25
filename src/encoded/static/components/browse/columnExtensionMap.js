@@ -75,16 +75,23 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         <div className="top-row">
           <span className="col-topleft">{topLeft}</span>
           <div className="status-indicators">
-            {/* Note status for cases with notes, checks if note_text exists with words */}
-            { titleTip && (
-              <i
-                className="status-indicator status-indicator-note far"
-                data-status={ note === null ? "note-unset" : "note-saved" }
-                data-title={titleTip}
-                data-tip="Notes are available for this case"
-                data-html
-              />
-            )}
+            { 
+                /**
+                 * Font Awesome icon is missing the className by default
+                 * to prevent intitial render. It is added on each render of
+                 * the CaseNotesColumn component and identified by the [data-title]
+                 * attribute in the stylesheets (_case-notes.scss).
+                */
+                titleTip && (
+                <i
+                    className="status-indicator status-indicator-note far"
+                    data-status={ note === null ? "note-unset" : "note-saved" }
+                    data-title={titleTip}
+                    data-tip="Notes are available for this case"
+                    data-html
+                />
+                )
+            }
             <i
               className="status-indicator status-indicator-dot ml-05"
               data-status={status}
