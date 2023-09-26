@@ -10,6 +10,7 @@ Change Log
 ======
 * Upgrade to Python 3.11.
 * Changed pyyaml version to ^6.0.1.
+* Updated boto versions.
 * Removed types/access_key.py and schemas/access_key.json as the ones in snovault are sufficient.
 * Added generate-local-access-key script (from snovault) to pyproject.toml;
   orignally created for smaht-portal since early in development no way to
