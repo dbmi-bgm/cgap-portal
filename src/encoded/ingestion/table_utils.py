@@ -3,7 +3,7 @@ import six
 import io
 import json
 import logging
-from collections import Mapping
+from collections.abc import Mapping
 from ..util import resolve_file_path
 
 logger = logging.getLogger(__name__)
