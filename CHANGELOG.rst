@@ -16,6 +16,35 @@ Change Log
 * Changed pyyaml version to 6.0.
 
 
+14.3.1
+======
+`PR 753: Auth0 Symlink Bugfix <https://github.com/dbmi-bgm/cgap-portal/pull/753>`_
+
+* Fix broken auth0-lock when symlinking SPC on local deployment
+
+
+14.3.0
+======
+`PR 746: Bm node18 upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/746>`_
+
+* Update Docker's MakeFile to use Node version 18.17.0
+* Update Github workflows to use Node version 18.17.0
+
+
+14.2.3
+======
+
+* Update README.rst
+
+
+14.2.2
+======
+`PR 741: Style updates for cgap-portal item-pages <https://github.com/dbmi-bgm/cgap-portal/pull/741>`_
+
+* Fixed bug occurring in collapsible text box
+* Changed green color for links to a less fluorescent green
+
+
 14.2.1
 ======
 
