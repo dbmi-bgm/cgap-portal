@@ -33,10 +33,13 @@ classifiers = [
     'Programming Language :: Python :: 3',
     'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.10"
+python = ">=3.8.1,<3.12"
 awscli = ">=1.29.54"
 boto3 = "^1.28.54"
 botocore = "^1.31.54"
@@ -178,6 +181,7 @@ dis2pheno = "encoded.commands.parse_hpoa:main"
 es-index-data = "snovault.commands.es_index_data:main"
 export-data = "encoded.commands.export_data:main"
 extract-test-data = "encoded.commands.extract_test_data:main"
+generate-local-access-key = "snovault.commands.generate_local_access_key:main"
 import-data = "encoded.commands.import_data:main"
 jsonld-rdf = "encoded.commands.jsonld_rdf:main"
 load-access-keys = "encoded.commands.load_access_keys:main"
@@ -202,6 +206,7 @@ submission-test = "encoded.commands.submission_test:main"
 # submit-metadata-bundle = "encoded.commands.submit_metadata_bundle:main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
+view-local-object= "snovault.commands.view_local_object:main"
 # cgap-specific commands
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
 gene-table-intake = "encoded.commands.gene_table_intake:main"
