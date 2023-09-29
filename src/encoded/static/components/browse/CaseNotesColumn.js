@@ -131,7 +131,7 @@ export const CaseNotesColumn = ({ result }) => {
         date: newNote?.date ?? null,
         user: newNote?.user ?? "",
         userId: newNote?.userId ?? "",
-        warining: newNote?.warning
+        warning: newNote?.warningText
       }
     }
     // If there is a note item attached to this case with deleted status
@@ -149,8 +149,7 @@ export const CaseNotesColumn = ({ result }) => {
       text: result?.note?.note_text ?? "",
       date: result?.note?.last_text_edited?.date_text_edited ?? null,
       user: result?.note?.last_text_edited?.text_edited_by?.display_title ?? "",
-      userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? "",
-      warning: ""
+      userId: result?.note?.last_text_edited?.text_edited_by?.uuid ?? ""
     }
   });
 
@@ -159,27 +158,10 @@ export const CaseNotesColumn = ({ result }) => {
   // Create a ref to pass down to the "save" button
   const buttonRef = useRef(null);
 
-
-  // Update the color of the indicator if there are unsaved changes
-  useEffect(() => {
-    // Select the status indicator HTML element using case's display title
-    const noteIndicator = document.querySelector(`i.status-indicator-note[data-title="${result.display_title}"]`);
-    noteIndicator.classList.add('icon-sticky-note')
-
-    // [currentText] is empty string (note is null or deleted), hide indicator
-    if (currentText === "" && currentText === lastSavedText.text) {
-      noteIndicator?.setAttribute('data-status', 'note-unset');
-    }
-    // [currentText] not empty, contains saved or unsaved text
-    else {
-      noteIndicator?.setAttribute('data-status', currentText === lastSavedText.text ? 'note-saved' : 'note-unsaved');
-      noteIndicator?.setAttribute('data-tip', currentText === lastSavedText.text ? 'Notes are available for this case.' : 'There are unsaved changes to the case notes.');
-    }
-  },[currentText, lastSavedText.text]);
-
-
   const caseID = result['@id'];
   const noteID = result.note ? result.note['@id'] : "";
+
+  const warningText = "It may take some time for changes to be reflected. Please refresh or search again in a few minutes.";
 
   /**
    * handleNoteSave executes a request to update the NOTE and CASE
@@ -244,7 +226,7 @@ export const CaseNotesColumn = ({ result }) => {
                   date: res['@graph'][0].last_text_edited.date_text_edited,
                   user: new_user,
                   userId: new_userId,
-                  warning: "Please allow the system a few minutes to reflect these changes."
+                  warning: warningText
                 });
               }
             });
@@ -270,7 +252,7 @@ export const CaseNotesColumn = ({ result }) => {
               date: patchRes['@graph'][0].last_text_edited.date_text_edited,
               user: new_user,
               userId: new_userId,
-              warning: "Please allow the system a few minutes to reflect these changes."
+              warning: warningText
             });
           }
         }).catch((e) => {
@@ -296,7 +278,7 @@ export const CaseNotesColumn = ({ result }) => {
             date: "",
             user: "",
             userId: "",
-            warning: "Please allow the system a few minutes to reflect these changes."
+            warning: warningText
           });
         }
       }).catch((e) => {
