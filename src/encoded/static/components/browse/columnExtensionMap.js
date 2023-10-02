@@ -80,10 +80,10 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                  * Only render the note icon if this is the display title 
                  * column, and contains a [titleTip].
                 */
-                titleTip && (
+                (titleTip && note != null) && (
                     <i
                         className="status-indicator status-indicator-note far icon-sticky-note"
-                        data-status={ note === null ? "note-unset" : "note-saved" }
+                        data-status={ note.status !== "deleted" ? "note-saved" : "note-unset" }
                         data-tip="Notes are available for this case"
                         data-html
                     />

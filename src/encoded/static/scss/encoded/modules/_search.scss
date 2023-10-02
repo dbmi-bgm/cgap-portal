@@ -451,5 +451,10 @@ body[data-pathname="/search/"]:not([data-current-action="add"]) {
           color: #9FA7AE;
           margin-top: 5px;
       }
+
+      .error {
+        margin-top: 5px;
+        text-align: left;
+      }
   }
 }

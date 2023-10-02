@@ -59,6 +59,7 @@ const CaseNotesPopover = forwardRef(({
             "Save Note"
           }
         </button>
+        { lastSavedText.error && <p className="text-danger error">{lastSavedText.error}</p>}
         { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
       </Popover.Content>
     </Popover>
@@ -162,6 +163,7 @@ export const CaseNotesColumn = ({ result }) => {
   const noteID = result.note ? result.note['@id'] : "";
 
   const warningText = "It may take some time for changes to be reflected. Please refresh or search again in a few minutes.";
+  const errorText = "An error has occurred. Please try again or contact an administrator."
 
   /**
    * handleNoteSave executes a request to update the NOTE and CASE
@@ -232,7 +234,13 @@ export const CaseNotesColumn = ({ result }) => {
             });
           }
         }).catch((e) => {
-          console.log("Error: ", e)
+          console.log("Error: ", e);
+
+          setLastSavedText({
+            ...lastSavedText,
+            warning: "",
+            error: errorText
+          });
         })
       }
       // ELSE: There is alrady a Note item linked, so simply modify its
@@ -257,6 +265,12 @@ export const CaseNotesColumn = ({ result }) => {
           }
         }).catch((e) => {
           console.log("Error: ", e);
+
+          setLastSavedText({
+            ...lastSavedText,
+            warning: "",
+            error: errorText
+          });
         });
       }
     }
@@ -283,6 +297,12 @@ export const CaseNotesColumn = ({ result }) => {
         }
       }).catch((e) => {
         console.log("Error: ", e);
+
+        setLastSavedText({
+          ...lastSavedText,
+          warning: "",
+          error: errorText
+        });
       });
     }
   }
