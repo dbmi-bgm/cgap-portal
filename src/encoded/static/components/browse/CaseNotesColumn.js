@@ -15,11 +15,10 @@ const CaseNotesPopover = forwardRef(({
   handleNoteSave,
   currentText,
   setCurrentText,
-  buttonRef,
   ...popoverProps
 }, ref) => {
 
-  // Information on the previous note, defaults to null/empty.
+  // Information on the previous note, defaults to null.
   const prevDate = lastSavedText.date;
   const prevEditor = lastSavedText.user;
 
@@ -47,7 +46,6 @@ const CaseNotesPopover = forwardRef(({
         <button 
           type="button" 
           className="btn btn-primary mr-04 w-100"
-          ref={buttonRef}
           onClick={() => handleNoteSave(currentText) }
           disabled={lastSavedText.text === currentText ? "disabled" : "" }
           >
@@ -59,7 +57,7 @@ const CaseNotesPopover = forwardRef(({
             "Save Note"
           }
         </button>
-        { lastSavedText.error && <p className="text-danger error">{lastSavedText.error}</p>}
+        { lastSavedText.error && <p className="text-danger error">{lastSavedText.error}</p> }
         { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
       </Popover.Content>
     </Popover>
@@ -76,8 +74,7 @@ const CaseNotesButton = ({
   lastSavedText, 
   handleNoteSave, 
   currentText, 
-  setCurrentText,
-  buttonRef
+  setCurrentText
 }) => (
   <OverlayTrigger 
     trigger="click"  
@@ -90,7 +87,6 @@ const CaseNotesButton = ({
         handleNoteSave={handleNoteSave}
         currentText={currentText}
         setCurrentText={setCurrentText}
-        buttonRef={buttonRef}
       />
     }
   >
@@ -156,9 +152,6 @@ export const CaseNotesColumn = ({ result }) => {
 
   const [currentText, setCurrentText] = useState(lastSavedText.text);
   
-  // Create a ref to pass down to the "save" button
-  const buttonRef = useRef(null);
-
   const caseID = result['@id'];
   const noteID = result.note ? result.note['@id'] : "";
 
@@ -181,9 +174,6 @@ export const CaseNotesColumn = ({ result }) => {
    * [currentText] !== [lastSavedText.text]
    */
   const handleNoteSave = () => {
-    // Replace button text with loader until the request completes (re-render)
-    buttonRef.current.innerHTML = `<i class="icon icon-spin icon-circle-notch fas" />`;
-
     /**
      * This the current text in the textarea input is not 
      * the empty string, which should be dealt with separately
@@ -285,8 +275,6 @@ export const CaseNotesColumn = ({ result }) => {
        */
       ajax.promise(noteID, "DELETE", {}, JSON.stringify()).then((deleteRes) => {
         if (deleteRes.status === "success") {
-          // Replace button text with loader until the request completes (re-render)
-          buttonRef.current.innerHTML = `Save Note`;
           setLastSavedText({
             text: "",
             date: "",
@@ -316,7 +304,6 @@ export const CaseNotesColumn = ({ result }) => {
         handleNoteSave={handleNoteSave}
         currentText={currentText}
         setCurrentText={setCurrentText}
-        buttonRef={buttonRef}
       />
       {/* Render either empty string or note.note_text */}
       <p className="case-notes-text">{lastSavedText.text}</p> 
