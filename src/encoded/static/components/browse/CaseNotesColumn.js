@@ -304,7 +304,6 @@ export const CaseNotesColumn = ({ result }) => {
 
   return (
     <div className="case-notes">
-      {/* Render Notes Button */}
       <CaseNotesButton
         note={result?.note}
         lastSavedText={lastSavedText}
@@ -312,7 +311,6 @@ export const CaseNotesColumn = ({ result }) => {
         currentText={currentText}
         setCurrentText={setCurrentText}
       />
-      {/* Render either empty string or note.note_text */}
       <p className="case-notes-text">{lastSavedText.text}</p> 
     </div>
   );
