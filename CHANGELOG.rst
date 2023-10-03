@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-14.3.2
+14.4.0
 ======
 `PR 737: Add notes for Case items <https://github.com/dbmi-bgm/cgap-portal/pull/737>`_
 
