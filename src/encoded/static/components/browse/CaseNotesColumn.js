@@ -3,7 +3,6 @@ import { Popover, OverlayTrigger } from "react-bootstrap";
 import { LocalizedTime } from "@hms-dbmi-bgm/shared-portal-components/es/components/ui/LocalizedTime";
 import { ajax } from "@hms-dbmi-bgm/shared-portal-components/es/components/util";
 
-
 /**
  * React-Boostrap (v1.6.7, Bootstrap 4.6 syntax) Popover component containing
  * the main user actions, such as the "save" button and the textarea element 
@@ -17,6 +16,8 @@ const CaseNotesPopover = forwardRef(({
   setCurrentText,
   ...popoverProps
 }, ref) => {
+
+  const [isLoading, setIsLoading] = useState(false);
 
   // Information on the previous note, defaults to null.
   const prevDate = lastSavedText.date;
@@ -46,15 +47,20 @@ const CaseNotesPopover = forwardRef(({
         <button 
           type="button" 
           className="btn btn-primary mr-04 w-100"
-          onClick={() => handleNoteSave(currentText) }
-          disabled={lastSavedText.text === currentText ? "disabled" : "" }
-          >
+          onClick={() => { setIsLoading(true); handleNoteSave() } }
+          // If text is modified or loading disable 
+          disabled={ lastSavedText.text === currentText || isLoading ? "disabled" : "" }
+        >
           {
-            // Show "Save Note" on unsaved changes OR no previous note exists
-            lastSavedText.date ? 
-            lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
-            :
-            "Save Note"
+            // Show spinner icon when note is modified and save is loading
+            (lastSavedText.text !== currentText) && (isLoading === true) ?
+              <i className="icon icon-spin icon-circle-notch fas" />
+              :
+              // Show "Save Note" on unsaved changes OR no previous note exists
+              lastSavedText.date ? 
+                lastSavedText.text === currentText ? "Note saved - edit note to save again" : "Save Note"
+                :
+                "Save Note"
           }
         </button>
         { lastSavedText.error && <p className="text-danger error">{lastSavedText.error}</p> }
@@ -193,7 +199,7 @@ export const CaseNotesColumn = ({ result }) => {
       */
       if (noteID === "") {
         // 1.POST a new note
-        ajax.promise("/notes-standard/", "POST", {}, JSON.stringify(payload)).then((res) => {
+        ajax.promise("/notes-standard", "POST", {}, JSON.stringify(payload)).then((res) => {
           // Save the note item into the corresponding project
           const newNoteId = res['@graph'][0]['@id'];
 
@@ -206,7 +212,6 @@ export const CaseNotesColumn = ({ result }) => {
             ajax.promise(caseID, "PATCH", {}, JSON.stringify({
               "note": "" + newNoteId
             })).then((patchRes) => {
-
               if (patchRes.status === "success") {
 
                 // If the user has the same uuid (after extracting the uuid), don't change the user field
@@ -221,10 +226,11 @@ export const CaseNotesColumn = ({ result }) => {
                   warning: warningText
                 });
               }
+              return res
             });
           }
         }).catch((e) => {
-          console.log("Error: ", e);
+          console.log(e);
 
           setLastSavedText({
             ...lastSavedText,
@@ -253,8 +259,9 @@ export const CaseNotesColumn = ({ result }) => {
               warning: warningText
             });
           }
+          return patchRes
         }).catch((e) => {
-          console.log("Error: ", e);
+          console.log(e);
 
           setLastSavedText({
             ...lastSavedText,
@@ -284,7 +291,7 @@ export const CaseNotesColumn = ({ result }) => {
           });
         }
       }).catch((e) => {
-        console.log("Error: ", e);
+        console.log(e);
 
         setLastSavedText({
           ...lastSavedText,
