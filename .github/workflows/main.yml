@@ -20,14 +20,14 @@ jobs:
     name: cgap-portal tests
 
     # The type of runner that the job will run on
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
 
     # Build matrix
     strategy:
       matrix:
         test_type: ['UNIT', 'INDEX', 'DOCKER']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
-        python_version: ['3.8']
+        python_version: ['3.11']
         node_version: ['18']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
@@ -108,7 +108,7 @@ jobs:
           poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
-        if: ${{ matrix.test_type == 'DOCKER' && matrix.node_version == '18' && matrix.python_version == '3.8' }}
+        if: ${{ matrix.test_type == 'DOCKER' && matrix.node_version == '18' && matrix.python_version == '3.11' }}
         run: |
           touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
           docker build .

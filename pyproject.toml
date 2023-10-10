@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "14.3.1"
+version = "15.0.0"
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -31,15 +31,17 @@ classifiers = [
     # Specify the Python versions you support here. In particular, ensure
     # that you indicate whether you support Python 2, Python 3 or both.
     'Programming Language :: Python :: 3',
-    'Programming Language :: Python :: 3.7',
     'Programming Language :: Python :: 3.8',
+    'Programming Language :: Python :: 3.9',
+    'Programming Language :: Python :: 3.10',
+    'Programming Language :: Python :: 3.11',
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.10"
-awscli = ">=1.27.79"
-boto3 = "^1.26.133"
-botocore = "^1.29.79"
+python = ">=3.8.1,<3.12"
+awscli = ">=1.29.62"
+boto3 = "^1.28.62"
+botocore = "^1.31.62"
 certifi = ">=2021.5.30"
 chardet = "3.0.4"
 codeguru-profiler-agent = "^1.2.4"
@@ -48,9 +50,9 @@ codeguru-profiler-agent = "^1.2.4"
 # of cryptography.hazmat.bindings._rust in cryptography package. 2023-04-21.
 cryptography = "39.0.2"
 colorama = "0.3.3"
-dcicpyvcf = "1.0.0.1b0"  # "^1.0.0"
-dcicsnovault = "^10.0.2"
-dcicutils = "^7.7.0"
+dcicpyvcf = "^3.0.0"
+dcicsnovault = "^11.0.0"
+dcicutils = "^8.0.0"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -88,7 +90,7 @@ python-dateutil = "^2.8.2"
 # python-magic is presently pinned to 0.4.15 in lockstep with dcicsnovault's requirements. See explanation there.
 python_magic = ">=0.4.24,<1"
 pytz = ">=2021.3"
-PyYAML = "5.3.1"
+PyYAML = "^6.0.1"
 rdflib = "^4.2.2"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
 # repoze.debug is needed to use pyramid.pserve - Will Feb 17 2022
@@ -122,12 +124,11 @@ WSGIProxy2 = "0.4.2"
 "zope.deprecation" = "^4.4.0"
 "zope.interface" = ">=4.7.2,<6"
 "zope.sqlalchemy" = "1.6"
-pyyaml = "5.3.1"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = "^1.26.79"
-botocore-stubs = "^1.29.79"
+boto3-stubs = "^1.28.62"
+botocore-stubs = "^1.31.62"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"
@@ -179,6 +180,7 @@ dis2pheno = "encoded.commands.parse_hpoa:main"
 es-index-data = "snovault.commands.es_index_data:main"
 export-data = "encoded.commands.export_data:main"
 extract-test-data = "encoded.commands.extract_test_data:main"
+generate-local-access-key = "snovault.commands.generate_local_access_key:main"
 import-data = "encoded.commands.import_data:main"
 jsonld-rdf = "encoded.commands.jsonld_rdf:main"
 load-access-keys = "encoded.commands.load_access_keys:main"
@@ -203,6 +205,7 @@ submission-test = "encoded.commands.submission_test:main"
 # submit-metadata-bundle = "encoded.commands.submit_metadata_bundle:main"
 update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
+view-local-object= "snovault.commands.view_local_object:main"
 # cgap-specific commands
 clear-variants-and-genes = "encoded.commands.clear_variants_and_genes:main"
 gene-table-intake = "encoded.commands.gene_table_intake:main"
