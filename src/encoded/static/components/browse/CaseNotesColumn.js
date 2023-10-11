@@ -24,7 +24,11 @@ const CaseNotesPopover = forwardRef(({
   const prevEditor = lastSavedText.user;
 
   return (
-    <Popover data-popover-category="notes" placement="bottom" {...popoverProps} ref={ref}>
+    <Popover 
+      data-popover-category="notes"  
+      ref={ref}
+      {...popoverProps}
+    >
       <Popover.Title as="h3">Case Notes</Popover.Title>
       <Popover.Content>
         {
@@ -83,10 +87,11 @@ const CaseNotesButton = ({
   setCurrentText
 }) => (
   <OverlayTrigger 
-    trigger="click"  
-    placement="bottom"
+    trigger="click"
     rootClose
-    overlay={ // Pass Popover as overlay
+    placement="bottom"
+    flip="true"
+    overlay={
       <CaseNotesPopover
         note={note}
         lastSavedText={lastSavedText}
