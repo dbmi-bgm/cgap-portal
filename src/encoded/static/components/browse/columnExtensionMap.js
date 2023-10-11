@@ -147,7 +147,7 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         individual = null,
         family = null,
         sample_processing = null,
-        note = null
+        note
     } = result;
 
     const { uuid: indvID = null } = individual || {};

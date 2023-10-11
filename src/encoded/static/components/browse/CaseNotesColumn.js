@@ -90,7 +90,7 @@ const CaseNotesButton = ({
     trigger="click"
     rootClose
     placement="bottom"
-    flip="true"
+    flip={true}
     overlay={
       <CaseNotesPopover
         note={note}
