@@ -6,7 +6,7 @@ cgap-portal
 Change Log
 ----------
 
-14.4.0
+15.1.0
 ======
 `PR 737: Add notes for Case items <https://github.com/dbmi-bgm/cgap-portal/pull/737>`_
 
@@ -15,6 +15,18 @@ Change Log
 * New "notes available" indicator in search headers column
 * New textarea popup component (CaseNotesColumn.js) for text input
 * New SCSS module (_case-notes.scss) for styling the above
+
+15.0.0
+======
+* Upgrade to Python 3.11.
+* Changed pyyaml version to ^6.0.1.
+* Updated boto versions.
+* Removed types/access_key.py and schemas/access_key.json as the ones in snovault are sufficient.
+* Added generate-local-access-key script (from snovault) to pyproject.toml;
+  orignally created for smaht-portal since early in development no way to
+  create an access-key normally using the UI; but generall useful/convenient.
+* Added generate-local-access-key script (defined in snovault).
+* Added view-local-object script (defined in snovault).
 
 
 14.3.1
