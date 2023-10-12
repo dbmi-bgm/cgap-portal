@@ -6,6 +6,11 @@ cgap-portal
 Change Log
 ----------
 
+15.0.1
+======
+* Remove Dana's user from master inserts
+
+
 15.0.0
 ======
 * Upgrade to Python 3.11.

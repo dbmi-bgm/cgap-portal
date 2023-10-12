@@ -25,7 +25,7 @@ TEST_PROJECT_NAME = TEST_PROJECT['name']
 TEST_PROJECT_ID = '/projects/%s/' % TEST_PROJECT_NAME
 
 # PI removed from DBMI institution because it conflicts with custom inserts - Will 28 Nov 2022
-DBMI_PI_EMAIL = 'dvuzman@research.bwh.harvard.edu'  # constant that does not really matter
+DBMI_PI_EMAIL = 'cgap.platform@gmail.com'  # constant that does not really matter
 DBMI_PI = master_lookup('User', email=DBMI_PI_EMAIL)
 DBMI_PI_UUID = DBMI_PI['uuid']
 
