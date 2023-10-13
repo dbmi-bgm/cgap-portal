@@ -14,7 +14,6 @@ Change Log
 * Reveals new "Notes" column in columnExtensionMap
 * New "notes available" indicator in search headers column
 * New textarea popup component (CaseNotesColumn.js) for text input
-* New SCSS module (_case-notes.scss) for styling the above
 
 
 15.0.1
