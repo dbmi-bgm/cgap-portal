@@ -16,6 +16,12 @@ Change Log
 * New textarea popup component (CaseNotesColumn.js) for text input
 * New SCSS module (_case-notes.scss) for styling the above
 
+
+15.0.1
+======
+* Remove Dana's user from master inserts
+
+
 15.0.0
 ======
 * Upgrade to Python 3.11.
