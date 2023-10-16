@@ -17,6 +17,7 @@ import { variantSampleColumnExtensionMap, structuralVariantSampleColumnExtension
 import QuickPopover from '../item-pages/components/QuickPopover';
 import { QCMFlag } from '../item-pages/components/QCM';
 import { CurrentFamilyController, findCanonicalFamilyIndex } from '../item-pages/CaseView/CurrentFamilyController';
+import { CaseNotesColumn } from './CaseNotesColumn';
 
 // eslint-disable-next-line no-unused-vars
 const { Item, ColumnDefinition } = typedefs;
@@ -41,6 +42,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
         topLeft,
         status,
         statusTip = null,
+        note,
         mainTitle = null,
         dateTitle = "Created:",
         bottom = null,
@@ -67,19 +69,44 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
             </div>);
     }
 
+    // Adds note icon functionality on case view
     return (
-        <div className="multi-field-cell">
-            <div className="top-row">
-                <span className="col-topleft">
-                    { topLeft }
-                </span>
-                <i className="status-indicator-dot ml-07" data-status={status} data-tip={statusTip || Schemas.Term.toName("status", status)} data-html />
-            </div>
-            <h4 className="col-main" data-tip={titleTip} data-delay-show={titleTipDelayShow} data-html={tooltipEnableHtml}>
-                <span>{ mainTitle || "-" }</span>
-            </h4>
-            { bottomSection }
+      <div className="multi-field-cell">
+        <div className="top-row">
+          <span className="col-topleft">{topLeft}</span>
+          <div className="status-indicators">
+            { 
+                /**
+                 * Only render the note icon if this is the display title 
+                 * column, and contains a [titleTip].
+                */
+                (titleTip && note != null) && (
+                    <i
+                        className="status-indicator status-indicator-note far icon-sticky-note"
+                        data-status={ note.status !== "deleted" ? "note-saved" : "note-unset" }
+                        data-tip="Notes are available for this case"
+                        data-html
+                    />
+                )
+            }
+            <i
+              className="status-indicator status-indicator-dot ml-05"
+              data-status={status}
+              data-tip={statusTip || Schemas.Term.toName("status", status)}
+              data-html
+            />
+          </div>
         </div>
+        <h4
+          className="col-main"
+          data-tip={titleTip}
+          data-delay-show={titleTipDelayShow}
+          data-html={tooltipEnableHtml}
+        >
+          <span>{mainTitle || "-"}</span>
+        </h4>
+        {bottomSection}
+      </div>
     );
 }, function(){ return false; });
 
@@ -119,7 +146,8 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         case_title = null,
         individual = null,
         family = null,
-        sample_processing = null
+        sample_processing = null,
+        note
     } = result;
 
     const { uuid: indvID = null } = individual || {};
@@ -136,8 +164,9 @@ export const DisplayTitleColumnCase = React.memo(function DisplayTitleCaseDefaul
         statusTip = "Case exists, but some linked item is missing: Family, Individual, or Sample Processing.";
     }
 
+
     return (
-        <MultiLevelColumn {...{ date, status, statusTip, titleTip }}
+        <MultiLevelColumn {...{ date, status, statusTip, note, titleTip }}
             titleTipDelayShow={750}
             dateTitle="Accession Date:" topLeft={<span className="accession text-muted">{ accession }</span>}
             mainTitle={
@@ -429,7 +458,14 @@ export const columnExtensionMap = {
             }
             return <span className="value">{ retLink }</span>;
         }
-    }
+    },
+    notes: {
+      "title": "Case Notes",
+      'widthMap' : { 'lg' : 420, 'md' : 375, 'sm' : 300 },
+      render: function renderNotesColumn(result) {
+        return <CaseNotesColumn result={result}/>;
+      },
+    },
 };
 
 

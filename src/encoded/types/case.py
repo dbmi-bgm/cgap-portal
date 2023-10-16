@@ -253,6 +253,10 @@ def _build_case_embedded_list():
         # File linkTo
         "structural_variant_vcf_file.file_ingestion_status",
         "structural_variant_vcf_file.accession",
+        # Note linkTo
+        "note.note_text",
+        "note.last_text_edited.date_text_edited",
+        "note.last_text_edited.text_edited_by.display_title",
     ]
 
 

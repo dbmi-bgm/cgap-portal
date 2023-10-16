@@ -6,6 +6,16 @@ cgap-portal
 Change Log
 ----------
 
+15.1.0
+======
+`PR 737: Add notes for Case items <https://github.com/dbmi-bgm/cgap-portal/pull/737>`_
+
+* Adds functionality for POSTing and PATCHing Note Items linked to Case Items
+* Reveals new "Notes" column in columnExtensionMap
+* New "notes available" indicator in search headers column
+* New textarea popup component (CaseNotesColumn.js) for text input
+
+
 15.0.1
 ======
 * Remove Dana's user from master inserts
