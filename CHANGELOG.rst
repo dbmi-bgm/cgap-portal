@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+15.1.1
+======
+* 2023-10-24
+* Change references to Dana's email address (dvuzman@research.bwh.harvard.edu) in
+  tests/data/inserts/institution.json to an existing one, since it was previously
+  removed from tests/data/master-inserts/user.json; make deploy1 fails without this.
+
+
 15.1.0
 ======
 `PR 737: Add notes for Case items <https://github.com/dbmi-bgm/cgap-portal/pull/737>`_
