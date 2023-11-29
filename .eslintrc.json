@@ -1,41 +1,29 @@
 {
-    "rules": {        
+    "rules": {  
         "array-callback-return" : "error",
-        "arrow-body-style" : ["error", "as-needed", { "requireReturnForObjectLiteral": true }],
-        "arrow-parens" : ["error", "always"],
-        "generator-star-spacing" : "error",
-        "indent": [2, 4, {"SwitchCase": 1}],
-        "getter-return" :"error",
-        "jsx-quotes" : ["error", "prefer-double"],
-        "linebreak-style": [2, "unix"],
         "new-cap" : "error",
         "no-await-in-loop": "error",
         "no-console": 0,
         "no-empty": 0,
         "no-global-assign" : "error",
         "no-invalid-this" : "error",
-        "no-tabs" : "error",
-        "no-trailing-spaces" : "error",
         "no-undef": 0,
         "no-unused-vars": ["warn", { "args" : "none" }],
         "no-useless-concat": "error",
         "no-useless-constructor": "error",
-        "no-whitespace-before-property" : "error",
-        "object-curly-spacing" : ["error", "always"],
         "prefer-const" : "error",
         "prefer-destructuring" : "warn",
         "prefer-spread" : "error",
+        "prettier/prettier": "error",
+        // Do not add rules options for prettier config here; it will interfere with editor extensions
+        // See: https://github.com/prettier/eslint-plugin-prettier#options
         "react/button-has-type" : "error",
         "react/destructuring-assignment" : ["warn", "always"],
         "react/display-name" : 0,
-        "react/jsx-closing-tag-location" : "error",
-        "react/jsx-indent" : "error",
-        "react/jsx-indent-props" : "error",
         "react/jsx-key" : "error",
         "react/jsx-no-duplicate-props" : "error",
         "react/jsx-no-bind" : ["warn", { "ignoreDOMComponents" : true }],
         "react/jsx-pascal-case" : ["error", { "allowAllCaps" : true }],
-        "react/jsx-props-no-multi-spaces" : "error",
         "react/no-access-state-in-setstate" : "error",
         "react/no-direct-mutation-state" : "error",
         "react/no-children-prop" : 1,
@@ -45,7 +33,6 @@
         "react/no-this-in-sfc" : "error",
         "react/no-typos": "error",
         "react/prop-types": [1, { "skipUndeclared" : true }],
-        "semi": ["error", "always"],
         "valid-typeof" : ["error", { "requireStringLiterals": true }]
     },
     "env": {
@@ -56,22 +43,27 @@
     },
     "parser" : "@babel/eslint-parser",
     "extends": [
+        "plugin:react/recommended",
         "eslint:recommended",
-        "plugin:react/recommended"
+        "prettier"
     ],
     "parserOptions": {
         "ecmaVersion": 6,
         "sourceType": "module",
         "ecmaFeatures": {
             "jsx": true,
-            "classes" : true
+            "classes" : true,
+            "modules": true
         }
     },
     "plugins": [
         "react",
-        "cypress"
+        "cypress",
+        "prettier"
     ],
     "overrides": [
+        // Prettier isn't great at formatting these files, so we're skipping
+        // them there; doing this here to prevent annoying squigglies
         {
             "files" : ["./src/encoded/static/data/*.jsx"],
             "rules" : {
@@ -80,5 +72,10 @@
                 "react/react-in-jsx-scope" : 0
             }
         }
-    ]
+    ],
+    "settings": {
+        "react": {
+            "version": "detect"
+        }
+      }
 }
