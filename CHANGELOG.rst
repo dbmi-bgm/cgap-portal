@@ -6,6 +6,15 @@ cgap-portal
 Change Log
 ----------
 
+15.1.2
+======
+`PR 759: Bm feb2024 npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/759>`_
+
+* Merge still-relevant dependabot fixes
+* Run `npm audit fix`
+* Bump SPC to 0.1.76
+
+
 15.1.1
 ======
 * 2023-10-24
