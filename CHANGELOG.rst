@@ -12,6 +12,8 @@ Change Log
 
 * Merge still-relevant dependabot fixes
 * Run `npm audit fix`
+* Bump SPC to 0.1.76
+
 
 15.1.1
 ======
