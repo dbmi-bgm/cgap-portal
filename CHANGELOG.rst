@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+15.2.0
+======
+`PR 761: feat: components and item page styles <https://github.com/dbmi-bgm/cgap-portal/pull/761>`_
+
+* Remove components that have been moved into the Shared Portal Components repository
+* Add styling in response to a change in shared portal components' item page tables (full width)
+
+
 15.1.2
 ======
 `PR 759: Bm feb2024 npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/759>`_
