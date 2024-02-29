@@ -6,6 +6,7 @@ import ReactTooltip from 'react-tooltip';
 import { Accordion, AccordionContext, Fade, useAccordionToggle } from 'react-bootstrap';
 
 import { navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
+import { DotRouter, DotRouterTab, TabPaneErrorBoundary } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/DotRouter';
 
 import { responsiveGridState } from './../../util/layout';
 import { usePrevious } from '../../util/hooks';
@@ -14,7 +15,6 @@ import DefaultItemView from './../DefaultItemView';
 import { EmbeddedCaseSearchTable } from '../components/EmbeddedItemSearchTable';
 import { PedigreeVizLoader } from '../components/pedigree-viz-loader';
 import { PedigreeTabViewBody, PedigreeFullScreenBtn } from '../components/PedigreeTabViewBody';
-import { DotRouter, DotRouterTab } from '../components/DotRouter';
 import { VariantSampleListController } from './VariantSampleListController';
 import { CaseSummaryTable } from './CaseSummaryTable';
 import { PedigreeTabView, PedigreeTabViewOptionsController } from './PedigreeTabView';
@@ -401,7 +401,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
             {!loadingAccordion && accordion}
 
             {canonicalFamily && caseIndividual ?
-                <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info">
+                <DotRouter href={href} isActive={isActiveTab} navClassName="container-wide pt-36 pb-36" contentsClassName="container-wide bg-light pt-36 pb-36" prependDotPath="case-info" errorBoundary={<TabPaneErrorBoundary/>}>
                     <DotRouterTab dotPath=".accessioning" default tabTitle="Accessioning">
                         <AccessioningTab {...{ context, href, canonicalFamily, secondaryFamilies }} />
                     </DotRouterTab>
