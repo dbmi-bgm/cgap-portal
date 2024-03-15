@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+15.2.0
+======
+
+* Security updates - nginx + python
+
+
 15.1.2
 ======
 `PR 759: Bm feb2024 npm updates <https://github.com/dbmi-bgm/cgap-portal/pull/759>`_
