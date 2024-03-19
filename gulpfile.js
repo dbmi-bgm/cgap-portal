@@ -225,7 +225,8 @@ function doSassBuild(done, options = {}) {
     commonRenderProcess('./src/encoded/static/scss/print.scss', printCssOutputLocation, printSourceMapLocation);
 }
 
-
+// Keeping the old name, but this is actually quite slow now
+// because it generates inline sourcemaps for debugging which are slower in Webpack5
 const devQuick = gulp.series(
     cleanBuildDirectory,
     setQuick,
@@ -233,6 +234,7 @@ const devQuick = gulp.series(
     gulp.parallel(watch, watchSharedPortalComponents)
 );
 
+// Slowest version; generates full sourcemaps
 const devAnalyzed = gulp.series(
     cleanBuildDirectory,
     setDevelopment,
@@ -240,12 +242,15 @@ const devAnalyzed = gulp.series(
     doWebpack
 );
 
+// Should be quickest build as doesn't include any build tools like sourcemapping
 const build = gulp.series(
     cleanBuildDirectory,
     setProduction,
     doWebpack
 );
 
+// Should be slower than devquick but faster than build because it includes
+// some inline sourcemap generation
 const buildQuick = gulp.series(
     cleanBuildDirectory,
     setQuick,

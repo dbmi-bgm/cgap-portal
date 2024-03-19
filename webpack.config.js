@@ -35,6 +35,7 @@ if (mode === 'production') {
     // removed eval from 'quick' builds; see: https://webpack.js.org/plugins/terser-webpack-plugin/#note-about-source-maps
     // This, unfortunately, means that quick builds will be slower than they used to be
     // If they end up being TOO slow, we can not generate sourcemaps on "quick" builds, potentially
+    // However, that will have implications for debugging/development workflows...
     devTool = 'inline-source-map';
     console.log("Generating inline source maps for quicker build...");
 } else if (env === 'development') {
