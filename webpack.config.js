@@ -98,7 +98,7 @@ Object.keys(spcPeerDependencies).forEach(function(packageName) {
 delete resolve.alias["react-bootstrap"];
 
 const optimization = {
-    minimize: mode === "production",
+    minimize: false, // mode === "production", TEMPORARILY DELETING FOR TESTING
     minimizer: [
         // Syntax for pulling module from webpack 5: https://stackoverflow.com/questions/66343602/use-latest-terser-webpack-plugin-with-webpack5
         (compiler) => {
