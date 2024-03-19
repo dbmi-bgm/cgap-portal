@@ -8,7 +8,7 @@ import _ from 'underscore';
 import { EmbeddedItemSearchTable, SearchTableTitle } from './../../item-pages/components/EmbeddedItemSearchTable';
 import { CohortStatisticalAnalysisTable } from './../../item-pages/components/CohortStatisticalAnalysisTable';
 import { EmbeddedCohortBrowser } from './../../item-pages/components/HiGlass/EmbeddedCohortBrowser';
-import { YoutubeVideoEmbed } from '../components/YoutubeVideoEmbed';
+import { YoutubeVideoEmbed } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/YoutubeVideoEmbed';
 
 
 /**

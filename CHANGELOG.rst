@@ -6,6 +6,26 @@ cgap-portal
 Change Log
 ----------
 
+15.3.1
+======
+
+`PR 761: feat: components and item page styles <https://github.com/dbmi-bgm/cgap-portal/pull/761>`_
+
+* Remove components that have been moved into the Shared Portal Components repository
+* Add styling in response to a change in shared portal components' item page tables (full width)
+
+
+15.3.0
+======
+
+`See https://github.com/dbmi-bgm/cgap-portal/pull/730 for more info`
+* Remove terser-webpack-plugin dev-dependency, since this is now included in Webpack 5 by default
+* No longer bundle source maps in production builds (just adds to the bundle size and makes site load slower)
+* Re-add build-quick script, since it will now serve a unique purpose, given default builds are running a little long these days
+* Added some comments we can use to easily profile while debugging Webpack; some to describe build changes
+* Resolve NODE_ENV "Conflicting values for 'process.env.NODE_ENV'" warning; fix for differences between prod/dev builds
+
+
 15.2.0
 ======
 
