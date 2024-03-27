@@ -7,7 +7,7 @@ import _ from 'underscore';
 import { object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 
 import { usePrevious } from '../../util/hooks';
-import { DotRouter, DotRouterTab } from '../components/DotRouter';
+import { DotRouter, DotRouterTab } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/DotRouter';
 import DefaultItemView from './../DefaultItemView';
 import { SomaticAccessioningTab } from './SomaticAccessioningTab';
 import { SomaticBioinformaticsTab } from './SomaticBioinformaticsTab';

@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+15.3.0
+======
+`PR 761: feat: CGAP components transfer <https://github.com/dbmi-bgm/cgap-portal/pull/761>`_
+
+* Remove components that have been moved into the Shared Portal Components repository
+
+
 15.2.0
 ======
 
