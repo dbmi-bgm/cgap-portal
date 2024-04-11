@@ -60,7 +60,7 @@ granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support i
 h5py = "^3.8.0"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
-idna = ">=2.10,<3"
+idna = ">=2.10,<4"
 isodate = ">=0.6.1,<1"
 jmespath = ">=0.10.0,<1"
 netaddr = ">=0.8.0,<1"
