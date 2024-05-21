@@ -95,7 +95,7 @@ rdflib = "^4.2.2"
 rdflib-jsonld = ">=0.5.0,<1.0.0"
 # repoze.debug is needed to use pyramid.pserve - Will Feb 17 2022
 "repoze.debug" = ">=1.0.2"
-requests = "^2.23.0"
+requests = "^2.32.0"
 rfc3986 = "^1.4.0"
 rsa = "3.3"
 rutter = ">=0.3,<1"
