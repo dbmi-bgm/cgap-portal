@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+15.3.1
+======
+`PR 769: Use snovault command to update inserts <https://github.com/dbmi-bgm/cgap-portal/pull/769>`_
+
+* Bring in snovault with updated command and remove nonfunctional version in this repo
+
+
 15.3.0
 ======
 `PR 761: feat: CGAP components transfer <https://github.com/dbmi-bgm/cgap-portal/pull/761>`_
