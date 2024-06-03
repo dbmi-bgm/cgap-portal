@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "15.3.0"
+version = "15.3.1"
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -43,7 +43,7 @@ awscli = ">=1.29.62"
 boto3 = "^1.28.62"
 botocore = "^1.31.62"
 certifi = ">=2021.5.30"
-chardet = "3.0.4"
+chardet = "^5.2.0"
 codeguru-profiler-agent = "^1.2.4"
 # At least on Mac M1 if cryptography package is later than 39.x.x (i.e. 40.x.x and up)
 # we get odd 'pyo3_runtime.PanicException: Python API call failed' error on import
@@ -51,8 +51,8 @@ codeguru-profiler-agent = "^1.2.4"
 cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "^3.0.0"
-dcicsnovault = "^11.0.0"
-dcicutils = "^8.0.0"
+dcicsnovault = "^11.14.2"
+dcicutils = "^8.8.5"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -203,7 +203,7 @@ spreadsheet-to-json = "encoded.commands.spreadsheet_to_json:main"
 submission-test = "encoded.commands.submission_test:main"
 # Use the same-named script in SubmitCGAP instead.
 # submit-metadata-bundle = "encoded.commands.submit_metadata_bundle:main"
-update-inserts-from-server = "encoded.commands.update_inserts_from_server:main"
+update-inserts-from-server = "snovault.commands.update_inserts_from_server:main"
 verify-item = "encoded.commands.verify_item:main"
 view-local-object= "snovault.commands.view_local_object:main"
 # cgap-specific commands
