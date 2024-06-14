@@ -1,0 +1,32 @@
+[
+    {
+      "title": "Test MetaWorkflow Handler",
+      "name": "test_metawf_handler",
+      "version": "v1",
+      "description": "Test metaworkflow handler",
+      "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+      "institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989",
+      "uuid": "3b291566-f96e-4ef9-a1eb-7ec994b5c689",
+      "aliases": ["cgap:test_metawf_handler"],
+      "meta_workflows": [
+        {
+            "meta_workflow": "ceafe51e-61b9-40fc-bdfa-d01e5e27046e",
+            "name": "test_mwf_1",
+            "items_for_creation_property_trace": [
+                "sample_processing.samples"
+            ]
+        },
+        {
+            "meta_workflow": "ceafe51e-61b9-40fc-bdfa-d01e5e27046e",
+            "items_for_creation_uuid": [
+                "4fdb481a-fbdb-4c0f-a68d-aac87f847bec",
+                "283f6047-61cd-4ddb-8881-ec1c87082569"
+            ],
+            "dependencies": [
+                "test_mwf_1"
+            ],
+            "duplication_flag": true
+        }
+      ]
+    }
+]

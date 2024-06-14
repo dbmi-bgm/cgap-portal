@@ -1,0 +1,178 @@
+{
+    "title": "MetaWorkflow Handler",
+    "description": "Schema for a handler that connects a set of metaworkflows, outlining an entire pipeline",
+    "id": "/profiles/meta_workflow_handler.json", 
+    "$schema": "http://json-schema.org/draft-04/schema#",
+    "type": "object",
+    "required": [
+        "project",
+        "institution"
+    ],
+    "additionalProperties": false,
+    "identifyingProperties": [
+        "uuid",
+        "aliases",
+        "accession"
+    ],
+    "mixinProperties": [ 
+        {
+            "$ref": "mixins.json#/schema_version"
+        },
+        {
+            "$ref": "mixins.json#/uuid"
+        },
+        {
+            "$ref": "mixins.json#/accession"
+        },
+        {
+            "$ref": "mixins.json#/aliases"
+        },
+        {
+            "$ref": "mixins.json#/status"
+        },
+        {
+            "$ref": "mixins.json#/submitted"
+        },
+        {
+            "$ref": "mixins.json#/modified"
+        },
+        {
+            "$ref": "mixins.json#/attribution"
+        }
+    ],
+    "mixinFacets": [
+        {
+            "$ref": "mixins.json#/facets_common" 
+        }
+    ],
+    "properties": {
+        "schema_version": {
+            "default": "1"
+        },
+        "accession": {
+            "accessionType": "MWH" 
+        },
+        "title": {
+            "title": "Title",
+            "description": "The preferred viewable name of the metaworkflow handler",
+            "type": "string"
+        },
+        "name": {
+            "title": "Name",
+            "description": "The name of the metaworkflow handler",
+            "type": "string"
+        },
+        "description": {
+            "title": "Description",
+            "description": "A short text description of the metaworkflow handler",
+            "type": "string",
+            "formInput": "textarea" 
+        },
+        "version": {
+            "title": "Version",
+            "description": "The version of the metaworkflow handler",
+            "type": "string"
+        },
+        "previous_version": {
+            "title": "Previous versions",
+            "description": "Link to the previous versions of the metaworkflow handler",
+            "type": "array",
+            "items": {
+                "title": "Previous version",
+                "description": "Link to a previous version of the metaworkflow handler",
+                "type": "string",
+                "linkTo": "MetaWorkflowHandler"
+            }
+        },
+        "version_upgrade_log": {
+            "title": "Version upgrade log",
+            "description": "Version upgrade log",
+            "type": "string"
+        },
+        "meta_workflows": {
+            "title": "MetaWorkflows",
+            "type": "array",
+            "items": {
+                "title": "MetaWorkflows",
+                "type": "object",
+                "required": [
+                    "meta_workflow"
+                ],
+                "oneOf": [
+                    {
+                        "required": [
+                            "items_for_creation_property_trace"
+                        ]
+                    },
+                    {
+                        "required": [
+                            "items_for_creation_uuid"
+                        ]
+                    }
+                ],
+                "additionalProperties": false,
+                "properties": {
+                    "meta_workflow": {
+                        "title": "MetaWorkflow",
+                        "description": "Link to the metaworkflow item",
+                        "type": "string",
+                        "linkTo": "MetaWorkflow"
+                    },
+                    "name": {
+                        "title": "MetaWorkflow name",
+                        "description": "User-submitted name of the metaworkflow",
+                        "type": "string"
+                    },
+                    "items_for_creation_property_trace": {
+                        "title": "Required items for creation (property traces)",
+                        "description": "List of item property traces needed for creation of the associated metaworkflow run",
+                        "type": "array",
+                        "items": {
+                            "type": "string"
+                        }
+                    },
+                    "items_for_creation_uuid": {
+                        "title": "Required items for creation (UUIDs)",
+                        "description": "List of item UUIDs needed for creation of the associated metaworkflow run",
+                        "type": "array",
+                        "items": {
+                            "type": "string",
+                            "format": "uuid"
+                        }
+                    },
+                    "dependencies": {
+                        "title": "Dependencies",
+                        "description": "List of dependencies that must be fulfilled to create the associated metaworkflow run",
+                        "type": "array",
+                        "items": {
+                            "title": "Dependency",
+                            "description": "One of the dependencies",
+                            "type": "string"
+                        },
+                        "default": []
+                    },
+                    "duplication_flag": {
+                        "title": "Duplication flag",
+                        "description": "Whether to duplicate an existing metaworkflow run for this metaworkflow",
+                        "type": "boolean",
+                        "default": false
+                    }
+                }
+            }
+        }
+    },
+    "facets": { 
+        "name": {
+            "title": "Name"
+        }
+    },
+    "columns": { 
+        "name": {
+            "title": "Name"
+        },
+        "version": {
+            "title": "Version",
+            "colTitle": "Version"
+        }
+    }
+}
