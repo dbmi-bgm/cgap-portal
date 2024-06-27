@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+15.4.0
+======
+
+* Updates related to Python 3.12.
+
+
 15.3.1
 ======
 `PR 769: Use snovault command to update inserts <https://github.com/dbmi-bgm/cgap-portal/pull/769>`_
