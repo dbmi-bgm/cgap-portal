@@ -1266,7 +1266,7 @@ files = [
 
 [[package]]
 name = "dcicpyvcf"
-version = "3.0.0.1b3"
+version = "3.0.0.1b5"
 description = "Variant Call Format (VCF) parser for Python"
 category = "main"
 optional = false
@@ -4869,4 +4869,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "b0f0207503b389def1b157655802972497c4273af4f20b03a038d2f2e43cadd0"
+content-hash = "2b06d8d04700d8d712c9ab6569cdb018f3820a13dec6d00000ef97533f250e5d"

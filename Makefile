@@ -48,15 +48,15 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
-	pip install poetry==1.4.2
+#	pip install poetry==1.4.2
 	pip install setuptools
 	pip install wheel
-ifeq ($(shell uname -s), Darwin)
-ifeq ($(shell uname -m), arm64)
-	pip install pysam=="0.21.0"
-	pip install matplotlib=="3.3.4"
-endif
-endif
+#ifeq ($(shell uname -s), Darwin)
+#ifeq ($(shell uname -m), arm64)
+#	pip install pysam=="0.21.0"
+#	pip install matplotlib=="3.3.4"
+#endif
+#endif
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
@@ -68,13 +68,13 @@ macbuild-poetry:
 	make macpoetry-install
 
 build:  # builds
-ifeq ($(shell uname -s), Darwin)
-	@echo "Looks like this is Mac so executing: make macbuild"
-	make macbuild
-else
+#ifeq ($(shell uname -s), Darwin)
+#	@echo "Looks like this is Mac so executing: make macbuild"
+#	make macbuild
+#else
 	make build-poetry
 	make build-after-poetry
-endif
+#endif
 
 macbuild:  # Builds for MacOS (see: bin/macpoetry-install)
 	make macbuild-poetry
