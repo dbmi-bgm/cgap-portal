@@ -1239,16 +1239,19 @@ files = [
 
 [[package]]
 name = "dcicpyvcf"
-version = "3.0.0.1b5"
+version = "3.0.0.1b6"
 description = "Variant Call Format (VCF) parser for Python"
 optional = false
-python-versions = "*"
-files = []
-develop = true
+python-versions = "<3.13,>=3.8.0"
+files = [
+    {file = "dcicpyvcf-3.0.0.1b6-py3-none-any.whl", hash = "sha256:b5131ad30bf7ecdee6bab9909b588dbfc6999bd48b73babe004444001ee22f3e"},
+    {file = "dcicpyvcf-3.0.0.1b6.tar.gz", hash = "sha256:f6d6615bb9d2df00e31a5f6bec6c31e1655779abf75af6390a4ce15869a51caf"},
+]
 
-[package.source]
-type = "directory"
-url = "../PyVCF"
+[package.dependencies]
+cython = "*"
+pysam = ">=0.22.1,<0.23.0"
+setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
@@ -4687,4 +4690,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "2b06d8d04700d8d712c9ab6569cdb018f3820a13dec6d00000ef97533f250e5d"
+content-hash = "c14ef6bd98ce1b7b673e545c12399bb179382b63bc6496f6d77bc25874202f89"
