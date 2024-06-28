@@ -43,60 +43,28 @@ moto-setup:  # optional moto setup that must be done separately
 	@# pip install "moto[server]==1.3.7"
 	@echo "'moto[server]' not being installed here. Regular 'moto' will be installed by pyproject.toml."
 
-macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
-	pip install poetry
-#	bin/macpoetry-install
-
-configure:  # does any pre-requisite installs
+configure:
 	pip install --upgrade pip
-#	pip install poetry==1.4.2
 	pip install poetry
 	pip install setuptools
 	pip install wheel
-#ifeq ($(shell uname -s), Darwin)
-#ifeq ($(shell uname -m), arm64)
-#	pip install pysam=="0.21.0"
-#	pip install matplotlib=="3.3.4"
-#endif
-#endif
 	poetry config virtualenvs.create false --local # do not create a virtualenv - the user should have already done this -wrr 20-Sept-2021
 
 build-poetry:
 	make configure
 	poetry install
 
-macbuild-poetry:
-	make configure
-	make macpoetry-install
-
 build:  # builds
-#ifeq ($(shell uname -s), Darwin)
-#	@echo "Looks like this is Mac so executing: make macbuild"
-#	make macbuild
-#else
 	make build-poetry
-	make build-after-poetry
-#endif
-
-macbuild:  # Builds for MacOS (see: bin/macpoetry-install)
-	make macbuild-poetry
 	make build-after-poetry
 
 rebuild:
 	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
 	make build
 
-macrebuild:
-	make clean  # Among other things, this assures 'make npm-setup' will run, but it also does other cleanup.
-	make macbuild
-
 build-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
 	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
 	make build
-
-macbuild-full:  # rebuilds for Catalina, addressing zlib possibly being in an alternate location.
-	make clean-node-modules  # This effectively assures that 'make npm-setup' will need to run.
-	make macbuild
 
 build-after-poetry:  # continuation of build after poetry install
 	make moto-setup
@@ -110,10 +78,6 @@ fix-dist-info:
 
 build-dev:  # same as build, but sets up locust as well
 	make build
-	make build-locust
-
-macbuild-dev:  # same as macbuild, but sets up locust as well
-	make macbuild
 	make build-locust
 
 build-locust:  # just pip installs locust - may cause instability
@@ -347,8 +311,8 @@ help:
 info:
 	@: $(info Here are some 'make' options:)
 	   $(info - Use 'make aws-ip-ranges' to download latest ip range information. Invoked automatically when needed.)
-	   $(info - Use 'make build' (or 'make macbuild' on OSX Catalina) to build only application dependencies.)
-	   $(info - Use 'make build-dev' (or 'make macbuild-dev' on OSX Catalina) to build all dependencies, even locust.)
+	   $(info - Use 'make build' to build only application dependencies.)
+	   $(info - Use 'make build-dev' to build all dependencies, even locust.)
 	   $(info - Use 'make build-locust' to install locust. Do not do this unless you know what you are doing.)
 	   $(info - Use 'make clean' to clear out (non-python) dependencies.)
 	   $(info - Use 'make clean-python' to clear python virtualenv for fresh poetry install.)
