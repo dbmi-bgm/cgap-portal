@@ -44,7 +44,8 @@ moto-setup:  # optional moto setup that must be done separately
 	@echo "'moto[server]' not being installed here. Regular 'moto' will be installed by pyproject.toml."
 
 macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an environment variable wrapper is needed
-	bin/macpoetry-install
+	pip install poetry
+#	bin/macpoetry-install
 
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
