@@ -49,6 +49,7 @@ macpoetry-install:  # Same as 'poetry install' except that on OSX Catalina, an e
 configure:  # does any pre-requisite installs
 	pip install --upgrade pip
 #	pip install poetry==1.4.2
+ 	pip install poetry
 	pip install setuptools
 	pip install wheel
 #ifeq ($(shell uname -s), Darwin)
