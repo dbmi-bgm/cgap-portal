@@ -87,17 +87,17 @@ requests = ">=0.14.0"
 
 [[package]]
 name = "awscli"
-version = "1.33.17"
+version = "1.33.18"
 description = "Universal Command Line Environment for AWS."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "awscli-1.33.17-py3-none-any.whl", hash = "sha256:87860c3626a3b3113bfdb8f3e8ebbc0df9b738e63eb9bd2c9cc2609376e1b9b8"},
-    {file = "awscli-1.33.17.tar.gz", hash = "sha256:00710a31ef30e4c01050e2e323674fb7b194df9522d2e8bc470d381f2d179686"},
+    {file = "awscli-1.33.18-py3-none-any.whl", hash = "sha256:4065a0c9ee7bd2281e0b04616242693abbe17cd9d7be966abc7a850d5044226d"},
+    {file = "awscli-1.33.18.tar.gz", hash = "sha256:800cae2c020dae7e86877e2b53dee637c19acc62de8084bc67e3434ac174ca35"},
 ]
 
 [package.dependencies]
-botocore = "1.34.135"
+botocore = "1.34.136"
 colorama = ">=0.2.5,<0.4.7"
 docutils = ">=0.10,<0.17"
 PyYAML = ">=3.10,<6.1"
@@ -258,17 +258,17 @@ files = [
 
 [[package]]
 name = "boto3"
-version = "1.34.135"
+version = "1.34.136"
 description = "The AWS SDK for Python"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3-1.34.135-py3-none-any.whl", hash = "sha256:6f5d7a20afbe45e3f7c6b5e96071752d36c3942535b1f7924964f1fdf25376a7"},
-    {file = "boto3-1.34.135.tar.gz", hash = "sha256:344f635233c85dbb509b87638232ff9132739f90bb5e6bf01fa0e0a521a9107e"},
+    {file = "boto3-1.34.136-py3-none-any.whl", hash = "sha256:d41037e2c680ab8d6c61a0a4ee6bf1fdd9e857f43996672830a95d62d6f6fa79"},
+    {file = "boto3-1.34.136.tar.gz", hash = "sha256:0314e6598f59ee0f34eb4e6d1a0f69fa65c146d2b88a6e837a527a9956ec2731"},
 ]
 
 [package.dependencies]
-botocore = ">=1.34.135,<1.35.0"
+botocore = ">=1.34.136,<1.35.0"
 jmespath = ">=0.7.1,<2.0.0"
 s3transfer = ">=0.10.0,<0.11.0"
 
@@ -277,13 +277,13 @@ crt = ["botocore[crt] (>=1.21.0,<2.0a0)"]
 
 [[package]]
 name = "boto3-stubs"
-version = "1.34.135"
-description = "Type annotations for boto3 1.34.135 generated with mypy-boto3-builder 7.24.0"
+version = "1.34.136"
+description = "Type annotations for boto3 1.34.136 generated with mypy-boto3-builder 7.24.0"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "boto3_stubs-1.34.135-py3-none-any.whl", hash = "sha256:7aa56baacba4f631400b3cc55d5a0554d63cfa0955ef9189ae28da476a3140e8"},
-    {file = "boto3_stubs-1.34.135.tar.gz", hash = "sha256:7d771b74d5c17987cd73e13add9334ba2e4c85ee1e59019ccd1534aa4f49666d"},
+    {file = "boto3_stubs-1.34.136-py3-none-any.whl", hash = "sha256:5826c22c10fc9032376bbee436d1b23b111e5fb1f13c75ecde8727151191f057"},
+    {file = "boto3_stubs-1.34.136.tar.gz", hash = "sha256:ecbce782ae19037d1f26673cfc30358493c9658ea0af06dd58a999be963ab275"},
 ]
 
 [package.dependencies]
@@ -334,7 +334,7 @@ bedrock-agent = ["mypy-boto3-bedrock-agent (>=1.34.0,<1.35.0)"]
 bedrock-agent-runtime = ["mypy-boto3-bedrock-agent-runtime (>=1.34.0,<1.35.0)"]
 bedrock-runtime = ["mypy-boto3-bedrock-runtime (>=1.34.0,<1.35.0)"]
 billingconductor = ["mypy-boto3-billingconductor (>=1.34.0,<1.35.0)"]
-boto3 = ["boto3 (==1.34.135)", "botocore (==1.34.135)"]
+boto3 = ["boto3 (==1.34.136)", "botocore (==1.34.136)"]
 braket = ["mypy-boto3-braket (>=1.34.0,<1.35.0)"]
 budgets = ["mypy-boto3-budgets (>=1.34.0,<1.35.0)"]
 ce = ["mypy-boto3-ce (>=1.34.0,<1.35.0)"]
@@ -683,13 +683,13 @@ xray = ["mypy-boto3-xray (>=1.34.0,<1.35.0)"]
 
 [[package]]
 name = "botocore"
-version = "1.34.135"
+version = "1.34.136"
 description = "Low-level, data-driven core of boto 3."
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "botocore-1.34.135-py3-none-any.whl", hash = "sha256:3aa9e85e7c479babefb5a590e844435449df418085f3c74d604277bc52dc3109"},
-    {file = "botocore-1.34.135.tar.gz", hash = "sha256:2e72f37072f75cb1391fca9d7a4c32cecb52a3557d62431d0f59d5311dc7d0cf"},
+    {file = "botocore-1.34.136-py3-none-any.whl", hash = "sha256:c63fe9032091fb9e9477706a3ebfa4d0c109b807907051d892ed574f9b573e61"},
+    {file = "botocore-1.34.136.tar.gz", hash = "sha256:7f7135178692b39143c8f152a618d2a3b71065a317569a7102d2306d4946f42f"},
 ]
 
 [package.dependencies]
@@ -705,13 +705,13 @@ crt = ["awscrt (==0.20.11)"]
 
 [[package]]
 name = "botocore-stubs"
-version = "1.34.135"
+version = "1.34.136"
 description = "Type annotations and code completion for botocore"
 optional = false
 python-versions = "<4.0,>=3.8"
 files = [
-    {file = "botocore_stubs-1.34.135-py3-none-any.whl", hash = "sha256:b77891dac2324b78f63c854e765cf76a71822f5d2868d9a4219ca1b06a93f9e3"},
-    {file = "botocore_stubs-1.34.135.tar.gz", hash = "sha256:f599499a5e0dacc27137b8b0728b1846c3a502b001dcee6da6a036407ccd1663"},
+    {file = "botocore_stubs-1.34.136-py3-none-any.whl", hash = "sha256:f8a8716d9f1b8387acce6ef35d9428ed4ef1584dbeb6cce3f2f95ba6ff8120f7"},
+    {file = "botocore_stubs-1.34.136.tar.gz", hash = "sha256:b97bece44abc9f16c1fcb022d3f03c22d411ea3dcb4730207a318eb8e6ef63e7"},
 ]
 
 [package.dependencies]
@@ -1239,13 +1239,13 @@ files = [
 
 [[package]]
 name = "dcicpyvcf"
-version = "3.0.0.1b6"
+version = "3.0.0.1b7"
 description = "Variant Call Format (VCF) parser for Python"
 optional = false
 python-versions = "<3.13,>=3.8.0"
 files = [
-    {file = "dcicpyvcf-3.0.0.1b6-py3-none-any.whl", hash = "sha256:b5131ad30bf7ecdee6bab9909b588dbfc6999bd48b73babe004444001ee22f3e"},
-    {file = "dcicpyvcf-3.0.0.1b6.tar.gz", hash = "sha256:f6d6615bb9d2df00e31a5f6bec6c31e1655779abf75af6390a4ce15869a51caf"},
+    {file = "dcicpyvcf-3.0.0.1b7-py3-none-any.whl", hash = "sha256:19d68c347e4f8987e6469fe5c34bf4ca083d39254f43a1abfb3fdf37200e163c"},
+    {file = "dcicpyvcf-3.0.0.1b7.tar.gz", hash = "sha256:24909a1f7784250c8a0dcbd7726def68458bc36b0cae15a33de5f3d4b7581df8"},
 ]
 
 [package.dependencies]
@@ -1255,19 +1255,19 @@ setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "11.16.0.1b3"
+version = "11.16.0.1b6"
 description = "Storage support for 4DN Data Portals."
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "dcicsnovault-11.16.0.1b3-py3-none-any.whl", hash = "sha256:7ed6c4a8039863ecbe22535d8712ce1e7e5e10ed5859a4860cca6c03b9b9d8ad"},
-    {file = "dcicsnovault-11.16.0.1b3.tar.gz", hash = "sha256:947a3670fbc5ec97e5de3839f76d5918a3c77dcf0035fff93b3431121373bea2"},
+    {file = "dcicsnovault-11.16.0.1b6-py3-none-any.whl", hash = "sha256:71a502ec455c1c74188edca87802c4accb9a66f17a06fa229930281a1e967967"},
+    {file = "dcicsnovault-11.16.0.1b6.tar.gz", hash = "sha256:a4e843323f0560a8ffb87d1e6ec2c9a292cafa2bc3584bbc7669fe2e137663c4"},
 ]
 
 [package.dependencies]
 aws_requests_auth = ">=0.4.1,<0.5.0"
-boto3 = ">=1.28.62"
-botocore = ">=1.31.62"
+boto3 = ">=1.34.136,<2.0.0"
+botocore = ">=1.34.136,<2.0.0"
 dcicutils = "8.12.0.1b6"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
@@ -2384,13 +2384,13 @@ files = [
 
 [[package]]
 name = "openpyxl"
-version = "3.1.4"
+version = "3.1.5"
 description = "A Python library to read/write Excel 2010 xlsx/xlsm files"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "openpyxl-3.1.4-py2.py3-none-any.whl", hash = "sha256:ec17f6483f2b8f7c88c57e5e5d3b0de0e3fb9ac70edc084d28e864f5b33bbefd"},
-    {file = "openpyxl-3.1.4.tar.gz", hash = "sha256:8d2c8adf5d20d6ce8f9bca381df86b534835e974ed0156dacefa76f68c1d69fb"},
+    {file = "openpyxl-3.1.5-py2.py3-none-any.whl", hash = "sha256:5282c12b107bffeef825f4617dc029afaf41d0ea60823bbb665ef3079dc79de2"},
+    {file = "openpyxl-3.1.5.tar.gz", hash = "sha256:cf0e3cf56142039133628b5acffe8ef0c12bc902d2aadd3e0fe5878dc08d1050"},
 ]
 
 [package.dependencies]
@@ -4690,4 +4690,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "c14ef6bd98ce1b7b673e545c12399bb179382b63bc6496f6d77bc25874202f89"
+content-hash = "7a8ff8366f1fdcf6c6bb7db1137c205d86c0878e2037ce174f001667a9094480"
