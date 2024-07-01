@@ -1283,14 +1283,14 @@ setuptools = "*"
 
 [[package]]
 name = "dcicsnovault"
-version = "11.17.0.1b3"
+version = "11.17.0.1b5"
 description = "Storage support for 4DN Data Portals."
 category = "main"
 optional = false
 python-versions = "<3.13,>=3.9"
 files = [
-    {file = "dcicsnovault-11.17.0.1b3-py3-none-any.whl", hash = "sha256:94bc5367fe8cc75f6928020d413648740ed2ddf3d0c825c6e0c34f39d36dcfcd"},
-    {file = "dcicsnovault-11.17.0.1b3.tar.gz", hash = "sha256:c655cb7d8ed9b16ba48ab1e0c5a6b1cd2913705023f1f6b4e967131cb1805150"},
+    {file = "dcicsnovault-11.17.0.1b5-py3-none-any.whl", hash = "sha256:41d07eac9b577c3bc11fa9d5882bef18ba1a3480473f9bc1f8b6f3332af14d44"},
+    {file = "dcicsnovault-11.17.0.1b5.tar.gz", hash = "sha256:cfcc7624e73f7da398f3bfffc030cad040bffe9f18541316003f22a0c500633a"},
 ]
 
 [package.dependencies]
@@ -1300,7 +1300,7 @@ botocore = ">=1.34.136,<2.0.0"
 dcicutils = "8.12.0.1b8"
 elasticsearch = "7.13.4"
 elasticsearch_dsl = ">=7.4.0,<8.0.0"
-future = ">=0.15.2,<1"
+future = ">=0.18.3,<0.19.0"
 html5lib = ">=1.1"
 humanfriendly = ">=1.44.9,<2.0.0"
 jsonschema = {version = ">=4.19.0,<5.0.0", extras = ["format-nongpl"]}
@@ -4872,4 +4872,4 @@ test = ["zope.testing"]
 [metadata]
 lock-version = "2.0"
 python-versions = ">=3.9,<3.13"
-content-hash = "5d16d4ad2767be3f058f08d3e1586e86e01a1268c6954b5a526e8c38b8211ad4"
+content-hash = "17a5aab397d129db459303bced966844628a6f798c744b47d7b9f9c8124d561c"
