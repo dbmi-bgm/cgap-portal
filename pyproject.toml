@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "15.3.1.1b7"  # TODO: To become 15.4.0
+version = "15.4.0"
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -53,8 +53,8 @@ cryptography = "39.0.2"
 colorama = "0.3.3"
 # dcicpyvcf = "^3.0.0"
 dcicpyvcf = "^3.0.0.1b7"
-dcicsnovault = "11.17.0.1b6"
-dcicutils = "8.12.0.1b10"
+dcicsnovault = "^11.18.0"
+dcicutils = "^8.13.0"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"

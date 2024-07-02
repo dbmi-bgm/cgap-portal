@@ -9,6 +9,7 @@ Change Log
 15.4.0
 ======
 
+* Dropped support for Python 3.8.
 * Updates related to Python 3.12.
 
 
