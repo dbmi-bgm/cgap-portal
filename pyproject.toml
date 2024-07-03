@@ -1,7 +1,7 @@
 [tool.poetry]
 # Note: Various modules refer to this system as "encoded", not "cgap-portal".
 name = "encoded"
-version = "15.3.1"
+version = "15.4.0"
 description = "Computational Genome Analysis Platform"
 authors = ["4DN-DCIC Team <support@4dnucleome.org>"]
 license = "MIT"
@@ -35,13 +35,14 @@ classifiers = [
     'Programming Language :: Python :: 3.9',
     'Programming Language :: Python :: 3.10',
     'Programming Language :: Python :: 3.11',
+    'Programming Language :: Python :: 3.12'
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.8.1,<3.12"
-awscli = ">=1.29.62"
-boto3 = "^1.28.62"
-botocore = "^1.31.62"
+python = ">=3.9,<3.13"
+awscli = ">=1.33.17"
+boto3 = "^1.34.136"
+botocore = "^1.34.136"
 certifi = ">=2021.5.30"
 chardet = "^5.2.0"
 codeguru-profiler-agent = "^1.2.4"
@@ -50,22 +51,28 @@ codeguru-profiler-agent = "^1.2.4"
 # of cryptography.hazmat.bindings._rust in cryptography package. 2023-04-21.
 cryptography = "39.0.2"
 colorama = "0.3.3"
-dcicpyvcf = "^3.0.0"
-dcicsnovault = "^11.14.2"
-dcicutils = "^8.8.5"
+dcicpyvcf = "^3.1.0"
+dcicsnovault = "^11.18.0"
+dcicutils = "^8.13.0"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
-granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
+#granite-suite = "0.1.11b0"  # Needs this exact vesion until Python 3.6 support is dropped. -kmp 10-Feb-2022
+granite-suite = "0.2.0.1b4"
 h5py = "^3.8.0"
 humanfriendly = "^1.44.9"
 hupper = "1.5"
 idna = ">=2.10,<3"
 isodate = ">=0.6.1,<1"
 jmespath = ">=0.10.0,<1"
+# Added because something (maybe granite-suite) is trying to install matplotlib 3.3.4 which does not install/build with Python 3.12.
+# Shoot granite-suite 0.2.0 is the latest and it wants matplotlib 3.3.4 which is problematic.
+matplotlib = "^3.9.0"
 netaddr = ">=0.8.0,<1"
 negspy = "0.2.24"
-numpy = "^1.24.2"  # negspy needs it
+# numpy = "^1.24.2"  # negspy needs it
+# numpy = "^2.0.0"
+numpy = "^1.26.4"
 openpyxl = "^3.0.7,!=3.0.8"  # a version 3.0.8 appeared but then got withdrawn, for now just pin 3.0.7. try again later.
 passlib = "^1.7.4"
 PasteDeploy = "1.5.2"
@@ -81,7 +88,7 @@ PyBrowserID = "^0.14.0"
 pycparser = "2.14"
 PyJWT = "^2.6.0"
 pyparsing = "^3.0.7"
-pyramid = "1.10.4"
+pyramid = "1.10.8"
 pyramid-multiauth = ">=0.9.0,<1"
 pyramid-retry = "^1.0"
 pyramid-tm = "^2.4"
@@ -116,7 +123,7 @@ transaction = "^3.0.0"
 translationstring = "1.3"
 uptime = ">=3.0.1,<4"
 urllib3 = "^1.26.4"
-venusian = "^1.2.0"
+venusian = "^3.1.0"
 waitress = "^2.1.1"
 WebOb = "^1.8.7"
 WebTest = "^2.0.35"
@@ -127,8 +134,8 @@ WSGIProxy2 = "0.4.2"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = "^1.28.62"
-botocore-stubs = "^1.31.62"
+boto3-stubs = "^1.34.136"
+botocore-stubs = "^1.34.136"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"
