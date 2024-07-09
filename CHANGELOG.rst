@@ -6,6 +6,11 @@ cgap-portal
 Change Log
 ----------
 
+15.5.0
+======
+* Use snovault search modules rather than the local ones (in the src/encoded/search directory).
+
+
 15.4.0
 ======
 

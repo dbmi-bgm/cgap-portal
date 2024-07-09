@@ -23,7 +23,7 @@ from snovault.validators import (
     no_validate_item_content_patch
 )
 from urllib.parse import urlparse, urlencode
-from ..search.search import get_iterable_search_results
+from snovault.search.search import get_iterable_search_results
 from .base import Item, collection_add, item_edit
 # from .user_content import StaticSection
 

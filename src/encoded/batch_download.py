@@ -11,7 +11,7 @@ from snovault.embed import make_subrequest
 from snovault.util import simple_path_ids, debug_log
 
 from .batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict, human_readable_filter_block_queries
-from .search.compound_search import CompoundSearchBuilder
+from snovault.search.compound_search import CompoundSearchBuilder
 from .types.variant import get_spreadsheet_mappings
 
 
