@@ -1,5 +1,5 @@
 import pytest
-from ..search.lucene_builder import LuceneBuilder
+from snovault.search.lucene_builder import LuceneBuilder
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.broken]
