@@ -12,8 +12,8 @@ from snovault.elasticsearch.indexer_utils import get_namespaced_index
 from snovault.schema_utils import load_schema
 from snovault.util import add_default_embeds
 from webtest import AppError
-from ..search.lucene_builder import LuceneBuilder
-from ..search.search_utils import find_nested_path
+from snovault.search.lucene_builder import LuceneBuilder
+from snovault.search.search_utils import find_nested_path
 
 
 pytestmark = [pytest.mark.working, pytest.mark.schema, pytest.mark.search, pytest.mark.workbook]
