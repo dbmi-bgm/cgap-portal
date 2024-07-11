@@ -40,9 +40,9 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.13"
-awscli = ">=1.33.17"
-boto3 = "^1.34.136"
-botocore = "^1.34.136"
+awscli = ">=1.33.25"
+boto3 = "^1.34.143"
+botocore = "^1.34.143"
 certifi = ">=2021.5.30"
 chardet = "^5.2.0"
 codeguru-profiler-agent = "^1.2.4"
@@ -53,8 +53,7 @@ cryptography = "39.0.2"
 colorama = "0.3.3"
 dcicpyvcf = "^3.1.0"
 dcicsnovault = "^11.18.0"
-# dcicutils = "^8.13.0"
-dcicutils = "8.13.1.1b3"
+dcicutils = "^8.13.3"
 elasticsearch = "7.13.4"
 execnet = "1.4.1"
 future = ">=0.18.2,<1"
@@ -135,8 +134,8 @@ WSGIProxy2 = "0.4.2"
 
 [tool.poetry.dev-dependencies]
 # PyCharm says boto3-stubs contains useful type hints
-boto3-stubs = "^1.34.136"
-botocore-stubs = "^1.34.136"
+boto3-stubs = "^1.34.143"
+botocore-stubs = "^1.34.143"
 coverage = ">=6.2"
 codacy-coverage = ">=1.3.11"
 coveralls = ">=3.3.1"

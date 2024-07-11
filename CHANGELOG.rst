@@ -9,6 +9,7 @@ Change Log
 15.5.0
 ======
 * Use snovault search modules rather than the local ones (in the src/encoded/search directory).
+* Update to dcicutils 8.13.3.
 
 
 15.4.0
