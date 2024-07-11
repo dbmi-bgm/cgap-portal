@@ -26,7 +26,7 @@ from ..batch_download_utils import stream_tsv_output, convert_item_to_sheet_dict
 from ..custom_embed import CustomEmbed
 from ..ingestion.common import CGAP_CORE_PROJECT
 from ..inheritance_mode import InheritanceMode
-from ..search.search import get_iterable_search_results
+from snovault.search.search import get_iterable_search_results
 from ..types.base import Item, get_item_or_none
 from ..util import resolve_file_path, build_s3_presigned_get_url, convert_integer_to_comma_string
 

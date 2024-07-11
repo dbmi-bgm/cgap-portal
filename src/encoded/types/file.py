@@ -49,7 +49,7 @@ from urllib.parse import (
     urlparse,
 )
 from ..authentication import session_properties
-from ..search.search import make_search_subreq
+from snovault.search.search import make_search_subreq
 from ..util import check_user_is_logged_in, make_s3_client
 from .base import (
     Item,

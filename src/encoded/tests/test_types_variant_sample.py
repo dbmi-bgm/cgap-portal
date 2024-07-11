@@ -163,7 +163,7 @@ class MockedSearchBuilder:
             # TODO Add "total": 0 and other properties to response.
             return {"@graph": []}
 
-@mock.patch("encoded.search.search.SearchBuilder", new=MockedSearchBuilder)
+@mock.patch("snovault.search.search.SearchBuilder", new=MockedSearchBuilder)
 def test_variant_sample_patch_notes_process_success(
     testapp,
     bgm_user,
