@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+15.6.0
+======
+* Update dcicsnovault (branch: dmichaels-20240709 - to become 11.20.0)
+  with fix for uuid not appearing in frame=raw view for search results.
+
+
 15.5.0
 ======
 * Use snovault search modules rather than the local ones (in the src/encoded/search directory).
