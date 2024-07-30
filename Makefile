@@ -90,17 +90,20 @@ download-genes: # grabs latest gene list from the below link, unzips and drops i
 	mv gene_inserts_v0.4.6.json src/encoded/annotations/gene_inserts_v0.4.6.json
 
 deploy1:  # starts postgres/ES locally and loads inserts, and also starts ingestion engine
-	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
+	# @DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E '/^[[:space:]]*#/d' | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
+	@DEBUGLOG=`pwd` dev-servers development.ini --app-name app --clear --init --load
 
 deploy1a:  # starts postgres/ES locally and loads inserts, but does not start the ingestion engine
-	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load --no_ingest
-#	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load
+	# @DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E '/^[[:space:]]*#/d' | sed -E 's|.*:([0-9]+)/.*|\1|'` dev-servers development.ini --app-name app --clear --init --load --no_ingest
+	@DEBUGLOG=`pwd` dev-servers development.ini --app-name app --clear --init --load --no_ingest
 
 deploy1b:  # starts ingestion engine separately so it can be easily stopped and restarted for debugging in foreground
-	@echo "Starting ingestion listener. Press ^C to exit." && DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` poetry run ingestion-listener development.ini --app-name app
+	# @echo "Starting ingestion listener. Press ^C to exit." && DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E '/^[[:space:]]*#/d' | sed -E 's|.*:([0-9]+)/.*|\1|'` poetry run ingestion-listener development.ini --app-name app
+	@echo "Starting ingestion listener. Press ^C to exit." && DEBUGLOG=`pwd` poetry run ingestion-listener development.ini --app-name app
 
 deploy2:  # spins up waittress to serve the application
-	@DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
+	# @DEBUGLOG=`pwd` SNOVAULT_DB_TEST_PORT=`grep 'sqlalchemy[.]url =' development.ini | sed -E '/^[[:space:]]*#/d' | sed -E 's|.*:([0-9]+)/.*|\1|'` pserve development.ini
+	@DEBUGLOG=`pwd` pserve development.ini
 
 deploy3:  # Uploads genes, consequences then ingests the VCF below
 	poetry run ingest-vcf src/encoded/annotations/GAPFIBVPFEP5_v0.5.4.reformat.altcounts.vcf dummy-accession hms-dbmi hms-dbmi development.ini --app-name app --post-variants --post-genes --post-conseq
