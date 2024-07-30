@@ -94,3 +94,17 @@ in numerous libaries, but importantly:
 * **dcicutils**
   [`pypi library <https://pypi.org/project/dcicutils/>`_]
   [`source repo <https://github.com/4dn-dcic/utils>`_]
+
+
+Running Locally on Different Ports
+==================================
+If you wish you run cgap-portal locally on different ports than the defaults, to, for example, allow you to run
+both cgap-portal and smaht-portal locally simultaneously, you will need to do the following:
+
+1. Change the 'sqlalchemy.url' property in development.ini to change its default port (5441) to something else, e.g. 5442.
+2. Change the 'sqlalchemy.url' property in development.ini to change its temporary directory (host) from its default (/tmp/snovault/pgdata) to something else, e.g. /tmp/snovault_cgap/pgdata).
+3. Change the 'elasticsearch.server' property in base.ini to change its default port (9200) to something else, e.g. 9202.
+4. Set the 'elasticsearch.server.transport_ports' property in base.ini to something other than its implicit default (9300-9305) to something else, e.g. 9400-9405.
+5. Change the 'port' propety in the '[server:main]' section in development from its default (6543) to something else, e.g. 7543.
+6. Change the 'server 127.0.0.1:6543' value in src/encoded/nginx-dev.conf to match the value in #5 above, e.g. 'server 127.0.0.1:7543'.
+7. Change the 'listen 8000' value in src/encoded/nginx-dev.conf to 'listen 8001'.
