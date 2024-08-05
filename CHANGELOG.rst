@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+15.5.1
+======
+`PR 774: fix: typerror in ItemDetailList's ShouldUseTable <https://github.com/dbmi-bgm/cgap-portal/pull/774>`_
+
+* Upgrades SPC version
+* fix: typerror, support number value being first
+
+
 15.5.0
 ======
 * Use snovault search modules rather than the local ones (in the src/encoded/search directory).
