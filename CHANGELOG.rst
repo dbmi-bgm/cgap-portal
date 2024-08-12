@@ -10,6 +10,8 @@ Change Log
 ======
 * Update dcicsnovault (branch: dmichaels-20240709 - to become 11.20.0)
   with fix for uuid not appearing in frame=raw view for search results.
+* Changes to run cgap-portal and smaht-portal locally simultaneously.
+  The real changes are in snovault 11.21.1.
 
 
 15.5.0
