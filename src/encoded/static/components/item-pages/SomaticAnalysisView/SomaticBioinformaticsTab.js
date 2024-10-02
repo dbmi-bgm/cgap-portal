@@ -1,5 +1,5 @@
 import React, { useContext } from 'react';
-import { Accordion, AccordionContext, useAccordionToggle } from 'react-bootstrap';
+import { Accordion, AccordionContext, useAccordionButton } from 'react-bootstrap';
 
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -124,9 +124,9 @@ function SQCMAccordionDrawer(props) {
 }
 
 function SQCMAccordionToggle({ children, eventKey, callback, tissueType, sequencingType, specimenType, sampleID }) {
-    const activeEventKey = useContext(AccordionContext);
+    const { activeEventKey } = useContext(AccordionContext);
 
-    const decoratedOnClick = useAccordionToggle(
+    const decoratedOnClick = useAccordionButton(
         eventKey,
         () => callback && callback(eventKey),
     );

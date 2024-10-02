@@ -3,7 +3,7 @@
 import React, { useState, useMemo, useCallback, useEffect, useContext } from 'react';
 import _ from 'underscore';
 import ReactTooltip from 'react-tooltip';
-import { Accordion, AccordionContext, Fade, useAccordionToggle } from 'react-bootstrap';
+import { Accordion, AccordionContext, Fade, useAccordionButton } from 'react-bootstrap';
 
 import { navigate, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { DotRouter, DotRouterTab, TabPaneErrorBoundary } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/DotRouter';
@@ -462,9 +462,9 @@ CaseInfoTabView.getTabObject = function (props) {
 export function CaseInfoToggle({ children, eventKey }) {
     // Want the line to fade out shortly after animation is triggered, not before (hence not using isCurrentEventKey which would trigger immediately)
     let showLine = true;
-    const decoratedOnClick = useAccordionToggle(eventKey, () => { showLine = !showLine; });
+    const decoratedOnClick = useAccordionButton(eventKey, () => { showLine = !showLine; });
 
-    const activeEventKey = useContext(AccordionContext);
+    const { activeEventKey } = useContext(AccordionContext);
     const isCurrentEventKey = activeEventKey === eventKey;
 
     const icon = isCurrentEventKey ? "minus" : "plus";

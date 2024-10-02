@@ -1,7 +1,7 @@
 'use strict';
 
 import React, { useContext } from 'react';
-import { Accordion, AccordionContext, useAccordionToggle } from 'react-bootstrap';
+import { Accordion, AccordionContext, useAccordionButton } from 'react-bootstrap';
 
 import { decorateNumberWithCommas } from '@hms-dbmi-bgm/shared-portal-components/es/components/util/value-transforms';
 
@@ -271,9 +271,9 @@ function QCMAccordionDrawer(props) {
 }
 
 function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType, specimenType, sampleID }) {
-    const activeEventKey = useContext(AccordionContext);
+    const { activeEventKey } = useContext(AccordionContext);
 
-    const decoratedOnClick = useAccordionToggle(
+    const decoratedOnClick = useAccordionButton(
         eventKey,
         () => callback && callback(eventKey),
     );
