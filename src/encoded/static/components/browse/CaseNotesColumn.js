@@ -50,7 +50,7 @@ const CaseNotesPopover = forwardRef(({
           ></textarea>
         <button 
           type="button" 
-          className="btn btn-primary mr-04 w-100"
+          className="btn btn-primary me-04 w-100"
           onClick={() => { setIsLoading(true); handleNoteSave() } }
           // If text is modified or loading disable 
           disabled={ lastSavedText.text === currentText || isLoading ? "disabled" : "" }

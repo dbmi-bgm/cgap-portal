@@ -37,8 +37,8 @@ export const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
             <a href={vcfAtId + "#provenance"} className="btn btn-sm btn-primary pull-right d-flex align-items-center"
                 data-tip="Click to view the provenance graph for the most up-to-date annotated VCF"
                 disabled={(!vcfAtId)}>
-                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas mr-08 small" />
-                <span className="mr-03">View</span><span className="text-600">Provenance Graph</span>
+                <i className="icon icon-fw icon-sitemap icon-rotate-90 fas me-08 small" />
+                <span className="me-03">View</span><span className="text-600">Provenance Graph</span>
             </a>
         </h4>
     );
@@ -50,7 +50,7 @@ export const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
         <React.Fragment>
             <h1><span className="text-300">Bioinformatics Analysis</span></h1>
             {/* TODO: See if there's any desire to include QC statuses here (BAM, SNV, SV, etc.)
-            <div className="tab-inner-container clearfix font-italic qc-status">
+            <div className="tab-inner-container clearfix fst-italic qc-status">
                 <span className="text-600">Current Status:</span><span className="text-success"> PASS <i className="icon icon-check fas"></i></span>
                 <span className="pull-right">3/28/20</span>
             </div> */}
@@ -150,14 +150,14 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage" popoverContent={bioinfoPopoverContent.coverage}>
                     {coverage.value || fallbackElem}
-                    {(coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
+                    {(coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ms-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Total Number of SNVs/Indels called">
                     {totalSNVIndelVars.value ? decorateNumberWithCommas(+totalSNVIndelVars.value) : fallbackElem}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Transition-Transversion ratio" popoverContent={bioinfoPopoverContent.transTransRatio}>
                     {transTransRatio.value || fallbackElem}
-                    {(transTransRatio.value && transTransRatio.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(transTransRatio.flag)} ml-05`} />}
+                    {(transTransRatio.value && transTransRatio.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(transTransRatio.flag)} ms-05`} />}
                 </BioinfoStatsEntry>
             </div>
             <div className="row py-0">
@@ -167,11 +167,11 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     {mapLongFormSexToLetter(predictedSex.value) || fallbackElem}&nbsp;
                     {!!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a>}
-                    {predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ml-02`} />}
+                    {predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ms-02`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
                     {heterozygosity.value || fallbackElem}
-                    {(heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ml-05`} />}
+                    {(heterozygosity.value && heterozygosity.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(heterozygosity.flag)} ms-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNVs/Indels After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSNVIndelVariants}>
                     {filteredSNVIndelVariants.value ? decorateNumberWithCommas(+filteredSNVIndelVariants.value) : fallbackElem}
@@ -187,7 +187,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNV/Indel De novo Fraction">
                     {deNovo.value || fallbackElem}
-                    {(deNovo.value && deNovo.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(deNovo.flag)} ml-05`} />}
+                    {(deNovo.value && deNovo.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(deNovo.flag)} ms-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Structural Variants After Hard Filters" popoverContent={bioinfoPopoverContent.filteredSVVariants}>
                     {filteredSVVariants.value ? decorateNumberWithCommas(+filteredSVVariants.value) : fallbackElem}
@@ -243,9 +243,9 @@ function QCMAccordionDrawer(props) {
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
 
     return (
-        <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0" : ""} ${idx === (qcmLen - 1) ? "border-bottom-0" : ""}`} key={atID}>
+        <div className={`card border-start-0 border-end-0 ${idx === 0 ? "border-top-0" : ""} ${idx === (qcmLen - 1) ? "border-bottom-0" : ""}`} key={atID}>
             <QCMAccordionToggle eventKey={atID} {...{ role, sequencingType, sampleID, specimenType }}>
-                <div className="d-flex align-items-center justify-items-center ml-2 ml-sm-0">
+                <div className="d-flex align-items-center justify-items-center ms-2 ms-sm-0">
                     {failFlags}
                     {warnFlags}
                 </div>
@@ -258,7 +258,7 @@ function QCMAccordionDrawer(props) {
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
                     }}>
-                        <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{individual_id || individual_accession}</a>
+                        <a href={atID} className="text-uppercase text-600 d-block text-small me-2">{individual_id || individual_accession}</a>
                         <span className="gen-identifier text-600 text-serif text-small pt-03">{idToGraphIdentifier[atID]}</span>&nbsp;
                     </div>
                     <div className="card-body px-5">
@@ -285,10 +285,10 @@ function QCMAccordionToggle({ children, eventKey, callback, role, sequencingType
     return (
         <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center flex-column flex-sm-row">
             <div className="d-flex align-items-center justify-items-center">
-                <i className={`icon icon-${icon} fas mr-1`} />
-                <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
+                <i className={`icon icon-${icon} fas me-1`} />
+                <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-start text-truncate text-600 text-capitalize text-larger ps-03">
                     {role ? `${role}:` : ""}
-                    <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">
+                    <div className="ms-lg-05 ms-xl-05 me-05 text-400 text-capitalize d-inline-block text-truncate">
                         {specimenType && sequencingType ? `${specimenType} - ${sequencingType}` :
                             specimenType ? specimenType : sequencingType}
                     </div>

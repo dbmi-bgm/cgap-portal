@@ -140,7 +140,7 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         renderedWarnings = (
             <div className="border-top border-bottom border-danger py-2 mb-16">
                 <h6 className="mt-0 mb-04 text-danger">Warnings:</h6>
-                <ul className="my-0 pl-36">
+                <ul className="my-0 ps-36">
                     { warnings.map(function(warning, idx){ return <li key={idx}>{ warning }</li>; }) }
                 </ul>
             </div>
@@ -218,23 +218,23 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
 
                 <div className="col-auto d-flex align-items-center">
                     <div className="last-saved text-small">
-                        <i className="icon icon-clock far mr-06" data-tip="Last Modified" />
+                        <i className="icon icon-clock far me-06" data-tip="Last Modified" />
                         <LocalizedTime timestamp={reportLastModified} formatType="date-time-md" />
                     </div>
-                    <div className="ml-12">
+                    <div className="ms-12">
                         <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
-                            <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
+                            <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas me-08`}/>
                             Save
                         </button>
                         {/*
                         <div className="btn-group" role="group">
                             <button type="submit" className="btn btn-primary align-items-center d-flex" disabled={isPatching}>
-                                <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas mr-08`}/>
+                                <i className={`icon icon-fw icon-${isPatching ? "circle-notch spin" : "save"} fas me-08`}/>
                                 Save
                             </button>
                             <button type="button" className="btn btn-primary align-items-center d-flex"
                                 onClick={onResetForm} data-tip="Revert unsaved changes">
-                                <i className="icon icon-fw icon-undo fas mr-08"/>
+                                <i className="icon icon-fw icon-undo fas me-08"/>
                                 Reset
                             </button>
                         </div>
@@ -357,7 +357,7 @@ function ReportFindingsTableNoSamplesFallback (props) {
         <React.Fragment>
             <div className="d-flex align-items-center">
                 { header }
-                <Checkbox name={"include_finding_tag_text_" + id} onChange={onCheck} checked={includeChecked} className="ml-16">
+                <Checkbox name={"include_finding_tag_text_" + id} onChange={onCheck} checked={includeChecked} className="ms-16">
                     Add text in place of table?
                 </Checkbox>
             </div>

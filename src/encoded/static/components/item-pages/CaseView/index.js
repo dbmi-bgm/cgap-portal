@@ -333,7 +333,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
                                     <span>
                                         {caseNamedTitle || caseNamedID}
                                     </span>
-                                    <object.CopyWrapper className="text-smaller text-muted text-monospace text-400" value={caseAccession} stopPropagation>
+                                    <object.CopyWrapper className="text-smaller text-muted font-monospace text-400" value={caseAccession} stopPropagation>
                                         {caseAccession}
                                     </object.CopyWrapper>
                                 </div>
@@ -358,8 +358,8 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
                                         <div className="card d-flex flex-column">
                                             <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
                                                 <div>
-                                                    <i className="icon icon-sitemap fas icon-fw mr-1" />
-                                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
+                                                    <i className="icon icon-sitemap fas icon-fw me-1" />
+                                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ms-05 me-05">
                                                         Pedigree
                                                     </h4>
                                                 </div>
@@ -414,7 +414,7 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
                     </DotRouterTab>
                     <DotRouterTab dotPath=".interpretation" cache disabled={disableInterpretation} tabTitle={
                         <span data-tip={isLoadingVariantSampleListItem ? "Loading latest selection, please wait..." : null}>
-                            {isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch mr-1 fas" /> : null}
+                            {isLoadingVariantSampleListItem ? <i className="icon icon-spin icon-circle-notch me-1 fas" /> : null}
                             Interpretation
                         </span>}>
                         <InterpretationTabController {...{ variantSampleListItem }}>
@@ -477,7 +477,7 @@ export function CaseInfoToggle({ children, eventKey }) {
             <div className="container-wide clickable" onClick={decoratedOnClick}>
                 <h3 className="tab-section-title">
                     <div className="d-flex align-items-center">
-                        <i className={`icon icon-${icon} fas mr-2 text-large`} />
+                        <i className={`icon icon-${icon} fas me-2 text-large`} />
                         { firstChild }
                     </div>
                     {secondChild}

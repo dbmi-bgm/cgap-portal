@@ -319,7 +319,7 @@ const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(prop
         <span>Family <strong>{pedigreeFamiliesIdx + 1}</strong></span>
     );
     return (
-        <DropdownButton onSelect={onSelect} title={title} variant="outline-dark" className="ml-05" alignRight>
+        <DropdownButton onSelect={onSelect} title={title} variant="outline-dark" className="ms-05" alignRight>
             {
                 familiesWithViewPermission.map(function(family, i){
                     const { original_pedigree: pf = null } = family;
@@ -347,7 +347,7 @@ const FamilySelectionDropdown = React.memo(function FamilySelectionDropdown(prop
 /** No longer in use for UX reasons; keeping it around temporarily in case people want it back */
 const ShowAsDiseasesDropdown = React.memo(function ShowAsDiseasesDropdown({ showAsDiseases, onSelect }){
     return (
-        <DropdownButton className="ml-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
+        <DropdownButton className="ms-05" onSelect={onSelect} title={showAsDiseases} variant="outline-dark" alignRight>
             <DropdownItem active={showAsDiseases === "Phenotypic Features"} eventKey="Phenotypic Features">Phenotypic Features</DropdownItem>
             <DropdownItem active={showAsDiseases === "Disorders"} eventKey="Disorders">Disorders</DropdownItem>
         </DropdownButton>

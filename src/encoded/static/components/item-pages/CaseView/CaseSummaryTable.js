@@ -49,27 +49,27 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     const columnTitles = {
         'sample' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-vial fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Sample</span>
+                <i className="icon icon-fw icon-vial fas me-05 align-middle"/>
+                <span className="d-none d-lg-inline ms-05">Sample</span>
             </React.Fragment>
         ),
         'individual' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-user fas mr-05 align-middle"/>
-                <span className="d-none d-lg-inline ml-05">Individual</span>
+                <i className="icon icon-fw icon-user fas me-05 align-middle"/>
+                <span className="d-none d-lg-inline ms-05">Individual</span>
             </React.Fragment>
         ),
         'assayType' : "Assay Type",
         'rawFiles' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-code fas mr-05 align-middle"/>
+                <i className="icon icon-fw icon-file-code fas me-05 align-middle"/>
                 Sequencing
             </React.Fragment>
         ),
         'processingType' : "Processing Type",
         'processedFiles' : (
             <React.Fragment>
-                <i className="icon icon-fw icon-file-medical-alt fas mr-05 align-middle"/>
+                <i className="icon icon-fw icon-file-medical-alt fas me-05 align-middle"/>
                 Pipeline
             </React.Fragment>
         ),
@@ -348,11 +348,11 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
     function statusToIcon(status){
         switch (status) {
             case "PASS":
-                return <i className="icon icon-check fas text-success mr-05"/>;
+                return <i className="icon icon-check fas text-success me-05"/>;
             case "FAIL":
-                return <i className="icon icon-times fas text-danger mr-05"/>;
+                return <i className="icon icon-times fas text-danger me-05"/>;
             case "WARN":
-                return <i className="icon icon-exclamation-triangle fas text-warning mr-05"/>;
+                return <i className="icon icon-exclamation-triangle fas text-warning me-05"/>;
             default:
                 return null;
         }
@@ -452,8 +452,8 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
 
         const indvLink = (
             <div className={`${genID ? "text-truncate" : ""}`}>
-                { isProband ? <span className="font-weight-bold d-block">Proband</span> : null}
-                { (role && role !== "proband") ? <span className="d-block font-weight-semibold text-capitalize">{role}</span> : null}
+                { isProband ? <span className="fw-bold d-block">Proband</span> : null}
+                { (role && role !== "proband") ? <span className="d-block fw-semibold text-capitalize">{role}</span> : null}
                 { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
                 <a href={indvId} className="accession d-block">{ individual_id || indvDisplayTitle }</a>
             </div>);
@@ -495,7 +495,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                             </span>
                             { specimen_collection_date ?
                                 <span data-tip="Specimen Collection Date">
-                                    <i className="mr-03 icon icon-fw icon-syringe fas text-secondary"/>
+                                    <i className="me-03 icon icon-fw icon-syringe fas text-secondary"/>
                                     <LocalizedTime timestamp={specimen_collection_date} />
                                 </span>
                                 : null }

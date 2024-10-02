@@ -250,7 +250,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
         };
 
         const savePresetDropdownCls = "btn btn-outline-primary-dark btn-sm text-truncate w-100";
-        const btnInner = <div><i className="icon icon-plus-circle fas mr-05" /> Create Preset from Current FilterSet</div>;
+        const btnInner = <div><i className="icon icon-plus-circle fas me-05" /> Create Preset from Current FilterSet</div>;
         const createPresetBtn = (
             <div className={`p-2 bg-white ${ isLoadingPresets || !presetResults || !presetResults.length ? "": "border-bottom"}`}>
                 <SaveFilterSetPresetButton {...savePresetDropdownProps} {...{ btnInner }} btnCls={savePresetDropdownCls} />
@@ -312,12 +312,12 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
         let nextToTitleIcon = null;
         if (errorMessage) {
             nextToTitleIcon = (
-                <i className="icon icon-exclamation-triangle fas ml-05 text-small" data-tip={errorMessage} data-html />
+                <i className="icon icon-exclamation-triangle fas ms-05 text-small" data-tip={errorMessage} data-html />
 
             );
         } else if (isCheckingForNewFilterSet || isLoadingPresets) {
             nextToTitleIcon = (
-                <i className="icon icon-circle-notch icon-spin fas ml-07 text-small text-muted" data-tip="Preset(s) below have been updated but this is not yet reflected." data-html />
+                <i className="icon icon-circle-notch icon-spin fas ms-07 text-small text-muted" data-tip="Preset(s) below have been updated but this is not yet reflected." data-html />
             );
         }
 
@@ -326,7 +326,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                 <div className="results-heading my-0 py-2 px-2 bg-light">
                     <div className="row align-items-center">
                         <h5 className="col text-400 my-0">
-                            <i className="icon icon-copy far mr-08"/>
+                            <i className="icon icon-copy far me-08"/>
                             <a href="/search/?type=FilterSet" className="text-body" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
                             { nextToTitleIcon }
                         </h5>
@@ -334,7 +334,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                             <div className="col-auto text-small">
                                 { totalResultCount } total
                                 { (totalResultCount || 0) >= 250 ?
-                                    <i className="icon icon-exclamation-triangle fas ml-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
+                                    <i className="icon icon-exclamation-triangle fas ms-1" data-tip="Showing most recent 250 results only.<br/><small>(Eventually we'll show more)</small>" data-html />
                                     : null }
                             </div>
                             : null }
@@ -461,7 +461,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
     } else {
         menuOptions.push(
             <a key="view" href={presetFSID} target="_blank" rel="noopener noreferrer" className="dropdown-item">
-                <i className="icon icon-fw icon-file-alt far mr-12" />
+                <i className="icon icon-fw icon-file-alt far me-12" />
                 View Details
             </a>
         );
@@ -474,14 +474,14 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
 
             menuOptions.push(
                 <a key="edit" href={presetFSID + "?currentAction=edit"} target="_blank" rel="noopener noreferrer" className="dropdown-item">
-                    <i className="icon icon-fw icon-pencil-alt fas mr-12" />
+                    <i className="icon icon-fw icon-pencil-alt fas me-12" />
                     Edit
                 </a>
             );
 
             menuOptions.push(
                 <DropdownItem key="delete" eventKey="delete">
-                    <i className="icon icon-fw icon-times fas mr-12" />
+                    <i className="icon icon-fw icon-times fas me-12" />
                     Delete
                 </DropdownItem>
             );
@@ -490,7 +490,7 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
                 // TODO make sure userProjectUUID not already in FS's `preset_for_projects` before showing or enabling
                 menuOptions.push(
                     <DropdownItem key="set-project-preset" eventKey="set-project-preset">
-                        <i className="icon icon-fw icon-user-friends fas mr-12" />
+                        <i className="icon icon-fw icon-user-friends fas me-12" />
                         Set as preset for my project
                     </DropdownItem>
                 );
@@ -574,13 +574,13 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
     const presetIconsToShow = (
         <React.Fragment>
             { isPresetForProject ?
-                <i className="mr-05 icon icon-fw icon-user-friends fas text-secondary" data-tip="Project preset" />
+                <i className="me-05 icon icon-fw icon-user-friends fas text-secondary" data-tip="Project preset" />
                 : null }
             { isPresetForUser ?
-                <i className="mr-05 icon icon-fw icon-user fas text-muted" data-tip="User preset" />
+                <i className="me-05 icon icon-fw icon-user fas text-muted" data-tip="User preset" />
                 : null }
             { isDefaultForProject ?
-                <i className="mr-05 icon icon-fw icon-star fas text-secondary" data-tip="Project default" />
+                <i className="me-05 icon icon-fw icon-star fas text-secondary" data-tip="Project default" />
                 : null }
         </React.Fragment>
     );
@@ -593,14 +593,14 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
             data-is-origin-of-current-case-filterset={isOriginOfCurrentCaseFilterSet}
             data-is-current-case-filterset-unchanged={isCurrentCaseFilterSetUnchanged}
             data-has-been-deleted={isDeleted}>
-            <div className="title pl-12 pr-08">
+            <div className="title ps-12 pe-08">
                 <h5 className="my-0 text-600 flex-grow-1 text-truncate" title={presetFSTitle}>
                     { presetFSTitle }
                 </h5>
             </div>
-            <div className="info pl-12 pr-08 text-small pb-04">
+            <div className="info ps-12 pe-08 text-small pb-04">
 
-                <DropdownButton variant="default btn-dropdown-icon mr-05" size="xs" disabled={!!(patchingPresetResultUUID || isDeleted)}
+                <DropdownButton variant="default btn-dropdown-icon me-05" size="xs" disabled={!!(patchingPresetResultUUID || isDeleted)}
                     onClick={onMenuClick} onSelect={onMenuOptionSelect}
                     title={
                         <i className={"icon text-secondary fas icon-fw icon-" + (isPatchingPreset ? "circle-notch icon-spin" : "ellipsis-v")} data-tip="View actions"/>
@@ -614,12 +614,12 @@ const PresetFilterSetResult = React.memo(function PresetFilterSetResult (props) 
                     <LocalizedTime timestamp={date_created} formatType="date-sm" />
                 </span>
 
-                <span className="flex-grow-1 count-indicator-wrapper ml-07 text-right">
+                <span className="flex-grow-1 count-indicator-wrapper ms-07 text-end">
                     <CountIndicator count={presetFBLen} data-tip={"Contains " + presetFBLen + " filter blocks"}
                         height={18} />
                 </span>
 
-                <div className="pl-08 flex-shrink-0 title-icon-container">
+                <div className="ps-08 flex-shrink-0 title-icon-container">
                     <button type="button" className="import-preset-btn btn btn-sm btn-outline-primary-dark"
                         onClick={importBtnDisabled ? null : onSelectPresetFilterSet} disabled={importBtnDisabled}
                         data-tip={

@@ -177,11 +177,11 @@ class FamilySection extends React.Component {
         return (
             <div className="family-table-section">
                 <h4 className="pane-section-title" onClick={this.onToggle}>
-                    <div className="col-auto pr-0">
+                    <div className="col-auto pe-0">
                         <i className={"toggle-open-icon icon icon-fw fas icon-" + (open ? 'minus' : 'plus')} />
                     </div>
                     <div className="col">
-                        { family.display_title }: <span className="text-200 font-italic">Family &amp; Report History</span>
+                        { family.display_title }: <span className="text-200 fst-italic">Family &amp; Report History</span>
                     </div>
                 </h4>
                 { open ? (
@@ -212,11 +212,11 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
     // Keeping these builtInHeader methods separate in case we want to build in custom columns later
     static builtInHeaders = [
-        { columnClass: 'individual',    className: 'text-left',         title: 'Individual',                initialWidth: 200   },
-        { columnClass: 'libraries',     className: 'text-left',         title: 'Sequencing Libraries',      initialWidth: 80    },
+        { columnClass: 'individual',    className: 'text-start',         title: 'Individual',                initialWidth: 200   },
+        { columnClass: 'libraries',     className: 'text-start',         title: 'Sequencing Libraries',      initialWidth: 80    },
         /* report + analysis columns have no labels, but have left alignment, so we add 12px padding left to visually align header to it better */
-        { columnClass: 'analysis',      className: 'text-left pl-12',         title: 'Analysis',            initialWidth: 80    },
-        { columnClass: 'report',        className: 'text-left pl-12',   title: 'Report',                    initialWidth: 260   }
+        { columnClass: 'analysis',      className: 'text-start ps-12',         title: 'Analysis',            initialWidth: 80    },
+        { columnClass: 'report',        className: 'text-start ps-12',   title: 'Report',                    initialWidth: 260   }
     ];
 
     /* Built-in headers */
@@ -284,7 +284,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             <StackedBlock columnClass="libraries" hideNameOnHover={false} key={atId} id={atId}
                 label={<StackedBlockNameLabel title="Sample" subtitle="Library" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
-                    <div className="name-title text-left pt-2 pb-2">
+                    <div className="name-title text-start pt-2 pb-2">
                         { atId ? <a href={atId}>{ workup_type }</a> : <span>{ workup_type }</span> }
                     </div>
                 </StackedBlockName>
@@ -330,7 +330,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             <StackedBlock key={analysis_type} columnClass="analysis" hideNameOnHover={false}
                                 label={<StackedBlockNameLabel title={null} subtitle={null} accession={null} subtitleVisible/>}>
                                 <StackedBlockName>
-                                    <span className="name-title text-left d-block">{ analysis_title }</span>
+                                    <span className="name-title text-start d-block">{ analysis_title }</span>
                                 </StackedBlockName>
                                 <StackedBlockList className="report" title="Report">
                                     { reportBlock ? <StackedBlockList className="report" title="Report">{reportBlock}</StackedBlockList> : FamilyReportStackedTable.renderEmptyBlock("report") }
@@ -362,12 +362,12 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
-                            <div className="d-flex text-left">
-                                <span className="mr-07 text-nowrap">Case ID:</span>
+                            <div className="d-flex text-start">
+                                <span className="me-07 text-nowrap">Case ID:</span>
                                 { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
                             </div>
-                            <div className="d-flex text-left">
-                                <span className="mr-07 text-nowrap">Report:</span>
+                            <div className="d-flex text-start">
+                                <span className="me-07 text-nowrap">Report:</span>
                                 { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
                             </div>
                         </StackedBlockName>
@@ -378,8 +378,8 @@ export class FamilyReportStackedTable extends React.PureComponent {
                     <StackedBlock columnClass="report" hideNameOnHover={false} key={reportAtId} id={reportAtId}
                         label={<StackedBlockNameLabel title={null} accession={null} subtitleVisible/>}>
                         <StackedBlockName>
-                            <div className="d-flex text-left">
-                                <span className="mr-07 text-nowrap">Case ID:</span>
+                            <div className="d-flex text-start">
+                                <span className="me-07 text-nowrap">Case ID:</span>
                                 { caseAtId ?
                                     <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a>
                                     : <span className="name-title text-capitalize">{ case_title }</span>
@@ -395,7 +395,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
             <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}
                 label={<StackedBlockNameLabel title="CGAP ID" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
-                    <div className="name-title pt-2 pb-2 text-left">
+                    <div className="name-title pt-2 pb-2 text-start">
                         { atId ?
                             <a href={atId} className="text-capitalize">
                                 { role || display_title }

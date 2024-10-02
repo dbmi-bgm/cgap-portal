@@ -132,7 +132,7 @@ function TranscriptSelectionSection(props){
         dropdownTitleToShow = selectedGeneTranscript ? (
             <span>
                 { selectedGeneTitle }
-                { currentGeneItemLoading ? <i className="ml-07 icon icon-spin fas icon-circle-notch"/> : null }
+                { currentGeneItemLoading ? <i className="ms-07 icon icon-spin fas icon-circle-notch"/> : null }
             </span>
         ) : <em>No gene selected</em>;
         body = <TranscriptSelectionSectionBody {...{ schemas }} currentTranscript={geneTranscriptList[currentTranscriptIdx]} />;
@@ -148,7 +148,7 @@ function TranscriptSelectionSection(props){
                     disabled={geneTranscriptListLen === 0} data-tip="Select a transcript (& gene) to view their details">
                     { geneListOptions }
                 </DropdownButton>
-                <div className="flex-grow-1 text-right">
+                <div className="flex-grow-1 text-end">
                     {/* BA1, BS1 here maybe */}
                 </div>
             </div>
@@ -281,15 +281,15 @@ function GDNAList({ context }){
         <React.Fragment>
             {/* Canononical GRCh38 entry */}
             <div className="row pb-1 pb-md-03" key="GRCh38">
-                <div className="col-12 col-md-3 font-italic"><em>GRCh38</em></div>
+                <div className="col-12 col-md-3 fst-italic"><em>GRCh38</em></div>
                 <div className="col-12 col-md-2">{ chrom }</div>
                 <div className="col-12 col-md-7">{ hgvsg }</div>
             </div>
             {/* Legacy GRCh37/hg19 support. */}
             <div className="row pb-1 pb-md-03" key="GRCh37">
-                <div className="col-12 col-md-3 font-italic">
+                <div className="col-12 col-md-3 fst-italic">
                     <em>GRCh37 (hg19)</em>
-                    <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm">
+                    <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ms-02 icon-sm">
                         {hg19PopoverContent}
                     </QuickPopover>
                 </div>
@@ -304,7 +304,7 @@ function GDNAList({ context }){
      * csq_hg19.forEach(function({ hg19_pos, hg19_chr, csq_hg19_hgvsg }, idx){
         renderedRows.push(
             <div className="row pb-1 pb-md-03" key={idx}>
-                <div className="col-12 col-md-3 font-italic"><em>GRCh37 (hg19)</em></div>
+                <div className="col-12 col-md-3 fst-italic"><em>GRCh37 (hg19)</em></div>
                 <div className="col-12 col-md-2 ">{ hg19_chr }</div>
                 <div className="col-12 col-md-7">{ csq_hg19_hgvsg }</div>
             </div>

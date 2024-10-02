@@ -184,12 +184,12 @@ export default class ExcelSubmissionView extends React.PureComponent {
         if (submissionID && submissionTitle){
             submissionLink = (
                 <h5 className="info-area mb-1 text-400 mt-05">
-                    <em className="ml-05">Saved as &bull; </em>
+                    <em className="ms-05">Saved as &bull; </em>
                     <a href={submissionID} target="_blank" rel="noopener noreferrer"
                         data-tip="Item is saved in database; further edits will modify it.">
                         { submissionTitle }
                     </a>
-                    <i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+                    <i className="icon icon-external-link-alt fas text-smaller ms-05"/>
                 </h5>
             );
         }
@@ -233,7 +233,7 @@ const LocalAlertsContainer = function LocalAlertsContainer(props) {
                         { noCloseButton !== true ?
                             <button type="button" className="close" onClick={() => closeAlert(i)}>
                                 <span aria-hidden="true">×</span>
-                                <span className="sr-only">Close alert</span>
+                                <span className="visually-hidden">Close alert</span>
                             </button>
                             : null }
                         <h4 className={"alert-heading mt-0" + (message ? " mb-05" : " mb-0")}>{ title }</h4>
@@ -509,7 +509,7 @@ class PanelOne extends React.PureComponent {
         if (!user) {
             return (
                 <div className="container text-center">
-                    <i className="mt-4 mb-4 icon icon-circle-notch fas icon-spin text-larger mr-1 align-middle"/>
+                    <i className="mt-4 mb-4 icon icon-circle-notch fas icon-spin text-larger me-1 align-middle"/>
                     <h5 className="d-inline text-300 align-middle">Loading Information...</h5>
                 </div>
             );
@@ -530,9 +530,9 @@ class PanelOne extends React.PureComponent {
                     <div className="row">
                         <div className="col-auto">{ institutionTitle }</div>
                         <div className="col">
-                            <i className="icon icon-fw icon-link fas small mr-05"/>
-                            <span className="text-monospace small">{ institutionID }</span> &bull;
-                            <a href={institutionID} target="_blank" rel="noopener noreferrer" className="ml-05"
+                            <i className="icon icon-fw icon-link fas small me-05"/>
+                            <span className="font-monospace small">{ institutionID }</span> &bull;
+                            <a href={institutionID} target="_blank" rel="noopener noreferrer" className="ms-05"
                                 data-tip="Open Institution in new window">
                                 <i className="icon icon-fw icon-external-link-alt fas small"/>
                             </a>
@@ -561,7 +561,7 @@ class PanelOne extends React.PureComponent {
                 <hr className="mb-1"/>
 
                 { valuesChanged ?
-                    <div className="buttons-container text-right">
+                    <div className="buttons-container text-end">
                         <button type="submit" className="btn btn-success"
                             disabled={createDisabled} onClick={this.handleCreate}>
                             { submissionItem ? "Submit Changes" : "Create & Proceed" }
@@ -660,7 +660,7 @@ class PanelTwo extends React.PureComponent {
                     <div className="field-section mt-2">
                         <label className="d-block mb-03">
                             Submit Data
-                            {/* <i className="icon icon-info-circle fas icon-fw ml-05" // Needs to be updated
+                            {/* <i className="icon icon-info-circle fas icon-fw ms-05" // Needs to be updated
                                 data-tip="Select & upload files generated in Proband and other pedigree software" /> */}
                         </label>
                         <AttachmentInputController {...{ ingestionType, href, clearAllAlerts }} context={submissionItem} onAddedFile={this.onAddedFile}>
@@ -684,7 +684,7 @@ class PanelTwo extends React.PureComponent {
                                     </span>
                                 </>
                                 : <span className="mb-0 text-small">To view full details of this Ingestion Submission, click <em><a href={atID} target="_blank" rel="noreferrer">here</a></em>.</span>}
-                            { ingestionType === "metadata_bundle" || ingestionType === "family_history" ? <div className="text-small mt-05"><span className="mr-1 text-600" data-tip="Use this ID to upload fastq files in SubmitCGAP.">Ingestion Submission UUID:</span> <object.CopyWrapper className="d-inline text-monospace" value={uuid} key="copy-uuid" data-tip="Click to copy">{ uuid }</object.CopyWrapper> </div>: null}
+                            { ingestionType === "metadata_bundle" || ingestionType === "family_history" ? <div className="text-small mt-05"><span className="me-1 text-600" data-tip="Use this ID to upload fastq files in SubmitCGAP.">Ingestion Submission UUID:</span> <object.CopyWrapper className="d-inline font-monospace" value={uuid} key="copy-uuid" data-tip="Click to copy">{ uuid }</object.CopyWrapper> </div>: null}
                         </div>
                         <div className="align-self-end">
                             { ingestionType === "metadata_bundle" || ingestionType === "genelist" ?
@@ -693,14 +693,14 @@ class PanelTwo extends React.PureComponent {
                                 </button> :
                                 <>
                                     <button type="button" className="btn btn-success" onClick={handleComplete} value="View Family Info">View Family Info</button>
-                                    <button type="button" className="btn btn-success ml-05" onClick={handleComplete} value="View Related Cases">View Related Cases</button>
+                                    <button type="button" className="btn btn-success ms-05" onClick={handleComplete} value="View Related Cases">View Related Cases</button>
                                 </>}
                         </div>
                     </div>
                     { ingestionType === "genelist" ? null : (
                         <>
                             <hr/>
-                            <span className="pl-1">Results:</span>
+                            <span className="ps-1">Results:</span>
                             <CreatedItemsTable aliasToAtIDMap={aliases} />
                         </>)}
                 </React.Fragment>
@@ -731,17 +731,17 @@ function CreatedItemsTable(props) {
         const label = (
             <React.Fragment>
                 <a className="text-600" href={atID} target="_blank" rel="noreferrer">{alias}</a>
-                <i className="icon icon-external-link-alt fas text-smaller ml-05"></i>
+                <i className="icon icon-external-link-alt fas text-smaller ms-05"></i>
             </React.Fragment>
         );
 
         const value = (
-            <object.CopyWrapper className="d-inline text-monospace" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
+            <object.CopyWrapper className="d-inline font-monospace" value={accession} key="copy-accession">{ accession }</object.CopyWrapper>
         );
 
         return <PartialList.Row {...{ label, value }} key={alias} colSm="7" colMd="7" colLg="7" className="pb-1" />;
     });
-    return <PartialList {...{ persistent }} className="pl-1 pt-1"/>;
+    return <PartialList {...{ persistent }} className="ps-1 pt-1"/>;
 }
 
 
@@ -851,7 +851,7 @@ function ExcelSubmissionFileAttachmentBtn(props) {
 
     const selectTitle = "Select " + uploadType + " file(s)...";
     const uploadTitle = "Upload " + uploadType;
-    const instructionsNode = <div className="text-small font-italic ml-02 mb-1">Accepted file types: { acceptedTypesDisplay }</div>;
+    const instructionsNode = <div className="text-small fst-italic ms-02 mb-1">Accepted file types: { acceptedTypesDisplay }</div>;
 
     return <FileAttachmentBtn {...passProps} {...{ selectTitle, uploadTitle, instructionsNode, acceptedTypes }}/>;
 }
@@ -878,7 +878,7 @@ function FileAttachmentBtn(props){
                 { instructionsNode }
                 <div className="input-group">
                     <div className="input-group-prepend">
-                        <span className="input-group-text pr-5" id="inputGroupFileAddon01">
+                        <span className="input-group-text pe-5" id="inputGroupFileAddon01">
                             { selectTitle }
                         </span>
                     </div>
@@ -918,13 +918,13 @@ function FileAttachmentBtn(props){
                 </div>
                 <div className="input-group-append">
                     <button type="button" className="btn btn-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}>
-                        <i className={"mr-08 icon icon-fw fas icon-" + icon} />
+                        <i className={"me-08 icon icon-fw fas icon-" + icon} />
                         {uploadTitle}
                     </button>
                 </div>
             </div>
-            { !loadingFileResult && postFileSuccess ? <span className="ml-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
-            { !loadingFileResult && postFileSuccess === false ? <span className="ml-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
+            { !loadingFileResult && postFileSuccess ? <span className="ms-1 text-success">Success! <i className="icon icon-check fas"></i></span> : null}
+            { !loadingFileResult && postFileSuccess === false ? <span className="ms-1 text-danger">Failure! <i className="icon icon-times-circle fas"></i></span> : null}
         </React.Fragment>
     );
 }
@@ -974,9 +974,9 @@ const LinkToFieldSection = React.memo(function LinkToFieldSection(props){
                     <ProjectDrop {...{ options, onSelect, selectedID, selectedTitle, variant }} selectedTitle={showTitle} />
                 </div>
                 <div className="col">
-                    <i className="icon icon-fw icon-link fas small mr-05"/>
-                    <span className="text-monospace small">{ selectedID }</span> &bull;
-                    <a href={selectedID} target="_blank" rel="noopener noreferrer" className="ml-05"
+                    <i className="icon icon-fw icon-link fas small me-05"/>
+                    <span className="font-monospace small">{ selectedID }</span> &bull;
+                    <a href={selectedID} target="_blank" rel="noopener noreferrer" className="ms-05"
                         data-tip={"Open " + type + " in new window"}>
                         <i className="icon icon-fw icon-external-link-alt fas small"/>
                     </a>
@@ -999,8 +999,8 @@ const ProjectDrop = (props) => {
                         <span className="text-600 d-block">{ display_title }</span>
                     </div>
                     <div className="col-auto d-none d-md-inline-block">
-                        <i className="icon icon-fw icon-link fas small mr-05"/>
-                        <span className="text-monospace small">{ projectID }</span>
+                        <i className="icon icon-fw icon-link fas small me-05"/>
+                        <span className="font-monospace small">{ projectID }</span>
                     </div>
                 </div>
             </DropdownItem>

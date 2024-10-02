@@ -422,7 +422,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             ));
 
 
-        const recentlySavedAsterisk = <span className="text-warning position-absolute ml-n1" data-tip="Recently saved and possibly not yet in search results">*</span>;
+        const recentlySavedAsterisk = <span className="text-warning position-absolute ms-n1" data-tip="Recently saved and possibly not yet in search results">*</span>;
 
         return (
             <div className="w-100 d-flex align-items-center justify-content-around py-1">
@@ -448,7 +448,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     { typeof lastSavedNoteText !== "undefined" ? recentlySavedAsterisk : null }
                     { typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ?
                         // Will be equal to null if saved text exists but unsaved text is blank (== will remove field upon save).
-                        <span className="text-danger text-700 position-absolute ml-n1" data-tip="Note text has not been saved yet.">*</span>
+                        <span className="text-danger text-700 position-absolute ms-n1" data-tip="Note text has not been saved yet.">*</span>
                         : null }
                 </button>
 
@@ -666,10 +666,10 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                     </div>
                     : null }
                 <div className="d-flex mt-08">
-                    <button type="button" className="btn btn-primary mr-04 w-100" disabled={saveDisabled} onClick={handleSave}>
+                    <button type="button" className="btn btn-primary me-04 w-100" disabled={saveDisabled} onClick={handleSave}>
                         Save
                     </button>
-                    <button type="button" className="btn btn-primary ml-04 w-100" disabled>
+                    <button type="button" className="btn btn-primary ms-04 w-100" disabled>
                         Approve
                     </button>
                 </div>
@@ -1122,7 +1122,7 @@ class CallClassificationButton extends React.PureComponent {
         const lastSavedIndicator = isLastSaved ?
             <span className="text-white text-700" data-tip="You recently saved this value and it may not be yet visible in search results"> *</span>
             : isLastSaveUnset ?
-                <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
+                <i className="icon icon-minus-circle fas ms-08" data-tip="Previous Value" />
                 : null;
 
         if (isDefaultSaveToProject) {
@@ -1142,17 +1142,17 @@ class CallClassificationButton extends React.PureComponent {
             // We don't have a way to unsave from project, so disable button for now if already saved to project.
             return (
                 <div className="d-flex">
-                    <button type="button" className={"dropdown-item pr-16" + saveToProjectBtnClass} onClick={this.handleClick} data-save-to-project={true}
+                    <button type="button" className={"dropdown-item pe-16" + saveToProjectBtnClass} onClick={this.handleClick} data-save-to-project={true}
                         disabled={disabled} data-html data-tip={saveToProjectBtnTip}>
                         { optionName }
-                        <i className="icon icon-project-diagram fas small ml-16" />
+                        <i className="icon icon-project-diagram fas small ms-16" />
                         { justSavedToProject && !isAssessmentSavedToProject ? // Not yet indexed
                             <span className="text-white text-700" data-tip="You recently saved this to project and it may not be yet visible in search results"> *</span>
                             : justRemovedFromProject ?
-                                <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
+                                <i className="icon icon-minus-circle fas ms-08" data-tip="Previous Value" />
                                 : null}
                     </button>
-                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-left" + saveToVSBtnClass} onClick={this.handleClick}
+                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-start" + saveToVSBtnClass} onClick={this.handleClick}
                         disabled={disabled} data-save-to-project={false} data-tip="Save only to this variant sample (and not project-wide for this variant)">
                         <i className="icon icon-vial fas" />
                         { lastSavedIndicator }
@@ -1210,7 +1210,7 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
                 { typeof window !== "undefined" && window.sessionStorage ?
                     <label className="d-block text-400 mt-08 pt-08 border-top mb-0">
                         <input type="checkbox" value={checked} className="align-middle" onChange={onCheck} />&nbsp;
-                        <span className="align-middle ml-04">Check to stop showing this message</span>
+                        <span className="align-middle ms-04">Check to stop showing this message</span>
                     </label>
                     : null }
             </Popover.Content>

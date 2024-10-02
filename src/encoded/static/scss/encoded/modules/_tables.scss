@@ -42,9 +42,9 @@ table {
 			}
 		}
 
-		/* If entire table or row has .text-left etc, apply to children as well (unless itself overrides). */
-		&.text-left,
-		&.text-right {
+		/* If entire table or row has .text-start etc, apply to children as well (unless itself overrides). */
+		&.text-start,
+		&.text-end {
 			> tr {
 				text-align: inherit;
 				> th,
@@ -55,9 +55,9 @@ table {
 		}
 	}
 
-	/* If entire table or row has .text-left etc, apply to children as well. */
-	&.text-left,
-	&.text-right {
+	/* If entire table or row has .text-start etc, apply to children as well. */
+	&.text-start,
+	&.text-end {
 		> thead,
 		> tbody {
 			text-align: inherit;

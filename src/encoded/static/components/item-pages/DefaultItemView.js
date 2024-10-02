@@ -454,7 +454,7 @@ export class ItemActionsTab extends React.PureComponent {
                 <ViewJSONAction href={href}>
                     <div className="icon-container clickable" onClick={this.toggleOpen} data-tip="Open window showing this Item in raw JSON format.">
                         <i className="icon icon-fw fas icon-file-code"/>
-                        <span className="text-monospace text-smaller">JSON</span>
+                        <span className="font-monospace text-smaller">JSON</span>
                     </div>
                 </ViewJSONAction>
             );

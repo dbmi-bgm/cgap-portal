@@ -187,7 +187,7 @@ export class WorkflowNodeElement extends React.PureComponent {
                 output += '<hr class="mt-08 mb-05"/>';
             }
             if (argumentName === 'Input' || argumentName === 'Output'){
-                argumentName += ' Argument &nbsp; <span class="text-500 text-monospace">' + name + '</span>';
+                argumentName += ' Argument &nbsp; <span class="text-500 font-monospace">' + name + '</span>';
             }
             output += '<small class="mb-03 d-inline-block">' + argumentName + '</small>';
         }
@@ -238,14 +238,14 @@ export class WorkflowNodeElement extends React.PureComponent {
             && node.meta.workflow.steps.length > 0
             && typeof node.meta.workflow.steps[0].name === 'string'
         ){
-            //elemProps.className += ' text-monospace';
+            //elemProps.className += ' font-monospace';
             return <div {...elemProps}>{ _.pluck(node.meta.workflow.steps, 'name').join(', ') }</div>;
         }
 
         // If Parameter
         if (isNodeParameter(node)){
             if (doesRunDataExist(node)){
-                elemProps.className += ' text-monospace';
+                elemProps.className += ' font-monospace';
                 return <div {...elemProps}>{ node.name }</div>;
             }
             return <div {...elemProps}>Parameter</div>;
@@ -256,7 +256,7 @@ export class WorkflowNodeElement extends React.PureComponent {
             if (fileFormatAsString) {
                 return <div {...elemProps}>{ fileFormatAsString }</div>;
             }
-            elemProps.className += ' text-monospace';
+            elemProps.className += ' font-monospace';
             return <div {...elemProps}>{ title }</div>;
         }
 
@@ -335,7 +335,7 @@ export class WorkflowNodeElement extends React.PureComponent {
             } else if (node.meta && node.meta.run_data && node.meta.run_data.file && typeof node.meta.run_data.file === 'object' && node.meta.run_data.file.file_type){
                 belowTitle = node.meta.run_data.file.file_type;
             } else {
-                belowTitle = <small className="text-monospace" style={{ 'bottom' : -15, 'color' : '#888' }}>{ node.name }</small>;
+                belowTitle = <small className="font-monospace" style={{ 'bottom' : -15, 'color' : '#888' }}>{ node.name }</small>;
             }
             return <div {...elemProps}>{ belowTitle }</div>;
         }
@@ -376,7 +376,7 @@ export class WorkflowNodeElement extends React.PureComponent {
         if (isNodeFile(node) && doesRunDataExist(node)){
             const { file : { accession, display_title } } = run_data;
             return (
-                <div className={"node-name" + (accession ? ' text-monospace' : '')}>
+                <div className={"node-name" + (accession ? ' font-monospace' : '')}>
                     { this.icon() }
                     { typeof file === 'string' ? ioType : accession || display_title }
                 </div>
@@ -384,7 +384,7 @@ export class WorkflowNodeElement extends React.PureComponent {
         }
 
         if (isNodeParameter(node) && doesRunDataExist(node)){
-            return <div className="node-name text-monospace">{ this.icon() }{ run_data.value }</div>;
+            return <div className="node-name font-monospace">{ this.icon() }{ run_data.value }</div>;
         }
 
         // Fallback / Default - use node.name

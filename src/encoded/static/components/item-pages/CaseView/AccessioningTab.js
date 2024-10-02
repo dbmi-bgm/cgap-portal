@@ -323,7 +323,7 @@ class FamilyAccessionStackedTable extends React.PureComponent {
         return ( // We can pass 'className={..}' to this if needed.
             <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}>
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex flex-column individual-role pr-2">
+                    <div className="d-flex flex-column individual-role pe-2">
                         { atId ?
                             <a href={atId} className={`name-title mx-0 text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }

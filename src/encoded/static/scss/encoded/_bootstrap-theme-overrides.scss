@@ -10,8 +10,8 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 
 // Taken largely from bootstrap / spacing.scss
-// Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
-// more fine-grained increments of _pixels-at-default-zoom_ so that e.g. mr-16 is equivalent to having margin-right: 16px at default zoom.
+// Overrides ONLY mb-, mt-, pb-, pt-, ms-, me-, ps-, and pe- util classnames to use
+// more fine-grained increments of _pixels-at-default-zoom_ so that e.g. me-16 is equivalent to having margin-right: 16px at default zoom.
 @each $breakpoint in map-keys($grid-breakpoints) {
 	@include media-breakpoint-up($breakpoint) {
 	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
@@ -21,13 +21,13 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 				.#{$abbrev}t#{$infix}-#{$util-size} {
 					#{$prop}-top: $util-size * 0.625rem !important;
 				}
-				.#{$abbrev}r#{$infix}-#{$util-size} {
+				.#{$abbrev}e#{$infix}-#{$util-size} {
 					#{$prop}-right: $util-size * 0.625rem !important;
 				}
 				.#{$abbrev}b#{$infix}-#{$util-size} {
 					#{$prop}-bottom: $util-size * 0.625rem !important;
 				}
-				.#{$abbrev}l#{$infix}-#{$util-size} {
+				.#{$abbrev}s#{$infix}-#{$util-size} {
 					#{$prop}-left: $util-size * 0.625rem !important;
 				}
 
@@ -35,13 +35,13 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-top: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
-					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
+					.#{$abbrev}e#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-right: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-bottom: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
-					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
+					.#{$abbrev}s#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-left: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 				}

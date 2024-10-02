@@ -23,7 +23,7 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
             <div className="dashboard-header">
                 <div className="container-wide d-flex align-items-center justify-content-between">
                     <div className="align-items-center d-flex">
-                        <i className="icon icon-fw icon-home fas mr-1" />
+                        <i className="icon icon-fw icon-home fas me-1" />
                         <h5 className="mt-0 mb-0 text-400">Home Dashboard</h5>
                     </div>
                 </div>
@@ -37,13 +37,13 @@ export const UserDashboard = React.memo(function UserDashboard({ windowHeight, w
                     </div>
                     <div className="mt-2 w-100 d-flex">
                         <a href="/search/?type=Case&proband_case=true" className="btn btn-primary p-10">
-                            <i className="fas icon icon-archive mr-05"></i>Germline
+                            <i className="fas icon icon-archive me-05"></i>Germline
                         </a>
-                        <a href="/search/?type=SomaticAnalysis" className="btn btn-primary ml-05 p-10">
-                            <i className="fas icon icon-spinner mr-05"></i>Somatic
+                        <a href="/search/?type=SomaticAnalysis" className="btn btn-primary ms-05 p-10">
+                            <i className="fas icon icon-spinner me-05"></i>Somatic
                         </a>
-                        <a href="/search/?type=CohortAnalysis" className="btn btn-primary ml-05 p-10">
-                            <i className="fas icon icon-project-diagram mr-05"></i>Cohort
+                        <a href="/search/?type=CohortAnalysis" className="btn btn-primary ms-05 p-10">
+                            <i className="fas icon icon-project-diagram me-05"></i>Cohort
                         </a>
                     </div>
                 </div>

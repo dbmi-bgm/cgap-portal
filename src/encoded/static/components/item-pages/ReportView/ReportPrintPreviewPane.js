@@ -253,14 +253,14 @@ function ReportHeader({ report, caseItem, reportSettings }){
                     <h4 className="text-400">{ organization_title || projectTitle }</h4>
                 </div>
                 <div className="col-6 d-flex align-items-center">
-                    <div className="text-right flex-grow-1 pr-16 pb-02">
+                    <div className="text-end flex-grow-1 pe-16 pb-02">
                         <h4 className="text-primary-dark text-600 my-0">GENOME SEQUENCING REPORT</h4>
                         <h6 className="text-primary text-400 my-0">Computational Genome Analysis Platform</h6>
                     </div>
                     <img id="cgap-report-logo" src={reportVars.logos.cgapSrc} />
                 </div>
             </div>
-            <div className="row text-left">
+            <div className="row text-start">
                 <div className="col-6">
 
                     <div className="report-header-box">

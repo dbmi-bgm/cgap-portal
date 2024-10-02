@@ -152,7 +152,7 @@ function StructuralVariantInfoSection({ context }) {
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_grch37" className="mb-0">GRCh37(hg19):
-                                <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ml-02 icon-sm" tooltip="Click here for more information">
+                                <QuickPopover popID="sv_vi_grch37" title={hg19PopoverTitle} className="p-0 ms-02 icon-sm" tooltip="Click here for more information">
                                     { hg19PopoverContent }
                                 </QuickPopover>
                             </label>
@@ -170,7 +170,7 @@ function StructuralVariantInfoSection({ context }) {
                         </div>
                     </div>
                 </div>
-                <div className="col-12 col-md-5 pl-2">
+                <div className="col-12 col-md-5 ps-2">
                     <div className="row">
                         <div className="col-12 col-md-6">
                             <label htmlFor="vi_genotype" className="mb-0">Genotype:</label>
@@ -380,7 +380,7 @@ const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
-                <i className="icon icon-spin icon-circle-notch fas mr-07"/>
+                <i className="icon icon-spin icon-circle-notch fas me-07"/>
                 : title }
         </button>
     );

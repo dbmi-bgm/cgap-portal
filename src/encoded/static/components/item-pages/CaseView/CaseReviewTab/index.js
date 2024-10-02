@@ -116,7 +116,7 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                     <h1 className="text-300 mb-0">
                         Case Review
                         { isFetchingReportItem || isLoadingVariantSampleListItem ?
-                            <i className="icon icon-fw icon-circle-notch icon-spin fas ml-12 text-muted" data-tip="Loading Report..." />
+                            <i className="icon icon-fw icon-circle-notch icon-spin fas ms-12 text-muted" data-tip="Loading Report..." />
                             : (
                                 <React.Fragment>
                                     {/* <i className="icon icon-arrow-right fas icon-xs mx-3"/>*/}
@@ -132,8 +132,8 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 
                     {/* Hidden Temporarily
                     <div>
-                        <button type="button" className="btn btn-primary ml-05 d-flex align-items-center" disabled>
-                            <i className="icon icon-file-pdf far mr-1"/>
+                        <button type="button" className="btn btn-primary ms-05 d-flex align-items-center" disabled>
+                            <i className="icon icon-file-pdf far me-1"/>
                             View Report
                         </button>
                     </div>
@@ -148,26 +148,26 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
                     <CaseSpecificSelectionsPanel {...commonSelectionsProps} {...{ reportNotesIncluded, kbNotesIncluded, toggleReportNoteSubselectionState, toggleKBNoteSubselectionState }} className="mb-12" />
 
                     <div className="d-block d-md-flex align-items-center justify-content-between mb-12">
-                        <div className="text-left">
+                        <div className="text-start">
                             {/*
-                            <button type="button" className="btn btn-primary mr-05" disabled>
+                            <button type="button" className="btn btn-primary me-05" disabled>
                                 Export current 'Send to Project' selections as <span className="text-600">TSV spreadsheet</span>
                             </button>
                             */}
 
                             <PatchItemsProgress>
-                                <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore }} className="my-1 mr-1"/>
+                                <SaveNotesToReportButton {...commonBtnProps} {...{ sendToReportStore }} className="my-1 me-1"/>
                             </PatchItemsProgress>
 
                             <PatchItemsProgress>
-                                <SaveNotesToProjectButton {...commonBtnProps} {...{ sendToProjectStore }} className="my-1 mr-1"/>
+                                <SaveNotesToProjectButton {...commonBtnProps} {...{ sendToProjectStore }} className="my-1 me-1"/>
                             </PatchItemsProgress>
 
                         </div>
 
-                        <div className="text-left">
+                        <div className="text-start">
                             <PatchItemsProgress>
-                                <SaveFindingsButton {...commonBtnProps} className="ml-md-05 my-1" {...{ changedClassificationsByVS,
+                                <SaveFindingsButton {...commonBtnProps} className="ms-md-05 my-1" {...{ changedClassificationsByVS,
                                     updateClassificationForVS, changedClassificationsCount, alreadyInReportNotes }} />
                             </PatchItemsProgress>
                         </div>

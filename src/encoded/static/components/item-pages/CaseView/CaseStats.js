@@ -36,7 +36,7 @@ function mapFeaturesToBadges(features = []) {
         const { display_title = null, '@id': featureID } = feature;
         return (
             // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
-            <a className="badge badge-pill badge-info text-400 text-small d-inline-block mr-03 mb-03 pb-04"
+            <a className="badge badge-pill badge-info text-400 text-small d-inline-block me-03 mb-03 pb-04"
                 href={featureID} target="_blank" rel="noopener noreferrer" key={featureID}>
                 { display_title }
             </a>
@@ -69,13 +69,13 @@ export const CaseStats = React.memo(function CaseStats(props){
             <div className="col-12 col-sm mb-2 mb-sm-0">
                 <div className="card h-100">
                     <div className="card-header primary-header d-flex align-items-center">
-                        <i className="icon icon-user fas icon-fw mr-1"/>
+                        <i className="icon icon-user fas icon-fw me-1"/>
                         <h4 className="my-0 text-400 flex-grow-1">
                             Patient Info
                         </h4>
                         { haveCaseEditPermission && individualAtID ?
                             <a href={individualAtID + "?currentAction=edit&callbackHref=" + caseAtID}
-                                className="text-white-50 ml-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
+                                className="text-white-50 ms-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -92,13 +92,13 @@ export const CaseStats = React.memo(function CaseStats(props){
             <div className="col-12 col-sm">
                 <div className="card h-100">
                     <div className="card-header primary-header d-flex align-items-center">
-                        <i className="icon icon-users fas icon-fw mr-1"/>
+                        <i className="icon icon-users fas icon-fw me-1"/>
                         <h4 className="my-0 text-400 flex-grow-1">
                             Family Info
                         </h4>
                         { haveCaseEditPermission && familyAtID ?
                             <a href={familyAtID + "?currentAction=edit&callbackHref=" + caseAtID}
-                                className="text-white-50 ml-12 text-small" data-tip="Edit Family. Changes may take a few minutes to appear.">
+                                className="text-white-50 ms-12 text-small" data-tip="Edit Family. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -151,7 +151,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
     return (
         <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-06">Individual ID:</label>
+                <label className="mb-0 me-06">Individual ID:</label>
                 <a href={individualAtID} target="_blank" rel="noopener noreferrer">
                     { individual_id }
                 </a>
@@ -159,7 +159,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
             <div className="card-text mb-1">
                 <label className="mb-0">CGAP Individual ID:</label>
                 {" "}
-                <span className="text-monospace text-small">{ accession }</span>
+                <span className="font-monospace text-small">{ accession }</span>
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">Sex (User-Submitted):</label>
@@ -172,7 +172,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
                 { age && age_units ? `${age} ${age_units}(s)` : fallbackElem }
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-02">Status:</label>
+                <label className="mb-0 me-02">Status:</label>
                 {" "}
                 { Schemas.Term.toName("status", status, true) || fallbackElem }
             </div>
@@ -227,7 +227,7 @@ export const FamilyInfo = React.memo(function FamilyInfo({ canonicalFamily }) {
             <div className="card-text mb-1">
                 <label className="mb-0">CGAP Family ID:</label>
                 {" "}
-                <span className="text-monospace text-small">{ familyAccession }</span>
+                <span className="font-monospace text-small">{ familyAccession }</span>
             </div>
             {/* <div className="card-text mb-1">
                 <label className="mb-0">Cohort:</label> { cohortTitle || fallbackElem }

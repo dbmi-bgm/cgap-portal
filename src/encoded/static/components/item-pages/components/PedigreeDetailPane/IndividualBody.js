@@ -141,7 +141,7 @@ export class IndividualBody extends React.PureComponent {
                                     <i className="icon icon-pencil-alt fas clickable" />
                                 </a>
                                 : isLoadingIndividual ?
-                                    <i className="icon icon-circle-notch icon-spin fas d-block mr-15" />
+                                    <i className="icon icon-circle-notch icon-spin fas d-block me-15" />
                                     : null }
                             { onClose ? <i className="icon icon-times fas clickable d-block" onClick={onClose}/> : null }
                         </div>

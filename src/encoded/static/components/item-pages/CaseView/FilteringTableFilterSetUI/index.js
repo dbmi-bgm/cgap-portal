@@ -276,7 +276,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                 <React.Fragment>
                     { selectedVariantSamples instanceof Map ?
                         <div className="filtering-tab-table-controls pb-08 row align-items-center mt-12">
-                            <div className="col-12 col-md col text-md-right pr-md-0">
+                            <div className="col-12 col-md col text-md-end pe-md-0">
                                 <h5 className="text-600">Move to Interpretation</h5>
                             </div>
                             <div className="col-12 col-md-auto">
@@ -308,7 +308,7 @@ export class FilteringTableFilterSetUI extends React.PureComponent {
                                 </React.Fragment>
                                 : null }
                         </h5>
-                        <div className="col col-lg-auto pr-06 d-flex">
+                        <div className="col col-lg-auto pe-06 d-flex">
                             <ExportSearchSpreadsheetButton {...{ requestedCompoundFilterSet, caseItem }} />
                         </div>
                     </AboveTableControlsBaseCGAP>
@@ -405,7 +405,7 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
     if (isFetchingInitialFilterSetItem) {
         titleBlock = (
             <h4 className="text-300 my-0 d-inline-flex align-items-center h-100 text-white px-3">
-                <i className="small icon icon-fw fas mr-1 icon-circle-notch icon-spin" />
+                <i className="small icon icon-fw fas me-1 icon-circle-notch icon-spin" />
                 <em>Loading Filter Set</em>
             </h4>
         );
@@ -420,25 +420,25 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
                 setTitleOfFilterSet(inputElem.value);
             }}>
                 <input type="text" name="filterName" className="form-control" defaultValue={fsTitle || fsDisplayTitle} />
-                <button type="reset" className="btn btn-sm btn-outline-light ml-08" onClick={function(e){
+                <button type="reset" className="btn btn-sm btn-outline-light ms-08" onClick={function(e){
                     e.stopPropagation();
                     e.preventDefault();
                     setIsEditingTitle(false);
                 }}>
                     <i className="icon icon-fw icon-times fas" />
                 </button>
-                <button type="submit" className="btn btn-sm btn-outline-success ml-08"><i className="icon icon-fw icon-check fas" /></button>
+                <button type="submit" className="btn btn-sm btn-outline-success ms-08"><i className="icon icon-fw icon-check fas" /></button>
             </form>
         );
     } */ else {
         titleBlock = (
             <button type="button" onClick={onHeaderClick}
-                className="btn btn-link btn-lg text-decoration-none h-100 w-100 text-left">
+                className="btn btn-link btn-lg text-decoration-none h-100 w-100 text-start">
                 <h4 className="my-0 text-400 text-white">
-                    <i className={"small icon icon-fw fas mr-1 icon-" + (bodyOpen ? "minus" : "plus")} />
+                    <i className={"small icon icon-fw fas me-1 icon-" + (bodyOpen ? "minus" : "plus")} />
                     { fsTitle || fsDisplayTitle || <em>No Title Set</em> }
                 </h4>
-                {/* bodyOpen ? <i className="icon icon-pencil-alt fas ml-1 clickable text-small" onClick={onClickEditTitle} /> : null */}
+                {/* bodyOpen ? <i className="icon icon-pencil-alt fas ms-1 clickable text-small" onClick={onClickEditTitle} /> : null */}
             </button>
         );
     }
@@ -455,16 +455,16 @@ const FilterSetUIHeader = React.memo(function FilterSetUIHeader(props){
     if (haveDuplicateQueries || haveDuplicateNames || !allFilterBlockNameQueriesValid) {
         const err = !allFilterBlockNameQueriesValid ? "Filter block with same name but different query value has been saved to Variant Sample selection list already. Please change Filter Block name below to proceed."
             : `Filter blocks with duplicate ${(haveDuplicateNames ? "names" : "") + (haveDuplicateNames && haveDuplicateQueries ? " and " : "") + (haveDuplicateQueries ? "queries" : "")} exist below.`;
-        warnIcon = <i className="icon icon-exclamation-triangle fas align-middle mr-15 text-danger" data-tip={err} />;
+        warnIcon = <i className="icon icon-exclamation-triangle fas align-middle me-15 text-danger" data-tip={err} />;
     }
 
     // todo if edit permission(?): [ Save Button etc. ] [ Sum Active(?) Filters ]
     return (
-        <div className="d-flex filter-set-ui-header align-items-center bg-primary-dark text-white pr-16">
+        <div className="d-flex filter-set-ui-header align-items-center bg-primary-dark text-white pe-16">
             <div className="flex-grow-1 align-self-stretch">
                 { titleBlock }
             </div>
-            <div className="flex-shrink-0 flex-grow-0 pl-16 overflow-hidden">
+            <div className="flex-shrink-0 flex-grow-0 ps-16 overflow-hidden">
                 { warnIcon }
                 <div role="group" className="dropdown btn-group">
                     <SaveFilterSetButton {...{ saveFilterSet, isSavingFilterSet, isEditDisabled, hasCurrentFilterSetChanged, haveCaseEditPermission }}
@@ -509,7 +509,7 @@ const FilterSetUIBody = React.memo(function FilterSetUIBody(props){
                                 : "Shift+Click to select an additional filter block"
                         }
                     </div>
-                    <div className="col-12 pb-02 col-sm-auto text-sm-right">
+                    <div className="col-12 pb-02 col-sm-auto text-sm-end">
                         { (allFilterBlocksSelected ? "All" : selectedFilterBlockIdxCount + "/" + filterBlocksLen) + " filter blocks selected" }
                     </div>
                 </div>
@@ -589,20 +589,20 @@ function FilterSetUIBlockBottomUI(props){
             <div className="col-auto mb-12">
                 <div className="btn-group" role="group" aria-label="Selection Controls">
                     <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onSelectAllClick} disabled={allFilterBlocksSelected}>
-                        <i className={"icon icon-fw far mr-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
+                        <i className={"icon icon-fw far me-1 icon-" + (allFilterBlocksSelected ? "check-square" : "square")} />
                         Select All
                     </button>
                     <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onToggleIntersectFilterBlocksBtnClick} disabled={filterBlocksLen < 2 || singleSelectedFilterBlockIdx !== null}
                         data-tip="Toggle whether to compute the union or intersection of filter blocks">
-                        <i className={"icon icon-fw far mr-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
+                        <i className={"icon icon-fw far me-1 icon-" + (intersectFilterBlocks ? "check-square" : "square")} />
                         Intersect
                     </button>
                 </div>
             </div>
             <div className="col-auto mb-12 flex-grow-1 d-flex justify-content-between flex-wrap">
-                <div className="btn-group mr-08" role="group" aria-label="Creation Controls">
+                <div className="btn-group me-08" role="group" aria-label="Creation Controls">
                     <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onAddBtnClick} data-tip="Add new blank filter block">
-                        <i className="icon icon-fw icon-plus fas mr-1" />
+                        <i className="icon icon-fw icon-plus fas me-1" />
                         Add Filter Block
                     </button>
                     <button type="button" className="btn btn-primary-dark d-flex align-items-center fixed-height" onClick={onCopyBtnClick} disabled={!currentSingleBlockQuery}

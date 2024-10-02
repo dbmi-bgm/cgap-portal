@@ -52,7 +52,7 @@ function SomaticBioinfoStatTable({ sample }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Coverage" popoverContent="">
                     {coverage.value || fallbackElem}
-                    {(coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ml-05`} />}
+                    {(coverage.value && coverage.flag) && <i className={`icon icon-flag fas text-${flagToBootstrapClass(coverage.flag)} ms-05`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Mean Insert Length">
                     {fallbackElem}
@@ -97,9 +97,9 @@ function SQCMAccordionDrawer(props) {
     const failFlags = fail.map((flag) => <QCMFlag key={flag} type="fail" title={flag} />);
 
     return (
-        <div className={`card border-left-0 border-right-0 ${idx === 0 ? "border-top-0" : ""} ${idx === (qcmLen - 1) ? "border-bottom-0" : ""}`} key={atID}>
+        <div className={`card border-start-0 border-end-0 ${idx === 0 ? "border-top-0" : ""} ${idx === (qcmLen - 1) ? "border-bottom-0" : ""}`} key={atID}>
             <SQCMAccordionToggle eventKey={sampleAtID} {...{ tissueType, sequencingType, sampleID, specimenType }}>
-                <div className="d-flex align-items-center justify-items-center ml-2 ml-sm-0">
+                <div className="d-flex align-items-center justify-items-center ms-2 ms-sm-0">
                     {failFlags}
                     {warnFlags}
                 </div>
@@ -112,7 +112,7 @@ function SQCMAccordionDrawer(props) {
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
                     }}>
-                        <a href={atID} className="text-uppercase text-600 d-block text-small mr-2">{individual_id || individual_accession}</a>
+                        <a href={atID} className="text-uppercase text-600 d-block text-small me-2">{individual_id || individual_accession}</a>
                     </div>
                     <div className="card-body px-5">
                         <SomaticBioinfoStatTable {...{ sample, individual }}/>
@@ -138,10 +138,10 @@ function SQCMAccordionToggle({ children, eventKey, callback, tissueType, sequenc
     return (
         <div onClick={decoratedOnClick} className="card-header btn d-flex justify-content-between justify-items-center flex-column flex-sm-row">
             <div className="d-flex align-items-center justify-items-center">
-                <i className={`icon icon-${icon} fas mr-1`} />
-                <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-left text-truncate text-600 text-capitalize text-larger pl-03">
+                <i className={`icon icon-${icon} fas me-1`} />
+                <div className="d-flex flex-column flex-lg-row flex-xl-row justify-content-center text-start text-truncate text-600 text-capitalize text-larger ps-03">
                     {tissueType ? `${tissueType}:` : ""}
-                    <div className="ml-lg-05 ml-xl-05 mr-05 text-400 text-capitalize d-inline-block text-truncate">
+                    <div className="ms-lg-05 ms-xl-05 me-05 text-400 text-capitalize d-inline-block text-truncate">
                         {specimenType && sequencingType ? `${specimenType} - ${sequencingType}` :
                             specimenType ? specimenType : sequencingType}
                     </div>

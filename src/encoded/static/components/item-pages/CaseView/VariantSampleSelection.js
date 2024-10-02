@@ -298,7 +298,7 @@ function VariantSampleListSortSelectDrop (props) {
 
     return (
         <div className="d-flex mt-2 mb-3">
-            <label htmlFor="vsl-sort-type" className="mr-1 mt-06">
+            <label htmlFor="vsl-sort-type" className="me-1 mt-06">
                 Sort By:
             </label>
             <DropdownButton
@@ -480,7 +480,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
 
     return (
         <div className="card mb-16 variant-sample-selection" data-is-deleted={isDeleted} key={index}>
-            <div className="card-header pr-12">
+            <div className="card-header pe-12">
                 <div className="d-flex flex-column flex-lg-row align-items-lg-center">
 
                     <div className="flex-auto mb-08 mb-lg-0">
@@ -503,7 +503,7 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                                 <ClassificationDropdown {...{ variantSample, tableTagsByID, unsavedClassification, updateClassificationForVS, searchType }} />
                                 <button type="button" className={"btn btn-sm d-flex align-items-center btn-" + (noSavedNotes ? "outline-secondary" : isExpanded ? "primary-dark" : "primary")}
                                     onClick={toggleIsExpanded} disabled={noSavedNotes}>
-                                    <i className={"icon icon-fw fas mr-06 icon-" + (!isExpanded ? "plus" : "minus")} />
+                                    <i className={"icon icon-fw fas me-06 icon-" + (!isExpanded ? "plus" : "minus")} />
                                     {/* !isExpanded ? "Review Notes & Classification" : "Hide Notes & Classification" */}
                                     Review Notes & Classification
                                 </button>
@@ -578,13 +578,13 @@ export const VariantSampleSelection = React.memo(function VariantSampleSelection
                     </div>
                     <div className="col-auto text-small"
                         data-tip={"Last modified (any note or the sample itself)" + (lastModifiedUserDisplayTitle ? " by " + lastModifiedUserDisplayTitle : "")}>
-                        <i className={"icon icon-calendar far mr-07" + (dateAnyNoteLastModified ? "" : " text-muted")}/>
+                        <i className={"icon icon-calendar far me-07" + (dateAnyNoteLastModified ? "" : " text-muted")}/>
                         { dateAnyNoteLastModified ?
                             <LocalizedTime timestamp={dateAnyNoteLastModified} />
                             : <em>N/A</em> }
                     </div>
                     <div className="col-auto text-small" data-tip={"Date added to interpretation"  + (selectedByUserDisplayTitle ? " by " + selectedByUserDisplayTitle : "")}>
-                        <i className="icon icon-calendar-plus far mr-07"/>
+                        <i className="icon icon-calendar-plus far me-07"/>
                         <LocalizedTime timestamp={date_selected} />
                     </div>
                 </div>
@@ -603,7 +603,7 @@ export const ACMGClassificationColumn = React.memo(function ACMGClassificationCo
     }
     return (
         <React.Fragment>
-            { showIcon ? <i className="status-indicator-dot mr-1" data-status={acmgClassification}/> : null }
+            { showIcon ? <i className="status-indicator-dot me-1" data-status={acmgClassification}/> : null }
             { acmgClassification }
         </React.Fragment>
     );
@@ -614,20 +614,20 @@ export const DiscoveryCandidacyColumn = React.memo(function DiscoveryCandidacyCo
     const labelStyle = useMemo(function(){ return { "width" : 70 }; }); // Don't create new object reference each re-render
     return (
         <React.Fragment>
-            <div className="text-left">
-                <span className="font-italic text-muted d-inline-block" style={labelStyle}>Gene: </span>
+            <div className="text-start">
+                <span className="fst-italic text-muted d-inline-block" style={labelStyle}>Gene: </span>
                 { geneCandidacy ?
-                    <span className="text-left">
-                        <i className="status-indicator-dot mr-1" data-status={geneCandidacy}/>
+                    <span className="text-start">
+                        <i className="status-indicator-dot me-1" data-status={geneCandidacy}/>
                         { geneCandidacy }
                     </span>
                     : <PlaceHolderStatusIndicator showIcon={showIcon} /> }
             </div>
-            <div className="text-left">
-                <span className="font-italic text-muted d-inline-block" style={labelStyle}>Variant: </span>
+            <div className="text-start">
+                <span className="fst-italic text-muted d-inline-block" style={labelStyle}>Variant: </span>
                 { variantCandidacy ?
-                    <span className="w-100 text-left">
-                        { showIcon ? <i className="status-indicator-dot mr-1" data-status={variantCandidacy}/> : null }
+                    <span className="w-100 text-start">
+                        { showIcon ? <i className="status-indicator-dot me-1" data-status={variantCandidacy}/> : null }
                         { variantCandidacy }
                     </span>
                     : <PlaceHolderStatusIndicator showIcon={showIcon} /> }
@@ -647,7 +647,7 @@ function InterpretationTabVariantSampleTitle(props){
     if (anyUnsavedChanges) {
         return (
             <React.Fragment>
-                <i className={`icon align-middle icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas mr-12`}/>
+                <i className={`icon align-middle icon-fw title-prefix-icon icon-${isDeleted ? "trash text-danger" : "check text-success"} fas me-12`}/>
                 <span className={"text-" + (isDeleted? "muted": "secondary")}>{ variantDisplayTitle }</span>
             </React.Fragment>
         );
@@ -655,7 +655,7 @@ function InterpretationTabVariantSampleTitle(props){
         const targetHref = vsID + "?showInterpretation=True&interpretationTab=1" + (caseAccession ? '&caseSource=' + caseAccession : '');
         return (
             <React.Fragment>
-                <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas mr-12`}
+                <i className={`icon align-middle icon-fw title-prefix-icon icon-${noSavedNotes ? "pen" : "sticky-note"} fas me-12`}
                     data-tip={noSavedNotes ? "This sample has no annotations yet" : "This sample has at least one annotation saved"}/>
                 <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
                     data-child-window={vsUUID} className="btn btn-link p-0 text-larger text-600 text-truncate">
@@ -682,14 +682,14 @@ const CaseReviewTabVariantSampleTitle = React.memo(function CaseReviewTabVariant
     return (
         <React.Fragment>
             <i data-tip={savedNotesTip} data-html className={
-                "icon align-middle icon-fw title-prefix-icon fas mr-12 icon-"
+                "icon align-middle icon-fw title-prefix-icon fas me-12 icon-"
                 + (noSavedNotes ? "exclamation-triangle text-warning"
                     : countNotesInReport > 0 ? "file-alt text-secondary"
                         : "minus-circle text-secondary")
             } />
             <span className="text-secondary">{ variantDisplayTitle }</span>
             { countNotesInKnowledgeBase > 0 ?
-                <i className="icon align-middle icon-fw icon-database fas ml-12 text-muted" data-html
+                <i className="icon align-middle icon-fw icon-database fas ms-12 text-muted" data-html
                     data-tip={`This sample has <b>${countNotesInKnowledgeBase}</b> (of ${countNotesInReport}) note${countNotesInKnowledgeBase === 1 ? "" : "s"} which have been saved to project.`}/>
                 : null }
         </React.Fragment>
@@ -711,12 +711,12 @@ const ActionsDropdown = React.memo(function ActionsDropdown(props){
         <DropdownButton size="sm" variant="light" className="d-inline-block" onSelect={onSelect}
             title={
                 <React.Fragment>
-                    <i className="icon icon-bars fas mr-07"/>
+                    <i className="icon icon-bars fas me-07"/>
                     Actions
                 </React.Fragment>
             }>
             <DropdownItem key={0} eventKey="delete">
-                <i className={"icon mr-08 icon-fw fas icon-" + (isDeleted ? "trash-restore" : "trash")} />
+                <i className={"icon me-08 icon-fw fas icon-" + (isDeleted ? "trash-restore" : "trash")} />
                 { isDeleted ? "Unmark from deletion" : "Mark for deletion" }
             </DropdownItem>
         </DropdownButton>
@@ -772,7 +772,7 @@ function ClassificationDropdown(props){
     }
 
     const unsavedIndicator = (
-        <i className="icon icon-asterisk fas mr-06 text-danger text-smaller"
+        <i className="icon icon-asterisk fas me-06 text-danger text-smaller"
             data-delay={500} data-tip="Not yet saved, click 'Update Findings' to apply."/>
     );
 
@@ -807,7 +807,7 @@ function ClassificationDropdown(props){
     // Right now we allow to select 1 tag per VS, but could support multiple theoretically later on.
 
     return (
-        <div className="py-1 py-lg-0 pr-lg-12">
+        <div className="py-1 py-lg-0 pe-lg-12">
             <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
                 disabled={!haveVSEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
                 data-delay={500} data-tip={tooltip}>
@@ -852,7 +852,7 @@ function FilterBlocksUsedPopovers (props) {
 
     return (
         <React.Fragment>
-            <i className={`icon icon-object-${filterBlocksIntersected ? "group" : "ungroup"} far mr-07`}
+            <i className={`icon icon-object-${filterBlocksIntersected ? "group" : "ungroup"} far me-07`}
                 data-tip={"Filter blocks matched when this sample was added." +
                     (filterBlocksIntersected ? " Search result came from intersecting these filter blocks." : "")} />
             { links }
@@ -890,8 +890,8 @@ function FilterBlockPopover(props){
 
 const PlaceHolderStatusIndicator = React.memo(function PlaceHolderStatusIndicator({ showIcon = true }){
     return (
-        <span className="text-left text-muted text-truncate">
-            { showIcon ? <i className="status-indicator-dot mr-1" data-status="Not Available" /> : null }
+        <span className="text-start text-muted text-truncate">
+            { showIcon ? <i className="status-indicator-dot me-1" data-status="Not Available" /> : null }
             Not Available
         </span>
     );
@@ -1124,7 +1124,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                         <div>
                                             { classification?
                                                 <React.Fragment>
-                                                    <i className="status-indicator-dot ml-1 mr-1" data-status={classification} />{classification}
+                                                    <i className="status-indicator-dot ms-1 me-1" data-status={classification} />{classification}
                                                 </React.Fragment>
                                                 : <em>None Defined</em> }
                                         </div>
@@ -1158,7 +1158,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                         <div>
                                             { gene_candidacy ?
                                                 <React.Fragment>
-                                                    <i className="status-indicator-dot ml-1 mr-1" data-status={gene_candidacy} />{gene_candidacy}
+                                                    <i className="status-indicator-dot ms-1 me-1" data-status={gene_candidacy} />{gene_candidacy}
                                                 </React.Fragment>
                                                 : <em>None Defined</em> }
                                         </div>
@@ -1169,7 +1169,7 @@ const VariantSampleExpandedNotes = React.memo(function VariantSampleExpandedNote
                                         <div>
                                             { variant_candidacy ?
                                                 <React.Fragment>
-                                                    <i className="status-indicator-dot ml-1 mr-1" data-status={variant_candidacy} />{variant_candidacy}
+                                                    <i className="status-indicator-dot ms-1 me-1" data-status={variant_candidacy} />{variant_candidacy}
                                                 </React.Fragment>
                                                 : <em>None Defined</em> }
                                         </div>

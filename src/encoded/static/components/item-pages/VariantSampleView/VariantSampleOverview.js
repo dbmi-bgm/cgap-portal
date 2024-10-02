@@ -339,7 +339,7 @@ export const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
-                <i className="icon icon-spin icon-circle-notch fas mr-07"/>
+                <i className="icon icon-spin icon-circle-notch fas me-07"/>
                 : title }
         </button>
     );
@@ -638,7 +638,7 @@ const ACMGInvokableRule = React.memo(function ACMGInvokableRule(props) {
     }, [ toggleRuleStrengthOptionsPopover, strength ]); // 'rule' is already compared in toggleRuleStrengthOptionsPopover useCallback wrapper.
 
     return (
-        <div ref={thisRef} className="acmg-invoker clickable ml-02 mr-02 flex-grow-1" key={rule} data-criteria={rule} data-invoked={!!strength}
+        <div ref={thisRef} className="acmg-invoker clickable ms-02 me-02 flex-grow-1" key={rule} data-criteria={rule} data-invoked={!!strength}
             onClick={onClick} data-html data-tip={acmgTip(rule, description)}>
             { rule }
         </div>

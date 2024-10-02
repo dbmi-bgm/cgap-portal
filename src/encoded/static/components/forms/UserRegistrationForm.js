@@ -424,11 +424,11 @@ class LookupProjectField extends React.PureComponent {
 
         return (
             <React.Fragment>
-                <div className="flexrow ml-0 mr-0">
+                <div className="flexrow ms-0 me-0">
                     { currProjectTitle }
                     <div className="field-buttons">
                         { currentProjectDetails && currentProjectDetails['@id'] ?
-                            <button type="button" onClick={onClear} className="btn btn-secondary mr-05">
+                            <button type="button" onClick={onClear} className="btn btn-secondary me-05">
                                 Clear
                             </button>
                             : null }
