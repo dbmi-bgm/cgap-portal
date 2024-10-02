@@ -860,7 +860,7 @@ class SVGeneNotePanel extends React.PureComponent {
                 <SVGeneInterpretationSubmitButton highlightedGeneChangedSinceLastSave={isHighlightedGeneUnsaved} selectedGeneID={highlightedGeneID_wip}
                     {...{ hasEditPermission, geneAtIDToGeneMap }} saveHighlightedGene={this.saveHighlightedGeneWrapper} />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
+                    <button type="button" className="btn btn-primary w-100 mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
                     </button> : null}
             </div>
@@ -1155,7 +1155,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
+                    <button type="button" className="btn btn-primary w-100 mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
                     </button> : null}
             </div>
@@ -1377,10 +1377,10 @@ function SVGeneInterpretationSubmitButton(props) {
     } = props;
 
     return (
-        <div data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item.": null }>
-            <Button variant="primary" className={"btn-block " + cls} onClick={() => saveHighlightedGene(geneAtIDToGeneMap[selectedGeneID])}
+        <div className="d-grid gap-1" data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item." : null} >
+            <Button variant="primary" className={cls} onClick={() => saveHighlightedGene(geneAtIDToGeneMap[selectedGeneID])}
                 disabled={!hasEditPermission || !highlightedGeneChangedSinceLastSave}>
-                { !hasEditPermission ? "Need Edit Permission": "Save Highlighted Gene" }
+                {!hasEditPermission ? "Need Edit Permission" : "Save Highlighted Gene"}
             </Button>
         </div>
     );
@@ -1412,18 +1412,18 @@ function GenericInterpretationSubmitButton(props) {
     if (isCurrent || isApproved || !hasEditPermission) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <div data-tip={dataTip}>
-                <Button variant="primary" disabled className={"btn-block " + cls}>
-                    { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
+            <div className="d-grid gap-1" data-tip={dataTip}>
+                <Button variant="primary" disabled className={cls}>
+                    {!hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved"}
                 </Button>
             </div>
         );
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
-            <div data-tip={dataTip}>
-                <Button variant="primary" className={"btn-block " + cls} onClick={saveAsDraft} data-tip={dataTip}
+            <div className="d-grid gap-1" data-tip={dataTip} >
+                <Button variant="primary" className={cls} onClick={saveAsDraft} data-tip={dataTip}
                     disabled={allButtonsDropsDisabled}>
-                    { isDraft ? "Re-save as Draft": "Save as Draft" }
+                    {isDraft ? "Re-save as Draft" : "Save as Draft"}
                 </Button>
             </div>
         );

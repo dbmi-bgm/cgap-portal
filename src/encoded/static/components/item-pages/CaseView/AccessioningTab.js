@@ -15,10 +15,10 @@ export const AccessioningTab = React.memo(function AccessioningTab(props) {
     const secondaryFamiliesLen = secondaryFamilies.length;
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
-        <div className="pt-2">
+        <div className="pt-2 d-grid gap-1">
             <button
                 type="button"
-                className="btn btn-block btn-outline-dark"
+                className="btn btn-outline-dark"
                 onClick={
                     function () {
                         setSecondaryFamiliesOpen(function (currentIsSecondaryFamiliesOpen) {

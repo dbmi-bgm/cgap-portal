@@ -389,10 +389,12 @@ export class SaveFilterSetPresetButton extends React.Component {
                         <p className="mb-16">
                             It may take some time before the preset is visible in list of presets and available for import.
                         </p>
-                        <button type="button" className="btn btn-success btn-block"
-                            onClick={this.onHideModal} autoFocus>
-                            OK
-                        </button>
+                        <div className="d-grid gap-1">
+                            <button type="button" className="btn btn-success"
+                                onClick={this.onHideModal} autoFocus>
+                                OK
+                            </button>
+                        </div>
                     </div>
                 );
             }
@@ -404,9 +406,11 @@ export class SaveFilterSetPresetButton extends React.Component {
                             Failed to create preset FilterSet
                         </h4>
                         <p className="mb-16 mt-0">You may not have permission yet to create new FilterSets. Check back again later or report to developers.</p>
-                        <button type="button" className="btn btn-warning btn-block" onClick={this.onHideModal}>
-                            Close
-                        </button>
+                        <div className="d-grid gap-1">
+                            <button type="button" className="btn btn-warning" onClick={this.onHideModal}>
+                                Close
+                            </button>
+                        </div>
                     </div>
                 );
             }

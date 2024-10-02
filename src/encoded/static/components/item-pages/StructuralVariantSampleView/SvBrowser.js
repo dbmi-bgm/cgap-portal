@@ -461,7 +461,7 @@ export class SvBrowser extends React.PureComponent {
                 <div className="d-block mb-1">
                   <button
                     type="button"
-                    className="btn btn-primary btn-block"
+                    className="btn btn-primary w-100"
                     onClick={this.exportDisplay}
                   >
                     <i className="icon icon-download icon-sm fas me-1"></i>
