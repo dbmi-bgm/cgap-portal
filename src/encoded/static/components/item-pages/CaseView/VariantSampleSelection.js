@@ -808,7 +808,7 @@ function ClassificationDropdown(props){
 
     return (
         <div className="py-1 py-lg-0 pe-lg-12">
-            <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" menuAlign="right" title={title} onSelect={onOptionSelect}
+            <DropdownButton size="sm" variant="outline-dark d-flex align-items-center" align="right" title={title} onSelect={onOptionSelect}
                 disabled={!haveVSEditPermission || tags.length === 0 || searchType === "StructuralVariantSample"}
                 data-delay={500} data-tip={tooltip}>
                 { renderedOptions }
