@@ -478,7 +478,7 @@ const hg19PopoverContent = (
 
         <p>
             For structural variants, both the start and end coordinates are converted to hg19 via an
-            implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If
+            implementation of <a href="https://github.com/konstantint/pyliftover" className="link-hover-underline">LiftOver</a>. If
             either one of these conversions fails, the variant will not be available in hg19
             coordinates.
         </p>

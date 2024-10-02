@@ -112,7 +112,7 @@ function SQCMAccordionDrawer(props) {
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
                     }}>
-                        <a href={atID} className="text-uppercase text-600 d-block text-small me-2">{individual_id || individual_accession}</a>
+                        <a href={atID} className="text-uppercase text-600 d-block text-small me-2 link-underline-hover">{individual_id || individual_accession}</a>
                     </div>
                     <div className="card-body px-5">
                         <SomaticBioinfoStatTable {...{ sample, individual }}/>

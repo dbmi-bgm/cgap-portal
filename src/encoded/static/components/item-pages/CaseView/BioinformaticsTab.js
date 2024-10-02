@@ -72,13 +72,13 @@ export const BioinformaticsTab = React.memo(function BioinformaticsTab(props) {
 const bioinfoPopoverContent = {
     predictedSexAndAncestry: (
         <div>
-            Sex and ancestry of each sample is predicted using the QC tool <a href="https://github.com/brentp/peddy" target="_blank" rel="noreferrer">peddy</a>.
-            For more info see peddy’s <a href="https://peddy.readthedocs.io/en/latest/" target="_blank" rel="noreferrer">documentation</a>.
+            Sex and ancestry of each sample is predicted using the QC tool <a href="https://github.com/brentp/peddy" target="_blank" rel="noreferrer" className="link-underline-hover">peddy</a>.
+            For more info see peddy’s <a href="https://peddy.readthedocs.io/en/latest/" target="_blank" rel="noreferrer" className="link-underline-hover">documentation</a>.
         </div>
     ),
     filteredSNVIndelVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SNV_germline/Pages/SNV_germline-step-filtering.html" target="_blank" rel="noreferrer" className="link-underline-hover">hard filters are applied</a> to
             remove variants that will not be of interest. This lowers the number of variants returned from the millions to the thousands.
             Briefly, these filters include: (1) removing intergenic variants; (2) including some variants based on VEP, ClinVar, and SpliceAI
             annotations; (3) Removing variants with only intronic consequences; and (4) removing common variants based on gnomAD population allele
@@ -87,7 +87,7 @@ const bioinfoPopoverContent = {
     ),
     filteredSVVariants: (
         <div>
-            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer">hard filters are applied</a> to
+            During processing, <a href="https://cgap-pipeline-main.readthedocs.io/en/latest/Pipelines/Downstream/SV_germline/Pages/SV_germline-step-part-3.html" target="_blank" rel="noreferrer" className="link-underline-hover">hard filters are applied</a> to
             remove structural variants (SVs) that will not be of interest. This limits the numbers and types of SVs returned from thousands
             to fewer than 500. Briefly, these filters include: (1) including SVs based on VEP annotations; (2) removing SVs with only intronic
             or intergenic consequences; (3) selecting SVs based on SV type (e.g., DEL and DUP); (3) removing common variants based on gnomAD-SV
@@ -166,7 +166,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Sex" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     {mapLongFormSexToLetter(predictedSex.value) || fallbackElem}&nbsp;
-                    {!!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a>}
+                    {!!predictedSex.link && <a href={predictedSex.link} target="_blank" rel="noreferrer" className="text-small link-underline-hover">(see peddy QC report)</a>}
                     {predictedSex.flag && <i className={`icon icon-flag fas text-${flagToBootstrapClass(predictedSex.flag)} ms-02`} />}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Heterozygosity ratio" popoverContent={bioinfoPopoverContent.heterozygosity}>
@@ -183,7 +183,7 @@ function BioinfoStatTable({ qualityControlMetrics }) {
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="Predicted Ancestry" popoverContent={bioinfoPopoverContent.predictedSexAndAncestry}>
                     {predictedAncestry.value || fallbackElem}&nbsp;
-                    {!!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small">(see peddy QC report)</a>}
+                    {!!predictedAncestry.link && <a href={predictedAncestry.link} target="_blank" rel="noreferrer" className="text-small link-underline-hover">(see peddy QC report)</a>}
                 </BioinfoStatsEntry>
                 <BioinfoStatsEntry label="SNV/Indel De novo Fraction">
                     {deNovo.value || fallbackElem}
@@ -258,7 +258,7 @@ function QCMAccordionDrawer(props) {
                         borderTop: "1px solid rgba(0, 0, 0, 0.08)",
                         borderBottom: "1px solid rgba(0, 0, 0, 0.08)"
                     }}>
-                        <a href={atID} className="text-uppercase text-600 d-block text-small me-2">{individual_id || individual_accession}</a>
+                        <a href={atID} className="text-uppercase text-600 d-block text-small me-2 link-underline-hover">{individual_id || individual_accession}</a>
                         <span className="gen-identifier text-600 text-serif text-small pt-03">{idToGraphIdentifier[atID]}</span>&nbsp;
                     </div>
                     <div className="card-body px-5">

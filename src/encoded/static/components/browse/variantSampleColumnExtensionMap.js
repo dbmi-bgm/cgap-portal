@@ -450,7 +450,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
                 <i className="icon icon-star fas text-primary" data-tip="Highlighted gene" />:&nbsp;
                 { highlighted_genes.map((gene) => {
                     const { display_title, "@id": atID } = gene;
-                    return <span key="atID" className="ms-02"><a href={atID}>{display_title}</a></span>;
+                    return <span key="atID" className="ms-02"><a href={atID} className="link-underline-hover">{display_title}</a></span>;
                 })}
             </div>
         );
@@ -471,13 +471,13 @@ const StructuralVariantTranscriptCSQGeneColumn = React.memo(function({ result })
     const genes = Object.keys(transcriptsDeduped);
 
     if (genes.length <= 2) { // show comma separated
-        return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
+        return <a href={path} target="_blank" rel="noreferrer" className="link-underline-hover">{genes.join(", ")}</a>;
     }
     // show first and last gene separated by "..." with first 10 available on hover
     const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
     const tipGenes = genes.slice(0, lastItemIndex).join(", ");
 
-    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
+    return <a href={path} target="_blank" rel="noreferrer" className="link-underline-hover" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
 });
 
 export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLabelColumn(props){

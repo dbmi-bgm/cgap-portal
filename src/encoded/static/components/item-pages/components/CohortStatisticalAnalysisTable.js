@@ -96,7 +96,7 @@ function ShowMore({ recordDifference, onClick }) {
   if (recordDifference > 0) {
     return (
       <div className="text-center py-3" onClick={onClick}>
-        <a href="#">Show more ({recordDifference})</a>
+        <a href="#" className="link-hover-underline">Show more ({recordDifference})</a>
       </div>
     );
   }

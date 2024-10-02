@@ -653,8 +653,8 @@ class PanelTwo extends React.PureComponent {
                     <div className="mt-1">
                         {/*TODO: update this with family history links */}
                         { ingestionType === "genelist" ?
-                            <>Click <a href="/help/submission/gene-lists" target="_blank" rel="noreferrer">here</a> for more on how to format your genelist submission document.</>
-                            : <>Click <a href="/help/submission/accessioning" target="_blank" rel="noreferrer">here</a> for more on how to format your accession submission document.</>}
+                            <>Click <a href="/help/submission/gene-lists" target="_blank" rel="noreferrer" className="link-underline-hover">here</a> for more on how to format your genelist submission document.</>
+                            : <>Click <a href="/help/submission/accessioning" target="_blank" rel="noreferrer" className="link-underline-hover">here</a> for more on how to format your accession submission document.</>}
                     </div>
                     <hr className="mb-1"/>
                     <div className="field-section mt-2">
@@ -730,7 +730,7 @@ function CreatedItemsTable(props) {
         }
         const label = (
             <React.Fragment>
-                <a className="text-600" href={atID} target="_blank" rel="noreferrer">{alias}</a>
+                <a className="text-600 link-underline-hover" href={atID} target="_blank" rel="noreferrer">{alias}</a>
                 <i className="icon icon-external-link-alt fas text-smaller ms-05"></i>
             </React.Fragment>
         );

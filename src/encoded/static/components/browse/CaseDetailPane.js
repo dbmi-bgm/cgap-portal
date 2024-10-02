@@ -285,7 +285,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                 label={<StackedBlockNameLabel title="Sample" subtitle="Library" accession={accession} subtitleVisible/>}>
                 <StackedBlockName>
                     <div className="name-title text-start pt-2 pb-2">
-                        { atId ? <a href={atId}>{ workup_type }</a> : <span>{ workup_type }</span> }
+                        { atId ? <a href={atId} className="link-underline-hover">{ workup_type }</a> : <span>{ workup_type }</span> }
                     </div>
                 </StackedBlockName>
                 <StackedBlockList className="analysis" title="Analysis">
@@ -364,11 +364,11 @@ export class FamilyReportStackedTable extends React.PureComponent {
                         <StackedBlockName>
                             <div className="d-flex text-start">
                                 <span className="me-07 text-nowrap">Case ID:</span>
-                                { caseAtId ? <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
+                                { caseAtId ? <a href={caseAtId} className="name-title text-capitalize link-underline-hover">{ case_title }</a> : <span className="name-title text-capitalize">{ case_title }</span>}
                             </div>
                             <div className="d-flex text-start">
                                 <span className="me-07 text-nowrap">Report:</span>
-                                { reportAtId ? <a href={reportAtId} className="name-title text-capitalize">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
+                                { reportAtId ? <a href={reportAtId} className="name-title text-capitalize link-underline-hover">{ reportTitle }</a> : <span className="name-title text-capitalize">{ reportTitle }</span>}
                             </div>
                         </StackedBlockName>
                     </StackedBlock>);
@@ -381,7 +381,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                             <div className="d-flex text-start">
                                 <span className="me-07 text-nowrap">Case ID:</span>
                                 { caseAtId ?
-                                    <a href={caseAtId} className="name-title text-capitalize">{ case_title }</a>
+                                    <a href={caseAtId} className="name-title text-capitalize link-underline-hover">{ case_title }</a>
                                     : <span className="name-title text-capitalize">{ case_title }</span>
                                 }
                             </div>
@@ -397,7 +397,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
                 <StackedBlockName>
                     <div className="name-title pt-2 pb-2 text-start">
                         { atId ?
-                            <a href={atId} className="text-capitalize">
+                            <a href={atId} className="text-capitalize link-underline-hover">
                                 { role || display_title }
                             </a>
                             : <span className="text-capitalize">{ role || display_title }</span>
@@ -418,7 +418,7 @@ export class FamilyReportStackedTable extends React.PureComponent {
 
         const showMoreExtTitle = (
             <React.Fragment>
-                { preventExpand ? <a href={object.itemUtil.atId(family)}>(view Family)</a> : null }
+                { preventExpand ? <a href={object.itemUtil.atId(family)} className="link-underline-hover">(view Family)</a> : null }
             </React.Fragment>
         );
 

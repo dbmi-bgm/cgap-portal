@@ -47,20 +47,20 @@ export const UserRegistrationModal = React.memo(function UserRegistrationModal(p
             <ul>
                 <li>
                     Please <span className="text-500">register below</span> or{' '}
-                    <a href="#" className="text-500" onClick={onExitLinkClick}>use a different email address</a>{' '}
+                    <a href="#" className="text-500 link-underline-hover" onClick={onExitLinkClick}>use a different email address</a>{' '}
                     if you have an existing account.
                 </li>
                 <li>
-                    For information on the CGAP login process, see our documentation <a href="/help/logging-in" target="_blank" rel="noreferrer noopener">here.</a>
+                    For information on the CGAP login process, see our documentation <a href="/help/logging-in" target="_blank" rel="noreferrer noopener" className="link-underline-hover">here.</a>
                 </li>
                 <li>
-                    This registration form will only work on the <a href="https://cgap-training.hms.harvard.edu" target="_blank" rel="noreferrer noopener">cgap-training</a> environment.
+                    This registration form will only work on the <a href="https://cgap-training.hms.harvard.edu" target="_blank" rel="noreferrer noopener" className="link-underline-hover">cgap-training</a> environment.
                     If you are not on this environment, please reach out to the CGAP team for help with account creation.
                 </li>
                 { isEmailAGmail?
                     <li>
                         If you prefer, you can use your institutional email address as your account ID by creating a new google account at{' '}
-                        <a href="https://accounts.google.com/signup/v2" target="_blank" rel="noopener noreferrer" onClick={onGoogleLinkClick}>
+                        <a href="https://accounts.google.com/signup/v2" target="_blank" rel="noopener noreferrer" onClick={onGoogleLinkClick} className="link-underline-hover">
                             https://accounts.google.com/signup/v2
                         </a> and selecting &quot;Use my current email address instead&quot;.
                     </li>

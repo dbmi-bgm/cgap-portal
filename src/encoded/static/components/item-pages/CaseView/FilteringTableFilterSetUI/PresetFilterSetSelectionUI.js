@@ -327,7 +327,7 @@ export class PresetFilterSetSelectionUI extends React.PureComponent {
                     <div className="row align-items-center">
                         <h5 className="col text-400 my-0">
                             <i className="icon icon-copy far me-08"/>
-                            <a href="/search/?type=FilterSet" className="text-body" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
+                            <a href="/search/?type=FilterSet" className="text-body link-underline-hover" target="_blank" data-delay-show={1000} data-tip="View all saved FilterSets">Presets</a>
                             { nextToTitleIcon }
                         </h5>
                         { !isCheckingForNewFilterSet && !isLoadingPresets ?

@@ -189,7 +189,7 @@ export default class DefaultItemView extends React.PureComponent {
                 }
                 Alerts.queue({
                     'title' : "Redirected",
-                    'message': <span>You have been redirected from <a href={ourOldItem['@id']}>{ redirected_from_accession }</a>, which this item ({ context.accession }) supercedes.</span>,
+                    'message': <span>You have been redirected from <a href={ourOldItem['@id']} className="link-underline-hover">{ redirected_from_accession }</a>, which this item ({ context.accession }) supercedes.</span>,
                     'style': 'warning'
                 });
             }, 'GET', (err)=>{

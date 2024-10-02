@@ -305,7 +305,7 @@ export default class UserRegistrationForm extends React.PureComponent {
                         </div>
                         <div className="col-12 col-lg-7">
                             <p>
-                                By signing up, you are agreeing to our <a href="/help/about/privacy-policy" target="_blank" rel="noreferrer noopener">Privacy Policy</a>.
+                                By signing up, you are agreeing to our <a href="/help/about/privacy-policy" target="_blank" rel="noreferrer noopener" className="link-underline-hover">Privacy Policy</a>.
                                 <br/>
                                 We may track your usage of the portal to help improve the quality of user experience and/or security assurance purposes.
                             </p>
@@ -410,7 +410,7 @@ class LookupProjectField extends React.PureComponent {
             currentProjectDetails && currentProjectDetails['@id'] && currentProjectDetails.display_title && (
                 <div style={LookupProjectField.fieldTitleColStyle}>
                     <a href={object.itemUtil.atId(currentProjectDetails)} target="_blank" data-tip="View project in new tab"
-                        rel="noopener noreferrer" style={{ verticalAlign: "middle" }}>
+                        rel="noopener noreferrer" style={{ verticalAlign: "middle" }} className="link-underline-hover">
                         { currentProjectDetails.display_title }
                     </a>
                     &nbsp;&nbsp;<i className="icon icon-fw icon-external-link-alt fas text-small"/>

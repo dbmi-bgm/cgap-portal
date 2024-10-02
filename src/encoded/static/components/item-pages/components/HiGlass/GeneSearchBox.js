@@ -189,6 +189,7 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
         <small>
           <a
             href="#"
+            className="link-hover-underline"
             onClick={(evt) => handleResultClick(evt, result.geneName)}
           >
             {result.geneName}

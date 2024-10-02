@@ -33,7 +33,7 @@ export default class HealthView extends React.PureComponent {
 
     static termTransformFxn(field, term){
         if (field === "foursight" && term && term.slice(0,4) === "http") {
-            return <a href={term} target="_blank" rel="noopener noreferrer">{ term }</a>;
+            return <a href={term} target="_blank" rel="noopener noreferrer" className="link-underline-hover">{ term }</a>;
         }
         return Term.toName(field, term, true);
     }

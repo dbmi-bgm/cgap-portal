@@ -113,7 +113,7 @@ class SomaticAccessionStackedTable extends React.PureComponent {
                 { atId && workup_type ?
                     <StackedBlockName className="flex-row align-items-center justify-content-between">
                         <div className="d-flex">
-                            <a href={atId} data-tip="View Sample" className="name-title">
+                            <a href={atId} data-tip="View Sample" className="name-title link-underline-hover">
                                 { workup_type }
                             </a>
                         </div>
@@ -122,7 +122,7 @@ class SomaticAccessionStackedTable extends React.PureComponent {
                     <StackedBlockName>
                         { workup_type ? null : "No workup type found for sample"}
                         { atId ?
-                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className="name-title">
+                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className="name-title link-underline-hover">
                                 { workup_type || accession }
                             </a> : <span className="name-title">{ workup_type || accession }</span>}
                     </StackedBlockName>
@@ -155,7 +155,7 @@ class SomaticAccessionStackedTable extends React.PureComponent {
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
                     <div className="d-flex flex-column individual-role pe-2">
                         { atId &&
-                            <a href={atId} className="name-title mx-0 text-truncate text-capitalize current-case">
+                            <a href={atId} className="name-title mx-0 text-truncate text-capitalize current-case link-underline-hover">
                                 Individual
                             </a>
                         }

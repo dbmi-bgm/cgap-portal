@@ -325,7 +325,7 @@ const hg19PopoverContent = (
         </p>
         <p>
             To calculate the variant for hg19 coordinates, the hg38 position is converted to hg19
-            via an implementation of <a href="https://github.com/konstantint/pyliftover">LiftOver</a>. If the hg19 conversion
+            via an implementation of <a href="https://github.com/konstantint/pyliftover" className="link-hover-underline">LiftOver</a>. If the hg19 conversion
             is successful, the variant is then converted to HGSV format. If the HGSV conversion is
             also successful, the result will be displayed. Otherwise, only the hg38 coordinates for
             the variant will be displayed.

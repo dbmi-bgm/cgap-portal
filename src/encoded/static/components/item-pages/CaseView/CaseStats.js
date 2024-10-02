@@ -36,7 +36,7 @@ function mapFeaturesToBadges(features = []) {
         const { display_title = null, '@id': featureID } = feature;
         return (
             // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
-            <a className="badge badge-pill badge-info text-400 text-small d-inline-block me-03 mb-03 pb-04"
+            <a className="badge badge-pill badge-info text-400 text-small d-inline-block me-03 mb-03 pb-04 link-underline-hover"
                 href={featureID} target="_blank" rel="noopener noreferrer" key={featureID}>
                 { display_title }
             </a>
@@ -75,7 +75,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                         </h4>
                         { haveCaseEditPermission && individualAtID ?
                             <a href={individualAtID + "?currentAction=edit&callbackHref=" + caseAtID}
-                                className="text-white-50 ms-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
+                                className="text-white-50 ms-12 text-small link-underline-hover" data-tip="Edit Individual. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -98,7 +98,7 @@ export const CaseStats = React.memo(function CaseStats(props){
                         </h4>
                         { haveCaseEditPermission && familyAtID ?
                             <a href={familyAtID + "?currentAction=edit&callbackHref=" + caseAtID}
-                                className="text-white-50 ms-12 text-small" data-tip="Edit Family. Changes may take a few minutes to appear.">
+                                className="text-white-50 ms-12 text-small link-underline-hover" data-tip="Edit Family. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -152,7 +152,7 @@ export const PatientInfo = React.memo(function PatientInfo({ caseItem = null }) 
         <React.Fragment>
             <div className="card-text mb-1">
                 <label className="mb-0 me-06">Individual ID:</label>
-                <a href={individualAtID} target="_blank" rel="noopener noreferrer">
+                <a href={individualAtID} target="_blank" rel="noopener noreferrer" className="link-underline-hover">
                     { individual_id }
                 </a>
             </div>
@@ -220,7 +220,7 @@ export const FamilyInfo = React.memo(function FamilyInfo({ canonicalFamily }) {
             <div className="card-text mb-1">
                 <label className="mb-0">Family ID:</label>
                 {" "}
-                <a href={familyAtID} target="_blank" rel="noopener noreferrer">
+                <a href={familyAtID} target="_blank" rel="noopener noreferrer" className="link-underline-hover">
                     { familyTitle || familyDisplayTitle }
                 </a>
             </div>

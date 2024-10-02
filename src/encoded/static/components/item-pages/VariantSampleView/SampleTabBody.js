@@ -472,7 +472,7 @@ const CompoundHetTable = React.memo(function CompoundHetTable(props) {
                     return (
                         <tr key={i}>
                             <td className="text-600 text-start">
-                                { href ? <a href={href}>{variant}</a> : variant }
+                                { href ? <a href={href} className="link-hover-underline">{variant}</a> : variant }
                             </td>
                             <td className="text-start">{ phase }</td>
                             <td className="text-start">{ gene }</td>

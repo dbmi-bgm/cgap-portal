@@ -21,7 +21,7 @@ export const SomaticAnalysisStats = React.memo(function SomaticAnalysisStats(pro
                         </h4>
                         { haveSAEditPermission && individualAtID ?
                             <a href={individualAtID + "?currentAction=edit&callbackHref=" + somaticAnalysisAtID}
-                                className="text-white-50 ms-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
+                                className="text-white-50 ms-12 text-small link-underline-hover" data-tip="Edit Individual. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
@@ -85,7 +85,7 @@ export const IndividualInfo = React.memo(function IndividualInfo({ individual })
         <React.Fragment>
             <div className="card-text mb-1">
                 <label className="mb-0 me-06">Individual ID:&nbsp;</label>
-                <a href={individualAtID} target="_blank" rel="noopener noreferrer">
+                <a href={individualAtID} target="_blank" rel="noopener noreferrer" className="link-underline-hover">
                     { display_title || individual_id }
                 </a>
             </div>
@@ -141,7 +141,7 @@ export const SampleSummaryInfo = React.memo(function SampleSummaryInfo({ samples
                         <div className="card-text mb-1">
                             <label className="mb-0">ID:&nbsp;</label>
                             { bam_sample_id || display_title ?
-                                <a href={atID}>{bam_sample_id || display_title}</a>
+                                <a href={atID} className="link-underline-hover">{bam_sample_id || display_title}</a>
                                 : fallbackElem }
                         </div>
                         {appendLine && <hr/>}

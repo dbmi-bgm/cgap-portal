@@ -287,14 +287,15 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                         <a href={files[0].fileUrl || ""}
                             rel="noopener noreferrer"
                             target="_blank"
-                            data-tip={tooltips[0]}>
+                            data-tip={tooltips[0]}
+                            className="link-underline-hover">
                             { ext.toUpperCase() }
                         </a>
                         { files[0].hasQm ?
                             <a href={files[0].qmUrl || ""}
                                 rel="noopener noreferrer"
                                 target="_blank"
-                                className={`${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
+                                className={`link-underline-hover ${statusToTextClass(overallQuality)} qc-status-${files[0].status}`}
                                 data-tip={tooltips[1]}>
                                 <sup>QC</sup>
                             </a>
@@ -321,7 +322,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                                         <a href={qmUrl}
                                             rel="noopener noreferrer"
                                             target="_blank"
-                                            className={`${statusToTextClass(
+                                            className={`link-underline-hover ${statusToTextClass(
                                                 getFileQuality(numFail, numWarn))} qc-status-${status}`}
                                             data-tip={tooltips[1]}>
                                             <sup>QC</sup>
@@ -455,7 +456,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                 { isProband ? <span className="fw-bold d-block">Proband</span> : null}
                 { (role && role !== "proband") ? <span className="d-block fw-semibold text-capitalize">{role}</span> : null}
                 { genID ? <span className="text-serif text-small gen-identifier d-block text-center">{ genID }</span>: null}
-                <a href={indvId} className="accession d-block">{ individual_id || indvDisplayTitle }</a>
+                <a href={indvId} className="link-underline-hover accession d-block">{ individual_id || indvDisplayTitle }</a>
             </div>);
 
         samples.forEach(function(sample, sampleIdx){
@@ -499,7 +500,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                                     <LocalizedTime timestamp={specimen_collection_date} />
                                 </span>
                                 : null }
-                            <a href={samplePath} className="accession d-block">{ sampleTitle }</a>
+                            <a href={samplePath} className="link-underline-hover accession d-block">{ sampleTitle }</a>
                         </React.Fragment>
                     ),
                     individualGroup,
