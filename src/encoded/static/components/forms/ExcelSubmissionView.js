@@ -231,7 +231,7 @@ const LocalAlertsContainer = function LocalAlertsContainer(props) {
                 return (
                     <div key={title} className={"alert alert-dismissable alert-" + (style || 'danger') + (noCloseButton === true ? ' no-close-button' : '')}>
                         { noCloseButton !== true ?
-                            <button type="button" className="close" onClick={() => closeAlert(i)}>
+                            <button type="button" className="btn-close" onClick={() => closeAlert(i)}>
                                 <span aria-hidden="true">×</span>
                                 <span className="visually-hidden">Close alert</span>
                             </button>
