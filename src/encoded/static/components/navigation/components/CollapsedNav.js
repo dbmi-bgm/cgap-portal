@@ -135,7 +135,7 @@ function BrowseNavItem(props){
 
     const navLink = (
         <React.Fragment>
-            <span className="text-black">Browse</span>
+            <span>Browse</span>
         </React.Fragment>
     );
     const active = propActive !== false && bodyProps.isAnyActive;
