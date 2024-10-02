@@ -179,7 +179,7 @@ table.matrix {
 	.family-tables-container {
 
 		// Only when present on item page(s)
-		@include media-breakpoint-down(sm){
+		@include media-breakpoint-down(md){
 			.item-page-table-row-container & {
 				border-bottom: 1px solid #ddd;
 			}

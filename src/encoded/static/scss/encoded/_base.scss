@@ -46,7 +46,7 @@ $dropdown-link-hover-bg: #ddd;
 /*****************************/
 
 /* We override these with our own subset */
-$enable-print-styles: false;
+// $enable-print-styles: false;
 
 $grid-breakpoints: (
   xs: 0,
@@ -85,7 +85,7 @@ $navbar-default-brand-color: rgb(210, 218, 223);
     }
 }
 @mixin navbar-static-position {
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(md) {
         @content;
     }
 }

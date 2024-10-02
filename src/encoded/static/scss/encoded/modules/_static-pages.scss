@@ -183,7 +183,7 @@
     //}
   }
 
-  @include media-breakpoint-down(lg) {
+  @include media-breakpoint-down(xl) {
     > ol.inner {
       border-top: 1px solid #eee;
     }

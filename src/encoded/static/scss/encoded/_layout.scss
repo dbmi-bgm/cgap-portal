@@ -164,7 +164,7 @@ body {
 	width: auto;
 	padding-left: 1rem; /* == 16px */
 	padding-right: 1rem;
-	@include media-breakpoint-between(md, lg) {
+	@include media-breakpoint-between(md, xl) {
 		max-width: none;
 		padding-left: 1.5rem;
 		padding-right: 1.5rem;
@@ -433,7 +433,7 @@ body.is-full-screen {
 }
 
 
-@include media-breakpoint-down(xs) {
+@include media-breakpoint-down(sm) {
 
 	.text-left-xs {
 		// Make text left-aligned for collapsed mobile view(s),
