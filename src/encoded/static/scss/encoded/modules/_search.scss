@@ -166,6 +166,14 @@ $search-results-header-row-height: 52px; /* 46px is existing default for both re
       }
     }
   }
+
+  a {
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
 }
 
 /*** FACETS CONTAINER STICKY ***/

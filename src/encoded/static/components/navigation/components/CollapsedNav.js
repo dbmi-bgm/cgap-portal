@@ -188,7 +188,7 @@ const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
                         </a>
                     </div>
                     <div className="col-auto ps-0 ps-1-md">
-                        <a href="/cohort-analysis" className="curated-browsers-link btn btn-primary btn-link btn-sm mt-1">
+                        <a href="/cohort-analysis" className="curated-browsers-link btn btn-primary btn-sm mt-1">
                             View Cohort Browser
                         </a>
                     </div>
