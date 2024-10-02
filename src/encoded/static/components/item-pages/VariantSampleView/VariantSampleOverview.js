@@ -692,7 +692,7 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
 
     return (
         <Popover id={"acmg-strength-pop-"+rule}>
-            <Popover.Title className="m-0" as="h4">Select ACMG Rule Strength</Popover.Title>
+            <Popover.Header className="m-0" as="h4">Select ACMG Rule Strength</Popover.Header>
             <Popover.Body className="p-0">
                 <div className="list-group list-group-flush acmg-popover-strengths">
                     { strengthOptions.map((options) => {

@@ -866,7 +866,7 @@ function FilterBlockPopover(props){
 
     const popover = (
         <Popover className="filterset-block-popover">
-            <Popover.Title className="m-0 text-400 bg-secondary text-light" as="h5">{ name }</Popover.Title>
+            <Popover.Header className="m-0 text-400 bg-secondary text-light" as="h5">{ name }</Popover.Header>
             <Popover.Body className="rounded-bottom py-1">
                 <FilterBlock {...{ filterBlock, index, facetDict }} showTitle={false} />
             </Popover.Body>

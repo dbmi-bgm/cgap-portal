@@ -166,7 +166,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "ref": this.callTrueButtonRef,
             "jsx": (
                 <Popover id="technical-review-popover">
-                    <Popover.Title className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Title>
+                    <Popover.Header className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Header>
                     <Popover.Body className="px-0 py-1">
                         { options.slice(0,1).map(function(optionName, i){
                             return (
@@ -174,7 +174,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                             );
                         }) }
                     </Popover.Body>
-                    <Popover.Title className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Title>
+                    <Popover.Header className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Header>
                     <Popover.Body className="px-0 py-1">
                         { options.slice(1).map(function(optionName, i){
                             return (
@@ -221,7 +221,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "ref": this.callFalseButtonRef,
             "jsx": (
                 <Popover id="technical-review-popover">
-                    <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
+                    <Popover.Header className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Header>
                     <Popover.Body className="px-0 py-1">
                         { options.map(function(optionName, i){
                             return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="danger" />;
@@ -605,7 +605,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
 
     return (
         <React.Fragment>
-            <Popover.Title className="m-0 text-600" as="h5">Technical Review Note</Popover.Title>
+            <Popover.Header className="m-0 text-600" as="h5">Technical Review Note</Popover.Header>
             <Popover.Body className="p-2">
                 { lastSavedTechnicalReviewForResult ?
                     <h5 className="text-400">
@@ -745,7 +745,7 @@ function commonNoteUpsertProcess ({
             jsx: (
                 // Set 'key' prop to re-instantiate and force to reposition.
                 <Popover id="technical-review-popover-updating" key="update">
-                    <Popover.Title className="m-0 text-600" as="h5">Updating...</Popover.Title>
+                    <Popover.Header className="m-0 text-600" as="h5">Updating...</Popover.Header>
                     <Popover.Body className="p-2 text-center">
                         <i className="icon icon-spin icon-circle-notch icon-2x text-secondary fas py-4"/>
                         <p>Updating Technical Review</p>
@@ -971,7 +971,7 @@ function commonNoteUpsertProcess ({
                     ref: { ...existingBtnRef },
                     jsx: (
                         <Popover id="technical-review-popover" key="error">
-                            <Popover.Title className="m-0 text-600" as="h5">Error</Popover.Title>
+                            <Popover.Header className="m-0 text-600" as="h5">Error</Popover.Header>
                             <Popover.Body className="d-flex align-items-center" style={{ maxWidth: 320 }}>
                                 <div className="p-2 text-center">
                                     <i className="icon icon-exclamation-triangle icon-2x text-danger fas"/>
@@ -1201,7 +1201,7 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
 
     return (
         <Popover {...passProps} id="technical-review-popover" key="success-new-review" ref={ref}>
-            <Popover.Title className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Title>
+            <Popover.Header className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Header>
             <Popover.Body style={{ maxWidth: 320 }}>
                 <h5 className="my-0">NOTE:</h5>
                 <p className="mt-0">

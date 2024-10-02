@@ -29,7 +29,7 @@ const CaseNotesPopover = forwardRef(({
       ref={ref}
       {...popoverProps}
     >
-      <Popover.Title as="h3">Case Notes</Popover.Title>
+      <Popover.Header as="h3">Case Notes</Popover.Header>
       <Popover.Body>
         {
           lastSavedText.date ?
