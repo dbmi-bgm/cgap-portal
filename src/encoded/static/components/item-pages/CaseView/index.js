@@ -254,14 +254,14 @@ const CaseInfoTabView = React.memo(function CaseInfoTabView(props) {
         </div>
     );
 
-    if (PedigreeVizView && windowWidth !== null && (rgs === "lg" || rgs === "xl")) {
+    if (PedigreeVizView && windowWidth !== null && (rgs === "lg" || rgs === "xl" || rgs === "xxl")) {
         // at windowWidth === null, `rgs` defaults to 'lg' or 'xl' for serverside render
 
         if (rgs === "lg") {
             pedWidth = 400;
         }
 
-        if (rgs === "xl") {
+        if (rgs === "xl" || rgs === "xxl") {
             pedWidth = 560;
             if (windowWidth >= 1680) {
                 pedWidth = 800;

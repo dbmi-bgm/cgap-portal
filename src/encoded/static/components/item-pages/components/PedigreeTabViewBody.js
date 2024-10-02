@@ -183,7 +183,7 @@ export class PedigreeTabViewBody extends React.PureComponent {
         if (rgs !== "xs" && rgs !== "sm") {
             // Should be aligned with CSS stylesheet.
             // Tablet or higher size; detail pane opens to side
-            if (rgs === "xl") {
+            if (rgs === "xl" || rgs === "xxl") {
                 detailPaneOpenOffsetWidth += 400;
             } else {
                 detailPaneOpenOffsetWidth += 320;

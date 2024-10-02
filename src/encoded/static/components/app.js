@@ -1755,7 +1755,7 @@ class BodyElement extends React.PureComponent {
         let innerContainerMinHeight;
         if (mounted && windowHeight){
             const rgs = responsiveGridState(windowWidth);
-            if ({ 'xl' : 1, 'lg' : 1, 'md' : 1 }[rgs]){
+            if ({ 'xxl': 1, 'xl' : 1, 'lg' : 1, 'md' : 1 }[rgs]){
                 innerContainerMinHeight = (
                     // Hardcoded:
                     // - minus top nav full height, footer, [testWarning]
