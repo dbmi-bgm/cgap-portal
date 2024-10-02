@@ -14,7 +14,7 @@ import ErrorPage from './static-pages/ErrorPage';
 import { NavigationBar } from './navigation/NavigationBar';
 import { NotLoggedInAlert } from './navigation/components/LoginNavItem';
 import { Footer } from './Footer';
-import { store } from './../store';
+import { store, batchDispatch } from './../store';
 
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
 import { ajax, JWT, console, isServerSide, object, layout, analytics, memoizedUrlParse, WindowEventDelegator } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
@@ -98,7 +98,7 @@ export default class App extends React.PureComponent {
 
         const { context } = props;
 
-        Alerts.setStore(store);
+        Alerts.setStore(store, false);
 
         /**
          * Whether HistoryAPI is supported in current browser.
@@ -166,7 +166,7 @@ export default class App extends React.PureComponent {
         // Here we grab full-length href from window and then update props.href (via Redux), if it is different.
         const windowHref = (window && window.location && window.location.href) || href;
         if (href !== windowHref){
-            store.dispatch({ 'type' : { 'href' : windowHref } });
+            store.dispatch({ type: 'SET_HREF', payload: windowHref });
         }
 
         // ANALYTICS INITIALIZATION; Sets userID (if any), performs initial pageview track
@@ -612,12 +612,12 @@ export default class App extends React.PureComponent {
                 this.currentNavigationRequest.abort();
                 this.currentNavigationRequest = null;
             }
-            store.dispatch({
-                type: {
-                    'href' : windowHref,
-                    'context' : event.state
-                }
-            });
+
+            const dispatchDict = {
+                href: windowHref,
+                context: event.state
+            };
+            batchDispatch(store, dispatchDict);
         }
 
         // Always async update in case of server side changes.
@@ -673,9 +673,7 @@ export default class App extends React.PureComponent {
      * @returns {void}
      */
     onHashChange(event) {
-        store.dispatch({
-            type: { 'href' : document.querySelector('link[rel="canonical"]').getAttribute('href') }
-        });
+        store.dispatch({ type: 'SET_HREF', payload: document.querySelector('link[rel="canonical"]').getAttribute('href') });
     }
 
     /**
@@ -870,8 +868,8 @@ export default class App extends React.PureComponent {
                 if (!options.skipUpdateHref) {
                     reduxDispatchDict.href = targetHref + hashAppendage;
                 }
-                if (_.keys(reduxDispatchDict).length > 0){
-                    store.dispatch({ 'type' : reduxDispatchDict });
+                if (_.keys(reduxDispatchDict).length > 0) {
+                    batchDispatch(store, reduxDispatchDict);
                 }
                 return false;
             }
@@ -939,7 +937,8 @@ export default class App extends React.PureComponent {
                     }
 
                     reduxDispatchDict.context = response;
-                    store.dispatch({ 'type' : _.extend({}, reduxDispatchDict, includeReduxDispatch) });
+                    const payloadReduxDispatchDict = _.extend({}, reduxDispatchDict, includeReduxDispatch);
+                    batchDispatch(store, payloadReduxDispatchDict);
                     return response;
                 })
                 .then((response) => { // Finalize - clean up `slowLoad : true` if in state, run callbacks and analytics.
@@ -1160,7 +1159,7 @@ export default class App extends React.PureComponent {
         // `lastBuildTime` is used for both CSS and JS because is most likely they change at the same time on production from recompiling
 
         return (
-            <html lang="en">
+            <html lang="en" suppressHydrationWarning={true}>
                 <head>
                     <meta charSet="utf-8"/>
                     <meta httpEquiv="Content-Type" content="text/html, charset=UTF-8"/>
@@ -1789,7 +1788,7 @@ class BodyElement extends React.PureComponent {
         return (
             // We skip setting `props.dangerouslySetInnerHTML` if mounted, since this data is only used for initializing over server-side-rendered HTML.
             <body data-current-action={currentAction} onClick={onBodyClick} onSubmit={onBodySubmit} data-path={hrefParts.path}
-                data-pathname={hrefParts.pathname} className={this.bodyClassName()}>
+                data-pathname={hrefParts.pathname} className={this.bodyClassName()} suppressHydrationWarning={true}>
 
                 <script data-prop-name="context" type="application/json" dangerouslySetInnerHTML={mounted ? null : {
                     __html: jsonScriptEscape(JSON.stringify(context))
