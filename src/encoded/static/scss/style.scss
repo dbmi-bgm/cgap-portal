@@ -18,6 +18,7 @@
 @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/solid";
 @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/regular";
 @import "../../../../node_modules/@fortawesome/fontawesome-free/scss/brands";
+@import "encoded/fontawesome-overrides";
 
 // Shared Components - own components might override or extend these
 @import "../../../../node_modules/@hms-dbmi-bgm/shared-portal-components/scss/toggle-switch.scss";
