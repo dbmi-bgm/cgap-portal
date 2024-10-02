@@ -16,9 +16,9 @@ export default function QuickPopover(props) {
     const popover = (
         <Popover id={popID}>
             {title ? <Popover.Title className="m-0" as="h4">{title}</Popover.Title> : null}
-            <Popover.Content>
+            <Popover.Body>
                 { popoverContent }
-            </Popover.Content>
+            </Popover.Body>
         </Popover>
     );
     const cls = "btn btn-link text-decoration-none" + (className ? " " + className : "");

@@ -277,13 +277,13 @@ const MatchingFilterBlockIndicesPopoverColumn = React.memo(function MatchingFilt
     const popover = (
         <Popover id={"mi:" + resultUUID}>
             <Popover.Title className="m-0 text-600" as="h5">Matches Filter Blocks:</Popover.Title>
-            <Popover.Content className="pt-0 ps-0 pe-04">
+            <Popover.Body className="pt-0 ps-0 pe-04">
                 <ul className="mb-0 mt-08">
                     { filterBlockNameList.map(function(fbName, i){
                         return <li key={i}>{ fbName }</li>;
                     }) }
                 </ul>
-            </Popover.Content>
+            </Popover.Body>
         </Popover>
     );
 

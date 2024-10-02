@@ -30,7 +30,7 @@ const CaseNotesPopover = forwardRef(({
       {...popoverProps}
     >
       <Popover.Title as="h3">Case Notes</Popover.Title>
-      <Popover.Content>
+      <Popover.Body>
         {
           lastSavedText.date ?
             <p className="last-saved small">
@@ -69,7 +69,7 @@ const CaseNotesPopover = forwardRef(({
         </button>
         { lastSavedText.error && <p className="text-danger error">{lastSavedText.error}</p> }
         { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
-      </Popover.Content>
+      </Popover.Body>
     </Popover>
   )
 });

@@ -167,21 +167,21 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "jsx": (
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Title>
-                    <Popover.Content className="px-0 py-1">
+                    <Popover.Body className="px-0 py-1">
                         { options.slice(0,1).map(function(optionName, i){
                             return (
                                 <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="success" />
                             );
                         }) }
-                    </Popover.Content>
+                    </Popover.Body>
                     <Popover.Title className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Title>
-                    <Popover.Content className="px-0 py-1">
+                    <Popover.Body className="px-0 py-1">
                         { options.slice(1).map(function(optionName, i){
                             return (
                                 <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="warning" />
                             );
                         }) }
-                    </Popover.Content>
+                    </Popover.Body>
                 </Popover>
             )
         });
@@ -222,11 +222,11 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "jsx": (
                 <Popover id="technical-review-popover">
                     <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
-                    <Popover.Content className="px-0 py-1">
+                    <Popover.Body className="px-0 py-1">
                         { options.map(function(optionName, i){
                             return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="danger" />;
                         }) }
-                    </Popover.Content>
+                    </Popover.Body>
                 </Popover>
             )
         });
@@ -606,7 +606,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
     return (
         <React.Fragment>
             <Popover.Title className="m-0 text-600" as="h5">Technical Review Note</Popover.Title>
-            <Popover.Content className="p-2">
+            <Popover.Body className="p-2">
                 { lastSavedTechnicalReviewForResult ?
                     <h5 className="text-400">
                         You have recently updated this technical review, <br/>
@@ -673,7 +673,7 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                         Approve
                     </button>
                 </div>
-            </Popover.Content>
+            </Popover.Body>
         </React.Fragment>
     );
 });
@@ -746,10 +746,10 @@ function commonNoteUpsertProcess ({
                 // Set 'key' prop to re-instantiate and force to reposition.
                 <Popover id="technical-review-popover-updating" key="update">
                     <Popover.Title className="m-0 text-600" as="h5">Updating...</Popover.Title>
-                    <Popover.Content className="p-2 text-center">
+                    <Popover.Body className="p-2 text-center">
                         <i className="icon icon-spin icon-circle-notch icon-2x text-secondary fas py-4"/>
                         <p>Updating Technical Review</p>
-                    </Popover.Content>
+                    </Popover.Body>
                 </Popover>
             )
         };
@@ -972,7 +972,7 @@ function commonNoteUpsertProcess ({
                     jsx: (
                         <Popover id="technical-review-popover" key="error">
                             <Popover.Title className="m-0 text-600" as="h5">Error</Popover.Title>
-                            <Popover.Content className="d-flex align-items-center" style={{ maxWidth: 320 }}>
+                            <Popover.Body className="d-flex align-items-center" style={{ maxWidth: 320 }}>
                                 <div className="p-2 text-center">
                                     <i className="icon icon-exclamation-triangle icon-2x text-danger fas"/>
                                 </div>
@@ -980,7 +980,7 @@ function commonNoteUpsertProcess ({
                                     <h5 className="text-600 my-0">Failed to save Technical Review</h5>
                                     <p className="mt-0">Please check permissions or report to admins/developers.</p>
                                 </div>
-                            </Popover.Content>
+                            </Popover.Body>
                         </Popover>
                     )
                 };
@@ -1202,7 +1202,7 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
     return (
         <Popover {...passProps} id="technical-review-popover" key="success-new-review" ref={ref}>
             <Popover.Title className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Title>
-            <Popover.Content style={{ maxWidth: 320 }}>
+            <Popover.Body style={{ maxWidth: 320 }}>
                 <h5 className="my-0">NOTE:</h5>
                 <p className="mt-0">
                     It may take some time for your changes to become available in search results, please refresh or search again in a few minutes.
@@ -1213,7 +1213,7 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
                         <span className="align-middle ms-04">Check to stop showing this message</span>
                     </label>
                     : null }
-            </Popover.Content>
+            </Popover.Body>
         </Popover>
     );
 });
