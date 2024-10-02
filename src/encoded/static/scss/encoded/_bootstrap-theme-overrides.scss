@@ -55,20 +55,6 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 }
 
 
-/**** Ports from Bootstrap v5, these can be deleted if/when we upgrade to Bootstrap 5 *****/
-
-.pe-none {
-	/* @see https://getbootstrap.com/docs/5.0/utilities/interactions/#pointer-events */
-	pointer-events: none;
-}
-
-.pe-auto {
-	/* @see https://getbootstrap.com/docs/5.0/utilities/interactions/#pointer-events */
-	pointer-events: auto;
-}
-
-/**** End Ports from Bootstrap5 ****/
-
 /**************************************
  ************* Text Styles ************
  **************************************/
@@ -117,7 +103,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 /** Extending Bootstrap button w/ rounded & ext-padding class **/
 /** btn-xs was removed in Bootstrap v4 so we recreate it here **/
 .btn.btn-xs {
-    @include button-size(1px, 5px, 0.825rem, 1.5, $border-radius-sm);
+    @include button-size(1px, 5px, 0.825rem, 1.5);
     font-weight: 400;
     padding-top: 2px;
     //> i.icon {
@@ -181,11 +167,13 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
   
 	// Reset rounded corners
 	> div.dropdown:not(:last-child) > .btn:not(.dropdown-toggle) {
-	  @include border-right-radius(0);
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
 	}
   
 	> div.dropdown:not(:first-child) > .btn {
-	  @include border-left-radius(0);
+		border-top-left-radius: 0;
+  		border-bottom-left-radius: 0;
 	}
   }
   
@@ -329,4 +317,17 @@ div[role="dialog"] {
 	}
 }
 
+/**************************************
+ ************ Link Styles ***********
+ **************************************/
 
+a {
+	text-decoration: none;
+	text-underline-offset: 0.125em;
+
+	&.link-underline-hover {
+		&:hover {
+			text-decoration: underline !important;
+		}
+	}
+}

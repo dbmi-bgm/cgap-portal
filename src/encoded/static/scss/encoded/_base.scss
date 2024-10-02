@@ -53,7 +53,8 @@ $grid-breakpoints: (
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1500px        // < xl is overridden from default of 1200px; others are Bootstrap v4 defaults
+  xl: 1200px,
+  xxl: 1500px,
 );
 
 $border-radius-base:                        3px;
@@ -115,10 +116,19 @@ $primary-dark: #2b6088; //#0c5979;
 $facetlist-excluding: #450000;
 
 
-// Will be extended in bootstrap's _variables.scss with Bootstrap orig colors (warning, success, primary, etc).
-// And then used to create utility classes 'text-primary-dark', 'bg-primary-dark', etc.
+// Previously, Bootstrap extended $theme-colors with default colors like warning, success, and primary.
+// However, as of Bootstrap v5, Bootstrap has removed the default Sass map merging to simplify customization and prevent redundant values.
+// Now, we need to explicitly define all values in the Sass maps for $theme-colors.
 $theme-colors: (
-    "primary-dark": $primary-dark
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
+  "dark": $dark,
+  "primary-dark": $primary-dark
 );
 
 // override 1.5, to help center text
