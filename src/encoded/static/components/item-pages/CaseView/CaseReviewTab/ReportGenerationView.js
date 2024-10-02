@@ -264,7 +264,7 @@ function TextAreaGroup (props) {
     const { readonly = false, required = false } = sectionOptions || {};
     const inputElementID = "report_generation_" + sectionKey;
     return (
-        <div className="form-group mb-2 border-bottom pb-24">
+        <div className="mb-2 border-bottom pb-24">
             { children ? children : title ? <label htmlFor={inputElementID}>{ title }</label> : null }
             <AutoGrowTextArea {...passProps} id={inputElementID} disabled={propDisabled || readonly} name={sectionKey} />
         </div>

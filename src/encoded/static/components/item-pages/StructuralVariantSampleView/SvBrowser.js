@@ -435,7 +435,7 @@ export class SvBrowser extends React.PureComponent {
                 </div>
                 <div className="d-block mb-2">
                   <form>
-                    <div className="form-group">
+                    <div className="mb-3">
                       <label className="fw-normal">
                         Minimal SV length (bp):
                       </label>
@@ -445,7 +445,7 @@ export class SvBrowser extends React.PureComponent {
                         onChange={(e) => this.updateSvLength(e, "min")}
                       />
                     </div>
-                    <div className="form-group">
+                    <div className="mb-3">
                       <label className="fw-normal">
                         Maximal SV length (bp):
                       </label>

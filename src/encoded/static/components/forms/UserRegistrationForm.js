@@ -257,7 +257,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                 <form method="POST" name="user-registration-form was-validated" ref={this.formRef} onSubmit={this.onFormSubmit}>
 
-                    <div className="form-group">
+                    <div className="mb-3">
                         <label htmlFor="email-address">Primary E-Mail or Username</label>
                         <h4 id="email-address" className="text-300 mt-0">
                             { object.itemUtil.User.gravatar(unverifiedUserEmail, 36, { 'style' : { 'borderRadius': '50%', 'marginRight' : 10 } }, 'mm') }
@@ -267,7 +267,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                     <div className="row">
                         <div className="col-12 col-md-6">
-                            <div className="form-group">
+                            <div className="mb-3">
                                 <label htmlFor="firstName">First Name <span className="text-danger">*</span></label>
                                 <input name="first_name" type="text" onChange={this.onFirstNameChange}
                                     className={"form-control" + (value_for_first_name === '' ? " is-invalid" : "")} />
@@ -275,7 +275,7 @@ export default class UserRegistrationForm extends React.PureComponent {
                             </div>
                         </div>
                         <div className="col-12 col-md-6">
-                            <div className="form-group">
+                            <div className="mb-3">
                                 <label htmlFor="lastName">Last Name <span className="text-danger">*</span></label>
                                 <input name="last_name" type="text" onChange={this.onLastNameChange}
                                     className={"form-control" + (value_for_last_name === '' ? " is-invalid" : "")} />
@@ -286,7 +286,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                     <hr className="mt-1 mb-2" />
 
-                    <div className="form-group">
+                    <div className="mb-3">
                         <label htmlFor="pendingProject">Primary Project <span className="text-300">(Selected for you)</span></label>
                         <div><p>cgap-training</p></div>
                         <small className="form-text text-muted">
@@ -465,7 +465,7 @@ function JobTitleField(props) {
     return (
         <Collapse in={!!(value_for_pending_project)}>
             <div className="clearfix">
-                <div className="form-group">
+                <div className="mb-3">
                     <label htmlFor="jobTitle">
                         Job Title
                         { value_for_pending_project_details && value_for_pending_project_details.display_title &&
