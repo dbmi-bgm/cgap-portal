@@ -28,13 +28,13 @@ jobs:
         test_type: ['UNIT', 'INDEX', 'DOCKER']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
         python_version: ['3.11']
-        node_version: ['18']
+        node_version: ['20']
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
-      - uses: actions/setup-python@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python_version }}
 
