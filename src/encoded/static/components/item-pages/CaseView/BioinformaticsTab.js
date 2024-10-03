@@ -215,7 +215,8 @@ function QCMAccordion(props) {
         return <div className="m-4">No Quality Control Metrics Available</div>;
     }
 
-    const sortedQCMs = sortAndAddRolePropsToQCMs(quality_control_metrics, relationshipMapping);
+    const clonedQualityControlMetrics = JSON.parse(JSON.stringify(quality_control_metrics));
+    const sortedQCMs = sortAndAddRolePropsToQCMs(clonedQualityControlMetrics, relationshipMapping);
 
     return (
         <Accordion defaultActiveKey={sortedQCMs[0].atID} className="w-100">
