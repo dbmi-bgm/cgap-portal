@@ -67,7 +67,7 @@ export function GraphTransformer(props){
     const extendedProps = _.extend({}, graphTransformerDefaultProps, _.mapObject(props || {}, function (value, key) {
         return value || graphTransformerDefaultProps[key];
     }));
-    const { dataset, children, imensionOpts, filterUnrelatedIndividuals, ...passProps } = extendedProps;
+    const { dataset, children, imensionOpts, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = extendedProps;
     const graphData = useMemo(function(){
         return buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals);
     }, [ dataset, dimensionOpts, filterUnrelatedIndividuals ]);
