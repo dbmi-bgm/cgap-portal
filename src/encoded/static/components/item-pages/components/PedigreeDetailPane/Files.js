@@ -68,8 +68,11 @@ export class FileWrapper extends React.PureComponent {
     }
 }
 
-function FileArrayField (props) {
-    const { fieldDisplayTitle, fieldName, fieldType, files, individualId, haveEditPermission = false, institution, project, fileSchema } = props;
+function FileArrayField({
+    files = [],
+    ...props
+}) {
+    const { fieldDisplayTitle, fieldName, fieldType, individualId, haveEditPermission = false, institution, project, fileSchema } = props;
     return (
         <div className="detail-row" data-describing={fieldDisplayTitle}>
             <label className="d-block">{fieldDisplayTitle}</label>
@@ -100,7 +103,4 @@ FileArrayField.propTypes = {
     "files": PropTypes.array,
     "haveEditPermission": PropTypes.bool,
     "fileSchema": PropTypes.object.isRequired
-};
-FileArrayField.defaultProps = {
-    files: []
 };

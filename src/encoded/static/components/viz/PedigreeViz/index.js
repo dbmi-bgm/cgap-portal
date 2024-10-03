@@ -3,6 +3,7 @@
 import React from 'react';
 import memoize from 'memoize-one';
 import { path as d3Path } from 'd3-path';
+import _ from 'underscore';
 /** @todo Pull this out into here if making a lib */
 import { requestAnimationFrame as raf, cancelAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import { isRelationshipNode } from './data-utilities';
@@ -36,7 +37,10 @@ import { pedigreeVizDefaultProps, pedigreeVizViewDefaultProps } from './default-
  *  - Twins of different specificites (requires additions to bounding box calculations, edge segments, etc.)
  */
 function PedigreeViz(props){
-    const { dataset, dimensionOpts, filterUnrelatedIndividuals, ...viewProps } = props;
+    const extendedProps = _.extend({}, pedigreeVizDefaultProps, _.mapObject(props || {}, function (value, key) {
+        return value || pedigreeVizDefaultProps[key];
+    }));
+    const { dataset, dimensionOpts, filterUnrelatedIndividuals, ...viewProps } = extendedProps;
     return (
         <GraphTransformer {...{ dataset, dimensionOpts, filterUnrelatedIndividuals }}>
             <PedigreeVizView {...viewProps} />
@@ -44,7 +48,6 @@ function PedigreeViz(props){
     );
 }
 PedigreeViz.propTypes = pedigreeVizPropTypes;
-PedigreeViz.defaultProps = pedigreeVizDefaultProps;
 
 
 /**
@@ -56,6 +59,9 @@ PedigreeViz.defaultProps = pedigreeVizDefaultProps;
  * - Define propTypes.
  */
 const PedigreeVizView = React.memo(function PedigreeVizView(props){
+    const extendedProps = _.extend({}, pedigreeVizViewDefaultProps, _.mapObject(props || {}, function (value, key) {
+        return value || pedigreeVizViewDefaultProps[key];
+    }));
     const {
         objectGraph, onNodeSelected, onDataChanged,
         zoomToExtentsOnMount, initialScale,
@@ -66,7 +72,7 @@ const PedigreeVizView = React.memo(function PedigreeVizView(props){
         detailPaneOpenOffsetHeight,
         disableSelect,
         ...passProps
-    } = props;
+    } = extendedProps;
 
     // May be overriden in `DetailPaneOffsetContainerSize`
     const containerHeight = height || Math.max(minimumHeight, graphHeight);
@@ -105,7 +111,6 @@ const PedigreeVizView = React.memo(function PedigreeVizView(props){
     );
 });
 PedigreeVizView.propTypes = pedigreeVizViewPropTypes;
-PedigreeVizView.defaultProps = pedigreeVizViewDefaultProps;
 
 /**
  * Controls when detail pane is open (currently always - may change with explicit 'close' button or similar).

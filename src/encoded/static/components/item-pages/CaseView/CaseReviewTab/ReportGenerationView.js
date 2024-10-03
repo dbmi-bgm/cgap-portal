@@ -252,7 +252,11 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
     );
 });
 
-function TextAreaGroup (props) {
+function TextAreaGroup({
+    rows = 1,
+    defaultValue = "",
+    ...props
+}) {
     const {
         sectionKey,
         sectionOptions,
@@ -270,10 +274,6 @@ function TextAreaGroup (props) {
         </div>
     );
 }
-TextAreaGroup.defaultProps = {
-    "rows": 1,
-    "defaultValue": ""
-};
 
 const ReportFindingsTable = React.memo(function ReportFindingsTable (props) {
     const { variantSamples, reportItem, visible = true } = props;

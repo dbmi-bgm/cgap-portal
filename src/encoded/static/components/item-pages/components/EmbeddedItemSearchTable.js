@@ -13,17 +13,20 @@ import { DetailPaneStateCache } from '@hms-dbmi-bgm/shared-portal-components/es/
 import { EmbeddedSearchView } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/EmbeddedSearchView';
 
 
-export function EmbeddedItemSearchTable (props){
+export function EmbeddedItemSearchTable({
+    columnExtensionMap = columnExtensionMapCGAP,
+    facets = undefined,
+    ...props
+}) {
     const {
         embeddedTableHeader: propEmbeddedTableHeader,
         embeddedTableFooter,
         /** @deprecated in favor of embeddedTableHeader */
         title,
         children,
-        facets,
         session, schemas: propSchemas,
         defaultOpenIndices, maxHeight,
-        columns, columnExtensionMap,
+        columns,
         // May not be present which prevents VirtualHrefController from navigating upon mount. Useful if want to init with filterSet search or in other place.
         searchHref,
         aboveTableComponent,
@@ -79,10 +82,6 @@ export function EmbeddedItemSearchTable (props){
         </div>
     );
 }
-EmbeddedItemSearchTable.defaultProps = {
-    "columnExtensionMap": columnExtensionMapCGAP,
-    "facets" : undefined // Default to those from search response.
-};
 
 
 /**

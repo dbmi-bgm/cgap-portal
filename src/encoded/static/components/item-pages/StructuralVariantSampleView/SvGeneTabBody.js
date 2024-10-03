@@ -8,11 +8,12 @@ import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 import { getInitialTranscriptIndex } from '../VariantSampleView/AnnotationSections';
+import { columnExtensionMap as columnExtensionMapCGAP} from '../../browse/columnExtensionMap';
 
 export function SvGeneTabBody (props){
 
     const {
-        columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        columnExtensionMap:  originalColExtMap = columnExtensionMapCGAP,
         selectedGenes,
         onSelectGene,
         savedVariantSampleIDMap = {},

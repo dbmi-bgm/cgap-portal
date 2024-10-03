@@ -70,12 +70,12 @@ export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView
         </div>
     );
 });
-ProvenanceGraphTabView.defaultProps = {
-    'graphSteps' : null,
-    'heading' : <span>Provenance</span>
-};
-ProvenanceGraphTabView.getTabObject = function(props){
-    const { windowWidth, windowHeight, isLoadingGraphSteps, graphSteps } = props;
+ProvenanceGraphTabView.getTabObject = function ({
+    graphSteps = null,
+    heading = <span>Provenance</span>,
+    ...props
+}) {
+    const { windowWidth, windowHeight, isLoadingGraphSteps } = props;
     const stepsExist = Array.isArray(graphSteps) && graphSteps.length > 0;
     let icon;
     if (isLoadingGraphSteps){

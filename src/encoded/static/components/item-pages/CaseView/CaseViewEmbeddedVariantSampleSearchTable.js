@@ -16,6 +16,7 @@ import { navigateChildWindow } from '../components/child-window-controls';
 import { VariantSampleDisplayTitleColumn, VariantSampleDisplayTitleColumnSV } from './../../browse/variantSampleColumnExtensionMap';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 import { TechnicalReviewColumn } from './TechnicalReviewColumn';
+import { columnExtensionMap as  columnExtensionMapCGAP} from '../../browse/columnExtensionMap';
 
 /* Used in FilteringTab */
 
@@ -26,7 +27,7 @@ import { TechnicalReviewColumn } from './TechnicalReviewColumn';
 export function CaseViewEmbeddedVariantSampleSearchTable(props){
     const {
         // Get/reuse default colExtMap from EmbeddedItemSearchTable
-        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        columnExtensionMap: originalColExtMap = columnExtensionMapCGAP,
         ...passProps
     } = props;
 
@@ -56,7 +57,7 @@ export function CaseViewEmbeddedVariantSampleSearchTable(props){
 export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
     const {
         // Get/reuse default colExtMap from EmbeddedItemSearchTable
-        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        columnExtensionMap: originalColExtMap = columnExtensionMapCGAP,
         ...passProps
     } = props;
 
@@ -95,7 +96,7 @@ export function CaseViewEmbeddedVariantSampleSearchTableSV(props) {
 export function CaseViewEmbeddedVariantSampleSearchTableBase(props){
     const {
         // Get/reuse default colExtMap from EmbeddedItemSearchTable
-        columnExtensionMap: originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        columnExtensionMap: originalColExtMap = columnExtensionMapCGAP,
         selectedVariantSamples,
         onSelectVariantSample,
         savedVariantSampleIDMap = {},
