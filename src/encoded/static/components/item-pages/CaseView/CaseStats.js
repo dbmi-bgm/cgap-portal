@@ -36,7 +36,7 @@ function mapFeaturesToBadges(features = []) {
         const { display_title = null, '@id': featureID } = feature;
         return (
             // TODO: create own ~ `.tag` styling or override Bootstrap's default. Maybe.
-            <a className="badge badge-pill badge-info text-400 text-small d-inline-block me-03 mb-03 pb-04 link-underline-hover"
+            <a className="badge rounded-pill bg-info text-400 text-small d-inline-block me-03 mb-03 pb-04"
                 href={featureID} target="_blank" rel="noopener noreferrer" key={featureID}>
                 { display_title }
             </a>
