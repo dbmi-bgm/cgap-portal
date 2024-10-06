@@ -882,7 +882,7 @@ function FileAttachmentBtn(props){
                             { selectTitle }
                         </span>
                     </div>
-                    <div className="input-group-append">
+                    <div className="input-group">
                         <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess === true }
                             className={"mb-0 btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
                             <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
@@ -916,7 +916,7 @@ function FileAttachmentBtn(props){
                         { onClearFile && <i className={`${clearBtnDisabled ? "" : "clickable"} icon fas icon-times icon-fw mx-2`} onClick={clearBtnDisabled ? undefined : onClearFile} />}
                     </div>
                 </div>
-                <div className="input-group-append">
+                <div className="input-group">
                     <button type="button" className="btn btn-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}>
                         <i className={"me-08 icon icon-fw fas icon-" + icon} />
                         {uploadTitle}

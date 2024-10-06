@@ -59,6 +59,7 @@ $grid-breakpoints: (
   xxl: 1500px,
 );
 
+$border-radius:                             .25rem;
 $border-radius-base:                        3px;
 $border-radius-lg:                          4px;
 $border-radius-sm:                          2px;
@@ -138,6 +139,8 @@ $btn-line-height: 1.45rem;
 
 
 /* Cards */
+$card-spacer-y: 1.25rem;
+$card-spacer-x: 1.25rem;
 $card-cap-bg: #fff;
 $card-bg: #fff;
 $card-inner-border-radius: 3px;
@@ -155,6 +158,16 @@ $h6-font-size: 0.85rem;
 /* Set variables for printing and prevent own print styles clashing with Bootstrap defaults */
 $print-page-size:                   8.5in 11in;
 $print-body-min-width:              8.5in;
+
+/* Popovers */
+$popover-border-color: #ebebeb;
+$popover-header-bg: #f7f7f7;
+$popover-body-padding-y: .5rem;
+$popover-body-padding-x: .75rem;
+
+/* Alerts */
+$alert-padding-y: .75rem;
+$alert-padding-x: 1.25rem;
 
 /****************************/
 /** FontAwesome Icon Stuff **/
