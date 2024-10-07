@@ -15,7 +15,7 @@ export default function QuickPopover(props) {
 
     const popover = (
         <Popover id={popID}>
-            {title ? <Popover.Title className="m-0" as="h4">{title}</Popover.Title> : null}
+            {title ? <Popover.Header className="m-0" as="h4">{title}</Popover.Header> : null}
             <Popover.Body>
                 { popoverContent }
             </Popover.Body>
