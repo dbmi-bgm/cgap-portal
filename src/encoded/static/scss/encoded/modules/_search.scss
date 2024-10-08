@@ -19,7 +19,7 @@ $search-results-header-row-height: 52px; /* 46px is existing default for both re
 .search-result-row .result-table-row .search-result-column-block {
   .inner {
     a.adv-block-link {
-      color: $body-color;
+      color: $table-color;
 
       &:hover {
         color: $link-hover-color;

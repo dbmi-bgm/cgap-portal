@@ -177,10 +177,10 @@ class FamilySection extends React.Component {
         return (
             <div className="family-table-section">
                 <h4 className="pane-section-title" onClick={this.onToggle}>
-                    <div className="col-auto pe-0">
+                    <div className="col-auto pe-0 ps-1">
                         <i className={"toggle-open-icon icon icon-fw fas icon-" + (open ? 'minus' : 'plus')} />
                     </div>
-                    <div className="col">
+                    <div className="col ps-1">
                         { family.display_title }: <span className="text-200 fst-italic">Family &amp; Report History</span>
                     </div>
                 </h4>
