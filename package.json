@@ -61,7 +61,7 @@
     "@gmod/tabix": "^1.5.11",
     "@gmod/vcf": "^5.0.6",
     "@hms-dbmi-bgm/react-workflow-viz": "0.1.11",
-    "@hms-dbmi-bgm/shared-portal-components": "github:4dn-dcic/shared-portal-components#0.1.91-beta.6",
+    "@hms-dbmi-bgm/shared-portal-components": "github:4dn-dcic/shared-portal-components#0.1.91-beta.7",
     "@reduxjs/toolkit": "^2.2.6",
     "auth0-lock": "^12.5.1",
     "buffer": "^6.0.3",
