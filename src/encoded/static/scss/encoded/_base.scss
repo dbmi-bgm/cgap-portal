@@ -38,6 +38,8 @@ $font-size-base: 1rem;
 $line-height-base: 1.45;
 
 $dropdown-link-hover-bg: #ddd;
+$dropdown-item-padding-y:  .25rem;
+$dropdown-item-padding-x:  1.5rem;
 
 
 
@@ -58,6 +60,8 @@ $grid-breakpoints: (
   xl: 1200px,
   xxl: 1500px,
 );
+
+$body-color: #495057;
 
 $border-radius:                             .25rem;
 $border-radius-base:                        3px;

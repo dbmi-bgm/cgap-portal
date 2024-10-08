@@ -270,6 +270,12 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
         /* Limit height & make scrollable if necessary */
         max-height: 50vh;
         overflow: auto;
+
+		a {
+			&:hover {
+				text-decoration: underline;
+			}
+		}
     }
 
     @include media-breakpoint-up(lg){
