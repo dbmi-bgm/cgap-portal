@@ -135,11 +135,9 @@ export class GeneSearchBox extends React.PureComponent {
     return (
       <React.Fragment>
         <div className="input-group">
-          <div className="input-group-prepend">
-            <span className="input-group-text" id="search-for-gene-addon">
-              <i className={icon} />
-            </span>
-          </div>
+          <span className="input-group-text" id="search-for-gene-addon">
+            <i className={icon} />
+          </span>
           <input
             type="text"
             onChange={(evt) => this.updateCurrentSearchTerm(evt)}

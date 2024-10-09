@@ -877,11 +877,9 @@ function FileAttachmentBtn(props){
             <React.Fragment>
                 { instructionsNode }
                 <div className="input-group">
-                    <div className="input-group-prepend">
-                        <span className="input-group-text pe-5" id="inputGroupFileAddon01">
-                            { selectTitle }
-                        </span>
-                    </div>
+                    <span className="input-group-text pe-5" id="inputGroupFileAddon01">
+                        {selectTitle}
+                    </span>
                     <div className="input-group">
                         <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess === true }
                             className={"mb-0 btn btn-primary " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
@@ -903,18 +901,16 @@ function FileAttachmentBtn(props){
         <React.Fragment>
             {instructionsNode}
             <div className="input-group">
-                <div className="input-group-prepend mw-50" style={{ maxWidth: "50%" }}>
-                    <div className="input-group-text w-100" id="inputGroupFileAddon01">
-                        <span className="text-truncate">{ filename }</span>
-                        <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess }
-                            className={"mb-0 py-0 btn btn-link " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
-                            <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange: undefined} className="d-none"
-                                disabled={loadingFileResult || postFileSuccess === true}
-                                accept={acceptedTypes} />
-                            Replace
-                        </label>
-                        { onClearFile && <i className={`${clearBtnDisabled ? "" : "clickable"} icon fas icon-times icon-fw mx-2`} onClick={clearBtnDisabled ? undefined : onClearFile} />}
-                    </div>
+                <div className="input-group-text w-100" id="inputGroupFileAddon01">
+                    <span className="text-truncate">{filename}</span>
+                    <label htmlFor="test_file" disabled={loadingFileResult || postFileSuccess}
+                        className={"mb-0 py-0 btn btn-link " + (loadingFileResult || postFileSuccess ? " disabled unclickable" : " clickable")}>
+                        <input id="test_file" type="file" onChange={!loadingFileResult && onFileInputChange ? onFileInputChange : undefined} className="d-none"
+                            disabled={loadingFileResult || postFileSuccess === true}
+                            accept={acceptedTypes} />
+                        Replace
+                    </label>
+                    {onClearFile && <i className={`${clearBtnDisabled ? "" : "clickable"} icon fas icon-times icon-fw mx-2`} onClick={clearBtnDisabled ? undefined : onClearFile} />}
                 </div>
                 <div className="input-group">
                     <button type="button" className="btn btn-success" onClick={onFormSubmit} disabled={loadingFileResult || postFileSuccess === true}>
