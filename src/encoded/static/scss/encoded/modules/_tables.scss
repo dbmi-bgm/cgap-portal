@@ -1,6 +1,7 @@
 /*  COMMON TABLES */
 
-table {
+table,
+.table {
 	@include font-size(0.9rem);
 	
 	> thead {
