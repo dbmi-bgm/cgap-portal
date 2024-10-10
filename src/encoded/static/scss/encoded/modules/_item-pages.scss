@@ -2957,8 +2957,12 @@ div.user-profile-page {
 		table.access-keys-table {
 
 			tr {
+				th {
+					padding: .75rem;
+				}
 				td {
 					border-bottom: 1px solid #eee;
+					padding: .75rem;
 					&.access-key-buttons {
 						width: 140px;
 						.btn.btn-xs {
