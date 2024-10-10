@@ -52,6 +52,9 @@ $dropdown-item-padding-x:  1.5rem;
 /* We override these with our own subset */
 // $enable-print-styles: false;
 
+/* To enable negative margins in Bootstrap 5, set the $enable-negative-margins variable to true */
+$enable-negative-margins: true;
+
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,
