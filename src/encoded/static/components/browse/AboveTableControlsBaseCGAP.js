@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import memoize from 'memoize-one';
+import { searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 import { SearchBar } from './SearchBar';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
