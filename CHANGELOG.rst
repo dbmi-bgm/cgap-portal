@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+15.6.0
+=======
+* 2024-10-11/dmichaels
+* Updated dcicutils version (8.16.1) for vulnerabilities.
+
+
 15.5.0
 ======
 * Use snovault search modules rather than the local ones (in the src/encoded/search directory).
