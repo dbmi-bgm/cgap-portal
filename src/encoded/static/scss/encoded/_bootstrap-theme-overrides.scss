@@ -211,6 +211,11 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	}
 }
 
+.btn-close {
+	&:focus {
+		box-shadow: none;
+	}
+}
 
 /**************************************
  ************ Form Inputs *************
@@ -307,6 +312,10 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 			/* Unset default .h1-.h6 styling of bottom+top margin. */
 			margin-top: 0;
 			margin-bottom: 0;
+		}
+
+		.btn-close {
+			font-size: 1.1rem;
 		}
 	}
 
