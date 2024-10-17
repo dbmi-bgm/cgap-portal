@@ -1,7 +1,10 @@
 /*  COMMON TABLES */
 
-table,
-.table {
+.table>thead>tr>th {
+	background-color: #f0f1f5;
+}
+
+table {
 	@include font-size(0.9rem);
 	
 	> thead {
