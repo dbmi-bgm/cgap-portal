@@ -13,7 +13,7 @@ function GeneListFilter({ geneLists, onChange }) {
 
   return (
     <div className="mb-1">
-      <label className="form-label font-weight-normal mb-0">Gene list</label>
+      <label className="form-label fw-normal mb-0">Gene list</label>
       <select
         className="form-control form-control-sm d-block"
         aria-label=".form-select-sm example"
@@ -39,7 +39,7 @@ function CohortCheckbox({ label, checked, onChange }) {
     <Checkbox
       checked={checked}
       onChange={onChange}
-      labelClassName="mb-0 font-weight-normal"
+      labelClassName="mb-0 fw-normal"
       className="checkbox-container"
       value={label}
     >
@@ -53,7 +53,7 @@ function AssociationTestFilter({ associationTests, activeTest, onChange }) {
 
   return (
     <div className="mb-1">
-      <label className="form-label font-weight-normal mb-0">
+      <label className="form-label fw-normal mb-0">
         Selected gene-based test
       </label>
       <select
@@ -74,7 +74,7 @@ function MaskFilter({ masks, activeMask, onChange }) {
 
   return (
     <div className="mb-1">
-      <label className="form-label font-weight-normal mb-0">
+      <label className="form-label fw-normal mb-0">
         Selected mask
       </label>
       <select
@@ -95,7 +95,7 @@ function ControlFilter({ controlList, activeControl, onChange }) {
 
   return (
     <div className="mb-1">
-      <label className="form-label font-weight-normal mb-0">
+      <label className="form-label fw-normal mb-0">
         Selected control group
       </label>
       <select
@@ -524,10 +524,10 @@ class EmbeddedCohortBrowserComponent extends React.PureComponent {
                   <div className="d-block mb-1 mt-2">
                     <button
                       type="button"
-                      className="btn btn-primary btn-block"
+                      className="btn btn-primary w-100"
                       onClick={this.exportDisplay}
                     >
-                      <i className="icon icon-download icon-sm fas mr-1"></i>
+                      <i className="icon icon-download icon-sm fas me-1"></i>
                       Export
                     </button>
                   </div>

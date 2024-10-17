@@ -41,7 +41,7 @@ export const CaseSpecificSelectionsPanel = React.memo(function CaseSpecificSelec
             <button type="button" className={"card-header btn py-3 bg-primary-dark" + (!isExpanded ? " rounded" : "")}
                 onClick={toggleExpanded}>
                 <h4 className="text-400 my-0 d-flex align-items-center text-white" >
-                    <i className={"mr-15 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
+                    <i className={"me-15 icon fas icon-" + (isExpanded ? "minus" : "plus")}/>
                     <span>Case Specific Selections</span>
                 </h4>
             </button>

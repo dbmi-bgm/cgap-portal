@@ -4,6 +4,7 @@ import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
 import memoize from 'memoize-one';
+import { searchFilters } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { AboveTableControlsBase } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/above-table-controls/AboveTableControlsBase';
 import { SearchBar } from './SearchBar';
 import Dropdown from 'react-bootstrap/esm/Dropdown';
@@ -61,7 +62,7 @@ export const AboveSearchViewOptions = React.memo(function AboveSearchViewOptions
     return(
         <React.Fragment>
             <SearchViewSubTitle {...{ itemType }} {...{ schemas, context, onFilter, isContextLoading, navigate, projectSelectEnabled }}
-                submitNewButton={<a href={`/search/?type=${itemType}&currentAction=add`} className="btn btn-primary"><i className="icon icon-plus fas icon-small mr-05"></i>Create New</a>} />
+                submitNewButton={<a href={`/search/?type=${itemType}&currentAction=add`} className="btn btn-primary"><i className="icon icon-plus fas icon-small me-05"></i>Create New</a>} />
             <hr className="tab-section-title-horiz-divider"/>
             <div className="container-wide toggle-reports">
 
@@ -147,7 +148,7 @@ export const AboveCaseSearchViewOptions = React.memo(function AboveCaseSearchVie
 const CaseSearchViewSubmitNewButton = React.memo(function CaseSearchViewSubmitNewButton(props) {
     return (
         <DropdownButton variant="primary d-flex align-items-center" id="submit-new" className="px-1"
-            title={<React.Fragment><i className="icon fas icon-plus mr-1"/>Submit New...</React.Fragment>}>
+            title={<React.Fragment><i className="icon fas icon-plus me-1"/>Submit New...</React.Fragment>}>
             <Dropdown.Item href="/search/?type=IngestionSubmission&currentAction=add">
                 Case
             </Dropdown.Item>
@@ -225,7 +226,7 @@ class ProjectFilterCheckbox extends React.PureComponent {
         return (
             <Checkbox disabled={isContextLoading} onChange={this.onChange} checked={checked} labelClassName={labelCls}>
                 <span className="text-small">
-                    { isChanging ? <i className="icon icon-circle-notch icon-spin fas mr-07 text-small" /> : null }
+                    { isChanging ? <i className="icon icon-circle-notch icon-spin fas me-07 text-small" /> : null }
                     { children }
                 </span>
             </Checkbox>
@@ -296,7 +297,7 @@ function ProjectSelectDropdown(props){
                 return (
                     <DropdownItem key={projectTerm} eventKey={projectTerm} active={active}>
                         { Term.toName("project.display_title", projectTerm) }
-                        <small className="ml-07">({ doc_count })</small>
+                        <small className="ms-07">({ doc_count })</small>
                     </DropdownItem>
                 );
             });
@@ -384,7 +385,7 @@ export const DashboardTitle = React.memo(function DashboardTitle(props){
         <div className="dashboard-header">
             <div className="container-wide d-flex align-items-center justify-content-between">
                 <div className="align-items-center d-flex">
-                    <i className={`icon icon-fw icon-${itemTypeToIconMap(subtitle)} mr-1`} />
+                    <i className={`icon icon-fw icon-${itemTypeToIconMap(subtitle)} me-1`} />
                     <h5 className="mt-0 mb-0 text-400">{subtitle} Dashboard</h5>
                 </div>
             </div>

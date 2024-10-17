@@ -15,10 +15,10 @@ export const AccessioningTab = React.memo(function AccessioningTab(props) {
     const secondaryFamiliesLen = secondaryFamilies.length;
 
     const viewSecondaryFamiliesBtn = secondaryFamiliesLen === 0 ? null : (
-        <div className="pt-2">
+        <div className="pt-2 d-grid gap-1">
             <button
                 type="button"
-                className="btn btn-block btn-outline-dark"
+                className="btn btn-outline-dark"
                 onClick={
                     function () {
                         setSecondaryFamiliesOpen(function (currentIsSecondaryFamiliesOpen) {
@@ -122,7 +122,7 @@ class FamilyAccessionStackedTable extends React.PureComponent {
             <StackedBlock {...{ columnClass }} subtitleVisible={false} key={"empty-" + columnClass}
                 label={<StackedBlockNameLabel title={null} accession={null} subtitle={null} subtitleVisible={false}/>}>
                 <StackedBlockName>
-                    <span className="name-title">-</span>
+                    <span className="name-title link-underline-hover">-</span>
                 </StackedBlockName>
             </StackedBlock>
         );
@@ -208,7 +208,7 @@ class FamilyAccessionStackedTable extends React.PureComponent {
                 { (atId && workup_type) ?
                     <StackedBlockName className="flex-row align-items-center justify-content-between">
                         <div className="d-flex">
-                            <a href={atId} data-tip="View Sample" className={`name-title ${isSampleForResult ? 'current-case' : ''}`}>
+                            <a href={atId} data-tip="View Sample" className={`name-title link-underline-hover ${isSampleForResult ? 'current-case' : ''}`}>
                                 { workup_type }
                             </a>
                         </div>
@@ -217,7 +217,7 @@ class FamilyAccessionStackedTable extends React.PureComponent {
                     <StackedBlockName>
                         { workup_type ? null : "No workup type found for sample"}
                         { atId ?
-                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className="name-title">
+                            <a href={atId} data-tip={workup_type ? null: "View Sample"} className="name-title link-underline-hover">
                                 { workup_type || accession }
                             </a> : <span className="name-title">{ workup_type || accession }</span>}
                     </StackedBlockName>
@@ -323,9 +323,9 @@ class FamilyAccessionStackedTable extends React.PureComponent {
         return ( // We can pass 'className={..}' to this if needed.
             <StackedBlock hideNameOnHover={false} columnClass="individual" key={atId} id={atId}>
                 <StackedBlockName className="flex-row align-items-center justify-content-between">
-                    <div className="d-flex flex-column individual-role pr-2">
+                    <div className="d-flex flex-column individual-role pe-2">
                         { atId ?
-                            <a href={atId} className={`name-title mx-0 text-truncate text-capitalize ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
+                            <a href={atId} className={`name-title mx-0 text-truncate text-capitalize link-underline-hover ${(result.individual['@id'] === individual['@id']) ? "current-case" : ""}`}>
                                 { role || display_title }
                             </a>
                             :

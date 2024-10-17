@@ -257,7 +257,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                 <form method="POST" name="user-registration-form was-validated" ref={this.formRef} onSubmit={this.onFormSubmit}>
 
-                    <div className="form-group">
+                    <div className="mb-3">
                         <label htmlFor="email-address">Primary E-Mail or Username</label>
                         <h4 id="email-address" className="text-300 mt-0">
                             { object.itemUtil.User.gravatar(unverifiedUserEmail, 36, { 'style' : { 'borderRadius': '50%', 'marginRight' : 10 } }, 'mm') }
@@ -267,7 +267,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                     <div className="row">
                         <div className="col-12 col-md-6">
-                            <div className="form-group">
+                            <div className="mb-3">
                                 <label htmlFor="firstName">First Name <span className="text-danger">*</span></label>
                                 <input name="first_name" type="text" onChange={this.onFirstNameChange}
                                     className={"form-control" + (value_for_first_name === '' ? " is-invalid" : "")} />
@@ -275,7 +275,7 @@ export default class UserRegistrationForm extends React.PureComponent {
                             </div>
                         </div>
                         <div className="col-12 col-md-6">
-                            <div className="form-group">
+                            <div className="mb-3">
                                 <label htmlFor="lastName">Last Name <span className="text-danger">*</span></label>
                                 <input name="last_name" type="text" onChange={this.onLastNameChange}
                                     className={"form-control" + (value_for_last_name === '' ? " is-invalid" : "")} />
@@ -286,7 +286,7 @@ export default class UserRegistrationForm extends React.PureComponent {
 
                     <hr className="mt-1 mb-2" />
 
-                    <div className="form-group">
+                    <div className="mb-3">
                         <label htmlFor="pendingProject">Primary Project <span className="text-300">(Selected for you)</span></label>
                         <div><p>cgap-training</p></div>
                         <small className="form-text text-muted">
@@ -305,7 +305,7 @@ export default class UserRegistrationForm extends React.PureComponent {
                         </div>
                         <div className="col-12 col-lg-7">
                             <p>
-                                By signing up, you are agreeing to our <a href="/help/about/privacy-policy" target="_blank" rel="noreferrer noopener">Privacy Policy</a>.
+                                By signing up, you are agreeing to our <a href="/help/about/privacy-policy" target="_blank" rel="noreferrer noopener" className="link-underline-hover">Privacy Policy</a>.
                                 <br/>
                                 We may track your usage of the portal to help improve the quality of user experience and/or security assurance purposes.
                             </p>
@@ -313,8 +313,8 @@ export default class UserRegistrationForm extends React.PureComponent {
                     </div>
 
 
-                    <div className="clearfix">
-                        <button type="submit" disabled={!(maySubmit)} className="btn btn-lg btn-primary text-300 btn-block mt-2">
+                    <div className="clearfix d-grid gap-1">
+                        <button type="submit" disabled={!(maySubmit)} className="btn btn-lg btn-primary text-300 mt-2">
                             Sign Up
                         </button>
                     </div>
@@ -410,7 +410,7 @@ class LookupProjectField extends React.PureComponent {
             currentProjectDetails && currentProjectDetails['@id'] && currentProjectDetails.display_title && (
                 <div style={LookupProjectField.fieldTitleColStyle}>
                     <a href={object.itemUtil.atId(currentProjectDetails)} target="_blank" data-tip="View project in new tab"
-                        rel="noopener noreferrer" style={{ verticalAlign: "middle" }}>
+                        rel="noopener noreferrer" style={{ verticalAlign: "middle" }} className="link-underline-hover">
                         { currentProjectDetails.display_title }
                     </a>
                     &nbsp;&nbsp;<i className="icon icon-fw icon-external-link-alt fas text-small"/>
@@ -424,11 +424,11 @@ class LookupProjectField extends React.PureComponent {
 
         return (
             <React.Fragment>
-                <div className="flexrow ml-0 mr-0">
+                <div className="flexrow ms-0 me-0">
                     { currProjectTitle }
                     <div className="field-buttons">
                         { currentProjectDetails && currentProjectDetails['@id'] ?
-                            <button type="button" onClick={onClear} className="btn btn-secondary mr-05">
+                            <button type="button" onClick={onClear} className="btn btn-secondary me-05">
                                 Clear
                             </button>
                             : null }
@@ -465,7 +465,7 @@ function JobTitleField(props) {
     return (
         <Collapse in={!!(value_for_pending_project)}>
             <div className="clearfix">
-                <div className="form-group">
+                <div className="mb-3">
                     <label htmlFor="jobTitle">
                         Job Title
                         { value_for_pending_project_details && value_for_pending_project_details.display_title &&

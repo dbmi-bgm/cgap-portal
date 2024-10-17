@@ -158,10 +158,10 @@ export const InterpretationTab = React.memo(function InterpretationTab (props) {
             <div className="d-flex align-items-center justify-content-between mb-2">
                 <h1 className="text-300 mb-0">
                     Interpretation
-                    { isLoadingVariantSampleListItem ? <i className="icon icon-circle-notch icon-spin fas text-muted ml-12"/> : null }
+                    { isLoadingVariantSampleListItem ? <i className="icon icon-circle-notch icon-spin fas text-muted ms-12"/> : null }
                 </h1>
                 <div className="d-block d-md-flex">
-                    <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="mr-08" />
+                    <ExportInterpretationSpreadsheetButton {...{ variantSampleListItem }} disabled={anyUnsavedChanges} className="me-08" />
                     <SaveVariantSampleListItemDeletionsAndOrderingButton {...{ variantSampleListItem, deletedVariantSampleSelections, deletedStructuralVariantSampleSelections,
                         resetVariantSampleSelectionDeletionsAndOrdering, anyUnsavedChanges, snvDeletionsLen, cnvDeletionsLen, fetchVariantSampleListItem }} />
                 </div>
@@ -282,12 +282,12 @@ function SaveVariantSampleListItemDeletionsAndOrderingButton (props) {
         <div className="btn-group" role="group">
             <button type="button" className={btnCls}
                 disabled={disabled} onClick={patchVariantSampleListItem}>
-                { iconCls ? <i className={"icon icon-fw mr-08 icon-" + iconCls}/> : null }
+                { iconCls ? <i className={"icon icon-fw me-08 icon-" + iconCls}/> : null }
                 Save { titleParts.join(" & ") }
             </button>
             <button type="button" className={btnCls} data-tip="Revert changes"
                 disabled={disabled} onClick={resetVariantSampleSelectionDeletionsAndOrdering}>
-                <i className="icon icon-fw icon-undo fas mr-08"/>
+                <i className="icon icon-fw icon-undo fas me-08"/>
                 Clear
             </button>
         </div>
@@ -303,7 +303,7 @@ const ExportInterpretationSpreadsheetButton = React.memo(function ExportInterpre
         <DropdownButton variant="outline-primary" disabled={disabled || vsObjects.length === 0} className={className}
             title={
                 <span>
-                    <i className="icon icon-fw icon-table fas mr-08"/>
+                    <i className="icon icon-fw icon-table fas me-08"/>
                     Export SNVs As...
                 </span>
             }>

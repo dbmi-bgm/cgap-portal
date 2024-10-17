@@ -59,7 +59,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
     if (showBottomAsDate) {
         bottomSection = (
             <div className="col-date text-smaller text-secondary">
-                { dateTitle && <span className="mr-04">{ dateTitle }</span>}
+                { dateTitle && <span className="me-04">{ dateTitle }</span>}
                 { date ? <LocalizedTime timestamp={date} formatType="date-xs" className="text-600"/> : datePlaceholder }
             </div>);
     } else {
@@ -90,7 +90,7 @@ const MultiLevelColumn = React.memo(function MultiLevelColumn(props){
                 )
             }
             <i
-              className="status-indicator status-indicator-dot ml-05"
+              className="status-indicator status-indicator-dot ms-05"
               data-status={status}
               data-tip={statusTip || Schemas.Term.toName("status", status)}
               data-html
@@ -437,7 +437,7 @@ export const columnExtensionMap = {
             const statusFormatted = Schemas.Term.toName('status', result.status);
             return (
                 <span className="value">
-                    <i className="status-indicator-dot mr-07" data-status={result.status} />
+                    <i className="status-indicator-dot me-07" data-status={result.status} />
                     { statusFormatted }
                 </span>
             );
@@ -558,10 +558,10 @@ const QCMultilevelColumn = React.memo(function QCMultilevelColumn({ result }) {
         qcFlags = (
             <div>
                 <a href={resultHrefPath + "#case-info.bioinformatics"} className="adv-block-link">
-                    <span className="mr-05">{fail} <i className={`icon icon-flag fas text-danger ml-05`} /></span>
-                    <span className="ml-05">{warn} <i className={`icon icon-flag fas text-warning ml-05`} /></span>
+                    <span className="me-05">{fail} <i className={`icon icon-flag fas text-danger ms-05`} /></span>
+                    <span className="ms-05">{warn} <i className={`icon icon-flag fas text-warning ms-05`} /></span>
                 </a>
-                <QuickPopover className="ml-05 mb-03 p-0" tooltip="Click for QC Summary">
+                <QuickPopover className="ms-05 mb-03 p-0" tooltip="Click for QC Summary">
                     <QCPopover {...{ qualityControlMetrics, relationshipMapping }} />
                 </QuickPopover>
             </div>
@@ -597,10 +597,10 @@ const QCPopover = React.memo(function QCPopover({ qualityControlMetrics, relatio
 
                         return (
                             <tr key={atID + bam_sample_id } className={`${ i !== sortedQCMS.length - 1 && "border-bottom"}`}>
-                                <td className="text-left text-600 text-capitalize text-larger pl-03 align-top align-left p-2">
+                                <td className="text-start text-600 text-capitalize text-larger ps-03 align-top align-left p-2">
                                     {role}:
                                 </td>
-                                <td className="text-left align-top text-larger align-left p-2">{sequencing_type}</td>
+                                <td className="text-start align-top text-larger align-left p-2">{sequencing_type}</td>
                                 <td className="p-2">{ warnFlags } { failFlags } { warnFlags.length == 0 && failFlags.length == 0 && "No Flags"}</td>
                             </tr>
                         );

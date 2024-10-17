@@ -95,7 +95,7 @@ export const VariantTabBody = React.memo(function VariantTabBody (props) {
                                 { clinvarExternalHref ?
                                     <a href={clinvarExternalHref} rel="noopener noreferrer" target="_blank"
                                         className="px-1" data-tip="View this variant in ClinVar">
-                                        <i className="icon icon-external-link-alt fas ml-07 text-small"/>
+                                        <i className="icon icon-external-link-alt fas ms-07 text-small"/>
                                     </a>
                                     : null }
                             </h4>
@@ -212,11 +212,11 @@ const GnomADTable = React.memo(function GnomADTable(props){
     const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
         return (
             <tr key={populationTitle}>
-                <td className="text-600 text-left">{ populationTitle }</td>
+                <td className="text-600 text-start">{ populationTitle }</td>
                 <td>{ standardizeGnomadValue(alleleCount) }</td>
                 <td>{ standardizeGnomadValue(alleleNum) }</td>
                 <td>{ standardizeGnomadValue(homozygoteNum) }</td>
-                <td className="text-left">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
+                <td className="text-start">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
             </tr>
         );
     });
@@ -225,35 +225,35 @@ const GnomADTable = React.memo(function GnomADTable(props){
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Population</th>
+                    <th className="text-start">Population</th>
                     <th data-tip={getTipForField(prefix + "_ac")}>Allele Count</th>
                     <th data-tip={getTipForField(prefix + "_an")}>Allele Number</th>
                     <th data-tip={getTipForField(prefix + "_nhomalt")}># of Homozygotes</th>
-                    <th className="text-left" data-tip={getTipForField(prefix + "_af")}>Allele Frequency</th>
+                    <th className="text-start" data-tip={getTipForField(prefix + "_af")}>Allele Frequency</th>
                 </tr>
             </thead>
             <tbody>
                 { ancestryTableRows }
                 <tr className="border-top">
-                    <td className="text-600 text-left">Female</td>
+                    <td className="text-600 text-start">Female</td>
                     <td>{ standardizeGnomadValue(gnomad_ac_female) }</td>
                     <td>{ standardizeGnomadValue(gnomad_an_female) }</td>
                     <td>{ standardizeGnomadValue(gnomad_nhomalt_female) }</td>
-                    <td className="text-left">{ gnomad_af_female === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_female) }</td>
+                    <td className="text-start">{ gnomad_af_female === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_female) }</td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Male</td>
+                    <td className="text-600 text-start">Male</td>
                     <td>{ standardizeGnomadValue(gnomad_ac_male) }</td>
                     <td>{ standardizeGnomadValue(gnomad_an_male) }</td>
                     <td>{ standardizeGnomadValue(gnomad_nhomalt_male) }</td>
-                    <td className="text-left">{ gnomad_af_male === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_male) }</td>
+                    <td className="text-start">{ gnomad_af_male === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af_male) }</td>
                 </tr>
                 <tr className="border-top">
-                    <td className="bg-light text-left"><strong>Total</strong></td>
+                    <td className="bg-light text-start"><strong>Total</strong></td>
                     <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_ac) }</td>
                     <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_an) }</td>
                     <td className="bg-light text-600">{ standardizeGnomadValue(gnomad_nhomalt) }</td>
-                    <td className="bg-light text-600 text-left">{ gnomad_af === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af) }</td>
+                    <td className="bg-light text-600 text-start">{ gnomad_af === 0 ? "0.0000" : standardizeGnomadValue(gnomad_af) }</td>
                 </tr>
             </tbody>
         </table>
@@ -306,49 +306,49 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <PredictorsTableHeading/>
                     <tbody>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">GERP++</label>
-                                <QuickPopover popID="GERP++" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_gerp_rs")} />
+                                <QuickPopover popID="GERP++" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_gerp_rs")} />
                             </td>
-                            <td className="text-left">{ csq_gerp_rs }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ csq_gerp_rs_rankscore }</td>
+                            <td className="text-start">{ csq_gerp_rs }</td>
+                            <td className="text-start">{ fallbackElem }</td>
+                            <td className="text-start">{ csq_gerp_rs_rankscore }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">CADD</label>
-                                <QuickPopover popID="CADD" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_cadd_phred")} />
+                                <QuickPopover popID="CADD" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_cadd_phred")} />
                             </td>
-                            <td className="text-left">{ csq_cadd_phred }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ csq_cadd_raw_rankscore }</td>
+                            <td className="text-start">{ csq_cadd_phred }</td>
+                            <td className="text-start">{ fallbackElem }</td>
+                            <td className="text-start">{ csq_cadd_raw_rankscore }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">phyloP (30 Mammals)</label>
-                                <QuickPopover popID="phylop30" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_phylop30way_mammalian")} />
+                                <QuickPopover popID="phylop30" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_phylop30way_mammalian")} />
                             </td>
-                            <td className="text-left">{ csq_phylop30way_mammalian }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-start">{ csq_phylop30way_mammalian }</td>
+                            <td className="text-start">{ fallbackElem }</td>
+                            <td className="text-start">{ fallbackElem }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">phyloP (100 Vertebrates)</label>
-                                <QuickPopover popID="phylop100" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_phylop100way_vertebrate")} />
+                                <QuickPopover popID="phylop100" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_phylop100way_vertebrate")} />
                             </td>
-                            <td className="text-left">{ csq_phylop100way_vertebrate }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ csq_phylop100way_vertebrate_rankscore }</td>
+                            <td className="text-start">{ csq_phylop100way_vertebrate }</td>
+                            <td className="text-start">{ fallbackElem }</td>
+                            <td className="text-start">{ csq_phylop100way_vertebrate_rankscore }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">phastCons (100 Vertebrates)</label>
-                                <QuickPopover popID="phastcons" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_phastcons100way_vertebrate")}/>
+                                <QuickPopover popID="phastcons" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_phastcons100way_vertebrate")}/>
                             </td>
-                            <td className="text-left">{ csq_phastcons100way_vertebrate }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ fallbackElem }</td>
+                            <td className="text-start">{ csq_phastcons100way_vertebrate }</td>
+                            <td className="text-start">{ fallbackElem }</td>
+                            <td className="text-start">{ fallbackElem }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -366,40 +366,40 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                     <PredictorsTableHeading/>
                     <tbody>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">SIFT</label>
-                                <QuickPopover popID="SIFT" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_sift_score")} />
+                                <QuickPopover popID="SIFT" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_sift_score")} />
                             </td>
-                            <td className="text-left">{ csq_sift_score }</td>
-                            <td className="text-left">{ csq_sift_pred }</td>
-                            <td className="text-left">{ csq_sift_converted_rankscore }</td>
+                            <td className="text-start">{ csq_sift_score }</td>
+                            <td className="text-start">{ csq_sift_pred }</td>
+                            <td className="text-start">{ csq_sift_converted_rankscore }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">PolyPhen2</label>
-                                <QuickPopover popID="PolyPhen2" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_polyphen2_hvar_score")} />
+                                <QuickPopover popID="PolyPhen2" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_polyphen2_hvar_score")} />
                             </td>
-                            <td className="text-left">{ csq_polyphen2_hvar_score }</td>
-                            <td className="text-left">{ csq_polyphen2_hvar_pred }</td>
-                            <td className="text-left">{ csq_polyphen2_hvar_rankscore }</td>
+                            <td className="text-start">{ csq_polyphen2_hvar_score }</td>
+                            <td className="text-start">{ csq_polyphen2_hvar_pred }</td>
+                            <td className="text-start">{ csq_polyphen2_hvar_rankscore }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">PrimateAI DL Score</label>
-                                <QuickPopover popID="PrimateAI" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_primateai_score")} />
+                                <QuickPopover popID="PrimateAI" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_primateai_score")} />
                             </td>
-                            <td className="text-left">{ csq_primateai_score }</td>
-                            <td className="text-left">{ csq_primateai_pred }</td>
-                            <td className="text-left">{ csq_primateai_rankscore }</td>
+                            <td className="text-start">{ csq_primateai_score }</td>
+                            <td className="text-start">{ csq_primateai_pred }</td>
+                            <td className="text-start">{ csq_primateai_rankscore }</td>
                         </tr>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">REVEL</label>
-                                <QuickPopover popID="REVEL" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("csq_revel_score")} />
+                                <QuickPopover popID="REVEL" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("csq_revel_score")} />
                             </td>
-                            <td className="text-left">{ csq_revel_score }</td>
-                            <td className="text-left">{ fallbackElem }</td>
-                            <td className="text-left">{ csq_revel_rankscore }</td>
+                            <td className="text-start">{ csq_revel_score }</td>
+                            <td className="text-start">{ fallbackElem }</td>
+                            <td className="text-start">{ csq_revel_rankscore }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -416,17 +416,17 @@ function PredictorsSection({ context, getTipForField, currentTranscriptIdx }){
                 <table className="w-100">
                     <thead>
                         <tr>
-                            <th className="text-left w-25">Prediction Tool</th>
-                            <th className="text-left w-75">Score</th>
+                            <th className="text-start w-25">Prediction Tool</th>
+                            <th className="text-start w-75">Score</th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td className="text-left">
+                            <td className="text-start">
                                 <label className="mb-0">SpliceAI</label>
-                                <QuickPopover popID="SpliceAI" className="p-0 ml-02 icon-sm" htmlContent={getTipForField("spliceaiMaxds")} />
+                                <QuickPopover popID="SpliceAI" className="p-0 ms-02 icon-sm" htmlContent={getTipForField("spliceaiMaxds")} />
                             </td>
-                            <td className="text-left">{ spliceaiMaxds }</td>
+                            <td className="text-start">{ spliceaiMaxds }</td>
                         </tr>
                     </tbody>
                 </table>
@@ -440,10 +440,10 @@ function PredictorsTableHeading(){
     return (
         <thead>
             <tr>
-                <th className="text-left w-25">Prediction Tool</th>
-                <th className="text-left w-25">Score</th>
-                <th className="text-left w-25">Prediction</th>
-                <th className="text-left w-25">Rank Score (0 to 1)</th>
+                <th className="text-start w-25">Prediction Tool</th>
+                <th className="text-start w-25">Score</th>
+                <th className="text-start w-25">Prediction</th>
+                <th className="text-start w-25">Rank Score (0 to 1)</th>
             </tr>
         </thead>
     );
@@ -506,7 +506,7 @@ function ExternalResourcesSection({ context, schemas, currentTranscriptIdx }){
                 <div className="col-12 col-lg-auto">
                     <a href={"https://genome.ucsc.edu/cgi-bin/hgTracks?db=hg38&position=" + chrPosVal} className="d-block" target="_blank" rel="noopener noreferrer" id="external_resource_for_ucsc_hg38">
                         <span className="align-middle">{ chrPosVal }</span>
-                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                        <i className="ms-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                     </a>
                 </div>
             </div>
@@ -529,7 +529,7 @@ const hgmdSearchLink = [
         <div className="col-12 col-lg-auto">
             <a href="https://my.qiagendigitalinsights.com/bbp/view/hgmd/pro/search_mut.php" className="d-block" target="_blank" rel="noopener noreferrer" id="external_resource_for_hgmdidsearch">
                 <span className="align-middle">Search</span>
-                <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                <i className="ms-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
             </a>
         </div>
     </div>

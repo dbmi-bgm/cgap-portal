@@ -135,11 +135,9 @@ export class GeneSearchBox extends React.PureComponent {
     return (
       <React.Fragment>
         <div className="input-group">
-          <div className="input-group-prepend">
-            <span className="input-group-text" id="search-for-gene-addon">
-              <i className={icon} />
-            </span>
-          </div>
+          <span className="input-group-text" id="search-for-gene-addon">
+            <i className={icon} />
+          </span>
           <input
             type="text"
             onChange={(evt) => this.updateCurrentSearchTerm(evt)}
@@ -166,14 +164,14 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
   if (error) {
     return (
       <div className="text-smaller">
-        <i className="icon icon-exclamation-triangle fas text-warning ml-05 mr-05"></i>
+        <i className="icon icon-exclamation-triangle fas text-warning ms-05 me-05"></i>
         {error}
       </div>
     );
   } else if (info) {
     return (
       <div className="text-smaller">
-        <i className="icon icon-info-circle fas text-secondary ml-05 mr-05"></i>
+        <i className="icon icon-info-circle fas text-secondary ms-05 me-05"></i>
         {info}
       </div>
     );
@@ -185,10 +183,11 @@ const GeneSearchResult = React.memo(function GeneSearchResult(props) {
     }
 
     return (
-      <div className="mr-1" key={result.geneName}>
+      <div className="me-1" key={result.geneName}>
         <small>
           <a
             href="#"
+            className="link-hover-underline"
             onClick={(evt) => handleResultClick(evt, result.geneName)}
           >
             {result.geneName}

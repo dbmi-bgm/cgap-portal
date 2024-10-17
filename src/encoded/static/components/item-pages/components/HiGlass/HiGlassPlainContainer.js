@@ -3,6 +3,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import _ from 'underscore';
+import memoize from 'memoize-one';
 import { console, object, ajax, isServerSide } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { requestAnimationFrame } from '@hms-dbmi-bgm/shared-portal-components/es/components/viz/utilities';
 import { PackageLockLoader } from './../../../util/package-lock-loader';
@@ -263,21 +264,38 @@ export class HiGlassPlainContainer extends React.PureComponent {
 }
 
 
-
+/**
+ * Attention! this function works if only process.env.NODE_ENV is set
+ * @todo remove this function when HiGlass works correctly under <StrictMode> in React 18
+ */
+const isDevelopmentEnv = memoize(function () {
+    try {
+        return (process.env.NODE_ENV === 'development') || (process.env.NODE_ENV === 'quick') || false;
+    } catch {
+        return false;
+    }
+});
+/**
+ * @todo remove this function when HiGlass works correctly under <StrictMode> in React 18
+ */
+const getReactVersion = memoize(function () {
+    try {
+        return parseInt((React.version || '-1').split('.')[0]);
+    } catch {
+        return -1;
+    }
+});
 
 
 const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContainerBody(props, ref){
-    
     const { viewConfig, options, hasRuntimeError, disabled, isValidating, mounted, higlassInitialized, width, height, mountCount, placeholder, style, className, packageLockJson } = props;
     const outerKey = "mount-number-" + mountCount;
     const { dependencies: { higlass : { version: higlassVersionUsed = null } = {} } = {} } = packageLockJson || {};
-
     const { HiGlassComponent } = higlassDependencies || {};
 
     let hiGlassInstance = null;
     const placeholderStyle = { width: width || null };
-
-    if (isValidating || !mounted || !higlassInitialized || higlassVersionUsed === null){ // Still loading/initializing...
+    if (isValidating || !mounted || higlassVersionUsed === null){ // Still loading/initializing...
         if (typeof height === 'number' && height >= 140){
             placeholderStyle.height = height;
             placeholderStyle.paddingTop = (height / 2) - 40;
@@ -293,6 +311,7 @@ const HiGlassPlainContainerBody = React.forwardRef(function HiGlassPlainContaine
         hiGlassInstance = (
             <div className="text-center" key={outerKey} style={placeholderStyle}>
                 <h4 className="text-400">Runtime Error</h4>
+                {isDevelopmentEnv() && getReactVersion() >= 18 ? <div>HiGlass may not render correctly under StrictMode in React 18 and later.</div> : null}
             </div>
         );
     } else {

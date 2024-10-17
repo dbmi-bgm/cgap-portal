@@ -25,7 +25,7 @@ function StatTestCheckbox({ label, checked, onChange }) {
     <Checkbox
       checked={checked}
       onChange={onChange}
-      labelClassName="mb-0 font-weight-normal"
+      labelClassName="mb-0 fw-normal"
       className="checkbox-container"
       value={label}
     >
@@ -96,7 +96,7 @@ function ShowMore({ recordDifference, onClick }) {
   if (recordDifference > 0) {
     return (
       <div className="text-center py-3" onClick={onClick}>
-        <a href="#">Show more ({recordDifference})</a>
+        <a href="#" className="link-hover-underline">Show more ({recordDifference})</a>
       </div>
     );
   }
@@ -360,7 +360,7 @@ class CohortStatisticalAnalysisTableComponent extends React.PureComponent {
     const headerCols = [];
     headerCols.push(<th key="th.geneName">Gene name</th>);
     this.state.activeTests.forEach((test) => {
-      let icon = "icon icon-sort-amount-down pl-1 fas";
+      let icon = "icon icon-sort-amount-down ps-1 fas";
       if (test !== this.state.sortedBy) {
         icon += " text-primary";
       }

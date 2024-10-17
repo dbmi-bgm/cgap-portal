@@ -114,7 +114,7 @@ export class IndividualBody extends React.PureComponent {
 
         let showTitle = getIndividualDisplayTitle(individual);
         if (individualID) {
-            showTitle = <a href={individualID}>{ showTitle }</a>;
+            showTitle = <a href={individualID} className="link-underline-hover">{ showTitle }</a>;
         }
 
         let editLink;
@@ -141,7 +141,7 @@ export class IndividualBody extends React.PureComponent {
                                     <i className="icon icon-pencil-alt fas clickable" />
                                 </a>
                                 : isLoadingIndividual ?
-                                    <i className="icon icon-circle-notch icon-spin fas d-block mr-15" />
+                                    <i className="icon icon-circle-notch icon-spin fas d-block me-15" />
                                     : null }
                             { onClose ? <i className="icon icon-times fas clickable d-block" onClick={onClose}/> : null }
                         </div>
@@ -254,7 +254,7 @@ function DiseaseListItem(props) {
     return (
         <div className="detail-row-list-item disease" key={featureID}>
             <div className="legend-patch" data-disease-index={diseaseIndex} />
-            <span className="title text-truncate text-capitalize"><a href={featureID}>{ title }</a></span>
+            <span className="title text-truncate text-capitalize"><a href={featureID} className="link-underline-hover">{ title }</a></span>
             { onsetAge !== null && onsetAgeUnits !== null ? (
                 <span className="onset" data-tip="Age of onset">
                     <small> @ </small>

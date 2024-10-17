@@ -25,7 +25,7 @@ export const Footer = React.memo(function Footer(){
                         <div className="footer-section copy-notice d-flex align-items-center justify-content-center justify-content-sm-end">
                             <div className="text-larger">
                                 <a href="https://www.youtube.com/@cgaptraining" target="_blank" rel="noreferrer">
-                                    <i className="icon icon-youtube fab mr-1"></i>
+                                    <i className="icon icon-youtube fab me-1"></i>
                                 </a>
                                 <a href="https://www.github.com/dbmi-bgm/" target="_blank" rel="noreferrer">
                                     <i className="icon icon-github fab"></i>

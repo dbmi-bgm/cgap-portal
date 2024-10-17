@@ -1096,7 +1096,7 @@ i.status-indicator-dot {
 
 	}
 
-	@include media-breakpoint-down(sm){
+	@include media-breakpoint-down(md){
 		/* Deprecated ? */
 		.array-group .array-group-row.list-item:not(.first-item) {
 			.item-label {
@@ -1314,7 +1314,7 @@ i.status-indicator-dot {
 				display: flex;
 				justify-content: space-evenly;
 
-				@include media-breakpoint-down(md) {
+				@include media-breakpoint-down(lg) {
 					flex-direction: column;
 				}
 
@@ -1327,7 +1327,7 @@ i.status-indicator-dot {
 					border: none;
 					background: transparent;
 
-					@include media-breakpoint-down(md) {
+					@include media-breakpoint-down(lg) {
 						margin-bottom: 5px;
 					}
 
@@ -1368,7 +1368,7 @@ i.status-indicator-dot {
 							}
 						}
 
-						@include media-breakpoint-down(md) {
+						@include media-breakpoint-down(lg) {
 							display: none;
 						}
 					}
@@ -2509,7 +2509,7 @@ table.report-findings-table {
 				> label {
 					cursor: pointer;
 					> input {
-						// Override default mr-08
+						// Override default me-08
 						margin-right: 16px !important;
 					}
 				}
@@ -2792,7 +2792,7 @@ div.user-profile-page {
 
 		// Override of prev CSS
 		.col-md-3.text-right.text-left-xs {
-			@include media-breakpoint-down(sm){
+			@include media-breakpoint-down(md){
 				text-align: left !important;
 			}
 		}
@@ -2865,7 +2865,7 @@ div.user-profile-page {
 			}
 		}
 
-		@include media-breakpoint-down(sm){
+		@include media-breakpoint-down(md){
 
 			.user-title-col {
 				padding-top: 2px;
@@ -2914,7 +2914,7 @@ div.user-profile-page {
 				}
 			}
 
-			@include media-breakpoint-down(sm){
+			@include media-breakpoint-down(md){
 				img.gravatar {
 					width: 94px; /* Account for border */
 					height: 70px;
@@ -2957,8 +2957,12 @@ div.user-profile-page {
 		table.access-keys-table {
 
 			tr {
+				th {
+					padding: .75rem;
+				}
 				td {
 					border-bottom: 1px solid #eee;
+					padding: .75rem;
 					&.access-key-buttons {
 						width: 140px;
 						.btn.btn-xs {

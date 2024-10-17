@@ -33,7 +33,7 @@ export default class HealthView extends React.PureComponent {
 
     static termTransformFxn(field, term){
         if (field === "foursight" && term && term.slice(0,4) === "http") {
-            return <a href={term} target="_blank" rel="noopener noreferrer">{ term }</a>;
+            return <a href={term} target="_blank" rel="noopener noreferrer" className="link-underline-hover">{ term }</a>;
         }
         return Term.toName(field, term, true);
     }
@@ -291,9 +291,9 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props){
 
     if (notYetLoaded) {
         return (
-            <button type="button" className="btn btn-block btn-lg btn-outline-dark refresh-counts-button btn-block mt-2"
+            <button type="button" className="btn btn-lg btn-outline-dark refresh-counts-button w-100 mt-2"
                 onClick={getCounts}>
-                <i className="icon icon-fw fas icon-sync mr-08"/>Get Database Counts
+                <i className="icon icon-fw fas icon-sync me-08"/>Get Database Counts
             </button>
         );
     }
@@ -303,14 +303,14 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props){
     if (db_es_total === 'loading...') {
         btnTitle = (
             <React.Fragment>
-                <i className="icon icon-fw fas icon-sync icon-spin mr-08"/>
+                <i className="icon icon-fw fas icon-sync icon-spin me-08"/>
                 Fetching Database Counts
             </React.Fragment>
         );
     } else {
         btnTitle = (
             <React.Fragment>
-                <i className="icon icon-fw fas icon-sync mr-08"/>
+                <i className="icon icon-fw fas icon-sync me-08"/>
                 Refresh Counts
             </React.Fragment>
         );
@@ -320,10 +320,12 @@ const DatabaseCountsInfo = React.memo(function DatabaseCountsInfo(props){
         <React.Fragment>
             <h3 className="text-400 mb-2 mt-3">Database Counts</h3>
 
-            <button type="button" className="btn btn-outline-dark refresh-counts-button btn-block mt-2"
-                onClick={getCounts} disabled={db_es_total === 'loading...'}>
-                { btnTitle }
-            </button>
+            <div className="d-grid gap-1">
+                <button type="button" className="btn btn-outline-dark refresh-counts-button mt-2"
+                    onClick={getCounts} disabled={db_es_total === 'loading...'}>
+                    {btnTitle}
+                </button>
+            </div>
 
             <ItemDetailList {...{ excludedKeys, schemas }} context={{ db_es_compare, db_es_total }} hideButtons keyTitleDescriptionMap={keyTitleDescriptionMapCounts} />
 

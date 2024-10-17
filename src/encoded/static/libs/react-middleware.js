@@ -3,7 +3,7 @@
 import React from 'react';
 import ReactDOMServer from 'react-dom/server';
 import fs from 'fs';
-import { store, mapStateToProps } from './../store';
+import { store, mapStateToProps, batchDispatch } from './../store';
 import { Provider, connect } from 'react-redux';
 import { JWT, object } from '@hms-dbmi-bgm/shared-portal-components/es/components/util';
 import { Alerts } from '@hms-dbmi-bgm/shared-portal-components/es/components/ui/Alerts';
@@ -53,9 +53,7 @@ export function appRenderFxn(body, res) {
     }
     // End JWT token grabbing
 
-    store.dispatch({
-        type: disp_dict
-    });
+    batchDispatch(store, disp_dict);
 
     var markup, AppWithReduxProps;
 
@@ -70,8 +68,8 @@ export function appRenderFxn(body, res) {
         );
     } catch (err) {
         store.dispatch({
-            type: 'context',
-            value: {
+            type: 'SET_CONTEXT',
+            payload: {
                 '@type': ['RenderingError', 'error'],
                 'status': 'error',
                 'code': 500,

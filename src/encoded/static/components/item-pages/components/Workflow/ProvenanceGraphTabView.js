@@ -10,10 +10,12 @@ import { WorkflowGraphSectionControls } from './WorkflowGraphSectionControls';
 import { FullHeightCalculator } from './../FullHeightCalculator';
 import { ProvenanceGraphOptionsStateController } from './ProvenanceGraphOptionsStateController';
 
-export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView(props){
+export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView({
+    graphSteps = null,
+    heading = <span>Provenance</span>,
+    ...props
+}) {
     const {
-        heading,
-        graphSteps = null,
         height: fullVizSpaceHeight,
         windowWidth,
         toggleAllRuns,
@@ -70,10 +72,6 @@ export const ProvenanceGraphTabView = React.memo(function ProvenanceGraphTabView
         </div>
     );
 });
-ProvenanceGraphTabView.defaultProps = {
-    'graphSteps' : null,
-    'heading' : <span>Provenance</span>
-};
 ProvenanceGraphTabView.getTabObject = function(props){
     const { windowWidth, windowHeight, isLoadingGraphSteps, graphSteps } = props;
     const stepsExist = Array.isArray(graphSteps) && graphSteps.length > 0;

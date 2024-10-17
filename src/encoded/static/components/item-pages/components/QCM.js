@@ -7,7 +7,7 @@ import { capitalize } from '@hms-dbmi-bgm/shared-portal-components/es/components
 import { flagToBootstrapClass } from '../../util/item';
 import QuickPopover from './QuickPopover';
 
-export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
+export function QCMFlag({ type, title, cls = "m-0 ms-1" }) {
     if (!title || !type) return null;
 
     const alertClass = type === "warn" ? "warning" : "danger";
@@ -15,7 +15,7 @@ export function QCMFlag({ type, title, cls = "m-0 ml-1" }) {
     return (
         <div data-flag={type} className={`qcm-flag alert alert-${alertClass} py-1 px-3 text-small border-0 d-flex align-items-center justify-items-center ${cls}`} role="alert">
             <span className="d-none d-lg-block text-truncate">{qcmFieldNameToDisplay(title)}</span>
-            <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ml-05`} />
+            <i className={`icon icon-flag fas text-${flagToBootstrapClass(alertClass)} ms-05`} />
         </div>
     );
 }
@@ -60,11 +60,11 @@ export function BioinfoStatsEntry(props) {
                 <label className="d-inline mb-0" htmlFor={id}>
                     {label && <>{label}:</>}
                     {!popoverContent && tooltip ?
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                        <i className="icon icon-info-circle fas icon-fw ms-05"
                             data-tip={tooltip} data-place="right" />
                         : null}
                 </label>
-                {popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ml-05">{popoverContent}</QuickPopover> : null}
+                {popoverContent ? <QuickPopover popID={label} tooltip={tooltip || "Click for more info"} className="p-0 ms-05">{popoverContent}</QuickPopover> : null}
                 <div {...{ id }}>{children}</div>
             </div>
         </div>

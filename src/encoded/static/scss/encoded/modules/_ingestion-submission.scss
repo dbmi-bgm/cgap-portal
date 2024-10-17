@@ -11,7 +11,7 @@ body[data-current-action="add"] {
             display: flex;
             margin-top: 30px;
 
-            @include media-breakpoint-down(md){
+            @include media-breakpoint-down(lg){
                 flex-direction: column;
             }
 
@@ -39,7 +39,7 @@ body[data-current-action="add"] {
                     }
                 }
 
-                @include media-breakpoint-down(md){
+                @include media-breakpoint-down(lg){
 
                     &:first-child {
                         border-radius: 10px 10px 0 0;

@@ -49,7 +49,7 @@ function FileDetailBody(props){
     if (context && context['@id'] === atId){
         title = accession || display_title;
     } else {
-        title = <a href={atId}>{ accession || display_title }</a>;
+        title = <a href={atId} className="link-underline-hover">{ accession || display_title }</a>;
     }
 
     return (
@@ -93,7 +93,7 @@ function StepDetailBody(props){
     }
     let title;
     if (stepID && display_title){
-        title = <a href={stepID}>{ display_title }</a>;
+        title = <a href={stepID} className="link-underline-hover">{ display_title }</a>;
     } else {
         title = display_title || stepNodeName;
     }

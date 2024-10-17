@@ -50,7 +50,7 @@ export function SampleTabBody(props){
                     <div className="info-body text-center overflow-auto d-flex h-100 d-flex justify-content-center flex-column">
                         <span>View BAM Snapshot</span>
                         <a href={atID + "@@download"} className="d-block pt-2 text-center mx-auto" target="_blank" rel="noopener noreferrer">
-                            <i className="icon icon-fw icon-2x icon-external-link-alt fas ml-05" />
+                            <i className="icon icon-fw icon-2x icon-external-link-alt fas ms-05" />
                         </a>
                     </div>
                 </div>
@@ -156,24 +156,24 @@ function CoverageTableRow(props) {
 
     return (
         <tr key={sampleID}>
-            <td className="text-left text-capitalize">{ relation }</td>
-            <td className="text-left"> { caseID }</td>
-            <td className="text-left">{ totalCoverage }</td>
-            <td className="text-left">{ refAD } {(refAD > 0 && refAD != totalCoverage) ? ` (${ Math.round(refAD/totalCoverage * 100 )}%)`: null }</td>
+            <td className="text-start text-capitalize">{ relation }</td>
+            <td className="text-start"> { caseID }</td>
+            <td className="text-start">{ totalCoverage }</td>
+            <td className="text-start">{ refAD } {(refAD > 0 && refAD != totalCoverage) ? ` (${ Math.round(refAD/totalCoverage * 100 )}%)`: null }</td>
             { altADs.map((ad, i) => (
-                <td key={`${i, ad}`} className="text-left">
+                <td key={`${i, ad}`} className="text-start">
                     { ad || 0}
                     { ad > 0 ? ` (${ Math.round(ad/totalCoverage * 100 )}%)`: null }
                 </td>
             ))}
-            <td className="text-left">{ label || "-" }</td>
+            <td className="text-start">{ label || "-" }</td>
         </tr>
     );
 }
 
 const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genotypeLabels = [], varRef }) {
     if (samplegeno.length === 0) {
-        return <span className="font-italic">No coverage data available.</span>;
+        return <span className="fst-italic">No coverage data available.</span>;
     }
 
     const mapNumgtToGT = {};
@@ -280,7 +280,7 @@ const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genot
         refAndAltCols = numGTKeys.sort((a,b) => a - b).map((numGT, i) => {
             const thisGT = mapNumgtToGT[numGT];
             const { bpGT = null, shortGT = null } = mapGTToShortenedTitles[thisGT];
-            return <th key={i} data-tip={thisGT} className="text-left">{`${numGT == 0 ? 'Ref': 'Alt'} (${bpGT || shortGT || thisGT})`}</th>;
+            return <th key={i} data-tip={thisGT} className="text-start">{`${numGT == 0 ? 'Ref': 'Alt'} (${bpGT || shortGT || thisGT})`}</th>;
         });
     } else { // looks like some columns were missing/incomplete, need to ensure # matches
         refAndAltCols = [];
@@ -291,15 +291,15 @@ const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genot
                 // if it's ref, just use ref placeholder to replace
                 if (i === 0) {
                     const { bpGT = null, shortGT = null } = shortenGT(varRef, 2);
-                    refAndAltCols.push(<th key={i} data-Tip={varRef} className="text-left">Ref ({bpGT || shortGT || varRef})</th>);
+                    refAndAltCols.push(<th key={i} data-Tip={varRef} className="text-start">Ref ({bpGT || shortGT || varRef})</th>);
                 } else { // apply placeholder name to empty alt column
-                    refAndAltCols.push(<th key={i} className="text-left">Alt (#{emptyColCount})</th>);
+                    refAndAltCols.push(<th key={i} className="text-start">Alt (#{emptyColCount})</th>);
                     emptyColCount++;
                 }
             } else { // use actual value
                 const thisGT = mapNumgtToGT[i];
                 const { bpGT = null, shortGT = null } = mapGTToShortenedTitles[thisGT];
-                refAndAltCols.push(<th key={i} data-tip={thisGT} className="text-left">{`${i == 0 ? 'Ref': 'Alt'} (${bpGT || shortGT || thisGT})`}</th>);
+                refAndAltCols.push(<th key={i} data-tip={thisGT} className="text-start">{`${i == 0 ? 'Ref': 'Alt'} (${bpGT || shortGT || thisGT})`}</th>);
             }
         }
     }
@@ -323,11 +323,11 @@ const CoverageTable = React.memo(function CoverageTable({ samplegeno = [], genot
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Relation</th>
-                    <th className="text-left">ID</th>
-                    <th className="text-left">Coverage</th>
+                    <th className="text-start">Relation</th>
+                    <th className="text-start">ID</th>
+                    <th className="text-start">Coverage</th>
                     { refAndAltCols }
-                    <th className="text-left">Call</th>
+                    <th className="text-start">Call</th>
                 </tr>
             </thead>
             <tbody>
@@ -343,31 +343,31 @@ function QualityTable(props) {
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Quality</th>
-                    <th className="text-left">Score</th>
-                    <th className="text-left">Definition</th>
+                    <th className="text-start">Quality</th>
+                    <th className="text-start">Score</th>
+                    <th className="text-start">Definition</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">Variant Quality</td>
-                    <td className="text-left">{ variantQuality }</td>
-                    <td className="text-left">{ getTipForField("QUAL") }</td>
+                    <td className="text-600 text-start">Variant Quality</td>
+                    <td className="text-start">{ variantQuality }</td>
+                    <td className="text-start">{ getTipForField("QUAL") }</td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Genotype Quality</td>
-                    <td className="text-left">{ genotypeQuality }</td>
-                    <td className="text-left">{ getTipForField("GQ") }</td>
+                    <td className="text-600 text-start">Genotype Quality</td>
+                    <td className="text-start">{ genotypeQuality }</td>
+                    <td className="text-start">{ getTipForField("GQ") }</td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Genotype Likelihoods(0/0,0/1,1/1)</td>
-                    <td className="text-left">{ genotypeLikelihood }</td>
-                    <td className="text-left">{ getTipForField("PL") }</td>
+                    <td className="text-600 text-start">Genotype Likelihoods(0/0,0/1,1/1)</td>
+                    <td className="text-start">{ genotypeLikelihood }</td>
+                    <td className="text-start">{ getTipForField("PL") }</td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">Strand Fisher Score</td>
-                    <td className="text-left">{ strandFisherScore }</td>
-                    <td className="text-left">{ getTipForField("FS") }</td>
+                    <td className="text-600 text-start">Strand Fisher Score</td>
+                    <td className="text-start">{ strandFisherScore }</td>
+                    <td className="text-start">{ getTipForField("FS") }</td>
                 </tr>
             </tbody>
         </table>
@@ -384,22 +384,22 @@ QualityTable.propTypes = {
 function DeNovoTable(props) {
     const { getTipForField, novoPP = null } = props;
     if (novoPP === null) {
-        return <span className="font-italic">Novo caller results are not provided for chrX, chrY, and chrM because these chromosomes do not meet model assumptions.</span>;
+        return <span className="fst-italic">Novo caller results are not provided for chrX, chrY, and chrM because these chromosomes do not meet model assumptions.</span>;
     }
     return (
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Inheritance Mode</th>
-                    <th className="text-left">Score</th>
-                    <th className="text-left">Definition</th>
+                    <th className="text-start">Inheritance Mode</th>
+                    <th className="text-start">Score</th>
+                    <th className="text-start">Definition</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">NovoCaller</td>
-                    <td className="text-left">{ novoPP }</td>
-                    <td className="text-left">{ getTipForField("novoPP") }</td>
+                    <td className="text-600 text-start">NovoCaller</td>
+                    <td className="text-start">{ novoPP }</td>
+                    <td className="text-start">{ getTipForField("novoPP") }</td>
                 </tr>
             </tbody>
         </table>
@@ -414,14 +414,14 @@ const CompoundHetTable = React.memo(function CompoundHetTable(props) {
     const { cmphetArr } = props;
 
     if (cmphetArr.length === 0) {
-        return <span className="font-italic">No other variants on the same gene have passed the CGAP filter for rare exonic or splicing variants or clinvar variants.</span>;
+        return <span className="fst-italic">No other variants on the same gene have passed the CGAP filter for rare exonic or splicing variants or clinvar variants.</span>;
     }
 
     function loadStatus(loadstatus) {
         switch (loadstatus) {
             case "error":
                 // TODO: tooltip broken; need to rework to account for the weirdness with the tooltip handlers getting unhooked
-                return <span data-tip="An error occurred while pulling this data. Reload page to try again."><i className="icon icon-exclamation-triangle fas text-warning mr-05"/> Error</span>;
+                return <span data-tip="An error occurred while pulling this data. Reload page to try again."><i className="icon icon-exclamation-triangle fas text-warning me-05"/> Error</span>;
             case "loading":
                 return <i className="icon icon-fw icon-circle-notch icon-spin fas"/>;
             default:
@@ -433,14 +433,14 @@ const CompoundHetTable = React.memo(function CompoundHetTable(props) {
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Variant</th>
-                    <th className="text-left">Phase</th>
-                    <th className="text-left">Gene</th>
-                    <th className="text-left">Impact</th>
-                    <th className="text-left">Transcript</th>
-                    <th className="text-left">Impact Transcript</th>
-                    <th data-tip="Location on worst effect transcript" className="text-left">Location</th>
-                    <th data-tip="Coding effect on worst effect transcript" className="text-left">Coding Effect</th>
+                    <th className="text-start">Variant</th>
+                    <th className="text-start">Phase</th>
+                    <th className="text-start">Gene</th>
+                    <th className="text-start">Impact</th>
+                    <th className="text-start">Transcript</th>
+                    <th className="text-start">Impact Transcript</th>
+                    <th data-tip="Location on worst effect transcript" className="text-start">Location</th>
+                    <th data-tip="Coding effect on worst effect transcript" className="text-start">Coding Effect</th>
                 </tr>
             </thead>
             <tbody>
@@ -471,13 +471,13 @@ const CompoundHetTable = React.memo(function CompoundHetTable(props) {
 
                     return (
                         <tr key={i}>
-                            <td className="text-600 text-left">
-                                { href ? <a href={href}>{variant}</a> : variant }
+                            <td className="text-600 text-start">
+                                { href ? <a href={href} className="link-hover-underline">{variant}</a> : variant }
                             </td>
-                            <td className="text-left">{ phase }</td>
-                            <td className="text-left">{ gene }</td>
-                            <td className="text-left">{ impactGene }</td>
-                            <td className="text-left">
+                            <td className="text-start">{ phase }</td>
+                            <td className="text-start">{ gene }</td>
+                            <td className="text-start">{ impactGene }</td>
+                            <td className="text-start">
                                 { finalTranscripts.map((item, i) => {
                                     if (finalTranscripts.length - 1 !== i) {
                                         return item + ", ";
@@ -485,9 +485,9 @@ const CompoundHetTable = React.memo(function CompoundHetTable(props) {
                                     return item;
                                 }) }
                             </td>
-                            <td className="text-left">{ impactTranscript }</td>
-                            <td className="text-left">{ loadStatus(location) }</td>
-                            <td className="text-left">{ loadStatus(coding_effect) }</td>
+                            <td className="text-start">{ impactTranscript }</td>
+                            <td className="text-start">{ loadStatus(location) }</td>
+                            <td className="text-start">{ loadStatus(coding_effect) }</td>
                         </tr>
                     );
                 })}

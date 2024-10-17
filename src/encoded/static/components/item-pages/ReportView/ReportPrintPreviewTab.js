@@ -70,7 +70,7 @@ ReportPrintPreviewTab.getTabObject = function(props) {
 function PrintPageButton(props){
     const {
         className = "btn btn-primary",
-        children = <React.Fragment><i className="icon icon-print fas mr-08"/>Print</React.Fragment>,
+        children = <React.Fragment><i className="icon icon-print fas me-08"/>Print</React.Fragment>,
         disabled = false
     } = props;
     const onClick = useCallback(function(e){

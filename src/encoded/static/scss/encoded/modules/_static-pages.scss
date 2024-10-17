@@ -133,6 +133,22 @@
       }
     }
   }
+
+  a {
+		text-decoration: none;
+
+		&:hover {
+			text-decoration: underline;
+		}
+	}
+
+  a.nav-link {
+    text-decoration: none;
+  
+    &:hover {
+      text-decoration: none !important;
+    }
+  }
 }
 
 .static-section-entry {
@@ -175,7 +191,7 @@
     //}
   }
 
-  @include media-breakpoint-down(lg) {
+  @include media-breakpoint-down(xl) {
     > ol.inner {
       border-top: 1px solid #eee;
     }

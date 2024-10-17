@@ -81,7 +81,7 @@ function PartnersLinks(props){
     };
     const partnerLinks = partners.map((p) =>
         <span key={p.id} className="partner-link">
-            <a href="#" data-for-id={p.id} onClick={onLinkClick}>
+            <a href="#" data-for-id={p.id} onClick={onLinkClick} className="link-underline-hover">
                 { getIndividualDisplayTitle(p) }
             </a>
         </span>

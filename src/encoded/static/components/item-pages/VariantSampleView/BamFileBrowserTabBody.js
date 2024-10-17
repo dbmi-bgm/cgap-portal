@@ -55,9 +55,9 @@ export const BamFileBrowserTabBody = React.memo(function BamFileBrowserTabBody (
                             </h4>
                         </div>
                         <div className="info-body">
-                            <div className="text-right">
+                            <div className="text-end">
                                 <button type="button" className="btn btn-primary btn-sm" onClick={exportDisplay}>
-                                    <i className="icon icon-download icon-sm fas mr-1"></i>Export
+                                    <i className="icon icon-download icon-sm fas me-1"></i>Export
                                 </button>
                             </div>
                             <HiGlassAjaxLoadContainer variantPositionAbsCoord={variantPositionAbsCoord} ref={higlassContainerRef} requestingTab="bam" bamSampleId={bamSampleId} file={file}/>

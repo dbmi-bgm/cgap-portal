@@ -41,7 +41,7 @@ function RowSpacingTypeSelect(props){
         "wide" : "Spread"
     };
     return (
-        <DropdownButton onSelect={onSelect} title={titleMap[rowSpacingType]} variant="outline-dark" alignRight>
+        <DropdownButton onSelect={onSelect} title={titleMap[rowSpacingType]} variant="outline-dark" align="end">
             <DropdownItem active={rowSpacingType === "compact"} eventKey="compact">Centered</DropdownItem>
             <DropdownItem active={rowSpacingType === "stacked"} eventKey="stacked">Stacked</DropdownItem>
             <DropdownItem active={rowSpacingType === "wide"} eventKey="wide">Spread</DropdownItem>
