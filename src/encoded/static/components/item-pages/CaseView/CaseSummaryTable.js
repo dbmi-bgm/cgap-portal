@@ -315,7 +315,7 @@ export const CaseSummaryTable = React.memo(function CaseSummaryTable(props){
                             return (
                                 <React.Fragment key={`${ext}-${fileUrl}`}>
                                     <a href={ fileUrl } rel="noopener noreferrer" target="_blank"
-                                        className={`${statusToTextClass(quality)}`} data-tip={tooltips[0]}>
+                                        className={`link-underline-hover ${statusToTextClass(quality)}`} data-tip={tooltips[0]}>
                                         {i + 1}
                                     </a>
                                     { hasQm ?
