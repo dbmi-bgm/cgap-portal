@@ -6,6 +6,23 @@ cgap-portal
 Change Log
 ----------
 
+16.0.0
+=======
+
+`PR 775: Bootstrap v5, React bootstrap v2, React 18, Redux and Misc. Npm Packages Upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/775>`_
+
+* Upgrade: React v17 to v18
+* Upgrade: Redux v4 to v5 (there are breaking changes in store and dispatchers. SPC is updated to support both new and legacy usage)
+* Upgrade: HiGlass (React 18-compatible)
+* Upgrade: auth0-Lock v11 to v12
+* Upgrade: gulp.js v4 to v5
+* Upgrade: react-workflow-viz (animation updates to eliminate findDOMNode errors)
+* Fix: User Content updates to fix markdown, jsx, and HTML static section rendering
+* Upgrade: Bootstrap v5
+* Upgrade: React-Bootstrap v2
+* Upgrade: FontAwesome v6
+
+
 15.6.0
 =======
 * 2024-10-11/dmichaels
