@@ -153,7 +153,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                     </p>
 
                     <div className="row mt-15">
-                        <div className="col-4 text-600 text-right no-user-select">
+                        <div className="col-4 text-600 text-end no-user-select">
                             Access Key ID
                         </div>
                         <div className="col-8">
@@ -161,7 +161,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                         </div>
                     </div>
                     <div className="row mt-05">
-                        <div className="col-4 text-600 text-right no-user-select">
+                        <div className="col-4 text-600 text-end no-user-select">
                             Secret Access Key
                         </div>
                         <div className="col-8">
@@ -212,7 +212,7 @@ class SyncedAccessKeyTable extends React.PureComponent {
                     'modal' : (
                         <Modal show onHide={this.hideModal}>
                             <Modal.Header closeButton>
-                                <Modal.Title className="text-400">Access key <span className="text-monospace">{ foundItem.access_key_id }</span> has been deleted.</Modal.Title>
+                                <Modal.Title className="text-400">Access key <span className="font-monospace">{ foundItem.access_key_id }</span> has been deleted.</Modal.Title>
                             </Modal.Header>
                         </Modal>
                     )
@@ -281,7 +281,7 @@ function AccessKeyTableContainer({ children, bodyClassName="card-body" }){
         <div className="access-keys-container card mt-36">
             <div className="card-header">
                 <h3 className="text-300">
-                    <i className="icon icon-fw icon-unlock fas mr-12" />
+                    <i className="icon icon-fw icon-unlock fas me-12" />
                     Access Keys
                 </h3>
             </div>
@@ -303,21 +303,23 @@ const AccessKeyTable = React.memo(function AccessKeyTable({ accessKeys, onDelete
     }
 
     return (
-        <table className="table access-keys-table bg-white">
-            <thead>
-                <tr>
-                    <th>Access Key ID</th>
-                    <th>Created</th>
-                    <th>Description</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                { accessKeys.map(function(accessKey, idx){
-                    return <AccessKeyTableRow {...{ onDelete, onResetSecret, accessKey, idx }} key={idx} />;
-                }) }
-            </tbody>
-        </table>
+        <div className="table-responsive-md">
+            <table className="table access-keys-table bg-white">
+                <thead>
+                    <tr>
+                        <th>Access Key ID</th>
+                        <th>Created</th>
+                        <th>Description</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {accessKeys.map(function (accessKey, idx) {
+                        return <AccessKeyTableRow {...{ onDelete, onResetSecret, accessKey, idx }} key={idx} />;
+                    })}
+                </tbody>
+            </table>
+        </div>
     );
 });
 
@@ -361,9 +363,7 @@ const AccessKeyTableRow = React.memo(function AccessKeyTableRow({ accessKey, idx
 export default class UserView extends React.Component {
 
     static onEditableFieldSave(nextContext){
-        store.dispatch({
-            type: { 'context': nextContext }
-        });
+        store.dispatch({ type: 'CONTEXT', payload: nextContext });
     }
 
     static propTypes = {
@@ -507,7 +507,7 @@ function ProfileContactFields(props){
 }
 
 function ProfileContactFieldsIcon({ icon }){
-    return <i className={"visible-lg-inline icon icon-fw mr-07 icon-" + icon }/>;
+    return <i className={"visible-lg-inline icon icon-fw me-07 icon-" + icon }/>;
 }
 
 
@@ -525,7 +525,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
         return (
             <li className="list-group-item" key={index}>
                 <div className="row project">
-                    <div className="col-md-3 text-left text-md-right">
+                    <div className="col-md-3 text-start text-md-end">
                         <label htmlFor={roleProjectID} className="text-500">Project</label>
                     </div>
                     <div id={roleProjectID} className="col-md-9 value text-500">
@@ -533,7 +533,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
                     </div>
                 </div>
                 <div className="row role">
-                    <div className="col-md-3 text-left text-md-right">
+                    <div className="col-md-3 text-start text-md-end">
                         <label htmlFor={roleRoleID} className="text-500">Role</label>
                     </div>
                     <div id={roleRoleID} className="col-md-9 value text-500">
@@ -548,7 +548,7 @@ const ProfileWorkFields = React.memo(function ProfileWorkFields({ user }){
         <div className="card h-100">
             <div className="card-header">
                 <h3 className="text-300 block-title">
-                    <i className="icon icon-users fas icon-fw mr-12" />
+                    <i className="icon icon-users fas icon-fw me-12" />
                     Organizations
                 </h3>
             </div>
@@ -607,12 +607,12 @@ export function ImpersonateUserForm({ updateAppSessionState }) {
                     <form onSubmit={onSubmit}>
                         <input type="text" className="mt-08 form-control" placeholder="Enter an email to impersonate..."
                             name="impersonate-user-email" ref={inputFieldRef} />
-                        <a href="/search/?type=User" target="_blank" className="btn btn-secondary btn-md mt-2 mr-2">
-                            <i className="icon icon-fw icon-users fas mr-08"/>
+                        <a href="/search/?type=User" target="_blank" className="btn btn-secondary btn-md mt-2 me-2">
+                            <i className="icon icon-fw icon-users fas me-08"/>
                             View Users
                         </a>
                         <button type="submit" className="btn btn-primary btn-md mt-2">
-                            <i className="icon icon-fw icon-user-ninja fas mr-08"/>
+                            <i className="icon icon-fw icon-user-ninja fas me-08"/>
                             Impersonate
                         </button>
                     </form>

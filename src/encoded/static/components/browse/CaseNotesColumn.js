@@ -29,8 +29,8 @@ const CaseNotesPopover = forwardRef(({
       ref={ref}
       {...popoverProps}
     >
-      <Popover.Title as="h3">Case Notes</Popover.Title>
-      <Popover.Content>
+      <Popover.Header as="h3">Case Notes</Popover.Header>
+      <Popover.Body>
         {
           lastSavedText.date ?
             <p className="last-saved small">
@@ -50,7 +50,7 @@ const CaseNotesPopover = forwardRef(({
           ></textarea>
         <button 
           type="button" 
-          className="btn btn-primary mr-04 w-100"
+          className="btn btn-primary me-04 w-100"
           onClick={() => { setIsLoading(true); handleNoteSave() } }
           // If text is modified or loading disable 
           disabled={ lastSavedText.text === currentText || isLoading ? "disabled" : "" }
@@ -69,7 +69,7 @@ const CaseNotesPopover = forwardRef(({
         </button>
         { lastSavedText.error && <p className="text-danger error">{lastSavedText.error}</p> }
         { lastSavedText.warning && <p className="small warning">{lastSavedText.warning}</p> }
-      </Popover.Content>
+      </Popover.Body>
     </Popover>
   )
 });

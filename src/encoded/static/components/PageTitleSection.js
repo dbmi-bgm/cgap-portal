@@ -304,7 +304,7 @@ export class StaticPageBreadcrumbs extends React.Component {
         if (ancestor['@id'] === this.props.context['@id']){
             inner = null;//ancestor.display_title;
         } else {
-            inner = <a href={ancestor['@id']}>{ ancestor.display_title }</a>;
+            inner = <a href={ancestor['@id']} className="link-underline-hover">{ ancestor.display_title }</a>;
         }
         return (
             <div className="static-breadcrumb" data-name={ancestor.name} key={ancestor['@id']}>
@@ -328,7 +328,7 @@ export class StaticPageBreadcrumbs extends React.Component {
                 if (editAction && editAction.href){
                     return (
                         <div className="static-edit-button pull-right" style={style}>
-                            <i className="icon icon-fw icon-pencil-alt fas"/> <a href={editAction.href} data-tip="Edit this Static Page">Edit</a>
+                            <i className="icon icon-fw icon-pencil-alt fas"/> <a href={editAction.href} className="link-underline-hover" data-tip="Edit this Static Page">Edit</a>
                         </div>
                     );
                 }

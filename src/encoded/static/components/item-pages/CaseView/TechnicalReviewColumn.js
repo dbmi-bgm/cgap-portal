@@ -166,22 +166,22 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "ref": this.callTrueButtonRef,
             "jsx": (
                 <Popover id="technical-review-popover">
-                    <Popover.Title className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Title>
-                    <Popover.Content className="px-0 py-1">
+                    <Popover.Header className="m-0 text-600 text-uppercase" as="h5">Present</Popover.Header>
+                    <Popover.Body className="px-0 py-1">
                         { options.slice(0,1).map(function(optionName, i){
                             return (
                                 <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="success" />
                             );
                         }) }
-                    </Popover.Content>
-                    <Popover.Title className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Title>
-                    <Popover.Content className="px-0 py-1">
+                    </Popover.Body>
+                    <Popover.Header className="m-0 text-600 text-uppercase border-top" as="h5">Present - with concerns</Popover.Header>
+                    <Popover.Body className="px-0 py-1">
                         { options.slice(1).map(function(optionName, i){
                             return (
                                 <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="warning" />
                             );
                         }) }
-                    </Popover.Content>
+                    </Popover.Body>
                 </Popover>
             )
         });
@@ -221,12 +221,12 @@ export class TechnicalReviewColumn extends React.PureComponent {
             "ref": this.callFalseButtonRef,
             "jsx": (
                 <Popover id="technical-review-popover">
-                    <Popover.Title className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Title>
-                    <Popover.Content className="px-0 py-1">
+                    <Popover.Header className="m-0 text-600 text-uppercase" as="h5">No Call</Popover.Header>
+                    <Popover.Body className="px-0 py-1">
                         { options.map(function(optionName, i){
                             return <CallClassificationButton {...commonBtnProps} {...{ optionName }} key={i} highlightColorStyle="danger" />;
                         }) }
-                    </Popover.Content>
+                    </Popover.Body>
                 </Popover>
             )
         });
@@ -422,7 +422,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
             ));
 
 
-        const recentlySavedAsterisk = <span className="text-warning position-absolute ml-n1" data-tip="Recently saved and possibly not yet in search results">*</span>;
+        const recentlySavedAsterisk = <span className="text-warning position-absolute ms-n1" data-tip="Recently saved and possibly not yet in search results">*</span>;
 
         return (
             <div className="w-100 d-flex align-items-center justify-content-around py-1">
@@ -448,7 +448,7 @@ export class TechnicalReviewColumn extends React.PureComponent {
                     { typeof lastSavedNoteText !== "undefined" ? recentlySavedAsterisk : null }
                     { typeof unsavedTechnicalReviewNoteTextForResult !== "undefined" ?
                         // Will be equal to null if saved text exists but unsaved text is blank (== will remove field upon save).
-                        <span className="text-danger text-700 position-absolute ml-n1" data-tip="Note text has not been saved yet.">*</span>
+                        <span className="text-danger text-700 position-absolute ms-n1" data-tip="Note text has not been saved yet.">*</span>
                         : null }
                 </button>
 
@@ -605,8 +605,8 @@ const NotePopoverContents = React.memo(function NotePopover(props){
 
     return (
         <React.Fragment>
-            <Popover.Title className="m-0 text-600" as="h5">Technical Review Note</Popover.Title>
-            <Popover.Content className="p-2">
+            <Popover.Header className="m-0 text-600" as="h5">Technical Review Note</Popover.Header>
+            <Popover.Body className="p-2">
                 { lastSavedTechnicalReviewForResult ?
                     <h5 className="text-400">
                         You have recently updated this technical review, <br/>
@@ -666,14 +666,14 @@ const NotePopoverContents = React.memo(function NotePopover(props){
                     </div>
                     : null }
                 <div className="d-flex mt-08">
-                    <button type="button" className="btn btn-primary mr-04 w-100" disabled={saveDisabled} onClick={handleSave}>
+                    <button type="button" className="btn btn-primary me-04 w-100" disabled={saveDisabled} onClick={handleSave}>
                         Save
                     </button>
-                    <button type="button" className="btn btn-primary ml-04 w-100" disabled>
+                    <button type="button" className="btn btn-primary ms-04 w-100" disabled>
                         Approve
                     </button>
                 </div>
-            </Popover.Content>
+            </Popover.Body>
         </React.Fragment>
     );
 });
@@ -745,11 +745,11 @@ function commonNoteUpsertProcess ({
             jsx: (
                 // Set 'key' prop to re-instantiate and force to reposition.
                 <Popover id="technical-review-popover-updating" key="update">
-                    <Popover.Title className="m-0 text-600" as="h5">Updating...</Popover.Title>
-                    <Popover.Content className="p-2 text-center">
+                    <Popover.Header className="m-0 text-600" as="h5">Updating...</Popover.Header>
+                    <Popover.Body className="p-2 text-center">
                         <i className="icon icon-spin icon-circle-notch icon-2x text-secondary fas py-4"/>
                         <p>Updating Technical Review</p>
-                    </Popover.Content>
+                    </Popover.Body>
                 </Popover>
             )
         };
@@ -971,8 +971,8 @@ function commonNoteUpsertProcess ({
                     ref: { ...existingBtnRef },
                     jsx: (
                         <Popover id="technical-review-popover" key="error">
-                            <Popover.Title className="m-0 text-600" as="h5">Error</Popover.Title>
-                            <Popover.Content className="d-flex align-items-center" style={{ maxWidth: 320 }}>
+                            <Popover.Header className="m-0 text-600" as="h5">Error</Popover.Header>
+                            <Popover.Body className="d-flex align-items-center" style={{ maxWidth: 320 }}>
                                 <div className="p-2 text-center">
                                     <i className="icon icon-exclamation-triangle icon-2x text-danger fas"/>
                                 </div>
@@ -980,7 +980,7 @@ function commonNoteUpsertProcess ({
                                     <h5 className="text-600 my-0">Failed to save Technical Review</h5>
                                     <p className="mt-0">Please check permissions or report to admins/developers.</p>
                                 </div>
-                            </Popover.Content>
+                            </Popover.Body>
                         </Popover>
                     )
                 };
@@ -1122,7 +1122,7 @@ class CallClassificationButton extends React.PureComponent {
         const lastSavedIndicator = isLastSaved ?
             <span className="text-white text-700" data-tip="You recently saved this value and it may not be yet visible in search results"> *</span>
             : isLastSaveUnset ?
-                <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
+                <i className="icon icon-minus-circle fas ms-08" data-tip="Previous Value" />
                 : null;
 
         if (isDefaultSaveToProject) {
@@ -1142,17 +1142,17 @@ class CallClassificationButton extends React.PureComponent {
             // We don't have a way to unsave from project, so disable button for now if already saved to project.
             return (
                 <div className="d-flex">
-                    <button type="button" className={"dropdown-item pr-16" + saveToProjectBtnClass} onClick={this.handleClick} data-save-to-project={true}
+                    <button type="button" className={"dropdown-item pe-16" + saveToProjectBtnClass} onClick={this.handleClick} data-save-to-project={true}
                         disabled={disabled} data-html data-tip={saveToProjectBtnTip}>
                         { optionName }
-                        <i className="icon icon-project-diagram fas small ml-16" />
+                        <i className="icon icon-project-diagram fas small ms-16" />
                         { justSavedToProject && !isAssessmentSavedToProject ? // Not yet indexed
                             <span className="text-white text-700" data-tip="You recently saved this to project and it may not be yet visible in search results"> *</span>
                             : justRemovedFromProject ?
-                                <i className="icon icon-minus-circle fas ml-08" data-tip="Previous Value" />
+                                <i className="icon icon-minus-circle fas ms-08" data-tip="Previous Value" />
                                 : null}
                     </button>
-                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-left" + saveToVSBtnClass} onClick={this.handleClick}
+                    <button type="button" className={"px-3 flex-grow-1 dropdown-item border-start" + saveToVSBtnClass} onClick={this.handleClick}
                         disabled={disabled} data-save-to-project={false} data-tip="Save only to this variant sample (and not project-wide for this variant)">
                         <i className="icon icon-vial fas" />
                         { lastSavedIndicator }
@@ -1201,8 +1201,8 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
 
     return (
         <Popover {...passProps} id="technical-review-popover" key="success-new-review" ref={ref}>
-            <Popover.Title className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Title>
-            <Popover.Content style={{ maxWidth: 320 }}>
+            <Popover.Header className="m-0 text-600" as="h5">{ created ? "Created" : "Updated" } Technical Review</Popover.Header>
+            <Popover.Body style={{ maxWidth: 320 }}>
                 <h5 className="my-0">NOTE:</h5>
                 <p className="mt-0">
                     It may take some time for your changes to become available in search results, please refresh or search again in a few minutes.
@@ -1210,10 +1210,10 @@ const SavedTechnicalReviewPopover = React.forwardRef(function ({ created = false
                 { typeof window !== "undefined" && window.sessionStorage ?
                     <label className="d-block text-400 mt-08 pt-08 border-top mb-0">
                         <input type="checkbox" value={checked} className="align-middle" onChange={onCheck} />&nbsp;
-                        <span className="align-middle ml-04">Check to stop showing this message</span>
+                        <span className="align-middle ms-04">Check to stop showing this message</span>
                     </label>
                     : null }
-            </Popover.Content>
+            </Popover.Body>
         </Popover>
     );
 });

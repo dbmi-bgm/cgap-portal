@@ -12,11 +12,11 @@ import { SvBrowserHiglass } from './SvBrowserHiglass';
 function SvSettingsCheckbox({ label, checked, onChange, disabled, loading = false }) {
     if (typeof onChange !== 'function') return null;
     if (typeof checked === 'undefined') return null;
-    const spinnerClass = "spinner-border text-secondary ml-1 spinner-border-sm" + (!loading ? " d-none" : "");
+    const spinnerClass = "spinner-border text-secondary ms-1 spinner-border-sm" + (!loading ? " d-none" : "");
 
     return (
         <Checkbox checked={checked} onChange={onChange} disabled={disabled || checked === null || loading}
-            labelClassName="mb-0 font-weight-normal"
+            labelClassName="mb-0 fw-normal"
             className="checkbox-container">
             {label}
             <div className={spinnerClass} role="status"></div>
@@ -435,8 +435,8 @@ export class SvBrowser extends React.PureComponent {
                 </div>
                 <div className="d-block mb-2">
                   <form>
-                    <div className="form-group">
-                      <label className="font-weight-normal">
+                    <div className="mb-3">
+                      <label className="fw-normal">
                         Minimal SV length (bp):
                       </label>
                       <input
@@ -445,8 +445,8 @@ export class SvBrowser extends React.PureComponent {
                         onChange={(e) => this.updateSvLength(e, "min")}
                       />
                     </div>
-                    <div className="form-group">
-                      <label className="font-weight-normal">
+                    <div className="mb-3">
+                      <label className="fw-normal">
                         Maximal SV length (bp):
                       </label>
                       <input
@@ -461,10 +461,10 @@ export class SvBrowser extends React.PureComponent {
                 <div className="d-block mb-1">
                   <button
                     type="button"
-                    className="btn btn-primary btn-block"
+                    className="btn btn-primary w-100"
                     onClick={this.exportDisplay}
                   >
-                    <i className="icon icon-download icon-sm fas mr-1"></i>
+                    <i className="icon icon-download icon-sm fas me-1"></i>
                     Export
                   </button>
                 </div>

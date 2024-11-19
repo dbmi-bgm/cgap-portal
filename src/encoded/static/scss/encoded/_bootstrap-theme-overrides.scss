@@ -10,8 +10,8 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 
 // Taken largely from bootstrap / spacing.scss
-// Overrides ONLY mb-, mt-, pb-, pt-, ml-, mr-, pl-, and pr- util classnames to use
-// more fine-grained increments of _pixels-at-default-zoom_ so that e.g. mr-16 is equivalent to having margin-right: 16px at default zoom.
+// Overrides ONLY mb-, mt-, pb-, pt-, ms-, me-, ps-, and pe- util classnames to use
+// more fine-grained increments of _pixels-at-default-zoom_ so that e.g. me-16 is equivalent to having margin-right: 16px at default zoom.
 @each $breakpoint in map-keys($grid-breakpoints) {
 	@include media-breakpoint-up($breakpoint) {
 	  	$infix: breakpoint-infix($breakpoint, $grid-breakpoints);
@@ -21,13 +21,13 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 				.#{$abbrev}t#{$infix}-#{$util-size} {
 					#{$prop}-top: $util-size * 0.625rem !important;
 				}
-				.#{$abbrev}r#{$infix}-#{$util-size} {
+				.#{$abbrev}e#{$infix}-#{$util-size} {
 					#{$prop}-right: $util-size * 0.625rem !important;
 				}
 				.#{$abbrev}b#{$infix}-#{$util-size} {
 					#{$prop}-bottom: $util-size * 0.625rem !important;
 				}
-				.#{$abbrev}l#{$infix}-#{$util-size} {
+				.#{$abbrev}s#{$infix}-#{$util-size} {
 					#{$prop}-left: $util-size * 0.625rem !important;
 				}
 
@@ -35,13 +35,13 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 					.#{$abbrev}t#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-top: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
-					.#{$abbrev}r#{$infix}-#{$util-size}#{$util-mini-size} {
+					.#{$abbrev}e#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-right: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 					.#{$abbrev}b#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-bottom: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
-					.#{$abbrev}l#{$infix}-#{$util-size}#{$util-mini-size} {
+					.#{$abbrev}s#{$infix}-#{$util-size}#{$util-mini-size} {
 						#{$prop}-left: $util-size * 0.625rem + ($util-mini-size * 0.0625rem) !important;
 					}
 				}
@@ -54,20 +54,6 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	}
 }
 
-
-/**** Ports from Bootstrap v5, these can be deleted if/when we upgrade to Bootstrap 5 *****/
-
-.pe-none {
-	/* @see https://getbootstrap.com/docs/5.0/utilities/interactions/#pointer-events */
-	pointer-events: none;
-}
-
-.pe-auto {
-	/* @see https://getbootstrap.com/docs/5.0/utilities/interactions/#pointer-events */
-	pointer-events: auto;
-}
-
-/**** End Ports from Bootstrap5 ****/
 
 /**************************************
  ************* Text Styles ************
@@ -85,6 +71,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
  **************************************/
 
 .btn {
+
     font-weight: 400;
     /* @include box-shadow(0 1px 3px rgba(0,0,0,.1), inset 0 -2px 3px rgba(0,0,0,.12), inset 0 1px 0 rgba(255,255,255,.3)); */
     //@include box-shadow(0 1px 3px rgba(0,0,0,0.25),inset 0 -1px 4px rgba(0,0,0,0.2),inset 0 1px 4px rgba(255,255,255,0.3));
@@ -112,14 +99,28 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	&.btn-xs.fixed-height {
 		height: 24px;
 	}
+	&.btn-link {
+		text-decoration: none;
+	}
+
+	&.disabled,
+    &:disabled {
+        cursor: default;
+        pointer-events: auto;
+
+        &:active {
+            pointer-events: none;
+        }
+    }
 }
 
 /** Extending Bootstrap button w/ rounded & ext-padding class **/
 /** btn-xs was removed in Bootstrap v4 so we recreate it here **/
 .btn.btn-xs {
-    @include button-size(1px, 5px, 0.825rem, 1.5, $border-radius-sm);
+    @include button-size(1px, 5px, 0.825rem, 2px);
     font-weight: 400;
     padding-top: 2px;
+	line-height: 1.5;
     //> i.icon {
     //    // Unset btn style
     //    transform: none;
@@ -132,12 +133,26 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
     padding-right: 7px;
 }
 
+.btn.btn-info,
+.btn.btn-success {
+    color: #fff !important;
+}
+
 /* Light gray BG, more prominent button style than btn-default */
 .btn.btn-secondary {
     @include button-variant(#e4e4e4, #e0e0e0);
     //&:active, &:focus {
     //    background-color: #e4e4e4;
     //}
+}
+
+.btn.btn-outline-success {
+    color: $success;
+    border-color: $success;
+    &:hover, &:active, &.active {
+        color: #fff;
+        background-color: $success;
+    }
 }
 
 
@@ -181,11 +196,13 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
   
 	// Reset rounded corners
 	> div.dropdown:not(:last-child) > .btn:not(.dropdown-toggle) {
-	  @include border-right-radius(0);
+		border-top-right-radius: 0;
+		border-bottom-right-radius: 0;
 	}
   
 	> div.dropdown:not(:first-child) > .btn {
-	  @include border-left-radius(0);
+		border-top-left-radius: 0;
+  		border-bottom-left-radius: 0;
 	}
   }
   
@@ -195,6 +212,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 
 /* Override sizing of btn-sm button re: our font */
 .btn.btn-sm {
+	line-height: 1.5;
 	&:not(.align-items-center) {
 		> i.icon {
 			// Center icons better within .btn-sm re: our fontface/height/etc
@@ -203,6 +221,11 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 	}
 }
 
+.btn-close {
+	&:focus {
+		box-shadow: none;
+	}
+}
 
 /**************************************
  ************ Form Inputs *************
@@ -212,6 +235,7 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
     // Overrides 0.75rem;
     padding-left: 0.5rem;
     padding-right: 0.5rem;
+	color: #495057;
 }
 
 
@@ -265,6 +289,12 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
         /* Limit height & make scrollable if necessary */
         max-height: 50vh;
         overflow: auto;
+
+		a {
+			&:hover {
+				text-decoration: underline;
+			}
+		}
     }
 
     @include media-breakpoint-up(lg){
@@ -292,11 +322,10 @@ $margin-util-sizes-mini: 1, 2, 3, 4, 5, 6, 7, 8; 		// * 1px
 			/* Unset default .h1-.h6 styling of bottom+top margin. */
 			margin-top: 0;
 			margin-bottom: 0;
+		}
 
-			&.h4 + button.close {
-				/* Default size for Modal.Title is h4; increase close button icon size (experimental) */
-				font-size: 1.8em;
-			}
+		.btn-close {
+			font-size: 1.1rem;
 		}
 	}
 
@@ -329,4 +358,26 @@ div[role="dialog"] {
 	}
 }
 
+/**************************************
+ ************ Link Styles ***********
+ **************************************/
 
+a {
+	text-decoration: none;
+	text-underline-offset: 0.125em;
+
+	&.link-underline-hover {
+		&:hover {
+			text-decoration: underline !important;
+		}
+	}
+}
+
+/**************************************
+ ************ Accordion ***********
+ **************************************/
+.accordion {
+	.card-header.btn {
+		border: 0 !important;
+	}
+}

@@ -142,23 +142,23 @@ function StaticHelpLinks() {
             </div>
             <a className="level-2-title text-small" href="https://www.youtube.com/@cgaptraining"
                 id="menutree-linkto-youtube_channel" target="_blank" rel="noopener noreferrer">
-                <span>Video Tutorials</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+                <span>Video Tutorials</span><i className="icon icon-external-link-alt fas text-smaller ms-05"/>
             </a>
             <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/geneticseducation"
                 id="menutree-linkto-geneticseducation_page" target="_blank" rel="noopener noreferrer">
-                <span>Training Guide</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+                <span>Training Guide</span><i className="icon icon-external-link-alt fas text-smaller ms-05"/>
             </a>
             <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/getinvolved"
                 id="menutree-linkto-getinvolved_page" target="_blank" rel="noopener noreferrer">
-                <span>Get Involved</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+                <span>Get Involved</span><i className="icon icon-external-link-alt fas text-smaller ms-05"/>
             </a>
             <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/faq"
                 id="menutree-linkto-faq_page" target="_blank" rel="noopener noreferrer">
-                <span>FAQ</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+                <span>FAQ</span><i className="icon icon-external-link-alt fas text-smaller ms-05"/>
             </a>
             <a className="level-2-title text-small" href="https://cgap.hms.harvard.edu/legal"
                 id="menutree-linkto-legal_page" target="_blank" rel="noopener noreferrer">
-                <span>Legal</span><i className="icon icon-external-link-alt fas text-smaller ml-05"/>
+                <span>Legal</span><i className="icon icon-external-link-alt fas text-smaller ms-05"/>
             </a>
         </div>
     )

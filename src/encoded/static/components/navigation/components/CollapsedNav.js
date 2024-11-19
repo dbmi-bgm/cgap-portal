@@ -86,7 +86,7 @@ function LeftNavAuthenticated(props){
         };
     }, [ context ]);
     return (
-        <div className="navbar-nav mr-auto">
+        <div className="navbar-nav me-auto">
             <BrowseNavItem {...{ href }} {...props} />
             <HelpNavItem {...props} />
         </div>
@@ -98,7 +98,7 @@ const LeftNavGuest = React.memo(function LeftNavGuest(props){
     // const { pathname = "/" } = url.parse(href, false);
 
     return (
-        <div className="navbar-nav mr-auto">
+        <div className="navbar-nav me-auto">
             <HelpNavItem {...props} />
         </div>
     );
@@ -135,7 +135,7 @@ function BrowseNavItem(props){
 
     const navLink = (
         <React.Fragment>
-            <span className="text-black">Browse</span>
+            <span>Browse</span>
         </React.Fragment>
     );
     const active = propActive !== false && bodyProps.isAnyActive;
@@ -179,7 +179,7 @@ const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
 
             <BigDropdownBigLink href={browseByCohortAnalysisHref} isActive={isBrowseByCohortAnalysisActive} isButton titleIcon="project-diagram fas" className="primary-big-link">
                 <div className="d-flex flex-column flex-lg-row">
-                    <div className="col pl-0">
+                    <div className="col ps-0">
                         <a href={browseByCohortAnalysisHref} >
                             <h4>Browse Cohorts</h4>
                             <div className="description">
@@ -187,8 +187,8 @@ const BrowseNavItemBody = React.memo(function BrowseNavItemBody(props) {
                             </div>
                         </a>
                     </div>
-                    <div className="col-auto pl-0 pl-1-md">
-                        <a href="/cohort-analysis" className="curated-browsers-link btn btn-primary btn-link btn-sm mt-1">
+                    <div className="col-auto ps-0 ps-1-md">
+                        <a href="/cohort-analysis" className="curated-browsers-link btn btn-primary btn-sm mt-1">
                             View Cohort Browser
                         </a>
                     </div>

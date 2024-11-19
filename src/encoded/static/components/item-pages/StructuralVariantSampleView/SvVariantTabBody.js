@@ -84,10 +84,10 @@ const SVGnomADTable = React.memo(function SVGnomADTable(props) {
     const ancestryTableRows = ancestryRowData.map(function({ popStr, populationTitle, alleleCount, alleleFreq, alleleNum, homozygoteNum }){
         return (
             <tr key={populationTitle}>
-                <td className="text-600 text-left">{ populationTitle }</td>
+                <td className="text-600 text-start">{ populationTitle }</td>
                 <td>{ standardizeGnomadValue(alleleCount) }</td>
                 <td>{ standardizeGnomadValue(alleleNum) }</td>
-                <td className="text-left">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
+                <td className="text-start">{ alleleFreq === 0 ? "0.0000" : standardizeGnomadValue(alleleFreq) }</td>
             </tr>
         );
     });
@@ -102,30 +102,30 @@ const SVGnomADTable = React.memo(function SVGnomADTable(props) {
         <table className="w-100">
             <thead>
                 <tr>
-                    <th className="text-left">Population</th>
+                    <th className="text-start">Population</th>
                     <th>
                         Allele Count
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                        <i className="icon icon-info-circle fas icon-fw ms-05"
                             data-tip={getTipForField("structural_variant." + prefix + "_ac")} />
                     </th>
                     <th>
                         Allele Number
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                        <i className="icon icon-info-circle fas icon-fw ms-05"
                             data-tip={getTipForField("structural_variant." + prefix + "_an")} />
                     </th>
-                    <th className="text-left">
+                    <th className="text-start">
                         Allele Frequency
-                        <i className="icon icon-info-circle fas icon-fw ml-05"
+                        <i className="icon icon-info-circle fas icon-fw ms-05"
                             data-tip={getTipForField("structural_variant." + prefix + "_af")} />
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">gnomAD SV</td>
+                    <td className="text-600 text-start">gnomAD SV</td>
                     <td>{gnomad_ac || fallbackElem}</td>
                     <td>{gnomad_an || fallbackElem}</td>
-                    <td className="text-left">{gnomad_af || fallbackElem}</td>
+                    <td className="text-start">{gnomad_af || fallbackElem}</td>
                 </tr>
                 { ancestryTableRows }
             </tbody>

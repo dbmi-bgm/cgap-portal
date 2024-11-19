@@ -13,16 +13,16 @@ import { File } from './typedefs';
  ************************/
 
 /** Uses different defaultProps.canDownloadStatuses, specific to project */
-export function FileDownloadButtonAuto(props){
-    return <FileDownloadButtonAutoOriginal {...props} />;
-}
-FileDownloadButtonAuto.defaultProps = {
-    'canDownloadStatuses' : [
+export function FileDownloadButtonAuto({
+    canDownloadStatuses = [
         'uploaded',
         'released',
         'replaced',
         'submission in progress',
         'released to project',
         'archived'
-    ]
-};
+    ],
+    ...props
+}) {
+    return <FileDownloadButtonAutoOriginal {...props} />;
+}

@@ -15,7 +15,7 @@ export default class ErrorPage extends React.PureComponent {
         if (status === 'invalid_login'){
             errorMessage = (
                 <div>
-                    <h3>The account you provided is not valid. <a href="/">Return</a> to the homepage.</h3>
+                    <h3>The account you provided is not valid. <a href="/" className="link-underline-hover">Return</a> to the homepage.</h3>
                     <h5>
                         Please note: our authentication system will automatically
                         attempt to log you in through your selected provider if you are
@@ -23,7 +23,7 @@ export default class ErrorPage extends React.PureComponent {
                         that you are logged in to the provider (e.g. google) with the matching email address.
                     </h5>
                     <h5>Access is restricted to 4DN consortium members.</h5>
-                    <h5><a href="mailto:4DN.DCIC.support@hms-dbmi.atlassian.net">Request an account.</a></h5>
+                    <h5><a href="mailto:4DN.DCIC.support@hms-dbmi.atlassian.net" className="link-underline-hover">Request an account.</a></h5>
                 </div>
             );
         } else if (status === 'not_found'){
@@ -31,7 +31,7 @@ export default class ErrorPage extends React.PureComponent {
         } else if (status === 'forbidden'){
             return <HTTPForbiddenView/>;
         }else{
-            errorMessage = <h3>{"The page you've requested does not exist or you have found an error."} <a href="/">Return</a> to the homepage.</h3>;
+            errorMessage = <h3>{"The page you've requested does not exist or you have found an error."} <a href="/" className="link-underline-hover">Return</a> to the homepage.</h3>;
         }
         return <div className="error-page text-center container" id="content">{ errorMessage }</div>;
     }
@@ -57,7 +57,7 @@ const HTTPNotFoundView = React.memo(function(props){
                 {"The page you've requested does not exist."}
             </h4>
             <p className="mb-0 mt-0">
-                <a href="/">Return</a> to the homepage.
+                <a href="/" className="link-underline-hover">Return</a> to the homepage.
             </p>
         </ErrorContainer>
     );
@@ -70,9 +70,9 @@ const HTTPForbiddenView = React.memo(function HTTPForbiddenView(props){
                 Access was denied to this resource.
             </h4>
             <p className="mb-0 mt-0">
-                If you have an account, please try logging in or return to the <a href="/">homepage</a>.
+                If you have an account, please try logging in or return to the <a href="/" className="link-underline-hover">homepage</a>.
                 <br/>
-                For instructions on how to set up an account, please visit the help page for <a href="/help/account-creation">Creating an Account</a>.
+                For instructions on how to set up an account, please visit the help page for <a href="/help/account-creation" className="link-underline-hover">Creating an Account</a>.
             </p>
         </ErrorContainer>
     );

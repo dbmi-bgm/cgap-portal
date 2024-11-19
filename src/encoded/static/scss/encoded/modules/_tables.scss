@@ -1,5 +1,9 @@
 /*  COMMON TABLES */
 
+.table>thead>tr>th {
+	background-color: #f0f1f5;
+}
+
 table {
 	@include font-size(0.9rem);
 	
@@ -21,6 +25,16 @@ table {
 					border-left: none !important;
 				}
 				*/
+
+				//In Bootstrap v5, text-left and text-right were replaced by text-start and text-end.
+				//Custom SCSS styles were added for text-left and text-right to maintain text alignment compatibility.
+				//These can be removed when no longer needed.
+				&.text-left {
+					text-align: left !important;
+				}
+				&.text-right {
+					text-align: right !important;
+				}
 			}
 		}
 
@@ -39,12 +53,19 @@ table {
 				text-align: center;
 				vertical-align: middle !important;
 				outline: none !important;
+
+				&.text-left {
+					text-align: left !important;
+				}
+				&.text-right {
+					text-align: right !important;
+				}
 			}
 		}
 
-		/* If entire table or row has .text-left etc, apply to children as well (unless itself overrides). */
-		&.text-left,
-		&.text-right {
+		/* If entire table or row has .text-start etc, apply to children as well (unless itself overrides). */
+		&.text-start,
+		&.text-end {
 			> tr {
 				text-align: inherit;
 				> th,
@@ -55,9 +76,9 @@ table {
 		}
 	}
 
-	/* If entire table or row has .text-left etc, apply to children as well. */
-	&.text-left,
-	&.text-right {
+	/* If entire table or row has .text-start etc, apply to children as well. */
+	&.text-start,
+	&.text-end {
 		> thead,
 		> tbody {
 			text-align: inherit;
@@ -179,7 +200,7 @@ table.matrix {
 	.family-tables-container {
 
 		// Only when present on item page(s)
-		@include media-breakpoint-down(sm){
+		@include media-breakpoint-down(md){
 			.item-page-table-row-container & {
 				border-bottom: 1px solid #ddd;
 			}

@@ -140,11 +140,11 @@ export class ClinicianNotes extends React.PureComponent {
                 }
                 { haveEditPermission && notesChanged ?
                     <div className="save-btn-container">
-                        <button type="button" disabled={isSaving} className="btn btn-sm btn-success mt-02 mr-05" onClick={this.onSave}
+                        <button type="button" disabled={isSaving} className="btn btn-sm btn-success mt-02 me-05" onClick={this.onSave}
                             data-tip="It may take a couple of minutes for changes to take effect">
                             { isSaving ?
                                 <React.Fragment>
-                                    <i className="icon icon-circle-notch fas icon-spin mr-08"/>
+                                    <i className="icon icon-circle-notch fas icon-spin me-08"/>
                                     Saving
                                 </React.Fragment>
                                 : "Save" }

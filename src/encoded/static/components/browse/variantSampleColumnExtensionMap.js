@@ -221,7 +221,7 @@ export const structuralVariantSampleColumnExtensionMap = {
 
             return (
                 <button type="button" onClick={onClickLinkNavigateChildWindow} data-href={targetHref}
-                    data-child-window={resultUUID} className="text-truncate text-left btn btn-link p-0">
+                    data-child-window={resultUUID} className="text-truncate text-start btn btn-link p-0">
                     <StructuralVariantTranscriptColumn {...{ result, align }} />
                 </button>
             );
@@ -297,12 +297,12 @@ export const VariantSampleDisplayTitleColumn = React.memo(function VariantSample
     ];
 
     if (variantID) {
-        rows.push(<span key={1} className="font-italic">{ variantID }</span>);
+        rows.push(<span key={1} className="fst-italic">{ variantID }</span>);
     }
 
     return (
         <button type="button" onClick={onClick} data-href={link || atID}
-            data-child-window={resultUUID} className="text-truncate text-left btn btn-link p-0">
+            data-child-window={resultUUID} className="text-truncate text-start btn btn-link p-0">
             <StackedRowColumn className={cls} {...{ rows }}  />
         </button>
     );
@@ -334,7 +334,7 @@ export const VariantSampleDisplayTitleColumnSV = React.memo(function VariantSamp
 
     return (
         <button type="button" onClick={onClick} data-href={link || atID}
-            data-child-window={resultUUID} className="text-truncate text-left btn btn-link p-0">
+            data-child-window={resultUUID} className="text-truncate text-start btn btn-link p-0">
             <StackedRowColumn className={cls} {...{ rows }}  />
         </button>
     );
@@ -365,7 +365,7 @@ export const GenesMostSevereDisplayTitle = React.memo(function GenesMostSevereDi
         <StackedRowColumn className={"text-" + align + (truncate ? " text-truncate" : "")}>
             <span>{ title }</span>
             <br/>
-            <em data-tip={showTips ? "Most Severe Transcript" : null} className="font-italic text-small">
+            <em data-tip={showTips ? "Most Severe Transcript" : null} className="fst-italic text-small">
                 { genes_most_severe_transcript}
             </em>
         </StackedRowColumn>
@@ -450,7 +450,7 @@ export const StructuralVariantTranscriptColumn = React.memo(function StructuralV
                 <i className="icon icon-star fas text-primary" data-tip="Highlighted gene" />:&nbsp;
                 { highlighted_genes.map((gene) => {
                     const { display_title, "@id": atID } = gene;
-                    return <span key="atID" className="ml-02"><a href={atID}>{display_title}</a></span>;
+                    return <span key="atID" className="ms-02"><a href={atID} className="link-underline-hover">{display_title}</a></span>;
                 })}
             </div>
         );
@@ -471,13 +471,13 @@ const StructuralVariantTranscriptCSQGeneColumn = React.memo(function({ result })
     const genes = Object.keys(transcriptsDeduped);
 
     if (genes.length <= 2) { // show comma separated
-        return <a href={path} target="_blank" rel="noreferrer">{genes.join(", ")}</a>;
+        return <a href={path} target="_blank" rel="noreferrer" className="link-underline-hover">{genes.join(", ")}</a>;
     }
     // show first and last gene separated by "..." with first 10 available on hover
     const lastItemIndex = genes.length >= 10 ? 10 : genes.length;
     const tipGenes = genes.slice(0, lastItemIndex).join(", ");
 
-    return <a href={path} target="_blank" rel="noreferrer" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
+    return <a href={path} target="_blank" rel="noreferrer" className="link-underline-hover" data-tip={tipGenes}>{`${genes[0]}...${genes[genes.length-1]}`}</a> ;
 });
 
 export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLabelColumn(props){
@@ -493,32 +493,32 @@ export const ProbandGenotypeLabelColumn = React.memo(function ProbandGenotypeLab
     const rowCls = truncate ? "text-truncate" : null;
 
     const rows = [
-        // <div key="proband_gt" className="d-block text-truncate"><span className="font-italic">Proband: </span>{proband_genotype_label}</div>
+        // <div key="proband_gt" className="d-block text-truncate"><span className="fst-italic">Proband: </span>{proband_genotype_label}</div>
         <div key={0} className={rowCls}>
             { showIcon ?
-                <i className="text-small icon icon-user icon-fw fas mr-04" data-tip={showTips ? "Proband Genotype" : null}/>
+                <i className="text-small icon icon-user icon-fw fas me-04" data-tip={showTips ? "Proband Genotype" : null}/>
                 : null }
             { proband_genotype_label }
         </div>
     ];
 
     if (mother_genotype_label) {
-        // rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="font-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
+        // rows.push(<div key="mother_gt" className="d-block text-truncate"><span className="fst-italic">Mother: </span>{mother_genotype_label || "-"}</div>);
         rows.push(
             <div key={1} className={rowCls}>
                 { showIcon ?
-                    <i className="text-small icon icon-circle icon-fw far mr-04" data-tip={showTips ? "Mother Genotype" : null}/>
+                    <i className="text-small icon icon-circle icon-fw far me-04" data-tip={showTips ? "Mother Genotype" : null}/>
                     : null }
                 { mother_genotype_label || "-" }
             </div>
         );
     }
     if (father_genotype_label) {
-        // rows.push(<div key="father_gt" className="d-block text-truncate"><span className="font-italic">Father: </span>{father_genotype_label || "-"}</div>);
+        // rows.push(<div key="father_gt" className="d-block text-truncate"><span className="fst-italic">Father: </span>{father_genotype_label || "-"}</div>);
         rows.push(
             <div key={2} className={rowCls}>
                 { showIcon ?
-                    <i className="text-small icon icon-square icon-fw far mr-04" data-tip={showTips?  "Father Genotype" : null}/>
+                    <i className="text-small icon icon-square icon-fw far me-04" data-tip={showTips?  "Father Genotype" : null}/>
                     : null }
                 { father_genotype_label || "-" }
             </div>
@@ -533,7 +533,7 @@ export const BAMSnapshotColumn = React.memo(function BAMSnapshotColumn({ result 
         <div className="mx-auto text-truncate">
             <button type="button" className="btn btn-outline-dark btn-sm" onClick={onClickLinkNavigateChildWindow}
                 href={resultAtID + "@@download/"} data-child-window={"bam-" + resultUUID} data-child-window-message="false"
-                data-html data-tip="View BAM Snapshot <i class='ml-07 icon-sm icon fas icon-external-link-alt'></i>">
+                data-html data-tip="View BAM Snapshot <i class='ms-07 icon-sm icon fas icon-external-link-alt'></i>">
                 <i className="icon icon-fw icon-image fas" />
             </button>
         </div>

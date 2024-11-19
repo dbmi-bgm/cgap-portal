@@ -135,21 +135,21 @@ const FilterBlockTitle = React.memo(function FilterBlockTitle (props) {
                 setNameOfFilterBlockAtIdx(index, inputElem.value);
             }}>
                 <input type="text" name="filterName" className="form-control" defaultValue={filterName} />
-                <button type="reset" className="btn btn-sm btn-outline-dark ml-08" onClick={function(e){
+                <button type="reset" className="btn btn-sm btn-outline-dark ms-08" onClick={function(e){
                     e.stopPropagation();
                     e.preventDefault();
                     setIsEditingTitle(false);
                 }}>
                     <i className="icon icon-fw icon-times fas" />
                 </button>
-                <button type="submit" className="btn btn-sm btn-outline-success ml-08">
+                <button type="submit" className="btn btn-sm btn-outline-success ms-08">
                     <i className="icon icon-fw icon-check fas" />
                 </button>
             </form>
         );
     } else {
         const isDuplicateName = typeof duplicateNameIndices[index] === "number";
-        const deleteIconCls = "icon fas mr-07 clickable icon-times-circle" + (!isOnlyFilterBlock ? "" : " disabled");
+        const deleteIconCls = "icon fas me-07 clickable icon-times-circle" + (!isOnlyFilterBlock ? "" : " disabled");
         const titleCls = "text-small pt-02" + (
             (isDuplicateName || !isValidNameContentsToSaveToVariantSampleList) ? " text-danger"
                 : !filterName ? " text-secondary"
@@ -162,13 +162,13 @@ const FilterBlockTitle = React.memo(function FilterBlockTitle (props) {
                     <i className={deleteIconCls} onClick={!isOnlyFilterBlock ? onRemoveClick : null}
                         data-tip={!isOnlyFilterBlock ? "Delete this filter block" : "Can't delete last filter block"} />
                     : null }
-                { isLoadingBlock ? <i className="icon fas mr-07 icon-circle-notch icon-spin" /> : null }
+                { isLoadingBlock ? <i className="icon fas me-07 icon-circle-notch icon-spin" /> : null }
                 <span className={titleCls} data-tip={isDuplicateName ? "Duplicate title of filter block #" + (duplicateNameIndices[index] + 1) : null}>
                     { filterName || <em>No Name</em> }
                 </span>
                 { typeof setNameOfFilterBlockAtIdx === "function" && typeof filterName === "string" ?
                     // Prevent [attempts at] editing of JSX/non-string 'filterName' values. Should only occur for hardcoded-UI stuff like DummyLoadingFilterBlock
-                    <i className="icon icon-pencil-alt fas ml-1 clickable text-smaller align-self-start" onClick={onEditClick} />
+                    <i className="icon icon-pencil-alt fas ms-1 clickable text-smaller align-self-start" onClick={onEditClick} />
                     : null }
             </React.Fragment>
         );
@@ -181,7 +181,7 @@ const FilterBlockTitle = React.memo(function FilterBlockTitle (props) {
             <div className="flex-grow-1 d-flex align-items-center">
                 { innerTitle }
             </div>
-            <div className="flex-grow-0 pl-16">
+            <div className="flex-grow-0 ps-16">
                 <div className="cached-counts-value" data-count-exists={countExists} data-tip={countExists ? cachedCount + " results found for this filter block." : null}>
                     { cachedCount }
                 </div>

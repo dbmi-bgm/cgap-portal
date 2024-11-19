@@ -339,7 +339,7 @@ export const OverviewTabTitle = React.memo(function OverviewTabTitle(props){
     return (
         <button type="button" className="d-block overview-tab" data-tab-title={title} data-tab-index={index} data-active={active} disabled={disabled}>
             { loading ?
-                <i className="icon icon-spin icon-circle-notch fas mr-07"/>
+                <i className="icon icon-spin icon-circle-notch fas me-07"/>
                 : title }
         </button>
     );
@@ -638,7 +638,7 @@ const ACMGInvokableRule = React.memo(function ACMGInvokableRule(props) {
     }, [ toggleRuleStrengthOptionsPopover, strength ]); // 'rule' is already compared in toggleRuleStrengthOptionsPopover useCallback wrapper.
 
     return (
-        <div ref={thisRef} className="acmg-invoker clickable ml-02 mr-02 flex-grow-1" key={rule} data-criteria={rule} data-invoked={!!strength}
+        <div ref={thisRef} className="acmg-invoker clickable ms-02 me-02 flex-grow-1" key={rule} data-criteria={rule} data-invoked={!!strength}
             onClick={onClick} data-html data-tip={acmgTip(rule, description)}>
             { rule }
         </div>
@@ -692,8 +692,8 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
 
     return (
         <Popover id={"acmg-strength-pop-"+rule}>
-            <Popover.Title className="m-0" as="h4">Select ACMG Rule Strength</Popover.Title>
-            <Popover.Content className="p-0">
+            <Popover.Header className="m-0" as="h4">Select ACMG Rule Strength</Popover.Header>
+            <Popover.Body className="p-0">
                 <div className="list-group list-group-flush acmg-popover-strengths">
                     { strengthOptions.map((options) => {
                         const { strengthOption, selected = false, defaultStr = false } = options;
@@ -713,7 +713,7 @@ function generateACMGRulePopover(rule, selectedStrength, invokerFx, setACMGStren
                         ;
                     })}
                 </div>
-            </Popover.Content>
+            </Popover.Body>
         </Popover>
     );
 }
