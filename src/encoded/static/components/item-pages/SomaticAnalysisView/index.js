@@ -97,12 +97,12 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                         <strong>{external_identifier || display_title}</strong> - {description}
                                     </span>
                                     <div className="d-flex text-smaller text-muted text-400 mt-02">
-                                        <object.CopyWrapper className="text-monospace mr-1" value={accession} stopPropagation>
+                                        <object.CopyWrapper className="font-monospace me-1" value={accession} stopPropagation>
                                             {accession}
                                         </object.CopyWrapper>
                                         <div>
                                             What is somatic analysis?
-                                            <i className="icon-info-circle icon fas ml-05"
+                                            <i className="icon-info-circle icon fas ms-05"
                                                 data-tip="Identifies somatic mutations present in a sample and absent in reference normal tissue from the same individual. ">
                                             </i>
                                         </div>
@@ -123,8 +123,8 @@ const SomaticAnalysisInfoTabView = React.memo(function CaseInfoTabView(props) {
                                         <div className="card d-flex flex-column">
                                             <div className="pedigree-vis-heading card-header primary-header d-flex justify-content-between">
                                                 <div>
-                                                    <i className="icon icon-spinner fas icon-fw mr-1" />
-                                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ml-05 mr-05">
+                                                    <i className="icon icon-spinner fas icon-fw me-1" />
+                                                    <h4 className="text-white text-400 d-inline-block mt-0 mb-0 ms-05 me-05">
                                                         Somatic Analysis Browser
                                                     </h4>
                                                 </div>

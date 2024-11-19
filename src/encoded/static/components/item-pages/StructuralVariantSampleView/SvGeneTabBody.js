@@ -8,11 +8,12 @@ import { EmbeddedItemSearchTable } from '../components/EmbeddedItemSearchTable';
 import { DisplayTitleColumnWrapper } from '@hms-dbmi-bgm/shared-portal-components/es/components/browse/components/table-commons';
 import { StackedRowColumn } from '../../browse/variantSampleColumnExtensionMap';
 import { getInitialTranscriptIndex } from '../VariantSampleView/AnnotationSections';
+import { columnExtensionMap as columnExtensionMapCGAP} from '../../browse/columnExtensionMap';
 
 export function SvGeneTabBody (props){
 
     const {
-        columnExtensionMap:  originalColExtMap = EmbeddedItemSearchTable.defaultProps.columnExtensionMap,
+        columnExtensionMap:  originalColExtMap = columnExtensionMapCGAP,
         selectedGenes,
         onSelectGene,
         savedVariantSampleIDMap = {},
@@ -138,7 +139,7 @@ const SVGeneDisplayTitleColumn = React.memo(function SVGeneDispalyTitleColumn(pr
         const transcriptIndex = getInitialTranscriptIndex(filteredTranscripts);
         const { csq_mane = null, csq_feature = null } = filteredTranscripts[transcriptIndex || 0];
         const transcriptDisplay = csq_mane || csq_feature;
-        rows.push(<span key="transcript" className="font-italic d-block text-small">{ transcriptDisplay } </span>);
+        rows.push(<span key="transcript" className="fst-italic d-block text-small">{ transcriptDisplay } </span>);
     }
 
     return (
@@ -161,8 +162,8 @@ export const HighlightedGeneSelector = React.memo(function HighlightedGeneSelect
         return onSelectGene(result, false, false);
     }, [ onSelectGene, result ]);
 
-    // return <input type="checkbox" cls="m-0 mr-2" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
-    return <IconCheckbox className="my-0 mr-2" iconOn="star fas" iconOff="star far" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
+    // return <input type="checkbox" cls="m-0 me-2" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
+    return <IconCheckbox className="my-0 me-2" iconOn="star fas" iconOff="star far" checked={isChecked} onChange={onChange} disabled={isLoadingVariantSampleListItem || isPrevSaved} />;
 });
 
 const geneTableColumns = {

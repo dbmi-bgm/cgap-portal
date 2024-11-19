@@ -15,27 +15,27 @@ export const SomaticAnalysisStats = React.memo(function SomaticAnalysisStats(pro
             <div className="col-12 col-sm mb-2 mb-sm-0">
                 <div className="card h-100">
                     <div className="card-header primary-header d-flex align-items-center">
-                        <i className="icon icon-user fas icon-fw mr-1"/>
+                        <i className="icon icon-user fas icon-fw me-1"/>
                         <h4 className="my-0 text-400 flex-grow-1">
                             Individual
                         </h4>
                         { haveSAEditPermission && individualAtID ?
                             <a href={individualAtID + "?currentAction=edit&callbackHref=" + somaticAnalysisAtID}
-                                className="text-white-50 ml-12 text-small" data-tip="Edit Individual. Changes may take a few minutes to appear.">
+                                className="text-white-50 ms-12 text-small link-underline-hover" data-tip="Edit Individual. Changes may take a few minutes to appear.">
                                 <i className="icon icon-fw icon-pencil-alt fas"/>
                             </a>
                             : null }
                     </div>
                     <div className="card-body">
                         { individualAtID && <IndividualInfo {...{ individual }} />}
-                        { !individualAtID && <div className="card-text mb-1 mr-06">No Individual Available</div>}
+                        { !individualAtID && <div className="card-text mb-1 me-06">No Individual Available</div>}
                     </div>
                 </div>
             </div>
             <div className="col-12 col-sm">
                 <div className="card h-100">
                     <div className="card-header primary-header d-flex align-items-center">
-                        <i className="icon icon-vial fas icon-fw mr-1"/>
+                        <i className="icon icon-vial fas icon-fw me-1"/>
                         <h4 className="my-0 text-400 flex-grow-1">
                             Sample Summary
                         </h4>
@@ -84,17 +84,17 @@ export const IndividualInfo = React.memo(function IndividualInfo({ individual })
     return (
         <React.Fragment>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-06">Individual ID:&nbsp;</label>
-                <a href={individualAtID} target="_blank" rel="noopener noreferrer">
+                <label className="mb-0 me-06">Individual ID:&nbsp;</label>
+                <a href={individualAtID} target="_blank" rel="noopener noreferrer" className="link-underline-hover">
                     { display_title || individual_id }
                 </a>
             </div>
             <div className="card-text mb-1">
                 <label className="mb-0">CGAP Individual ID:&nbsp;</label>
-                <span className="text-monospace text-small">{ accession }</span>
+                <span className="font-monospace text-small">{ accession }</span>
             </div>
             <div className="card-text mb-1">
-                <label className="mb-0 mr-02">Diagnosis:&nbsp;</label>
+                <label className="mb-0 me-02">Diagnosis:&nbsp;</label>
                 <span className="text-capitalize">{primaryDisorders ? primaryDisorders: fallbackElem}</span>
             </div>
             <div className="card-text mb-1">
@@ -141,7 +141,7 @@ export const SampleSummaryInfo = React.memo(function SampleSummaryInfo({ samples
                         <div className="card-text mb-1">
                             <label className="mb-0">ID:&nbsp;</label>
                             { bam_sample_id || display_title ?
-                                <a href={atID}>{bam_sample_id || display_title}</a>
+                                <a href={atID} className="link-underline-hover">{bam_sample_id || display_title}</a>
                                 : fallbackElem }
                         </div>
                         {appendLine && <hr/>}

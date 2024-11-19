@@ -109,13 +109,13 @@ function UserActionsMenu(props){
         const isActive = isActionActive(action, href);
         let prepend = null;
         if (actionID === "impersonate") {
-            prepend = <i className="icon icon-fw icon-user-secret fas mr-07"/>;
+            prepend = <i className="icon icon-fw icon-user-secret fas me-07"/>;
         }
         if (actionID === "profile") {
-            prepend = <i className="icon icon-fw icon-user fas mr-07"/>;
+            prepend = <i className="icon icon-fw icon-user fas me-07"/>;
         }
         if (actionID === "submissions") {
-            prepend = <i className="icon icon-fw icon-file-import fas mr-07"/>;
+            prepend = <i className="icon icon-fw icon-file-import fas me-07"/>;
         }
         return (
             <div className={"level-1-title-container" + (isActive ? " active" : "")} key={actionID}>
@@ -162,7 +162,7 @@ function LogoutLink({ performLogout, isLoading = false }){
     return (
         <div className="level-1-title-container">
             <a className="level-1-title text-medium d-block" onClick={performLogout} id="logoutbtn" href="#">
-                <i className={"icon icon-fw fas mr-07 icon-" + (isLoading ? "spin icon-circle-notch" : "sign-out-alt")}/>
+                <i className={"icon icon-fw fas me-07 icon-" + (isLoading ? "spin icon-circle-notch" : "sign-out-alt")}/>
                 <span>Log Out</span>
             </a>
         </div>

@@ -132,7 +132,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
                 return (
                     <a href={linkToID} className="d-block" target="_blank" rel="noopener noreferrer" id={"external_resource_for_" + fieldName} key={externalID}>
                         <span className="align-middle">{ externalID }</span>
-                        <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                        <i className="ms-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                     </a>
                 );
             });
@@ -148,7 +148,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
                             { title }
                         </a>
                         { index === extIDsLen - 1 ?
-                            <i className="ml-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
+                            <i className="ms-05 icon icon-fw icon-external-link-alt fas text-smaller text-secondary" />
                             : (index === 0 ? " + " : " ") }
                     </React.Fragment>
                 );
@@ -160,7 +160,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
                 <div className="col-12 col-lg">
                     <label className="mb-0 black-label" htmlFor={"external_resource_for_" + fieldName}>
                         { schemaTitle || fieldName }
-                        { schemaDescription ? <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                        { schemaDescription ? <i className="icon icon-info-circle fas icon-fw ms-02 icon-sm"
                             data-tip={schemaDescription} /> : null}
                     </label>
                 </div>
@@ -176,7 +176,7 @@ export const ExternalDatabasesSection = React.memo(function ExternalDatabasesSec
 
     const externalDatabaseElemsLen = externalDatabaseElems.length;
     if (externalDatabaseElemsLen === 0) {
-        return <h4 className="text-center font-italic text-400 my-0 pb-08">No External Databases</h4>;
+        return <h4 className="text-center fst-italic text-400 my-0 pb-08">No External Databases</h4>;
     } else if (externalDatabaseElemsLen >= 4) {
         const mp = Math.ceil(externalDatabaseElemsLen / 2);
         const col1 = externalDatabaseElems.slice(0, mp);
@@ -229,7 +229,7 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
                     <label htmlFor="variant.transcript.csq_gene.name" className="mb-0">
-                        Gene Name: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                        Gene Name: <i className="icon icon-info-circle fas icon-fw ms-02 icon-sm"
                             data-tip={getTipForField("name")}/>
                     </label>
                 </div>
@@ -241,7 +241,7 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
                     <label htmlFor="variant.transcript.csq_gene.gene_symbol" className="mb-0" >
-                        Symbol: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                        Symbol: <i className="icon icon-info-circle fas icon-fw ms-02 icon-sm"
                             data-tip={getTipForField("gene_symbol")}/>
                     </label>
                 </div>
@@ -264,7 +264,7 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
                     <label htmlFor="variant.transcript.csq_gene.gene_biotype" className="mb-0">
-                        Gene Type: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                        Gene Type: <i className="icon icon-info-circle fas icon-fw ms-02 icon-sm"
                             data-tip={getTipForField("gene_biotype")} />
                     </label>
                 </div>
@@ -309,7 +309,7 @@ export const GeneOverview = React.memo(function GeneOverview(props) {
             <div className="row mb-03">
                 <div className="col-12 col-xl-3">
                     <label htmlFor="variant.transcript.csq_gene.gene_summary" className="mb-0">
-                        Gene Summary: <i className="icon icon-info-circle fas icon-fw ml-02 icon-sm"
+                        Gene Summary: <i className="icon icon-info-circle fas icon-fw ms-02 icon-sm"
                             data-tip={getTipForField("gene_summary")}/>
                     </label>
                 </div>
@@ -337,35 +337,35 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
         // more todo
     } = currentGeneItem;
     return (
-        <table className="w-100 text-left">
+        <table className="w-100 text-start">
             <thead className="bg-transparent">
                 <tr>
-                    <th className="text-left">Constraint</th>
+                    <th className="text-start">Constraint</th>
                     <th>
                         Synonymous
                         <span data-tip="Score as applied to synonymous variants only. A dot (•) indicates the score is not applicable to synonymous variants.">
-                            <i className="icon icon-info-circle fas ml-03"/>
+                            <i className="icon icon-info-circle fas ms-03"/>
                         </span>
                     </th>
                     <th>
                         Missense
                         <span data-tip="Score as applied to missense variants only. A dot (•) indicates the score is not applicable to missense variants.">
-                            <i className="icon icon-info-circle fas ml-03"/>
+                            <i className="icon icon-info-circle fas ms-03"/>
                         </span>
                     </th>
                     <th>
                         LoF
                         <span data-tip="Score as applied to loss-of-function variants only. A dot (•) indicates the score is not applicable to LoF variants.">
-                            <i className="icon icon-info-circle fas ml-03"/>
+                            <i className="icon icon-info-circle fas ms-03"/>
                         </span>
                     </th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         Expected
-                        <QuickPopover popID="gene_exp" className="p-0 icon-sm ml-02">{genePopoverContents.expected}</QuickPopover>
+                        <QuickPopover popID="gene_exp" className="p-0 icon-sm ms-02">{genePopoverContents.expected}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("exp_syn")}>{ falsyZeroCheck(exp_syn, fallbackNotPresent)}</span>
@@ -378,9 +378,9 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         Observed
-                        <QuickPopover popID="gene_obs" className="p-0 icon-sm ml-02">{genePopoverContents.observed}</QuickPopover>
+                        <QuickPopover popID="gene_obs" className="p-0 icon-sm ms-02">{genePopoverContents.observed}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("obs_syn")}>{ falsyZeroCheck(obs_syn, fallbackNotPresent)}</span>
@@ -393,9 +393,9 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         O/E (range)
-                        <QuickPopover popID="gene_oerange" className="p-0 icon-sm ml-02">{genePopoverContents.oerange}</QuickPopover>
+                        <QuickPopover popID="gene_oerange" className="p-0 icon-sm ms-02">{genePopoverContents.oerange}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("oe_syn")}>{ falsyZeroCheck(shortenToSignificantDigits(oe_syn), fallbackNotPresent)}</span>
@@ -411,9 +411,9 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         Z-score
-                        <QuickPopover popID="gene_zscore" className="p-0 icon-sm ml-02">{genePopoverContents.zscore}</QuickPopover>
+                        <QuickPopover popID="gene_zscore" className="p-0 icon-sm ms-02">{genePopoverContents.zscore}</QuickPopover>
                     </td>
                     <td>
                         <span data-tip={getTipForField("syn_z")}>{ falsyZeroCheck(shortenToSignificantDigits(syn_z), fallbackNotPresent)}</span>
@@ -426,9 +426,9 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         LOEUF
-                        <QuickPopover popID="gene_loeuf" className="p-0 icon-sm ml-02">{genePopoverContents.loeuf}</QuickPopover>
+                        <QuickPopover popID="gene_loeuf" className="p-0 icon-sm ms-02">{genePopoverContents.loeuf}</QuickPopover>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
@@ -437,9 +437,9 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         S-Het
-                        <QuickPopover popID="gene_shet" className="p-0 icon-sm ml-02">{genePopoverContents.shet}</QuickPopover>
+                        <QuickPopover popID="gene_shet" className="p-0 icon-sm ms-02">{genePopoverContents.shet}</QuickPopover>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>{ fallbackNotImplemented }</td>
@@ -448,9 +448,9 @@ export const ConstraintScoresSection = React.memo(function ConstraintScoresSecti
                     </td>
                 </tr>
                 <tr>
-                    <td className="text-600 text-left">
+                    <td className="text-600 text-start">
                         RVIS (ExAC)
-                        <QuickPopover popID="gene_rvis" className="p-0 icon-sm ml-02">{genePopoverContents.rvis}</QuickPopover>
+                        <QuickPopover popID="gene_rvis" className="p-0 icon-sm ms-02">{genePopoverContents.rvis}</QuickPopover>
                     </td>
                     <td>{ fallbackNotImplemented }</td>
                     <td>
@@ -539,7 +539,7 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
     // Ensure that the date is valid by running through date parser
     const lastEvaluatedFromClinVar = Date.parse(new Date(lastEvaluatedFromClinVarRaw));
 
-    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ml-07 text-smaller text-secondary"/>;
+    const externalLinkIconAppend = <i className="icon icon-external-link-alt fas ms-07 text-smaller text-secondary"/>;
 
     const clinVarSearchLink = clinvarVariantSearchUrl ? (
         <React.Fragment>
@@ -556,8 +556,8 @@ export function ClinVarSection({ context, getTipForField, schemas, clinvarExtern
         // No ClinVar info available. Still include link to search for variant at same location, though.
         return (
             <div className="d-flex align-items-center justify-content-center h-100 flex-column">
-                { clinVarSearchLink ? <div className="my-2 flex-grow-1 w-100 text-left">{ clinVarSearchLink }</div> : null }
-                <h4 className="font-italic text-400 my-0 pb-24 flex-grow-1">No record in ClinVar</h4>
+                { clinVarSearchLink ? <div className="my-2 flex-grow-1 w-100 text-start">{ clinVarSearchLink }</div> : null }
+                <h4 className="fst-italic text-400 my-0 pb-24 flex-grow-1">No record in ClinVar</h4>
             </div>
         );
     }
@@ -642,7 +642,7 @@ export function GeneTranscriptDisplayTitle({ transcript, hideGene }){
                 <span className="text-400"> ({ geneDisplayTitle || <em>No Gene</em> })</span>
                 : null}
             { csq_canonical ?
-                <span className="text-400 ml-05 text-muted small" data-tip="Canonical Transcript">
+                <span className="text-400 ms-05 text-muted small" data-tip="Canonical Transcript">
                     <i className="icon icon-asterisk fas"/>
                 </span>
                 : null }

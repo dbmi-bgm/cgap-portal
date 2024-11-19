@@ -633,7 +633,7 @@ export class InterpretationSpaceController extends React.Component {
 
 function GenericInterpretationSpaceTabBtn(props) {
     const { disabled, tabName, tooltip = null, onClick, isActive = false, unsavedDraft = false, cls = "" } = props;
-    const className = `${cls} btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"} ${unsavedDraft ? 'font-italic': ""}`;
+    const className = `${cls} btn btn-xs ${isActive ? "btn-primary-dark": "btn-link"} ${unsavedDraft ? 'fst-italic': ""}`;
     return (
         <div data-tip={disabled ? "Coming Soon": ""}>
             <button type="button" data-tip={tooltip} {...{ onClick, className, disabled }}>
@@ -860,7 +860,7 @@ class SVGeneNotePanel extends React.PureComponent {
                 <SVGeneInterpretationSubmitButton highlightedGeneChangedSinceLastSave={isHighlightedGeneUnsaved} selectedGeneID={highlightedGeneID_wip}
                     {...{ hasEditPermission, geneAtIDToGeneMap }} saveHighlightedGene={this.saveHighlightedGeneWrapper} />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
+                    <button type="button" className="btn btn-primary w-100 mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
                     </button> : null}
             </div>
@@ -930,13 +930,13 @@ function GenesDrop(props) {
             </label>
             <div className="w-100 d-flex note-field-drop">
                 <Dropdown as={ButtonGroup} className={cls}>
-                    <Dropdown.Toggle variant="outline-secondary text-left">
+                    <Dropdown.Toggle variant="outline-secondary text-start">
                         { title || "Select a gene to interpret..." }
                     </Dropdown.Toggle>
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown>
                 { value ?
-                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => clearSelectedGene()}>
+                    <Button variant="danger" className={cls + ' ms-03'} onClick={() => clearSelectedGene()}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
                     : null}
@@ -1012,13 +1012,13 @@ function HighlightedGenesDrop(props) {
                     filterMethod="includes" onChange={(atID) => { onSelectGene((geneAtIDToGeneMap[atID])); } }
                     maxResults={3} {...{ optionRenderFunction, titleRenderFunction, customFilterFunction }} />
                 {/* <Dropdown as={ButtonGroup} className={cls}> // keeping this around in case there are issues.
-                    <Dropdown.Toggle variant="outline-secondary text-left">
+                    <Dropdown.Toggle variant="outline-secondary text-start">
                         { value || "Select an option..." }
                     </Dropdown.Toggle>
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown> */}
                 { selectedGeneID ?
-                    <Button variant="danger" className={cls + ' ml-03'} onClick={() => onResetSelectedGenes(highlightedGene)}>
+                    <Button variant="danger" className={cls + ' ms-03'} onClick={() => onResetSelectedGenes(highlightedGene)}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
                     : null}
@@ -1155,7 +1155,7 @@ class GenericInterpretationPanel extends React.PureComponent {
                     saveAsDraft={this.saveStateAsDraft}
                 />
                 { caseSource ?
-                    <button type="button" className="btn btn-primary btn-block mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
+                    <button type="button" className="btn btn-primary w-100 mt-05" onClick={() => onReturnToCaseClick(caseSource)}>
                         Return to Case
                     </button> : null}
             </div>
@@ -1182,7 +1182,7 @@ function NoteFieldDrop(props) {
     if (static_enum.length > 0) {
         dropOptions = static_enum.map((option) => (
             <Dropdown.Item onClick={() => onOptionChange(field, option)} key={option}>
-                <i className="status-indicator-dot mr-07" data-status={option}/>{option}
+                <i className="status-indicator-dot me-07" data-status={option}/>{option}
             </Dropdown.Item>
         ));
     }
@@ -1190,17 +1190,17 @@ function NoteFieldDrop(props) {
     return (
         <React.Fragment>
             <label className="w-100 text-small">
-                { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
+                { title } { description ? <i className="icon icon-info-circle fas icon-fw ms-05" data-tip={description} /> : null }
             </label>
             <div className="w-100 d-flex note-field-drop">
                 <Dropdown as={ButtonGroup} className={cls}>
-                    <Dropdown.Toggle disabled={disableInputs} variant="outline-secondary text-left" id="dropdown-basic">
-                        { value ? <><i className="status-indicator-dot ml-1 mr-07" data-status={value} /> { value }</> : "Select an option..."}
+                    <Dropdown.Toggle disabled={disableInputs} variant="outline-secondary text-start" id="dropdown-basic">
+                        { value ? <><i className="status-indicator-dot ms-1 me-07" data-status={value} /> { value }</> : "Select an option..."}
                     </Dropdown.Toggle>
                     <Dropdown.Menu>{ dropOptions }</Dropdown.Menu>
                 </Dropdown>
                 { value ?
-                    <Button disabled={disableInputs} variant="danger" className={cls + ' ml-03'} onClick={() => onOptionChange(field, null)}>
+                    <Button disabled={disableInputs} variant="danger" className={cls + ' ms-03'} onClick={() => onOptionChange(field, null)}>
                         <i className="icon icon-trash-alt fas" />
                     </Button>
                     : null}
@@ -1249,7 +1249,7 @@ function GenericFieldForm(props) {
     if (!schemas) {
         return (
             <div className="d-flex align-items-center justify-content-center pb-05 mb-1">
-                <i className="icon icon-fw fas icon-circle-notch icon-spin mr-08"/>
+                <i className="icon icon-fw fas icon-circle-notch icon-spin me-08"/>
                 Loading...
             </div>);
     }
@@ -1301,7 +1301,7 @@ function ACMGPicker(props) {
     return (
         <React.Fragment>
             <label className="w-100 text-small">
-                { title } { description ? <i className="icon icon-info-circle fas icon-fw ml-05" data-tip={description} /> : null }
+                { title } { description ? <i className="icon icon-info-circle fas icon-fw ms-05" data-tip={description} /> : null }
             </label>
             <div className="w-100 d-flex flex-wrap acmg-picker mb-08">
                 { selections.length > 0 ? picked : <div className="acmg-invoker text-muted" data-tip={"Use the picker above to make invocations."} data-criteria="none">None</div>}
@@ -1310,8 +1310,8 @@ function ACMGPicker(props) {
             { autoClassification ?
                 <React.Fragment>
                     <label className="w-100 text-small">CGAP&apos;s Classification:</label>
-                    <div className="w-100 mb-08 ml-1">
-                        <i className="status-indicator-dot ml-1 mr-1" data-status={autoClassification} />{autoClassification}
+                    <div className="w-100 mb-08 ms-1">
+                        <i className="status-indicator-dot ms-1 me-1" data-status={autoClassification} />{autoClassification}
                     </div>
                 </React.Fragment>
                 : null }
@@ -1325,7 +1325,7 @@ export const ACMGPickerOption = React.memo(function ACMGPickerOption (props) {
         isFallback = false,
         toggleInvocation,
         onToggleCallback = null,
-        className = "mr-01 ml-01"
+        className = "me-01 ms-01"
     } = props;
     const {
         rule_strength: strength,
@@ -1377,10 +1377,10 @@ function SVGeneInterpretationSubmitButton(props) {
     } = props;
 
     return (
-        <div data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item.": null }>
-            <Button variant="primary" className={"btn-block " + cls} onClick={() => saveHighlightedGene(geneAtIDToGeneMap[selectedGeneID])}
+        <div className="d-grid gap-1" data-tip={!hasEditPermission ? "You must be added to the project to submit a note for this item." : null} >
+            <Button variant="primary" className={cls} onClick={() => saveHighlightedGene(geneAtIDToGeneMap[selectedGeneID])}
                 disabled={!hasEditPermission || !highlightedGeneChangedSinceLastSave}>
-                { !hasEditPermission ? "Need Edit Permission": "Save Highlighted Gene" }
+                {!hasEditPermission ? "Need Edit Permission" : "Save Highlighted Gene"}
             </Button>
         </div>
     );
@@ -1412,18 +1412,18 @@ function GenericInterpretationSubmitButton(props) {
     if (isCurrent || isApproved || !hasEditPermission) {
         // No further steps allowed; saved to knowledgebase or approved to case
         return (
-            <div data-tip={dataTip}>
-                <Button variant="primary" disabled className={"btn-block " + cls}>
-                    { !hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved" }
+            <div className="d-grid gap-1" data-tip={dataTip}>
+                <Button variant="primary" disabled className={cls}>
+                    {!hasEditPermission ? "Need Edit Permission" : "Cannot edit - already approved"}
                 </Button>
             </div>
         );
     } else { // Brand new draft OR previous draft; allow saving or re-saving as draft
         return (
-            <div data-tip={dataTip}>
-                <Button variant="primary" className={"btn-block " + cls} onClick={saveAsDraft} data-tip={dataTip}
+            <div className="d-grid gap-1" data-tip={dataTip} >
+                <Button variant="primary" className={cls} onClick={saveAsDraft} data-tip={dataTip}
                     disabled={allButtonsDropsDisabled}>
-                    { isDraft ? "Re-save as Draft": "Save as Draft" }
+                    {isDraft ? "Re-save as Draft" : "Save as Draft"}
                 </Button>
             </div>
         );
@@ -1446,14 +1446,14 @@ function UnsavedInterpretationModal(props) {
             <Modal show={true} onHide={onHide} centered>
                 <Modal.Header closeButton style={{ backgroundColor: "#bdcbd9", color: "#1e435e" }}>
                     <Modal.Title>
-                        <div className="modal-title font-italic text-600 h4">
+                        <div className="modal-title fst-italic text-600 h4">
                             Variant Interpretation: <span className="text-300">Unsaved Changes</span>
                         </div>
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
                     <div className="text-small text-center mt-2">This variant interpretation is <u>incomplete</u> and contains at least 1:</div>
-                    <div className="font-italic text-center text-600 h3 my-3" style={{ color: "#1e435e" }}>Unsaved Variant Classification</div>
+                    <div className="fst-italic text-center text-600 h3 my-3" style={{ color: "#1e435e" }}>Unsaved Variant Classification</div>
                     <div className="text-small text-center mb-2">Are you sure you want to navigate away?</div>
                 </Modal.Body>
                 <Modal.Footer className="d-flex" style={{ backgroundColor: "#eff0f0" }}>

@@ -183,9 +183,11 @@ export const ProgressModal = React.memo(function ProgressModal (props) {
                 </div>
                 { finished ? modalOnCompleteJSX : null }
                 { finished ?
-                    <button type="button" className="mt-24 btn btn-block btn-primary" onClick={onHide}>
-                        Close
-                    </button>
+                    <div className="d-grid gap-1">
+                        <button type="button" className="mt-24 btn btn-primary" onClick={onHide}>
+                            Close
+                        </button>
+                    </div>
                     : null }
             </Modal.Body>
         </Modal>

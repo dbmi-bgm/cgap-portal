@@ -22,9 +22,11 @@ $modal-backdrop-opacity : 0.8;
 
 $facetlist-selected-term-color : #248bac;
 
-$badge-color-warning : #e29302;
-$badge-color-error : #bd0000;
-$badge-color-internal-action: #d0d0d0;
+$badge-padding-y: .25em;
+$badge-padding-x: .4em;
+$badge-font-size: 75%;
+$badge-border-radius: .25em;
+$badge-color: #fff;
 
 $font-family-sans-serif : "Source Sans Pro", "Work Sans", Helvetica, Arial, sans-serif;
 $font-family-serif : "Yrsa", "Times New Roman", Georgia, Times, serif;
@@ -36,6 +38,8 @@ $font-size-base: 1rem;
 $line-height-base: 1.45;
 
 $dropdown-link-hover-bg: #ddd;
+$dropdown-item-padding-y:  .25rem;
+$dropdown-item-padding-x:  1.5rem;
 
 
 
@@ -46,16 +50,25 @@ $dropdown-link-hover-bg: #ddd;
 /*****************************/
 
 /* We override these with our own subset */
-$enable-print-styles: false;
+// $enable-print-styles: false;
+
+/* To enable negative margins in Bootstrap 5, set the $enable-negative-margins variable to true */
+$enable-negative-margins: true;
 
 $grid-breakpoints: (
   xs: 0,
   sm: 576px,
   md: 768px,
   lg: 992px,
-  xl: 1500px        // < xl is overridden from default of 1200px; others are Bootstrap v4 defaults
+  xl: 1200px,
+  xxl: 1500px,
 );
 
+$body-color: #212529;
+
+$btn-close-bg: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"><line x1="4" y1="4" x2="20" y2="20" stroke="black" stroke-width="5" /><line x1="20" y1="4" x2="4" y2="20" stroke="black" stroke-width="5" /></svg>');
+
+$border-radius:                             .25rem;
 $border-radius-base:                        3px;
 $border-radius-lg:                          4px;
 $border-radius-sm:                          2px;
@@ -84,7 +97,7 @@ $navbar-default-brand-color: rgb(210, 218, 223);
     }
 }
 @mixin navbar-static-position {
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(md) {
         @content;
     }
 }
@@ -95,6 +108,7 @@ $grid-gutter-width:                         20px;
 $link-color: #428bca;
 
 /** Setup some other variables for tables, etc. **/
+$table-color:                #212529;
 $expset-table-border-color : #eee;
 
 
@@ -115,10 +129,19 @@ $primary-dark: #2b6088; //#0c5979;
 $facetlist-excluding: #450000;
 
 
-// Will be extended in bootstrap's _variables.scss with Bootstrap orig colors (warning, success, primary, etc).
-// And then used to create utility classes 'text-primary-dark', 'bg-primary-dark', etc.
+// Previously, Bootstrap extended $theme-colors with default colors like warning, success, and primary.
+// However, as of Bootstrap v5, Bootstrap has removed the default Sass map merging to simplify customization and prevent redundant values.
+// Now, we need to explicitly define all values in the Sass maps for $theme-colors.
 $theme-colors: (
-    "primary-dark": $primary-dark
+  "primary": $primary,
+  "secondary": $secondary,
+  "success": $success,
+  "info": $info,
+  "warning": $warning,
+  "danger": $danger,
+  "light": $light,
+  "dark": $dark,
+  "primary-dark": $primary-dark
 );
 
 // override 1.5, to help center text
@@ -126,6 +149,10 @@ $btn-line-height: 1.45rem;
 
 
 /* Cards */
+$card-spacer-y: 1.25rem;
+$card-spacer-x: 1.25rem;
+$card-cap-padding-y: .75rem;
+$card-cap-padding-x: 1.25rem;
 $card-cap-bg: #fff;
 $card-bg: #fff;
 $card-inner-border-radius: 3px;
@@ -144,15 +171,25 @@ $h6-font-size: 0.85rem;
 $print-page-size:                   8.5in 11in;
 $print-body-min-width:              8.5in;
 
+/* Popovers */
+$popover-border-color: #ebebeb;
+$popover-header-bg: #f7f7f7;
+$popover-body-padding-y: .5rem;
+$popover-body-padding-x: .75rem;
+
+/* Alerts */
+$alert-padding-y: .75rem;
+$alert-padding-x: 1.25rem;
+
 /****************************/
 /** FontAwesome Icon Stuff **/
 /****************************/
 
-$fa-font-path: "/static/font/fontawesome5.9" !default;
+$fa-font-path: "/static/font/fontawesome6" !default;
 $fa-font-size-base: $font-size-base;
 $fa-css-prefix: icon;
 
-$fa-font-family: 'Font Awesome 5 Free';
+$fa-font-family: 'Font Awesome 6 Free';
 
 
 /**************************************************************

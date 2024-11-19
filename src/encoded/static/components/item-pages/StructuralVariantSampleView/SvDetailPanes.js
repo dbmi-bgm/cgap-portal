@@ -184,7 +184,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                 <div className="col-12 col-xl-3">
                     <label htmlFor="sv-con-break1" className="mb-0" data-tip={null}>
                         Breakpoint 1:
-                        <QuickPopover popID="sv-con-break2-pop" className="p-0 ml-02 icon-sm" tooltip="Click for more information" title={breakpointPopoverTitle}>
+                        <QuickPopover popID="sv-con-break2-pop" className="p-0 ms-02 icon-sm" tooltip="Click for more information" title={breakpointPopoverTitle}>
                             { breakpointPopoverContent }
                         </QuickPopover>
                     </label>
@@ -197,7 +197,7 @@ function ConsequenceOfSVSection({ currentTranscript }) {
                 <div className="col-12 col-xl-3">
                     <label htmlFor="sv-con-break2" className="mb-0" data-tip={null}>
                         Breakpoint 2:
-                        <QuickPopover popID="sv-con-break2-pop" className="p-0 ml-02 icon-sm" tooltip="Click for more information" title={breakpointPopoverTitle}>
+                        <QuickPopover popID="sv-con-break2-pop" className="p-0 ms-02 icon-sm" tooltip="Click for more information" title={breakpointPopoverTitle}>
                             { breakpointPopoverContent }
                         </QuickPopover>
                     </label>

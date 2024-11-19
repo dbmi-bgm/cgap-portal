@@ -52,7 +52,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" style={style} disabled>
                 <span className="d-flex align-items-center">
-                    <i className="icon icon-circle-notch icon-spin fas mr-1"/>
+                    <i className="icon icon-circle-notch icon-spin fas me-1"/>
                     Loading selections...
                 </span>
             </button>
@@ -61,7 +61,7 @@ export function AddToVariantSampleListButton(props){
         return (
             <button type="button" className="btn btn-primary" style={style} disabled>
                 <span className="d-flex align-items-center">
-                    <i className="icon icon-circle-notch icon-spin fas mr-1"/>
+                    <i className="icon icon-circle-notch icon-spin fas me-1"/>
                     Saving selections...
                 </span>
             </button>

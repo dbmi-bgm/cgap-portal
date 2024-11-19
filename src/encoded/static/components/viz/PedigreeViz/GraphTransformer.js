@@ -1,11 +1,11 @@
 
 import React, { useMemo } from 'react';
+import _ from 'underscore';
 import { standardizeObjectsInList, createObjectGraph, createRelationships } from './data-utilities';
 import { assignTreeHeightIndices, orderObjectGraph, positionObjectGraph } from './layout-utilities';
 import { getGraphHeight, getGraphWidth, createEdges } from './layout-utilities-drawing';
 import { graphTransformerPropTypes } from './prop-types';
 import { graphTransformerDefaultProps, POSITION_DEFAULTS } from './default-props';
-
 /**
  * Function to parse dataset into graph (and associated data).
  *
@@ -64,7 +64,10 @@ function getFullDims(dimensionOpts = {}){
 
 /** React Component wrapper */
 export function GraphTransformer(props){
-    const { dataset, children, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = props;
+    const extendedProps = _.extend({}, graphTransformerDefaultProps, _.mapObject(props || {}, function (value, key) {
+        return value || graphTransformerDefaultProps[key];
+    }));
+    const { dataset, children, imensionOpts, dimensionOpts, filterUnrelatedIndividuals, ...passProps } = extendedProps;
     const graphData = useMemo(function(){
         return buildGraphData(dataset, dimensionOpts, filterUnrelatedIndividuals);
     }, [ dataset, dimensionOpts, filterUnrelatedIndividuals ]);
@@ -73,4 +76,3 @@ export function GraphTransformer(props){
     return React.Children.map(children, function(child){ return React.cloneElement(child, viewProps); });
 }
 GraphTransformer.propTypes = graphTransformerPropTypes;
-GraphTransformer.defaultProps = graphTransformerDefaultProps;

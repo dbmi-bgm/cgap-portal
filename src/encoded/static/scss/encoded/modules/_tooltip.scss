@@ -5,17 +5,17 @@
 
 body .__react_component_tooltip {
 
-    padding: 6px 15px;
+    padding: 7px 15px;
 	z-index: 9999 !important;
 
     max-width: 630px;
-    @include media-breakpoint-down(xs) {
+    @include media-breakpoint-down(sm) {
         max-width : 400px;
     }
-    @include media-breakpoint-down(sm) {
+    @include media-breakpoint-down(md) {
         max-width : 500px;
     }
-    @include media-breakpoint-down(md) {
+    @include media-breakpoint-down(lg) {
         max-width : 600px;
     }
 

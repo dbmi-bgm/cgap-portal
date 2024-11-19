@@ -189,7 +189,7 @@ export default class DefaultItemView extends React.PureComponent {
                 }
                 Alerts.queue({
                     'title' : "Redirected",
-                    'message': <span>You have been redirected from <a href={ourOldItem['@id']}>{ redirected_from_accession }</a>, which this item ({ context.accession }) supercedes.</span>,
+                    'message': <span>You have been redirected from <a href={ourOldItem['@id']} className="link-underline-hover">{ redirected_from_accession }</a>, which this item ({ context.accession }) supercedes.</span>,
                     'style': 'warning'
                 });
             }, 'GET', (err)=>{
@@ -454,7 +454,7 @@ export class ItemActionsTab extends React.PureComponent {
                 <ViewJSONAction href={href}>
                     <div className="icon-container clickable" onClick={this.toggleOpen} data-tip="Open window showing this Item in raw JSON format.">
                         <i className="icon icon-fw fas icon-file-code"/>
-                        <span className="text-monospace text-smaller">JSON</span>
+                        <span className="font-monospace text-smaller">JSON</span>
                     </div>
                 </ViewJSONAction>
             );

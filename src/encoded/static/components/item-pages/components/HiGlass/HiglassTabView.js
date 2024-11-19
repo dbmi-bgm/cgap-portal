@@ -8,7 +8,10 @@ import { console, ajax } from '@hms-dbmi-bgm/shared-portal-components/es/compone
 import { FullHeightCalculator } from './../FullHeightCalculator';
 import { HiGlassAjaxLoadContainer } from './HiGlassAjaxLoadContainer';
 
-export const HiglassTabView = React.memo(function HiglassTabView(props){
+export const HiglassTabView = React.memo(function HiglassTabView({
+    heading = <span>Annotation browser</span>,
+    ...props
+}) {
     const {
         heading
     } = props;
@@ -29,9 +32,7 @@ export const HiglassTabView = React.memo(function HiglassTabView(props){
         </div>
     );
 });
-HiglassTabView.defaultProps = {
-    'heading' : <span>Annotation browser</span>
-};
+
 HiglassTabView.getTabObject = function(props){
 
     const icon = <i className="icon icon-times fas icon-fw"/>;
