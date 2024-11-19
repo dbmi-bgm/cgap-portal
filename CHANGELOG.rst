@@ -6,6 +6,14 @@ cgap-portal
 Change Log
 ----------
 
+16.1.0
+=====
+
+`PR 776: Node v20 Upgrade <https://github.com/dbmi-bgm/cgap-portal/pull/776>`_
+
+* Node 18 to 20 upgrade including GitHub actions
+
+
 16.0.0
 =======
 
