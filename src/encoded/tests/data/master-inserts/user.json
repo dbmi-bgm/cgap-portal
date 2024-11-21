@@ -392,5 +392,22 @@
             }
         ],
         "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
+    },
+    {
+        "email": "sarah_nicholson@hms.harvard.edu",
+        "first_name": "Sarah",
+        "last_name": "Nicholson",
+        "uuid": "21a76481-3843-4b38-b18c-a41babb0748f",
+        "groups": [
+            "admin"
+        ],
+        "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+        "project_roles": [
+            {
+                "project": "12a92962-8265-4fc0-b2f8-cf14f05db58b",
+                "role": "developer"
+            }
+        ],
+        "user_institution": "828cd4fe-ebb0-4b36-a94a-d2e3a36cc989"
     }
 ]

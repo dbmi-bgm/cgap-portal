@@ -6,6 +6,13 @@ cgap-portal
 Change Log
 ----------
 
+16.2.0
+======
+`PR 778: SN Add user <https://github.com/dbmi-bgm/cgap-portal/pull/778>`_
+
+* Add to user item for SN to `master-inserts/user.json`
+
+
 16.1.0
 =====
 
