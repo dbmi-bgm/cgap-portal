@@ -191,11 +191,14 @@ export const CaseReviewTab = React.memo(function CaseReviewTab (props) {
 });
 
 
-
+// DEPRECATED/MOVED to UpdateInterpretationsButton.js
 function countVariantSamplesWithAnySelectionSize(variantSampleListItem, selectionStore){
-    const { variant_samples: vsObjects = [] } = variantSampleListItem || {}; // Might not yet be loaded.
+    const {
+        variant_samples: snvVSObjects = [],
+        structural_variant_samples: cnvVSObjects = []
+    } = variantSampleListItem || {}; // Might not yet be loaded.
     let count = 0;
-    vsObjects.forEach(function({ variant_sample_item }){
+    snvVSObjects.concat(cnvVSObjects).forEach(function({ variant_sample_item }){
         if (_.any(getAllNotesFromVariantSample(variant_sample_item), function({ uuid }){ return selectionStore[uuid]; })) {
             count++;
         }
@@ -332,6 +335,15 @@ function SaveNotesToProjectButton (props) {
 
 class SaveNotesToReportButton extends React.PureComponent {
 
+    /**
+     * IMPORTANT: Whenever implement a "remove from report" function,
+     * need to ensure it doesn't remove if a finding_table_tag exists.
+     *
+     * @param {{ uuid: string }[]} existingReportVariantSamples
+     * @param {{ uuid: string }[]} vslVariantSampleItems
+     * @param {string} reportUUID
+     * @param {Object<string, boolean>} sendToReportStore
+     */
     static buildPatchPayloads (
         existingReportVariantSamples,
         vslVariantSampleItems,
@@ -558,11 +570,11 @@ class SaveNotesToReportButton extends React.PureComponent {
     }
 
     render(){
-        const { fetchedReportItem, sendToReportStore, className } = this.props;
+        const { variantSampleListItem, fetchedReportItem, sendToReportStore, className } = this.props;
         const { uuid: reportUUID = null } = fetchedReportItem || {};
 
         const selectionStoreSize = this.memoized.selectionStoreSize(sendToReportStore);
-        const variantSamplesWithAnySelections = this.memoized.variantSamplesWithAnySelections();
+        const variantSamplesWithAnySelections = this.memoized.variantSamplesWithAnySelections(variantSampleListItem, sendToReportStore);
         const disabled = this.isDisabled();
         const btnCls = "btn btn-" + (!reportUUID ? "outline-danger" : "primary") + (className ? " " + className : "");
 
