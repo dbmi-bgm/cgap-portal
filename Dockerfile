@@ -1,9 +1,10 @@
 # CGAP-Portal (Production) Dockerfile
 
 # Bullseye with Python 3.11.5
+# 2026-02-24: Update docker image to a Python 3.11.12 version;
 # 2023-09-28: Update docker image to a Python 3.11 version;
 # this was previously: FROM python:3.8.13-slim-buster
-FROM python:3.11.5-slim-bullseye
+FROM python:3.11.12-slim-bullseye
 
 MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
 
