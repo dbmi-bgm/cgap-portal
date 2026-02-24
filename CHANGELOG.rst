@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+16.3.0
+======
+
+* New base image
+
+
 16.2.0
 ======
 `PR 778: SN Add user <https://github.com/dbmi-bgm/cgap-portal/pull/778>`_
