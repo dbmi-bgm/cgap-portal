@@ -75,7 +75,7 @@ negspy = "0.2.24"
 # numpy = "^2.0.0"
 numpy = "^1.26.4"
 openpyxl = "^3.0.7,!=3.0.8"  # a version 3.0.8 appeared but then got withdrawn, for now just pin 3.0.7. try again later.
-packaging = ">=24.1"
+packaging = ">=24.2"
 passlib = "^1.7.4"
 PasteDeploy = "1.5.2"
 pbkdf2 = "1.3"
