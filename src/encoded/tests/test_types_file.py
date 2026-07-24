@@ -1,4 +1,5 @@
 import boto3
+import json
 import os
 import pytest
 import tempfile
@@ -32,15 +33,59 @@ def file(testapp, project, experiment, institution, file_formats):
     return res.json['@graph'][0]
 
 
-def test_external_creds():
+def _assume_role_response():
+    return {
+        'Credentials': {
+            'AccessKeyId': 'ASIAEXAMPLE',
+            'SecretAccessKey': 'secret',
+            'SessionToken': 'session',
+            'Expiration': '2026-07-24T00:00:00Z',
+        },
+        'AssumedRoleUser': {
+            'Arn': 'arn:aws:sts::123456789012:assumed-role/test-upload-role/name',
+            'AssumedRoleId': 'AROAEXAMPLE:name',
+        },
+        'ResponseMetadata': {'RequestId': 'request-id'},
+    }
 
-    with mock.patch.object(tf, 'boto3', autospec=True):
 
+def test_external_creds_assumes_upload_role_from_environment(monkeypatch):
+    role_arn = 'arn:aws:iam::123456789012:role/test-upload-role'
+    monkeypatch.delenv('IDENTITY', raising=False)
+    monkeypatch.setenv('S3_UPLOAD_ROLE_ARN', role_arn)
+    response = _assume_role_response()
+    sts = mock.Mock()
+    sts.assume_role.return_value = response
+
+    with mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.return_value = sts
         ret = external_creds('test-wfout-bucket', 'test-key', 'name')
-        assert ret['key'] == 'test-key'
-        assert ret['bucket'] == 'test-wfout-bucket'
-        assert ret['service'] == 's3'
-        assert 'upload_credentials' in ret.keys()
+
+    mocked_boto3.client.assert_called_once_with('sts')
+    sts.assume_role.assert_called_once()
+    assume_role_kwargs = sts.assume_role.call_args.kwargs
+    assert assume_role_kwargs['RoleArn'] == role_arn
+    assert assume_role_kwargs['RoleSessionName'] == 'name'
+    assert json.loads(assume_role_kwargs['Policy'])['Statement'][0]['Resource'] == \
+        'arn:aws:s3:::test-wfout-bucket/test-key'
+    assert ret['upload_credentials']['federated_user_arn'] == response['AssumedRoleUser']['Arn']
+    assert ret['upload_credentials']['federated_user_id'] == response['AssumedRoleUser']['AssumedRoleId']
+
+
+def test_external_creds_assumes_upload_role_from_identity(monkeypatch):
+    role_arn = 'arn:aws:iam::123456789012:role/identity-upload-role'
+    monkeypatch.setenv('IDENTITY', 'test-identity')
+    monkeypatch.delenv('S3_UPLOAD_ROLE_ARN', raising=False)
+    response = _assume_role_response()
+    sts = mock.Mock()
+    sts.assume_role.return_value = response
+
+    with mock.patch.object(tf, 'assume_identity', return_value={'S3_UPLOAD_ROLE_ARN': role_arn}), \
+            mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.return_value = sts
+        external_creds('test-wfout-bucket', 'test-key', 'name')
+
+    assert sts.assume_role.call_args.kwargs['RoleArn'] == role_arn
 
 
 def test_force_beanstalk_env():
