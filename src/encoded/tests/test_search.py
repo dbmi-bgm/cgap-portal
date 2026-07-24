@@ -4,6 +4,7 @@ import webtest
 
 from datetime import datetime, timedelta
 from urllib.parse import urlencode
+from uuid import uuid4
 from dcicutils.misc_utils import Retry, ignored, local_attrs
 from dcicutils.qa_utils import notice_pytest_fixtures
 from pyramid.httpexceptions import HTTPBadRequest
@@ -1468,6 +1469,7 @@ def bucket_range_data_raw():
 def bucket_range_data(workbook, es_testapp, bucket_range_data_raw):
     uuids = []
     for entry in bucket_range_data_raw:
+        entry = dict(entry, uuid=str(uuid4()))
         response = es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
         uuids.append(response.json['@graph'][0]['uuid'])
     es_testapp.post_json('/index', {'record': False})
