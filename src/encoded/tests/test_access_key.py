@@ -121,9 +121,9 @@ def test_access_key_submitter_cannot_create_for_someone_else(anontestapp, submit
         '/access_key/', {'user': 'BOGUS'}, extra_environ=extra_environ, status=422)
 
 
-def _reset_access_key_as(anontestapp, access_key, user):
+def _reset_access_key_as(anontestapp, access_key, user_email):
     headers = {'Authorization': auth_header(access_key)}
-    extra_environ = {'REMOTE_USER': str(user['email'])}  # Must be native string for Python 2.7
+    extra_environ = {'REMOTE_USER': str(user_email)}  # Must be native string for Python 2.7
     res = anontestapp.post_json(
         access_key['@id'] + '@@reset-secret', {}, extra_environ=extra_environ)
     new_headers = {
@@ -135,11 +135,11 @@ def _reset_access_key_as(anontestapp, access_key, user):
 
 
 def test_access_key_reset_allows_owner(anontestapp, access_key, bgm_user):
-    _reset_access_key_as(anontestapp, access_key, bgm_user)
+    _reset_access_key_as(anontestapp, access_key, bgm_user['email'])
 
 
-def test_access_key_reset_allows_admin(anontestapp, access_key, admin_persona):
-    _reset_access_key_as(anontestapp, access_key, admin_persona)
+def test_access_key_reset_allows_admin(anontestapp, access_key):
+    _reset_access_key_as(anontestapp, access_key, 'TEST')
 
 
 def test_access_key_reset_denies_non_owner(anontestapp, access_key, submitter):
