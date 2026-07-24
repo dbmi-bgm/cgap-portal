@@ -400,6 +400,9 @@ class TestingBucketRangeFacets(Item):
     schema = {
         'type': 'object',
         'properties': {
+            'bucket_range_fixture_id': {
+                'type': 'string'
+            },
             'no_value_integer': {
                 'type': 'integer',
                 'add_no_value': True  # if a range query is specified on this field, include documents that

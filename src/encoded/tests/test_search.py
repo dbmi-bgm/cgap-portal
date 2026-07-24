@@ -1467,19 +1467,18 @@ def bucket_range_data_raw():
 
 @pytest.fixture(scope='session')  # XXX: consider scope further - Will 11/5/2020
 def bucket_range_data(workbook, es_testapp, bucket_range_data_raw):
-    uuids = []
+    fixture_id = str(uuid4())
     for entry in bucket_range_data_raw:
-        entry = dict(entry, uuid=str(uuid4()))
-        response = es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
-        uuids.append(response.json['@graph'][0]['uuid'])
+        entry = dict(entry, bucket_range_fixture_id=fixture_id)
+        es_testapp.post_json('/TestingBucketRangeFacets', entry, status=201)
     es_testapp.post_json('/index', {'record': False})
-    return uuids
+    return fixture_id
 
 
-def bucket_range_search_url(uuids, extra_params=''):
+def bucket_range_search_url(fixture_id, extra_params=''):
     """Build a search URL limited to the records created by bucket_range_data."""
-    uuid_params = urlencode([('uuid', item_uuid) for item_uuid in uuids])
-    return '/search/?type=TestingBucketRangeFacets&%s%s' % (uuid_params, extra_params)
+    fixture_filter = urlencode({'bucket_range_fixture_id': fixture_id})
+    return '/search/?type=TestingBucketRangeFacets&%s%s' % (fixture_filter, extra_params)
 
 
 class TestSearchBucketRangeFacets:
@@ -1509,9 +1508,10 @@ class TestSearchBucketRangeFacets:
                 break
         return result
 
-    def test_search_bucket_range_is_scoped_to_fixture_data(self, workbook, es_testapp, bucket_range_data):
+    def test_search_bucket_range_is_scoped_to_fixture_data(self, workbook, es_testapp, bucket_range_data,
+                                                           bucket_range_data_raw):
         res = es_testapp.get(bucket_range_search_url(bucket_range_data)).json
-        assert res['total'] == len(bucket_range_data)
+        assert res['total'] == len(bucket_range_data_raw)
 
     @pytest.mark.parametrize('expected_fields, expected_counts', [
         (['special_integer'], 5),
