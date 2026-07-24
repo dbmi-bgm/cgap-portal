@@ -1,3 +1,5 @@
+from types import SimpleNamespace
+
 import boto3
 import json
 import os
@@ -31,6 +33,31 @@ def file(testapp, project, experiment, institution, file_formats):
     }
     res = testapp.post_json('/file_fastq', item)
     return res.json['@graph'][0]
+
+
+def test_file_fastq_generates_accession_without_duplicate(file_fastq):
+    accession = file_fastq['accession']
+    assert accession.startswith('GAPFI')
+    assert len(accession) == 12
+
+
+def test_file_unique_keys_handle_alternate_and_replaced_accessions():
+    file_item = object.__new__(tf.File)
+    file_item.type_info = SimpleNamespace(schema_keys={})
+
+    properties = {
+        'accession': 'GAPFI1234567',
+        'alternate_accessions': ['GAPFI7654321'],
+        'status': 'in review',
+    }
+    assert file_item.unique_keys(properties) == {
+        'accession': ['GAPFI7654321', 'GAPFI1234567'],
+    }
+
+    replaced_properties = dict(properties, status='replaced')
+    assert file_item.unique_keys(replaced_properties) == {
+        'accession': ['GAPFI7654321'],
+    }
 
 
 def _assume_role_response():
