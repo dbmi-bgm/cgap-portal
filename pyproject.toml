@@ -132,7 +132,7 @@ WebOb = "^1.8.7"
 WebTest = "^2.0.35"
 WSGIProxy2 = "0.4.2"
 "zope.deprecation" = "^4.4.0"
-"zope.interface" = ">=4.7.2,<6"
+"zope.interface" = ">=4.7.2,<5"
 "zope.sqlalchemy" = "1.6"
 
 [tool.poetry.dev-dependencies]
