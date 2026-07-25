@@ -8,7 +8,6 @@ from snovault.ingestion.ingestion_processors import ingestion_processor
 from snovault.types.ingestion import SubmissionFolio
 from ..submit import submit_metadata_bundle
 from ..submit_genelist import submit_genelist, submit_variant_update
-from ..s3_diagnostics import log_genelist_s3_client_diagnostics
 
 
 log = structlog.getLogger(__name__)
@@ -23,7 +22,6 @@ def handle_genelist(submission: SubmissionFolio):
 
     with submission.processing_context():
         s3_client = submission.s3_client
-        log_genelist_s3_client_diagnostics(s3_client)
         submission_id = submission.submission_id
         institution = get_parameter(submission.parameters, 'institution')
         project = get_parameter(submission.parameters, 'project')

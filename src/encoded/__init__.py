@@ -26,7 +26,6 @@ from .s3_client import (
     install_snovault_ingestion_s3_client,
     install_snovault_s3_client,
 )
-from .s3_diagnostics import install_snovault_ingestion_s3_diagnostics
 from snovault.loadxl import load_all
 
 
@@ -208,7 +207,6 @@ def main(global_config, **local_config):
     config.include('.visualization')
     config.include('snovault.ingestion.ingestion_listener')
     install_snovault_ingestion_s3_client()
-    install_snovault_ingestion_s3_diagnostics()
     config.include('.ingestion.ingestion_message_handler_vcf')
     config.include('snovault.ingestion.ingestion_message_handler_default')
     config.include('.ingestion.ingestion_processors')
