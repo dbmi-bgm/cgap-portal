@@ -1,20 +1,14 @@
+# syntax=docker/dockerfile:1.7
 # CGAP-Portal (Production) Dockerfile
 
-# Bullseye with Python 3.11.5
-# 2023-09-28: Update docker image to a Python 3.11 version;
-# this was previously: FROM python:3.8.13-slim-buster
-FROM python:3.11.5-slim-bullseye
+# Keep the CGAP base image and tool versions; only the build is split into
+# builder/runtime stages so compilers and front-end build dependencies do not
+# ship in the production image.
+ARG BASE_IMAGE=python:3.11.5-slim-bullseye
 
-MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
+FROM ${BASE_IMAGE} AS builder
 
-# Build Arguments
-ARG INI_BASE
-ENV INI_BASE=${INI_BASE:-"cgap_any_alpha.ini"}
-
-# Configure (global) Env
-# Note that some important versions are pinned in this statement
-ENV NGINX_USER=nginx \
-    DEBIAN_FRONTEND=noninteractive \
+ENV DEBIAN_FRONTEND=noninteractive \
     CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
     PYTHONFAULTHANDLER=1 \
     PYTHONUNBUFFERED=1 \
@@ -25,22 +19,15 @@ ENV NGINX_USER=nginx \
     NVM_VERSION=v0.39.1 \
     NODE_VERSION=20.17.0
 
-# Configure Python3.7 venv
 ENV VIRTUAL_ENV=/opt/venv
 RUN python -m venv /opt/venv
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-# Install system level dependencies (poetry, nvm, nginx)
-# Note that the ordering of these operations is intentional to minimize package footprint
+# Build-only system dependencies, Poetry, and Node.
 WORKDIR /home/nginx/.nvm
 ENV NVM_DIR=/home/nginx/.nvm
-COPY deploy/docker/production/install_nginx_bullseye.sh /install_nginx.sh
-
-# Temporarily replacing
-#     curl -sSL https://install.python-poetry.org | POETRY_HOME=/opt/venv python - && \
-# with
-#     pip install poetry==1.1.15
-# because of a problem with wheel compatibility in 1.2.0. Need to debug that later. -kmp 31-Aug-2022
+RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Pipeline-Depth "0";' >> /etc/apt/apt.conf.d/80-retries
 RUN apt-get update && apt-get upgrade -y && \
     apt-get install -y --no-install-recommends vim emacs net-tools ca-certificates build-essential \
     gcc zlib1g-dev postgresql-client libpq-dev git make curl libmagic-dev && \
@@ -49,56 +36,78 @@ RUN apt-get update && apt-get upgrade -y && \
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/${NVM_VERSION}/install.sh | bash && \
     . "$NVM_DIR/nvm.sh" && nvm install ${NODE_VERSION} && \
     nvm use v${NODE_VERSION} && \
-    nvm alias default v${NODE_VERSION} && \
-    curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
-
-# Install nginx
-RUN bash /install_nginx.sh && \
-    chown -R nginx:nginx /opt/venv && \
-    mkdir -p /home/nginx/cgap-portal && \
-    mv aws-ip-ranges.json /home/nginx/cgap-portal/aws-ip-ranges.json && \
-    # uninstalled by nginx install, but needed later for npm install
-    apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
-    apt-get clean
-
-# Link, verify installations
+    nvm alias default v${NODE_VERSION}
 ENV PATH="/home/nginx/.nvm/versions/node/v${NODE_VERSION}/bin/:${PATH}"
 
-# Build application
 WORKDIR /home/nginx/cgap-portal
 
-# Do the back-end dependency install
-COPY pyproject.toml .
-COPY poetry.lock .
-RUN poetry install --no-root --no-dev
+# Install locked back-end and front-end dependencies before copying source so
+# code-only changes retain the expensive dependency layers.
+COPY pyproject.toml poetry.lock poetry.toml ./
+RUN --mount=type=cache,target=/root/.cache/pypoetry \
+    --mount=type=cache,target=/root/.cache/pip \
+    poetry install --no-root --no-dev
 
-# Do the front-end dependency install
-COPY package.json .
-COPY package-lock.json .
-RUN npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python && npm cache clean --force
+COPY package.json package-lock.json ./
+RUN --mount=type=cache,target=/root/.npm \
+    npm ci --no-fund --no-progress --no-optional --no-audit --python=/opt/venv/bin/python
 
-# Copy over the rest of the code
 COPY . .
-
-# Build remaining back-end
-RUN poetry install --no-dev -vvv && \
+RUN --mount=type=cache,target=/root/.cache/pypoetry \
+    poetry install --no-dev -vvv && \
     python setup_eb.py develop && \
     make fix-dist-info
 
-# Build front-end, remove node_modules when done
 ENV NODE_ENV=production
 RUN npm run build && \
     npm run build-scss && \
-    rm -rf node_modules/ && \
-    apt-get remove --purge --auto-remove -y ca-certificates
+    rm -rf node_modules/
 
-# Copy config files in (down here for quick debugging)
-# Remove default configuration from Nginx
-RUN rm /etc/nginx/nginx.conf && \
-    rm /etc/nginx/conf.d/default.conf
+# CGAP consumes this generated file from the application root at runtime.
+RUN curl -o aws-ip-ranges.json https://ip-ranges.amazonaws.com/ip-ranges.json
+
+FROM ${BASE_IMAGE} AS runtime
+
+MAINTAINER William Ronchetti "william_ronchetti@hms.harvard.edu"
+
+# Build Arguments
+ARG INI_BASE
+ENV INI_BASE=${INI_BASE:-"cgap_any_alpha.ini"}
+
+ENV NGINX_USER=nginx \
+    DEBIAN_FRONTEND=noninteractive \
+    CRYPTOGRAPHY_DONT_BUILD_RUST=1 \
+    PYTHONFAULTHANDLER=1 \
+    PYTHONUNBUFFERED=1 \
+    PYTHONHASHSEED=random \
+    PIP_DISABLE_PIP_VERSION_CHECK=on \
+    PIP_DEFAULT_TIMEOUT=100 \
+    VIRTUAL_ENV=/opt/venv \
+    NODE_VERSION=20.17.0
+ENV NODE_DIR=/home/nginx/.nvm/versions/node/v${NODE_VERSION}
+ENV PATH="$VIRTUAL_ENV/bin:${NODE_DIR}/bin:$PATH"
+
+RUN echo 'Acquire::Retries "5";' > /etc/apt/apt.conf.d/80-retries && \
+    echo 'Acquire::http::Pipeline-Depth "0";' >> /etc/apt/apt.conf.d/80-retries
+
+# Runtime dependencies only. libpq5 remains because CGAP includes the source
+# psycopg2 package as well as psycopg2-binary; headers and compilers stay above.
+RUN apt-get update && apt-get upgrade -y && \
+    apt-get install -y --no-install-recommends ca-certificates git make libmagic1 libpq5 && \
+    apt-get clean
+
+# Install CGAP's pinned nginx.org packages with its existing signed-by keyring
+# verification. Do not replace this with an unverified or distro-default source.
+COPY deploy/docker/production/install_nginx_bullseye.sh /install_nginx.sh
+RUN bash /install_nginx.sh && \
+    apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
+    apt-get clean
+
+# Remove packaged nginx defaults and install CGAP's configuration.
+RUN rm -f /etc/nginx/nginx.conf /etc/nginx/conf.d/default.conf
 COPY deploy/docker/production/nginx.conf /etc/nginx/nginx.conf
 
-# nginx filesystem setup
+# nginx and CGAP's cache/log/pid paths are writable by the non-root runtime user.
 RUN chown -R nginx:nginx /var/cache/nginx && \
     chown -R nginx:nginx /var/log/nginx && \
     chown -R nginx:nginx /etc/nginx/conf.d && \
@@ -112,42 +121,31 @@ RUN chown -R nginx:nginx /var/cache/nginx && \
     mkdir -p /data/nginx/cache && \
     chown -R nginx:nginx /data/nginx/cache
 
-# Pull all required files
-# Note that *.ini must match the env name in secrets manager!
-# Note that deploy/docker/production/entrypoint.sh resolves which entrypoint to run
-# based on env variable "application_type".
-# For now, this is mastertest. - Will 04/29/21
-COPY deploy/docker/local/docker_development.ini development.ini
-COPY deploy/docker/local/entrypoint.sh entrypoint_local.sh
-RUN chown nginx:nginx development.ini
-RUN chmod +x entrypoint_local.sh
+WORKDIR /home/nginx/cgap-portal
 
-# Production setup
-RUN chown nginx:nginx poetry.toml && \
-    touch production.ini && \
-    chown nginx:nginx production.ini && \
-    touch session-secret.b64 && \
-    chown nginx:nginx session-secret.b64 &&  \
-    touch supervisord.log && \
-    chown nginx:nginx supervisord.log && \
-    touch supervisord.sock && \
-    chown nginx:nginx supervisord.sock && \
-    touch supervisord.pid && \
-    chown nginx:nginx supervisord.pid
-COPY deploy/docker/production/$INI_BASE deploy/ini_files/.
-COPY deploy/docker/production/entrypoint.sh .
-COPY deploy/docker/production/entrypoint_portal.sh .
-COPY deploy/docker/production/entrypoint_deployment.sh .
-COPY deploy/docker/production/entrypoint_indexer.sh .
-COPY deploy/docker/production/entrypoint_ingester.sh .
-COPY deploy/docker/production/supervisord.conf .
-COPY deploy/docker/production/assume_identity.py .
-RUN chmod +x entrypoint.sh && \
-    chmod +x entrypoint_deployment.sh && \
-    chmod +x entrypoint_deployment.sh && \
-    chmod +x entrypoint_indexer.sh && \
-    chmod +x entrypoint_ingester.sh && \
-    chmod +x assume_identity.py
+# Copy only the built application, venv, and Node runtime from the builder.
+COPY --chown=nginx:nginx --from=builder /opt/venv /opt/venv
+COPY --chown=nginx:nginx --from=builder /home/nginx/cgap-portal /home/nginx/cgap-portal
+COPY --chown=nginx:nginx --from=builder ${NODE_DIR} ${NODE_DIR}
+
+# CGAP-specific configuration and entrypoints.
+COPY --chown=nginx:nginx deploy/docker/local/docker_development.ini development.ini
+COPY --chown=nginx:nginx deploy/docker/local/entrypoint.sh entrypoint_local.sh
+COPY --chown=nginx:nginx deploy/docker/production/$INI_BASE deploy/ini_files/.
+COPY --chown=nginx:nginx deploy/docker/production/entrypoint.sh .
+COPY --chown=nginx:nginx deploy/docker/production/entrypoint_portal.sh .
+COPY --chown=nginx:nginx deploy/docker/production/entrypoint_deployment.sh .
+COPY --chown=nginx:nginx deploy/docker/production/entrypoint_indexer.sh .
+COPY --chown=nginx:nginx deploy/docker/production/entrypoint_ingester.sh .
+COPY --chown=nginx:nginx deploy/docker/production/supervisord.conf .
+COPY --chown=nginx:nginx deploy/docker/production/assume_identity.py .
+
+RUN touch production.ini session-secret.b64 supervisord.log supervisord.sock supervisord.pid && \
+    chown nginx:nginx production.ini session-secret.b64 supervisord.log supervisord.sock supervisord.pid && \
+    chmod +x entrypoint.sh entrypoint_local.sh entrypoint_portal.sh \
+             entrypoint_deployment.sh entrypoint_indexer.sh entrypoint_ingester.sh \
+             assume_identity.py
+
 EXPOSE 8000
 
 # Container does not run as root

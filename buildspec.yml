@@ -1,5 +1,14 @@
 version: 0.2
 
+# The production Dockerfile uses BuildKit cache mounts in its builder stage.
+env:
+  variables:
+    DOCKER_BUILDKIT: "1"
+
+cache:
+  modes:
+    - LOCAL_DOCKER_LAYER_CACHE
+
 phases:
   pre_build:
     commands:

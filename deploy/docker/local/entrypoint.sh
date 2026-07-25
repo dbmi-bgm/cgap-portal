@@ -15,8 +15,8 @@ if [  -z ${TEST+x} ]; then
 
     fi
 
-    # Start nginx proxy
-    service nginx start
+    # Start nginx proxy; the production portal runs nginx under supervisord.
+    /usr/sbin/nginx
 
     # Start application
     make deploy2
