@@ -27,6 +27,7 @@ jobs:
 
     # Build matrix
     strategy:
+      fail-fast: true
       matrix:
         test_type: ['UNIT', 'INDEX', 'DOCKER']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
