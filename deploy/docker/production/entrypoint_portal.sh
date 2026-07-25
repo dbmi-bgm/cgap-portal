@@ -6,9 +6,6 @@ echo "Starting up CGAP-Portal WSGI"
 # secrets manager - this builds production.ini
 poetry run python -m assume_identity
 
-# Start nginx proxy
-service nginx start
-
-# Start application workers
+# Start application workers and nginx (nginx runs in the foreground under supervisord)
 echo "Starting supervisor"
 supervisord -c supervisord.conf

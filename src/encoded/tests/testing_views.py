@@ -400,6 +400,9 @@ class TestingBucketRangeFacets(Item):
     schema = {
         'type': 'object',
         'properties': {
+            'bucket_range_fixture_id': {
+                'type': 'string'
+            },
             'no_value_integer': {
                 'type': 'integer',
                 'add_no_value': True  # if a range query is specified on this field, include documents that
@@ -440,12 +443,13 @@ class TestingBucketRangeFacets(Item):
             }
         },
         'facets': {
+            # Snovault range facets include integer upper bounds; keep adjacent ranges disjoint.
             'no_value_integer': {
                 'title': 'No value integer',
                 'aggregation_type': 'range',
                 'ranges': [
-                    {'from': 0, 'to': 5},
-                    {'from': 5, 'to': 10}
+                    {'from': 0, 'to': 4},
+                    {'from': 5, 'to': 9}
                 ]
             },
             'no_value_integer_array': {
@@ -453,32 +457,32 @@ class TestingBucketRangeFacets(Item):
                 'aggregation_type': 'range',
                 'ranges': [
                     {'from': 0, 'to': 0},  # test zero range faceting behavior
-                    {'from': 0, 'to': 5},
-                    {'from': 5, 'to': 10}
+                    {'from': 0, 'to': 4},
+                    {'from': 5, 'to': 9}
                 ]
             },
             'special_integer': {
                 'title': 'Special Integer',
                 'aggregation_type': 'range',
                 'ranges': [
-                    {'from': 0, 'to': 5},
-                    {'from': 5, 'to': 10}
+                    {'from': 0, 'to': 4},
+                    {'from': 5, 'to': 9}
                 ]
             },
             'special_object_that_holds_integer.embedded_integer': {
                 'title': 'Single Object Embedded Integer',
                 'aggregation_type': 'range',
                 'ranges': [
-                    {'from': 0, 'to': 5},
-                    {'from': 5, 'to': 10}
+                    {'from': 0, 'to': 4},
+                    {'from': 5, 'to': 9}
                 ]
             },
             'array_of_objects_that_holds_integer.embedded_integer': {
                 'title': 'Array of Objects Embedded Integer',
                 'aggregation_type': 'range',
                 'ranges': [
-                    {'from': 0, 'to': 5, 'label': 'Low'},
-                    {'from': 5, 'to': 10, 'label': 'High'}
+                    {'from': 0, 'to': 4, 'label': 'Low'},
+                    {'from': 5, 'to': 9, 'label': 'High'}
                 ]
             }
         }

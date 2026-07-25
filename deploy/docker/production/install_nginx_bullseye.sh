@@ -11,16 +11,24 @@ set -x \
     && apt-get update \
     && apt-get install --no-install-recommends --no-install-suggests -y gnupg2 ca-certificates \
     && \
-    NGINX_GPGKEY=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62; \
-    found=''; \
-    for server in \
-        hkp://keyserver.ubuntu.com:80 \
-        pgp.mit.edu \
-    ; do \
-        echo "Fetching GPG key $NGINX_GPGKEY from $server"; \
-        apt-key adv --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$NGINX_GPGKEY" && found=yes && break; \
+    NGINX_GPGKEYS="573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 8540A6F18833A80E9C1653A42FD21310B49F6B46 9E9BE90EACBCDE69FE9B204CBCDCD8A38D88A2B3"; \
+    NGINX_GPGKEY_PATH=/etc/apt/keyrings/nginx-archive-keyring.gpg; \
+    mkdir -p "$(dirname "$NGINX_GPGKEY_PATH")"; \
+    GNUPGHOME="$(mktemp -d)"; \
+    export GNUPGHOME; \
+    for NGINX_GPGKEY in $NGINX_GPGKEYS; do \
+        found=''; \
+        for server in \
+            hkp://keyserver.ubuntu.com:80 \
+            pgp.mit.edu \
+        ; do \
+            echo "Fetching GPG key $NGINX_GPGKEY from $server"; \
+            gpg --batch --keyserver "$server" --keyserver-options timeout=10 --recv-keys "$NGINX_GPGKEY" && found=yes && break; \
+        done; \
+        test -z "$found" && echo >&2 "error: failed to fetch GPG key $NGINX_GPGKEY" && exit 1; \
     done; \
-    test -z "$found" && echo >&2 "error: failed to fetch GPG key $NGINX_GPGKEY" && exit 1; \
+    gpg --batch --export $NGINX_GPGKEYS > "$NGINX_GPGKEY_PATH"; \
+    rm -rf "$GNUPGHOME"; \
     apt-get remove --purge --auto-remove -y gnupg2 && rm -rf /var/lib/apt/lists/* \
     && dpkgArch="$(dpkg --print-architecture)" \
     && nginxPackages=" \
@@ -32,11 +40,11 @@ set -x \
     " \
     && case "$dpkgArch" in \
         amd64|arm64) \
-            echo "deb https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
+            echo "deb [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
             && apt-get update \
             ;; \
         *) \
-            echo "deb-src https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
+            echo "deb-src [signed-by=$NGINX_GPGKEY_PATH] https://nginx.org/packages/mainline/debian/ bullseye nginx" >> /etc/apt/sources.list.d/nginx.list \
             \
             && tempDir="$(mktemp -d)" \
             && chmod 777 "$tempDir" \

@@ -728,7 +728,9 @@ class SampleForQc(ItemProperties):
         for processed_file_atid in self.processed_files[::-1]:  # Most recent last
             processed_file = FileForQc(processed_file_atid, self.request)
             if processed_file.is_bam():
-                result.append(processed_file.create_quality_metric_for_qc(BamQc))
+                quality_metric = processed_file.create_quality_metric_for_qc(BamQc)
+                if quality_metric:
+                    result.append(quality_metric)
                 break
         return result
 

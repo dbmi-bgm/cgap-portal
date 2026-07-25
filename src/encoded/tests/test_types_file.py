@@ -1,4 +1,7 @@
+from types import SimpleNamespace
+
 import boto3
+import json
 import os
 import pytest
 import tempfile
@@ -7,7 +10,7 @@ import tempfile
 from unittest import mock
 from .. import source_beanstalk_env_vars
 from ..types import file as tf
-from ..types.file import external_creds  # , FileFastq, post_upload
+from ..types.file import external_creds, make_s3_upload_client  # , FileFastq, post_upload
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -32,15 +35,130 @@ def file(testapp, project, experiment, institution, file_formats):
     return res.json['@graph'][0]
 
 
-def test_external_creds():
+def test_file_fastq_generates_accession_without_duplicate(file_fastq):
+    accession = file_fastq['accession']
+    assert accession.startswith('GAPFI')
+    assert len(accession) == 12
 
-    with mock.patch.object(tf, 'boto3', autospec=True):
 
+def test_file_unique_keys_handle_alternate_and_replaced_accessions():
+    file_item = object.__new__(tf.File)
+    file_item.type_info = SimpleNamespace(schema_keys={})
+
+    properties = {
+        'accession': 'GAPFI1234567',
+        'alternate_accessions': ['GAPFI7654321'],
+        'status': 'in review',
+    }
+    assert file_item.unique_keys(properties) == {
+        'accession': ['GAPFI7654321', 'GAPFI1234567'],
+    }
+
+    replaced_properties = dict(properties, status='replaced')
+    assert file_item.unique_keys(replaced_properties) == {
+        'accession': ['GAPFI7654321'],
+    }
+
+
+def _assume_role_response():
+    return {
+        'Credentials': {
+            'AccessKeyId': 'ASIAEXAMPLE',
+            'SecretAccessKey': 'secret',
+            'SessionToken': 'session',
+            'Expiration': '2026-07-24T00:00:00Z',
+        },
+        'AssumedRoleUser': {
+            'Arn': 'arn:aws:sts::123456789012:assumed-role/test-upload-role/name',
+            'AssumedRoleId': 'AROAEXAMPLE:name',
+        },
+        'ResponseMetadata': {'RequestId': 'request-id'},
+    }
+
+
+def test_external_creds_assumes_upload_role_from_environment(monkeypatch):
+    role_arn = 'arn:aws:iam::123456789012:role/test-upload-role'
+    monkeypatch.delenv('IDENTITY', raising=False)
+    monkeypatch.setenv('S3_UPLOAD_ROLE_ARN', role_arn)
+    response = _assume_role_response()
+    sts = mock.Mock()
+    sts.assume_role.return_value = response
+
+    with mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.return_value = sts
         ret = external_creds('test-wfout-bucket', 'test-key', 'name')
-        assert ret['key'] == 'test-key'
-        assert ret['bucket'] == 'test-wfout-bucket'
-        assert ret['service'] == 's3'
-        assert 'upload_credentials' in ret.keys()
+
+    mocked_boto3.client.assert_called_once_with('sts')
+    sts.assume_role.assert_called_once()
+    assume_role_kwargs = sts.assume_role.call_args.kwargs
+    assert assume_role_kwargs['RoleArn'] == role_arn
+    assert assume_role_kwargs['RoleSessionName'] == 'name'
+    assert json.loads(assume_role_kwargs['Policy'])['Statement'][0]['Resource'] == \
+        'arn:aws:s3:::test-wfout-bucket/test-key'
+    assert ret['upload_credentials']['federated_user_arn'] == response['AssumedRoleUser']['Arn']
+    assert ret['upload_credentials']['federated_user_id'] == response['AssumedRoleUser']['AssumedRoleId']
+
+
+def test_external_creds_assumes_upload_role_from_identity(monkeypatch):
+    role_arn = 'arn:aws:iam::123456789012:role/identity-upload-role'
+    monkeypatch.setenv('IDENTITY', 'test-identity')
+    monkeypatch.delenv('S3_UPLOAD_ROLE_ARN', raising=False)
+    response = _assume_role_response()
+    sts = mock.Mock()
+    sts.assume_role.return_value = response
+
+    with mock.patch.object(tf, 'assume_identity', return_value={'S3_UPLOAD_ROLE_ARN': role_arn}), \
+            mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.return_value = sts
+        external_creds('test-wfout-bucket', 'test-key', 'name')
+
+    mocked_boto3.client.assert_called_once_with('sts')
+    assert sts.assume_role.call_args.kwargs['RoleArn'] == role_arn
+
+
+def test_s3_upload_client_uses_assumed_session_credentials_not_gac_keys(monkeypatch):
+    role_arn = 'arn:aws:iam::123456789012:role/test-upload-role'
+    monkeypatch.setenv('IDENTITY', 'test-identity')
+    response = _assume_role_response()
+    sts = mock.Mock()
+    sts.assume_role.return_value = response
+    s3 = mock.Mock()
+
+    with mock.patch.object(
+        tf,
+        'assume_identity',
+        return_value={
+            'S3_UPLOAD_ROLE_ARN': role_arn,
+            'S3_AWS_ACCESS_KEY_ID': 'obsolete-gac-access-key',
+            'S3_AWS_SECRET_ACCESS_KEY': 'obsolete-gac-secret-key',
+        },
+    ), mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.side_effect = [sts, s3]
+        assert make_s3_upload_client() is s3
+
+    mocked_boto3.client.assert_has_calls([
+        mock.call('sts'),
+        mock.call(
+            's3',
+            aws_access_key_id='ASIAEXAMPLE',
+            aws_secret_access_key='secret',
+            aws_session_token='session',
+        ),
+    ])
+    assert 'obsolete-gac-access-key' not in repr(mocked_boto3.client.call_args_list)
+    assert 'obsolete-gac-secret-key' not in repr(mocked_boto3.client.call_args_list)
+
+
+def test_s3_upload_client_uses_ambient_provider_without_role(monkeypatch):
+    monkeypatch.delenv('IDENTITY', raising=False)
+    monkeypatch.delenv('S3_UPLOAD_ROLE_ARN', raising=False)
+    s3 = mock.Mock()
+
+    with mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.return_value = s3
+        assert make_s3_upload_client() is s3
+
+    mocked_boto3.client.assert_called_once_with('s3')
 
 
 def test_force_beanstalk_env():

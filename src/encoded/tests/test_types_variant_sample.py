@@ -100,11 +100,11 @@ def test_variant_sample_proband_inheritance(bgm_user_testapp, bgm_y_variant_samp
 @pytest.mark.integrated  # uses (cgap-devtest) s3
 def test_bam_snapshot_download(workbook, es_testapp, test_variant_sample):
     """ Tests that we can correctly download an IGV image from the wfoutput bucket. """
-    test_variant_sample['file'] += '2'
-    res = es_testapp.post_json(VARIANT_SAMPLE_URL, test_variant_sample, status=[201, 409]).json
+    variant_sample = dict(test_variant_sample, file=test_variant_sample['file'] + '2')
+    res = es_testapp.post_json(VARIANT_SAMPLE_URL, variant_sample, status=[201, 409]).json
     uuid = res['@graph'][0]['uuid']
     bam_snapshot_location = res['@graph'][0]['bam_snapshot']
-    assert bam_snapshot_location == test_variant_sample['file'] + '/bamsnap/chr1_12125898.png'
+    assert bam_snapshot_location == variant_sample['file'] + '/bamsnap/chr1_12125898.png'
     download = es_testapp.get('/' + uuid + '/@@download').location
     # download location is https://cgap-unit-testing-wfout.s3.amazonaws.com/dummy-file-name2/bamsnap/chr1_12125898.png
     resp = requests.get(download)

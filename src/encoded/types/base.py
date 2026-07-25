@@ -249,16 +249,6 @@ class Item(snovault.Item):
             return title + ' - ' + self.properties.get('accession')
         return title
 
-    def unique_keys(self, properties):
-        """smth."""
-        keys = super(Item, self).unique_keys(properties)
-        if 'accession' not in self.schema['properties']:
-            return keys
-        keys.setdefault('accession', []).extend(properties.get('alternate_accessions', []))
-        if properties.get('status') != 'replaced' and 'accession' in properties:
-            keys['accession'].append(properties['accession'])
-        return keys
-
     def is_update_by_admin_user(self):
         # determine if the submitter in the properties is an admin user
         userid = get_userid()

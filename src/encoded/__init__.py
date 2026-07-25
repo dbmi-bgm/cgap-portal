@@ -22,6 +22,10 @@ from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
 from .appdefs import APP_VERSION_REGISTRY_KEY
+from .s3_client import (
+    install_snovault_ingestion_s3_client,
+    install_snovault_s3_client,
+)
 from snovault.loadxl import load_all
 
 
@@ -188,6 +192,7 @@ def main(global_config, **local_config):
     config.include(configure_dbsession)
     config.include('snovault')
     config.commit()  # commit so search can override listing
+    install_snovault_s3_client()
 
     # Render an HTML page to browsers and a JSON document for API clients
     # config.include(add_schemas_to_html_responses)
@@ -201,6 +206,7 @@ def main(global_config, **local_config):
     config.include('snovault.loadxl')
     config.include('.visualization')
     config.include('snovault.ingestion.ingestion_listener')
+    install_snovault_ingestion_s3_client()
     config.include('.ingestion.ingestion_message_handler_vcf')
     config.include('snovault.ingestion.ingestion_message_handler_default')
     config.include('.ingestion.ingestion_processors')

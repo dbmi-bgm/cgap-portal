@@ -844,14 +844,15 @@ class TestSampleForQc:
         return self.sample_for_qc({})
 
     @pytest.mark.parametrize(
-        "is_bam_results",
+        "is_bam_results,quality_metric,expected",
         [
-            [],
-            [False],
-            [True, True, False],
+            ([], QcTestConstants.RESULT, []),
+            ([False], QcTestConstants.RESULT, []),
+            ([True, True, False], QcTestConstants.RESULT, [QcTestConstants.RESULT]),
+            ([True], None, []),
         ],
     )
-    def test_get_quality_metrics(self, is_bam_results):
+    def test_get_quality_metrics(self, is_bam_results, quality_metric, expected):
         """Test retrieval of relevant QualityMetric objects from
         processed files on the Sample.
 
@@ -867,9 +868,7 @@ class TestSampleForQc:
         ) as mocked_file:
             mocked_file_instance = mocked_file.return_value
             mocked_file_instance.is_bam.side_effect = is_bam_results
-            mocked_file_instance.create_quality_metric_for_qc.return_value = (
-                QcTestConstants.RESULT
-            )
+            mocked_file_instance.create_quality_metric_for_qc.return_value = quality_metric
             sample_for_qc = self.empty_sample_for_qc()
             sample_for_qc.processed_files = processed_file_atids
             result = sample_for_qc.get_quality_metrics()
@@ -878,10 +877,10 @@ class TestSampleForQc:
                 mocked_file_instance.create_quality_metric_for_qc.assert_called_once_with(
                     sample_type_module.BamQc
                 )
-                assert result == [QcTestConstants.RESULT]
+                assert result == expected
             else:
                 mocked_file_instance.create_quality_metric_for_qc.assert_not_called()
-                assert result == []
+                assert result == expected
 
 
 class TestItemQcProperties:

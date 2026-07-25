@@ -13,6 +13,9 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions: #Needed for OIDC authentication
+  id-token: write
+  contents: read   
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -24,6 +27,7 @@ jobs:
 
     # Build matrix
     strategy:
+      fail-fast: true
       matrix:
         test_type: ['UNIT', 'INDEX', 'DOCKER']
         # We are really not set up for these next two to be multiplicative, so be careful adding more.
@@ -60,16 +64,16 @@ jobs:
           node --version
           make build
       - name: Configure AWS Credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          role-to-assume: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           aws-region: us-east-1
 
       - name: QA (UNIT)
         if: ${{ matrix.test_type == 'UNIT' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          S3_UPLOAD_ROLE_ARN: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           TEST_JOB_ID: cgap-unit-test-${{ github.run_number }}-
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
@@ -91,6 +95,7 @@ jobs:
         if: ${{ matrix.test_type == 'INDEX' }}
         env:
           S3_ENCRYPT_KEY: ${{ secrets.S3_ENCRYPT_KEY }}
+          S3_UPLOAD_ROLE_ARN: ${{ secrets.AWS_OIDC_ROLE_ARN }}
           TEST_JOB_ID: cgap-idx-test-${{ github.run_number }}-
           GLOBAL_ENV_BUCKET: ${{ secrets.GLOBAL_ENV_BUCKET }}
           ACCOUNT_NUMBER: $ {{ secrets.ACCOUNT_NUMBER }}
@@ -108,7 +113,7 @@ jobs:
           poetry run wipe-test-indices $TEST_JOB_ID search-cgap-unit-testing-opensearch-tcs45cjpwgdzoi7pafr6oewq6u.us-east-1.es.amazonaws.com:443
 
       - name: Docker Build
-        if: ${{ matrix.test_type == 'DOCKER' && matrix.node_version == '18' && matrix.python_version == '3.11' }}
+        if: ${{ matrix.test_type == 'DOCKER' }}
         run: |
           touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
           docker build .
