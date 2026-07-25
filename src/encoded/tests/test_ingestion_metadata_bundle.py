@@ -48,6 +48,22 @@ class MockQueueManager:
 @contextlib.contextmanager
 def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test_pseudoenv, fake_tester_email):
 
+    mocked_sts_client = mock.Mock()
+    mocked_sts_client.assume_role.return_value = {
+        "Credentials": {
+            "AccessKeyId": "ASIAEXAMPLE",
+            "SecretAccessKey": "test-secret",
+            "SessionToken": "test-session",
+            "Expiration": "2026-07-25T00:00:00Z",
+        }
+    }
+
+    def mocked_boto3_client(service_name, **kwargs):
+        if service_name == "sts":
+            return mocked_sts_client
+        assert service_name == "s3"
+        return mocked_s3_client
+
     def mocked_get_trusted_email(request, context, raise_errors):
         assert context == "Submission"
         assert raise_errors is False
@@ -60,7 +76,7 @@ def authorized_ingestion_simulation(mocked_queue_manager, mocked_s3_client, test
         with mock.patch.object(ingestion_listener_module, "beanstalk_env_from_request",
                                return_value=test_pseudoenv):
             with mock.patch.object(qa_utils, "FILE_SYSTEM_VERBOSE", False):  # This should be a parameter but isn't
-                with mock.patch.object(boto3, "client", constantly(mocked_s3_client)):
+                with mock.patch.object(boto3, "client", mocked_boto3_client):
                     with mock.patch.object(ingestion_listener_module, "get_queue_manager",
                                            constantly(mocked_queue_manager)):
                         with mock.patch.object(util_module, "subrequest_item_creation",
