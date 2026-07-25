@@ -30,7 +30,10 @@ def test_snovault_shared_presign_uses_cgap_session_client(monkeypatch):
     monkeypatch.setattr(snovault_util, "make_s3_client", original)
 
     with patch('encoded.types.file.make_s3_upload_client', return_value=client) as factory:
-        assert install_snovault_s3_client(snovault_util)
+        install_snovault_s3_client(snovault_util)
+        assert getattr(
+            snovault_util.make_s3_client, "_cgap_s3_session_client", False
+        ) is True
         assert snovault_util.build_s3_presigned_get_url(
             params={'Bucket': 'test-bucket', 'Key': 'test-key'}
         ) == "presigned-url"
