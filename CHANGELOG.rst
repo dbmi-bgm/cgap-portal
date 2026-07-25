@@ -6,6 +6,12 @@ cgap-portal
 Change Log
 ----------
 
+17.0.0
+======
+
+* Update to OIDC role, use assume role where needed to remove iam user dependency
+
+
 16.2.0
 ======
 `PR 778: SN Add user <https://github.com/dbmi-bgm/cgap-portal/pull/778>`_
