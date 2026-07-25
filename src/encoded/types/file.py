@@ -92,6 +92,48 @@ def show_upload_credentials(request=None, context=None, status=None):
     return request.has_permission('edit', context)
 
 
+def _s3_upload_identity():
+    """Load the upload identity without reading its obsolete S3 key fields."""
+
+    return assume_identity() if 'IDENTITY' in os.environ else None
+
+
+def _s3_upload_role_arn(identity):
+    if identity is not None:
+        return identity.get('S3_UPLOAD_ROLE_ARN')
+    return os.environ.get('S3_UPLOAD_ROLE_ARN')
+
+
+def _assume_s3_upload_role(role_arn, role_session_name, policy=None):
+    assume_role_kwargs = {
+        'RoleArn': role_arn,
+        'RoleSessionName': role_session_name,
+    }
+    if policy is not None:
+        assume_role_kwargs['Policy'] = json.dumps(policy)
+    return boto3.client('sts').assume_role(**assume_role_kwargs)
+
+
+def make_s3_upload_client(role_session_name='cgap-genelist-upload'):
+    """Make an S3 client from the established ambient/AssumeRole upload path."""
+
+    identity = _s3_upload_identity()
+    role_arn = _s3_upload_role_arn(identity)
+    if not role_arn:
+        # In environments without S3_UPLOAD_ROLE_ARN, retain boto3's ambient
+        # provider chain (including its session token handling).
+        return boto3.client('s3')
+
+    token = _assume_s3_upload_role(role_arn, role_session_name)
+    credentials = token['Credentials']
+    return boto3.client(
+        's3',
+        aws_access_key_id=credentials['AccessKeyId'],
+        aws_secret_access_key=credentials['SecretAccessKey'],
+        aws_session_token=credentials['SessionToken'],
+    )
+
+
 def external_creds(bucket, key, name=None, profile_name=None):
     """
     if name is None, we want the link to s3 but no need to generate
@@ -114,8 +156,8 @@ def external_creds(bucket, key, name=None, profile_name=None):
             ]
         }
         # In the new environment, extract S3 Keys from global application configuration
-        if 'IDENTITY' in os.environ:
-            identity = assume_identity()
+        identity = _s3_upload_identity()
+        if identity is not None:
             s3_encrypt_key_id = identity.get('ENCODED_S3_ENCRYPT_KEY_ID')
             if s3_encrypt_key_id:  # must be used with ACCOUNT_NUMBER as well
                 policy['Statement'].append({  # NoQA - PyCharm doesn't like this append for some bogus reason
@@ -129,16 +171,11 @@ def external_creds(bucket, key, name=None, profile_name=None):
                     ],
                     'Resource': f'arn:aws:kms:{CGAP_ECR_REGION}:{identity["ACCOUNT_NUMBER"]}:key/{s3_encrypt_key_id}'
                 })
-            role_arn = identity.get('S3_UPLOAD_ROLE_ARN')
+            role_arn = _s3_upload_role_arn(identity)
         # In the old account, we are always passing IAM User creds so these will just work
         else:
             role_arn = os.environ.get('S3_UPLOAD_ROLE_ARN')
-        conn = boto3.client('sts')
-        token = conn.assume_role(
-            RoleArn=role_arn,
-            RoleSessionName=name,
-            Policy=json.dumps(policy)
-        )
+        token = _assume_s3_upload_role(role_arn, name, policy=policy)
         # 'access_key' 'secret_key' 'expiration' 'session_token'
         credentials = token.get('Credentials')
         # Convert Expiration datetime object to string via cast

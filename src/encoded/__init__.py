@@ -22,6 +22,7 @@ from snovault.elasticsearch import APP_FACTORY
 from snovault.elasticsearch.interfaces import INVALIDATION_SCOPE_ENABLED
 from dcicutils.misc_utils import VirtualApp
 from .appdefs import APP_VERSION_REGISTRY_KEY
+from .s3_client import install_snovault_ingestion_s3_client
 from .s3_diagnostics import install_snovault_ingestion_s3_diagnostics
 from snovault.loadxl import load_all
 
@@ -202,6 +203,7 @@ def main(global_config, **local_config):
     config.include('snovault.loadxl')
     config.include('.visualization')
     config.include('snovault.ingestion.ingestion_listener')
+    install_snovault_ingestion_s3_client()
     install_snovault_ingestion_s3_diagnostics()
     config.include('.ingestion.ingestion_message_handler_vcf')
     config.include('snovault.ingestion.ingestion_message_handler_default')

@@ -10,7 +10,7 @@ import tempfile
 from unittest import mock
 from .. import source_beanstalk_env_vars
 from ..types import file as tf
-from ..types.file import external_creds  # , FileFastq, post_upload
+from ..types.file import external_creds, make_s3_upload_client  # , FileFastq, post_upload
 
 
 pytestmark = [pytest.mark.setone, pytest.mark.working]
@@ -112,7 +112,53 @@ def test_external_creds_assumes_upload_role_from_identity(monkeypatch):
         mocked_boto3.client.return_value = sts
         external_creds('test-wfout-bucket', 'test-key', 'name')
 
+    mocked_boto3.client.assert_called_once_with('sts')
     assert sts.assume_role.call_args.kwargs['RoleArn'] == role_arn
+
+
+def test_s3_upload_client_uses_assumed_session_credentials_not_gac_keys(monkeypatch):
+    role_arn = 'arn:aws:iam::123456789012:role/test-upload-role'
+    monkeypatch.setenv('IDENTITY', 'test-identity')
+    response = _assume_role_response()
+    sts = mock.Mock()
+    sts.assume_role.return_value = response
+    s3 = mock.Mock()
+
+    with mock.patch.object(
+        tf,
+        'assume_identity',
+        return_value={
+            'S3_UPLOAD_ROLE_ARN': role_arn,
+            'S3_AWS_ACCESS_KEY_ID': 'obsolete-gac-access-key',
+            'S3_AWS_SECRET_ACCESS_KEY': 'obsolete-gac-secret-key',
+        },
+    ), mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.side_effect = [sts, s3]
+        assert make_s3_upload_client() is s3
+
+    mocked_boto3.client.assert_has_calls([
+        mock.call('sts'),
+        mock.call(
+            's3',
+            aws_access_key_id='ASIAEXAMPLE',
+            aws_secret_access_key='secret',
+            aws_session_token='session',
+        ),
+    ])
+    assert 'obsolete-gac-access-key' not in repr(mocked_boto3.client.call_args_list)
+    assert 'obsolete-gac-secret-key' not in repr(mocked_boto3.client.call_args_list)
+
+
+def test_s3_upload_client_uses_ambient_provider_without_role(monkeypatch):
+    monkeypatch.delenv('IDENTITY', raising=False)
+    monkeypatch.delenv('S3_UPLOAD_ROLE_ARN', raising=False)
+    s3 = mock.Mock()
+
+    with mock.patch.object(tf, 'boto3') as mocked_boto3:
+        mocked_boto3.client.return_value = s3
+        assert make_s3_upload_client() is s3
+
+    mocked_boto3.client.assert_called_once_with('s3')
 
 
 def test_force_beanstalk_env():
