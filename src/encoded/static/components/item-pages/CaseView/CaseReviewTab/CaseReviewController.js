@@ -11,9 +11,12 @@ import { getAllNotesFromVariantSample } from './../variant-sample-selection-pane
 export class CaseReviewController extends React.Component {
 
     static savedClassificationsByVS(variantSampleListItem){
-        const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
+        const {
+            variant_samples: snvVSObjects = [],
+            structural_variant_samples: cnvVSObjects = []
+        } = variantSampleListItem || {};
         const savedClassificationsByVS = {};
-        vsObjects.forEach(function({ variant_sample_item }){
+        snvVSObjects.concat(cnvVSObjects).forEach(function({ variant_sample_item }){
             const { uuid: vsUUID, finding_table_tag = null } = variant_sample_item;
             if (!vsUUID) {
                 return; // No view permission or similar.
@@ -248,6 +251,7 @@ export class CaseReviewSelectedNotesStore extends React.PureComponent {
                 return false;
             }
             // Ensure this Report is in `Note.associated_items`.
+            // TODO: Remove this check?
             const foundReportEntryInNote = _.findWhere(noteAssociatedItems, { "item_type": "Report", "item_identifier": reportUUID });
             if (!foundReportEntryInNote) {
                 return false;

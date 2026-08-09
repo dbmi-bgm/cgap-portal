@@ -49,7 +49,9 @@ export const ReportGenerationView = React.memo(function ReportGenerationView (pr
         });
     }, [ report_sections ]);
 
-    const { variant_samples: vsObjects = [] } = variantSampleListItem || {};
+    const {
+        variant_samples: vsObjects = []
+    } = variantSampleListItem || {};
     const variantSamples = vsObjects.map(function({ variant_sample_item }){
         return variant_sample_item;
     });
