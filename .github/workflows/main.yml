@@ -116,4 +116,7 @@ jobs:
         if: ${{ matrix.test_type == 'DOCKER' }}
         run: |
           touch deploy/docker/local/docker_development.ini  # cheap substitute for prepare-docker to make ignored file
-          docker build .
+          docker build -t cgap-portal-nginx-smoke .
+          # Smoke check: patched nginx is installed and the image's config parses (no network traffic).
+          docker run --rm --entrypoint nginx cgap-portal-nginx-smoke -v 2>&1 | tee /dev/stderr | grep -q 'nginx/1.31.9'
+          docker run --rm --entrypoint nginx cgap-portal-nginx-smoke -t

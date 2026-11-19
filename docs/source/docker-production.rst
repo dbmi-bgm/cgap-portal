@@ -33,7 +33,7 @@ The production application configuration is in ``deploy/docker/production``. A d
     * entrypoint_deployment.sh - deployment entrypoint
     * entrypoint_indexer.sh - indexer entrypoint
     * entrypoint_ingester.sh - ingester entrypoint
-    * install_nginx.sh - script for pulling in nginx
+    * install_nginx_bookworm.sh - script for pulling in nginx.org mainline packages (signature-verified) on the Debian bookworm base
     * cgap_any_alpha.ini - base ini file used to build production.ini on the server given variables set in the GAC
     * nginx.conf - nginx configuration
 
