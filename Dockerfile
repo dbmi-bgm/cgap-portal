@@ -4,7 +4,7 @@
 # Keep the CGAP base image and tool versions; only the build is split into
 # builder/runtime stages so compilers and front-end build dependencies do not
 # ship in the production image.
-ARG BASE_IMAGE=python:3.11.5-slim-bullseye
+ARG BASE_IMAGE=python:3.11.16-slim-bookworm
 
 FROM ${BASE_IMAGE} AS builder
 
@@ -98,7 +98,7 @@ RUN apt-get update && apt-get upgrade -y && \
 
 # Install CGAP's pinned nginx.org packages with its existing signed-by keyring
 # verification. Do not replace this with an unverified or distro-default source.
-COPY deploy/docker/production/install_nginx_bullseye.sh /install_nginx.sh
+COPY deploy/docker/production/install_nginx_bookworm.sh /install_nginx.sh
 RUN bash /install_nginx.sh && \
     apt-get update && apt-get install -y --no-install-recommends ca-certificates && \
     apt-get clean

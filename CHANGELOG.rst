@@ -6,6 +6,17 @@ cgap-portal
 Change Log
 ----------
 
+17.0.1
+======
+
+* Security: upgrade nginx to 1.31.9 (njs 1.0.2) to address CVE-2026-123633 (use-after-free in HTTP/2) and
+  CVE-2026-123007 (memory corruption in HTTP/2 flow control); see https://nginx.org/en/security_advisories.html
+* nginx.org's Debian bullseye mainline repository ends at 1.31.6, so the production image base moves from
+  ``python:3.11.5-slim-bullseye`` to ``python:3.11.16-slim-bookworm`` (Python 3.11 unchanged) and
+  ``install_nginx_bullseye.sh`` becomes ``install_nginx_bookworm.sh``, installing from the signature-verified
+  nginx.org mainline bookworm repository
+
+
 17.0.0
 ======
 
